@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "trendsearth_ui"
+version = "0.1.0"
+description = "A Dash app for viewing and managing the Trends.Earth GEF API"
+authors = ["Alex Zvoleff <azvoleff@conservation.org>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "trendsearth_ui"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+dash = "^2.17.0"
+dash-bootstrap-components = "^1.6.0"
+dash-ag-grid = "^31.0.0"
+pandas = "^2.2.0"
+requests = "^2.31.0"
+gunicorn = "^21.2.0"
+
+[tool.poetry.scripts]
+trendsearth-ui = "trendsearth_ui.app:app.run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
