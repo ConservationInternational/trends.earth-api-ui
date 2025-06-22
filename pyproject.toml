@@ -9,15 +9,16 @@ packages = [{include = "trendsearth_ui"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-dash = "^2.17.0"
+dash = ">=2.17.0,<4.0.0"
 dash-bootstrap-components = "^1.6.0"
 dash-ag-grid = "^31.0.0"
 pandas = "^2.2.0"
 requests = "^2.31.0"
 gunicorn = "^21.2.0"
+dash-leaflet = "^0.1.23"
 
 [tool.poetry.scripts]
-trendsearth-ui = "trendsearth_ui.app:app.run"
+trendsearth-ui = "trendsearth_ui.app:run"
 
 [build-system]
 requires = ["poetry-core"]

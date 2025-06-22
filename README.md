@@ -8,6 +8,22 @@ A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin f
 - View and edit users and scripts (admin only)
 - Browse executions, parameters, results, and logs
 - Paging and per-ID search for executions
+- **Map Visualization** - View execution areas on an interactive map:
+  - Click "Show Map" buttons in the Executions table to display processing areas
+  - Automatically parses GeoJSON data from execution parameters
+  - Interactive Leaflet map with area boundaries highlighted
+  - Automatically centers and zooms to show the processing area
+- **Status Dashboard** (admin only) - View system status with:
+  - Text summary from the most recent status log entry
+  - Interactive charts showing execution counts by status over time
+  - Three time period views: Last Hour, Last 24 Hours, Last Week
+  - Auto-refresh every 60 seconds
+- **Edit Functionality** (admin only) - Edit users and scripts directly from the tables:
+  - Click "Edit" buttons in Users table to modify user details (name, institution, country, role)
+  - Click "Edit" buttons in Scripts table to modify script details (name, description, publication status)
+  - Modal dialogs with form validation and error handling
+  - Automatic table refresh after successful edits
+  - Correctly identifies the selected user/script even when the table is sorted or filtered
 
 ## Installation
 
@@ -34,9 +50,19 @@ poetry install
 
 ### 4. Run the app
 
-#### Development mode (Poetry)
+#### Development mode (Direct Python)
+```bash
+python -m trendsearth_ui.app
+```
+
+#### Development mode (Poetry - if Poetry is properly configured)
 ```bash
 poetry run python -m trendsearth_ui.app
+```
+
+#### Using Poetry script (if Poetry is properly configured)
+```bash
+poetry run trendsearth-ui
 ```
 
 #### Production mode (Docker with Gunicorn)
