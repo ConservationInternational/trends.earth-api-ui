@@ -1,8 +1,10 @@
 # Trends.Earth GEF API Viewer
 
-[![Tests](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg)](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/tests.yml)
-[![Code Quality](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg)](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/quality.yml)
-[![codecov](https://codecov.io/gh/azvoleff/trends.earth-api-ui/branch/main/graph/badge.svg)](https://codecov.io/gh/azvoleff/trends.earth-api-ui)
+[![Tests](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml)
+[![Code Quality](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml)
+[![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
