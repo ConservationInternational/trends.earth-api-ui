@@ -17,9 +17,92 @@ requests = "^2.31.0"
 gunicorn = "^21.2.0"
 dash-leaflet = "^0.1.23"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-mock = "^3.10.0"
+pytest-cov = "^4.1.0"
+ruff = "^0.1.0"
+
 [tool.poetry.scripts]
-trendsearth-ui = "trendsearth_ui.app:run"
+trendsearth-ui = "trendsearth_ui.app:main"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    ".conda",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "ICN", # flake8-import-conventions
+]
+ignore = [
+    "E501",  # line too long, handled by formatter
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # ignore unused imports in __init__.py files
+"tests/*" = ["F401", "F811", "ARG", "SIM"]  # ignore unused imports and redefined names in tests
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.isort]
+known-first-party = ["trendsearth_ui"]
+force-single-line = false
+force-sort-within-sections = true
+single-line-exclusions = ["typing"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--color=yes"
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "functional: Functional tests",
+    "slow: Slow running tests",
+    "auth: Authentication related tests",
+    "ui: User interface tests",
+    "api: API related tests"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]

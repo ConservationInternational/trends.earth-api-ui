@@ -1,5 +1,9 @@
 # Trends.Earth GEF API Viewer
 
+[![Tests](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg)](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/tests.yml)
+[![Code Quality](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg)](https://github.com/azvoleff/trends.earth-api-ui/actions/workflows/quality.yml)
+[![codecov](https://codecov.io/gh/azvoleff/trends.earth-api-ui/branch/main/graph/badge.svg)](https://codecov.io/gh/azvoleff/trends.earth-api-ui)
+
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
 ## Features
@@ -91,6 +95,74 @@ The app will be available at:
 - Production: http://localhost:8000
 
 Health check endpoint: `/health`
+
+## Testing
+
+The project includes a comprehensive test suite with unit, integration, and functional tests.
+
+### Running Tests Locally
+
+#### Install test dependencies
+```bash
+pip install pytest pytest-mock pytest-cov
+```
+
+#### Run all tests
+```bash
+python -m pytest tests/ -v
+```
+
+#### Run tests by category
+```bash
+# Unit tests only
+python -m pytest tests/unit/ -v
+
+# Integration tests only  
+python -m pytest tests/integration/ -v
+
+# Functional tests only
+python -m pytest tests/functional/ -v
+```
+
+#### Run tests with coverage
+```bash
+python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=html --cov-report=term-missing
+```
+
+#### Run specific test file
+```bash
+python -m pytest tests/unit/test_config.py -v
+```
+
+### Test Structure
+
+- **`tests/unit/`** - Unit tests for individual components and utilities
+- **`tests/integration/`** - Integration tests for complete app functionality  
+- **`tests/functional/`** - Functional tests for specific features
+- **`tests/fixtures/`** - Shared test data and samples
+- **`conftest.py`** - Pytest configuration and fixtures
+
+### Continuous Integration
+
+Tests and code quality checks are automatically run on GitHub Actions for:
+- **Tests**: Python versions 3.9, 3.11, 3.12 on all pushes to `main` and `develop` branches and pull requests
+- **Code Quality**: Ruff linting and formatting checks
+- **Coverage**: Code coverage is tracked and reported to Codecov
+
+### Code Quality Tools
+
+The project uses Ruff for both linting and code formatting:
+
+```bash
+# Lint code with Ruff
+ruff check trendsearth_ui/ tests/
+
+# Format code with Ruff
+ruff format trendsearth_ui/ tests/
+
+# Fix auto-fixable issues
+ruff check --fix trendsearth_ui/ tests/
+```
 
 ## Configuration
 
