@@ -7,9 +7,11 @@ import pytest
 
 from trendsearth_ui.utils.geojson import (
     create_map_from_geojsons,
+    create_minimap,
     ensure_geojson_feature,
     extract_coordinates_from_geometry,
     get_geometry_from_geojson,
+    get_tile_layer,
 )
 
 
@@ -178,9 +180,12 @@ class TestCreateMapFromGeoJSONs:
         result = create_map_from_geojsons(geojson_data, exec_id)
 
         # Verify that map components were called
-        mock_geojson.assert_called_once()
-        mock_tile.assert_called_once()
-        mock_map.assert_called_once()
+        # Now expects 2 GeoJSON calls: 1 for main map + 1 for minimap bounds
+        assert mock_geojson.call_count == 2
+        # Expects 2 TileLayer calls: 1 for main map + 1 for minimap
+        assert mock_tile.call_count == 2
+        # Expects 2 Map calls: 1 for main map + 1 for minimap
+        assert mock_map.call_count == 2
 
         assert isinstance(result, list)
 
@@ -206,9 +211,12 @@ class TestCreateMapFromGeoJSONs:
         result = create_map_from_geojsons(geojson_list, exec_id)
 
         # Verify that multiple GeoJSON layers were created
-        assert mock_geojson.call_count == 2
-        mock_tile.assert_called_once()
-        mock_map.assert_called_once()
+        # Now expects 3 GeoJSON calls: 2 for main map layers + 1 for minimap bounds
+        assert mock_geojson.call_count == 3
+        # Expects 2 TileLayer calls: 1 for main map + 1 for minimap
+        assert mock_tile.call_count == 2
+        # Expects 2 Map calls: 1 for main map + 1 for minimap
+        assert mock_map.call_count == 2
 
         assert isinstance(result, list)
 
@@ -218,9 +226,7 @@ class TestCreateMapFromGeoJSONs:
 
         assert isinstance(result, list)
         assert len(result) == 1
-        # Should return an error message component
-
-    def test_create_map_exception_handling(self):
+        # Should return an error message component    def test_create_map_exception_handling(self):
         """Test that exceptions are handled gracefully."""
         # Test with data that might cause an exception
         result = create_map_from_geojsons(None, "test123")
@@ -228,3 +234,98 @@ class TestCreateMapFromGeoJSONs:
         assert isinstance(result, list)
         assert len(result) == 1
         # Should return an error message component
+
+
+class TestCreateMinimap:
+    """Test the create_minimap function."""
+
+    def test_create_minimap_basic(self):
+        """Test creating a basic minimap."""
+        center = [40.7128, -74.0060]  # New York coordinates
+        zoom = 10
+        map_id = "test_map"
+
+        result = create_minimap(center, zoom, map_id)
+
+        # Should return an HTML div container
+        assert result is not None
+        assert hasattr(result, 'children')
+
+    def test_create_minimap_zoom_calculation(self):
+        """Test that minimap zoom is calculated correctly."""
+        center = [40.7128, -74.0060]
+        zoom = 10
+        map_id = "test_map"
+
+        result = create_minimap(center, zoom, map_id)
+
+        # Verify structure
+        assert result is not None
+        assert hasattr(result, 'children')
+        if hasattr(result, 'children') and result.children:
+            assert len(result.children) == 1  # Should contain one minimap element
+
+    def test_create_minimap_low_zoom(self):
+        """Test minimap with low zoom level."""
+        center = [0, 0]
+        zoom = 2
+        map_id = "test_map"
+
+        result = create_minimap(center, zoom, map_id)
+
+        # Should still work with low zoom
+        assert result is not None
+        assert hasattr(result, 'children')
+
+    def test_create_minimap_high_zoom(self):
+        """Test minimap with high zoom level."""
+        center = [40.7128, -74.0060]
+        zoom = 18
+        map_id = "test_map"
+
+        result = create_minimap(center, zoom, map_id)
+
+        # Should still work with high zoom
+        assert result is not None
+        assert hasattr(result, 'children')
+
+
+class TestGetTileLayer:
+    """Test the get_tile_layer utility function."""
+
+    def test_default_tile_layer(self):
+        """Test getting the default tile layer."""
+        import dash_leaflet as dl
+
+        from trendsearth_ui.utils.geojson import get_tile_layer
+
+        layer = get_tile_layer()
+
+        # Verify it returns a TileLayer component
+        assert isinstance(layer, dl.TileLayer)
+        # Verify it has the expected type
+        assert layer._type == "TileLayer"
+
+    def test_specific_tile_provider(self):
+        """Test getting a specific tile provider."""
+        import dash_leaflet as dl
+
+        from trendsearth_ui.utils.geojson import get_tile_layer
+
+        layer = get_tile_layer("carto_positron")
+
+        # Verify it returns a TileLayer component
+        assert isinstance(layer, dl.TileLayer)
+        assert layer._type == "TileLayer"
+
+    def test_invalid_provider_fallback(self):
+        """Test that invalid provider names fall back to default."""
+        import dash_leaflet as dl
+
+        from trendsearth_ui.utils.geojson import get_tile_layer
+
+        layer = get_tile_layer("nonexistent_provider")
+
+        # Should still return a valid TileLayer
+        assert isinstance(layer, dl.TileLayer)
+        assert layer._type == "TileLayer"

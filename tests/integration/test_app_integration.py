@@ -2,7 +2,6 @@
 
 from unittest.mock import Mock, patch
 
-from dash.testing import DashComposite
 import pytest
 
 from trendsearth_ui.app import app
