@@ -14,7 +14,7 @@ dash-bootstrap-components = "^1.6.0"
 dash-ag-grid = "^31.0.0"
 pandas = "^2.2.0"
 requests = "^2.31.0"
-gunicorn = "^21.2.0"
+gunicorn = "^23.0.0"
 dash-leaflet = "^0.1.23"
 
 [tool.poetry.group.dev.dependencies]
