@@ -22,19 +22,18 @@ class TestCreateMainLayout:
         # Should contain H1, Div, and multiple Store components
         assert "H1" in children_types
         assert "Div" in children_types
-        assert "Store" in children_types
-
-        # Should contain modals
+        assert "Store" in children_types        # Should contain modals
         assert any("Modal" in str(type(child)) for child in layout.children)
+
     def test_main_layout_stores(self):
         """Test that main layout contains all required stores."""
         layout = create_main_layout()
 
-        # Get all Store components (check component type, not just id)
+        # Get all Store components by checking the class name
         stores = [
             child
             for child in layout.children
-            if hasattr(child, 'type') and child.type == 'Store'
+            if child.__class__.__name__ == 'Store'
         ]
 
         # Should have multiple stores for different data

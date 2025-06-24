@@ -16,8 +16,9 @@ def test_app_structure(dash_app):
     layout = dash_app.layout
     layout_str = str(layout)
 
-    # Check for main navigation components
-    assert "dbc-tabs" in layout_str or "tabs" in layout_str, "App should have tabs"
+    # Check for main structural components (tabs are added dynamically via callbacks)
+    assert "page-content" in layout_str, "App should have page-content div"
+    assert "Store" in layout_str, "App should have data stores"
 
 
 def test_status_tab_presence(dash_app):

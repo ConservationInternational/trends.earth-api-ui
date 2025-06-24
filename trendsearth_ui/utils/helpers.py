@@ -46,11 +46,11 @@ def safe_table_data(data, column_ids=None):
 def get_user_info(token):
     """Get user information from API."""
     headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(f"{API_BASE}/user/me", headers=headers)
+    resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
     if resp.status_code == 200:
         user_data = resp.json().get("data", {})
         return user_data
-    resp = requests.get(f"{API_BASE}/user", headers=headers)
+    resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
     if resp.status_code == 200:
         users = resp.json().get("data", [])
         if users:
@@ -66,14 +66,14 @@ def fetch_scripts_and_users(token):
     users = []
 
     try:
-        resp_scripts = requests.get(f"{API_BASE}/script", headers=headers)
+        resp_scripts = requests.get(f"{API_BASE}/script", headers=headers, timeout=10)
         if resp_scripts.status_code == 200:
             scripts = resp_scripts.json().get("data", [])
     except Exception:
         pass
 
     try:
-        resp_users = requests.get(f"{API_BASE}/user", headers=headers)
+        resp_users = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
         if resp_users.status_code == 200:
             users = resp_users.json().get("data", [])
     except Exception:
