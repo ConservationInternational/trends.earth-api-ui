@@ -1,0 +1,240 @@
+name: Rollback ECS Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_definition_revision:
+        description: 'Task definition revision to rollback to (e.g., "5") or "previous" for last revision'
+        required: true
+        default: 'previous'
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Get current and target task definitions
+      id: task-definitions
+      run: |
+        # Get current task definition revision
+        CURRENT_REVISION=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].taskDefinition' \
+          --output text | grep -o '[0-9]*$')
+        
+        echo "Current revision: $CURRENT_REVISION"
+        
+        if [ "${{ github.event.inputs.task_definition_revision }}" = "previous" ]; then
+          # Get the previous revision (current - 1)
+          TARGET_REVISION=$((CURRENT_REVISION - 1))
+        else
+          # Use specified revision
+          TARGET_REVISION="${{ github.event.inputs.task_definition_revision }}"
+        fi
+        
+        if [ "$TARGET_REVISION" -lt 1 ]; then
+          echo "❌ Invalid target revision: $TARGET_REVISION"
+          exit 1
+        fi
+        
+        # Construct task definition ARNs
+        TASK_DEF_FAMILY=$(aws ecs describe-task-definition \
+          --task-definition ${{ secrets.ECS_SERVICE }} \
+          --query 'taskDefinition.family' \
+          --output text)
+        
+        TARGET_TASK_DEF="$TASK_DEF_FAMILY:$TARGET_REVISION"
+        
+        # Verify target task definition exists
+        aws ecs describe-task-definition --task-definition "$TARGET_TASK_DEF" > /dev/null
+        if [ $? -ne 0 ]; then
+          echo "❌ Target task definition not found: $TARGET_TASK_DEF"
+          echo "Available revisions:"
+          aws ecs list-task-definitions --family-prefix "$TASK_DEF_FAMILY" --status ACTIVE
+          exit 1
+        fi
+        
+        echo "current-revision=$CURRENT_REVISION" >> $GITHUB_OUTPUT
+        echo "target-revision=$TARGET_REVISION" >> $GITHUB_OUTPUT
+        echo "target-task-def=$TARGET_TASK_DEF" >> $GITHUB_OUTPUT
+
+    - name: Rollback ECS service
+      run: |
+        echo "Rolling back ECS service to task definition: ${{ steps.task-definitions.outputs.target-task-def }}"
+        
+        # Update the service with the target task definition
+        aws ecs update-service \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --service ${{ secrets.ECS_SERVICE }} \
+          --task-definition ${{ steps.task-definitions.outputs.target-task-def }}
+        
+        echo "✅ Rollback initiated"
+
+    - name: Wait for rollback to complete
+      run: |
+        echo "Waiting for rollback deployment to stabilize..."
+        
+        # Wait for service stability (this can take several minutes)
+        aws ecs wait services-stable \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }}
+        
+        echo "✅ Rollback deployment completed"
+
+    - name: Verify rollback
+      run: |
+        # Check service status
+        RUNNING_COUNT=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].runningCount' \
+          --output text)
+        
+        DESIRED_COUNT=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].desiredCount' \
+          --output text)
+        
+        CURRENT_TASK_DEF=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].taskDefinition' \
+          --output text)
+        
+        echo "Service status: $RUNNING_COUNT/$DESIRED_COUNT tasks running"
+        echo "Current task definition: $CURRENT_TASK_DEF"
+        
+        if [ "$RUNNING_COUNT" -eq "$DESIRED_COUNT" ] && [ "$RUNNING_COUNT" -gt 0 ]; then
+          echo "✅ ECS service is running with desired capacity after rollback"
+        else
+          echo "❌ ECS service is not running properly after rollback"
+          exit 1
+        fi
+        
+        # Try to get load balancer URL and perform health check
+        LB_URL=$(aws elbv2 describe-load-balancers \
+          --query 'LoadBalancers[?contains(LoadBalancerName, `trendsearth`) == `true`].DNSName' \
+          --output text 2>/dev/null || echo "")
+        
+        if [ -z "$LB_URL" ] && [ -n "${{ secrets.ECS_SERVICE_URL }}" ]; then
+          LB_URL="${{ secrets.ECS_SERVICE_URL }}"
+        fi
+        
+        if [ -n "$LB_URL" ]; then
+          echo "Performing health check on $LB_URL"
+          for i in {1..10}; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/health" || echo "000")
+            if [ "$response" = "200" ]; then
+              echo "✅ Health check passed after rollback (attempt $i)"
+              echo "Application URL: http://$LB_URL"
+              break
+            else
+              echo "⏳ Health check failed (attempt $i), retrying in 15 seconds..."
+              if [ $i -eq 10 ]; then
+                echo "⚠️ Health check failed after rollback, but ECS service is running"
+                echo "This may be due to application startup time or configuration"
+              fi
+              sleep 15
+            fi
+          done
+        else
+          echo "⚠️ No load balancer URL configured, skipping health check"
+        fi
+
+    - name: Rollback notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "🔄 ECS rollback completed successfully!"
+          echo "ECS Cluster: ${{ secrets.ECS_CLUSTER }}"
+          echo "ECS Service: ${{ secrets.ECS_SERVICE }}"
+          echo "Rolled back from revision: ${{ steps.task-definitions.outputs.current-revision }}"
+          echo "Rolled back to revision: ${{ steps.task-definitions.outputs.target-revision }}"
+          echo "Task Definition: ${{ steps.task-definitions.outputs.target-task-def }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Rollback time: $(date -u)"
+          
+          # Try to show application URL
+          LB_URL=$(aws elbv2 describe-load-balancers \
+            --query 'LoadBalancers[?contains(LoadBalancerName, `trendsearth`) == `true`].DNSName' \
+            --output text 2>/dev/null || echo "")
+          
+          if [ -z "$LB_URL" ] && [ -n "${{ secrets.ECS_SERVICE_URL }}" ]; then
+            LB_URL="${{ secrets.ECS_SERVICE_URL }}"
+          fi
+          
+          if [ -n "$LB_URL" ]; then
+            echo "Application URL: http://$LB_URL"
+          fi
+        else
+          echo "💥 ECS rollback failed!"
+          echo "Manual intervention may be required."
+          echo "Check ECS console for service status and logs."
+          echo "Current task definition may need manual reversion."
+        fi
+          
+          echo "Rolling back to deployment: $TARGET_DEPLOYMENT"
+          
+          # Update symlink
+          ln -sfn "$TARGET_PATH" "$CURRENT_LINK"
+          
+          # Restart service
+          sudo systemctl restart trendsearth-ui
+          
+          echo "✅ Rollback completed"
+        EOF
+
+    - name: Verify rollback
+      run: |
+        # Wait for service to start
+        sleep 15
+        
+        # Check service status
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          if sudo systemctl is-active --quiet trendsearth-ui; then
+            echo "✅ Service is running after rollback"
+          else
+            echo "❌ Service failed to start after rollback"
+            sudo systemctl status trendsearth-ui
+            exit 1
+          fi
+        EOF
+        
+        # Check health endpoint
+        for i in {1..6}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:8050/health || echo "000")
+          if [ "$response" = "200" ]; then
+            echo "✅ Health check passed after rollback (attempt $i)"
+            break
+          else
+            echo "⏳ Health check failed (attempt $i), retrying in 10 seconds..."
+            if [ $i -eq 6 ]; then
+              echo "❌ Health check failed after rollback"
+              exit 1
+            fi
+            sleep 10
+          fi
+        done
+
+    - name: Rollback notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "🔄 Rollback completed successfully!"
+          echo "Application URL: http://${{ secrets.EC2_HOST }}:8050"
+          echo "Rolled back to: ${{ github.event.inputs.deployment_timestamp }}"
+          echo "Triggered by: ${{ github.actor }}"
+        else
+          echo "💥 Rollback failed!"
+          echo "Manual intervention may be required."
+        fi

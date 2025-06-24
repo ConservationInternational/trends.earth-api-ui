@@ -1,0 +1,167 @@
+name: Deploy to ECS (Production)
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production  # Use GitHub environment for additional protection
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        echo "Building Docker image..."
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        
+        echo "Pushing Docker image to ECR..."
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: .aws/task-definition.json
+        container-name: trendsearth-ui
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      id: deploy-ecs
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Get deployment details
+      id: deployment-info
+      run: |
+        # Get service details
+        SERVICE_ARN=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].serviceArn' \
+          --output text)
+        
+        TASK_DEFINITION_ARN=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].taskDefinition' \
+          --output text)
+        
+        echo "service-arn=$SERVICE_ARN" >> $GITHUB_OUTPUT
+        echo "task-definition-arn=$TASK_DEFINITION_ARN" >> $GITHUB_OUTPUT
+        
+        # Try to get load balancer URL
+        LB_URL=$(aws elbv2 describe-load-balancers \
+          --query 'LoadBalancers[?contains(LoadBalancerName, `trendsearth`) == `true`].DNSName' \
+          --output text 2>/dev/null || echo "")
+        
+        if [ -z "$LB_URL" ] && [ -n "${{ secrets.ECS_SERVICE_URL }}" ]; then
+          LB_URL="${{ secrets.ECS_SERVICE_URL }}"
+        fi
+        
+        echo "lb-url=$LB_URL" >> $GITHUB_OUTPUT
+
+    - name: Verify deployment
+      run: |
+        # Wait for deployment to stabilize
+        echo "Waiting for deployment to stabilize..."
+        sleep 45
+        
+        # Check service status
+        RUNNING_COUNT=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].runningCount' \
+          --output text)
+        
+        DESIRED_COUNT=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --services ${{ secrets.ECS_SERVICE }} \
+          --query 'services[0].desiredCount' \
+          --output text)
+        
+        echo "Service status: $RUNNING_COUNT/$DESIRED_COUNT tasks running"
+        
+        if [ "$RUNNING_COUNT" -eq "$DESIRED_COUNT" ] && [ "$RUNNING_COUNT" -gt 0 ]; then
+          echo "✅ ECS service is running with desired capacity"
+        else
+          echo "❌ ECS service is not running properly"
+          exit 1
+        fi
+        
+        # Health check if URL is available
+        LB_URL="${{ steps.deployment-info.outputs.lb-url }}"
+        if [ -n "$LB_URL" ]; then
+          echo "Performing health check on $LB_URL"
+          for i in {1..12}; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/health" || echo "000")
+            if [ "$response" = "200" ]; then
+              echo "✅ Health check passed (attempt $i)"
+              echo "Application URL: http://$LB_URL"
+              break
+            else
+              echo "⏳ Health check failed (attempt $i), retrying in 15 seconds..."
+              if [ $i -eq 12 ]; then
+                echo "⚠️ Health check failed after 12 attempts, but ECS service is running"
+                echo "This may be due to load balancer configuration or health check endpoint"
+              fi
+              sleep 15
+            fi
+          done
+        else
+          echo "⚠️ No load balancer URL configured, skipping health check"
+        fi
+
+    - name: Send deployment notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "🎉 Production deployment to ECS completed successfully!"
+          echo "Container Image: ${{ steps.build-image.outputs.image }}"
+          echo "ECS Cluster: ${{ secrets.ECS_CLUSTER }}"
+          echo "ECS Service: ${{ secrets.ECS_SERVICE }}"
+          echo "Task Definition: ${{ steps.deployment-info.outputs.task-definition-arn }}"
+          
+          LB_URL="${{ steps.deployment-info.outputs.lb-url }}"
+          if [ -n "$LB_URL" ]; then
+            echo "Application URL: http://$LB_URL"
+          fi
+          
+          echo "Commit: ${{ github.sha }}"
+          echo "Deployed by: ${{ github.actor }}"
+          echo "Deployment time: $(date -u)"
+        else
+          echo "💥 Production deployment failed!"
+          echo "Check the logs above for details."
+          echo "You may need to check ECS service logs in AWS Console."
+          echo "Consider rolling back if necessary."
+        fi

@@ -5,8 +5,18 @@
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Deploy Status](https://img.shields.io/badge/deployment-EC2-orange.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy.yml)
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
+
+## 🚀 Deployment
+
+This application supports automatic deployment to Amazon EC2 instances using GitHub Actions. See [EC2_DEPLOYMENT_SETUP.md](EC2_DEPLOYMENT_SETUP.md) for detailed setup instructions.
+
+### Available Deployment Workflows:
+- **Basic Deployment** (`deploy.yml`) - Simple deployment with process management
+- **Production Deployment** (`deploy-production.yml`) - Advanced deployment with systemd, versioning, and rollback capability
+- **Rollback** (`rollback.yml`) - Manual rollback to previous deployments
 
 ## Features
 

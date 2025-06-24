@@ -1,0 +1,102 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: .aws/task-definition.json
+        container-name: trendsearth-ui
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Verify deployment
+      run: |
+        # Wait for deployment to stabilize
+        sleep 30
+        
+        # Get the load balancer URL from ECS service
+        LB_URL=$(aws elbv2 describe-load-balancers \
+          --query 'LoadBalancers[?contains(LoadBalancerName, `trendsearth`) == `true`].DNSName' \
+          --output text)
+        
+        if [ -z "$LB_URL" ]; then
+          echo "⚠️ Load balancer URL not found, trying direct service endpoint"
+          LB_URL="${{ secrets.ECS_SERVICE_URL }}"
+        fi
+        
+        # Check health endpoint
+        for i in {1..10}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/health" || echo "000")
+          if [ "$response" = "200" ]; then
+            echo "✅ Health check passed (attempt $i)"
+            echo "Application URL: http://$LB_URL"
+            break
+          else
+            echo "⏳ Health check failed (attempt $i), retrying in 15 seconds..."
+            if [ $i -eq 10 ]; then
+              echo "❌ Health check failed after 10 attempts"
+              exit 1
+            fi
+            sleep 15
+          fi
+        done
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "🎉 Deployment to ECS completed successfully!"
+          echo "Container Image: ${{ steps.build-image.outputs.image }}"
+          echo "ECS Cluster: ${{ secrets.ECS_CLUSTER }}"
+          echo "ECS Service: ${{ secrets.ECS_SERVICE }}"
+          echo "Deployed commit: ${{ github.sha }}"
+          echo "Deployed by: ${{ github.actor }}"
+        else
+          echo "💥 ECS deployment failed!"
+          echo "Check the logs above for details."
+          echo "You may need to check ECS service logs in AWS Console."
+        fi
