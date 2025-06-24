@@ -26,7 +26,7 @@ def parse_date(date_str):
 def safe_table_data(data, column_ids=None):
     """Safely process table data for display."""
     if not data:
-        return data
+        return []
     newdata = []
     for i, row in enumerate(data):
         newrow = {}

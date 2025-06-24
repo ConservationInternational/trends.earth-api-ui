@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
 """Test script to debug login issues."""
 
+import os
 import requests
+import pytest
 from trendsearth_ui.config import AUTH_URL, API_BASE
 from trendsearth_ui.utils import get_user_info
 
+@pytest.mark.skip(reason="Interactive test - requires manual credentials")
 def test_login():
     """Test the login process step by step."""
     print("Testing Trends.Earth API login...")
     print(f"AUTH_URL: {AUTH_URL}")
     print(f"API_BASE: {API_BASE}")
     
-    # Test credentials - replace with actual test credentials
-    test_email = input("Enter test email: ")
-    test_password = input("Enter test password: ")
+    # Test credentials - use environment variables for CI
+    test_email = os.getenv("TEST_EMAIL")
+    test_password = os.getenv("TEST_PASSWORD")
+    
+    if not test_email or not test_password:
+        pytest.skip("TEST_EMAIL and TEST_PASSWORD environment variables required")
+    
+    print("\n1. Testing login endpoint...")
+    auth_data = {"email": test_email, "password": test_password}
     
     print("\n1. Testing login endpoint...")
     auth_data = {"email": test_email, "password": test_password}
