@@ -91,9 +91,10 @@ def test_extract_coordinates_from_point():
 
     coords = extract_coordinates_from_geometry(point_geometry)
     assert coords is not None, "Should extract coordinates from point"
-    assert len(coords) == 2, "Point should have 2 coordinates"
-    assert coords[0] == -73.9857, "Longitude should match"
-    assert coords[1] == 40.7484, "Latitude should match"
+    assert len(coords) == 1, "Point should return 1 coordinate pair"
+    assert len(coords[0]) == 2, "Coordinate pair should have 2 values"
+    assert coords[0][1] == -73.9857, "Longitude should match (swapped to lat/lon format)"
+    assert coords[0][0] == 40.7484, "Latitude should match (swapped to lat/lon format)"
 
 
 def test_geojson_parsing(test_geojsons, test_geojson_string):
