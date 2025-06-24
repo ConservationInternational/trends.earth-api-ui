@@ -46,17 +46,25 @@ def safe_table_data(data, column_ids=None):
 def get_user_info(token):
     """Get user information from API."""
     headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
-    if resp.status_code == 200:
-        user_data = resp.json().get("data", {})
-        return user_data
-    resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
-    if resp.status_code == 200:
-        users = resp.json().get("data", [])
-        if users:
-            user_data = users[0]
+    
+    try:
+        resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
+        if resp.status_code == 200:
+            user_data = resp.json().get("data", {})
             return user_data
-    return {}
+        
+        resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
+        if resp.status_code == 200:
+            users = resp.json().get("data", [])
+            if users:
+                user_data = users[0]
+                return user_data
+    except Exception:
+        # Return None for any network errors or other exceptions
+        return None
+    
+    # Return None if both API calls failed
+    return None
 
 
 def fetch_scripts_and_users(token):
