@@ -31,7 +31,8 @@ def register_callbacks(app):
         Output("login-alert", "is_open"),
         Input("login-btn", "n_clicks"),
         State("login-email", "value"),
-        State("login-password", "value"),        prevent_initial_call=True,
+        State("login-password", "value"),
+        prevent_initial_call=True,
     )
     def login_api(_n, email, password):
         """Handle login authentication."""
