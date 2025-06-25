@@ -51,12 +51,12 @@ def get_user_info(token):
     headers = {"Authorization": f"Bearer {token}"}
     
     try:
-        resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=5)
+        resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
         if resp.status_code == 200:
             user_data = resp.json().get("data", {})
             return user_data
         
-        resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=5)
+        resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
         if resp.status_code == 200:
             users = resp.json().get("data", [])
             if users:
