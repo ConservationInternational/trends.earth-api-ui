@@ -1,12 +1,20 @@
 """Initialize callbacks package."""
 
-# Import all callback modules to register them
-from . import auth, edit, executions, map, modals, profile, refresh, status, tabs
-
 
 def register_all_callbacks(app):
     """Register all callbacks with the Dash app."""
-    # Import each module and call its register function
+    # Import each module only when needed to avoid circular imports
+    from . import auth
+    from . import tabs
+    from . import executions
+    from . import modals
+    from . import map
+    from . import profile
+    from . import edit
+    from . import refresh
+    from . import status
+    
+    # Register all callbacks
     auth.register_callbacks(app)
     tabs.register_callbacks(app)
     executions.register_callbacks(app)
@@ -20,13 +28,4 @@ def register_all_callbacks(app):
 
 __all__ = [
     "register_all_callbacks",
-    "auth",
-    "tabs",
-    "executions",
-    "modals",
-    "map",
-    "profile",
-    "edit",
-    "refresh",
-    "status",
 ]
