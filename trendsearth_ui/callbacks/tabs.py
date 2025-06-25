@@ -14,7 +14,7 @@ from ..utils import fetch_scripts_and_users
 
 def register_callbacks(app):
     """Register tab rendering callbacks."""
-
+    
     @app.callback(
         Output("tab-content", "children"),
         Output("scripts-raw-data", "data"),
@@ -30,9 +30,18 @@ def register_callbacks(app):
         if not token:
             return html.Div("Please login to view content."), [], []
 
+        # Add additional safety check
+        if not tab:
+            return html.Div("Loading..."), [], []
+
         is_admin = role == "ADMIN"
-        # Fetch scripts and users for joins
-        scripts, users = fetch_scripts_and_users(token)
+        
+        # Only fetch data if we have a valid token and tab
+        try:
+            scripts, users = fetch_scripts_and_users(token)
+        except Exception as e:
+            print(f"Error fetching data: {e}")
+            scripts, users = [], []
 
         if tab == "scripts":
             content = scripts_tab_content(scripts, users, is_admin)

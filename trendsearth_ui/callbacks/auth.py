@@ -38,10 +38,9 @@ def register_callbacks(app):
         """Handle login authentication."""
         if not email or not password:
             return None, None, None, "Please enter both email and password.", "warning", True
-
         try:
             auth_data = {"email": email, "password": password}
-            resp = requests.post(AUTH_URL, json=auth_data, timeout=10)
+            resp = requests.post(AUTH_URL, json=auth_data, timeout=5)
 
             if resp.status_code == 200:
                 data = resp.json()
@@ -56,5 +55,9 @@ def register_callbacks(app):
             else:
                 return None, None, None, "Invalid credentials.", "danger", True
 
+        except requests.exceptions.Timeout:
+            return None, None, None, "Login failed: Connection timeout. Please try again.", "danger", True
+        except requests.exceptions.ConnectionError:
+            return None, None, None, "Login failed: Cannot connect to server. Please check your internet connection.", "danger", True
         except Exception as e:
             return None, None, None, f"Login failed: {str(e)}", "danger", True

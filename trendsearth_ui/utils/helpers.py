@@ -44,23 +44,32 @@ def safe_table_data(data, column_ids=None):
 
 
 def get_user_info(token):
-    """Get user information from API."""
+    """Get user information from API with improved error handling."""
+    if not token:
+        return None
+        
     headers = {"Authorization": f"Bearer {token}"}
     
     try:
-        resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
+        resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=5)
         if resp.status_code == 200:
             user_data = resp.json().get("data", {})
             return user_data
         
-        resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
+        resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=5)
         if resp.status_code == 200:
             users = resp.json().get("data", [])
             if users:
                 user_data = users[0]
                 return user_data
-    except Exception:
-        # Return None for any network errors or other exceptions
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while fetching user info")
+        return None
+    except requests.exceptions.ConnectionError:
+        print("Connection error occurred while fetching user info")
+        return None
+    except Exception as e:
+        print(f"Error fetching user info: {e}")
         return None
     
     # Return None if both API calls failed
@@ -68,23 +77,34 @@ def get_user_info(token):
 
 
 def fetch_scripts_and_users(token):
-    """Fetch scripts and users data for joins."""
+    """Fetch scripts and users data for joins with improved error handling."""
+    if not token:
+        return [], []
+        
     headers = {"Authorization": f"Bearer {token}"}
     scripts = []
     users = []
 
     try:
-        resp_scripts = requests.get(f"{API_BASE}/script", headers=headers, timeout=10)
+        resp_scripts = requests.get(f"{API_BASE}/script", headers=headers, timeout=5)
         if resp_scripts.status_code == 200:
             scripts = resp_scripts.json().get("data", [])
-    except Exception:
-        pass
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while fetching scripts")
+    except requests.exceptions.ConnectionError:
+        print("Connection error occurred while fetching scripts")
+    except Exception as e:
+        print(f"Error fetching scripts: {e}")
 
     try:
-        resp_users = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
+        resp_users = requests.get(f"{API_BASE}/user", headers=headers, timeout=5)
         if resp_users.status_code == 200:
             users = resp_users.json().get("data", [])
-    except Exception:
-        pass
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while fetching users")
+    except requests.exceptions.ConnectionError:
+        print("Connection error occurred while fetching users") 
+    except Exception as e:
+        print(f"Error fetching users: {e}")
 
     return scripts, users
