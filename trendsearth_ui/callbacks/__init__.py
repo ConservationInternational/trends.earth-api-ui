@@ -1,7 +1,7 @@
 """Initialize callbacks package."""
 
 # Import all callback modules to register them
-from . import auth, edit, executions, map, modals, profile, refresh, tabs
+from . import auth, edit, executions, map, modals, profile, refresh, status, tabs
 
 
 def register_all_callbacks(app):
@@ -15,6 +15,7 @@ def register_all_callbacks(app):
     profile.register_callbacks(app)
     edit.register_callbacks(app)
     refresh.register_callbacks(app)
+    status.register_callbacks(app)
 
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "profile",
     "edit",
     "refresh",
+    "status",
 ]
