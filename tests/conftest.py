@@ -15,9 +15,9 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from trendsearth_ui.callbacks import register_all_callbacks
-from trendsearth_ui.components import create_main_layout
-from trendsearth_ui.config import API_BASE, APP_TITLE, AUTH_URL
+from trendsearth_ui.callbacks import register_all_callbacks  # noqa: E402
+from trendsearth_ui.components import create_main_layout  # noqa: E402
+from trendsearth_ui.config import API_BASE, APP_TITLE, AUTH_URL  # noqa: E402
 
 
 @pytest.fixture

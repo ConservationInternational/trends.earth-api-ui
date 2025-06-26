@@ -249,7 +249,7 @@ class TestCreateMinimap:
 
         # Should return an HTML div container
         assert result is not None
-        assert hasattr(result, 'children')
+        assert hasattr(result, "children")
 
     def test_create_minimap_zoom_calculation(self):
         """Test that minimap zoom is calculated correctly."""
@@ -261,8 +261,8 @@ class TestCreateMinimap:
 
         # Verify structure
         assert result is not None
-        assert hasattr(result, 'children')
-        if hasattr(result, 'children') and result.children:
+        assert hasattr(result, "children")
+        if hasattr(result, "children") and result.children:
             assert len(result.children) == 1  # Should contain one minimap element
 
     def test_create_minimap_low_zoom(self):
@@ -275,7 +275,7 @@ class TestCreateMinimap:
 
         # Should still work with low zoom
         assert result is not None
-        assert hasattr(result, 'children')
+        assert hasattr(result, "children")
 
     def test_create_minimap_high_zoom(self):
         """Test minimap with high zoom level."""
@@ -287,7 +287,7 @@ class TestCreateMinimap:
 
         # Should still work with high zoom
         assert result is not None
-        assert hasattr(result, 'children')
+        assert hasattr(result, "children")
 
 
 class TestGetTileLayer:

@@ -33,5 +33,5 @@ for url in doc_urls:
         print(f"{url}: {r.status_code}")
     except Exception as e:
         print(f"{url}: Error - {e}")
-        
+
 print("Done.")

@@ -14,7 +14,7 @@ from ..utils import fetch_scripts_and_users
 
 def register_callbacks(app):
     """Register tab rendering callbacks."""
-    
+
     @app.callback(
         Output("tab-content", "children"),
         Output("scripts-raw-data", "data"),
@@ -36,7 +36,7 @@ def register_callbacks(app):
 
         # Handle case where role might not be set yet
         is_admin = (role == "ADMIN") if role else False
-        
+
         # Only fetch data if we have a valid token and tab
         try:
             scripts, users = fetch_scripts_and_users(token)

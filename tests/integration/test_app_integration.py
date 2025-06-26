@@ -86,7 +86,7 @@ class TestAuthenticationFlow:
                 callback_map = str(dash_app.callback_map)
             except AttributeError:
                 # Fallback for older versions or if callback_map doesn't exist
-                callback_map = str(getattr(dash_app, '_callback_map', {}))
+                callback_map = str(getattr(dash_app, "_callback_map", {}))
             assert "login_api" in callback_map
 
     def test_page_navigation_callback_exists(self, dash_app):
@@ -97,7 +97,7 @@ class TestAuthenticationFlow:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "display_page" in callback_map or "page-content" in callback_map
 
 
@@ -107,13 +107,16 @@ class TestTabRendering:
     @patch("trendsearth_ui.callbacks.tabs.fetch_scripts_and_users")
     def test_tab_rendering_callback_exists(self, mock_fetch, dash_app):
         """Test that tab rendering callback is registered."""
-        mock_fetch.return_value = ([], [])  # Empty scripts and users        # Check that the render_tab callback is registered
+        mock_fetch.return_value = (
+            [],
+            [],
+        )  # Empty scripts and users        # Check that the render_tab callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "render_tab" in callback_map or "tab-content" in callback_map
 
     def test_all_tab_callbacks_registered(self, dash_app):
@@ -123,7 +126,7 @@ class TestTabRendering:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have tab content rendering
         assert "tab-content" in callback_map or "tabs" in callback_map
@@ -139,13 +142,13 @@ class TestExecutionsTableIntegration:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": [], "total": 0}
-        mock_get.return_value = mock_response        # Check that executions table callback is registered
+        mock_get.return_value = mock_response  # Check that executions table callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "executions-table" in callback_map or "getRowsResponse" in callback_map
 
     def test_executions_refresh_callbacks_exist(self, dash_app):
@@ -155,7 +158,7 @@ class TestExecutionsTableIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have refresh functionality
         assert "refresh" in callback_map.lower() or "executions" in callback_map
@@ -171,7 +174,7 @@ class TestModalIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have JSON modal functionality
         assert "json-modal" in callback_map or "modal" in callback_map.lower()
@@ -183,7 +186,7 @@ class TestModalIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have edit modal functionality
         assert "edit-user-modal" in callback_map or "edit-script-modal" in callback_map
@@ -195,7 +198,7 @@ class TestModalIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have map modal functionality
         assert "map-modal" in callback_map or "map" in callback_map.lower()
@@ -210,13 +213,13 @@ class TestProfileIntegration:
         # Mock successful update response
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_patch.return_value = mock_response        # Check that profile update callback is registered
+        mock_patch.return_value = mock_response  # Check that profile update callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "profile" in callback_map.lower() or "update-profile" in callback_map
 
     @patch("trendsearth_ui.callbacks.profile.requests.put")
@@ -225,13 +228,13 @@ class TestProfileIntegration:
         # Mock successful password change response
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_put.return_value = mock_response        # Check that password change callback is registered
+        mock_put.return_value = mock_response  # Check that password change callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "password" in callback_map.lower() or "change-password" in callback_map
 
 
@@ -245,7 +248,7 @@ class TestRefreshIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have log refresh functionality
         assert "refresh-logs" in callback_map or "logs-refresh" in callback_map
@@ -257,7 +260,7 @@ class TestRefreshIntegration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have countdown functionality
         assert "countdown" in callback_map.lower()
@@ -273,7 +276,7 @@ class TestCallbackRegistration:
             callback_map = str(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_map = str(getattr(dash_app, '_callback_map', {}))
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
 
         # Should have callbacks from all modules
         expected_components = [
@@ -285,7 +288,7 @@ class TestCallbackRegistration:
             "profile",  # profile callbacks
             "edit-user-modal",  # edit callbacks
             "refresh",  # refresh callbacks
-        ]        # At least some of these should be present
+        ]  # At least some of these should be present
         found_components = sum(1 for comp in expected_components if comp in callback_map)
         assert found_components > 0
 
@@ -305,5 +308,5 @@ class TestCallbackRegistration:
             callback_count = len(dash_app.callback_map)
         except AttributeError:
             # Fallback for older versions or if callback_map doesn't exist
-            callback_count = len(getattr(dash_app, '_callback_map', {}))
+            callback_count = len(getattr(dash_app, "_callback_map", {}))
         assert callback_count > 0

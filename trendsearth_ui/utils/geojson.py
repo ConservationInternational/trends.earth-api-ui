@@ -5,7 +5,7 @@ import json
 from dash import html
 import dash_leaflet as dl
 
-from ..config import MAP_TILE_PROVIDERS, DEFAULT_MAP_TILE_PROVIDER
+from ..config import DEFAULT_MAP_TILE_PROVIDER, MAP_TILE_PROVIDERS
 
 
 def ensure_geojson_feature(geojson_data):
@@ -160,11 +160,11 @@ def create_map_from_geojsons(geojsons, exec_id):
                     center_lat = sum(coord[0] for coord in coords) / len(coords)
                     center_lon = sum(coord[1] for coord in coords) / len(coords)
                     center = [center_lat, center_lon]
-                    zoom = 10        # Create the map with English-only tile layer
+                    zoom = 10  # Create the map with English-only tile layer
         map_component = dl.Map(
             children=[
                 get_tile_layer(),  # Uses configured English-only tile provider
-                *map_layers
+                *map_layers,
             ],
             style={"width": "100%", "height": "600px"},
             center=center,
@@ -178,11 +178,8 @@ def create_map_from_geojsons(geojsons, exec_id):
         # Return both the main map and the minimap in a container
         return [
             html.Div(
-                children=[
-                    map_component,
-                    minimap_component
-                ],
-                style={"position": "relative", "width": "100%", "height": "600px"}
+                children=[map_component, minimap_component],
+                style={"position": "relative", "width": "100%", "height": "600px"},
             )
         ]
 
@@ -192,73 +189,75 @@ def create_map_from_geojsons(geojsons, exec_id):
 
 def get_tile_layer(provider_name=None):
     """Get a configured tile layer for English-language maps.
-    
+
     Args:
         provider_name (str, optional): Name of the tile provider to use.
                                      If None, uses DEFAULT_MAP_TILE_PROVIDER.
-    
+
     Returns:
         dl.TileLayer: Configured tile layer component.
     """
     provider = provider_name or DEFAULT_MAP_TILE_PROVIDER
-    
+
     if provider not in MAP_TILE_PROVIDERS:
         provider = DEFAULT_MAP_TILE_PROVIDER
-    
+
     tile_config = MAP_TILE_PROVIDERS[provider]
-    
+
     return dl.TileLayer(
         url=tile_config["url"],
         attribution=tile_config["attribution"],
-        subdomains=tile_config.get("subdomains", ['a', 'b', 'c']),
-        maxZoom=tile_config.get("maxZoom", 18)
+        subdomains=tile_config.get("subdomains", ["a", "b", "c"]),
+        maxZoom=tile_config.get("maxZoom", 18),
     )
 
 
 def create_minimap(center, zoom, map_id):
     """Create a small overview/locator map.
-    
+
     Args:
         center (list): [lat, lon] center coordinates for the main map
         zoom (int): Zoom level of the main map
         map_id (str): ID for the map container
-    
+
     Returns:
         html.Div: Container with the minimap
     """
     # Calculate appropriate zoom level for overview (typically 3-4 levels lower)
     overview_zoom = max(1, zoom - 4)
-      # Create a simple polygon to show the approximate area of the main map
+    # Create a simple polygon to show the approximate area of the main map
     # Calculate rough bounds based on zoom level (this is approximate)
     lat_offset = 0.5 * (2 ** (10 - zoom))  # Rough calculation
     lon_offset = 0.7 * (2 ** (10 - zoom))  # Rough calculation
-    
+
     # Create a polygon showing the main map's approximate bounds
     bounds_polygon = {
         "type": "Feature",
         "geometry": {
             "type": "Polygon",
-            "coordinates": [[
-                [center[1] - lon_offset, center[0] - lat_offset],  # Southwest [lon, lat]
-                [center[1] + lon_offset, center[0] - lat_offset],  # Southeast [lon, lat]
-                [center[1] + lon_offset, center[0] + lat_offset],  # Northeast [lon, lat]
-                [center[1] - lon_offset, center[0] + lat_offset],  # Northwest [lon, lat]
-                [center[1] - lon_offset, center[0] - lat_offset]   # Close polygon [lon, lat]
-            ]]
+            "coordinates": [
+                [
+                    [center[1] - lon_offset, center[0] - lat_offset],  # Southwest [lon, lat]
+                    [center[1] + lon_offset, center[0] - lat_offset],  # Southeast [lon, lat]
+                    [center[1] + lon_offset, center[0] + lat_offset],  # Northeast [lon, lat]
+                    [center[1] - lon_offset, center[0] + lat_offset],  # Northwest [lon, lat]
+                    [center[1] - lon_offset, center[0] - lat_offset],  # Close polygon [lon, lat]
+                ]
+            ],
         },
-        "properties": {}
+        "properties": {},
     }
-    
+
     # Create a GeoJSON layer showing the main map's bounds
     bounds_layer = dl.GeoJSON(
         data=bounds_polygon,
         options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
     )
-      # Create the minimap with minimal interactions
+    # Create the minimap with minimal interactions
     minimap = dl.Map(
         children=[
             get_tile_layer("carto_positron"),  # Use light tiles for overview
-            bounds_layer
+            bounds_layer,
         ],
         style={
             "width": "150px",
@@ -269,21 +268,16 @@ def create_minimap(center, zoom, map_id):
             "zIndex": 1000,
             "border": "2px solid #333",
             "borderRadius": "4px",
-            "boxShadow": "0 2px 8px rgba(0,0,0,0.3)"
+            "boxShadow": "0 2px 8px rgba(0,0,0,0.3)",
         },
         center=center,
         zoom=overview_zoom,
         id=f"minimap-{map_id}",
         # Disable most interactions on the minimap
         zoomControl=False,
-        dragging=False
+        dragging=False,
     )
-    
+
     return html.Div(
-        children=[minimap],
-        style={
-            "position": "relative",
-            "width": "0px",
-            "height": "0px"
-        }
+        children=[minimap], style={"position": "relative", "width": "0px", "height": "0px"}
     )

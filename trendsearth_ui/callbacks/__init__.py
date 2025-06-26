@@ -6,15 +6,22 @@ def register_all_callbacks(app):
     """Register all callbacks with the Dash app."""
     # Use importlib to dynamically import modules to avoid circular imports
     callback_modules = [
-        'auth', 'tabs', 'executions', 'modals', 
-        'map', 'profile', 'edit', 'refresh', 'status'
+        "auth",
+        "tabs",
+        "executions",
+        "modals",
+        "map",
+        "profile",
+        "edit",
+        "refresh",
+        "status",
     ]
-    
+
     for module_name in callback_modules:
         try:
             # Use importlib to import the module
-            module = importlib.import_module(f'.{module_name}', package='trendsearth_ui.callbacks')
-            if hasattr(module, 'register_callbacks'):
+            module = importlib.import_module(f".{module_name}", package="trendsearth_ui.callbacks")
+            if hasattr(module, "register_callbacks"):
                 module.register_callbacks(app)
             else:
                 print(f"Warning: Module {module_name} does not have register_callbacks function")

@@ -47,15 +47,15 @@ def get_user_info(token):
     """Get user information from API with improved error handling."""
     if not token:
         return None
-        
+
     headers = {"Authorization": f"Bearer {token}"}
-    
+
     try:
         resp = requests.get(f"{API_BASE}/user/me", headers=headers, timeout=10)
         if resp.status_code == 200:
             user_data = resp.json().get("data", {})
             return user_data
-        
+
         resp = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
         if resp.status_code == 200:
             users = resp.json().get("data", [])
@@ -71,7 +71,7 @@ def get_user_info(token):
     except Exception as e:
         print(f"Error fetching user info: {e}")
         return None
-    
+
     # Return None if both API calls failed
     return None
 
@@ -80,7 +80,7 @@ def fetch_scripts_and_users(token):
     """Fetch scripts and users data for joins with improved error handling."""
     if not token:
         return [], []
-        
+
     headers = {"Authorization": f"Bearer {token}"}
     scripts = []
     users = []
@@ -103,7 +103,7 @@ def fetch_scripts_and_users(token):
     except requests.exceptions.Timeout:
         print("Timeout occurred while fetching users")
     except requests.exceptions.ConnectionError:
-        print("Connection error occurred while fetching users") 
+        print("Connection error occurred while fetching users")
     except Exception as e:
         print(f"Error fetching users: {e}")
 

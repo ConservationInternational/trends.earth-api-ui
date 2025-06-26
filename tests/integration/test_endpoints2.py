@@ -13,10 +13,10 @@ except Exception as e:
 # Test different possible auth endpoints
 auth_endpoints = [
     "https://api.trends.earth/auth/login",
-    "https://api.trends.earth/api/auth/login", 
+    "https://api.trends.earth/api/auth/login",
     "https://api.trends.earth/login",
     "https://api.trends.earth/api/login",
-    "https://api.trends.earth/api/v1/auth/login"
+    "https://api.trends.earth/api/v1/auth/login",
 ]
 
 for endpoint in auth_endpoints:
