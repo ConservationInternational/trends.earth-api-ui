@@ -91,6 +91,15 @@ def register_callbacks(app):
             total_rows = len(table_data)
             page_data = table_data[start_row:end_row]
 
+            # Ensure every row has an 'id' field and print for debugging
+            for row in page_data:
+                if "id" not in row:
+                    print(f"⚠️ Row missing 'id': {row}")
+                else:
+                    print(
+                        f"✅ Row for grid: id={row['id']}, logs={row.get('logs')}, name={row.get('name')}"
+                    )
+
             return {"rowData": page_data, "rowCount": total_rows}
 
         except Exception as e:

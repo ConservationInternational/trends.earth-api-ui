@@ -230,7 +230,7 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def show_script_logs_modal(cell, token, is_open):
-        """Show script logs modal."""
+        """Show script logs modal using rowIndex and backend pagination (like executions)."""
         if not cell:
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
@@ -238,33 +238,54 @@ def register_callbacks(app):
         if col != "logs":
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
-        # Try to get row data directly from the cell click event
-        row_data = cell.get("data")
-        if not row_data or "id" not in row_data:
+        row_index = cell.get("rowIndex")
+        if row_index is None:
+            return True, "Could not get row index.", None, "Error", {"display": "none"}, True, None
+
+        headers = {"Authorization": f"Bearer {token}"}
+        page_size = 50  # This should match your cacheBlockSize
+        page = (row_index // page_size) + 1
+        row_in_page = row_index % page_size
+
+        params = {
+            "page": page,
+            "per_page": page_size,
+        }
+        resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+        if resp.status_code != 200:
             return (
                 True,
-                "Could not get script data from cell click. This indicates a configuration issue.",
+                f"Failed to fetch script data: {resp.text}",
                 None,
                 "Error",
                 {"display": "none"},
                 True,
                 None,
             )
-
-        script_id = row_data.get("id")
+        result = resp.json()
+        scripts = result.get("data", [])
+        if row_in_page >= len(scripts):
+            return (
+                True,
+                f"Row index {row_in_page} out of range for page {page}",
+                None,
+                "Error",
+                {"display": "none"},
+                True,
+                None,
+            )
+        script = scripts[row_in_page]
+        script_id = script.get("id")
         if not script_id:
             return (
                 True,
-                f"Could not get script ID from row data. Row: {row_data}",
+                f"Could not get script ID from row data. Row: {script}",
                 None,
                 "Error",
                 {"display": "none"},
                 True,
                 None,
             )
-
-        headers = {"Authorization": f"Bearer {token}"}
-
         # Fetch logs for the script
         resp = requests.get(f"{API_BASE}/script/{script_id}/log", headers=headers)
         if resp.status_code != 200:
@@ -277,7 +298,6 @@ def register_callbacks(app):
                 True,
                 None,
             )
-
         logs_data = resp.json().get("data", [])
         if not logs_data:
             return (
@@ -289,7 +309,6 @@ def register_callbacks(app):
                 True,
                 None,
             )
-
         # Parse and format logs for display
         if isinstance(logs_data, list):
             parsed_logs = []
@@ -298,32 +317,20 @@ def register_callbacks(app):
                     register_date = log.get("register_date", "")
                     level = log.get("level", "")
                     text = log.get("text", "")
-
-                    # Parse and format the date
-                    formatted_date = parse_date(register_date) or register_date
-
-                    # Create formatted log line
-                    log_line = f"{formatted_date} - {level} - {text}"
-                    parsed_logs.append((register_date, log_line))
+                    parsed_logs.append(f"[{register_date}] {level}: {text}")
                 else:
-                    # Fallback for non-dict log entries
-                    parsed_logs.append(("", str(log)))
-
-            # Sort by register_date in descending order
-            parsed_logs.sort(key=lambda x: x[0], reverse=True)
-            logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                    parsed_logs.append(str(log))
+            logs_display = html.Pre("\n".join(parsed_logs))
         else:
-            logs_content = str(logs_data)
-
-        log_context = {"type": "script", "id": script_id}
+            logs_display = html.Pre(str(logs_data))
         return (
             True,
-            html.Pre(logs_content, style={"whiteSpace": "pre-wrap", "fontSize": "12px"}),
+            logs_display,
             logs_data,
             "Script Logs",
             {"display": "inline-block"},
             False,
-            log_context,
+            {"script_id": script_id},
         )
 
 

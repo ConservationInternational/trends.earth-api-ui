@@ -174,105 +174,123 @@ def users_tab_content(users, is_admin):
 
 def scripts_tab_content(scripts, users, is_admin):
     """Create the scripts tab content."""
-    if not scripts:
-        return html.Div([html.Div("No scripts found.")])
+    try:
+        if not scripts or not isinstance(scripts, list):
+            return html.Div([html.Div("No scripts found or data error.")])
 
-    user_col = None
-    if scripts and "user_id" in scripts[0]:
-        user_col = "user_id"
-    elif scripts and "author_id" in scripts[0]:
-        user_col = "author_id"
+        user_col = None
+        if scripts and "user_id" in scripts[0]:
+            user_col = "user_id"
+        elif scripts and "author_id" in scripts[0]:
+            user_col = "author_id"
 
-    cols = []
-    if scripts:
-        if "name" in scripts[0]:
-            cols.append({"name": "Script Name", "id": "name"})
-        if user_col:
-            cols.append({"name": "User Name", "id": "user_name"})
-        for k in scripts[0]:
-            if k not in ("name", user_col):
-                cols.append({"name": k, "id": k})
-        # Add logs column for scripts
-        cols.append({"name": "Logs", "id": "logs"})
-        # Add edit column for admin users
-        if is_admin:
-            cols.append({"name": "Edit", "id": "edit"})
+        cols = []
+        if scripts:
+            if "name" in scripts[0]:
+                cols.append({"name": "Script Name", "id": "name"})
+            if user_col:
+                cols.append({"name": "User Name", "id": "user_name"})
+            for k in scripts[0]:
+                if k not in ("name", user_col):
+                    cols.append({"name": k, "id": k})
+            # Add logs column for scripts
+            cols.append({"name": "Logs", "id": "logs"})
+            # Add edit column for admin users
+            if is_admin:
+                cols.append({"name": "Edit", "id": "edit"})
 
-    table_data = []
-    user_id_to_name = {u.get("id"): u.get("name") for u in users or []}
-    for s in scripts:
-        row = s.copy()
-        if user_col:
-            row["user_name"] = user_id_to_name.get(row.get(user_col), "")
-        for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
-            if date_col in row:
-                row[date_col] = parse_date(row.get(date_col))
-        # Add logs action button
-        row["logs"] = "Show Logs"
-        # Add edit button for admin users
-        if is_admin:
-            row["edit"] = "Edit"
-        table_data.append(row)
+        table_data = []
+        user_id_to_name = {u.get("id"): u.get("name") for u in users or []}
+        for s in scripts:
+            row = s.copy()
+            if user_col:
+                row["user_name"] = user_id_to_name.get(row.get(user_col), "")
+            for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
+                if date_col in row:
+                    row[date_col] = parse_date(row.get(date_col))
+            # Add logs action button
+            row["logs"] = "Show Logs"
+            # Add edit button for admin users
+            if is_admin:
+                row["edit"] = "Edit"
+            table_data.append(row)
 
-    table_data = safe_table_data(table_data, [c["id"] for c in cols])
-    table_data = sorted(table_data, key=lambda x: x.get("name", ""))
+        table_data = safe_table_data(table_data, [c["id"] for c in cols])
+        table_data = sorted(table_data, key=lambda x: x.get("name", ""))
 
-    style_data_conditional = [
-        {"condition": "params.data.status == 'SUCCESS'", "style": {"backgroundColor": "#D1E7DD"}},
-        {"condition": "params.data.status == 'FAIL'", "style": {"backgroundColor": "#F8D7DA"}},
-    ]
-
-    column_defs = [{"headerName": c["name"], "field": c["id"]} for c in cols]
-    for c in column_defs:
-        if c["field"] == "name":
-            c["sort"] = "asc"
-        if c["field"] in ("start_date", "end_date", "created_at", "updated_at"):
-            c["filter"] = "agDateColumnFilter"
-        if c["field"] == "logs":
-            c["sortable"] = False
-            c["filter"] = False
-        if c["field"] == "edit":
-            c["sortable"] = False
-            c["filter"] = False
-
-    return html.Div(
-        [
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Button(
-                                "Refresh Scripts",
-                                id="refresh-scripts-btn",
-                                color="primary",
-                                className="mb-3",
-                            ),
-                        ],
-                        width="auto",
-                    ),
-                ]
-            ),
-            dag.AgGrid(
-                columnDefs=column_defs,
-                id="scripts-table",
-                defaultColDef={"sortable": True, "resizable": True, "filter": True},
-                columnSize="sizeToFit",
-                rowModelType="infinite",
-                dashGridOptions={
-                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
-                    "maxBlocksInCache": 2,
-                    "blockLoadDebounceMillis": 500,
-                    "purgeClosedRowNodes": True,
-                    "maxConcurrentDatasourceRequests": 1,
-                    "includeHiddenColumnsInAdvancedFilter": True,
-                    "enableCellTextSelection": True,
-                    "getRowId": {"function": "params => params.data.id"},
-                    "suppressRowClickSelection": False,
-                },
-                getRowStyle={"styleConditions": style_data_conditional},
-            ),
+        style_data_conditional = [
+            {
+                "condition": "params.data.status == 'SUCCESS'",
+                "style": {"backgroundColor": "#D1E7DD"},
+            },
+            {"condition": "params.data.status == 'FAIL'", "style": {"backgroundColor": "#F8D7DA"}},
         ]
-    )
+
+        column_defs = [{"headerName": c["name"], "field": c["id"]} for c in cols]
+        for c in column_defs:
+            if c["field"] == "name":
+                c["sort"] = "asc"
+            if c["field"] in ("start_date", "end_date", "created_at", "updated_at"):
+                c["filter"] = "agDateColumnFilter"
+            if c["field"] == "logs":
+                c["sortable"] = False
+                c["filter"] = False
+                c["suppressClickEdit"] = True
+                c["cellRenderer"] = {
+                    "function": """
+                        function(params) {
+                            return `<button class='btn btn-link'>Show Logs</button>`;
+                        }
+                    """
+                }
+            if c["field"] == "edit":
+                c["sortable"] = False
+                c["filter"] = False
+
+        return html.Div(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Button(
+                                    "Refresh Scripts",
+                                    id="refresh-scripts-btn",
+                                    color="primary",
+                                    className="mb-3",
+                                ),
+                            ],
+                            width="auto",
+                        ),
+                    ]
+                ),
+                dag.AgGrid(
+                    columnDefs=column_defs,
+                    id="scripts-table",
+                    defaultColDef={"sortable": True, "resizable": True, "filter": True},
+                    columnSize="sizeToFit",
+                    rowModelType="infinite",
+                    dashGridOptions={
+                        "cacheBlockSize": DEFAULT_PAGE_SIZE,
+                        "maxBlocksInCache": 2,
+                        "blockLoadDebounceMillis": 500,
+                        "purgeClosedRowNodes": True,
+                        "maxConcurrentDatasourceRequests": 1,
+                        "includeHiddenColumnsInAdvancedFilter": True,
+                        "enableCellTextSelection": True,
+                        "getRowId": {"function": "params => params.data.id"},
+                        "suppressRowClickSelection": False,
+                    },
+                    getRowStyle={"styleConditions": style_data_conditional},
+                    dangerously_allow_code=True,
+                ),
+            ]
+        )
+    except Exception as e:
+        import traceback
+
+        print(f"Error in scripts_tab_content: {e}\n{traceback.format_exc()}")
+        return html.Div([html.Div(f"Error loading scripts table: {e}")])
 
 
 def profile_tab_content(user_data):
@@ -319,8 +337,8 @@ def profile_tab_content(user_data):
                                                         id="profile-email",
                                                         type="email",
                                                         placeholder="Enter your email",
-                                                        disabled=True,
                                                         value=current_email,
+                                                        disabled=True,
                                                     ),
                                                 ],
                                                 width=6,
