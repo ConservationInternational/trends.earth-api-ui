@@ -90,6 +90,12 @@ def login_layout():
                                             id="login-btn",
                                             color="primary",
                                             className="mt-2",
+                                            n_clicks=0,
+                                            style={"width": "100%"},
+                                        ),
+                                        html.Div(
+                                            id="login-feedback",
+                                            style={"margin-top": "10px", "min-height": "20px"},
                                         ),
                                     ]
                                 ),
