@@ -2,6 +2,7 @@
 
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+from dash_extensions import Cookie
 
 from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_URL
 from .modals import edit_script_modal, edit_user_modal, json_modal, map_modal
@@ -23,6 +24,8 @@ def create_main_layout():
             dcc.Store(id="current-log-context"),
             dcc.Store(id="edit-user-data"),
             dcc.Store(id="edit-script-data"),
+            # Cookie store for persistent authentication
+            Cookie(id="auth-cookie"),
             # Modals
             json_modal(),
             edit_user_modal(),
@@ -81,6 +84,19 @@ def login_layout():
                                                         placeholder="Enter password",
                                                     ),
                                                     width=9,
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    dbc.Checkbox(
+                                                        id="remember-me-checkbox",
+                                                        label="Remember me for 6 hours",
+                                                        value=True,
+                                                    ),
+                                                    width=12,
                                                 ),
                                             ],
                                             className="mb-3",

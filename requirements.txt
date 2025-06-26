@@ -5,3 +5,4 @@ dash-ag-grid
 plotly
 pandas
 dash-leaflet
+dash-extensions

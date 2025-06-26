@@ -344,6 +344,12 @@ def profile_tab_content(user_data):
                                                         color="primary",
                                                         className="me-2",
                                                     ),
+                                                    dbc.Button(
+                                                        "Logout",
+                                                        id="logout-btn",
+                                                        color="danger",
+                                                        className="me-2",
+                                                    ),
                                                     dbc.Alert(
                                                         id="profile-update-alert",
                                                         is_open=False,

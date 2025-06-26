@@ -1,5 +1,11 @@
 """Initialize utils package."""
 
+from .cookies import (
+    clear_auth_cookie_data,
+    create_auth_cookie_data,
+    extract_auth_from_cookie,
+    is_auth_cookie_valid,
+)
 from .geojson import (
     create_map_from_geojsons,
     ensure_geojson_feature,
@@ -21,4 +27,8 @@ __all__ = [
     "create_map_from_geojsons",
     "get_tile_layer",
     "render_json_tree",
+    "create_auth_cookie_data",
+    "is_auth_cookie_valid",
+    "extract_auth_from_cookie",
+    "clear_auth_cookie_data",
 ]
