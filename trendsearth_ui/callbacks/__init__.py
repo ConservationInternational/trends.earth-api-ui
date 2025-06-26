@@ -1,17 +1,12 @@
 """Initialize callbacks package."""
 import importlib
 
-# Explicit imports for test compatibility
-from . import status
-
 
 def register_all_callbacks(app):
     """Register all callbacks with the Dash app."""
-    # Explicit registration for test compatibility
-    status.register_callbacks(app)
-    
     # Use importlib to dynamically import modules to avoid circular imports
     callback_modules = [
+        "status",  # Move status to dynamic import list
         "auth",
         "manual_tabs",  # Add manual tabs before tabs
         "tabs",
@@ -21,7 +16,6 @@ def register_all_callbacks(app):
         "profile",
         "edit",
         "refresh",
-        # "status",  # Already registered explicitly above
     ]
 
     for module_name in callback_modules:
@@ -40,5 +34,4 @@ def register_all_callbacks(app):
 
 __all__ = [
     "register_all_callbacks",
-    "status",  # Explicitly imported module
 ]

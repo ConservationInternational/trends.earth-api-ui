@@ -34,7 +34,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call="initial_duplicate",
     )
-    def display_page(token, pathname):
+    def display_page(token, _pathname):
         """Display login or dashboard based on authentication status."""
         # Check if we have a valid token in store
         if token:
