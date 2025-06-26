@@ -142,41 +142,76 @@ def dashboard_layout():
             dismissable=True,
             duration=4000,
         ),
-        # Use Bootstrap HTML tabs instead of dbc.Tabs
-        html.Div([
-            html.Ul([
-                html.Li([
-                    html.Button("Executions", 
-                              id="executions-tab-btn", 
-                              className="nav-link active",
-                              **{"data-tab": "executions"})
-                ], className="nav-item"),
-                html.Li([
-                    html.Button("Users", 
-                              id="users-tab-btn", 
-                              className="nav-link",
-                              **{"data-tab": "users"})
-                ], className="nav-item"),
-                html.Li([
-                    html.Button("Scripts", 
-                              id="scripts-tab-btn", 
-                              className="nav-link",
-                              **{"data-tab": "scripts"})
-                ], className="nav-item"),
-                html.Li([
-                    html.Button("Status", 
-                              id="status-tab-btn", 
-                              className="nav-link",
-                              **{"data-tab": "status"})
-                ], className="nav-item"),
-                html.Li([
-                    html.Button("Profile", 
-                              id="profile-tab-btn", 
-                              className="nav-link",
-                              **{"data-tab": "profile"})
-                ], className="nav-item"),
-            ], className="nav nav-tabs", id="tabs-nav"),
-        ]),
+        # Collapsible main panel containing the tabs
+        dbc.Collapse(
+            html.Div(
+                [
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Executions",
+                                        id="executions-tab-btn",
+                                        className="nav-link active",
+                                        **{"data-tab": "executions"},
+                                    )
+                                ],
+                                className="nav-item",
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Users",
+                                        id="users-tab-btn",
+                                        className="nav-link",
+                                        **{"data-tab": "users"},
+                                    )
+                                ],
+                                className="nav-item",
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Scripts",
+                                        id="scripts-tab-btn",
+                                        className="nav-link",
+                                        **{"data-tab": "scripts"},
+                                    )
+                                ],
+                                className="nav-item",
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Status",
+                                        id="status-tab-btn",
+                                        className="nav-link",
+                                        **{"data-tab": "status"},
+                                    )
+                                ],
+                                className="nav-item",
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Profile",
+                                        id="profile-tab-btn",
+                                        className="nav-link",
+                                        **{"data-tab": "profile"},
+                                    )
+                                ],
+                                className="nav-item",
+                            ),
+                        ],
+                        className="nav nav-tabs",
+                        id="tabs-nav",
+                    ),
+                ]
+            ),
+            id="main-panel",
+            is_open=True,
+        ),
         html.Div(id="tab-content", className="tab-content"),
         # Hidden store to track active tab
         dcc.Store(id="active-tab-store", data="executions"),

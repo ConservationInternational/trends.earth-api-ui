@@ -27,7 +27,7 @@ def register_callbacks(app):
     def render_tab(tab, token, role, user_data):
         """Render the content for the active tab."""
         print(f"🔍 render_tab called: tab={tab}, token={bool(token)}, role={role}")
-        
+
         # Handle initial load when stores might not be populated yet
         if not token:
             print("❌ No token provided to render_tab")
@@ -39,13 +39,13 @@ def register_callbacks(app):
             print(f"🔄 No tab provided, defaulting to: {tab}")
 
         print(f"✅ Rendering tab: {tab}")
-        
+
         # Handle case where role might not be set yet
         is_admin = (role == "ADMIN") if role else False
 
         # Only fetch data if we have a valid token and tab
         try:
-            print(f"📡 Fetching scripts and users data...")
+            print("📡 Fetching scripts and users data...")
             scripts, users = fetch_scripts_and_users(token)
             print(f"✅ Data fetched successfully: {len(scripts)} scripts, {len(users)} users")
         except Exception as e:
@@ -57,9 +57,9 @@ def register_callbacks(app):
             return content, scripts, users
 
         elif tab == "executions":
-            print(f"🎯 Creating executions tab content...")
+            print("🎯 Creating executions tab content...")
             content = executions_tab_content()
-            print(f"✅ Executions content created successfully")
+            print("✅ Executions content created successfully")
             return content, scripts, users
 
         elif tab == "users":
