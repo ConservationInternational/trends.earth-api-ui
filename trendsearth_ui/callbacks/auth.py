@@ -2,6 +2,10 @@
 
 from dash import Input, Output, State, callback_context, no_update
 import requests
+import json
+from datetime import datetime, timedelta
+import flask
+from flask import request
 
 from ..components import dashboard_layout, login_layout
 from ..config import AUTH_URL
@@ -24,23 +28,29 @@ def register_callbacks(app):
             Output("token-store", "data", allow_duplicate=True),
             Output("role-store", "data", allow_duplicate=True),
             Output("user-store", "data", allow_duplicate=True),
-            Output("login-email", "value", allow_duplicate=True),
         ],
         [
             Input("token-store", "data"),
-            Input("auth-cookie", "data"),
+            Input("url", "pathname"),  # Use URL pathname to trigger on page load
         ],
-        prevent_initial_call=False,
+        prevent_initial_call='initial_duplicate',
     )
-    def display_page(token, cookie_data):
+    def display_page(token, pathname):
         """Display login or dashboard based on authentication status."""
-        ctx = callback_context
-        
         # Check if we have a valid token in store
         if token:
-            return dashboard_layout(), False, no_update, no_update, no_update, no_update
+            return dashboard_layout(), False, no_update, no_update, no_update
         
-        # If no token in store, check cookie for valid authentication
+        # If no token in store, check HTTP cookie for valid authentication
+        cookie_data = None
+        try:
+            auth_cookie = request.cookies.get('auth_token')
+            if auth_cookie:
+                cookie_data = json.loads(auth_cookie)
+        except Exception as e:
+            print(f"Error reading auth cookie: {e}")
+            cookie_data = None
+        
         if cookie_data and is_auth_cookie_valid(cookie_data):
             stored_token, stored_email, stored_user_data = extract_auth_from_cookie(cookie_data)
             if stored_token and stored_user_data:
@@ -51,17 +61,11 @@ def register_callbacks(app):
                     False, 
                     stored_token, 
                     role, 
-                    stored_user_data,
-                    stored_email
+                    stored_user_data
                 )
         
         # No valid authentication found, show login page
-        # If cookie has email but expired, pre-populate email field
-        email_value = ""
-        if cookie_data and isinstance(cookie_data, dict):
-            email_value = cookie_data.get("email", "")
-        
-        return login_layout(), True, None, None, None, email_value
+        return login_layout(), True, None, None, None
 
     @app.callback(
         [
@@ -71,7 +75,6 @@ def register_callbacks(app):
             Output("login-alert", "children"),
             Output("login-alert", "color"),
             Output("login-alert", "is_open"),
-            Output("auth-cookie", "data"),
         ],
         [Input("login-btn", "n_clicks")],
         [
@@ -90,7 +93,7 @@ def register_callbacks(app):
             return (
                 None, None, None, 
                 "Please enter both email and password.", 
-                "warning", True, no_update
+                "warning", True
             )
 
         print(f"🌐 Attempting to connect to: {AUTH_URL}")
@@ -108,30 +111,40 @@ def register_callbacks(app):
                     role = user_data.get("role", "USER")
                     print(f"✅ Login successful for user: {user_data.get('email', 'unknown')}")
                     
-                    # Create cookie data if remember me is checked
-                    cookie_data = no_update
+                    # Set HTTP cookie if remember me is checked
                     if remember_me:
                         cookie_data = create_auth_cookie_data(token, email, user_data)
-                        print(f"🍪 Created authentication cookie with 6-hour expiration")
+                        cookie_value = json.dumps(cookie_data)
+                        
+                        # Access Flask response through callback context
+                        ctx = callback_context
+                        if hasattr(ctx, 'response') and ctx.response:
+                            expiration = datetime.now() + timedelta(hours=6)
+                            ctx.response.set_cookie(
+                                'auth_token', 
+                                cookie_value,
+                                expires=expiration,
+                                httponly=True,
+                                secure=False,  # Set to True in production with HTTPS
+                                samesite='Lax'
+                            )
+                            print(f"🍪 Set HTTP authentication cookie with 6-hour expiration")
                     
                     return (
                         token, role, user_data, 
-                        "Login successful!", "success", True,
-                        cookie_data
+                        "Login successful!", "success", True
                     )
                 else:
                     print("❌ Failed to retrieve user information")
                     return (
                         None, None, None, 
-                        "Failed to retrieve user information.", "danger", True,
-                        no_update
+                        "Failed to retrieve user information.", "danger", True
                     )
             else:
                 print(f"❌ Login failed with status code: {resp.status_code}")
                 return (
                     None, None, None, 
-                    "Invalid credentials.", "danger", True,
-                    no_update
+                    "Invalid credentials.", "danger", True
                 )
 
         except requests.exceptions.Timeout:
@@ -139,26 +152,24 @@ def register_callbacks(app):
             return (
                 None, None, None,
                 "Login failed: Connection timeout. Please try again later.",
-                "danger", True, no_update
+                "danger", True
             )
         except requests.exceptions.ConnectionError:
             print("❌ Connection error during login")
             return (
                 None, None, None,
                 "Login failed: Cannot connect to authentication server. Please check the server status.",
-                "danger", True, no_update
+                "danger", True
             )
         except Exception as e:
             print(f"❌ Login error: {str(e)}")
             return (
                 None, None, None, 
-                f"Login failed: {str(e)}", "danger", True,
-                no_update
+                f"Login failed: {str(e)}", "danger", True
             )
 
     @app.callback(
         [
-            Output("auth-cookie", "data", allow_duplicate=True),
             Output("token-store", "clear_data", allow_duplicate=True),
         ],
         [Input("logout-btn", "n_clicks")],
@@ -168,5 +179,45 @@ def register_callbacks(app):
         """Handle user logout and clear authentication cookie."""
         if _n:
             print("🚪 User logging out - clearing authentication data")
-            return clear_auth_cookie_data(), True
-        return no_update, no_update
+            
+            # Clear HTTP cookie
+            ctx = callback_context
+            if hasattr(ctx, 'response') and ctx.response:
+                ctx.response.set_cookie(
+                    'auth_token', 
+                    '',
+                    expires=0,  # Expire immediately
+                    httponly=True,
+                    secure=False,  # Set to True in production with HTTPS
+                    samesite='Lax'
+                )
+                print("🍪 Cleared HTTP authentication cookie")
+            
+            return True
+        return no_update
+
+    @app.callback(
+        [Output("login-email", "value")],
+        [Input("page-content", "children")],
+        prevent_initial_call=True,
+    )
+    def populate_login_email(page_content):
+        """Pre-populate email field from expired cookie when login page is shown."""
+        # Check if this is the login page being displayed
+        if page_content and isinstance(page_content, dict):
+            # Check if we have cookie data with an email to pre-populate
+            cookie_data = None
+            try:
+                auth_cookie = request.cookies.get('auth_token')
+                if auth_cookie:
+                    cookie_data = json.loads(auth_cookie)
+            except Exception as e:
+                print(f"Error reading auth cookie for email population: {e}")
+                cookie_data = None
+            
+            if cookie_data and isinstance(cookie_data, dict):
+                email_value = cookie_data.get("email", "")
+                if email_value:
+                    return [email_value]
+        
+        return [""]

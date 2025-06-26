@@ -42,8 +42,9 @@ register_all_callbacks(app)
 def main():
     """Main entry point for console script."""
     print("Starting Trends.Earth API Dashboard...")
-    print("Access the app at: http://127.0.0.1:8050")
-    app.run(debug=True, host="127.0.0.1", port=8050)
+    print(f"Access the app at: http://127.0.0.1:8050")
+    print(f"Debug mode: True")
+    app.run(debug=True, host="127.0.0.1", port=8050, use_reloader=False)
 
 
 if __name__ == "__main__":

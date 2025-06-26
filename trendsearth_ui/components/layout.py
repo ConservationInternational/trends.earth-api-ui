@@ -2,7 +2,6 @@
 
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from dash_extensions import Cookie
 
 from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_URL
 from .modals import edit_script_modal, edit_user_modal, json_modal, map_modal
@@ -14,6 +13,8 @@ def create_main_layout():
         [
             html.H1(APP_TITLE),
             html.Div(id="page-content"),
+            # URL component for navigation tracking
+            dcc.Location(id="url", refresh=False),
             # Data stores
             dcc.Store(id="token-store"),
             dcc.Store(id="role-store"),
@@ -24,8 +25,6 @@ def create_main_layout():
             dcc.Store(id="current-log-context"),
             dcc.Store(id="edit-user-data"),
             dcc.Store(id="edit-script-data"),
-            # Cookie store for persistent authentication
-            Cookie(id="auth-cookie"),
             # Modals
             json_modal(),
             edit_user_modal(),
