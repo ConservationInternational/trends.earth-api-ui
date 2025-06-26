@@ -20,62 +20,58 @@ def register_callbacks(app):
         Output("scripts-raw-data", "data"),
         Output("users-raw-data", "data"),
         Input("active-tab-store", "data"),
+        Input("user-store", "data"),
         State("token-store", "data"),
         State("role-store", "data"),
         State("user-store", "data"),
     )
-    def render_tab(tab, token, role, user_data):
-        """Render the content for the active tab."""
-        print(f"🔍 render_tab called: tab={tab}, token={bool(token)}, role={role}")
+    def render_tab(tab, _, token, role, user_data):
+        import dash
+        from dash import no_update
+
+        # Check if tab-content exists in the layout
+        # This is a workaround: if the callback is triggered before dashboard is loaded, just return no_update
+        try:
+            # Dash 2.x: callback_context.states contains all State values, but we can't directly check layout
+            # Instead, check if the tab-content is present in the DOM by checking the trigger and token
+            if not token or tab is None:
+                return no_update, no_update, no_update
+        except Exception:
+            return no_update, no_update, no_update
+
+        ctx = dash.callback_context
+        trigger = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else None
 
         # Handle initial load when stores might not be populated yet
         if not token:
-            print("❌ No token provided to render_tab")
             return html.Div("Please login to view content."), [], []
 
         # Set default tab if none provided
         if not tab:
             tab = "executions"  # Default to executions tab
-            print(f"🔄 No tab provided, defaulting to: {tab}")
 
-        print(f"✅ Rendering tab: {tab}")
+        # Fetch scripts and users only if tab changes
+        scripts, users = [], []
+        if trigger == "active-tab-store":
+            try:
+                scripts, users = fetch_scripts_and_users(token)
+            except Exception:
+                scripts, users = [], []
 
-        # Handle case where role might not be set yet
-        is_admin = (role == "ADMIN") if role else False
-
-        # Only fetch data if we have a valid token and tab
-        try:
-            print("📡 Fetching scripts and users data...")
-            scripts, users = fetch_scripts_and_users(token)
-            print(f"✅ Data fetched successfully: {len(scripts)} scripts, {len(users)} users")
-        except Exception as e:
-            print(f"❌ Error fetching data: {e}")
-            scripts, users = [], []
-
-        if tab == "scripts":
-            content = scripts_tab_content(scripts, users, is_admin)
-            return content, scripts, users
-
+        # Profile tab: always re-render with latest user_data
+        if tab == "profile":
+            return profile_tab_content(user_data or {}), scripts, users
+        elif tab == "scripts":
+            return scripts_tab_content(scripts, users, role == "ADMIN"), scripts, users
         elif tab == "executions":
-            print("🎯 Creating executions tab content...")
-            content = executions_tab_content()
-            print("✅ Executions content created successfully")
-            return content, scripts, users
-
+            return executions_tab_content(), scripts, users
         elif tab == "users":
-            content = users_tab_content(users, is_admin)
-            return content, scripts, users
-
-        elif tab == "profile":
-            # Pass user_data even if it's None - the profile_tab_content handles it
-            content = profile_tab_content(user_data or {})
-            return content, scripts, users
-
+            return users_tab_content(users, role == "ADMIN"), scripts, users
         elif tab == "status":
-            content = status_tab_content(is_admin)
-            return content, scripts, users
-
+            return status_tab_content(role == "ADMIN"), scripts, users
         return html.Div("Unknown tab."), scripts, users
+
+    # Remove the now-unnecessary update_profile_tab_on_user_change callback
 
 
 # Legacy callback decorators for backward compatibility (these won't be executed)

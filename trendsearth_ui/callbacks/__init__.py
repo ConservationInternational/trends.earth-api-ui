@@ -15,6 +15,8 @@ def register_all_callbacks(app):
         "manual_tabs",  # Add manual tabs before tabs
         "tabs",
         "executions",
+        "users",  # Add users table callbacks
+        "scripts",  # Add scripts table callbacks
         "modals",
         "map",
         "profile",

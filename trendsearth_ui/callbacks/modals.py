@@ -227,10 +227,9 @@ def register_callbacks(app):
         Input("scripts-table", "cellClicked"),
         State("token-store", "data"),
         State("json-modal", "is_open"),
-        State("scripts-raw-data", "data"),
         prevent_initial_call=True,
     )
-    def show_script_logs_modal(cell, token, is_open, scripts_data):
+    def show_script_logs_modal(cell, token, is_open):
         """Show script logs modal."""
         if not cell:
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
@@ -239,12 +238,12 @@ def register_callbacks(app):
         if col != "logs":
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
-        row_index = cell.get("rowIndex")
-
-        if row_index is None or not scripts_data:
+        # Try to get row data directly from the cell click event
+        row_data = cell.get("data")
+        if not row_data or "id" not in row_data:
             return (
                 True,
-                "Could not get script data.",
+                "Could not get script data from cell click. This indicates a configuration issue.",
                 None,
                 "Error",
                 {"display": "none"},
@@ -252,24 +251,11 @@ def register_callbacks(app):
                 None,
             )
 
-        if row_index >= len(scripts_data):
-            return (
-                True,
-                f"Row index {row_index} out of range",
-                None,
-                "Error",
-                {"display": "none"},
-                True,
-                None,
-            )
-
-        script = scripts_data[row_index]
-        script_id = script.get("id")
-
+        script_id = row_data.get("id")
         if not script_id:
             return (
                 True,
-                f"Could not get script ID from row data. Row: {script}",
+                f"Could not get script ID from row data. Row: {row_data}",
                 None,
                 "Error",
                 {"display": "none"},

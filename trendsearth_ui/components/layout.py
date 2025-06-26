@@ -13,6 +13,7 @@ def create_main_layout():
         [
             html.H1(APP_TITLE),
             html.Div(id="page-content"),
+            html.Div(id="tab-content"),
             # URL component for navigation tracking
             dcc.Location(id="url", refresh=False),
             # Data stores
@@ -25,6 +26,9 @@ def create_main_layout():
             dcc.Store(id="current-log-context"),
             dcc.Store(id="edit-user-data"),
             dcc.Store(id="edit-script-data"),
+            dcc.Store(id="users-table-refresh-trigger"),
+            dcc.Store(id="scripts-table-refresh-trigger"),
+            dcc.Store(id="active-tab-store", data="executions"),
             # Modals
             json_modal(),
             edit_user_modal(),
@@ -212,7 +216,6 @@ def dashboard_layout():
             id="main-panel",
             is_open=True,
         ),
-        html.Div(id="tab-content", className="tab-content"),
         # Hidden store to track active tab
         dcc.Store(id="active-tab-store", data="executions"),
     ]

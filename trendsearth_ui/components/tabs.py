@@ -97,7 +97,7 @@ def executions_tab_content():
 def users_tab_content(users, is_admin):
     """Create the users tab content."""
     if not users:
-        return html.Div([html.Div("No users found.")])
+        return html.Div([html.Div("No users found.")]), []
 
     user_keys = list(users[0].keys())
     cols = []
@@ -130,7 +130,7 @@ def users_tab_content(users, is_admin):
             c["sortable"] = False
             c["filter"] = False
 
-    return html.Div(
+    content = html.Div(
         [
             dbc.Row(
                 [
@@ -149,14 +149,27 @@ def users_tab_content(users, is_admin):
             ),
             dag.AgGrid(
                 columnDefs=column_defs,
-                rowData=table_data,
                 id="users-table",
                 defaultColDef={"sortable": True, "resizable": True, "filter": True},
                 columnSize="sizeToFit",
-                dashGridOptions={"pagination": True, "paginationPageSize": DEFAULT_PAGE_SIZE},
+                rowModelType="infinite",
+                dashGridOptions={
+                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
+                    "maxBlocksInCache": 2,
+                    "blockLoadDebounceMillis": 500,
+                    "purgeClosedRowNodes": True,
+                    "maxConcurrentDatasourceRequests": 1,
+                    "includeHiddenColumnsInAdvancedFilter": True,
+                    "enableCellTextSelection": True,
+                    "getRowId": {"function": "params => params.data.id"},
+                    "suppressRowClickSelection": False,
+                },
             ),
         ]
     )
+
+    # Return both the content and the sorted table data for use in callbacks
+    return content
 
 
 def scripts_tab_content(scripts, users, is_admin):
@@ -241,11 +254,21 @@ def scripts_tab_content(scripts, users, is_admin):
             ),
             dag.AgGrid(
                 columnDefs=column_defs,
-                rowData=table_data,
                 id="scripts-table",
                 defaultColDef={"sortable": True, "resizable": True, "filter": True},
                 columnSize="sizeToFit",
-                dashGridOptions={"pagination": True, "paginationPageSize": DEFAULT_PAGE_SIZE},
+                rowModelType="infinite",
+                dashGridOptions={
+                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
+                    "maxBlocksInCache": 2,
+                    "blockLoadDebounceMillis": 500,
+                    "purgeClosedRowNodes": True,
+                    "maxConcurrentDatasourceRequests": 1,
+                    "includeHiddenColumnsInAdvancedFilter": True,
+                    "enableCellTextSelection": True,
+                    "getRowId": {"function": "params => params.data.id"},
+                    "suppressRowClickSelection": False,
+                },
                 getRowStyle={"styleConditions": style_data_conditional},
             ),
         ]
