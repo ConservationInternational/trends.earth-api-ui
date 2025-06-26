@@ -173,7 +173,7 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("scripts-raw-data", "data"),
             State("users-raw-data", "data"),
-            State("tabs", "active_tab"),
+            State("active-tab-store", "data"),
         ],
         prevent_initial_call=True,
     )
@@ -222,7 +222,7 @@ def register_callbacks(app):
     @app.callback(
         Output("executions-countdown", "children"),
         Input("executions-countdown-interval", "n_intervals"),
-        State("tabs", "active_tab"),
+        State("active-tab-store", "data"),
         prevent_initial_call=True,
     )
     def update_executions_countdown(n_intervals, active_tab):

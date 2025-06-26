@@ -10,7 +10,7 @@ from .callbacks import register_all_callbacks
 from .components import create_main_layout
 
 # Import configuration
-from .config import APP_TITLE
+from .config import APP_TITLE, APP_PORT, APP_HOST
 
 server = flask.Flask(__name__)
 app = dash.Dash(
@@ -42,9 +42,9 @@ register_all_callbacks(app)
 def main():
     """Main entry point for console script."""
     print("Starting Trends.Earth API Dashboard...")
-    print(f"Access the app at: http://127.0.0.1:8050")
+    print(f"Access the app at: http://{APP_HOST}:{APP_PORT}")
     print(f"Debug mode: True")
-    app.run(debug=True, host="127.0.0.1", port=8050, use_reloader=False)
+    app.run(debug=True, host=APP_HOST, port=APP_PORT, use_reloader=False)
 
 
 if __name__ == "__main__":

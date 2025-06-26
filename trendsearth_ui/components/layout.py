@@ -135,27 +135,53 @@ def login_layout():
 
 def dashboard_layout():
     """Create the main dashboard layout."""
-    return [
+    layout = [
         dbc.Alert(
             id="alert",
             is_open=False,
             dismissable=True,
             duration=4000,
         ),
-        dbc.Collapse(
-            dbc.Tabs(
-                [
-                    dbc.Tab(label="Executions", tab_id="executions"),
-                    dbc.Tab(label="Users", tab_id="users"),
-                    dbc.Tab(label="Scripts", tab_id="scripts"),
-                    dbc.Tab(label="Status", tab_id="status"),
-                    dbc.Tab(label="Profile", tab_id="profile"),
-                ],
-                id="tabs",
-                active_tab="executions",  # Default to executions
-            ),
-            id="main-panel",
-            is_open=True,
-        ),
-        html.Div(id="tab-content"),
+        # Use Bootstrap HTML tabs instead of dbc.Tabs
+        html.Div([
+            html.Ul([
+                html.Li([
+                    html.Button("Executions", 
+                              id="executions-tab-btn", 
+                              className="nav-link active",
+                              **{"data-tab": "executions"})
+                ], className="nav-item"),
+                html.Li([
+                    html.Button("Users", 
+                              id="users-tab-btn", 
+                              className="nav-link",
+                              **{"data-tab": "users"})
+                ], className="nav-item"),
+                html.Li([
+                    html.Button("Scripts", 
+                              id="scripts-tab-btn", 
+                              className="nav-link",
+                              **{"data-tab": "scripts"})
+                ], className="nav-item"),
+                html.Li([
+                    html.Button("Status", 
+                              id="status-tab-btn", 
+                              className="nav-link",
+                              **{"data-tab": "status"})
+                ], className="nav-item"),
+                html.Li([
+                    html.Button("Profile", 
+                              id="profile-tab-btn", 
+                              className="nav-link",
+                              **{"data-tab": "profile"})
+                ], className="nav-item"),
+            ], className="nav nav-tabs", id="tabs-nav"),
+        ]),
+        html.Div(id="tab-content", className="tab-content"),
+        # Hidden store to track active tab
+        dcc.Store(id="active-tab-store", data="executions"),
     ]
+    print(f"🏗️ Dashboard layout created with {len(layout)} components:")
+    for i, component in enumerate(layout):
+        print(f"  {i}: {type(component).__name__} - {getattr(component, 'id', 'no id')}")
+    return layout

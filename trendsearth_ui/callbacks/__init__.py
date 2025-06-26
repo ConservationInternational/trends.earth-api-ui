@@ -7,6 +7,7 @@ def register_all_callbacks(app):
     # Use importlib to dynamically import modules to avoid circular imports
     callback_modules = [
         "auth",
+        "manual_tabs",  # Add manual tabs before tabs
         "tabs",
         "executions",
         "modals",

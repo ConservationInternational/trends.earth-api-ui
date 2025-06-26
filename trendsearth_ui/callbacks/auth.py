@@ -39,7 +39,10 @@ def register_callbacks(app):
         """Display login or dashboard based on authentication status."""
         # Check if we have a valid token in store
         if token:
-            return dashboard_layout(), False, no_update, no_update, no_update
+            print(f"✅ Token found in store, displaying dashboard layout")
+            dashboard = dashboard_layout()
+            print(f"🏗️ Dashboard layout created: {type(dashboard)}")
+            return dashboard, False, no_update, no_update, no_update
         
         # If no token in store, check HTTP cookie for valid authentication
         cookie_data = None
