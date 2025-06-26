@@ -23,18 +23,19 @@ def register_callbacks(app):
         State("token-store", "data"),
         State("role-store", "data"),
         State("user-store", "data"),
-        prevent_initial_call=True,
     )
     def render_tab(tab, token, role, user_data):
         """Render the content for the active tab."""
+        # Handle initial load when stores might not be populated yet
         if not token:
             return html.Div("Please login to view content."), [], []
 
-        # Add additional safety check
+        # Set default tab if none provided
         if not tab:
-            return html.Div("Loading..."), [], []
+            tab = "executions"  # Default to executions tab
 
-        is_admin = role == "ADMIN"
+        # Handle case where role might not be set yet
+        is_admin = (role == "ADMIN") if role else False
         
         # Only fetch data if we have a valid token and tab
         try:
@@ -56,7 +57,8 @@ def register_callbacks(app):
             return content, scripts, users
 
         elif tab == "profile":
-            content = profile_tab_content(user_data)
+            # Pass user_data even if it's None - the profile_tab_content handles it
+            content = profile_tab_content(user_data or {})
             return content, scripts, users
 
         elif tab == "status":
