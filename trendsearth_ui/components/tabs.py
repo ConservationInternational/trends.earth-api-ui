@@ -12,7 +12,7 @@ def executions_tab_content():
     """Create the executions tab content."""
     column_defs = [
         {"headerName": "Script Name", "field": "script_name"},
-        {"headerName": "User Email", "field": "user_email"},
+        {"headerName": "User Name", "field": "user_name"},
         {"headerName": "Status", "field": "status"},
         {"headerName": "Start Date", "field": "start_date", "filter": "agDateColumnFilter"},
         {"headerName": "End Date", "field": "end_date", "filter": "agDateColumnFilter"},
@@ -97,7 +97,7 @@ def executions_tab_content():
 def users_tab_content(users, is_admin):
     """Create the users tab content."""
     if not users:
-        return html.Div([html.Div("No users found.")]), []
+        return html.Div([html.Div("No users found.")])
 
     user_keys = list(users[0].keys())
     cols = []

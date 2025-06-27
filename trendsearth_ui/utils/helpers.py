@@ -86,7 +86,8 @@ def fetch_scripts_and_users(token):
     users = []
 
     try:
-        resp_scripts = requests.get(f"{API_BASE}/script", headers=headers, timeout=5)
+        params = {"include": "user_name"}
+        resp_scripts = requests.get(f"{API_BASE}/script", params=params, headers=headers, timeout=5)
         if resp_scripts.status_code == 200:
             scripts = resp_scripts.json().get("data", [])
     except requests.exceptions.Timeout:

@@ -247,10 +247,7 @@ def register_callbacks(app):
         page = (row_index // page_size) + 1
         row_in_page = row_index % page_size
 
-        params = {
-            "page": page,
-            "per_page": page_size,
-        }
+        params = {"page": page, "per_page": page_size, "include": "user_name"}
         resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
         if resp.status_code != 200:
             return (

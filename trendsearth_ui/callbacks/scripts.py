@@ -13,12 +13,11 @@ def register_callbacks(app):
         [Input("scripts-table", "getRowsRequest"), Input("scripts-table-refresh-trigger", "data")],
         [
             State("scripts-raw-data", "data"),
-            State("users-raw-data", "data"),
             State("role-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def get_scripts_rows(request, _refresh_trigger, scripts_data, users_data, role):
+    def get_scripts_rows(request, _refresh_trigger, scripts_data, role):
         """Get scripts data for ag-grid with infinite row model."""
         try:
             if not request or not scripts_data:
@@ -31,21 +30,10 @@ def register_callbacks(app):
 
             # Create table data with edit buttons for admin users
             is_admin = role == "ADMIN"
-            user_id_to_name = {u.get("id"): u.get("name") for u in users_data or []}
-
-            # Determine user column
-            user_col = None
-            if scripts_data and "user_id" in scripts_data[0]:
-                user_col = "user_id"
-            elif scripts_data and "author_id" in scripts_data[0]:
-                user_col = "author_id"
 
             table_data = []
             for script in scripts_data:
                 row = script.copy()
-                # Add user name
-                if user_col:
-                    row["user_name"] = user_id_to_name.get(row.get(user_col), "")
                 # Parse dates
                 for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                     if date_col in row:
@@ -110,32 +98,20 @@ def register_callbacks(app):
         Output("scripts-table", "getRowsResponse", allow_duplicate=True),
         Input("refresh-scripts-btn", "n_clicks"),
         State("scripts-raw-data", "data"),
-        State("users-raw-data", "data"),
         State("role-store", "data"),
         prevent_initial_call=True,
     )
-    def refresh_scripts_table(n_clicks, scripts_data, users_data, role):
+    def refresh_scripts_table(n_clicks, scripts_data, role):
         """Manually refresh the scripts table."""
         if not n_clicks or not scripts_data:
             return {"rowData": [], "rowCount": 0}
 
         # Create table data with edit buttons for admin users
         is_admin = role == "ADMIN"
-        user_id_to_name = {u.get("id"): u.get("name") for u in users_data or []}
-
-        # Determine user column
-        user_col = None
-        if scripts_data and "user_id" in scripts_data[0]:
-            user_col = "user_id"
-        elif scripts_data and "author_id" in scripts_data[0]:
-            user_col = "author_id"
 
         table_data = []
         for script in scripts_data:
             row = script.copy()
-            # Add user name
-            if user_col:
-                row["user_name"] = user_id_to_name.get(row.get(user_col), "")
             # Parse dates
             for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                 if date_col in row:

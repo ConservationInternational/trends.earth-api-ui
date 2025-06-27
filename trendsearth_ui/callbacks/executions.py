@@ -14,11 +14,9 @@ def register_callbacks(app):
         Output("executions-table", "getRowsResponse"),
         Input("executions-table", "getRowsRequest"),
         State("token-store", "data"),
-        State("scripts-raw-data", "data"),
-        State("users-raw-data", "data"),
         prevent_initial_call=True,
     )
-    def get_execution_rows(request, token, scripts, users):
+    def get_execution_rows(request, token):
         """Get execution data for ag-grid with infinite row model."""
         try:
             if not request or not token:
@@ -37,6 +35,7 @@ def register_callbacks(app):
                 "page": page,
                 "per_page": page_size,
                 "exclude": "params,results",
+                "include": "user_name,script_name",
             }
 
             # Add sorting to API request if supported
@@ -47,8 +46,8 @@ def register_callbacks(app):
 
                 # Map frontend field names to API field names
                 field_mapping = {
-                    "script_name": "script_id",
-                    "user_email": "user_id",
+                    "script_name": "script_name",
+                    "user_name": "user_name",
                     "status": "status",
                     "start_date": "start_date",
                     "end_date": "end_date",
@@ -72,14 +71,9 @@ def register_callbacks(app):
             executions = result.get("data", [])
             total_rows = result.get("total", 0)
 
-            script_id_to_name = {s.get("id"): s.get("name") for s in scripts or []}
-            user_id_to_email = {u.get("id"): u.get("email") for u in users or []}
-
             tabledata = []
             for exec_row in executions:
                 row = exec_row.copy()
-                row["script_name"] = script_id_to_name.get(row.get("script_id"), "")
-                row["user_email"] = user_id_to_email.get(row.get("user_id"), "")
                 row["params"] = "Show Params"
                 row["results"] = "Show Results"
                 row["logs"] = "Show Logs"
@@ -117,12 +111,10 @@ def register_callbacks(app):
         Input("refresh-executions-btn", "n_clicks"),
         [
             State("token-store", "data"),
-            State("scripts-raw-data", "data"),
-            State("users-raw-data", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_executions_table(n_clicks, token, scripts, users):
+    def refresh_executions_table(n_clicks, token):
         """Manually refresh the executions table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, 0
@@ -135,6 +127,7 @@ def register_callbacks(app):
             "page": 1,
             "per_page": DEFAULT_PAGE_SIZE,
             "exclude": "params,results",
+            "include": "script_name,user_name",
         }
 
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
@@ -146,14 +139,9 @@ def register_callbacks(app):
         executions = result.get("data", [])
         total_rows = result.get("total", 0)
 
-        script_id_to_name = {s.get("id"): s.get("name") for s in scripts or []}
-        user_id_to_email = {u.get("id"): u.get("email") for u in users or []}
-
         tabledata = []
         for exec_row in executions:
             row = exec_row.copy()
-            row["script_name"] = script_id_to_name.get(row.get("script_id"), "")
-            row["user_email"] = user_id_to_email.get(row.get("user_id"), "")
             row["params"] = "Show Params"
             row["results"] = "Show Results"
             row["logs"] = "Show Logs"
@@ -171,13 +159,11 @@ def register_callbacks(app):
         Input("executions-auto-refresh-interval", "n_intervals"),
         [
             State("token-store", "data"),
-            State("scripts-raw-data", "data"),
-            State("users-raw-data", "data"),
             State("active-tab-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def auto_refresh_executions_table(_n_intervals, token, scripts, users, active_tab):
+    def auto_refresh_executions_table(_n_intervals, token, active_tab):
         """Auto-refresh the executions table."""
         # Only refresh if executions tab is active
         if active_tab != "executions" or not token:
@@ -200,14 +186,9 @@ def register_callbacks(app):
         executions = result.get("data", [])
         total_rows = result.get("total", 0)
 
-        script_id_to_name = {s.get("id"): s.get("name") for s in scripts or []}
-        user_id_to_email = {u.get("id"): u.get("email") for u in users or []}
-
         tabledata = []
         for exec_row in executions:
             row = exec_row.copy()
-            row["script_name"] = script_id_to_name.get(row.get("script_id"), "")
-            row["user_email"] = user_id_to_email.get(row.get("user_id"), "")
             row["params"] = "Show Params"
             row["results"] = "Show Results"
             row["logs"] = "Show Logs"
