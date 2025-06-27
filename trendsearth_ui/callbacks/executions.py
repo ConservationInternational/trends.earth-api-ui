@@ -47,7 +47,7 @@ def register_callbacks(app):
                 else:
                     sort_sql.append(f"{col} asc")
             if sort_sql:
-                params["sort_sql"] = ",".join(sort_sql)
+                params["sort"] = ",".join(sort_sql)
 
             # Build SQL-style filter string
             filter_sql = []
