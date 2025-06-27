@@ -28,9 +28,9 @@ def test_status_tab_presence(dash_app):
 
     # Check if Status-related content is in the layout
     # This might need adjustment based on actual implementation
-    assert (
-        "status" in layout_str.lower() or "Status" in layout_str
-    ), "Status tab should be in the dashboard layout"
+    assert "status" in layout_str.lower() or "Status" in layout_str, (
+        "Status tab should be in the dashboard layout"
+    )
 
 
 def test_admin_access_components(dash_app):
