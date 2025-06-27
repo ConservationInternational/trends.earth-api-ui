@@ -113,7 +113,14 @@ def create_map_from_geojsons(geojsons, exec_id):
                     layer = dl.GeoJSON(
                         data=feature_data,
                         id=f"geojson-{i}",
-                        options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
+                        options={
+                            "style": {
+                                "color": "red",
+                                "weight": 2,
+                                "fillOpacity": 0.2,
+                                "fillColor": "red",
+                            }
+                        },
                         hoverStyle={"weight": 3, "color": "blue"},
                     )
                     map_layers.append(layer)
@@ -147,7 +154,9 @@ def create_map_from_geojsons(geojsons, exec_id):
             layer = dl.GeoJSON(
                 data=feature_data,
                 id="geojson-0",
-                options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
+                options={
+                    "style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}
+                },
                 hoverStyle={"weight": 3, "color": "blue"},
             )
             map_layers.append(layer)
@@ -245,9 +254,11 @@ def create_minimap(center, zoom, map_id, geojsons=None):
     aoi_markers = []
     if geojsons is not None:
         import numpy as np
+
         def get_centroid(coords):
             arr = np.array(coords)
             return [float(arr[:, 0].mean()), float(arr[:, 1].mean())]
+
         if isinstance(geojsons, (dict, str)):
             geojsons = [geojsons]
         for geo in geojsons:
@@ -264,22 +275,46 @@ def create_minimap(center, zoom, map_id, geojsons=None):
             coords = geometry.get("coordinates", [])
             if gtype == "Point":
                 # coords: [lon, lat]
-                aoi_markers.append(dl.Marker(position=[coords[1], coords[0]], children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+                aoi_markers.append(
+                    dl.Marker(
+                        position=[coords[1], coords[0]],
+                        children=[dl.Tooltip("AOI")],
+                        icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"},
+                    )
+                )
             elif gtype == "Polygon":
                 # coords: [[[lon, lat], ...]]
                 flat = [pt for ring in coords for pt in ring]
                 if flat:
                     centroid = get_centroid([[pt[1], pt[0]] for pt in flat])
-                    aoi_markers.append(dl.Marker(position=centroid, children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+                    aoi_markers.append(
+                        dl.Marker(
+                            position=centroid,
+                            children=[dl.Tooltip("AOI")],
+                            icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"},
+                        )
+                    )
             elif gtype == "MultiPolygon":
                 for poly in coords:
                     flat = [pt for ring in poly for pt in ring]
                     if flat:
                         centroid = get_centroid([[pt[1], pt[0]] for pt in flat])
-                        aoi_markers.append(dl.Marker(position=centroid, children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+                        aoi_markers.append(
+                            dl.Marker(
+                                position=centroid,
+                                children=[dl.Tooltip("AOI")],
+                                icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"},
+                            )
+                        )
             elif gtype == "MultiPoint":
                 for pt in coords:
-                    aoi_markers.append(dl.Marker(position=[pt[1], pt[0]], children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+                    aoi_markers.append(
+                        dl.Marker(
+                            position=[pt[1], pt[0]],
+                            children=[dl.Tooltip("AOI")],
+                            icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"},
+                        )
+                    )
     minimap = dl.Map(
         children=[
             get_tile_layer("carto_positron"),

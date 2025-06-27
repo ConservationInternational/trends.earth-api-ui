@@ -21,9 +21,9 @@ def test_status_callbacks_has_register_function():
     try:
         with open(status_file) as f:
             content = f.read()
-            assert "def register_callbacks(app):" in content, (
-                "Status callbacks missing register_callbacks function"
-            )
+            assert (
+                "def register_callbacks(app):" in content
+            ), "Status callbacks missing register_callbacks function"
             print("✅ Status callbacks has register_callbacks function")
     except Exception as e:
         print(f"❌ Error reading status callbacks file: {e}")
@@ -62,9 +62,9 @@ def test_main_callbacks_imports_status():
         with open(init_file) as f:
             content = f.read()
 
-        assert "from . import" in content and "status" in content, (
-            "Main callbacks does not import status module"
-        )
+        assert (
+            "from . import" in content and "status" in content
+        ), "Main callbacks does not import status module"
         print("✅ Main callbacks imports status module")
     except Exception as e:
         print(f"❌ Error reading main callbacks file: {e}")
@@ -78,9 +78,9 @@ def test_main_callbacks_registers_status():
         with open(init_file) as f:
             content = f.read()
 
-        assert "status.register_callbacks(app)" in content, (
-            "Main callbacks does not register status callbacks"
-        )
+        assert (
+            "status.register_callbacks(app)" in content
+        ), "Main callbacks does not register status callbacks"
         print("✅ Main callbacks registers status callbacks")
     except Exception as e:
         print(f"❌ Error checking main callbacks registration: {e}")
