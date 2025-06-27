@@ -109,11 +109,11 @@ def create_map_from_geojsons(geojsons, exec_id):
                     # Convert bare geometry to GeoJSON Feature if needed
                     feature_data = ensure_geojson_feature(geojson_dict)
 
-                    # Add GeoJSON layer
+                    # Add GeoJSON layer (always red)
                     layer = dl.GeoJSON(
                         data=feature_data,
                         id=f"geojson-{i}",
-                        options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2}},
+                        options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
                         hoverStyle={"weight": 3, "color": "blue"},
                     )
                     map_layers.append(layer)
@@ -147,7 +147,7 @@ def create_map_from_geojsons(geojsons, exec_id):
             layer = dl.GeoJSON(
                 data=feature_data,
                 id="geojson-0",
-                options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2}},
+                options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
                 hoverStyle={"weight": 3, "color": "blue"},
             )
             map_layers.append(layer)
@@ -172,8 +172,8 @@ def create_map_from_geojsons(geojsons, exec_id):
             id=f"map-{exec_id}",
         )
 
-        # Create the minimap/locator map
-        minimap_component = create_minimap(center, zoom, exec_id)
+        # Create the minimap/locator map, always pass geojsons
+        minimap_component = create_minimap(center, zoom, exec_id, geojsons=geojsons)
 
         # Return both the main map and the minimap in a container
         return [
@@ -212,23 +212,12 @@ def get_tile_layer(provider_name=None):
     )
 
 
-def create_minimap(center, zoom, map_id):
-    """Create a small overview/locator map.
-
-    Args:
-        center (list): [lat, lon] center coordinates for the main map
-        zoom (int): Zoom level of the main map
-        map_id (str): ID for the map container
-
-    Returns:
-        html.Div: Container with the minimap
-    """
+def create_minimap(center, zoom, map_id, geojsons=None):
+    """Create a small overview/locator map with red points for AOIs."""
     # Calculate appropriate zoom level for overview (typically 3-4 levels lower)
     overview_zoom = max(1, zoom - 4)
-    # Create a simple polygon to show the approximate area of the main map
-    # Calculate rough bounds based on zoom level (this is approximate)
-    lat_offset = 0.5 * (2 ** (10 - zoom))  # Rough calculation
-    lon_offset = 0.7 * (2 ** (10 - zoom))  # Rough calculation
+    lat_offset = 0.5 * (2 ** (10 - zoom))
+    lon_offset = 0.7 * (2 ** (10 - zoom))
 
     # Create a polygon showing the main map's approximate bounds
     bounds_polygon = {
@@ -237,27 +226,65 @@ def create_minimap(center, zoom, map_id):
             "type": "Polygon",
             "coordinates": [
                 [
-                    [center[1] - lon_offset, center[0] - lat_offset],  # Southwest [lon, lat]
-                    [center[1] + lon_offset, center[0] - lat_offset],  # Southeast [lon, lat]
-                    [center[1] + lon_offset, center[0] + lat_offset],  # Northeast [lon, lat]
-                    [center[1] - lon_offset, center[0] + lat_offset],  # Northwest [lon, lat]
-                    [center[1] - lon_offset, center[0] - lat_offset],  # Close polygon [lon, lat]
+                    [center[1] - lon_offset, center[0] - lat_offset],
+                    [center[1] + lon_offset, center[0] - lat_offset],
+                    [center[1] + lon_offset, center[0] + lat_offset],
+                    [center[1] - lon_offset, center[0] + lat_offset],
+                    [center[1] - lon_offset, center[0] - lat_offset],
                 ]
             ],
         },
         "properties": {},
     }
-
-    # Create a GeoJSON layer showing the main map's bounds
     bounds_layer = dl.GeoJSON(
         data=bounds_polygon,
         options={"style": {"color": "red", "weight": 2, "fillOpacity": 0.2, "fillColor": "red"}},
     )
-    # Create the minimap with minimal interactions
+
+    # Add AOI points/centroids as red markers
+    aoi_markers = []
+    if geojsons is not None:
+        import numpy as np
+        def get_centroid(coords):
+            arr = np.array(coords)
+            return [float(arr[:, 0].mean()), float(arr[:, 1].mean())]
+        if isinstance(geojsons, (dict, str)):
+            geojsons = [geojsons]
+        for geo in geojsons:
+            if isinstance(geo, str):
+                try:
+                    geo = json.loads(geo)
+                except Exception:
+                    continue
+            feature = ensure_geojson_feature(geo)
+            geometry = get_geometry_from_geojson(feature)
+            if not geometry:
+                continue
+            gtype = geometry.get("type")
+            coords = geometry.get("coordinates", [])
+            if gtype == "Point":
+                # coords: [lon, lat]
+                aoi_markers.append(dl.Marker(position=[coords[1], coords[0]], children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+            elif gtype == "Polygon":
+                # coords: [[[lon, lat], ...]]
+                flat = [pt for ring in coords for pt in ring]
+                if flat:
+                    centroid = get_centroid([[pt[1], pt[0]] for pt in flat])
+                    aoi_markers.append(dl.Marker(position=centroid, children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+            elif gtype == "MultiPolygon":
+                for poly in coords:
+                    flat = [pt for ring in poly for pt in ring]
+                    if flat:
+                        centroid = get_centroid([[pt[1], pt[0]] for pt in flat])
+                        aoi_markers.append(dl.Marker(position=centroid, children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
+            elif gtype == "MultiPoint":
+                for pt in coords:
+                    aoi_markers.append(dl.Marker(position=[pt[1], pt[0]], children=[dl.Tooltip("AOI")], icon={"iconUrl": None, "iconColor": "red", "markerColor": "red"}))
     minimap = dl.Map(
         children=[
-            get_tile_layer("carto_positron"),  # Use light tiles for overview
+            get_tile_layer("carto_positron"),
             bounds_layer,
+            *aoi_markers,
         ],
         style={
             "width": "150px",
@@ -273,11 +300,9 @@ def create_minimap(center, zoom, map_id):
         center=center,
         zoom=overview_zoom,
         id=f"minimap-{map_id}",
-        # Disable most interactions on the minimap
         zoomControl=False,
         dragging=False,
     )
-
     return html.Div(
         children=[minimap], style={"position": "relative", "width": "0px", "height": "0px"}
     )
