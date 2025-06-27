@@ -27,7 +27,6 @@ def register_callbacks(app):
             page_size = end_row - start_row
             page = (start_row // page_size) + 1
 
-            # Handle sorting
             sort_model = request.get("sortModel", [])
             filter_model = request.get("filterModel", {})
 
@@ -38,28 +37,77 @@ def register_callbacks(app):
                 "include": "user_name,script_name",
             }
 
-            # Add sorting to API request if supported
-            if sort_model:
-                sort_item = sort_model[0]  # Take first sort
-                sort_field = sort_item.get("colId")
-                sort_dir = sort_item.get("sort")
-
-                # Map frontend field names to API field names
-                field_mapping = {
-                    "script_name": "script_name",
-                    "user_name": "user_name",
-                    "status": "status",
-                    "start_date": "start_date",
-                    "end_date": "end_date",
-                    "progress": "progress",
-                    "id": "id",
-                }
-
-                api_field = field_mapping.get(sort_field, sort_field)
-                if sort_dir == "desc":
-                    params["sort_by"] = f"-{api_field}"
+            # Build SQL-style sort string
+            sort_sql = []
+            for sort in sort_model:
+                col = sort.get("colId")
+                direction = sort.get("sort", "asc")
+                if direction == "desc":
+                    sort_sql.append(f"{col} desc")
                 else:
-                    params["sort_by"] = api_field
+                    sort_sql.append(f"{col} asc")
+            if sort_sql:
+                params["sort_sql"] = ",".join(sort_sql)
+
+            # Build SQL-style filter string
+            filter_sql = []
+            for field, config in filter_model.items():
+                # Text filter
+                if config.get("filterType") == "text":
+                    val = config.get("filter", "")
+                    filter_type = config.get("type", "contains")
+                    if filter_type == "equals":
+                        filter_sql.append(f"{field}='{val}'")
+                    elif filter_type == "notEqual":
+                        filter_sql.append(f"{field}!='{val}'")
+                    elif filter_type == "contains":
+                        filter_sql.append(f"{field} like '%{val}%'")
+                    elif filter_type == "notContains":
+                        filter_sql.append(f"{field} not like '%{val}%'")
+                    elif filter_type == "startsWith":
+                        filter_sql.append(f"{field} like '{val}%'")
+                    elif filter_type == "endsWith":
+                        filter_sql.append(f"{field} like '%{val}'")
+                # Number filter
+                elif config.get("filterType") == "number":
+                    val = config.get("filter")
+                    filter_type = config.get("type", "equals")
+                    if filter_type == "equals":
+                        filter_sql.append(f"{field}={val}")
+                    elif filter_type == "notEqual":
+                        filter_sql.append(f"{field}!={val}")
+                    elif filter_type == "greaterThan":
+                        filter_sql.append(f"{field}>{val}")
+                    elif filter_type == "lessThan":
+                        filter_sql.append(f"{field}<{val}")
+                    elif filter_type == "greaterThanOrEqual":
+                        filter_sql.append(f"{field}>={val}")
+                    elif filter_type == "lessThanOrEqual":
+                        filter_sql.append(f"{field}<={val}")
+                # Date filter
+                elif config.get("filterType") == "date":
+                    date_from = config.get("dateFrom")
+                    date_to = config.get("dateTo")
+                    filter_type = config.get("type", "equals")
+                    if filter_type == "equals" and date_from:
+                        filter_sql.append(f"{field}='{date_from}'")
+                    elif filter_type == "notEqual" and date_from:
+                        filter_sql.append(f"{field}!='{date_from}'")
+                    elif filter_type == "greaterThan" and date_from:
+                        filter_sql.append(f"{field}>'{date_from}'")
+                    elif filter_type == "lessThan" and date_from:
+                        filter_sql.append(f"{field}<'{date_from}'")
+                    elif filter_type == "greaterThanOrEqual" and date_from:
+                        filter_sql.append(f"{field}>='{date_from}'")
+                    elif filter_type == "lessThanOrEqual" and date_from:
+                        filter_sql.append(f"{field}<='{date_from}'")
+                    elif filter_type == "inRange":
+                        if date_from:
+                            filter_sql.append(f"{field}>='{date_from}'")
+                        if date_to:
+                            filter_sql.append(f"{field}<='{date_to}'")
+            if filter_sql:
+                params["filter"] = ",".join(filter_sql)
 
             headers = {"Authorization": f"Bearer {token}"}
             resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
@@ -82,22 +130,6 @@ def register_callbacks(app):
                     if date_col in row:
                         row[date_col] = parse_date(row.get(date_col))
                 tabledata.append(row)
-
-            # Apply client-side filtering for fields that can't be filtered server-side
-            if filter_model:
-                filtered_data = []
-                for row in tabledata:
-                    include_row = True
-                    for field, filter_config in filter_model.items():
-                        if "filter" in filter_config:
-                            filter_value = filter_config["filter"].lower()
-                            row_value = str(row.get(field, "")).lower()
-                            if filter_value not in row_value:
-                                include_row = False
-                                break
-                    if include_row:
-                        filtered_data.append(row)
-                tabledata = filtered_data
 
             return {"rowData": tabledata, "rowCount": total_rows}
 
