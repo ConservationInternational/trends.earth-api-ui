@@ -89,10 +89,14 @@ def register_callbacks(app):
             else:
                 # Fallback: try to get basic system info from executions endpoint
                 resp = requests.get(
-                    f"{API_BASE}/execution", 
-                    headers=headers, 
-                    params={"per_page": 1, "exclude": "params,results", "include": "script_name,user_name"}, 
-                    timeout=5
+                    f"{API_BASE}/execution",
+                    headers=headers,
+                    params={
+                        "per_page": 1,
+                        "exclude": "params,results",
+                        "include": "script_name,user_name",
+                    },
+                    timeout=5,
                 )
                 if resp.status_code == 200:
                     result = resp.json()
