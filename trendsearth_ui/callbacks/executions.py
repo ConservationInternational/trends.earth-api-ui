@@ -207,6 +207,7 @@ def register_callbacks(app):
             "page": 1,
             "per_page": DEFAULT_PAGE_SIZE,
             "exclude": "params,results",
+            "include": "script_name,user_name",
         }
 
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)

@@ -47,6 +47,7 @@ def register_callbacks(app):
             "page": page,
             "per_page": page_size,
             "exclude": "results",  # We need params, so exclude only results
+            "include": "script_name,user_name",
         }
 
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)

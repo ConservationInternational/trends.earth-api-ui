@@ -39,7 +39,7 @@ def register_callbacks(app):
             resp = requests.get(
                 f"{API_BASE}/log",
                 headers=headers,
-                params={"per_page": 1, "sort_by": "-register_date"},
+                params={"per_page": 1, "sort": "-register_date"},
                 timeout=5,  # Reduced timeout for faster response
             )
 
@@ -89,7 +89,10 @@ def register_callbacks(app):
             else:
                 # Fallback: try to get basic system info from executions endpoint
                 resp = requests.get(
-                    f"{API_BASE}/execution", headers=headers, params={"per_page": 1}, timeout=5
+                    f"{API_BASE}/execution", 
+                    headers=headers, 
+                    params={"per_page": 1, "exclude": "params,results", "include": "script_name,user_name"}, 
+                    timeout=5
                 )
                 if resp.status_code == 200:
                     result = resp.json()
@@ -167,6 +170,7 @@ def register_callbacks(app):
                 "per_page": per_page,
                 "start_date_gte": start_time_str,
                 "exclude": "params,results",  # Exclude heavy fields
+                "include": "script_name,user_name",
             }
 
             resp = requests.get(
