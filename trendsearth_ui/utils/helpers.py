@@ -86,7 +86,7 @@ def fetch_scripts_and_users(token):
     users = []
 
     try:
-        params = {"include": "user_name"} 
+        params = {"include": "user_name"}
         resp_scripts = requests.get(
             f"{API_BASE}/script", params=params, headers=headers, timeout=10
         )

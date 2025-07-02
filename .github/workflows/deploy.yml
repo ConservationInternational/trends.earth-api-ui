@@ -48,7 +48,7 @@ jobs:
       run: |
         # Create a new task definition file with the updated image URI
         # Note that we are using the build sha as the image tag
-        sed "s|\\\("image\\\": \\\"\\).*\\(\\\"\\)|\1${{ steps.build-image.outputs.image }}\2|g" .aws/task-definition.json > .aws/task-definition-new.json
+        sed "s|\"image\": \"[^\"]*\"|\"image\": \"${{ steps.build-image.outputs.image }}\"|g" .aws/task-definition.json > .aws/task-definition-new.json
         echo "task-definition=.aws/task-definition-new.json" >> $GITHUB_OUTPUT
 
     - name: Deploy Amazon ECS task definition
