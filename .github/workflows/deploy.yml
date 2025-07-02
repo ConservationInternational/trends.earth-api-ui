@@ -45,20 +45,25 @@ jobs:
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: .aws/task-definition.json
-        container-name: trendsearth-ui
-        image: ${{ steps.build-image.outputs.image }}
+      run: |
+        # Create a new task definition file with the updated image URI
+        # Note that we are using the build sha as the image tag
+        sed "s|\\\("image\\\": \\\"\\).*\\(\\\"\\)|\1${{ steps.build-image.outputs.image }}\2|g" .aws/task-definition.json > .aws/task-definition-new.json
+        echo "task-definition=.aws/task-definition-new.json" >> $GITHUB_OUTPUT
 
     - name: Deploy Amazon ECS task definition
       id: deploy-ecs
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ secrets.ECS_SERVICE }}
-        cluster: ${{ secrets.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      run: |
+        # Register the new task definition
+        TASK_DEFINITION_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.task-def.outputs.task-definition }} --query 'taskDefinition.taskDefinitionArn' --output text)
+        echo "task-definition-arn=$TASK_DEFINITION_ARN" >> $GITHUB_OUTPUT
+
+        # Update the service with the new task definition
+        aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER }} --service ${{ secrets.ECS_SERVICE }} --task-definition $TASK_DEFINITION_ARN --force-new-deployment
+
+        # Wait for the service to stabilize
+        echo "Waiting for deployment to stabilize..."
+        aws ecs wait services-stable --cluster ${{ secrets.ECS_CLUSTER }} --services ${{ secrets.ECS_SERVICE }}
 
     - name: Get deployment details
       id: deployment-info

@@ -86,10 +86,14 @@ def fetch_scripts_and_users(token):
     users = []
 
     try:
-        params = {"include": "user_name"}
-        resp_scripts = requests.get(f"{API_BASE}/script", params=params, headers=headers, timeout=5)
+        params = {"include": "user_name"} 
+        resp_scripts = requests.get(
+            f"{API_BASE}/script", params=params, headers=headers, timeout=10
+        )
         if resp_scripts.status_code == 200:
             scripts = resp_scripts.json().get("data", [])
+        else:
+            print(f"Scripts API returned status {resp_scripts.status_code}: {resp_scripts.text}")
     except requests.exceptions.Timeout:
         print("Timeout occurred while fetching scripts")
     except requests.exceptions.ConnectionError:
@@ -98,9 +102,11 @@ def fetch_scripts_and_users(token):
         print(f"Error fetching scripts: {e}")
 
     try:
-        resp_users = requests.get(f"{API_BASE}/user", headers=headers, timeout=5)
+        resp_users = requests.get(f"{API_BASE}/user", headers=headers, timeout=10)
         if resp_users.status_code == 200:
             users = resp_users.json().get("data", [])
+        else:
+            print(f"Users API returned status {resp_users.status_code}: {resp_users.text}")
     except requests.exceptions.Timeout:
         print("Timeout occurred while fetching users")
     except requests.exceptions.ConnectionError:
@@ -108,4 +114,5 @@ def fetch_scripts_and_users(token):
     except Exception as e:
         print(f"Error fetching users: {e}")
 
+    print(f"Fetched {len(scripts)} scripts and {len(users)} users")
     return scripts, users

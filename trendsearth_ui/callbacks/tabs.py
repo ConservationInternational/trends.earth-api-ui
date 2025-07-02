@@ -50,12 +50,13 @@ def register_callbacks(app):
         if not tab:
             tab = "executions"  # Default to executions tab
 
-        # Fetch scripts and users only if tab changes
+        # Always fetch scripts and users data for admin tabs
         scripts, users = [], []
-        if trigger == "active-tab-store":
+        if tab in ["scripts", "users"] or trigger == "active-tab-store":
             try:
                 scripts, users = fetch_scripts_and_users(token)
-            except Exception:
+            except Exception as e:
+                print(f"Error fetching scripts and users: {e}")
                 scripts, users = [], []
 
         # Profile tab: always re-render with latest user_data
