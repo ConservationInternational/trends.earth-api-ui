@@ -15,8 +15,8 @@ def create_auth_cookie_data(token: str, email: str, user_data: dict) -> dict:
     Returns:
         Dictionary containing auth data with expiration timestamp
     """
-    # Set expiration to 6 hours from now
-    expiration = datetime.now() + timedelta(hours=6)
+    # Set expiration to 12 hours from now
+    expiration = datetime.now() + timedelta(hours=12)
 
     return {
         "token": token,

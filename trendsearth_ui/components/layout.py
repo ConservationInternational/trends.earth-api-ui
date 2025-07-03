@@ -33,6 +33,11 @@ def create_main_layout():
             dcc.Store(
                 id="scripts-table-state"
             ),  # Store current sort/filter state for scripts table
+            dcc.Store(
+                id="executions-total-count-store", data=0
+            ),  # Store total count for executions
+            dcc.Store(id="users-total-count-store", data=0),  # Store total count for users
+            dcc.Store(id="scripts-total-count-store", data=0),  # Store total count for scripts
             dcc.Store(id="active-tab-store", data="executions"),
             # Modals
             json_modal(),
@@ -101,7 +106,7 @@ def login_layout():
                                                 dbc.Col(
                                                     dbc.Checkbox(
                                                         id="remember-me-checkbox",
-                                                        label="Remember me for 6 hours",
+                                                        label="Remember me for 12 hours",
                                                         value=True,
                                                     ),
                                                     width=12,

@@ -11,7 +11,11 @@ def register_callbacks(app):
     """Register executions table callbacks."""
 
     @app.callback(
-        [Output("executions-table", "getRowsResponse"), Output("executions-table-state", "data")],
+        [
+            Output("executions-table", "getRowsResponse"),
+            Output("executions-table-state", "data"),
+            Output("executions-total-count-store", "data"),
+        ],
         Input("executions-table", "getRowsRequest"),
         State("token-store", "data"),
         prevent_initial_call=False,
@@ -21,10 +25,10 @@ def register_callbacks(app):
         print(f"DEBUG: get_execution_rows called with request={request}, token={bool(token)}")
         try:
             if not token:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
             if not request:
                 # Return empty data but let ag-grid know there might be data
-                return {"rowData": [], "rowCount": None}, {}
+                return {"rowData": [], "rowCount": None}, {}, 0
 
             start_row = request.get("startRow", 0)
             end_row = request.get("endRow", 10000)
@@ -130,7 +134,7 @@ def register_callbacks(app):
 
             if resp.status_code != 200:
                 print(f"DEBUG: API call failed with status {resp.status_code}")
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             executions = result.get("data", [])
@@ -158,17 +162,18 @@ def register_callbacks(app):
             }
 
             print(f"DEBUG: Returning {len(tabledata)} rows to ag-grid, rowCount: {total_rows}")
-            return {"rowData": tabledata, "rowCount": total_rows}, table_state
+            return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:
             print(f"Error in get_execution_rows: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
         [
             Output("executions-table", "getRowsResponse", allow_duplicate=True),
             Output("executions-table-state", "data", allow_duplicate=True),
             Output("executions-countdown-interval", "n_intervals"),
+            Output("executions-total-count-store", "data", allow_duplicate=True),
         ],
         Input("refresh-executions-btn", "n_clicks"),
         [
@@ -179,7 +184,7 @@ def register_callbacks(app):
     def refresh_executions_table(n_clicks, token):
         """Manually refresh the executions table."""
         if not n_clicks or not token:
-            return {"rowData": [], "rowCount": 0}, {}, 0
+            return {"rowData": [], "rowCount": 0}, {}, 0, 0
 
         # For infinite row model, we need to trigger a refresh by clearing the cache
         # This is done by returning a fresh response for the first page
@@ -195,7 +200,7 @@ def register_callbacks(app):
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
 
         if resp.status_code != 200:
-            return {"rowData": [], "rowCount": 0}, {}, 0
+            return {"rowData": [], "rowCount": 0}, {}, 0, 0
 
         result = resp.json()
         executions = result.get("data", [])
@@ -215,25 +220,27 @@ def register_callbacks(app):
 
         # Reset countdown timer to 0 when manually refreshed
         # For refresh, we don't have sort/filter state, so return empty state
-        return {"rowData": tabledata, "rowCount": total_rows}, {}, 0
+        return {"rowData": tabledata, "rowCount": total_rows}, {}, 0, total_rows
 
     @app.callback(
         [
             Output("executions-table", "getRowsResponse", allow_duplicate=True),
             Output("executions-table-state", "data", allow_duplicate=True),
+            Output("executions-total-count-store", "data", allow_duplicate=True),
         ],
         Input("executions-auto-refresh-interval", "n_intervals"),
         [
             State("token-store", "data"),
             State("active-tab-store", "data"),
+            State("executions-table-state", "data"),  # Preserve existing table state
         ],
         prevent_initial_call=True,
     )
-    def auto_refresh_executions_table(_n_intervals, token, active_tab):
-        """Auto-refresh the executions table."""
+    def auto_refresh_executions_table(_n_intervals, token, active_tab, table_state):
+        """Auto-refresh the executions table with preserved sorting/filtering state."""
         # Only refresh if executions tab is active
         if active_tab != "executions" or not token:
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
             headers = {"Authorization": f"Bearer {token}"}
@@ -245,10 +252,17 @@ def register_callbacks(app):
                 "include": "script_name,user_name,user_email,duration",
             }
 
+            # Preserve existing sort and filter settings if available
+            if table_state:
+                if table_state.get("sort_sql"):
+                    params["sort"] = table_state["sort_sql"]
+                if table_state.get("filter_sql"):
+                    params["filter"] = table_state["filter_sql"]
+
             resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
 
             if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, table_state or {}, 0
 
             result = resp.json()
             executions = result.get("data", [])
@@ -266,12 +280,12 @@ def register_callbacks(app):
                         row[date_col] = parse_date(row.get(date_col))
                 tabledata.append(row)
 
-            # For auto-refresh, we don't have sort/filter state, so return empty state
-            return {"rowData": tabledata, "rowCount": total_rows}, {}
+            # Preserve table state from current state
+            return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
 
         except Exception as e:
             print(f"Error in auto_refresh_executions_table: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, table_state or {}, 0
 
     @app.callback(
         Output("executions-countdown", "children"),
@@ -287,6 +301,15 @@ def register_callbacks(app):
         # Calculate remaining seconds (30 second cycle)
         remaining = 30 - (n_intervals % 30)
         return f"{remaining}s"
+
+    @app.callback(
+        Output("executions-total-count", "children"),
+        Input("executions-total-count-store", "data"),
+        prevent_initial_call=True,
+    )
+    def update_executions_total_display(total_count):
+        """Update the executions total count display."""
+        return f"Total: {total_count:,}"
 
 
 # Legacy callback decorators for backward compatibility (these won't be executed)

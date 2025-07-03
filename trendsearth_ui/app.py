@@ -1,3 +1,5 @@
+import os
+
 import dash
 import dash_bootstrap_components as dbc
 import flask
@@ -13,11 +15,16 @@ from .components import create_main_layout
 from .config import APP_HOST, APP_PORT, APP_TITLE
 
 server = flask.Flask(__name__)
+
+# Configure assets directory
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+
 app = dash.Dash(
     __name__,
     server=server,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     suppress_callback_exceptions=True,
+    assets_folder=assets_dir,
 )
 app.title = APP_TITLE
 

@@ -11,7 +11,11 @@ def register_callbacks(app):
     """Register scripts table callbacks."""
 
     @app.callback(
-        [Output("scripts-table", "getRowsResponse"), Output("scripts-table-state", "data")],
+        [
+            Output("scripts-table", "getRowsResponse"),
+            Output("scripts-table-state", "data"),
+            Output("scripts-total-count-store", "data"),
+        ],
         Input("scripts-table", "getRowsRequest"),
         [State("token-store", "data"), State("role-store", "data")],
         prevent_initial_call=False,
@@ -23,10 +27,10 @@ def register_callbacks(app):
         )
         try:
             if not token:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
             if not request:
                 # Return empty data but let ag-grid know there might be data
-                return {"rowData": [], "rowCount": None}, {}
+                return {"rowData": [], "rowCount": None}, {}, 0
 
             start_row = request.get("startRow", 0)
             end_row = request.get("endRow", 10000)
@@ -131,7 +135,7 @@ def register_callbacks(app):
 
             if resp.status_code != 200:
                 print(f"DEBUG: API call failed with status {resp.status_code}")
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             scripts = result.get("data", [])
@@ -162,16 +166,17 @@ def register_callbacks(app):
             }
 
             print(f"DEBUG: Returning {len(tabledata)} scripts to ag-grid, rowCount: {total_rows}")
-            return {"rowData": tabledata, "rowCount": total_rows}, table_state
+            return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:
             print(f"Error in get_scripts_rows: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
         [
             Output("scripts-table", "getRowsResponse", allow_duplicate=True),
             Output("scripts-table-state", "data", allow_duplicate=True),
+            Output("scripts-total-count-store", "data", allow_duplicate=True),
         ],
         Input("refresh-scripts-btn", "n_clicks"),
         [State("token-store", "data"), State("role-store", "data")],
@@ -180,7 +185,7 @@ def register_callbacks(app):
     def refresh_scripts_table(n_clicks, token, role):
         """Manually refresh the scripts table."""
         if not n_clicks or not token:
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
             # For infinite row model, we need to trigger a refresh by clearing the cache
@@ -196,7 +201,7 @@ def register_callbacks(app):
             resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
 
             if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             scripts = result.get("data", [])
@@ -218,8 +223,17 @@ def register_callbacks(app):
                 tabledata.append(row)
 
             # For refresh, we don't have sort/filter state, so return empty state
-            return {"rowData": tabledata, "rowCount": total_rows}, {}
+            return {"rowData": tabledata, "rowCount": total_rows}, {}, total_rows
 
         except Exception as e:
             print(f"Error in refresh_scripts_table: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
+
+    @app.callback(
+        Output("scripts-total-count", "children"),
+        Input("scripts-total-count-store", "data"),
+        prevent_initial_call=True,
+    )
+    def update_scripts_total_display(total_count):
+        """Update the scripts total count display."""
+        return f"Total: {total_count:,}"

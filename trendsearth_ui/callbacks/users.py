@@ -11,7 +11,11 @@ def register_callbacks(app):
     """Register users table callbacks."""
 
     @app.callback(
-        [Output("users-table", "getRowsResponse"), Output("users-table-state", "data")],
+        [
+            Output("users-table", "getRowsResponse"),
+            Output("users-table-state", "data"),
+            Output("users-total-count-store", "data"),
+        ],
         Input("users-table", "getRowsRequest"),
         [State("token-store", "data"), State("role-store", "data")],
         prevent_initial_call=False,
@@ -23,10 +27,10 @@ def register_callbacks(app):
         )
         try:
             if not token:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
             if not request:
                 # Return empty data but let ag-grid know there might be data
-                return {"rowData": [], "rowCount": None}, {}
+                return {"rowData": [], "rowCount": None}, {}, 0
 
             start_row = request.get("startRow", 0)
             end_row = request.get("endRow", 10000)
@@ -130,7 +134,7 @@ def register_callbacks(app):
 
             if resp.status_code != 200:
                 print(f"DEBUG: API call failed with status {resp.status_code}")
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             users = result.get("data", [])
@@ -160,16 +164,17 @@ def register_callbacks(app):
             }
 
             print(f"DEBUG: Returning {len(tabledata)} users to ag-grid, rowCount: {total_rows}")
-            return {"rowData": tabledata, "rowCount": total_rows}, table_state
+            return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:
             print(f"Error in get_users_rows: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
         [
             Output("users-table", "getRowsResponse", allow_duplicate=True),
             Output("users-table-state", "data", allow_duplicate=True),
+            Output("users-total-count-store", "data", allow_duplicate=True),
         ],
         Input("refresh-users-btn", "n_clicks"),
         [State("token-store", "data"), State("role-store", "data")],
@@ -178,7 +183,7 @@ def register_callbacks(app):
     def refresh_users_table(n_clicks, token, role):
         """Manually refresh the users table."""
         if not n_clicks or not token:
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
             # For infinite row model, we need to trigger a refresh by clearing the cache
@@ -193,7 +198,7 @@ def register_callbacks(app):
             resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
 
             if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, {}
+                return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             users = result.get("data", [])
@@ -214,8 +219,17 @@ def register_callbacks(app):
                 tabledata.append(row)
 
             # For refresh, we don't have sort/filter state, so return empty state
-            return {"rowData": tabledata, "rowCount": total_rows}, {}
+            return {"rowData": tabledata, "rowCount": total_rows}, {}, total_rows
 
         except Exception as e:
             print(f"Error in refresh_users_table: {str(e)}")
-            return {"rowData": [], "rowCount": 0}, {}
+            return {"rowData": [], "rowCount": 0}, {}, 0
+
+    @app.callback(
+        Output("users-total-count", "children"),
+        Input("users-total-count-store", "data"),
+        prevent_initial_call=True,
+    )
+    def update_users_total_display(total_count):
+        """Update the users total count display."""
+        return f"Total: {total_count:,}"

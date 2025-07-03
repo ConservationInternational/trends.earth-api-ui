@@ -1,6 +1,7 @@
 """Status dashboard callbacks."""
 
 from datetime import datetime, timedelta
+import time
 
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import pandas as pd
@@ -8,6 +9,36 @@ import plotly.express as px
 import requests
 
 from ..config import API_BASE
+
+# Simple in-memory cache for status data with TTL
+_status_cache = {
+    "summary": {"data": None, "timestamp": 0, "ttl": 30},  # 30 seconds
+    "charts": {"data": {}, "timestamp": 0, "ttl": 60},  # 60 seconds for charts
+}
+
+
+def get_cached_data(cache_key, ttl=None):
+    """Get cached data if still valid."""
+    cache_entry = _status_cache.get(cache_key, {})
+    if ttl is None:
+        ttl = cache_entry.get("ttl", 30)
+    
+    current_time = time.time()
+    if (cache_entry.get("data") is not None and 
+        current_time - cache_entry.get("timestamp", 0) < ttl):
+        return cache_entry["data"]
+    return None
+
+
+def set_cached_data(cache_key, data, ttl=None):
+    """Set cached data with timestamp."""
+    if cache_key not in _status_cache:
+        _status_cache[cache_key] = {}
+    
+    _status_cache[cache_key]["data"] = data
+    _status_cache[cache_key]["timestamp"] = time.time()
+    if ttl is not None:
+        _status_cache[cache_key]["ttl"] = ttl
 
 
 def register_callbacks(app):
@@ -26,10 +57,20 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def update_status_summary(_n_intervals, _refresh_clicks, token, active_tab):
-        """Update the status summary from the most recent log entry."""
+        """Update the status summary from the most recent log entry with caching."""
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status" or not token:
             return no_update
+
+        # Check cache first (unless it's a manual refresh)
+        ctx = callback_context
+        is_manual_refresh = (ctx.triggered and 
+                           ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn")
+        
+        if not is_manual_refresh:
+            cached_data = get_cached_data("summary")
+            if cached_data is not None:
+                return cached_data
 
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -69,7 +110,7 @@ def register_callbacks(app):
                         "DEBUG": "secondary",
                     }.get(level, "secondary")
 
-                    return html.Div(
+                    summary = html.Div(
                         [
                             html.P(
                                 [html.Strong("Last Update: "), formatted_date], className="mb-2"
@@ -84,8 +125,14 @@ def register_callbacks(app):
                             html.P([html.Strong("Status: "), text], className="mb-0"),
                         ]
                     )
+
+                    # Cache the result
+                    set_cached_data("summary", summary)
+                    return summary
                 else:
-                    return "No status logs found."
+                    result = "No status logs found."
+                    set_cached_data("summary", result)
+                    return result
             else:
                 # Fallback: try to get basic system info from executions endpoint
                 resp = requests.get(
@@ -101,7 +148,7 @@ def register_callbacks(app):
                 if resp.status_code == 200:
                     result = resp.json()
                     total = result.get("total", 0)
-                    return html.Div(
+                    fallback_result = html.Div(
                         [
                             html.P([html.Strong("System Status: "), "Online"], className="mb-2"),
                             html.P(
@@ -109,15 +156,25 @@ def register_callbacks(app):
                             ),
                         ]
                     )
+                    set_cached_data("summary", fallback_result)
+                    return fallback_result
                 else:
-                    return f"Failed to fetch status information. API responded with status {resp.status_code}."
+                    error_result = f"Failed to fetch status information. API responded with status {resp.status_code}."
+                    set_cached_data("summary", error_result, ttl=10)  # Cache errors for shorter time
+                    return error_result
 
         except requests.exceptions.Timeout:
-            return "Status update failed: Connection timeout."
+            error_result = "Status update failed: Connection timeout."
+            set_cached_data("summary", error_result, ttl=10)
+            return error_result
         except requests.exceptions.ConnectionError:
-            return "Status update failed: Cannot connect to API server."
+            error_result = "Status update failed: Cannot connect to API server."
+            set_cached_data("summary", error_result, ttl=10)
+            return error_result
         except Exception as e:
-            return f"Status update failed: {str(e)}"
+            error_result = f"Status update failed: {str(e)}"
+            set_cached_data("summary", error_result, ttl=10)
+            return error_result
 
     @app.callback(
         Output("status-charts", "children"),
@@ -133,7 +190,7 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def update_status_charts(_n_intervals, _refresh_clicks, time_period, token, active_tab):
-        """Update the status charts based on selected time period."""
+        """Update the status charts based on selected time period with caching."""
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status" or not token:
             return no_update
@@ -145,47 +202,54 @@ def register_callbacks(app):
         if time_period == "hour":
             start_time = now - timedelta(hours=1)
             title_suffix = "Last Hour"
-            per_page = 200  # Reduced for better performance
+            per_page = 50  # Reduced for better performance
         elif time_period == "day":
             start_time = now - timedelta(days=1)
             title_suffix = "Last 24 Hours"
-            per_page = 500  # Moderate limit
+            per_page = 100  # Moderate limit
         elif time_period == "week":
             start_time = now - timedelta(weeks=1)
             title_suffix = "Last Week"
-            per_page = 1000  # Higher limit for week view
+            per_page = 200  # Reduced from 1000 for better performance
         else:
             start_time = now - timedelta(hours=1)
             title_suffix = "Last Hour"
-            per_page = 200
+            per_page = 50
 
         try:
-            # Check if this is a manual refresh or just a tab change
+            # Create cache key based on time period and rounded start time for better caching
+            cache_key = f"charts_{time_period}_{int(start_time.timestamp() // 300)}"  # 5-minute buckets
+            
+            # Check cache first (unless it's a manual refresh)
             ctx = callback_context
-            if ctx.triggered:
-                trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-                # If it's just a tab change within status tabs, use faster query
-                if trigger_id == "status-time-tabs":
-                    per_page = min(per_page, 100)  # Reduced for tab changes
-
-            # Fetch execution data for the time period
+            is_manual_refresh = (ctx.triggered and 
+                               ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn")
+            
+            if not is_manual_refresh:
+                cached_data = get_cached_data("charts")
+                if cached_data and cache_key in cached_data:
+                    return cached_data[cache_key]
+            start_time_rounded = start_time.replace(second=0, microsecond=0)
+            cache_key = f"status_chart_{time_period}_{start_time_rounded.isoformat()}"
+            
+            # Fetch execution data for the time period - only get essential fields
             start_time_str = start_time.isoformat()
             params = {
                 "per_page": per_page,
                 "start_date_gte": start_time_str,
-                "exclude": "params,results",  # Exclude heavy fields
-                "include": "script_name,user_name,user_email,duration",
+                "exclude": "params,results,logs",  # Exclude all heavy fields including logs
+                "fields": "status,start_date,id",  # Only get essential fields for chart
             }
 
             resp = requests.get(
                 f"{API_BASE}/execution",
                 headers=headers,
                 params=params,
-                timeout=10,  # Reasonable timeout
+                timeout=5,  # Reduced timeout for faster response
             )
 
             if resp.status_code != 200:
-                return html.Div(
+                error_result = html.Div(
                     [
                         html.H5(f"Execution Status Trends - {title_suffix}", className="mb-3"),
                         html.Div(
@@ -194,9 +258,21 @@ def register_callbacks(app):
                         ),
                     ]
                 )
+                return error_result
 
             result = resp.json()
             executions = result.get("data", [])
+            
+            if executions is None:
+                return html.Div(
+                    [
+                        html.H5(f"Execution Status Trends - {title_suffix}", className="mb-3"),
+                        html.Div(
+                            "Failed to fetch execution data.",
+                            className="alert alert-warning",
+                        ),
+                    ]
+                )
 
             if not executions:
                 return html.Div(
@@ -309,7 +385,7 @@ def register_callbacks(app):
                     )
                 )
 
-            return html.Div(
+            chart_result = html.Div(
                 [
                     html.H5(f"Execution Status Trends - {title_suffix}", className="mb-3"),
                     html.Div(summary_cards, className="d-flex flex-wrap mb-4"),
@@ -322,6 +398,13 @@ def register_callbacks(app):
                     ),
                 ]
             )
+
+            # Cache the result
+            cached_charts = get_cached_data("charts") or {}
+            cached_charts[cache_key] = chart_result
+            set_cached_data("charts", cached_charts)
+            
+            return chart_result
 
         except requests.exceptions.Timeout:
             return html.Div(

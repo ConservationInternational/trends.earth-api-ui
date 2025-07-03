@@ -60,6 +60,21 @@ def executions_tab_content():
                         ],
                         width="auto",
                     ),
+                    dbc.Col(
+                        [
+                            html.Div(
+                                [
+                                    html.Span(
+                                        id="executions-total-count",
+                                        children="Total: 0",
+                                        className="text-muted fw-bold",
+                                    ),
+                                ],
+                                className="d-flex align-items-center justify-content-end",
+                            )
+                        ],
+                        width=True,
+                    ),
                 ],
                 className="justify-content-between",
             ),
@@ -122,6 +137,21 @@ def users_tab_content():
                         ],
                         width="auto",
                     ),
+                    dbc.Col(
+                        [
+                            html.Div(
+                                [
+                                    html.Span(
+                                        id="users-total-count",
+                                        children="Total: 0",
+                                        className="text-muted fw-bold",
+                                    ),
+                                ],
+                                className="d-flex align-items-center justify-content-end",
+                            )
+                        ],
+                        width=True,
+                    ),
                 ]
             ),
             dag.AgGrid(
@@ -180,6 +210,21 @@ def scripts_tab_content():
                             ),
                         ],
                         width="auto",
+                    ),
+                    dbc.Col(
+                        [
+                            html.Div(
+                                [
+                                    html.Span(
+                                        id="scripts-total-count",
+                                        children="Total: 0",
+                                        className="text-muted fw-bold",
+                                    ),
+                                ],
+                                className="d-flex align-items-center justify-content-end",
+                            )
+                        ],
+                        width=True,
                     ),
                 ]
             ),
