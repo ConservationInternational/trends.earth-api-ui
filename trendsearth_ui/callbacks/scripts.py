@@ -1,7 +1,9 @@
 """Scripts table callbacks."""
 
 from dash import Input, Output, State
+import requests
 
+from ..config import API_BASE, DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 
 
@@ -10,85 +12,131 @@ def register_callbacks(app):
 
     @app.callback(
         Output("scripts-table", "getRowsResponse"),
-        [Input("scripts-table", "getRowsRequest"), Input("scripts-table-refresh-trigger", "data")],
-        [
-            State("scripts-raw-data", "data"),
-            State("role-store", "data"),
-        ],
+        Input("scripts-table", "getRowsRequest"),
+        [State("token-store", "data"), State("role-store", "data")],
         prevent_initial_call=True,
     )
-    def get_scripts_rows(request, _refresh_trigger, scripts_data, role):
-        """Get scripts data for ag-grid with infinite row model."""
+    def get_scripts_rows(request, token, role):
+        """Get scripts data for ag-grid with infinite row model with server-side operations."""
         try:
-            if not request or not scripts_data:
+            if not request or not token:
                 return {"rowData": [], "rowCount": 0}
 
             start_row = request.get("startRow", 0)
-            end_row = request.get("endRow", 100)
+            end_row = request.get("endRow", 10000)
+            page_size = end_row - start_row
+            page = (start_row // page_size) + 1
+
             sort_model = request.get("sortModel", [])
             filter_model = request.get("filterModel", {})
 
-            # Create table data with edit buttons for admin users
+            params = {
+                "page": page,
+                "per_page": page_size,
+                "include": "user_name",
+            }
+
+            # Build SQL-style sort string
+            sort_sql = []
+            for sort in sort_model:
+                col = sort.get("colId")
+                direction = sort.get("sort", "asc")
+                if direction == "desc":
+                    sort_sql.append(f"{col} desc")
+                else:
+                    sort_sql.append(f"{col} asc")
+            if sort_sql:
+                params["sort"] = ",".join(sort_sql)
+
+            # Build SQL-style filter string
+            filter_sql = []
+            for field, config in filter_model.items():
+                # Skip action columns
+                if field in ("logs", "edit"):
+                    continue
+                # Text filter
+                if config.get("filterType") == "text":
+                    val = config.get("filter", "")
+                    filter_type = config.get("type", "contains")
+                    if filter_type == "equals":
+                        filter_sql.append(f"{field}='{val}'")
+                    elif filter_type == "notEqual":
+                        filter_sql.append(f"{field}!='{val}'")
+                    elif filter_type == "contains":
+                        filter_sql.append(f"{field} like '%{val}%'")
+                    elif filter_type == "notContains":
+                        filter_sql.append(f"{field} not like '%{val}%'")
+                    elif filter_type == "startsWith":
+                        filter_sql.append(f"{field} like '{val}%'")
+                    elif filter_type == "endsWith":
+                        filter_sql.append(f"{field} like '%{val}'")
+                # Number filter
+                elif config.get("filterType") == "number":
+                    val = config.get("filter")
+                    filter_type = config.get("type", "equals")
+                    if filter_type == "equals":
+                        filter_sql.append(f"{field}={val}")
+                    elif filter_type == "notEqual":
+                        filter_sql.append(f"{field}!={val}")
+                    elif filter_type == "greaterThan":
+                        filter_sql.append(f"{field}>{val}")
+                    elif filter_type == "lessThan":
+                        filter_sql.append(f"{field}<{val}")
+                    elif filter_type == "greaterThanOrEqual":
+                        filter_sql.append(f"{field}>={val}")
+                    elif filter_type == "lessThanOrEqual":
+                        filter_sql.append(f"{field}<={val}")
+                # Date filter
+                elif config.get("filterType") == "date":
+                    date_from = config.get("dateFrom")
+                    date_to = config.get("dateTo")
+                    filter_type = config.get("type", "equals")
+                    if filter_type == "equals" and date_from:
+                        filter_sql.append(f"{field}='{date_from}'")
+                    elif filter_type == "notEqual" and date_from:
+                        filter_sql.append(f"{field}!='{date_from}'")
+                    elif filter_type == "greaterThan" and date_from:
+                        filter_sql.append(f"{field}>'{date_from}'")
+                    elif filter_type == "lessThan" and date_from:
+                        filter_sql.append(f"{field}<'{date_from}'")
+                    elif filter_type == "greaterThanOrEqual" and date_from:
+                        filter_sql.append(f"{field}>='{date_from}'")
+                    elif filter_type == "lessThanOrEqual" and date_from:
+                        filter_sql.append(f"{field}<='{date_from}'")
+                    elif filter_type == "inRange":
+                        if date_from:
+                            filter_sql.append(f"{field}>='{date_from}'")
+                        if date_to:
+                            filter_sql.append(f"{field}<='{date_to}'")
+            if filter_sql:
+                params["filter"] = ",".join(filter_sql)
+
+            headers = {"Authorization": f"Bearer {token}"}
+            resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+
+            if resp.status_code != 200:
+                return {"rowData": [], "rowCount": 0}
+
+            result = resp.json()
+            scripts = result.get("data", [])
+            total_rows = result.get("total", 0)
+
+            # Check if user is admin to add edit buttons
             is_admin = role == "ADMIN"
 
-            table_data = []
-            for script in scripts_data:
-                row = script.copy()
-                # Parse dates
+            tabledata = []
+            for script_row in scripts:
+                row = script_row.copy()
+                row["logs"] = "Show Logs"
+                # Only add edit button for admin users
+                if is_admin:
+                    row["edit"] = "Edit"
                 for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                     if date_col in row:
                         row[date_col] = parse_date(row.get(date_col))
-                # Add logs action button
-                row["logs"] = "Show Logs"
-                # Add edit button for admin users
-                if is_admin:
-                    row["edit"] = "Edit"
-                table_data.append(row)
+                tabledata.append(row)
 
-            # Apply sorting
-            if sort_model:
-                sort_item = sort_model[0]
-                sort_field = sort_item.get("colId")
-                sort_dir = sort_item.get("sort")
-                reverse = sort_dir == "desc"
-
-                if sort_field:
-                    table_data = sorted(
-                        table_data,
-                        key=lambda x: str(x.get(sort_field, "")).lower(),
-                        reverse=reverse,
-                    )
-
-            # Apply filtering
-            if filter_model:
-                filtered_data = []
-                for row in table_data:
-                    include_row = True
-                    for field, filter_config in filter_model.items():
-                        if "filter" in filter_config:
-                            filter_value = filter_config["filter"].lower()
-                            row_value = str(row.get(field, "")).lower()
-                            if filter_value not in row_value:
-                                include_row = False
-                                break
-                    if include_row:
-                        filtered_data.append(row)
-                table_data = filtered_data
-
-            # Apply pagination
-            total_rows = len(table_data)
-            page_data = table_data[start_row:end_row]
-
-            # Ensure every row has an 'id' field and print for debugging
-            for row in page_data:
-                if "id" not in row:
-                    print(f"⚠️ Row missing 'id': {row}")
-                else:
-                    print(
-                        f"✅ Row for grid: id={row['id']}, logs={row.get('logs')}, name={row.get('name')}"
-                    )
-
-            return {"rowData": page_data, "rowCount": total_rows}
+            return {"rowData": tabledata, "rowCount": total_rows}
 
         except Exception as e:
             print(f"Error in get_scripts_rows: {str(e)}")
@@ -97,35 +145,46 @@ def register_callbacks(app):
     @app.callback(
         Output("scripts-table", "getRowsResponse", allow_duplicate=True),
         Input("refresh-scripts-btn", "n_clicks"),
-        State("scripts-raw-data", "data"),
-        State("role-store", "data"),
+        [State("token-store", "data"), State("role-store", "data")],
         prevent_initial_call=True,
     )
-    def refresh_scripts_table(n_clicks, scripts_data, role):
+    def refresh_scripts_table(n_clicks, token, role):
         """Manually refresh the scripts table."""
-        if not n_clicks or not scripts_data:
+        if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}
 
-        # Create table data with edit buttons for admin users
+        # For infinite row model, we need to trigger a refresh by clearing the cache
+        # This is done by returning a fresh response for the first page
+        headers = {"Authorization": f"Bearer {token}"}
+
+        params = {
+            "page": 1,
+            "per_page": DEFAULT_PAGE_SIZE,
+            "include": "user_name",
+        }
+
+        resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+
+        if resp.status_code != 200:
+            return {"rowData": [], "rowCount": 0}
+
+        result = resp.json()
+        scripts = result.get("data", [])
+        total_rows = result.get("total", 0)
+
+        # Check if user is admin to add edit buttons
         is_admin = role == "ADMIN"
 
-        table_data = []
-        for script in scripts_data:
-            row = script.copy()
-            # Parse dates
+        tabledata = []
+        for script_row in scripts:
+            row = script_row.copy()
+            row["logs"] = "Show Logs"
+            # Only add edit button for admin users
+            if is_admin:
+                row["edit"] = "Edit"
             for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                 if date_col in row:
                     row[date_col] = parse_date(row.get(date_col))
-            # Add logs action button
-            row["logs"] = "Show Logs"
-            # Add edit button for admin users
-            if is_admin:
-                row["edit"] = "Edit"
-            table_data.append(row)
+            tabledata.append(row)
 
-        # Sort by name by default
-        table_data = sorted(table_data, key=lambda x: x.get("name", ""))
-
-        # Return first page
-        page_data = table_data[:100]
-        return {"rowData": page_data, "rowCount": len(table_data)}
+        return {"rowData": tabledata, "rowCount": total_rows}

@@ -307,7 +307,7 @@ def register_callbacks(app):
                 True,
                 None,
             )
-        # Parse and format logs for display
+        # Parse and format logs for display (same as execution logs)
         if isinstance(logs_data, list):
             parsed_logs = []
             for log in logs_data:
@@ -315,12 +315,27 @@ def register_callbacks(app):
                     register_date = log.get("register_date", "")
                     level = log.get("level", "")
                     text = log.get("text", "")
-                    parsed_logs.append(f"[{register_date}] {level}: {text}")
+
+                    # Parse and format the date
+                    formatted_date = parse_date(register_date) or register_date
+
+                    # Create formatted log line
+                    log_line = f"{formatted_date} - {level} - {text}"
+                    parsed_logs.append((register_date, log_line))
                 else:
-                    parsed_logs.append(str(log))
-            logs_display = html.Pre("\n".join(parsed_logs))
+                    # Fallback for non-dict log entries
+                    parsed_logs.append(("", str(log)))
+
+            # Sort by register_date in descending order
+            parsed_logs.sort(key=lambda x: x[0], reverse=True)
+            logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+            logs_display = html.Pre(
+                logs_content, style={"whiteSpace": "pre-wrap", "fontSize": "12px"}
+            )
         else:
-            logs_display = html.Pre(str(logs_data))
+            logs_display = html.Pre(
+                str(logs_data), style={"whiteSpace": "pre-wrap", "fontSize": "12px"}
+            )
         return (
             True,
             logs_display,
@@ -328,7 +343,7 @@ def register_callbacks(app):
             "Script Logs",
             {"display": "inline-block"},
             False,
-            {"script_id": script_id},
+            {"type": "script", "id": script_id, "status": script.get("status", "UNKNOWN")},
         )
 
 

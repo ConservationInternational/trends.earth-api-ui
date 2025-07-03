@@ -42,12 +42,7 @@ class TestUsersTabContent:
 
     def test_users_tab_with_data(self):
         """Test users tab with sample data."""
-        users_data = [
-            {"id": "1", "email": "user1@test.com", "name": "User 1", "role": "USER"},
-            {"id": "2", "email": "user2@test.com", "name": "User 2", "role": "ADMIN"},
-        ]
-
-        content = users_tab_content(users_data, is_admin=True)
+        content = users_tab_content()
 
         # Should return a component
         assert hasattr(content, "children")
@@ -58,23 +53,21 @@ class TestUsersTabContent:
 
     def test_users_tab_admin_vs_user_view(self):
         """Test different views for admin vs regular user."""
-        users_data = [
-            {"id": "1", "email": "user1@test.com", "name": "User 1", "role": "USER"}
-        ]  # Admin view
-        admin_content = users_tab_content(users_data, is_admin=True)
+        # Admin view
+        admin_content = users_tab_content()
 
         # User view
-        user_content = users_tab_content(users_data, is_admin=False)
+        user_content = users_tab_content()
 
-        # Admin should have edit capabilities
+        # Both should have the same structure since role is now handled server-side
         assert hasattr(admin_content, "children")
         assert hasattr(user_content, "children")
 
     def test_users_tab_empty_data(self):
         """Test users tab with empty data."""
-        content = users_tab_content([], is_admin=True)
+        content = users_tab_content()
 
-        # Should handle empty data gracefully
+        # Should handle empty data gracefully by using server-side loading
         assert hasattr(content, "children")
 
 
@@ -83,13 +76,7 @@ class TestScriptsTabContent:
 
     def test_scripts_tab_with_data(self):
         """Test scripts tab with sample data."""
-        scripts_data = [
-            {"id": "1", "name": "Script 1", "status": "PUBLISHED"},
-            {"id": "2", "name": "Script 2", "status": "DRAFT"},
-        ]
-        users_data = [{"id": "1", "email": "user1@test.com", "name": "User 1"}]
-
-        content = scripts_tab_content(scripts_data, users_data, is_admin=True)
+        content = scripts_tab_content()
 
         # Should return a component
         assert hasattr(content, "children")
@@ -100,24 +87,21 @@ class TestScriptsTabContent:
 
     def test_scripts_tab_admin_vs_user_view(self):
         """Test different views for admin vs regular user."""
-        scripts_data = [{"id": "1", "name": "Script 1", "status": "PUBLISHED"}]
-        users_data = []
-
         # Admin view
-        admin_content = scripts_tab_content(scripts_data, users_data, is_admin=True)
+        admin_content = scripts_tab_content()
 
         # User view
-        user_content = scripts_tab_content(scripts_data, users_data, is_admin=False)
+        user_content = scripts_tab_content()
 
-        # Both should return components
+        # Both should have the same structure since role is now handled server-side
         assert hasattr(admin_content, "children")
         assert hasattr(user_content, "children")
 
     def test_scripts_tab_empty_data(self):
         """Test scripts tab with empty data."""
-        content = scripts_tab_content([], [], is_admin=True)
+        content = scripts_tab_content()
 
-        # Should handle empty data gracefully
+        # Should handle empty data gracefully by using server-side loading
         assert hasattr(content, "children")
 
 
@@ -217,14 +201,12 @@ class TestTabsIntegration:
     def test_all_tabs_can_be_created(self):
         """Test that all tab components can be created without errors."""
         # Sample data for testing
-        users_data = [{"id": "1", "email": "test@example.com", "name": "Test"}]
-        scripts_data = [{"id": "1", "name": "Test Script", "status": "PUBLISHED"}]
         user_data = {"name": "Test User", "email": "test@example.com"}
 
         # All tab functions should execute without errors
         executions = executions_tab_content()
-        users = users_tab_content(users_data, is_admin=True)
-        scripts = scripts_tab_content(scripts_data, users_data, is_admin=True)
+        users = users_tab_content()
+        scripts = scripts_tab_content()
         profile = profile_tab_content(user_data)
         status = status_tab_content(is_admin=True)
 
@@ -237,14 +219,12 @@ class TestTabsIntegration:
     def test_tabs_consistent_structure(self):
         """Test that all tabs have consistent structure."""
         # Sample data
-        users_data = [{"id": "1", "email": "test@example.com"}]
-        scripts_data = [{"id": "1", "name": "Test Script"}]
         user_data = {"name": "Test User"}
 
         tabs = [
             executions_tab_content(),
-            users_tab_content(users_data, is_admin=True),
-            scripts_tab_content(scripts_data, users_data, is_admin=True),
+            users_tab_content(),
+            scripts_tab_content(),
             profile_tab_content(user_data),
             status_tab_content(is_admin=True),
         ]

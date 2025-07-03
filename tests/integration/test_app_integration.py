@@ -104,13 +104,9 @@ class TestAuthenticationFlow:
 class TestTabRendering:
     """Test tab rendering integration."""
 
-    @patch("trendsearth_ui.callbacks.tabs.fetch_scripts_and_users")
-    def test_tab_rendering_callback_exists(self, mock_fetch, dash_app):
+    def test_tab_rendering_callback_exists(self, dash_app):
         """Test that tab rendering callback is registered."""
-        mock_fetch.return_value = (
-            [],
-            [],
-        )  # Empty scripts and users        # Check that the render_tab callback is registered
+        # Check that the render_tab callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)

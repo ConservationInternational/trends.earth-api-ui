@@ -8,7 +8,6 @@ import pytest
 
 from trendsearth_ui.config import API_BASE
 from trendsearth_ui.utils.helpers import (
-    fetch_scripts_and_users,
     get_user_info,
     parse_date,
     safe_table_data,
@@ -127,53 +126,3 @@ class TestGetUserInfoFunction:
         result = get_user_info(token)
 
         assert result is None
-
-
-class TestFetchScriptsAndUsersFunction:
-    """Test the fetch_scripts_and_users utility function."""
-
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_fetch_scripts_and_users_success(self, mock_get, mock_script_data, mock_user_data):
-        """Test successful scripts and users fetching."""
-        scripts_response = Mock()
-        scripts_response.status_code = 200
-        scripts_response.json.return_value = {"data": [mock_script_data]}
-
-        users_response = Mock()
-        users_response.status_code = 200
-        users_response.json.return_value = {"data": [mock_user_data]}
-
-        mock_get.side_effect = [scripts_response, users_response]
-
-        token = "test_token"
-        scripts, users = fetch_scripts_and_users(token)
-
-        assert len(scripts) == 1
-        assert scripts[0] == mock_script_data
-        assert len(users) == 1
-        assert users[0] == mock_user_data
-        assert mock_get.call_count == 2
-
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_fetch_scripts_and_users_failure(self, mock_get):
-        """Test scripts and users fetching with API failures."""
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_get.return_value = mock_response
-
-        token = "test_token"
-        scripts, users = fetch_scripts_and_users(token)
-
-        assert scripts == []
-        assert users == []
-
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_fetch_scripts_and_users_exception(self, mock_get):
-        """Test scripts and users fetching with exception."""
-        mock_get.side_effect = Exception("Network error")
-
-        token = "test_token"
-        scripts, users = fetch_scripts_and_users(token)
-
-        assert scripts == []
-        assert users == []

@@ -9,7 +9,6 @@ from ..components import (
     status_tab_content,
     users_tab_content,
 )
-from ..utils import fetch_scripts_and_users
 
 
 def register_callbacks(app):
@@ -17,8 +16,6 @@ def register_callbacks(app):
 
     @app.callback(
         Output("tab-content", "children"),
-        Output("scripts-raw-data", "data"),
-        Output("users-raw-data", "data"),
         Input("active-tab-store", "data"),
         Input("user-store", "data"),
         State("token-store", "data"),
@@ -26,7 +23,6 @@ def register_callbacks(app):
         State("user-store", "data"),
     )
     def render_tab(tab, _, token, role, user_data):
-        import dash
         from dash import no_update
 
         # Check if tab-content exists in the layout
@@ -35,42 +31,30 @@ def register_callbacks(app):
             # Dash 2.x: callback_context.states contains all State values, but we can't directly check layout
             # Instead, check if the tab-content is present in the DOM by checking the trigger and token
             if not token or tab is None:
-                return no_update, no_update, no_update
+                return no_update
         except Exception:
-            return no_update, no_update, no_update
-
-        ctx = dash.callback_context
-        trigger = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else None
+            return no_update
 
         # Handle initial load when stores might not be populated yet
         if not token:
-            return html.Div("Please login to view content."), [], []
+            return html.Div("Please login to view content.")
 
         # Set default tab if none provided
         if not tab:
             tab = "executions"  # Default to executions tab
 
-        # Always fetch scripts and users data for admin tabs
-        scripts, users = [], []
-        if tab in ["scripts", "users"] or trigger == "active-tab-store":
-            try:
-                scripts, users = fetch_scripts_and_users(token)
-            except Exception as e:
-                print(f"Error fetching scripts and users: {e}")
-                scripts, users = [], []
-
         # Profile tab: always re-render with latest user_data
         if tab == "profile":
-            return profile_tab_content(user_data or {}), scripts, users
+            return profile_tab_content(user_data or {})
         elif tab == "scripts":
-            return scripts_tab_content(scripts, users, role == "ADMIN"), scripts, users
+            return scripts_tab_content()
         elif tab == "executions":
-            return executions_tab_content(), scripts, users
+            return executions_tab_content()
         elif tab == "users":
-            return users_tab_content(users, role == "ADMIN"), scripts, users
+            return users_tab_content()
         elif tab == "status":
-            return status_tab_content(role == "ADMIN"), scripts, users
-        return html.Div("Unknown tab."), scripts, users
+            return status_tab_content(role == "ADMIN")
+        return html.Div("Unknown tab.")
 
     # Remove the now-unnecessary update_profile_tab_on_user_change callback
 
