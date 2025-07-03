@@ -19,10 +19,10 @@ def register_callbacks(app):
             Output("map-info", "children"),
         ],
         [Input("executions-table", "cellClicked")],
-        [State("token-store", "data")],
+        [State("token-store", "data"), State("executions-table-state", "data")],
         prevent_initial_call=True,
     )
-    def show_map_modal(cell_clicked, token):
+    def show_map_modal(cell_clicked, token, table_state):
         """Show map modal for execution area visualization."""
         if not cell_clicked or not token:
             return False, [], ""
@@ -47,8 +47,15 @@ def register_callbacks(app):
             "page": page,
             "per_page": page_size,
             "exclude": "results",  # We need params, so exclude only results
-            "include": "script_name,user_name",
+            "include": "script_name,user_name,user_email,duration",
         }
+
+        # Apply the same sort and filter that the table is currently using
+        if table_state:
+            if table_state.get("sort_sql"):
+                params["sort"] = table_state["sort_sql"]
+            if table_state.get("filter_sql"):
+                params["filter"] = table_state["filter_sql"]
 
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
         if resp.status_code != 200:

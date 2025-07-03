@@ -26,8 +26,13 @@ def create_main_layout():
             dcc.Store(id="current-log-context"),
             dcc.Store(id="edit-user-data"),
             dcc.Store(id="edit-script-data"),
-            dcc.Store(id="users-table-refresh-trigger"),
-            dcc.Store(id="scripts-table-refresh-trigger"),
+            dcc.Store(
+                id="executions-table-state"
+            ),  # Store current sort/filter state for executions table
+            dcc.Store(id="users-table-state"),  # Store current sort/filter state for users table
+            dcc.Store(
+                id="scripts-table-state"
+            ),  # Store current sort/filter state for scripts table
             dcc.Store(id="active-tab-store", data="executions"),
             # Modals
             json_modal(),

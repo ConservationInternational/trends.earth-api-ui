@@ -94,7 +94,7 @@ def register_callbacks(app):
                     params={
                         "per_page": 1,
                         "exclude": "params,results",
-                        "include": "script_name,user_name",
+                        "include": "script_name,user_name,user_email,duration",
                     },
                     timeout=5,
                 )
@@ -174,7 +174,7 @@ def register_callbacks(app):
                 "per_page": per_page,
                 "start_date_gte": start_time_str,
                 "exclude": "params,results",  # Exclude heavy fields
-                "include": "script_name,user_name",
+                "include": "script_name,user_name,user_email,duration",
             }
 
             resp = requests.get(

@@ -19,11 +19,14 @@ def register_callbacks(app):
         Output("logs-refresh-interval", "disabled"),
         Output("current-log-context", "data"),
         Input("executions-table", "cellClicked"),
-        State("token-store", "data"),
-        State("json-modal", "is_open"),
+        [
+            State("token-store", "data"),
+            State("json-modal", "is_open"),
+            State("executions-table-state", "data"),
+        ],
         prevent_initial_call=True,
     )
-    def show_json_modal(cell, token, is_open):
+    def show_json_modal(cell, token, is_open, table_state):
         """Show JSON/logs modal for execution cell clicks."""
         if not cell:
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
@@ -54,6 +57,13 @@ def register_callbacks(app):
             "exclude": "params,results",
             "include": "script_name,user_name",
         }
+
+        # Apply the same sort and filter that the table is currently using
+        if table_state:
+            if table_state.get("sort_sql"):
+                params["sort"] = table_state["sort_sql"]
+            if table_state.get("filter_sql"):
+                params["filter"] = table_state["filter_sql"]
 
         resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
         if resp.status_code != 200:

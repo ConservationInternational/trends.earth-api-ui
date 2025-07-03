@@ -1,6 +1,9 @@
 """Edit modal callbacks for users and scripts."""
 
 from dash import Input, Output, State, no_update
+import requests
+
+from ..config import API_BASE
 
 
 def register_callbacks(app):
@@ -17,10 +20,14 @@ def register_callbacks(app):
             Output("edit-user-role", "value"),
         ],
         [Input("users-table", "cellClicked")],
-        [State("role-store", "data")],
+        [
+            State("role-store", "data"),
+            State("token-store", "data"),
+            State("users-table-state", "data"),
+        ],
         prevent_initial_call=True,
     )
-    def open_edit_user_modal(cell_clicked, role):
+    def open_edit_user_modal(cell_clicked, role, token, table_state):
         """Open edit user modal from user table."""
         print(f"🔧 USER EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
         if not cell_clicked or role != "ADMIN":
@@ -28,13 +35,39 @@ def register_callbacks(app):
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "", "", "USER"
 
-        # Get row data directly from the cell click event
-        row_data = cell_clicked.get("data")
-        if not row_data or "id" not in row_data:
-            print("❌ No row data found in cell click event")
+        # Get row index from cell click event (for infinite row model)
+        row_index = cell_clicked.get("rowIndex")
+        if row_index is None:
+            print("❌ No row index found in cell click event")
             return False, None, "", "", "", "", "USER"
 
-        user = row_data
+        # Calculate which page this row is on
+        headers = {"Authorization": f"Bearer {token}"}
+        page_size = 50  # This should match your cacheBlockSize
+        page = (row_index // page_size) + 1
+        row_in_page = row_index % page_size
+
+        params = {"page": page, "per_page": page_size}
+
+        # Apply the same sort and filter that the table is currently using
+        if table_state:
+            if table_state.get("sort_sql"):
+                params["sort"] = table_state["sort_sql"]
+            if table_state.get("filter_sql"):
+                params["filter"] = table_state["filter_sql"]
+
+        resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
+        if resp.status_code != 200:
+            print(f"❌ Failed to fetch user data: {resp.text}")
+            return False, None, "", "", "", "", "USER"
+
+        result = resp.json()
+        users = result.get("data", [])
+        if row_in_page >= len(users):
+            print(f"❌ Row index {row_in_page} out of range for page {page}")
+            return False, None, "", "", "", "", "USER"
+
+        user = users[row_in_page]
         print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
 
         return (
@@ -56,23 +89,53 @@ def register_callbacks(app):
             Output("edit-script-status", "value"),
         ],
         [Input("scripts-table", "cellClicked")],
-        [State("role-store", "data")],
+        [
+            State("role-store", "data"),
+            State("token-store", "data"),
+            State("scripts-table-state", "data"),
+        ],
         prevent_initial_call=True,
     )
-    def open_edit_script_modal(cell_clicked, role):
+    def open_edit_script_modal(cell_clicked, role, token, table_state):
         print(f"🔧 SCRIPT EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
         if not cell_clicked or role != "ADMIN":
             return False, None, "", "", "DRAFT"
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "DRAFT"
 
-        # Get row data directly from the cell click event
-        row_data = cell_clicked.get("data")
-        if not row_data or "id" not in row_data:
-            print("❌ No row data found in cell click event")
+        # Get row index from cell click event (for infinite row model)
+        row_index = cell_clicked.get("rowIndex")
+        if row_index is None:
+            print("❌ No row index found in cell click event")
             return False, None, "", "", "DRAFT"
 
-        script = row_data
+        # Calculate which page this row is on
+        headers = {"Authorization": f"Bearer {token}"}
+        page_size = 50  # This should match your cacheBlockSize
+        page = (row_index // page_size) + 1
+        row_in_page = row_index % page_size
+
+        params = {"page": page, "per_page": page_size, "include": "user_name"}
+
+        # Apply the same sort and filter that the table is currently using
+        if table_state:
+            if table_state.get("sort_sql"):
+                params["sort"] = table_state["sort_sql"]
+            if table_state.get("filter_sql"):
+                params["filter"] = table_state["filter_sql"]
+
+        resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+        if resp.status_code != 200:
+            print(f"❌ Failed to fetch script data: {resp.text}")
+            return False, None, "", "", "DRAFT"
+
+        result = resp.json()
+        scripts = result.get("data", [])
+        if row_in_page >= len(scripts):
+            print(f"❌ Row index {row_in_page} out of range for page {page}")
+            return False, None, "", "", "DRAFT"
+
+        script = scripts[row_in_page]
         print(f"✅ Found script data: {script.get('id')} - {script.get('name')}")
 
         return (
