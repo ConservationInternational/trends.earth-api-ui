@@ -18,7 +18,7 @@ LOGS_REFRESH_INTERVAL = 10 * 1000  # 10 seconds in milliseconds
 STATUS_REFRESH_INTERVAL = 60 * 1000  # 60 seconds in milliseconds
 
 # UI Constants
-LOGO_URL = "https://docs.trends.earth/en/latest/_images/trends_earth_logo_bl_1200.png"
+LOGO_URL = "/assets/trends_earth_logo.svg"
 LOGO_HEIGHT = "60px"
 
 # Map Configuration - Tile providers with English labels
