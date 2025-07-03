@@ -55,7 +55,7 @@ def register_callbacks(app):
             "page": page,
             "per_page": page_size,
             "exclude": "params,results",
-            "include": "script_name,user_name",
+            "include": "script_name,user_name,user_email,duration",
         }
 
         # Apply the same sort and filter that the table is currently using
