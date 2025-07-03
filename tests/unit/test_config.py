@@ -36,7 +36,8 @@ class TestConfigurationConstants:
         assert "Trends.Earth" in APP_TITLE
 
         assert isinstance(LOGO_URL, str)
-        assert LOGO_URL.startswith("http")
+        # Logo URL can be either external (http) or local assets path
+        assert LOGO_URL.startswith(("http", "/assets/"))
 
         assert isinstance(LOGO_HEIGHT, str)
         assert "px" in LOGO_HEIGHT
@@ -117,13 +118,19 @@ class TestConfigurationConsistency:
 
     def test_url_consistency(self):
         """Test URL format consistency."""
-        urls = [API_BASE, AUTH_URL, LOGO_URL]
-
-        for url in urls:
+        # API and AUTH URLs should be external URLs
+        external_urls = [API_BASE, AUTH_URL]
+        
+        for url in external_urls:
             assert isinstance(url, str)
             assert url.startswith(("http://", "https://"))
             # Should not have trailing whitespace
             assert url == url.strip()
+            
+        # Logo URL can be external or local asset path
+        assert isinstance(LOGO_URL, str)
+        assert LOGO_URL.startswith(("http://", "https://", "/assets/"))
+        assert LOGO_URL == LOGO_URL.strip()
 
 
 class TestConfigurationImport:

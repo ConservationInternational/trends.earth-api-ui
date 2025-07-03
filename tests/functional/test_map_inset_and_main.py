@@ -71,7 +71,7 @@ def test_main_map_layers_and_styles():
         if hasattr(c, "options") and isinstance(getattr(c, "options", None), dict)
     ]
     assert any(
-        layer.options.get("style", {}).get("color") == "red" for layer in geo_layers
+        layer.options.get("style", {}).get("color") in ["red", "#FF0000"] for layer in geo_layers
     ), "Main map should have red polygons/lines."
 
 
