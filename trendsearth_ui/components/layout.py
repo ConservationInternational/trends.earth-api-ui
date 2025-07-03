@@ -218,8 +218,6 @@ def dashboard_layout():
         ),
         # Hidden store to track active tab
         dcc.Store(id="active-tab-store", data="executions"),
-        # Add tab-content placeholder for test compatibility
-        html.Div(id="tab-content"),
     ]
     print(f"🏗️ Dashboard layout created with {len(layout)} components:")
     for i, component in enumerate(layout):

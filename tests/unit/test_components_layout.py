@@ -106,7 +106,7 @@ class TestDashboardLayout:
 
         # Should contain tab structure
         assert "tabs" in layout_str.lower()
-        assert "tab-content" in layout_str
+        assert "tabs-nav" in layout_str  # Check for the tabs navigation ID
 
         # Should contain expected tabs
         expected_tabs = ["executions", "users", "scripts", "status", "profile"]
