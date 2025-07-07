@@ -22,10 +22,9 @@ def get_cached_data(cache_key, ttl=None):
     cache_entry = _status_cache.get(cache_key, {})
     if ttl is None:
         ttl = cache_entry.get("ttl", 30)
-    
+
     current_time = time.time()
-    if (cache_entry.get("data") is not None and 
-        current_time - cache_entry.get("timestamp", 0) < ttl):
+    if cache_entry.get("data") is not None and current_time - cache_entry.get("timestamp", 0) < ttl:
         return cache_entry["data"]
     return None
 
@@ -34,7 +33,7 @@ def set_cached_data(cache_key, data, ttl=None):
     """Set cached data with timestamp."""
     if cache_key not in _status_cache:
         _status_cache[cache_key] = {}
-    
+
     _status_cache[cache_key]["data"] = data
     _status_cache[cache_key]["timestamp"] = time.time()
     if ttl is not None:
@@ -64,9 +63,10 @@ def register_callbacks(app):
 
         # Check cache first (unless it's a manual refresh)
         ctx = callback_context
-        is_manual_refresh = (ctx.triggered and 
-                           ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn")
-        
+        is_manual_refresh = (
+            ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
+        )
+
         if not is_manual_refresh:
             cached_data = get_cached_data("summary")
             if cached_data is not None:
@@ -160,7 +160,9 @@ def register_callbacks(app):
                     return fallback_result
                 else:
                     error_result = f"Failed to fetch status information. API responded with status {resp.status_code}."
-                    set_cached_data("summary", error_result, ttl=10)  # Cache errors for shorter time
+                    set_cached_data(
+                        "summary", error_result, ttl=10
+                    )  # Cache errors for shorter time
                     return error_result
 
         except requests.exceptions.Timeout:
@@ -218,20 +220,23 @@ def register_callbacks(app):
 
         try:
             # Create cache key based on time period and rounded start time for better caching
-            cache_key = f"charts_{time_period}_{int(start_time.timestamp() // 300)}"  # 5-minute buckets
-            
+            cache_key = (
+                f"charts_{time_period}_{int(start_time.timestamp() // 300)}"  # 5-minute buckets
+            )
+
             # Check cache first (unless it's a manual refresh)
             ctx = callback_context
-            is_manual_refresh = (ctx.triggered and 
-                               ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn")
-            
+            is_manual_refresh = (
+                ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
+            )
+
             if not is_manual_refresh:
                 cached_data = get_cached_data("charts")
                 if cached_data and cache_key in cached_data:
                     return cached_data[cache_key]
             start_time_rounded = start_time.replace(second=0, microsecond=0)
             cache_key = f"status_chart_{time_period}_{start_time_rounded.isoformat()}"
-            
+
             # Fetch execution data for the time period - only get essential fields
             start_time_str = start_time.isoformat()
             params = {
@@ -262,7 +267,7 @@ def register_callbacks(app):
 
             result = resp.json()
             executions = result.get("data", [])
-            
+
             if executions is None:
                 return html.Div(
                     [
@@ -403,7 +408,7 @@ def register_callbacks(app):
             cached_charts = get_cached_data("charts") or {}
             cached_charts[cache_key] = chart_result
             set_cached_data("charts", cached_charts)
-            
+
             return chart_result
 
         except requests.exceptions.Timeout:

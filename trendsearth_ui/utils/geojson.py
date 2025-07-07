@@ -244,7 +244,7 @@ def create_map_from_geojsons(geojsons, exec_id):
                 center_lat = sum(coord[0] for coord in all_coordinates) / len(all_coordinates)
                 center_lon = sum(coord[1] for coord in all_coordinates) / len(all_coordinates)
                 center = [center_lat, center_lon]
-                zoom = 10  # Reasonable zoom for viewing polygons
+                zoom = 6  # Better overview for viewing polygons
                 print(f"DEBUG: Calculated center from {len(all_coordinates)} coordinates: {center}")
             else:
                 print("DEBUG: No coordinates found, using default center")
@@ -357,7 +357,7 @@ def create_map_from_geojsons(geojsons, exec_id):
                     center_lat = sum(coord[0] for coord in coords) / len(coords)
                     center_lon = sum(coord[1] for coord in coords) / len(coords)
                     center = [center_lat, center_lon]
-                    zoom = 9  # Lower zoom for better overview
+                    zoom = 5  # Lower zoom for better overview
                     print(f"DEBUG: Calculated single center: {center}, zoom: {zoom}")
         else:
             print(f"DEBUG: No valid geojsons provided or unsupported type: {type(geojsons)}")

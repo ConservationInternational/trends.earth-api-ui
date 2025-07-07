@@ -64,10 +64,11 @@ def login_layout():
                                         alt="Trends.Earth Logo",
                                         style={"height": LOGO_HEIGHT, "marginBottom": "15px"},
                                     ),
-                                    html.H4("Login"),
+                                    html.H4("Login", style={"color": "white"}),
                                 ],
                                 className="text-center",
-                            )
+                            ),
+                            style={"backgroundColor": "#495057"},
                         ),
                         dbc.CardBody(
                             [

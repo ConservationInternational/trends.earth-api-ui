@@ -35,40 +35,49 @@ def register_callbacks(app):
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "", "", "USER"
 
-        # Get row index from cell click event (for infinite row model)
-        row_index = cell_clicked.get("rowIndex")
-        if row_index is None:
-            print("❌ No row index found in cell click event")
-            return False, None, "", "", "", "", "USER"
+        # Try to get row data from cell click event first
+        row_data = cell_clicked.get("data")
+        user_id = None
 
-        # Calculate which page this row is on
-        headers = {"Authorization": f"Bearer {token}"}
-        page_size = 50  # This should match your cacheBlockSize
-        page = (row_index // page_size) + 1
-        row_in_page = row_index % page_size
+        if row_data:
+            user_id = row_data.get("id")
+            user = row_data
 
-        params = {"page": page, "per_page": page_size}
+        # If we don't have row data or user_id, fall back to pagination approach
+        if not user_id:
+            row_index = cell_clicked.get("rowIndex")
+            if row_index is None:
+                print("❌ No row index found in cell click event")
+                return False, None, "", "", "", "", "USER"
 
-        # Apply the same sort and filter that the table is currently using
-        if table_state:
-            if table_state.get("sort_sql"):
-                params["sort"] = table_state["sort_sql"]
-            if table_state.get("filter_sql"):
-                params["filter"] = table_state["filter_sql"]
+            # Calculate which page this row is on
+            headers = {"Authorization": f"Bearer {token}"}
+            page_size = 50  # This should match your cacheBlockSize
+            page = (row_index // page_size) + 1
+            row_in_page = row_index % page_size
 
-        resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
-        if resp.status_code != 200:
-            print(f"❌ Failed to fetch user data: {resp.text}")
-            return False, None, "", "", "", "", "USER"
+            params = {"page": page, "per_page": page_size}
 
-        result = resp.json()
-        users = result.get("data", [])
-        if row_in_page >= len(users):
-            print(f"❌ Row index {row_in_page} out of range for page {page}")
-            return False, None, "", "", "", "", "USER"
+            # Apply the same sort and filter that the table is currently using
+            if table_state:
+                if table_state.get("sort_sql"):
+                    params["sort"] = table_state["sort_sql"]
+                if table_state.get("filter_sql"):
+                    params["filter"] = table_state["filter_sql"]
 
-        user = users[row_in_page]
-        print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
+            resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
+            if resp.status_code != 200:
+                print(f"❌ Failed to fetch user data: {resp.text}")
+                return False, None, "", "", "", "", "USER"
+
+            result = resp.json()
+            users = result.get("data", [])
+            if row_in_page >= len(users):
+                print(f"❌ Row index {row_in_page} out of range for page {page}")
+                return False, None, "", "", "", "", "USER"
+
+            user = users[row_in_page]
+            print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
 
         return (
             True,
@@ -103,40 +112,50 @@ def register_callbacks(app):
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "DRAFT"
 
-        # Get row index from cell click event (for infinite row model)
-        row_index = cell_clicked.get("rowIndex")
-        if row_index is None:
-            print("❌ No row index found in cell click event")
-            return False, None, "", "", "DRAFT"
+        # Try to get row data from cell click event first
+        row_data = cell_clicked.get("data")
+        script_id = None
 
-        # Calculate which page this row is on
-        headers = {"Authorization": f"Bearer {token}"}
-        page_size = 50  # This should match your cacheBlockSize
-        page = (row_index // page_size) + 1
-        row_in_page = row_index % page_size
+        if row_data:
+            script_id = row_data.get("id")
+            script = row_data
 
-        params = {"page": page, "per_page": page_size, "include": "user_name"}
+        # If we don't have row data or script_id, fall back to pagination approach
+        if not script_id:
+            row_index = cell_clicked.get("rowIndex")
+            if row_index is None:
+                print("❌ No row index found in cell click event")
+                return False, None, "", "", "DRAFT"
 
-        # Apply the same sort and filter that the table is currently using
-        if table_state:
-            if table_state.get("sort_sql"):
-                params["sort"] = table_state["sort_sql"]
-            if table_state.get("filter_sql"):
-                params["filter"] = table_state["filter_sql"]
+            # Calculate which page this row is on
+            headers = {"Authorization": f"Bearer {token}"}
+            page_size = 50  # This should match your cacheBlockSize
+            page = (row_index // page_size) + 1
+            row_in_page = row_index % page_size
 
-        resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
-        if resp.status_code != 200:
-            print(f"❌ Failed to fetch script data: {resp.text}")
-            return False, None, "", "", "DRAFT"
+            params = {"page": page, "per_page": page_size, "include": "user_name"}
 
-        result = resp.json()
-        scripts = result.get("data", [])
-        if row_in_page >= len(scripts):
-            print(f"❌ Row index {row_in_page} out of range for page {page}")
-            return False, None, "", "", "DRAFT"
+            # Apply the same sort and filter that the table is currently using
+            if table_state:
+                if table_state.get("sort_sql"):
+                    params["sort"] = table_state["sort_sql"]
+                if table_state.get("filter_sql"):
+                    params["filter"] = table_state["filter_sql"]
 
-        script = scripts[row_in_page]
-        print(f"✅ Found script data: {script.get('id')} - {script.get('name')}")
+            resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+            if resp.status_code != 200:
+                print(f"❌ Failed to fetch script data: {resp.text}")
+                return False, None, "", "", "DRAFT"
+
+            result = resp.json()
+            scripts = result.get("data", [])
+
+            if row_in_page >= len(scripts):
+                print(f"❌ Row index {row_in_page} out of range for page {page}")
+                return False, None, "", "", "DRAFT"
+
+            script = scripts[row_in_page]
+            print(f"✅ Found script data: {script.get('id')} - {script.get('name')}")
 
         return (
             True,
@@ -192,9 +211,6 @@ def register_callbacks(app):
         """Save user edits to the API and trigger table refresh."""
         if not n_clicks or not user_data or not token:
             return no_update, no_update
-        import requests
-
-        from ..config import API_BASE
 
         user_id = user_data.get("id")
         if not user_id:
@@ -245,9 +261,6 @@ def register_callbacks(app):
         """Save script edits to the API and trigger table refresh."""
         if not n_clicks or not script_data or not token:
             return no_update, no_update
-        import requests
-
-        from ..config import API_BASE
 
         script_id = script_data.get("id")
         if not script_id:

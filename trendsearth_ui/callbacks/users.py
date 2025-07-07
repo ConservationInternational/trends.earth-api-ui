@@ -57,75 +57,44 @@ def register_callbacks(app):
             if sort_sql:
                 params["sort"] = ",".join(sort_sql)
 
-            # Build SQL-style filter string with proper escaping
+            # Build SQL-style filter string (Admin only)
             filter_sql = []
-            for field, config in filter_model.items():
-                # Skip action columns that don't exist in the API
-                if field in ("edit",):
-                    continue
+            if role == "ADMIN":  # Only admins can use filters
+                for field, config in filter_model.items():
+                    if config.get("filterType") == "text":
+                        filter_type = config.get("type", "contains")
+                        val = config.get("filter", "").strip()
+                        if val:
+                            if filter_type == "contains":
+                                filter_sql.append(f"{field} like '%{val}%'")
+                            elif filter_type == "equals":
+                                filter_sql.append(f"{field}='{val}'")
+                            elif filter_type == "notEquals":
+                                filter_sql.append(f"{field}!='{val}'")
+                            elif filter_type == "startsWith":
+                                filter_sql.append(f"{field} like '{val}%'")
+                            elif filter_type == "endsWith":
+                                filter_sql.append(f"{field} like '%{val}'")
+                    elif config.get("filterType") == "number":
+                        filter_type = config.get("type", "equals")
+                        val = config.get("filter")
+                        if val is not None:
+                            if filter_type == "equals":
+                                filter_sql.append(f"{field}={val}")
+                            elif filter_type == "notEqual":
+                                filter_sql.append(f"{field}!={val}")
+                            elif filter_type == "greaterThan":
+                                filter_sql.append(f"{field}>{val}")
+                            elif filter_type == "greaterThanOrEqual":
+                                filter_sql.append(f"{field}>={val}")
+                            elif filter_type == "lessThan":
+                                filter_sql.append(f"{field}<{val}")
+                            elif filter_type == "lessThanOrEqual":
+                                filter_sql.append(f"{field}<={val}")
 
-                # Text filter
-                if config.get("filterType") == "text":
-                    val = config.get("filter", "").replace("'", "''")  # Escape single quotes
-                    filter_type = config.get("type", "contains")
-                    if val:  # Only add filter if value is not empty
-                        if filter_type == "equals":
-                            filter_sql.append(f"{field}='{val}'")
-                        elif filter_type == "notEqual":
-                            filter_sql.append(f"{field}!='{val}'")
-                        elif filter_type == "contains":
-                            filter_sql.append(f"{field} like '%{val}%'")
-                        elif filter_type == "notContains":
-                            filter_sql.append(f"{field} not like '%{val}%'")
-                        elif filter_type == "startsWith":
-                            filter_sql.append(f"{field} like '{val}%'")
-                        elif filter_type == "endsWith":
-                            filter_sql.append(f"{field} like '%{val}'")
-
-                # Number filter
-                elif config.get("filterType") == "number":
-                    val = config.get("filter")
-                    filter_type = config.get("type", "equals")
-                    if val is not None:  # Allow 0 as a valid filter value
-                        if filter_type == "equals":
-                            filter_sql.append(f"{field}={val}")
-                        elif filter_type == "notEqual":
-                            filter_sql.append(f"{field}!={val}")
-                        elif filter_type == "greaterThan":
-                            filter_sql.append(f"{field}>{val}")
-                        elif filter_type == "lessThan":
-                            filter_sql.append(f"{field}<{val}")
-                        elif filter_type == "greaterThanOrEqual":
-                            filter_sql.append(f"{field}>={val}")
-                        elif filter_type == "lessThanOrEqual":
-                            filter_sql.append(f"{field}<={val}")
-
-                # Date filter
-                elif config.get("filterType") == "date":
-                    date_from = config.get("dateFrom")
-                    date_to = config.get("dateTo")
-                    filter_type = config.get("type", "equals")
-                    if filter_type == "equals" and date_from:
-                        filter_sql.append(f"{field}='{date_from}'")
-                    elif filter_type == "notEqual" and date_from:
-                        filter_sql.append(f"{field}!='{date_from}'")
-                    elif filter_type == "greaterThan" and date_from:
-                        filter_sql.append(f"{field}>'{date_from}'")
-                    elif filter_type == "lessThan" and date_from:
-                        filter_sql.append(f"{field}<'{date_from}'")
-                    elif filter_type == "greaterThanOrEqual" and date_from:
-                        filter_sql.append(f"{field}>='{date_from}'")
-                    elif filter_type == "lessThanOrEqual" and date_from:
-                        filter_sql.append(f"{field}<='{date_from}'")
-                    elif filter_type == "inRange":
-                        if date_from:
-                            filter_sql.append(f"{field}>='{date_from}'")
-                        if date_to:
-                            filter_sql.append(f"{field}<='{date_to}'")
-
+            # Add filters to params if any
             if filter_sql:
                 params["filter"] = ",".join(filter_sql)
-                print(f"DEBUG: Applied filters: {params['filter']}")
 
             headers = {"Authorization": f"Bearer {token}"}
             resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
@@ -177,10 +146,14 @@ def register_callbacks(app):
             Output("users-total-count-store", "data", allow_duplicate=True),
         ],
         Input("refresh-users-btn", "n_clicks"),
-        [State("token-store", "data"), State("role-store", "data")],
+        [
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("users-table-state", "data"),
+        ],
         prevent_initial_call=True,
     )
-    def refresh_users_table(n_clicks, token, role):
+    def refresh_users_table(n_clicks, token, role, table_state):
         """Manually refresh the users table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0
@@ -194,6 +167,13 @@ def register_callbacks(app):
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
             }
+
+            # Preserve existing sort and filter settings if available
+            if table_state:
+                if table_state.get("sort_sql"):
+                    params["sort"] = table_state["sort_sql"]
+                if table_state.get("filter_sql"):
+                    params["filter"] = table_state["filter_sql"]
 
             resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
 
@@ -218,8 +198,8 @@ def register_callbacks(app):
                         row[date_col] = parse_date(row.get(date_col))
                 tabledata.append(row)
 
-            # For refresh, we don't have sort/filter state, so return empty state
-            return {"rowData": tabledata, "rowCount": total_rows}, {}, total_rows
+            # Return data with preserved table state
+            return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
 
         except Exception as e:
             print(f"Error in refresh_users_table: {str(e)}")
