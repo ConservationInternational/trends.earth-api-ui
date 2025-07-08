@@ -122,7 +122,6 @@ class TestConfigurationConsistency:
         external_urls = [API_BASE, AUTH_URL]
 
         for url in external_urls:
-        for url in external_urls:
             assert isinstance(url, str)
             assert url.startswith(("http://", "https://"))
             # Should not have trailing whitespace
