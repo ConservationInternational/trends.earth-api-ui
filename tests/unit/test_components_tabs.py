@@ -177,6 +177,11 @@ class TestStatusTabContent:
 
         # Should return a component (likely with restricted access message)
         assert hasattr(content, "children")
+        
+        # Should contain access denied message
+        content_str = str(content)
+        assert "Access denied" in content_str
+        assert "Administrator privileges required" in content_str
 
     def test_status_tab_refresh_components(self):
         """Test that status tab contains refresh components."""
@@ -184,15 +189,91 @@ class TestStatusTabContent:
         content_str = str(content)
 
         # Should contain refresh functionality
-        assert "refresh-status-btn" in content_str or "refresh" in content_str.lower()
+        assert "refresh-status-btn" in content_str
+        assert "status-countdown" in content_str
+        assert "status-auto-refresh-interval" in content_str
+        assert "status-countdown-interval" in content_str
 
     def test_status_tab_charts_section(self):
         """Test that status tab contains charts section."""
         content = status_tab_content(is_admin=True)
         content_str = str(content)
 
-        # Should contain charts or status visualization
-        assert "chart" in content_str.lower() or "status" in content_str.lower()
+        # Should contain charts container and loading components
+        assert "status-charts" in content_str
+        assert "loading-status-charts" in content_str
+
+    def test_status_tab_manual_time_tabs(self):
+        """Test that status tab contains manual time period tabs."""
+        content = status_tab_content(is_admin=True)
+        content_str = str(content)
+
+        # Should contain Bootstrap nav tabs structure
+        assert "nav nav-tabs" in content_str
+        assert "nav-item" in content_str
+        assert "nav-link" in content_str
+
+        # Should contain all time period tabs
+        assert "Last Hour" in content_str
+        assert "Last 24 Hours" in content_str
+        assert "Last Week" in content_str
+        assert "Last Month" in content_str
+
+        # Should contain all tab IDs
+        assert "status-tab-hour" in content_str
+        assert "status-tab-day" in content_str
+        assert "status-tab-week" in content_str
+        assert "status-tab-month" in content_str
+
+    def test_status_tab_data_store(self):
+        """Test that status tab contains data store for tab state."""
+        content = status_tab_content(is_admin=True)
+        content_str = str(content)
+
+        # Should contain the store component for tracking active tab
+        assert "status-time-tabs-store" in content_str
+
+    def test_status_tab_not_using_dbc_tabs(self):
+        """Test that status tab uses manual tabs instead of dbc.Tabs."""
+        content = status_tab_content(is_admin=True)
+        content_str = str(content)
+
+        # Should NOT contain dbc.Tabs references (which were causing visibility issues)
+        assert "dbc.Tab(" not in content_str
+        assert "dbc.Tabs(" not in content_str
+
+        # Should contain manual HTML nav structure
+        assert "html.Ul(" in content_str or "nav nav-tabs" in content_str
+
+    def test_status_tab_default_active_state(self):
+        """Test that status tab has proper default active state."""
+        content = status_tab_content(is_admin=True)
+        content_str = str(content)
+
+        # Should have "nav-link active" for the default tab (hour)
+        assert "nav-link active" in content_str
+
+    def test_status_tab_bootstrap_styling(self):
+        """Test that status tab contains proper Bootstrap styling."""
+        content = status_tab_content(is_admin=True)
+        content_str = str(content)
+
+        # Should contain Dash Bootstrap Components (as they appear in string representation)
+        bootstrap_components = [
+            "Card(",
+            "CardHeader(",
+            "CardBody(",
+            "Button(",
+            "Row(",
+            "Col(",
+            "Div(",
+            "mb-3",
+            "badge",
+            "bg-secondary"
+        ]
+
+        for component in bootstrap_components:
+            assert component in content_str, f"Should contain Bootstrap component: {component}"
 
 
 class TestTabsIntegration:

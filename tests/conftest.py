@@ -12,6 +12,8 @@ import dash
 from dash import Dash
 import dash_bootstrap_components as dbc
 import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -148,3 +150,57 @@ def mock_requests():
         patch("requests.put") as mock_put,
     ):
         yield {"get": mock_get, "post": mock_post, "patch": mock_patch, "put": mock_put}
+
+
+@pytest.fixture
+def dash_app_with_auth():
+    """Create a Dash app instance with authentication simulation for testing."""
+    app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+    app.title = APP_TITLE
+    app.layout = create_main_layout()
+    register_all_callbacks(app)
+    
+    # Start the app server in a separate thread for testing
+    server = app.server
+    
+    # Create a headless Chrome driver for testing
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+        return app, driver
+    except Exception:
+        # If Chrome is not available, return None to skip these tests
+        return None
+
+
+@pytest.fixture
+def dash_app_non_admin():
+    """Create a Dash app instance with non-admin user simulation for testing."""
+    app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+    app.title = APP_TITLE
+    app.layout = create_main_layout()
+    register_all_callbacks(app)
+    
+    # Start the app server in a separate thread for testing
+    server = app.server
+    
+    # Create a headless Chrome driver for testing
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+        return app, driver
+    except Exception:
+        # If Chrome is not available, return None to skip these tests
+        return None

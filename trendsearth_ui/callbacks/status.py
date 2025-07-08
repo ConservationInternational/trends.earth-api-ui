@@ -418,7 +418,7 @@ def register_callbacks(app):
         [
             Input("status-auto-refresh-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
-            Input("status-time-tabs", "active_tab"),
+            Input("status-time-tabs-store", "data"),
         ],
         [
             State("token-store", "data"),
@@ -820,15 +820,59 @@ def register_callbacks(app):
 
     @app.callback(
         Output("status-countdown", "children"),
-        Input("status-countdown-interval", "n_intervals"),
+        [
+            Input("status-countdown-interval", "n_intervals"),
+            Input("refresh-status-btn", "n_clicks"),
+        ],
         State("active-tab-store", "data"),
         prevent_initial_call=True,
     )
-    def update_status_countdown(n_intervals, active_tab):
+    def update_status_countdown(n_intervals, refresh_clicks, active_tab):
         """Update the status auto-refresh countdown."""
         if active_tab != "status":
-            return "45s"
+            return "60s"
 
-        # Calculate remaining seconds (45 second cycle)
-        remaining = 45 - (n_intervals % 45)
+        # Check if refresh button was clicked to reset countdown
+        ctx = callback_context
+        if ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn":
+            return "60s"  # Reset to full interval
+
+        # Calculate remaining seconds (60 second cycle to match STATUS_REFRESH_INTERVAL)
+        remaining = 60 - (n_intervals % 60)
         return f"{remaining}s"
+
+    @app.callback(
+        [
+            Output("status-tab-hour", "className"),
+            Output("status-tab-day", "className"),
+            Output("status-tab-week", "className"),
+            Output("status-tab-month", "className"),
+            Output("status-time-tabs-store", "data"),
+        ],
+        [
+            Input("status-tab-hour", "n_clicks"),
+            Input("status-tab-day", "n_clicks"),
+            Input("status-tab-week", "n_clicks"),
+            Input("status-tab-month", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def switch_status_time_tabs(hour_clicks, day_clicks, week_clicks, month_clicks):
+        """Handle tab switching for status time period tabs."""
+        ctx = callback_context
+        if not ctx.triggered:
+            return "nav-link active", "nav-link", "nav-link", "nav-link", "hour"
+
+        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+        # Define tab mapping
+        tab_map = {
+            "status-tab-hour": ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link")),
+            "status-tab-day": ("day", ("nav-link", "nav-link active", "nav-link", "nav-link")),
+            "status-tab-week": ("week", ("nav-link", "nav-link", "nav-link active", "nav-link")),
+            "status-tab-month": ("month", ("nav-link", "nav-link", "nav-link", "nav-link active")),
+        }
+
+        active_tab, classes = tab_map.get(trigger_id, ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link")))
+
+        return classes[0], classes[1], classes[2], classes[3], active_tab
