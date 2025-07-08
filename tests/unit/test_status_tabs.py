@@ -2,12 +2,13 @@
 Unit tests for the new status tab functionality including manual tab switching.
 """
 
-import pytest
-from dash import html, dcc
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
-from trendsearth_ui.components.tabs import status_tab_content
+from dash import dcc, html
+import pytest
+
 from trendsearth_ui.callbacks.status import register_callbacks
+from trendsearth_ui.components.tabs import status_tab_content
 
 
 class TestStatusTabStructure:
@@ -131,7 +132,7 @@ class TestStatusTabCallbacks:
 
         assert tab_switching_callback is not None, "Tab switching callback should be registered"
 
-    @patch('trendsearth_ui.callbacks.status.callback_context')
+    @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_tab_switching_logic(self, mock_ctx):
         """Test the tab switching logic."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -145,13 +146,14 @@ class TestStatusTabCallbacks:
                 # Store the function for testing
                 callback_functions[func.__name__] = func
                 return func
+
             return decorator
 
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
         # Get the tab switching function
-        tab_switch_func = callback_functions.get('switch_status_time_tabs')
+        tab_switch_func = callback_functions.get("switch_status_time_tabs")
         assert tab_switch_func is not None, "Tab switching function should exist"
 
         # Test hour tab click
@@ -178,7 +180,7 @@ class TestStatusTabCallbacks:
         expected = ("nav-link", "nav-link", "nav-link", "nav-link active", "month")
         assert result == expected
 
-    @patch('trendsearth_ui.callbacks.status.callback_context')
+    @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_countdown_reset_on_refresh(self, mock_ctx):
         """Test that countdown resets when refresh button is clicked."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -191,13 +193,14 @@ class TestStatusTabCallbacks:
             def decorator(func):
                 callback_functions[func.__name__] = func
                 return func
+
             return decorator
 
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
         # Get the countdown function
-        countdown_func = callback_functions.get('update_status_countdown')
+        countdown_func = callback_functions.get("update_status_countdown")
         assert countdown_func is not None, "Countdown function should exist"
 
         # Test refresh button click (should reset to 60s)
@@ -220,11 +223,11 @@ class TestStatusTabsIntegration:
         content = status_tab_content(is_admin=True)
 
         # Should be a valid Dash component
-        assert hasattr(content, 'children')
+        assert hasattr(content, "children")
 
         # Should contain proper Dash component types
         def check_component_structure(component):
-            if hasattr(component, 'children') and component.children:
+            if hasattr(component, "children") and component.children:
                 if isinstance(component.children, list):
                     for child in component.children:
                         check_component_structure(child)
@@ -237,19 +240,21 @@ class TestStatusTabsIntegration:
     def test_status_tab_css_classes(self):
         """Test that proper CSS classes are applied."""
         content = status_tab_content(is_admin=True)
-        content_str = str(content)        # Should contain Bootstrap classes - check for Dash component representations
+        content_str = str(
+            content
+        )  # Should contain Bootstrap classes - check for Dash component representations
         bootstrap_classes = [
             "nav-tabs",
             "nav-link",
             "nav-item",
             "mb-3",
-            "Card(",  # Dash component representation
-            "CardHeader(",  # Dash component representation
-            "CardBody(",   # Dash component representation
-            "Button(",  # Dash component representation
+            "dbc.Card(",  # Dash component representation
+            "dbc.CardHeader(",  # Dash component representation
+            "dbc.CardBody(",  # Dash component representation
+            "dbc.Button(",  # Dash component representation
             "color='primary'",
             "badge",
-            "bg-secondary"
+            "bg-secondary",
         ]
 
         for css_class in bootstrap_classes:
@@ -272,14 +277,7 @@ class TestStatusTabsIntegration:
         content_str = str(content)
 
         # Should contain responsive Bootstrap classes
-        responsive_classes = [
-            "col-",
-            "Row(",
-            "Col(",
-            "d-flex",
-            "justify-content-",
-            "align-items-"
-        ]
+        responsive_classes = ["col-", "Row(", "Col(", "d-flex", "justify-content-", "align-items-"]
 
         # At least some responsive classes should be present
         has_responsive = any(cls in content_str for cls in responsive_classes)
@@ -298,7 +296,7 @@ class TestStatusTabsErrorHandling:
         content = status_tab_content(is_admin="invalid")
         assert content is not None
 
-    @patch('trendsearth_ui.callbacks.status.callback_context')
+    @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_tab_switching_with_no_trigger(self, mock_ctx):
         """Test tab switching when no trigger is provided."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -310,12 +308,13 @@ class TestStatusTabsErrorHandling:
             def decorator(func):
                 callback_functions[func.__name__] = func
                 return func
+
             return decorator
 
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        tab_switch_func = callback_functions.get('switch_status_time_tabs')
+        tab_switch_func = callback_functions.get("switch_status_time_tabs")
 
         # Test with no trigger
         mock_ctx.triggered = []
@@ -323,7 +322,7 @@ class TestStatusTabsErrorHandling:
         expected = ("nav-link active", "nav-link", "nav-link", "nav-link", "hour")
         assert result == expected
 
-    @patch('trendsearth_ui.callbacks.status.callback_context')
+    @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_countdown_with_non_status_tab(self, mock_ctx):
         """Test countdown when not on status tab."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -335,12 +334,13 @@ class TestStatusTabsErrorHandling:
             def decorator(func):
                 callback_functions[func.__name__] = func
                 return func
+
             return decorator
 
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        countdown_func = callback_functions.get('update_status_countdown')
+        countdown_func = callback_functions.get("update_status_countdown")
 
         # Test when not on status tab
         result = countdown_func(30, 0, "executions")

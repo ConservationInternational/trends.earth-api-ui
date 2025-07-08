@@ -3,10 +3,10 @@ Functional tests for status tabs functionality with Selenium availability checks
 """
 
 import pytest
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
 
 
 class TestStatusTabVisibility:
@@ -17,10 +17,11 @@ class TestStatusTabVisibility:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         # For now, just ensure we can create the status tab content
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -29,9 +30,10 @@ class TestStatusTabVisibility:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -40,9 +42,10 @@ class TestStatusTabVisibility:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -51,9 +54,10 @@ class TestStatusTabVisibility:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -62,9 +66,10 @@ class TestStatusTabVisibility:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -77,9 +82,10 @@ class TestStatusTabRefreshFunctionality:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -88,9 +94,10 @@ class TestStatusTabRefreshFunctionality:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -99,9 +106,10 @@ class TestStatusTabRefreshFunctionality:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -114,9 +122,10 @@ class TestStatusTabNonAdminAccess:
         if dash_app_non_admin is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_non_admin
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=False)
         content_str = str(content)
         assert "Access denied" in content_str
@@ -126,9 +135,10 @@ class TestStatusTabNonAdminAccess:
         if dash_app_non_admin is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_non_admin
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=False)
         content_str = str(content)
         assert "Access denied" in content_str
@@ -138,9 +148,10 @@ class TestStatusTabNonAdminAccess:
         if dash_app_non_admin is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_non_admin
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=False)
         content_str = str(content)
         assert "Access denied" in content_str
@@ -154,9 +165,10 @@ class TestStatusTabResponsiveness:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -165,9 +177,10 @@ class TestStatusTabResponsiveness:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -180,9 +193,10 @@ class TestStatusTabsPerformance:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 
@@ -191,9 +205,10 @@ class TestStatusTabsPerformance:
         if dash_app_with_auth is None:
             pytest.skip("Chrome driver not available for functional tests")
         app, driver = dash_app_with_auth
-        
+
         # Test implementation would go here
         from trendsearth_ui.components.tabs import status_tab_content
+
         content = status_tab_content(is_admin=True)
         assert content is not None
 

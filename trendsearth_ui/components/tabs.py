@@ -527,48 +527,67 @@ def status_tab_content(is_admin):
                     dbc.CardHeader(html.H4("System Status Trends")),
                     dbc.CardBody(
                         [
-                            html.Div([
-                                html.Ul([
-                                    html.Li([
-                                        html.A(
-                                            "Last Hour",
-                                            href="#",
-                                            className="nav-link active",
-                                            id="status-tab-hour",
-                                            **{"data-tab": "hour"}
-                                        )
-                                    ], className="nav-item"),
-                                    html.Li([
-                                        html.A(
-                                            "Last 24 Hours",
-                                            href="#",
-                                            className="nav-link",
-                                            id="status-tab-day",
-                                            **{"data-tab": "day"}
-                                        )
-                                    ], className="nav-item"),
-                                    html.Li([
-                                        html.A(
-                                            "Last Week",
-                                            href="#",
-                                            className="nav-link",
-                                            id="status-tab-week",
-                                            **{"data-tab": "week"}
-                                        )
-                                    ], className="nav-item"),
-                                    html.Li([
-                                        html.A(
-                                            "Last Month",
-                                            href="#",
-                                            className="nav-link",
-                                            id="status-tab-month",
-                                            **{"data-tab": "month"}
-                                        )
-                                    ], className="nav-item"),
-                                ], className="nav nav-tabs", id="status-time-tabs"),
-                                # Hidden store to track active tab
-                                dcc.Store(id="status-time-tabs-store", data="hour"),
-                            ], className="mb-3"),
+                            html.Div(
+                                [
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "Last Hour",
+                                                        href="#",
+                                                        className="nav-link active",
+                                                        id="status-tab-hour",
+                                                        **{"data-tab": "hour"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "Last 24 Hours",
+                                                        href="#",
+                                                        className="nav-link",
+                                                        id="status-tab-day",
+                                                        **{"data-tab": "day"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "Last Week",
+                                                        href="#",
+                                                        className="nav-link",
+                                                        id="status-tab-week",
+                                                        **{"data-tab": "week"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "Last Month",
+                                                        href="#",
+                                                        className="nav-link",
+                                                        id="status-tab-month",
+                                                        **{"data-tab": "month"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
+                                        ],
+                                        className="nav nav-tabs",
+                                        id="status-time-tabs",
+                                    ),
+                                    # Hidden store to track active tab
+                                    dcc.Store(id="status-time-tabs-store", data="hour"),
+                                ],
+                                className="mb-3",
+                            ),
                             dcc.Loading(
                                 id="loading-status-charts",
                                 children=[

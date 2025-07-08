@@ -177,7 +177,7 @@ class TestStatusTabContent:
 
         # Should return a component (likely with restricted access message)
         assert hasattr(content, "children")
-        
+
         # Should contain access denied message
         content_str = str(content)
         assert "Access denied" in content_str
@@ -258,18 +258,18 @@ class TestStatusTabContent:
         content = status_tab_content(is_admin=True)
         content_str = str(content)
 
-        # Should contain Dash Bootstrap Components (as they appear in string representation)
+        # Should contain Dash Bootstrap Components
         bootstrap_components = [
-            "Card(",
-            "CardHeader(",
-            "CardBody(",
-            "Button(",
-            "Row(",
-            "Col(",
-            "Div(",
+            "dbc.Card(",
+            "dbc.CardHeader(",
+            "dbc.CardBody(",
+            "dbc.Button(",
+            "dbc.Row(",
+            "dbc.Col(",
+            "html.Div(",
             "mb-3",
             "badge",
-            "bg-secondary"
+            "bg-secondary",
         ]
 
         for component in bootstrap_components:

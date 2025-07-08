@@ -1,6 +1,5 @@
 """Map modal callbacks."""
 
-
 from dash import Input, Output, State, html, no_update
 import requests
 

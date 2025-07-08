@@ -159,10 +159,7 @@ def dash_app_with_auth():
     app.title = APP_TITLE
     app.layout = create_main_layout()
     register_all_callbacks(app)
-    
-    # Start the app server in a separate thread for testing
-    server = app.server
-    
+
     # Create a headless Chrome driver for testing
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -170,7 +167,7 @@ def dash_app_with_auth():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    
+
     try:
         driver = webdriver.Chrome(options=chrome_options)
         return app, driver
@@ -186,10 +183,7 @@ def dash_app_non_admin():
     app.title = APP_TITLE
     app.layout = create_main_layout()
     register_all_callbacks(app)
-    
-    # Start the app server in a separate thread for testing
-    server = app.server
-    
+
     # Create a headless Chrome driver for testing
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -197,7 +191,7 @@ def dash_app_non_admin():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    
+
     try:
         driver = webdriver.Chrome(options=chrome_options)
         return app, driver

@@ -827,7 +827,7 @@ def register_callbacks(app):
         State("active-tab-store", "data"),
         prevent_initial_call=True,
     )
-    def update_status_countdown(n_intervals, refresh_clicks, active_tab):
+    def update_status_countdown(n_intervals, _refresh_clicks, active_tab):
         """Update the status auto-refresh countdown."""
         if active_tab != "status":
             return "60s"
@@ -857,7 +857,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def switch_status_time_tabs(hour_clicks, day_clicks, week_clicks, month_clicks):
+    def switch_status_time_tabs(_hour_clicks, _day_clicks, _week_clicks, _month_clicks):
         """Handle tab switching for status time period tabs."""
         ctx = callback_context
         if not ctx.triggered:
@@ -873,6 +873,8 @@ def register_callbacks(app):
             "status-tab-month": ("month", ("nav-link", "nav-link", "nav-link", "nav-link active")),
         }
 
-        active_tab, classes = tab_map.get(trigger_id, ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link")))
+        active_tab, classes = tab_map.get(
+            trigger_id, ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link"))
+        )
 
         return classes[0], classes[1], classes[2], classes[3], active_tab
