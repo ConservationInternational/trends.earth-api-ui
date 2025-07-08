@@ -63,11 +63,11 @@ def register_callbacks(app):
                 page = (row_index // page_size) + 1
                 row_in_page = row_index % page_size
 
-                # For executions, we only need basic info to get the ID
+                # Use exclude=params,results for pagination since we'll fetch them separately
                 params = {
                     "page": page,
                     "per_page": page_size,
-                    "exclude": "params,results",  # Exclude large fields for pagination
+                    "exclude": "params,results",
                     "include": "script_name,user_name,user_email,duration",
                 }
 
@@ -104,8 +104,8 @@ def register_callbacks(app):
                         None,
                     )
 
-                execution = executions[row_in_page]
-                execution_id = execution.get("id")
+                execution_data = executions[row_in_page]
+                execution_id = execution_data.get("id")
 
             except Exception as e:
                 return (
@@ -121,7 +121,7 @@ def register_callbacks(app):
         if not execution_id:
             return (
                 True,
-                f"Could not get execution ID. Cell data: {cell}",
+                "Could not get execution ID from row or pagination data.",
                 None,
                 "Error",
                 {"display": "none"},
@@ -132,9 +132,16 @@ def register_callbacks(app):
         try:
             headers = {"Authorization": f"Bearer {token}"}
 
-            # Now fetch the specific execution data based on the column clicked
             if col == "params":
-                resp = requests.get(f"{API_BASE}/execution/{execution_id}", headers=headers)
+                # Always fetch params from the individual execution endpoint
+                print(f"DEBUG: Fetching params for execution {execution_id}")
+                # Try to explicitly include params in the request
+                resp = requests.get(
+                    f"{API_BASE}/execution/{execution_id}",
+                    headers=headers,
+                    params={"include": "params"},
+                )
+                print(f"DEBUG: Params API response: {resp.status_code}")
                 if resp.status_code != 200:
                     return (
                         True,
@@ -146,7 +153,29 @@ def register_callbacks(app):
                         None,
                     )
                 execution = resp.json()
-                params = execution.get("params", {})
+                # Handle API response structure - check if data is wrapped in a 'data' field
+                if (
+                    isinstance(execution, dict)
+                    and "data" in execution
+                    and execution.get("data") is not None
+                ):
+                    execution_data = execution["data"]
+                else:
+                    execution_data = execution
+                params = execution_data.get("params", {})
+                print(f"DEBUG: Params data type: {type(params)}, has content: {bool(params)}")
+
+                if not params:
+                    return (
+                        True,
+                        html.P("No parameters found for this execution."),
+                        {},
+                        f"Execution {execution_id} - Parameters",
+                        {"display": "none"},
+                        True,
+                        None,
+                    )
+
                 return (
                     True,
                     render_json_tree(params),
@@ -158,7 +187,15 @@ def register_callbacks(app):
                 )
 
             elif col == "results":
-                resp = requests.get(f"{API_BASE}/execution/{execution_id}", headers=headers)
+                # Always fetch results from the individual execution endpoint
+                print(f"DEBUG: Fetching results for execution {execution_id}")
+                # Try to explicitly include results in the request
+                resp = requests.get(
+                    f"{API_BASE}/execution/{execution_id}",
+                    headers=headers,
+                    params={"include": "results"},
+                )
+                print(f"DEBUG: Results API response: {resp.status_code}")
                 if resp.status_code != 200:
                     return (
                         True,
@@ -170,7 +207,29 @@ def register_callbacks(app):
                         None,
                     )
                 execution = resp.json()
-                results = execution.get("results", {})
+                # Handle API response structure - check if data is wrapped in a 'data' field
+                if (
+                    isinstance(execution, dict)
+                    and "data" in execution
+                    and execution.get("data") is not None
+                ):
+                    execution_data = execution["data"]
+                else:
+                    execution_data = execution
+                results = execution_data.get("results", {})
+                print(f"DEBUG: Results data type: {type(results)}, has content: {bool(results)}")
+
+                if not results:
+                    return (
+                        True,
+                        html.P("No results found for this execution."),
+                        {},
+                        f"Execution {execution_id} - Results",
+                        {"display": "none"},
+                        True,
+                        None,
+                    )
+
                 return (
                     True,
                     render_json_tree(results),
@@ -182,54 +241,74 @@ def register_callbacks(app):
                 )
 
             elif col == "logs":
-                # For logs, we'll show the initial logs and enable refresh
-                resp = requests.get(
-                    f"{API_BASE}/log",
-                    headers=headers,
-                    params={"execution_id": execution_id, "per_page": 50, "sort": "register_date"},
-                )
+                # For logs, try the execution-specific endpoint first
+                resp = requests.get(f"{API_BASE}/execution/{execution_id}/log", headers=headers)
                 if resp.status_code != 200:
-                    return (
-                        True,
-                        f"Failed to fetch logs: {resp.status_code} - {resp.text}",
-                        None,
-                        f"Execution {execution_id} - Logs",
-                        {"display": "none"},
-                        True,
-                        {"execution_id": execution_id, "type": "logs"},
+                    # Fall back to general log endpoint with execution_id parameter
+                    resp = requests.get(
+                        f"{API_BASE}/log",
+                        headers=headers,
+                        params={
+                            "execution_id": execution_id,
+                            "per_page": 50,
+                            "sort": "register_date",
+                        },
                     )
+                    if resp.status_code != 200:
+                        return (
+                            True,
+                            f"Failed to fetch logs: {resp.status_code} - {resp.text}",
+                            None,
+                            f"Execution {execution_id} - Logs",
+                            {"display": "none"},
+                            True,
+                            {"execution_id": execution_id, "type": "logs"},
+                        )
 
                 result = resp.json()
                 logs = result.get("data", [])
 
                 if not logs:
-                    log_content = [html.P("No logs found for this execution.")]
+                    log_content = html.P("No logs found for this execution.")
                 else:
-                    log_content = []
-                    for log in logs:
-                        log_content.append(
-                            html.Div(
-                                [
-                                    html.Span(
-                                        f"[{parse_date(log.get('register_date', ''))}] ",
-                                        style={"fontWeight": "bold", "color": "#666"},
-                                    ),
-                                    html.Span(
-                                        f"{log.get('level', 'INFO')}: ",
-                                        style={
-                                            "fontWeight": "bold",
-                                            "color": {
-                                                "ERROR": "#dc3545",
-                                                "WARNING": "#ffc107",
-                                                "INFO": "#17a2b8",
-                                                "DEBUG": "#6c757d",
-                                            }.get(log.get("level", "INFO"), "#17a2b8"),
-                                        },
-                                    ),
-                                    html.Span(log.get("text", "")),
-                                ],
-                                style={"marginBottom": "10px", "fontFamily": "monospace"},
-                            )
+                    # Parse and format logs the same way as script logs
+                    if isinstance(logs, list):
+                        parsed_logs = []
+                        for log in logs:
+                            if isinstance(log, dict):
+                                register_date = log.get("register_date", "")
+                                level = log.get("level", "INFO")
+                                text = log.get("text", "")
+
+                                # Parse and format the date
+                                formatted_date = parse_date(register_date) or register_date
+
+                                # Create formatted log line
+                                log_line = f"{formatted_date} - {level} - {text}"
+                                parsed_logs.append((register_date, log_line))
+                            else:
+                                # Fallback for non-dict log entries
+                                parsed_logs.append(("", str(log)))
+
+                        # Sort by register_date in descending order
+                        parsed_logs.sort(key=lambda x: x[0], reverse=True)
+                        logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                        log_content = html.Pre(
+                            logs_content,
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
+                        )
+                    else:
+                        log_content = html.Pre(
+                            str(logs),
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
                         )
 
                 return (

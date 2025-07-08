@@ -22,7 +22,6 @@ def register_callbacks(app):
     )
     def get_execution_rows(request, token):
         """Get execution data for ag-grid with infinite row model."""
-        print(f"DEBUG: get_execution_rows called with request={request}, token={bool(token)}")
         try:
             if not token:
                 return {"rowData": [], "rowCount": 0}, {}, 0
@@ -133,17 +132,13 @@ def register_callbacks(app):
 
             headers = {"Authorization": f"Bearer {token}"}
             resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
-            print(f"DEBUG: API call to {API_BASE}/execution with params {params}")
-            print(f"DEBUG: Response status: {resp.status_code}")
 
             if resp.status_code != 200:
-                print(f"DEBUG: API call failed with status {resp.status_code}")
                 return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             executions = result.get("data", [])
             total_rows = result.get("total", 0)
-            print(f"DEBUG: Received {len(executions)} executions, total: {total_rows}")
 
             tabledata = []
             for exec_row in executions:
@@ -165,7 +160,6 @@ def register_callbacks(app):
                 "filter_sql": ",".join(filter_sql) if filter_sql else None,
             }
 
-            print(f"DEBUG: Returning {len(tabledata)} rows to ag-grid, rowCount: {total_rows}")
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:

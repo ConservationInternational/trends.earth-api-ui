@@ -152,6 +152,7 @@ class TestExecutionModalLogic:
                 params = {
                     "page": page,
                     "per_page": page_size,
+                    "exclude": "params,results",
                     "include": "script_name,user_name,user_email,duration",
                 }
 
@@ -276,6 +277,7 @@ class TestExecutionModalLogic:
             params = {
                 "page": page,
                 "per_page": page_size,
+                "exclude": "params,results",
                 "include": "script_name,user_name,user_email,duration",
             }
 
