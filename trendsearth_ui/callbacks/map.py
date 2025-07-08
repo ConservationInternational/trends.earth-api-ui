@@ -99,15 +99,14 @@ def register_callbacks(app):
         try:
             headers = {"Authorization": f"Bearer {token}"}
 
-            # Fetch full execution details including params directly using the execution ID
+            # First try with include=params
             resp = requests.get(
                 f"{API_BASE}/execution/{execution_id}",
                 headers=headers,
                 params={"include": "params"},
             )
-            print(f"DEBUG: Map execution API response: {resp.status_code}")
+
             if resp.status_code != 200:
-                print(f"DEBUG: Failed to fetch execution details: {resp.status_code}")
                 return (
                     False,
                     [],
@@ -115,6 +114,7 @@ def register_callbacks(app):
                 )
 
             execution_response = resp.json()
+
             # Handle API response structure - check if data is wrapped in a 'data' field
             if (
                 isinstance(execution_response, dict)
@@ -124,39 +124,66 @@ def register_callbacks(app):
                 execution_data = execution_response["data"]
             else:
                 execution_data = execution_response
+
             params_data = execution_data.get("params")
-            print(f"DEBUG: Params data type: {type(params_data)}, has content: {bool(params_data)}")
+
+            # If no params with include, try without include parameter
+            if not params_data:
+                resp2 = requests.get(f"{API_BASE}/execution/{execution_id}", headers=headers)
+
+                if resp2.status_code == 200:
+                    execution_response2 = resp2.json()
+
+                    if (
+                        isinstance(execution_response2, dict)
+                        and "data" in execution_response2
+                        and execution_response2.get("data") is not None
+                    ):
+                        execution_data2 = execution_response2["data"]
+                    else:
+                        execution_data2 = execution_response2
+
+                    params_data = execution_data2.get("params")
 
             if not params_data:
-                print("DEBUG: No parameters found for execution")
-                return False, [], "No parameters found for this execution."
-
-            # Parse geojsons field
-            geojsons = None
-            print("DEBUG: Parsing geojsons from params")
-            if isinstance(params_data, dict):
-                geojsons = params_data.get("geojsons")
-                print(
-                    f"DEBUG: Found geojsons in dict: {type(geojsons)} - {str(geojsons)[:100] if geojsons else 'None'}..."
+                return (
+                    False,
+                    [],
+                    f"No parameters found for execution {execution_id}. The execution may not have geojson data required for mapping.",
                 )
+
+            # Parse geojsons field - check both 'geojsons' and 'geojson' keys
+            geojsons = None
+            if isinstance(params_data, dict):
+                # Try both 'geojsons' (plural) and 'geojson' (singular)
+                geojsons = params_data.get("geojsons") or params_data.get("geojson")
             elif isinstance(params_data, str):
-                print("DEBUG: Params data is string, trying to parse JSON")
                 try:
                     import json
 
                     params_dict = json.loads(params_data)
-                    geojsons = params_dict.get("geojsons")
-                    print(
-                        f"DEBUG: Parsed geojsons from JSON: {type(geojsons)} - {str(geojsons)[:100] if geojsons else 'None'}..."
+                    # Try both 'geojsons' (plural) and 'geojson' (singular)
+                    geojsons = params_dict.get("geojsons") or params_dict.get("geojson")
+                except json.JSONDecodeError:
+                    return (
+                        False,
+                        [],
+                        f"Could not parse parameters JSON for execution {execution_id}.",
                     )
-                except json.JSONDecodeError as e:
-                    print(f"DEBUG: JSON decode error: {e}")
-                    return False, [], "Could not parse parameters JSON."
 
             if not geojsons:
-                print("DEBUG: No geojsons found in parameters")
-                return False, [], "No geojsons found in execution parameters."
+                available_keys = (
+                    list(params_data.keys()) if isinstance(params_data, dict) else "Not a dict"
+                )
+                return (
+                    False,
+                    [],
+                    f"No geojsons found in execution {execution_id} parameters. Available params: {available_keys}",
+                )
 
+            print(
+                f"DEBUG: Found geojsons - type: {type(geojsons)}, content preview: {str(geojsons)[:200]}..."
+            )
             print("DEBUG: Creating map from geojsons")
             # Create map with geojsons
             from ..utils.geojson import create_map_from_geojsons
@@ -182,9 +209,6 @@ def register_callbacks(app):
 
         except Exception as e:
             print(f"DEBUG: Exception in map callback: {e}")
-            import traceback
-
-            traceback.print_exc()
             return False, [], f"Error creating map: {str(e)}"
 
     @app.callback(

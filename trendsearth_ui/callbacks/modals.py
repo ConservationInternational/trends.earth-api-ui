@@ -134,14 +134,11 @@ def register_callbacks(app):
 
             if col == "params":
                 # Always fetch params from the individual execution endpoint
-                print(f"DEBUG: Fetching params for execution {execution_id}")
-                # Try to explicitly include params in the request
                 resp = requests.get(
                     f"{API_BASE}/execution/{execution_id}",
                     headers=headers,
                     params={"include": "params"},
                 )
-                print(f"DEBUG: Params API response: {resp.status_code}")
                 if resp.status_code != 200:
                     return (
                         True,
@@ -163,7 +160,6 @@ def register_callbacks(app):
                 else:
                     execution_data = execution
                 params = execution_data.get("params", {})
-                print(f"DEBUG: Params data type: {type(params)}, has content: {bool(params)}")
 
                 if not params:
                     return (
@@ -188,14 +184,11 @@ def register_callbacks(app):
 
             elif col == "results":
                 # Always fetch results from the individual execution endpoint
-                print(f"DEBUG: Fetching results for execution {execution_id}")
-                # Try to explicitly include results in the request
                 resp = requests.get(
                     f"{API_BASE}/execution/{execution_id}",
                     headers=headers,
                     params={"include": "results"},
                 )
-                print(f"DEBUG: Results API response: {resp.status_code}")
                 if resp.status_code != 200:
                     return (
                         True,
@@ -217,7 +210,6 @@ def register_callbacks(app):
                 else:
                     execution_data = execution
                 results = execution_data.get("results", {})
-                print(f"DEBUG: Results data type: {type(results)}, has content: {bool(results)}")
 
                 if not results:
                     return (
