@@ -494,7 +494,29 @@ def status_tab_content(is_admin):
                 [
                     dbc.CardHeader(html.H4("System Status Summary")),
                     dbc.CardBody(
-                        [html.Div(id="status-summary", children="Loading system status...")]
+                        [
+                            dcc.Loading(
+                                id="loading-status-summary",
+                                children=[
+                                    html.Div(
+                                        id="status-summary",
+                                        children=[
+                                            html.Div(
+                                                [
+                                                    html.I(
+                                                        className="fas fa-circle-notch fa-spin me-2"
+                                                    ),
+                                                    "Loading system status...",
+                                                ],
+                                                className="text-center text-muted p-3",
+                                            )
+                                        ],
+                                    )
+                                ],
+                                type="default",
+                                color="#007bff",
+                            )
+                        ]
                     ),
                 ],
                 className="mb-4",
@@ -502,21 +524,60 @@ def status_tab_content(is_admin):
             # Status charts
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Execution Status Trends")),
+                    dbc.CardHeader(html.H4("System Status Trends")),
                     dbc.CardBody(
                         [
-                            dbc.Tabs(
-                                [
-                                    dbc.Tab(label="Last Hour", tab_id="hour", id="status-tab-hour"),
-                                    dbc.Tab(
-                                        label="Last 24 Hours", tab_id="day", id="status-tab-day"
-                                    ),
-                                    dbc.Tab(label="Last Week", tab_id="week", id="status-tab-week"),
-                                ],
+                            html.Div(
                                 id="status-time-tabs",
-                                active_tab="hour",
+                                children=[
+                                    dbc.Tabs(
+                                        [
+                                            dbc.Tab(
+                                                label="Last Hour",
+                                                tab_id="hour",
+                                                id="status-tab-hour",
+                                            ),
+                                            dbc.Tab(
+                                                label="Last 24 Hours",
+                                                tab_id="day",
+                                                id="status-tab-day",
+                                            ),
+                                            dbc.Tab(
+                                                label="Last Week",
+                                                tab_id="week",
+                                                id="status-tab-week",
+                                            ),
+                                            dbc.Tab(
+                                                label="Last Month",
+                                                tab_id="month",
+                                                id="status-tab-month",
+                                            ),
+                                        ],
+                                        id="status-time-tabs",
+                                        active_tab="hour",
+                                    )
+                                ],
                             ),
-                            html.Div(id="status-charts", className="mt-3"),
+                            dcc.Loading(
+                                id="loading-status-charts",
+                                children=[
+                                    html.Div(
+                                        id="status-charts",
+                                        className="mt-3",
+                                        children=[
+                                            html.Div(
+                                                [
+                                                    html.I(className="fas fa-chart-line me-2"),
+                                                    "Loading charts...",
+                                                ],
+                                                className="text-center text-muted p-4",
+                                            )
+                                        ],
+                                    )
+                                ],
+                                type="default",
+                                color="#007bff",
+                            ),
                         ]
                     ),
                 ]
