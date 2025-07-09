@@ -260,13 +260,13 @@ class TestStatusTabContent:
 
         # Should contain Dash Bootstrap Components
         bootstrap_components = [
-            "dbc.Card(",
-            "dbc.CardHeader(",
-            "dbc.CardBody(",
-            "dbc.Button(",
-            "dbc.Row(",
-            "dbc.Col(",
-            "html.Div(",
+            "Card(",
+            "CardHeader(",
+            "CardBody(",
+            "Button(",
+            "Row(",
+            "Col(",
+            "Div(",
             "mb-3",
             "badge",
             "bg-secondary",

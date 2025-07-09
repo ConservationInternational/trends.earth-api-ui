@@ -248,10 +248,10 @@ class TestStatusTabsIntegration:
             "nav-link",
             "nav-item",
             "mb-3",
-            "dbc.Card(",  # Dash component representation
-            "dbc.CardHeader(",  # Dash component representation
-            "dbc.CardBody(",  # Dash component representation
-            "dbc.Button(",  # Dash component representation
+            "Card(",  # Dash component representation
+            "CardHeader(",  # Dash component representation
+            "CardBody(",  # Dash component representation
+            "Button(",  # Dash component representation
             "color='primary'",
             "badge",
             "bg-secondary",
