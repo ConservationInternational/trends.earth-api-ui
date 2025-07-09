@@ -346,6 +346,191 @@ class TestStatusTabsErrorHandling:
         result = countdown_func(30, 0, "executions")
         assert result == "60s"
 
+    @patch("trendsearth_ui.callbacks.status.callback_context")
+    def test_status_tab_execution_status_grouping(self, mock_ctx):
+        """Test that execution status structure is present in callback response."""
+        # Mock the callback context
+        mock_ctx.triggered = []
+
+        # Import the callback function for testing
+        from trendsearth_ui.callbacks.status import register_callbacks
+
+        # Create a mock app and capture the callback
+        mock_app = Mock()
+        callback_functions = {}
+
+        def capture_callback(*args, **kwargs):
+            def decorator(func):
+                callback_functions[func.__name__] = func
+                return func
+
+            return decorator
+
+        mock_app.callback = capture_callback
+        register_callbacks(mock_app)
+
+        # Get the summary function
+        summary_func = callback_functions.get("update_status_summary")
+        assert summary_func is not None, "Summary function should exist"
+
+        # Mock a successful response with test data
+        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "data": [
+                    {
+                        "timestamp": "2023-01-01T12:00:00Z",
+                        "executions_active": 5,
+                        "executions_ready": 3,
+                        "executions_running": 2,
+                        "executions_finished": 10,
+                        "users_count": 15,
+                        "scripts_count": 8,
+                        "memory_available_percent": 75.0,
+                        "cpu_usage_percent": 25.0,
+                    }
+                ]
+            }
+            mock_get.return_value = mock_response
+
+            # Mock the availability check
+            with patch(
+                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            ):
+                result = summary_func(0, 0, "test_token", "status", "UTC")
+                result_str = str(result)
+
+                # Should contain execution status section header
+                assert "Execution Status" in result_str
+
+    @patch("trendsearth_ui.callbacks.status.callback_context")
+    def test_status_tab_summary_totals_section(self, mock_ctx):
+        """Test that summary totals are properly grouped with a header."""
+        # Mock the callback context
+        mock_ctx.triggered = []
+
+        # Import the callback function for testing
+        from trendsearth_ui.callbacks.status import register_callbacks
+
+        # Create a mock app and capture the callback
+        mock_app = Mock()
+        callback_functions = {}
+
+        def capture_callback(*args, **kwargs):
+            def decorator(func):
+                callback_functions[func.__name__] = func
+                return func
+
+            return decorator
+
+        mock_app.callback = capture_callback
+        register_callbacks(mock_app)
+
+        # Get the summary function
+        summary_func = callback_functions.get("update_status_summary")
+        assert summary_func is not None, "Summary function should exist"
+
+        # Mock a successful response with test data
+        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "data": [
+                    {
+                        "timestamp": "2023-01-01T12:00:00Z",
+                        "executions_active": 5,
+                        "executions_ready": 3,
+                        "executions_running": 2,
+                        "executions_finished": 10,
+                        "users_count": 15,
+                        "scripts_count": 8,
+                        "memory_available_percent": 75.0,
+                        "cpu_usage_percent": 25.0,
+                    }
+                ]
+            }
+            mock_get.return_value = mock_response
+
+            # Mock the availability check
+            with patch(
+                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            ):
+                result = summary_func(0, 0, "test_token", "status", "UTC")
+                result_str = str(result)
+
+                # Should contain summary totals section header
+                assert "Summary Totals" in result_str
+
+                # Should contain total executions count
+                assert "Total Executions" in result_str
+
+                # Should still contain users and scripts
+                assert "Users" in result_str
+                assert "Scripts" in result_str
+
+    @patch("trendsearth_ui.callbacks.status.callback_context")
+    def test_status_tab_section_headers(self, mock_ctx):
+        """Test that both section headers are present and properly styled."""
+        # Mock the callback context
+        mock_ctx.triggered = []
+
+        # Import the callback function for testing
+        from trendsearth_ui.callbacks.status import register_callbacks
+
+        # Create a mock app and capture the callback
+        mock_app = Mock()
+        callback_functions = {}
+
+        def capture_callback(*args, **kwargs):
+            def decorator(func):
+                callback_functions[func.__name__] = func
+                return func
+
+            return decorator
+
+        mock_app.callback = capture_callback
+        register_callbacks(mock_app)
+
+        # Get the summary function
+        summary_func = callback_functions.get("update_status_summary")
+        assert summary_func is not None, "Summary function should exist"
+
+        # Mock a successful response with test data
+        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "data": [
+                    {
+                        "timestamp": "2023-01-01T12:00:00Z",
+                        "executions_active": 5,
+                        "executions_ready": 3,
+                        "executions_running": 2,
+                        "executions_finished": 10,
+                        "users_count": 15,
+                        "scripts_count": 8,
+                        "memory_available_percent": 75.0,
+                        "cpu_usage_percent": 25.0,
+                    }
+                ]
+            }
+            mock_get.return_value = mock_response
+
+            # Mock the availability check
+            with patch(
+                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            ):
+                result = summary_func(0, 0, "test_token", "status", "UTC")
+                result_str = str(result)
+
+                # Should contain both section headers
+                assert "Execution Status" in result_str
+                assert "Summary Totals" in result_str
+
+                # Should contain proper styling classes for headers
+                assert "text-center mb-3 text-muted" in result_str
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

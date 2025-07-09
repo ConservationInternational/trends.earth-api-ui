@@ -319,70 +319,108 @@ def register_callbacks(app):
                                 className="row mb-4",
                             ),
                             html.Hr(),
+                            # Execution Status Section
                             html.Div(
                                 [
-                                    html.Div(
-                                        [
-                                            html.H6("Active", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["executions_active"]),
-                                                className="text-primary",
-                                            ),
-                                        ],
-                                        className="col-md-2 text-center",
+                                    html.H5(
+                                        "Execution Status", className="text-center mb-3 text-muted"
                                     ),
                                     html.Div(
                                         [
-                                            html.H6("Ready", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["executions_ready"]),
-                                                className="text-warning",
+                                            html.Div(
+                                                [
+                                                    html.H6("Active", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["executions_active"]),
+                                                        className="text-primary",
+                                                    ),
+                                                ],
+                                                className="col-md-3 text-center",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Ready", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["executions_ready"]),
+                                                        className="text-warning",
+                                                    ),
+                                                ],
+                                                className="col-md-3 text-center",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Running", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["executions_running"]),
+                                                        className="text-info",
+                                                    ),
+                                                ],
+                                                className="col-md-3 text-center",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Finished", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["executions_finished"]),
+                                                        className="text-success",
+                                                    ),
+                                                ],
+                                                className="col-md-3 text-center",
                                             ),
                                         ],
-                                        className="col-md-2 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Running", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["executions_running"]),
-                                                className="text-info",
-                                            ),
-                                        ],
-                                        className="col-md-2 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Finished", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["executions_finished"]),
-                                                className="text-success",
-                                            ),
-                                        ],
-                                        className="col-md-2 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Users", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["users_count"]),
-                                                className="text-secondary",
-                                            ),
-                                        ],
-                                        className="col-md-2 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Scripts", className="mb-2"),
-                                            html.H4(
-                                                str(metrics["scripts_count"]),
-                                                className="text-secondary",
-                                            ),
-                                        ],
-                                        className="col-md-2 text-center",
+                                        className="row mb-4",
                                     ),
                                 ],
-                                className="row",
+                                className="mb-4",
+                            ),
+                            html.Hr(),
+                            # Summary Totals Section
+                            html.Div(
+                                [
+                                    html.H5(
+                                        "Summary Totals", className="text-center mb-3 text-muted"
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                [
+                                                    html.H6("Total Executions", className="mb-2"),
+                                                    html.H4(
+                                                        str(
+                                                            metrics["executions_active"]
+                                                            + metrics["executions_ready"]
+                                                            + metrics["executions_running"]
+                                                            + metrics["executions_finished"]
+                                                        ),
+                                                        className="text-info",
+                                                    ),
+                                                ],
+                                                className="col-md-4 text-center",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Users", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["users_count"]),
+                                                        className="text-secondary",
+                                                    ),
+                                                ],
+                                                className="col-md-4 text-center",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Scripts", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["scripts_count"]),
+                                                        className="text-secondary",
+                                                    ),
+                                                ],
+                                                className="col-md-4 text-center",
+                                            ),
+                                        ],
+                                        className="row",
+                                    ),
+                                ],
                             ),
                         ]
                     )
