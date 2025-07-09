@@ -28,7 +28,7 @@ class TestAppIntegration:
         layout_str = str(layout)
 
         # Should contain main application components
-        assert "Trends.Earth API Dashboard" in layout_str
+        # Note: Title is now only shown in dashboard layout, not main layout
         assert "page-content" in layout_str
         assert "token-store" in layout_str
         assert "role-store" in layout_str

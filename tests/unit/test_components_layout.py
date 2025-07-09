@@ -19,8 +19,7 @@ class TestCreateMainLayout:
         # Check for required components
         children_types = [type(child).__name__ for child in layout.children]
 
-        # Should contain H1, Div, and multiple Store components
-        assert "H1" in children_types
+        # Should contain Div and multiple Store components (H1 title is now only in dashboard layout)
         assert "Div" in children_types
         assert "Store" in children_types  # Should contain modals
         assert any("Modal" in str(type(child)) for child in layout.children)
@@ -55,12 +54,21 @@ class TestLoginLayout:
         """Test that login layout has correct structure."""
         layout = login_layout()
 
-        # Should be a Row component
+        # Should be a Div component containing stores and layout
         assert hasattr(layout, "children")
         assert isinstance(layout.children, list)
 
+        # Find the Row component (skip any Store components)
+        row = None
+        for child in layout.children:
+            if hasattr(child, "children") and "Row" in str(type(child)):
+                row = child
+                break
+
+        assert row is not None, "Should contain a Row component"
+
         # Should contain a Column with a Card
-        col = layout.children[0]
+        col = row.children[0]
         assert hasattr(col, "children")
 
         card = col.children
