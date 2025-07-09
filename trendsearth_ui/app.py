@@ -25,8 +25,36 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     suppress_callback_exceptions=True,
     assets_folder=assets_dir,
+    meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1"},
+        {"name": "description", "content": "Trends.Earth API Dashboard - Manage scripts, users, and executions"},
+    ],
 )
 app.title = APP_TITLE
+
+# Add favicon links to the HTML head
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        <link rel="icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
+        <link rel="shortcut icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
+        <link rel="apple-touch-icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 
 
 @server.route("/api-ui-health")
@@ -36,7 +64,12 @@ def health_check():
 
 @server.route("/favicon.ico")
 def favicon():
-    return send_from_directory(server.root_path, "favicon.ico", mimetype="image/vnd.microsoft.icon")
+    return send_from_directory(assets_dir, "trends_earth_logo_square_200x200.png", mimetype="image/png")
+
+
+@server.route("/assets/<path:filename>")
+def serve_assets(filename):
+    return send_from_directory(assets_dir, filename)
 
 
 # Create the main layout

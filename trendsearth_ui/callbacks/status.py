@@ -257,11 +257,14 @@ def register_callbacks(app):
                         "executions_ready": latest_status.get("executions_ready", 0),
                         "executions_running": latest_status.get("executions_running", 0),
                         "executions_finished": latest_status.get("executions_finished", 0),
+                        "executions_failed": latest_status.get("executions_failed", 0),
+                        "executions_count": latest_status.get("executions_count", 0),
                         "users_count": latest_status.get("users_count", 0),
                         "scripts_count": latest_status.get("scripts_count", 0),
                         "memory_available_percent": latest_status.get(
                             "memory_available_percent", 0
                         ),
+                        "memory_used_percent": 100 - latest_status.get("memory_available_percent", 0),
                         "cpu_usage_percent": latest_status.get("cpu_usage_percent", 0),
                     }
 
@@ -271,13 +274,13 @@ def register_callbacks(app):
 
                     if (
                         metrics["cpu_usage_percent"] > 90
-                        or metrics["memory_available_percent"] < 10
+                        or metrics["memory_used_percent"] > 90
                     ):
                         health_status = "Critical"
                         health_color = "danger"
                     elif (
                         metrics["cpu_usage_percent"] > 75
-                        or metrics["memory_available_percent"] < 25
+                        or metrics["memory_used_percent"] > 75
                     ):
                         health_status = "Warning"
                         health_color = "warning"
@@ -308,9 +311,9 @@ def register_callbacks(app):
                                     ),
                                     html.Div(
                                         [
-                                            html.H6("Memory Available", className="mb-2"),
+                                            html.H6("Memory Used", className="mb-2"),
                                             html.H4(
-                                                f"{metrics['memory_available_percent']:.1f}%",
+                                                f"{metrics['memory_used_percent']:.1f}%",
                                                 className="text-info",
                                             ),
                                         ],
@@ -334,6 +337,7 @@ def register_callbacks(app):
                                         "Current Execution Status",
                                         className="text-center mb-3 text-muted",
                                     ),
+                                    # Calculate total for percentage calculations
                                     html.Div(
                                         [
                                             html.Div(
@@ -344,11 +348,11 @@ def register_callbacks(app):
                                                         className="text-primary",
                                                     ),
                                                     html.Small(
-                                                        f"{(metrics['executions_active'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        f"{(metrics['executions_active'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
                                                         className="text-muted",
                                                     ),
                                                 ],
-                                                className="col-md-3 text-center",
+                                                className="col-md text-center mb-3",
                                             ),
                                             html.Div(
                                                 [
@@ -358,11 +362,11 @@ def register_callbacks(app):
                                                         className="text-warning",
                                                     ),
                                                     html.Small(
-                                                        f"{(metrics['executions_ready'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        f"{(metrics['executions_ready'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
                                                         className="text-muted",
                                                     ),
                                                 ],
-                                                className="col-md-3 text-center",
+                                                className="col-md text-center mb-3",
                                             ),
                                             html.Div(
                                                 [
@@ -372,11 +376,11 @@ def register_callbacks(app):
                                                         className="text-info",
                                                     ),
                                                     html.Small(
-                                                        f"{(metrics['executions_running'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        f"{(metrics['executions_running'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
                                                         className="text-muted",
                                                     ),
                                                 ],
-                                                className="col-md-3 text-center",
+                                                className="col-md text-center mb-3",
                                             ),
                                             html.Div(
                                                 [
@@ -386,14 +390,28 @@ def register_callbacks(app):
                                                         className="text-success",
                                                     ),
                                                     html.Small(
-                                                        f"{(metrics['executions_finished'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        f"{(metrics['executions_finished'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
                                                         className="text-muted",
                                                     ),
                                                 ],
-                                                className="col-md-3 text-center",
+                                                className="col-md text-center mb-3",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.H6("Failed", className="mb-2"),
+                                                    html.H4(
+                                                        str(metrics["executions_failed"]),
+                                                        className="text-danger",
+                                                    ),
+                                                    html.Small(
+                                                        f"{(metrics['executions_failed'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
+                                                        className="text-muted",
+                                                    ),
+                                                ],
+                                                className="col-md text-center mb-3",
                                             ),
                                         ],
-                                        className="row mb-4",
+                                        className="row",
                                     ),
                                 ],
                                 className="mb-4",
@@ -411,12 +429,7 @@ def register_callbacks(app):
                                                 [
                                                     html.H6("Total Executions", className="mb-2"),
                                                     html.H4(
-                                                        str(
-                                                            metrics["executions_active"]
-                                                            + metrics["executions_ready"]
-                                                            + metrics["executions_running"]
-                                                            + metrics["executions_finished"]
-                                                        ),
+                                                        str(metrics["executions_count"]),
                                                         className="text-info",
                                                     ),
                                                 ],
@@ -668,9 +681,12 @@ def register_callbacks(app):
                                 "executions_ready": log.get("executions_ready", 0),
                                 "executions_running": log.get("executions_running", 0),
                                 "executions_finished": log.get("executions_finished", 0),
+                                "executions_failed": log.get("executions_failed", 0),
+                                "executions_count": log.get("executions_count", 0),
                                 "users_count": log.get("users_count", 0),
                                 "scripts_count": log.get("scripts_count", 0),
                                 "memory_available_percent": log.get("memory_available_percent", 0),
+                                "memory_used_percent": 100 - log.get("memory_available_percent", 0),
                                 "cpu_usage_percent": log.get("cpu_usage_percent", 0),
                             }
                         )
@@ -693,11 +709,10 @@ def register_callbacks(app):
             # Create charts with optimized rendering
             charts = []
 
-            # 1. Execution Status Chart with dual y-axes (always show this)
-            # Create subplot with secondary y-axis
-            execution_fig = make_subplots(specs=[[{"secondary_y": True}]])
+            # 1. Execution Status Chart with single y-axis (always show this)
+            execution_fig = go.Figure()
 
-            # Add traces for active, ready, running on left y-axis
+            # Add all execution traces on the same y-axis
             execution_fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
@@ -705,8 +720,7 @@ def register_callbacks(app):
                     name="executions_active",
                     line={"color": "#17a2b8"},
                     mode="lines",
-                ),
-                secondary_y=False,
+                )
             )
 
             execution_fig.add_trace(
@@ -716,8 +730,7 @@ def register_callbacks(app):
                     name="executions_ready",
                     line={"color": "#ffc107"},
                     mode="lines",
-                ),
-                secondary_y=False,
+                )
             )
 
             execution_fig.add_trace(
@@ -727,11 +740,9 @@ def register_callbacks(app):
                     name="executions_running",
                     line={"color": "#28a745"},
                     mode="lines",
-                ),
-                secondary_y=False,
+                )
             )
 
-            # Add trace for finished executions on right y-axis
             execution_fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
@@ -739,13 +750,18 @@ def register_callbacks(app):
                     name="executions_finished",
                     line={"color": "#6c757d"},
                     mode="lines",
-                ),
-                secondary_y=True,
+                )
             )
 
-            # Set y-axes titles
-            execution_fig.update_yaxes(title_text="Active, Ready, Running Count", secondary_y=False)
-            execution_fig.update_yaxes(title_text="Finished Count", secondary_y=True)
+            execution_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_failed"],
+                    name="executions_failed",
+                    line={"color": "#dc3545"},
+                    mode="lines",
+                )
+            )
 
             # Update layout
             execution_fig.update_layout(
@@ -753,13 +769,9 @@ def register_callbacks(app):
                 height=300,
                 showlegend=True,
                 xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
+                yaxis_title="Execution Count",
                 hovermode="x unified",
-                margin={
-                    "l": 40,
-                    "r": 60,
-                    "t": 40,
-                    "b": 40,
-                },  # More right margin for secondary y-axis
+                margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
             )
 
@@ -777,11 +789,11 @@ def register_callbacks(app):
             )
 
             # 2. System Resource Usage Chart (only if data exists)
-            if df["cpu_usage_percent"].max() > 0 or df["memory_available_percent"].max() > 0:
+            if df["cpu_usage_percent"].max() > 0 or df["memory_used_percent"].max() > 0:
                 resource_fig = px.line(
                     df,
                     x="timestamp",
-                    y=["cpu_usage_percent", "memory_available_percent"],
+                    y=["cpu_usage_percent", "memory_used_percent"],
                     title=f"System Resource Usage - {title_suffix}",
                     labels={"timestamp": "Time", "value": "Percentage", "variable": "Resource"},
                 )
@@ -800,7 +812,7 @@ def register_callbacks(app):
                 # Color mapping for resources
                 resource_colors = {
                     "cpu_usage_percent": "#dc3545",
-                    "memory_available_percent": "#17a2b8",
+                    "memory_used_percent": "#17a2b8",
                 }
 
                 # Update trace colors
