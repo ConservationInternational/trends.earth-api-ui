@@ -12,6 +12,7 @@ def register_all_callbacks(app):
 
     # Use importlib to dynamically import other modules to avoid circular imports
     callback_modules = [
+        "timezone",  # Add timezone first for early detection
         "auth",
         "manual_tabs",  # Add manual tabs before tabs
         "tabs",

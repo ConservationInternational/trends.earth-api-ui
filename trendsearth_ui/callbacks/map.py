@@ -28,21 +28,17 @@ def register_callbacks(app):
         if col != "map":
             return False, [], ""
 
-        print("DEBUG: Processing map click for execution")
         # Try to get row data from cell click event first
         row_data = cell_clicked.get("data")
         execution_id = None
 
         if row_data:
             execution_id = row_data.get("id")
-            print(f"DEBUG: Got execution ID from row data: {execution_id}")
 
         # If we don't have execution_id from row data, fall back to pagination approach
         if not execution_id:
-            print("DEBUG: No execution ID from row data, trying pagination")
             row_index = cell_clicked.get("rowIndex")
             if row_index is None:
-                print("DEBUG: No row index available")
                 return False, [], "Could not get row index from cell click event."
 
             try:
@@ -180,15 +176,10 @@ def register_callbacks(app):
                     f"No geojsons found in execution {execution_id} parameters. Available params: {available_keys}",
                 )
 
-            print(
-                f"DEBUG: Found geojsons - type: {type(geojsons)}, content preview: {str(geojsons)[:200]}..."
-            )
-            print("DEBUG: Creating map from geojsons")
             # Create map with geojsons
             from ..utils.geojson import create_map_from_geojsons
 
             map_children = create_map_from_geojsons(geojsons, execution_id)
-            print("DEBUG: Map children created successfully")
 
             # Create info text
             info_text = html.Div(
@@ -203,11 +194,9 @@ def register_callbacks(app):
                 ]
             )
 
-            print("DEBUG: Map modal returning successfully")
             return True, map_children, info_text
 
         except Exception as e:
-            print(f"DEBUG: Exception in map callback: {e}")
             return False, [], f"Error creating map: {str(e)}"
 
     @app.callback(

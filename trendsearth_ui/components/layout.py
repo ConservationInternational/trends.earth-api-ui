@@ -3,12 +3,16 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
+from ..callbacks.timezone import get_timezone_components
 from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_URL
 from .modals import edit_script_modal, edit_user_modal, json_modal, map_modal
 
 
 def create_main_layout():
     """Create the main application layout with all stores and modals."""
+    # Get timezone detection components
+    timezone_components = get_timezone_components()
+
     return dbc.Container(
         [
             html.H1(APP_TITLE),
@@ -39,6 +43,8 @@ def create_main_layout():
             dcc.Store(id="users-total-count-store", data=0),  # Store total count for users
             dcc.Store(id="scripts-total-count-store", data=0),  # Store total count for scripts
             dcc.Store(id="active-tab-store", data="executions"),
+            # Timezone detection components
+            *timezone_components,
             # Modals
             json_modal(),
             edit_user_modal(),

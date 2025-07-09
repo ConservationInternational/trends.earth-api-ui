@@ -6,9 +6,12 @@ import time
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import requests
 
 from ..config import API_BASE
+from ..utils.timezone_utils import format_local_time, get_chart_axis_label, get_safe_timezone
 
 # Simple in-memory cache for status data with TTL
 _status_cache = {
@@ -67,7 +70,7 @@ def is_status_endpoint_available(token):
         return False
 
 
-def get_fallback_summary(token):
+def get_fallback_summary(token, user_timezone="UTC"):
     """Get basic system info as fallback when status endpoint is unavailable."""
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -83,6 +86,14 @@ def get_fallback_summary(token):
         if resp.status_code == 200:
             result = resp.json()
             total = result.get("total", 0)
+
+            # Format current time using Python timezone conversion
+            utc_now = datetime.now()
+            utc_time_str = utc_now.strftime("%Y-%m-%d %H:%M:%S UTC")
+            local_time_str, tz_abbrev = format_local_time(
+                utc_now, user_timezone, include_seconds=True
+            )
+
             return html.Div(
                 [
                     html.Div(
@@ -106,9 +117,16 @@ def get_fallback_summary(token):
                             html.Div(
                                 [
                                     html.H6("Last Updated", className="mb-2"),
-                                    html.Small(
-                                        datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
-                                        className="text-muted",
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                f"{local_time_str} {tz_abbrev}",
+                                                className="fw-bold text-primary",
+                                            ),
+                                            html.Div(
+                                                f"({utc_time_str})", className="text-muted small"
+                                            ),
+                                        ]
                                     ),
                                 ],
                                 className="col-md-4 text-center",
@@ -154,13 +172,17 @@ def register_callbacks(app):
         [
             State("token-store", "data"),
             State("active-tab-store", "data"),
+            State("user-timezone-store", "data"),
         ],
     )
-    def update_status_summary(_n_intervals, _refresh_clicks, token, active_tab):
+    def update_status_summary(_n_intervals, _refresh_clicks, token, active_tab, user_timezone):
         """Update the status summary from the status endpoint with caching."""
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status" or not token:
             return no_update
+
+        # Get safe timezone
+        safe_timezone = get_safe_timezone(user_timezone)
 
         # Check cache first (unless it's a manual refresh)
         ctx = callback_context
@@ -175,7 +197,7 @@ def register_callbacks(app):
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token):
-            fallback_result = get_fallback_summary(token)
+            fallback_result = get_fallback_summary(token, safe_timezone)
             set_cached_data("summary", fallback_result, ttl=20)  # Shorter cache for fallback
             return fallback_result
 
@@ -196,11 +218,26 @@ def register_callbacks(app):
                     latest_status = status_data[0]
                     timestamp = latest_status.get("timestamp", "")
 
-                    # Format the timestamp
+                    # Format the timestamp - show local time on top, UTC in parentheses
                     try:
                         if timestamp:
-                            dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                            formatted_date = dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                            dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                            utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+                            # Use Python to convert UTC to user's local time
+                            local_time_str, tz_abbrev = format_local_time(
+                                dt_utc, safe_timezone, include_seconds=True
+                            )
+
+                            formatted_date = html.Div(
+                                [
+                                    html.Div(
+                                        f"{local_time_str} {tz_abbrev}",
+                                        className="fw-bold text-primary",
+                                    ),
+                                    html.Div(f"({utc_time_str})", className="text-muted small"),
+                                ]
+                            )
                         else:
                             formatted_date = "Unknown time"
                     except Exception:
@@ -274,7 +311,7 @@ def register_callbacks(app):
                                     html.Div(
                                         [
                                             html.H6("Last Updated", className="mb-2"),
-                                            html.Small(formatted_date, className="text-muted"),
+                                            formatted_date,
                                         ],
                                         className="col-md-3 text-center",
                                     ),
@@ -423,13 +460,19 @@ def register_callbacks(app):
         [
             State("token-store", "data"),
             State("active-tab-store", "data"),
+            State("user-timezone-store", "data"),
         ],
     )
-    def update_status_charts(_n_intervals, _refresh_clicks, time_period, token, active_tab):
+    def update_status_charts(
+        _n_intervals, _refresh_clicks, time_period, token, active_tab, user_timezone
+    ):
         """Update the status charts based on selected time period with caching."""
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status" or not token:
             return no_update
+
+        # Get safe timezone for chart labels
+        safe_timezone = get_safe_timezone(user_timezone)
 
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -547,10 +590,11 @@ def register_callbacks(app):
                 timestamp = log.get("timestamp")
                 if timestamp:
                     try:
-                        dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                        # Keep timestamps as UTC datetime objects for plotting
+                        dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
                         df_data.append(
                             {
-                                "timestamp": dt,
+                                "timestamp": dt_utc,
                                 "executions_active": log.get("executions_active", 0),
                                 "executions_ready": log.get("executions_ready", 0),
                                 "executions_running": log.get("executions_running", 0),
@@ -580,42 +624,75 @@ def register_callbacks(app):
             # Create charts with optimized rendering
             charts = []
 
-            # 1. Execution Status Chart (always show this)
-            execution_fig = px.line(
-                df,
-                x="timestamp",
-                y=[
-                    "executions_active",
-                    "executions_ready",
-                    "executions_running",
-                    "executions_finished",
-                ],
-                title=f"Execution Counts - {title_suffix}",
-                labels={"timestamp": "Time", "value": "Count", "variable": "Status"},
+            # 1. Execution Status Chart with dual y-axes (always show this)
+            # Create subplot with secondary y-axis
+            execution_fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+            # Add traces for active, ready, running on left y-axis
+            execution_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_active"],
+                    name="executions_active",
+                    line={"color": "#17a2b8"},
+                    mode="lines",
+                ),
+                secondary_y=False,
             )
 
+            execution_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_ready"],
+                    name="executions_ready",
+                    line={"color": "#ffc107"},
+                    mode="lines",
+                ),
+                secondary_y=False,
+            )
+
+            execution_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_running"],
+                    name="executions_running",
+                    line={"color": "#28a745"},
+                    mode="lines",
+                ),
+                secondary_y=False,
+            )
+
+            # Add trace for finished executions on right y-axis
+            execution_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_finished"],
+                    name="executions_finished",
+                    line={"color": "#6c757d"},
+                    mode="lines",
+                ),
+                secondary_y=True,
+            )
+
+            # Set y-axes titles
+            execution_fig.update_yaxes(title_text="Active, Ready, Running Count", secondary_y=False)
+            execution_fig.update_yaxes(title_text="Finished Count", secondary_y=True)
+
+            # Update layout
             execution_fig.update_layout(
-                height=300,  # Reduced height for faster rendering
+                title=f"Execution Counts - {title_suffix}",
+                height=300,
                 showlegend=True,
-                xaxis_title="Time",
-                yaxis_title="Count",
+                xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
                 hovermode="x unified",
-                margin={"l": 40, "r": 40, "t": 40, "b": 40},  # Smaller margins
+                margin={
+                    "l": 40,
+                    "r": 60,
+                    "t": 40,
+                    "b": 40,
+                },  # More right margin for secondary y-axis
+                xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
             )
-
-            # Color mapping for execution statuses
-            execution_colors = {
-                "executions_active": "#17a2b8",
-                "executions_ready": "#ffc107",
-                "executions_running": "#28a745",
-                "executions_finished": "#6c757d",
-            }
-
-            # Update trace colors
-            for trace in execution_fig.data:
-                var_name = trace.name
-                if var_name in execution_colors:
-                    trace.line.color = execution_colors[var_name]
 
             charts.append(
                 html.Div(
@@ -643,11 +720,12 @@ def register_callbacks(app):
                 resource_fig.update_layout(
                     height=300,
                     showlegend=True,
-                    xaxis_title="Time",
+                    xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
                     yaxis_title="Percentage (%)",
                     hovermode="x unified",
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
                     yaxis={"range": [0, 100]},
+                    xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
                 )
 
                 # Color mapping for resources
@@ -675,38 +753,56 @@ def register_callbacks(app):
                     )
                 )
 
-            # 3. Users and Scripts Chart (only for longer time periods to reduce clutter)
+            # 3. Users and Scripts Chart with dual y-axes (only for longer time periods to reduce clutter)
             if time_period in ["week", "month"] and (
                 df["users_count"].max() > 0 or df["scripts_count"].max() > 0
             ):
-                entities_fig = px.line(
-                    df,
-                    x="timestamp",
-                    y=["users_count", "scripts_count"],
-                    title=f"Users and Scripts Count - {title_suffix}",
-                    labels={"timestamp": "Time", "value": "Count", "variable": "Entity Type"},
+                # Create subplot with secondary y-axis for Users and Scripts
+                entities_fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+                # Add users count on left y-axis
+                entities_fig.add_trace(
+                    go.Scatter(
+                        x=df["timestamp"],
+                        y=df["users_count"],
+                        name="users_count",
+                        line={"color": "#28a745"},
+                        mode="lines",
+                    ),
+                    secondary_y=False,
                 )
 
+                # Add scripts count on right y-axis
+                entities_fig.add_trace(
+                    go.Scatter(
+                        x=df["timestamp"],
+                        y=df["scripts_count"],
+                        name="scripts_count",
+                        line={"color": "#fd7e14"},
+                        mode="lines",
+                    ),
+                    secondary_y=True,
+                )
+
+                # Set y-axes titles
+                entities_fig.update_yaxes(title_text="Users Count", secondary_y=False)
+                entities_fig.update_yaxes(title_text="Scripts Count", secondary_y=True)
+
+                # Update layout
                 entities_fig.update_layout(
+                    title=f"Users and Scripts Count - {title_suffix}",
                     height=300,
                     showlegend=True,
-                    xaxis_title="Time",
-                    yaxis_title="Count",
+                    xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
                     hovermode="x unified",
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    margin={
+                        "l": 40,
+                        "r": 60,
+                        "t": 40,
+                        "b": 40,
+                    },  # More right margin for secondary y-axis
+                    xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
                 )
-
-                # Color mapping for entities
-                entity_colors = {
-                    "users_count": "#28a745",
-                    "scripts_count": "#fd7e14",
-                }
-
-                # Update trace colors
-                for trace in entities_fig.data:
-                    var_name = trace.name
-                    if var_name in entity_colors:
-                        trace.line.color = entity_colors[var_name]
 
                 charts.append(
                     html.Div(

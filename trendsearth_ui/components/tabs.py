@@ -15,6 +15,7 @@ def executions_tab_content():
         {"headerName": "Status", "field": "status"},
         {"headerName": "Start Date", "field": "start_date", "filter": "agDateColumnFilter"},
         {"headerName": "End Date", "field": "end_date", "filter": "agDateColumnFilter"},
+        {"headerName": "Duration", "field": "duration"},
         {"headerName": "Progress", "field": "progress"},
         {"headerName": "ID", "field": "id"},
         {"headerName": "Params", "field": "params", "sortable": False, "filter": False},

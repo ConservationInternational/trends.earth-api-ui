@@ -7,6 +7,26 @@ from ..config import API_BASE, DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 
 
+def format_duration(duration_seconds):
+    """Format duration from seconds to Hours:Seconds format."""
+    if duration_seconds is None or duration_seconds == 0:
+        return "-"
+
+    try:
+        # Convert to int if it's a float/string
+        duration_seconds = int(float(duration_seconds))
+
+        hours = duration_seconds // 3600
+        remaining_seconds = duration_seconds % 3600
+
+        if hours > 0:
+            return f"{hours}:{remaining_seconds:02d}"
+        else:
+            return f"0:{remaining_seconds:02d}"
+    except (ValueError, TypeError):
+        return "-"
+
+
 def register_callbacks(app):
     """Register executions table callbacks."""
 
@@ -147,6 +167,11 @@ def register_callbacks(app):
                 row["results"] = "Show Results"
                 row["logs"] = "Show Logs"
                 row["map"] = "Show Map"
+
+                # Format duration in Hours:Seconds format
+                if "duration" in row:
+                    row["duration"] = format_duration(row.get("duration"))
+
                 for date_col in ["start_date", "end_date"]:
                     if date_col in row:
                         row[date_col] = parse_date(row.get(date_col))
@@ -219,6 +244,11 @@ def register_callbacks(app):
             row["results"] = "Show Results"
             row["logs"] = "Show Logs"
             row["map"] = "Show Map"
+
+            # Format duration in Hours:Seconds format
+            if "duration" in row:
+                row["duration"] = format_duration(row.get("duration"))
+
             for date_col in ["start_date", "end_date"]:
                 if date_col in row:
                     row[date_col] = parse_date(row.get(date_col))
@@ -281,6 +311,11 @@ def register_callbacks(app):
                 row["results"] = "Show Results"
                 row["logs"] = "Show Logs"
                 row["map"] = "Show Map"
+
+                # Format duration in Hours:Seconds format
+                if "duration" in row:
+                    row["duration"] = format_duration(row.get("duration"))
+
                 for date_col in ["start_date", "end_date"]:
                     if date_col in row:
                         row[date_col] = parse_date(row.get(date_col))
