@@ -19,6 +19,7 @@ def register_all_callbacks(app):
         "executions",
         "users",  # Add users table callbacks
         "scripts",  # Add scripts table callbacks
+        "admin",  # Add admin callbacks
         "modals",
         "map",
         "profile",

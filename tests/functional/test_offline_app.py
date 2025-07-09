@@ -22,7 +22,7 @@ app = dash.Dash(
 app.title = "Trends.Earth API Dashboard - Offline Test"
 
 
-@server.route("/health")
+@server.route("/api-ui-health")
 def health_check():
     return {"status": "healthy"}, 200
 

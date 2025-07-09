@@ -28,7 +28,7 @@ app.layout = dbc.Container(
 )
 
 
-@server.route("/health")
+@server.route("/api-ui-health")
 def health_check():
     return {"status": "healthy"}, 200
 

@@ -287,5 +287,156 @@ def register_callbacks(app):
             print(f"❌ Failed to update script: {resp.status_code} {resp.text}")
             return no_update, no_update
 
+    @app.callback(
+        [
+            Output("delete-user-modal", "is_open"),
+            Output("delete-user-name", "children"),
+            Output("delete-user-email", "children"),
+            Output("delete-user-data", "data"),
+        ],
+        [Input("delete-edit-user", "n_clicks")],
+        [State("edit-user-data", "data"), State("role-store", "data")],
+        prevent_initial_call=True,
+    )
+    def open_delete_user_modal(delete_clicks, user_data, role):
+        """Open delete user confirmation modal."""
+        if not delete_clicks or role != "ADMIN" or not user_data:
+            return False, "", "", None
+
+        return (
+            True,
+            user_data.get("name", "Unknown"),
+            user_data.get("email", "Unknown"),
+            user_data,
+        )
+
+    @app.callback(
+        Output("delete-user-modal", "is_open", allow_duplicate=True),
+        [Input("cancel-delete-user", "n_clicks")],
+        prevent_initial_call=True,
+    )
+    def close_delete_user_modal(cancel_clicks):
+        """Close delete user modal."""
+        if cancel_clicks:
+            return False
+        return no_update
+
+    @app.callback(
+        [
+            Output("delete-user-modal", "is_open", allow_duplicate=True),
+            Output("edit-user-modal", "is_open", allow_duplicate=True),
+            Output("refresh-users-btn", "n_clicks", allow_duplicate=True),
+        ],
+        [Input("confirm-delete-user", "n_clicks")],
+        [
+            State("delete-user-data", "data"),
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("refresh-users-btn", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def confirm_delete_user(confirm_clicks, user_data, token, role, current_refresh_clicks):
+        """Confirm and execute user deletion."""
+        if not confirm_clicks or role != "ADMIN" or not user_data or not token:
+            return no_update, no_update, no_update
+
+        user_id = user_data.get("id")
+        if not user_id:
+            print("❌ No user ID found for deletion")
+            return no_update, no_update, no_update
+
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            resp = requests.delete(f"{API_BASE}/user/{user_id}", headers=headers, timeout=10)
+
+            if resp.status_code in [200, 204]:
+                print(f"✅ User {user_id} deleted successfully")
+                # Close both modals and refresh users table
+                return False, False, (current_refresh_clicks or 0) + 1
+            else:
+                print(f"❌ Failed to delete user: {resp.status_code} {resp.text}")
+                # Close delete modal but keep edit modal open
+                return False, no_update, no_update
+
+        except Exception as e:
+            print(f"❌ Error deleting user: {e}")
+            # Close delete modal but keep edit modal open
+            return False, no_update, no_update
+
+    @app.callback(
+        [
+            Output("delete-script-modal", "is_open"),
+            Output("delete-script-data", "data"),
+            Output("delete-script-name", "children"),
+        ],
+        [Input("delete-edit-script", "n_clicks")],
+        [
+            State("edit-script-data", "data"),
+            State("role-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def open_delete_script_modal(n_clicks, script_data, role):
+        """Open delete script confirmation modal."""
+        if not n_clicks or role != "ADMIN" or not script_data:
+            return False, None, ""
+
+        script_name = script_data.get("name", "Unknown Script")
+        return True, script_data, script_name
+
+    @app.callback(
+        Output("delete-script-modal", "is_open", allow_duplicate=True),
+        [Input("cancel-delete-script", "n_clicks")],
+        prevent_initial_call=True,
+    )
+    def close_delete_script_modal(n_clicks):
+        """Close delete script confirmation modal."""
+        if n_clicks:
+            return False
+        return no_update
+
+    @app.callback(
+        [
+            Output("delete-script-modal", "is_open", allow_duplicate=True),
+            Output("edit-script-modal", "is_open", allow_duplicate=True),
+            Output("refresh-scripts-btn", "n_clicks", allow_duplicate=True),
+        ],
+        [Input("confirm-delete-script", "n_clicks")],
+        [
+            State("delete-script-data", "data"),
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("refresh-scripts-btn", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def delete_script(n_clicks, script_data, token, role, current_refresh_clicks):
+        """Delete script after confirmation."""
+        if not n_clicks or role != "ADMIN" or not script_data or not token:
+            return no_update, no_update, no_update
+
+        script_id = script_data.get("id")
+        if not script_id:
+            return False, no_update, no_update
+
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            resp = requests.delete(f"{API_BASE}/script/{script_id}", headers=headers, timeout=10)
+
+            if resp.status_code in [200, 204]:
+                print(f"✅ Script {script_id} deleted successfully")
+                # Close both modals and refresh scripts table
+                return False, False, (current_refresh_clicks or 0) + 1
+            else:
+                print(f"❌ Failed to delete script: {resp.status_code} {resp.text}")
+                # Close delete modal but keep edit modal open
+                return False, no_update, no_update
+
+        except Exception as e:
+            print(f"❌ Error deleting script: {e}")
+            # Close delete modal but keep edit modal open
+            return False, no_update, no_update
+
 
 # Legacy callback decorators for backward compatibility (these won't be executed)

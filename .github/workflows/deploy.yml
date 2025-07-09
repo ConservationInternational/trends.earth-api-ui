@@ -122,7 +122,7 @@ jobs:
         if [ -n "$LB_URL" ]; then
           echo "Performing health check on $LB_URL"
           for i in {1..12}; do
-            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/health" || echo "000")
+            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/api-ui-health" || echo "000")
             if [ "$response" = "200" ]; then
               echo "✅ Health check passed (attempt $i)"
               echo "Application URL: http://$LB_URL"

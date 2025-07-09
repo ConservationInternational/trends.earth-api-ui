@@ -173,12 +173,20 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("active-tab-store", "data"),
             State("user-timezone-store", "data"),
+            State("role-store", "data"),
         ],
+        prevent_initial_call=False,  # Allow initial call to load status when tab is first accessed
     )
-    def update_status_summary(_n_intervals, _refresh_clicks, token, active_tab, user_timezone):
+    def update_status_summary(
+        _n_intervals, _refresh_clicks, token, active_tab, user_timezone, role
+    ):
         """Update the status summary from the status endpoint with caching."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token or role != "ADMIN":
+            return no_update
+
         # Only update when status tab is active to avoid unnecessary API calls
-        if active_tab != "status" or not token:
+        if active_tab != "status":
             return no_update
 
         # Get safe timezone
@@ -319,11 +327,12 @@ def register_callbacks(app):
                                 className="row mb-4",
                             ),
                             html.Hr(),
-                            # Execution Status Section
+                            # Execution Status Summary Cards
                             html.Div(
                                 [
                                     html.H5(
-                                        "Execution Status", className="text-center mb-3 text-muted"
+                                        "Current Execution Status",
+                                        className="text-center mb-3 text-muted",
                                     ),
                                     html.Div(
                                         [
@@ -333,6 +342,10 @@ def register_callbacks(app):
                                                     html.H4(
                                                         str(metrics["executions_active"]),
                                                         className="text-primary",
+                                                    ),
+                                                    html.Small(
+                                                        f"{(metrics['executions_active'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        className="text-muted",
                                                     ),
                                                 ],
                                                 className="col-md-3 text-center",
@@ -344,6 +357,10 @@ def register_callbacks(app):
                                                         str(metrics["executions_ready"]),
                                                         className="text-warning",
                                                     ),
+                                                    html.Small(
+                                                        f"{(metrics['executions_ready'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        className="text-muted",
+                                                    ),
                                                 ],
                                                 className="col-md-3 text-center",
                                             ),
@@ -354,6 +371,10 @@ def register_callbacks(app):
                                                         str(metrics["executions_running"]),
                                                         className="text-info",
                                                     ),
+                                                    html.Small(
+                                                        f"{(metrics['executions_running'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        className="text-muted",
+                                                    ),
                                                 ],
                                                 className="col-md-3 text-center",
                                             ),
@@ -363,6 +384,10 @@ def register_callbacks(app):
                                                     html.H4(
                                                         str(metrics["executions_finished"]),
                                                         className="text-success",
+                                                    ),
+                                                    html.Small(
+                                                        f"{(metrics['executions_finished'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished']) * 100):.1f}%",
+                                                        className="text-muted",
                                                     ),
                                                 ],
                                                 className="col-md-3 text-center",
@@ -499,14 +524,20 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("active-tab-store", "data"),
             State("user-timezone-store", "data"),
+            State("role-store", "data"),
         ],
+        prevent_initial_call=False,  # Allow initial call to load status when tab is first accessed
     )
     def update_status_charts(
-        _n_intervals, _refresh_clicks, time_period, token, active_tab, user_timezone
+        _n_intervals, _refresh_clicks, time_period, token, active_tab, user_timezone, role
     ):
         """Update the status charts based on selected time period with caching."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token or role != "ADMIN":
+            return no_update
+
         # Only update when status tab is active to avoid unnecessary API calls
-        if active_tab != "status" or not token:
+        if active_tab != "status":
             return no_update
 
         # Get safe timezone for chart labels
@@ -855,58 +886,6 @@ def register_callbacks(app):
                     )
                 )
 
-            # Create summary statistics from the most recent data point
-            latest_data = df.iloc[-1] if len(df) > 0 else None
-            if latest_data is not None:
-                total_executions = (
-                    latest_data["executions_active"]
-                    + latest_data["executions_ready"]
-                    + latest_data["executions_running"]
-                    + latest_data["executions_finished"]
-                )
-
-                summary_cards = []
-
-                # Execution summary
-                execution_summary = {
-                    "Active": latest_data["executions_active"],
-                    "Ready": latest_data["executions_ready"],
-                    "Running": latest_data["executions_running"],
-                    "Finished": latest_data["executions_finished"],
-                }
-
-                for status, count in execution_summary.items():
-                    percentage = (count / total_executions) * 100 if total_executions > 0 else 0
-
-                    color_class = {
-                        "Active": "info",
-                        "Ready": "warning",
-                        "Running": "success",
-                        "Finished": "secondary",
-                    }.get(status, "secondary")
-
-                    summary_cards.append(
-                        html.Div(
-                            [
-                                html.H6(status, className="card-title mb-1"),
-                                html.H5(str(int(count)), className=f"text-{color_class} mb-1"),
-                                html.Small(f"{percentage:.1f}%", className="text-muted"),
-                            ],
-                            className=f"card border-{color_class} text-center p-2 me-2 mb-2",
-                            style={"minWidth": "100px"},
-                        )
-                    )
-
-                charts.insert(
-                    0,
-                    html.Div(
-                        [
-                            html.H6("Current Status Summary"),
-                            html.Div(summary_cards, className="d-flex flex-wrap mb-3"),
-                        ]
-                    ),
-                )
-
             chart_result = html.Div(
                 [
                     html.H5(f"System Status Trends - {title_suffix}", className="mb-3"),
@@ -963,6 +942,10 @@ def register_callbacks(app):
     )
     def update_status_countdown(n_intervals, _refresh_clicks, active_tab):
         """Update the status auto-refresh countdown."""
+        # Guard: Skip if required components are not present (e.g., after logout)
+        if active_tab is None:
+            return no_update
+
         if active_tab != "status":
             return "60s"
 

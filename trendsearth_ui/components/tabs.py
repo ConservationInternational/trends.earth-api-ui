@@ -341,12 +341,6 @@ def profile_tab_content(user_data):
                                                         color="primary",
                                                         className="me-2",
                                                     ),
-                                                    dbc.Button(
-                                                        "Logout",
-                                                        id="logout-btn",
-                                                        color="danger",
-                                                        className="me-2",
-                                                    ),
                                                     dbc.Alert(
                                                         id="profile-update-alert",
                                                         is_open=False,
@@ -621,6 +615,352 @@ def status_tab_content(is_admin):
                 id="status-countdown-interval",
                 interval=1000,  # 1 second for countdown
                 n_intervals=0,
+            ),
+        ]
+    )
+
+
+def admin_tab_content(is_admin):
+    """Create the admin tab content with forms for creating users and uploading scripts."""
+    if not is_admin:
+        return html.Div(
+            [
+                dbc.Alert(
+                    "Access denied. Administrator privileges required to access admin functions.",
+                    color="danger",
+                )
+            ]
+        )
+
+    return html.Div(
+        [
+            # Page Header
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H2(
+                                [
+                                    html.I(className="fas fa-user-shield me-2"),
+                                    "Administration Panel",
+                                ],
+                                className="mb-4",
+                            )
+                        ]
+                    )
+                ]
+            ),
+            # Create New User Section
+            dbc.Card(
+                [
+                    dbc.CardHeader(
+                        html.H4(
+                            [
+                                html.I(className="fas fa-user-plus me-2"),
+                                "Create New User",
+                            ]
+                        )
+                    ),
+                    dbc.CardBody(
+                        [
+                            dbc.Form(
+                                [
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Name *"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-name",
+                                                        type="text",
+                                                        placeholder="Enter full name",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Email *"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-email",
+                                                        type="email",
+                                                        placeholder="Enter email address",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Password *"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-password",
+                                                        type="password",
+                                                        placeholder="Set password for user",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Confirm Password *"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-confirm-password",
+                                                        type="password",
+                                                        placeholder="Confirm password",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Institution"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-institution",
+                                                        type="text",
+                                                        placeholder="Enter institution/organization",
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Country"),
+                                                    dbc.Input(
+                                                        id="admin-new-user-country",
+                                                        type="text",
+                                                        placeholder="Enter country",
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Role *"),
+                                                    dbc.Select(
+                                                        id="admin-new-user-role",
+                                                        options=[
+                                                            {"label": "User", "value": "USER"},
+                                                            {"label": "Admin", "value": "ADMIN"},
+                                                        ],
+                                                        value="USER",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Button(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-user-plus me-2"
+                                                            ),
+                                                            "Create User",
+                                                        ],
+                                                        id="admin-create-user-btn",
+                                                        color="success",
+                                                        className="me-2",
+                                                    ),
+                                                    dbc.Button(
+                                                        [
+                                                            html.I(className="fas fa-eraser me-2"),
+                                                            "Clear Form",
+                                                        ],
+                                                        id="admin-clear-user-form-btn",
+                                                        color="secondary",
+                                                        outline=True,
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Alert(
+                                        id="admin-create-user-alert",
+                                        is_open=False,
+                                        dismissable=True,
+                                        duration=5000,
+                                    ),
+                                ]
+                            )
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            # Upload New Script Section
+            dbc.Card(
+                [
+                    dbc.CardHeader(
+                        html.H4(
+                            [
+                                html.I(className="fas fa-file-upload me-2"),
+                                "Upload New Script",
+                            ]
+                        )
+                    ),
+                    dbc.CardBody(
+                        [
+                            dbc.Form(
+                                [
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Script Name *"),
+                                                    dbc.Input(
+                                                        id="admin-new-script-name",
+                                                        type="text",
+                                                        placeholder="Enter script name",
+                                                        required=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Script Status"),
+                                                    dbc.Select(
+                                                        id="admin-new-script-status",
+                                                        options=[
+                                                            {"label": "Draft", "value": "DRAFT"},
+                                                            {"label": "Active", "value": "ACTIVE"},
+                                                            {
+                                                                "label": "Inactive",
+                                                                "value": "INACTIVE",
+                                                            },
+                                                        ],
+                                                        value="DRAFT",
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Description"),
+                                                    dbc.Textarea(
+                                                        id="admin-new-script-description",
+                                                        placeholder="Enter script description",
+                                                        rows=3,
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Script File *"),
+                                                    dcc.Upload(
+                                                        id="admin-script-upload",
+                                                        children=html.Div(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-cloud-upload-alt me-2"
+                                                                ),
+                                                                "Drag and Drop or ",
+                                                                html.A("Select Script File"),
+                                                            ]
+                                                        ),
+                                                        style={
+                                                            "width": "100%",
+                                                            "height": "80px",
+                                                            "lineHeight": "80px",
+                                                            "borderWidth": "2px",
+                                                            "borderStyle": "dashed",
+                                                            "borderRadius": "10px",
+                                                            "textAlign": "center",
+                                                            "marginBottom": "10px",
+                                                            "cursor": "pointer",
+                                                            "backgroundColor": "#f8f9fa",
+                                                        },
+                                                        multiple=False,
+                                                        accept=".py,.js,.sh,.bat,.r,.ipynb",
+                                                    ),
+                                                    html.Div(
+                                                        id="admin-script-upload-status",
+                                                        className="text-muted small",
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Button(
+                                                        [
+                                                            html.I(className="fas fa-upload me-2"),
+                                                            "Upload Script",
+                                                        ],
+                                                        id="admin-upload-script-btn",
+                                                        color="primary",
+                                                        className="me-2",
+                                                        disabled=True,
+                                                    ),
+                                                    dbc.Button(
+                                                        [
+                                                            html.I(className="fas fa-eraser me-2"),
+                                                            "Clear Form",
+                                                        ],
+                                                        id="admin-clear-script-form-btn",
+                                                        color="secondary",
+                                                        outline=True,
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Alert(
+                                        id="admin-upload-script-alert",
+                                        is_open=False,
+                                        dismissable=True,
+                                        duration=5000,
+                                    ),
+                                ]
+                            )
+                        ]
+                    ),
+                ],
+                className="mb-4",
             ),
         ]
     )

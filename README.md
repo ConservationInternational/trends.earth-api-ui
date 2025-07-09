@@ -106,7 +106,7 @@ The app will be available at:
 - Development: http://localhost:8050
 - Production: http://localhost:8000
 
-Health check endpoint: `/health`
+Health check endpoint: `/api-ui-health`
 
 ## Testing
 

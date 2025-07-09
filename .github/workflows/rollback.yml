@@ -133,7 +133,7 @@ jobs:
         if [ -n "$LB_URL" ]; then
           echo "Performing health check on $LB_URL"
           for i in {1..10}; do
-            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/health" || echo "000")
+            response=$(curl -s -o /dev/null -w "%{http_code}" "http://$LB_URL/api-ui-health" || echo "000")
             if [ "$response" = "200" ]; then
               echo "✅ Health check passed after rollback (attempt $i)"
               echo "Application URL: http://$LB_URL"
@@ -212,7 +212,7 @@ jobs:
         
         # Check health endpoint
         for i in {1..6}; do
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:8050/health || echo "000")
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:8050/api-ui-health || echo "000")
           if [ "$response" = "200" ]; then
             echo "✅ Health check passed after rollback (attempt $i)"
             break

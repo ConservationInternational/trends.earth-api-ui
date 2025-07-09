@@ -4,8 +4,15 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 
 from ..callbacks.timezone import get_timezone_components
-from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_URL
-from .modals import edit_script_modal, edit_user_modal, json_modal, map_modal
+from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_SQUARE_URL, LOGO_URL
+from .modals import (
+    delete_script_modal,
+    delete_user_modal,
+    edit_script_modal,
+    edit_user_modal,
+    json_modal,
+    map_modal,
+)
 
 
 def create_main_layout():
@@ -15,7 +22,6 @@ def create_main_layout():
 
     return dbc.Container(
         [
-            html.H1(APP_TITLE),
             html.Div(id="page-content"),
             html.Div(id="tab-content"),
             # URL component for navigation tracking
@@ -43,6 +49,8 @@ def create_main_layout():
             dcc.Store(id="users-total-count-store", data=0),  # Store total count for users
             dcc.Store(id="scripts-total-count-store", data=0),  # Store total count for scripts
             dcc.Store(id="active-tab-store", data="executions"),
+            dcc.Store(id="delete-user-data"),  # Store data for user being deleted
+            dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             # Timezone detection components
             *timezone_components,
             # Modals
@@ -50,6 +58,8 @@ def create_main_layout():
             edit_user_modal(),
             edit_script_modal(),
             map_modal(),
+            delete_user_modal(),
+            delete_script_modal(),
         ],
         fluid=True,
     )
@@ -57,98 +67,110 @@ def create_main_layout():
 
 def login_layout():
     """Create the login page layout."""
-    return dbc.Row(
+    return html.Div(
         [
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            html.Div(
-                                [
-                                    html.Img(
-                                        src=LOGO_URL,
-                                        alt="Trends.Earth Logo",
-                                        style={"height": LOGO_HEIGHT, "marginBottom": "15px"},
-                                    ),
-                                    html.H4("Login", style={"color": "white"}),
-                                ],
-                                className="text-center",
-                            ),
-                            style={"backgroundColor": "#495057"},
-                        ),
-                        dbc.CardBody(
+            # Hidden store to prevent callback errors
+            dcc.Store(id="active-tab-store", data=None, storage_type="memory"),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        dbc.Card(
                             [
-                                dbc.Form(
+                                dbc.CardHeader(
+                                    html.Div(
+                                        [
+                                            html.Img(
+                                                src=LOGO_URL,
+                                                alt="Trends.Earth Logo",
+                                                style={
+                                                    "height": LOGO_HEIGHT,
+                                                    "marginBottom": "15px",
+                                                },
+                                            ),
+                                            html.H4("Login", style={"color": "white"}),
+                                        ],
+                                        className="text-center",
+                                    ),
+                                    style={"backgroundColor": "#495057"},
+                                ),
+                                dbc.CardBody(
                                     [
-                                        dbc.Row(
+                                        dbc.Form(
                                             [
-                                                dbc.Label("Email", width=3),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="login-email",
-                                                        type="email",
-                                                        placeholder="Enter email",
-                                                    ),
-                                                    width=9,
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Label("Email", width=3),
+                                                        dbc.Col(
+                                                            dbc.Input(
+                                                                id="login-email",
+                                                                type="email",
+                                                                placeholder="Enter email",
+                                                            ),
+                                                            width=9,
+                                                        ),
+                                                    ],
+                                                    className="mb-3",
                                                 ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Label("Password", width=3),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="login-password",
-                                                        type="password",
-                                                        placeholder="Enter password",
-                                                    ),
-                                                    width=9,
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Label("Password", width=3),
+                                                        dbc.Col(
+                                                            dbc.Input(
+                                                                id="login-password",
+                                                                type="password",
+                                                                placeholder="Enter password",
+                                                            ),
+                                                            width=9,
+                                                        ),
+                                                    ],
+                                                    className="mb-3",
                                                 ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.Checkbox(
-                                                        id="remember-me-checkbox",
-                                                        label="Remember me for 12 hours",
-                                                        value=True,
-                                                    ),
-                                                    width=12,
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Col(
+                                                            dbc.Checkbox(
+                                                                id="remember-me-checkbox",
+                                                                label="Remember me for 12 hours",
+                                                                value=True,
+                                                            ),
+                                                            width=12,
+                                                        ),
+                                                    ],
+                                                    className="mb-3",
                                                 ),
-                                            ],
-                                            className="mb-3",
+                                                dbc.Button(
+                                                    "Login",
+                                                    id="login-btn",
+                                                    color="primary",
+                                                    className="mt-2",
+                                                    n_clicks=0,
+                                                    style={"width": "100%"},
+                                                ),
+                                                html.Div(
+                                                    id="login-feedback",
+                                                    style={
+                                                        "margin-top": "10px",
+                                                        "min-height": "20px",
+                                                    },
+                                                ),
+                                            ]
                                         ),
-                                        dbc.Button(
-                                            "Login",
-                                            id="login-btn",
-                                            color="primary",
-                                            className="mt-2",
-                                            n_clicks=0,
-                                            style={"width": "100%"},
-                                        ),
-                                        html.Div(
-                                            id="login-feedback",
-                                            style={"margin-top": "10px", "min-height": "20px"},
+                                        html.Hr(),
+                                        dbc.Alert(
+                                            id="login-alert",
+                                            is_open=False,
+                                            dismissable=True,
+                                            duration=4000,
                                         ),
                                     ]
                                 ),
-                                html.Hr(),
-                                dbc.Alert(
-                                    id="login-alert",
-                                    is_open=False,
-                                    dismissable=True,
-                                    duration=4000,
-                                ),
-                            ]
+                            ],
+                            style={"maxWidth": "400px"},
                         ),
-                    ],
-                    style={"maxWidth": "400px"},
-                ),
-                width=6,
-                className="mx-auto mt-4",
+                        width=6,
+                        className="mx-auto mt-4",
+                    ),
+                ]
             ),
         ]
     )
@@ -157,6 +179,60 @@ def login_layout():
 def dashboard_layout():
     """Create the main dashboard layout."""
     layout = [
+        # Top header with logout button
+        dbc.Navbar(
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Img(
+                                        src=LOGO_SQUARE_URL,
+                                        height="40px",
+                                        className="me-2",
+                                    ),
+                                    dbc.NavbarBrand(
+                                        APP_TITLE,
+                                        className="fw-bold",
+                                    ),
+                                ],
+                                width="auto",
+                            ),
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Span(
+                                                id="header-user-info",
+                                                className="me-3 text-muted",
+                                            ),
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-sign-out-alt me-2"),
+                                                    "Logout",
+                                                ],
+                                                id="header-logout-btn",
+                                                color="outline-secondary",
+                                                size="sm",
+                                            ),
+                                        ],
+                                        className="d-flex align-items-center justify-content-end",
+                                    )
+                                ],
+                                width=True,
+                            ),
+                        ],
+                        className="w-100 align-items-center",
+                    )
+                ],
+                fluid=True,
+            ),
+            color="dark",
+            dark=True,
+            style={"backgroundColor": "#495057"},
+            className="mb-3",
+        ),
         dbc.Alert(
             id="alert",
             is_open=False,
@@ -201,6 +277,19 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        "Admin",
+                                        id="admin-tab-btn",
+                                        className="nav-link",
+                                        **{"data-tab": "admin"},
+                                    )
+                                ],
+                                className="nav-item",
+                                id="admin-tab-li",
+                                style={"display": "none"},  # Hidden by default
                             ),
                             html.Li(
                                 [

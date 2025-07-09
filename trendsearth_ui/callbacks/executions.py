@@ -1,6 +1,6 @@
 """Executions table callbacks."""
 
-from dash import Input, Output, State
+from dash import Input, Output, State, no_update
 import requests
 
 from ..config import API_BASE, DEFAULT_PAGE_SIZE
@@ -274,8 +274,12 @@ def register_callbacks(app):
     )
     def auto_refresh_executions_table(_n_intervals, token, active_tab, table_state):
         """Auto-refresh the executions table with preserved sorting/filtering state."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token:
+            return {"rowData": [], "rowCount": 0}, {}, 0
+
         # Only refresh if executions tab is active
-        if active_tab != "executions" or not token:
+        if active_tab != "executions":
             return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
@@ -336,6 +340,10 @@ def register_callbacks(app):
     )
     def update_executions_countdown(n_intervals, active_tab):
         """Update the executions auto-refresh countdown."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if active_tab is None:
+            return no_update
+
         if active_tab != "executions":
             return "30s"
 

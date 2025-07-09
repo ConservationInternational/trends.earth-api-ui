@@ -175,6 +175,13 @@ def edit_user_modal():
             dbc.ModalFooter(
                 [
                     dbc.Button("Cancel", id="cancel-edit-user", className="me-1", outline=True),
+                    dbc.Button(
+                        [html.I(className="fas fa-trash me-2"), "Delete User"],
+                        id="delete-edit-user",
+                        color="danger",
+                        className="me-auto",
+                        outline=True,
+                    ),
                     dbc.Button("Save Changes", id="save-edit-user", color="primary"),
                 ]
             ),
@@ -279,6 +286,16 @@ def edit_script_modal():
             dbc.ModalFooter(
                 [
                     dbc.Button("Cancel", id="cancel-edit-script", className="me-1", outline=True),
+                    dbc.Button(
+                        [
+                            html.I(className="fas fa-trash me-2"),
+                            "Delete Script",
+                        ],
+                        id="delete-edit-script",
+                        color="danger",
+                        className="me-1",
+                        outline=True,
+                    ),
                     dbc.Button("Save Changes", id="save-edit-script", color="primary"),
                 ]
             ),
@@ -307,5 +324,111 @@ def map_modal():
         ],
         id="map-modal",
         size="xl",
+        is_open=False,
+    )
+
+
+def delete_user_modal():
+    """Create the delete user confirmation modal."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [
+                        html.I(className="fas fa-exclamation-triangle text-warning me-2"),
+                        "Confirm User Deletion",
+                    ]
+                )
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        [
+                            "Are you sure you want to delete the user ",
+                            html.Strong(id="delete-user-name", children=""),
+                            " (",
+                            html.Strong(id="delete-user-email", children=""),
+                            ")?",
+                        ]
+                    ),
+                    dbc.Alert(
+                        [
+                            html.I(className="fas fa-exclamation-triangle me-2"),
+                            html.Strong("Warning: "),
+                            "This action cannot be undone. All user data and associated executions will be permanently deleted.",
+                        ],
+                        color="warning",
+                        className="mb-0",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Cancel",
+                        id="cancel-delete-user",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        [html.I(className="fas fa-trash me-2"), "Delete User"],
+                        id="confirm-delete-user",
+                        color="danger",
+                    ),
+                ]
+            ),
+        ],
+        id="delete-user-modal",
+        is_open=False,
+    )
+
+
+def delete_script_modal():
+    """Create the delete script confirmation modal."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [
+                        html.I(className="fas fa-exclamation-triangle text-warning me-2"),
+                        "Delete Script",
+                    ]
+                )
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        [
+                            "Are you sure you want to delete the script ",
+                            html.Strong(id="delete-script-name", children=""),
+                            "?",
+                        ]
+                    ),
+                    html.P(
+                        [
+                            html.Strong("Warning: "),
+                            "This action cannot be undone. All data associated with this script will be permanently removed.",
+                        ],
+                        className="text-danger",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Cancel",
+                        id="cancel-delete-script",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        [html.I(className="fas fa-trash me-2"), "Delete Script"],
+                        id="confirm-delete-script",
+                        color="danger",
+                    ),
+                ]
+            ),
+        ],
+        id="delete-script-modal",
         is_open=False,
     )

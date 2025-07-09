@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 import json
 
-from dash import Input, Output, State, callback_context, no_update
+from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
 import requests
 
@@ -164,13 +164,19 @@ def register_callbacks(app):
     @app.callback(
         [
             Output("token-store", "clear_data", allow_duplicate=True),
+            Output("role-store", "clear_data", allow_duplicate=True),
+            Output("user-store", "clear_data", allow_duplicate=True),
+            Output("page-content", "children", allow_duplicate=True),
+            Output("tab-content", "children", allow_duplicate=True),
         ],
-        [Input("logout-btn", "n_clicks")],
+        [
+            Input("header-logout-btn", "n_clicks"),
+        ],
         prevent_initial_call=True,
     )
-    def logout_user(_n):
+    def logout_user(header_logout_clicks):
         """Handle user logout and clear authentication cookie."""
-        if _n:
+        if header_logout_clicks:
             print("🚪 User logging out - clearing authentication data")
 
             # Clear HTTP cookie
@@ -186,8 +192,8 @@ def register_callbacks(app):
                 )
                 print("🍪 Cleared HTTP authentication cookie")
 
-            return True
-        return no_update
+            return (True, True, True, login_layout(), [])
+        return (no_update, no_update, no_update, no_update, no_update)
 
     @app.callback(
         [Output("login-email", "value")],
@@ -214,3 +220,37 @@ def register_callbacks(app):
                     return [email_value]
 
         return [""]
+
+    @app.callback(
+        Output("header-user-info", "children"),
+        [
+            Input("user-store", "data"),
+            Input("role-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def update_header_user_info(user_data, role):
+        """Update the user info display in the header."""
+        if not user_data:
+            return ""
+
+        user_name = user_data.get("name", "")
+        user_email = user_data.get("email", "")
+
+        # Display name if available, otherwise email
+        display_name = user_name if user_name else user_email
+
+        # Add role badge
+        role_color = "primary" if role == "ADMIN" else "secondary"
+        role_text = role.title() if role else "User"
+
+        return html.Div(
+            [
+                html.Span(f"Welcome, {display_name}", className="me-2"),
+                html.Span(
+                    role_text,
+                    className=f"badge bg-{role_color}",
+                ),
+            ],
+            className="d-flex align-items-center",
+        )
