@@ -118,27 +118,34 @@ def register_callbacks(app):
         password_data = {"current_password": current_password, "new_password": new_password}
 
         try:
-            user_id = user_data.get("id")
-            resp = requests.put(
-                f"{API_BASE}/user/{user_id}/password",
+            print(f"🔐 Attempting password change for user: {user_data.get('email', 'unknown')}")
+            
+            resp = requests.post(
+                f"{API_BASE}/user/me/change-password",
                 json=password_data,
                 headers=headers,
                 timeout=10,
             )
 
             if resp.status_code == 200:
+                print("✅ Password changed successfully")
                 # Clear password fields on success
                 return "Password changed successfully!", "success", True, "", "", ""
             else:
+                print(f"❌ Password change failed with status: {resp.status_code}")
                 error_msg = "Failed to change password."
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("msg", error_msg)
+                    print(f"🔍 API error response: {error_data}")
                 except Exception:
                     pass
+                # Add status code to error message for debugging
+                error_msg += f" (Status: {resp.status_code})"
                 return error_msg, "danger", True, no_update, no_update, no_update
 
         except Exception as e:
+            print(f"💥 Network error during password change: {str(e)}")
             return f"Network error: {str(e)}", "danger", True, no_update, no_update, no_update
 
 

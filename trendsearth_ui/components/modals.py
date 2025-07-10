@@ -168,10 +168,61 @@ def edit_user_modal():
                                 ],
                                 className="mb-3",
                             ),
+                            html.Hr(),
+                            html.H5("Change Password", className="mb-3"),
+                            dbc.Alert(
+                                id="admin-password-change-alert",
+                                dismissable=True,
+                                is_open=False,
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("New Password"),
+                                            dbc.Input(
+                                                id="admin-new-password",
+                                                type="password",
+                                                placeholder="Enter new password",
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Confirm Password"),
+                                            dbc.Input(
+                                                id="admin-confirm-password",
+                                                type="password",
+                                                placeholder="Confirm new password",
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                "Change Password",
+                                                id="admin-change-password-btn",
+                                                color="warning",
+                                                outline=True,
+                                            ),
+                                        ],
+                                        width="auto",
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
                         ]
                     )
                 ]
             ),
+            dcc.Store(id="edit-user-data"),
             dbc.ModalFooter(
                 [
                     dbc.Button("Cancel", id="cancel-edit-user", className="me-1", outline=True),

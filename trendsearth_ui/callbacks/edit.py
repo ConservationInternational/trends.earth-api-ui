@@ -18,6 +18,8 @@ def register_callbacks(app):
             Output("edit-user-institution", "value"),
             Output("edit-user-country", "value"),
             Output("edit-user-role", "value"),
+            Output("admin-new-password", "value"),
+            Output("admin-confirm-password", "value"),
         ],
         [Input("users-table", "cellClicked")],
         [
@@ -31,9 +33,9 @@ def register_callbacks(app):
         """Open edit user modal from user table."""
         print(f"🔧 USER EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
         if not cell_clicked or role != "ADMIN":
-            return False, None, "", "", "", "", "USER"
+            return False, None, "", "", "", "", "USER", "", ""
         if cell_clicked.get("colId") != "edit":
-            return False, None, "", "", "", "", "USER"
+            return False, None, "", "", "", "", "USER", "", ""
 
         # Try to get row data from cell click event first
         row_data = cell_clicked.get("data")
@@ -48,7 +50,7 @@ def register_callbacks(app):
             row_index = cell_clicked.get("rowIndex")
             if row_index is None:
                 print("❌ No row index found in cell click event")
-                return False, None, "", "", "", "", "USER"
+                return False, None, "", "", "", "", "USER", "", ""
 
             # Calculate which page this row is on
             headers = {"Authorization": f"Bearer {token}"}
@@ -68,13 +70,13 @@ def register_callbacks(app):
             resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
             if resp.status_code != 200:
                 print(f"❌ Failed to fetch user data: {resp.text}")
-                return False, None, "", "", "", "", "USER"
+                return False, None, "", "", "", "", "USER", "", ""
 
             result = resp.json()
             users = result.get("data", [])
             if row_in_page >= len(users):
                 print(f"❌ Row index {row_in_page} out of range for page {page}")
-                return False, None, "", "", "", "", "USER"
+                return False, None, "", "", "", "", "USER", "", "", "", ""
 
             user = users[row_in_page]
             print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
@@ -87,6 +89,8 @@ def register_callbacks(app):
             user.get("institution", ""),
             user.get("country", ""),
             user.get("role", "USER"),
+            "",  # Clear admin password field
+            "",  # Clear admin confirm password field
         )
 
     @app.callback(
@@ -437,6 +441,87 @@ def register_callbacks(app):
             print(f"❌ Error deleting script: {e}")
             # Close delete modal but keep edit modal open
             return False, no_update, no_update
+
+    @app.callback(
+        [
+            Output("admin-password-change-alert", "children"),
+            Output("admin-password-change-alert", "color"),
+            Output("admin-password-change-alert", "is_open"),
+            Output("admin-new-password", "value"),
+            Output("admin-confirm-password", "value"),
+        ],
+        [Input("admin-change-password-btn", "n_clicks")],
+        [
+            State("admin-new-password", "value"),
+            State("admin-confirm-password", "value"),
+            State("edit-user-data", "data"),
+            State("token-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def admin_change_password(n_clicks, new_password, confirm_password, user_data, token):
+        """Change password for another user (admin only)."""
+        if not n_clicks or not token or not user_data:
+            return no_update, no_update, no_update, no_update, no_update
+
+        if not new_password or not confirm_password:
+            return (
+                "Both password fields are required.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if new_password != confirm_password:
+            return "Passwords do not match.", "danger", True, no_update, no_update
+
+        if len(new_password) < 6:
+            return (
+                "Password must be at least 6 characters long.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        user_id = user_data.get("id")
+        if not user_id:
+            return "User ID not found.", "danger", True, no_update, no_update
+
+        headers = {"Authorization": f"Bearer {token}"}
+        password_data = {"new_password": new_password}
+
+        try:
+            print(f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}")
+            
+            resp = requests.post(
+                f"{API_BASE}/user/{user_id}/change-password",
+                json=password_data,
+                headers=headers,
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                print("✅ Password changed successfully by admin")
+                # Clear password fields on success
+                return "Password changed successfully!", "success", True, "", ""
+            else:
+                print(f"❌ Password change failed with status: {resp.status_code}")
+                error_msg = "Failed to change password."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("msg", error_msg)
+                    print(f"🔍 API error response: {error_data}")
+                except Exception:
+                    pass
+                # Add status code to error message for debugging
+                error_msg += f" (Status: {resp.status_code})"
+                return error_msg, "danger", True, no_update, no_update
+
+        except Exception as e:
+            print(f"💥 Network error during admin password change: {str(e)}")
+            return f"Network error: {str(e)}", "danger", True, no_update, no_update
 
 
 # Legacy callback decorators for backward compatibility (these won't be executed)
