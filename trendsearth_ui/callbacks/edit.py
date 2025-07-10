@@ -76,7 +76,7 @@ def register_callbacks(app):
             users = result.get("data", [])
             if row_in_page >= len(users):
                 print(f"❌ Row index {row_in_page} out of range for page {page}")
-                return False, None, "", "", "", "", "USER", "", "", "", ""
+                return False, None, "", "", "", "", "USER", "", ""
 
             user = users[row_in_page]
             print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
@@ -447,8 +447,8 @@ def register_callbacks(app):
             Output("admin-password-change-alert", "children"),
             Output("admin-password-change-alert", "color"),
             Output("admin-password-change-alert", "is_open"),
-            Output("admin-new-password", "value"),
-            Output("admin-confirm-password", "value"),
+            Output("admin-new-password", "value", allow_duplicate=True),
+            Output("admin-confirm-password", "value", allow_duplicate=True),
         ],
         [Input("admin-change-password-btn", "n_clicks")],
         [

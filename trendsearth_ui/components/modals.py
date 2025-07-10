@@ -222,7 +222,6 @@ def edit_user_modal():
                     )
                 ]
             ),
-            dcc.Store(id="edit-user-data"),
             dbc.ModalFooter(
                 [
                     dbc.Button("Cancel", id="cancel-edit-user", className="me-1", outline=True),
