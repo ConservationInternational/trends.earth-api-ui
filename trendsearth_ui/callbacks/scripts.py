@@ -17,10 +17,14 @@ def register_callbacks(app):
             Output("scripts-total-count-store", "data"),
         ],
         Input("scripts-table", "getRowsRequest"),
-        [State("token-store", "data"), State("role-store", "data")],
+        [
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("user-timezone-store", "data"),
+        ],
         prevent_initial_call=False,
     )
-    def get_scripts_rows(request, token, role):
+    def get_scripts_rows(request, token, role, user_timezone):
         """Get scripts data for ag-grid with infinite row model with server-side operations."""
         print(
             f"DEBUG: get_scripts_rows called with request={request}, token={bool(token)}, role={role}"
@@ -122,7 +126,7 @@ def register_callbacks(app):
                     row["edit"] = "Edit"
                 for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                     if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col))
+                        row[date_col] = parse_date(row.get(date_col), user_timezone)
                 tabledata.append(row)
 
             # Store the current table state for use in edit callbacks
@@ -151,10 +155,11 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("role-store", "data"),
             State("scripts-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_scripts_table(n_clicks, token, role, table_state):
+    def refresh_scripts_table(n_clicks, token, role, table_state, user_timezone):
         """Manually refresh the scripts table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0
@@ -198,7 +203,7 @@ def register_callbacks(app):
                     row["edit"] = "Edit"
                 for date_col in ["start_date", "end_date", "created_at", "updated_at"]:
                     if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col))
+                        row[date_col] = parse_date(row.get(date_col), user_timezone)
                 tabledata.append(row)
 
             # Return data with preserved table state

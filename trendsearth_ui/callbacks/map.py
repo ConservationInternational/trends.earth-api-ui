@@ -52,7 +52,7 @@ def register_callbacks(app):
                     "page": page,
                     "per_page": page_size,
                     "exclude": "results",  # We need params for map, so exclude only results
-                    "include": "script_name,user_name,user_email,duration",
+                    "include": "script_name,user_name,user_email,user_id,duration",
                 }
 
                 # Apply the same sort and filter that the table is currently using

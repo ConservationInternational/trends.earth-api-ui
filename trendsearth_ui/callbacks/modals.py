@@ -23,10 +23,11 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("json-modal", "is_open"),
             State("executions-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def show_json_modal(cell, token, is_open, table_state):
+    def show_json_modal(cell, token, is_open, table_state, user_timezone):
         """Show JSON/logs modal for execution cell clicks."""
         if not cell:
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
@@ -68,7 +69,7 @@ def register_callbacks(app):
                     "page": page,
                     "per_page": page_size,
                     "exclude": "params,results",
-                    "include": "script_name,user_name,user_email,duration",
+                    "include": "script_name,user_name,user_email,user_id,duration",
                 }
 
                 # Apply the same sort and filter that the table is currently using
@@ -273,7 +274,9 @@ def register_callbacks(app):
                                 text = log.get("text", "")
 
                                 # Parse and format the date
-                                formatted_date = parse_date(register_date) or register_date
+                                formatted_date = (
+                                    parse_date(register_date, user_timezone) or register_date
+                                )
 
                                 # Create formatted log line
                                 log_line = f"{formatted_date} - {level} - {text}"
@@ -401,10 +404,11 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("json-modal", "is_open"),
             State("scripts-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def show_script_logs_modal(cell, token, is_open, table_state):
+    def show_script_logs_modal(cell, token, is_open, table_state, user_timezone):
         """Show script logs modal using rowIndex and backend pagination (like executions)."""
         if not cell:
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
@@ -528,7 +532,7 @@ def register_callbacks(app):
                         text = log.get("text", "")
 
                         # Parse and format the date
-                        formatted_date = parse_date(register_date) or register_date
+                        formatted_date = parse_date(register_date, user_timezone) or register_date
 
                         # Create formatted log line
                         log_line = f"{formatted_date} - {level} - {text}"

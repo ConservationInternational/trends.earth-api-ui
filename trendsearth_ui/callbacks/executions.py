@@ -36,10 +36,13 @@ def register_callbacks(app):
             Output("executions-total-count-store", "data"),
         ],
         Input("executions-table", "getRowsRequest"),
-        State("token-store", "data"),
+        [
+            State("token-store", "data"),
+            State("user-timezone-store", "data"),
+        ],
         prevent_initial_call=False,
     )
-    def get_execution_rows(request, token):
+    def get_execution_rows(request, token, user_timezone):
         """Get execution data for ag-grid with infinite row model."""
         try:
             if not token:
@@ -60,7 +63,7 @@ def register_callbacks(app):
                 "page": page,
                 "per_page": page_size,
                 "exclude": "params,results",
-                "include": "user_name,script_name,user_email,duration",
+                "include": "user_name,script_name,user_email,user_id,duration",
             }
 
             # Build SQL-style sort string
@@ -84,7 +87,7 @@ def register_callbacks(app):
                     if val and val.upper() in ["PENDING", "RUNNING", "FINISHED", "FAILED"]:
                         filter_sql.append(f"status='{val.upper()}'")
                 elif config.get("filterType") == "text":
-                    # General text filters (user_name, user_email, etc.)
+                    # General text filters (user_name, user_email, user_id, etc.)
                     filter_type = config.get("type", "contains")
                     val = config.get("filter", "").strip()
                     if val:
@@ -173,7 +176,7 @@ def register_callbacks(app):
 
                 for date_col in ["start_date", "end_date"]:
                     if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col))
+                        row[date_col] = parse_date(row.get(date_col), user_timezone)
                 tabledata.append(row)
 
             # Store the current table state for use in modal callbacks
@@ -201,10 +204,11 @@ def register_callbacks(app):
         [
             State("token-store", "data"),
             State("executions-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_executions_table(n_clicks, token, table_state):
+    def refresh_executions_table(n_clicks, token, table_state, user_timezone):
         """Manually refresh the executions table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0, 0
@@ -217,7 +221,7 @@ def register_callbacks(app):
             "page": 1,
             "per_page": DEFAULT_PAGE_SIZE,
             "exclude": "params,results",
-            "include": "script_name,user_name,user_email,duration",
+            "include": "script_name,user_name,user_email,user_id,duration",
         }
 
         # Preserve existing sort and filter settings if available
@@ -250,7 +254,7 @@ def register_callbacks(app):
 
             for date_col in ["start_date", "end_date"]:
                 if date_col in row:
-                    row[date_col] = parse_date(row.get(date_col))
+                    row[date_col] = parse_date(row.get(date_col), user_timezone)
             tabledata.append(row)
 
         # Reset countdown timer to 0 when manually refreshed
@@ -268,10 +272,11 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("active-tab-store", "data"),
             State("executions-table-state", "data"),  # Preserve existing table state
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def auto_refresh_executions_table(_n_intervals, token, active_tab, table_state):
+    def auto_refresh_executions_table(_n_intervals, token, active_tab, table_state, user_timezone):
         """Auto-refresh the executions table with preserved sorting/filtering state."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
@@ -288,7 +293,7 @@ def register_callbacks(app):
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
                 "exclude": "params,results",
-                "include": "script_name,user_name,user_email,duration",
+                "include": "script_name,user_name,user_email,user_id,duration",
             }
 
             # Preserve existing sort and filter settings if available
@@ -321,7 +326,7 @@ def register_callbacks(app):
 
                 for date_col in ["start_date", "end_date"]:
                     if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col))
+                        row[date_col] = parse_date(row.get(date_col), user_timezone)
                 tabledata.append(row)
 
             # Preserve table state from current state

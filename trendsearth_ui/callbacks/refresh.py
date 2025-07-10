@@ -19,10 +19,11 @@ def register_callbacks(app):
             State("current-log-context", "data"),
             State("token-store", "data"),
             State("json-modal", "is_open"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_logs(_refresh_clicks, _n_intervals, log_context, token, modal_open):
+    def refresh_logs(_refresh_clicks, _n_intervals, log_context, token, modal_open, user_timezone):
         """Refresh logs in the modal."""
         if not modal_open or not log_context or not token:
             return no_update, no_update, no_update
@@ -70,7 +71,7 @@ def register_callbacks(app):
                     text = log.get("text", "")
 
                     # Parse and format the date
-                    formatted_date = parse_date(register_date) or register_date
+                    formatted_date = parse_date(register_date, user_timezone) or register_date
 
                     # Create formatted log line
                     log_line = f"{formatted_date} - {level} - {text}"

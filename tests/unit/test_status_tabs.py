@@ -395,8 +395,8 @@ class TestStatusTabsErrorHandling:
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN")
                 result_str = str(result)
 
-                # Should contain execution status section header
-                assert "Execution Status" in result_str
+                # Should contain execution status section content (without main header)
+                assert "Active Executions" in result_str
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_summary_totals_section(self, mock_ctx):
@@ -517,8 +517,9 @@ class TestStatusTabsErrorHandling:
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN")
                 result_str = str(result)
 
-                # Should contain both section headers
-                assert "Execution Status" in result_str
+                # Should contain section headers (Updated: main "Execution Status" header removed)
+                assert "Active Executions" in result_str
+                assert "Completed Executions" in result_str
                 assert "Summary Totals" in result_str
 
                 # Should contain proper styling classes for headers

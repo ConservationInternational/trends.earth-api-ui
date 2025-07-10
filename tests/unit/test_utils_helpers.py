@@ -21,13 +21,13 @@ class TestParseDateFunction:
         """Test parsing a valid ISO format date."""
         date_str = "2025-06-21T10:30:00Z"
         result = parse_date(date_str)
-        assert result == "2025-06-21 10:30:00"
+        assert result == "2025-06-21 10:30 UTC"
 
     def test_parse_date_with_microseconds(self):
         """Test parsing ISO format with microseconds."""
         date_str = "2025-06-21T10:30:00.123456Z"
         result = parse_date(date_str)
-        assert result == "2025-06-21 10:30:00"
+        assert result == "2025-06-21 10:30 UTC"
 
     def test_parse_date_with_none(self):
         """Test parsing None returns None."""
@@ -38,6 +38,14 @@ class TestParseDateFunction:
         """Test parsing empty string returns None."""
         result = parse_date("")
         assert result is None
+
+    def test_parse_date_with_timezone(self):
+        """Test parsing date with custom timezone."""
+        date_str = "2025-06-21T10:30:00Z"
+        result = parse_date(date_str, "America/New_York")
+        # UTC 10:30 should be 06:30 in EDT (UTC-4 in summer)
+        assert "06:30" in result
+        assert "EDT" in result or "EST" in result
 
     def test_parse_date_with_invalid_format(self):
         """Test parsing invalid format returns original string."""

@@ -435,10 +435,6 @@ def register_callbacks(app):
                             # Execution Status Summary Cards
                             html.Div(
                                 [
-                                    html.H5(
-                                        "Current Execution Status",
-                                        className="text-center mb-4 text-muted",
-                                    ),
                                     # Side-by-side execution groups
                                     html.Div(
                                         [
@@ -600,7 +596,7 @@ def register_callbacks(app):
                             html.Div(
                                 [
                                     html.H5(
-                                        "Summary Totals", className="text-center mb-3 text-muted"
+                                        "Summary Totals (all time)", className="text-center mb-3 text-muted"
                                     ),
                                     html.Div(
                                         [

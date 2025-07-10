@@ -153,7 +153,7 @@ class TestExecutionModalLogic:
                     "page": page,
                     "per_page": page_size,
                     "exclude": "params,results",
-                    "include": "script_name,user_name,user_email,duration",
+                    "include": "script_name,user_name,user_email,user_id,duration",
                 }
 
                 resp = requests.get("http://api.test/execution", params=params, headers=headers)
@@ -278,7 +278,7 @@ class TestExecutionModalLogic:
                 "page": page,
                 "per_page": page_size,
                 "exclude": "params,results",
-                "include": "script_name,user_name,user_email,duration",
+                "include": "script_name,user_name,user_email,user_id,duration",
             }
 
             resp = requests.get("http://api.test/execution", params=params, headers=headers)

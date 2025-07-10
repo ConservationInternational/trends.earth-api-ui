@@ -6,19 +6,33 @@ import json
 import requests
 
 from ..config import API_BASE
+from .timezone_utils import format_local_time, get_safe_timezone
 
 
-def parse_date(date_str):
-    """Parse date string and return formatted string for ag-grid."""
+def parse_date(date_str, user_timezone="UTC"):
+    """Parse date string and return formatted string for ag-grid with timezone conversion.
+
+    Args:
+        date_str: UTC date string from the API
+        user_timezone: User's timezone (IANA timezone name)
+
+    Returns:
+        Formatted local time string or None/original string if parsing fails
+    """
     if not date_str:
         return None
     try:
         # Handle ISO format with Z and potential microseconds
         if isinstance(date_str, str) and date_str.endswith("Z"):
             date_str = date_str[:-1] + "+00:00"
-        dt = datetime.fromisoformat(date_str)
-        # Return in ISO format without timezone info for ag-grid
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
+        dt_utc = datetime.fromisoformat(date_str)
+
+        # Convert to user's local timezone
+        safe_timezone = get_safe_timezone(user_timezone)
+        local_time_str, tz_abbrev = format_local_time(dt_utc, safe_timezone, include_seconds=False)
+
+        # Return formatted local time with timezone abbreviation
+        return f"{local_time_str} {tz_abbrev}"
     except (ValueError, TypeError):
         return date_str  # Return original if parsing fails
 

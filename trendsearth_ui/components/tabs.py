@@ -12,11 +12,12 @@ def executions_tab_content():
     column_defs = [
         {"headerName": "Script Name", "field": "script_name"},
         {"headerName": "User Name", "field": "user_name"},
+        {"headerName": "User Email", "field": "user_email"},
+        {"headerName": "User ID", "field": "user_id"},
         {"headerName": "Status", "field": "status"},
         {"headerName": "Start Date", "field": "start_date", "filter": "agDateColumnFilter"},
         {"headerName": "End Date", "field": "end_date", "filter": "agDateColumnFilter"},
         {"headerName": "Duration", "field": "duration"},
-        {"headerName": "Progress", "field": "progress"},
         {"headerName": "ID", "field": "id"},
         {"headerName": "Params", "field": "params", "sortable": False, "filter": False},
         {"headerName": "Results", "field": "results", "sortable": False, "filter": False},
@@ -112,14 +113,14 @@ def executions_tab_content():
 def users_tab_content():
     """Create the users tab content."""
     column_defs = [
-        {"headerName": "Email", "field": "email"},
+        {"headerName": "User Email", "field": "email"},
+        {"headerName": "User ID", "field": "id"},
         {"headerName": "Name", "field": "name"},
         {"headerName": "Institution", "field": "institution"},
         {"headerName": "Country", "field": "country"},
         {"headerName": "Role", "field": "role"},
         {"headerName": "Created At", "field": "created_at", "filter": "agDateColumnFilter"},
         {"headerName": "Updated At", "field": "updated_at", "filter": "agDateColumnFilter"},
-        {"headerName": "ID", "field": "id"},
         {"headerName": "Edit", "field": "edit", "sortable": False, "filter": False},
     ]
 
