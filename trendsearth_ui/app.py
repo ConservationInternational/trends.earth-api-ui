@@ -25,6 +25,7 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     suppress_callback_exceptions=True,
     assets_folder=assets_dir,
+    assets_url_path="/assets/",
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
         {
@@ -42,10 +43,9 @@ app.index_string = """
     <head>
         {%metas%}
         <title>{%title%}</title>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
         {%favicon%}
-        <link rel="icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
-        <link rel="shortcut icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
-        <link rel="apple-touch-icon" type="image/png" sizes="200x200" href="/assets/trends_earth_logo_square_200x200.png">
         {%css%}
     </head>
     <body>
@@ -67,9 +67,7 @@ def health_check():
 
 @server.route("/favicon.ico")
 def favicon():
-    return send_from_directory(
-        assets_dir, "trends_earth_logo_square_200x200.png", mimetype="image/png"
-    )
+    return send_from_directory(assets_dir, "favicon.ico", mimetype="image/x-icon")
 
 
 @server.route("/assets/<path:filename>")

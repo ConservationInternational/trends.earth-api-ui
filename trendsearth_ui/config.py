@@ -22,7 +22,7 @@ STATUS_REFRESH_INTERVAL = (
 # UI Constants
 LOGO_URL = "/assets/trends_earth_logo.png"
 LOGO_HEIGHT = "60px"
-LOGO_SQUARE_URL = "/assets/trends_earth_logo_square_200x200.png"
+LOGO_SQUARE_URL = "/assets/trends_earth_logo_square_192x192.png"
 
 # Map Configuration - Tile providers with English labels
 MAP_TILE_PROVIDERS = {
