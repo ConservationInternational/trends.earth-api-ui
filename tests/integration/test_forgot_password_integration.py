@@ -102,11 +102,11 @@ class TestForgotPasswordIntegration:
                 assert result_success[1] == result_not_found[1] == "success"
                 assert result_success[2] == result_not_found[2] is True
                 assert result_success[3] == result_not_found[3] == ""
-                assert result_success[4] == result_not_found[4] is True  # Modal stays open
-                assert result_success[5] == result_not_found[5] is True  # Send button disabled
+                assert result_success[4] == result_not_found[4] == {"display": "none"}  # Form hidden
+                assert result_success[5] == result_not_found[5] == {"display": "none"}  # Initial buttons hidden
                 assert (
-                    result_success[6] == result_not_found[6] == "Close"
-                )  # Cancel button changed to Close
+                    result_success[6] == result_not_found[6] == {"display": "block"}
+                )  # Success buttons shown
 
     def test_forgot_password_endpoint_url_construction(self):
         """Test that the correct API endpoint is constructed."""

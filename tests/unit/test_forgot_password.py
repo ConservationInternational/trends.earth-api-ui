@@ -94,13 +94,13 @@ class TestForgotPasswordCallbacks:
         # Test opening modal
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             self.mock_context.triggered = [{"prop_id": "forgot-password-link.n_clicks"}]
-            result = toggle_callback["func"](1, 0, False)
+            result = toggle_callback["func"](1, 0, 0, False)
             assert result is True
 
         # Test closing modal
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             self.mock_context.triggered = [{"prop_id": "cancel-forgot-password.n_clicks"}]
-            result = toggle_callback["func"](1, 1, True)
+            result = toggle_callback["func"](1, 1, 0, True)
             assert result is False
 
     @patch("trendsearth_ui.callbacks.auth.requests.post")
@@ -128,9 +128,9 @@ class TestForgotPasswordCallbacks:
         assert result[1] == "success"
         assert result[2] is True
         assert result[3] == ""  # Email field should be cleared
-        assert result[4] is True  # Modal should stay open so user can see the message
-        assert result[5] is True  # Send button should be disabled after success
-        assert result[6] == "Close"  # Cancel button should change to "Close"
+        assert result[4] == {"display": "none"}  # Form should be hidden
+        assert result[5] == {"display": "none"}  # Initial buttons should be hidden
+        assert result[6] == {"display": "block"}  # Success buttons should be shown
 
     @patch("trendsearth_ui.callbacks.auth.requests.post")
     def test_send_password_reset_callback_user_not_found(self, mock_post):
@@ -157,9 +157,9 @@ class TestForgotPasswordCallbacks:
         assert result[1] == "success"
         assert result[2] is True
         assert result[3] == ""  # Email field should be cleared
-        assert result[4] is True  # Modal should stay open so user can see the message
-        assert result[5] is True  # Send button should be disabled after success
-        assert result[6] == "Close"  # Cancel button should change to "Close"
+        assert result[4] == {"display": "none"}  # Form should be hidden
+        assert result[5] == {"display": "none"}  # Initial buttons should be hidden
+        assert result[6] == {"display": "block"}  # Success buttons should be shown
 
     def test_send_password_reset_callback_invalid_email(self):
         """Test the send password reset callback with invalid email."""
@@ -317,9 +317,11 @@ class TestForgotPasswordCallbacks:
 
         # Test modal opening (should reset state)
         result = reset_callback["func"](True)
-        assert result[0] is False  # Send button enabled
-        assert result[1] == "Cancel"  # Cancel button text
-        assert result[2] is False  # Alert closed
+        assert result[0] == {"display": "block"}  # Form shown
+        assert result[1] == {"display": "block"}  # Initial buttons shown
+        assert result[2] == {"display": "none"}  # Success buttons hidden
+        assert result[3] is False  # Alert closed
+        assert result[4] == ""  # Email field cleared
 
         # Test modal closing (should not update)
         from dash import no_update
@@ -328,3 +330,5 @@ class TestForgotPasswordCallbacks:
         assert result[0] is no_update
         assert result[1] is no_update
         assert result[2] is no_update
+        assert result[3] is no_update
+        assert result[4] is no_update
