@@ -264,7 +264,8 @@ def register_callbacks(app):
                         "memory_available_percent": latest_status.get(
                             "memory_available_percent", 0
                         ),
-                        "memory_used_percent": 100 - latest_status.get("memory_available_percent", 0),
+                        "memory_used_percent": 100
+                        - latest_status.get("memory_available_percent", 0),
                         "cpu_usage_percent": latest_status.get("cpu_usage_percent", 0),
                     }
 
@@ -272,16 +273,10 @@ def register_callbacks(app):
                     health_status = "Healthy"
                     health_color = "success"
 
-                    if (
-                        metrics["cpu_usage_percent"] > 90
-                        or metrics["memory_used_percent"] > 90
-                    ):
+                    if metrics["cpu_usage_percent"] > 90 or metrics["memory_used_percent"] > 90:
                         health_status = "Critical"
                         health_color = "danger"
-                    elif (
-                        metrics["cpu_usage_percent"] > 75
-                        or metrics["memory_used_percent"] > 75
-                    ):
+                    elif metrics["cpu_usage_percent"] > 75 or metrics["memory_used_percent"] > 75:
                         health_status = "Warning"
                         health_color = "warning"
 

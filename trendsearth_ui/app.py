@@ -27,13 +27,16 @@ app = dash.Dash(
     assets_folder=assets_dir,
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
-        {"name": "description", "content": "Trends.Earth API Dashboard - Manage scripts, users, and executions"},
+        {
+            "name": "description",
+            "content": "Trends.Earth API Dashboard - Manage scripts, users, and executions",
+        },
     ],
 )
 app.title = APP_TITLE
 
 # Add favicon links to the HTML head
-app.index_string = '''
+app.index_string = """
 <!DOCTYPE html>
 <html>
     <head>
@@ -54,7 +57,7 @@ app.index_string = '''
         </footer>
     </body>
 </html>
-'''
+"""
 
 
 @server.route("/api-ui-health")
@@ -64,7 +67,9 @@ def health_check():
 
 @server.route("/favicon.ico")
 def favicon():
-    return send_from_directory(assets_dir, "trends_earth_logo_square_200x200.png", mimetype="image/png")
+    return send_from_directory(
+        assets_dir, "trends_earth_logo_square_200x200.png", mimetype="image/png"
+    )
 
 
 @server.route("/assets/<path:filename>")

@@ -239,13 +239,44 @@ def create_map_from_geojsons(geojsons, exec_id):
                 else:
                     print(f"DEBUG: Skipping non-dict geojson_dict: {type(geojson_dict)}")
 
-            # Calculate center from all coordinates
+            # Calculate center and zoom from all coordinates
             if all_coordinates:
                 center_lat = sum(coord[0] for coord in all_coordinates) / len(all_coordinates)
                 center_lon = sum(coord[1] for coord in all_coordinates) / len(all_coordinates)
                 center = [center_lat, center_lon]
-                zoom = 6  # Better overview for viewing polygons
+
+                # Calculate bounds to determine appropriate zoom level
+                min_lat = min(coord[0] for coord in all_coordinates)
+                max_lat = max(coord[0] for coord in all_coordinates)
+                min_lon = min(coord[1] for coord in all_coordinates)
+                max_lon = max(coord[1] for coord in all_coordinates)
+
+                # Calculate the longest edge
+                lat_span = max_lat - min_lat
+                lon_span = max_lon - min_lon
+                max_span = max(lat_span, lon_span)
+
+                # Calculate zoom so longest edge takes up half the map width
+                # Improved zoom calculation for better regional viewing
+                if max_span > 0:
+                    # Use a more balanced approach for different area sizes
+                    import math
+
+                    # Define zoom levels based on span ranges
+                    if max_span >= 10:  # Very large areas (countries/continents)
+                        zoom = max(1, min(4, int(5 - math.log10(max_span))))
+                    elif max_span >= 1:  # Large regions (states/provinces)
+                        zoom = max(4, min(8, int(8 - math.log10(max_span * 10))))
+                    elif max_span >= 0.1:  # Medium areas (cities/counties)
+                        zoom = max(8, min(12, int(12 - math.log10(max_span * 100))))
+                    else:  # Small areas (neighborhoods/buildings)
+                        zoom = max(12, min(18, int(16 - math.log10(max_span * 1000))))
+                else:
+                    zoom = 8
+
                 print(f"DEBUG: Calculated center from {len(all_coordinates)} coordinates: {center}")
+                print(f"DEBUG: Bounds: lat({min_lat}, {max_lat}), lon({min_lon}, {max_lon})")
+                print(f"DEBUG: Max span: {max_span}, calculated zoom: {zoom}")
             else:
                 print("DEBUG: No coordinates found, using default center")
 
@@ -357,8 +388,41 @@ def create_map_from_geojsons(geojsons, exec_id):
                     center_lat = sum(coord[0] for coord in coords) / len(coords)
                     center_lon = sum(coord[1] for coord in coords) / len(coords)
                     center = [center_lat, center_lon]
-                    zoom = 5  # Lower zoom for better overview
+
+                    # Calculate bounds to determine appropriate zoom level
+                    min_lat = min(coord[0] for coord in coords)
+                    max_lat = max(coord[0] for coord in coords)
+                    min_lon = min(coord[1] for coord in coords)
+                    max_lon = max(coord[1] for coord in coords)
+
+                    # Calculate the longest edge
+                    lat_span = max_lat - min_lat
+                    lon_span = max_lon - min_lon
+                    max_span = max(lat_span, lon_span)
+
+                    # Calculate zoom so longest edge takes up half the map width
+                    # Improved zoom calculation for better regional viewing
+                    if max_span > 0:
+                        # Use a more balanced approach for different area sizes
+                        import math
+
+                        # Define zoom levels based on span ranges
+                        if max_span >= 10:  # Very large areas (countries/continents)
+                            zoom = max(1, min(4, int(5 - math.log10(max_span))))
+                        elif max_span >= 1:  # Large regions (states/provinces)
+                            zoom = max(4, min(8, int(8 - math.log10(max_span * 10))))
+                        elif max_span >= 0.1:  # Medium areas (cities/counties)
+                            zoom = max(8, min(12, int(12 - math.log10(max_span * 100))))
+                        else:  # Small areas (neighborhoods/buildings)
+                            zoom = max(12, min(18, int(16 - math.log10(max_span * 1000))))
+                    else:
+                        zoom = 8
+
                     print(f"DEBUG: Calculated single center: {center}, zoom: {zoom}")
+                    print(
+                        f"DEBUG: Single bounds: lat({min_lat}, {max_lat}), lon({min_lon}, {max_lon})"
+                    )
+                    print(f"DEBUG: Single max span: {max_span}")
         else:
             print(f"DEBUG: No valid geojsons provided or unsupported type: {type(geojsons)}")
 
@@ -514,12 +578,8 @@ def create_minimap(center, zoom, map_id, geojsons=None):
             *aoi_markers,
         ],
         style={
-            "width": "150px",
-            "height": "100px",
-            "position": "absolute",
-            "top": "10px",
-            "right": "10px",
-            "zIndex": 1000,
+            "width": "225px",  # 1.5x larger than original 150px
+            "height": "150px",  # 1.5x larger than original 100px
             "border": "2px solid #333",
             "borderRadius": "4px",
             "boxShadow": "0 2px 8px rgba(0,0,0,0.3)",
@@ -530,6 +590,43 @@ def create_minimap(center, zoom, map_id, geojsons=None):
         zoomControl=False,
         dragging=False,
     )
+
+    # Create close button
+    close_button = html.Button(
+        "×",
+        id={"type": "minimap-close", "index": map_id},
+        style={
+            "position": "absolute",
+            "top": "2px",
+            "right": "2px",
+            "width": "20px",
+            "height": "20px",
+            "background": "rgba(255, 255, 255, 0.9)",
+            "border": "1px solid #ccc",
+            "borderRadius": "3px",
+            "fontSize": "14px",
+            "fontWeight": "bold",
+            "cursor": "pointer",
+            "display": "flex",
+            "alignItems": "center",
+            "justifyContent": "center",
+            "padding": "0",
+            "lineHeight": "1",
+            "zIndex": "1001",
+            "color": "#666",
+        },
+        title="Close minimap",
+        n_clicks=0,
+    )
+
+    # Return minimap container with close button
     return html.Div(
-        children=[minimap], style={"position": "relative", "width": "0px", "height": "0px"}
+        children=[minimap, close_button],
+        id={"type": "minimap-container", "index": map_id},
+        style={
+            "position": "absolute",
+            "top": "10px",
+            "right": "10px",
+            "zIndex": 1000,
+        },
     )

@@ -1,6 +1,6 @@
 """Map modal callbacks."""
 
-from dash import Input, Output, State, html, no_update
+from dash import MATCH, Input, Output, State, html, no_update
 import requests
 
 from ..config import API_BASE
@@ -208,6 +208,18 @@ def register_callbacks(app):
         """Close the map modal."""
         if n_clicks:
             return False
+        return no_update
+
+    # Add server-side callback for closing minimaps using pattern matching
+    @app.callback(
+        Output({"type": "minimap-container", "index": MATCH}, "style"),
+        Input({"type": "minimap-close", "index": MATCH}, "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def close_minimap(n_clicks):
+        """Close the minimap by hiding the container."""
+        if n_clicks and n_clicks > 0:
+            return {"display": "none"}
         return no_update
 
 
