@@ -530,10 +530,10 @@ def status_tab_content(is_admin):
                                                 [
                                                     html.A(
                                                         "Last Hour",
-                                                        href="#",
                                                         className="nav-link active",
                                                         id="status-tab-hour",
                                                         **{"data-tab": "hour"},
+                                                        style={"cursor": "pointer"},
                                                     )
                                                 ],
                                                 className="nav-item",
@@ -542,10 +542,10 @@ def status_tab_content(is_admin):
                                                 [
                                                     html.A(
                                                         "Last 24 Hours",
-                                                        href="#",
                                                         className="nav-link",
                                                         id="status-tab-day",
                                                         **{"data-tab": "day"},
+                                                        style={"cursor": "pointer"},
                                                     )
                                                 ],
                                                 className="nav-item",
@@ -554,10 +554,10 @@ def status_tab_content(is_admin):
                                                 [
                                                     html.A(
                                                         "Last Week",
-                                                        href="#",
                                                         className="nav-link",
                                                         id="status-tab-week",
                                                         **{"data-tab": "week"},
+                                                        style={"cursor": "pointer"},
                                                     )
                                                 ],
                                                 className="nav-item",
@@ -566,10 +566,10 @@ def status_tab_content(is_admin):
                                                 [
                                                     html.A(
                                                         "Last Month",
-                                                        href="#",
                                                         className="nav-link",
                                                         id="status-tab-month",
                                                         **{"data-tab": "month"},
+                                                        style={"cursor": "pointer"},
                                                     )
                                                 ],
                                                 className="nav-item",
