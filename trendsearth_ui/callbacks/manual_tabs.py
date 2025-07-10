@@ -12,10 +12,67 @@ def register_callbacks(app):
             Input("role-store", "data"),
             Input("token-store", "data"),
         ],
-        prevent_initial_call=True,
+        prevent_initial_call=False,  # Allow initial call to show admin tab on dashboard load
     )
     def toggle_admin_tab_visibility(role, token):
         """Show/hide admin tab based on user role."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token:
+            return {"display": "none"}
+
+        if role == "ADMIN":
+            return {"display": "block"}
+        else:
+            return {"display": "none"}
+
+    @app.callback(
+        Output("users-tab-li", "style"),
+        [
+            Input("role-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,  # Allow initial call to show users tab on dashboard load
+    )
+    def toggle_users_tab_visibility(role, token):
+        """Show/hide users tab based on user role."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token:
+            return {"display": "none"}
+
+        if role == "ADMIN":
+            return {"display": "block"}
+        else:
+            return {"display": "none"}
+
+    @app.callback(
+        Output("status-tab-li", "style"),
+        [
+            Input("role-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,  # Allow initial call to show status tab on dashboard load
+    )
+    def toggle_status_tab_visibility(role, token):
+        """Show/hide status tab based on user role."""
+        # Guard: Skip if not logged in (prevents execution after logout)
+        if not token:
+            return {"display": "none"}
+
+        if role == "ADMIN":
+            return {"display": "block"}
+        else:
+            return {"display": "none"}
+
+    @app.callback(
+        Output("scripts-tab-li", "style"),
+        [
+            Input("role-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,  # Allow initial call to show scripts tab on dashboard load
+    )
+    def toggle_scripts_tab_visibility(role, token):
+        """Show/hide scripts tab based on user role."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
             return {"display": "none"}

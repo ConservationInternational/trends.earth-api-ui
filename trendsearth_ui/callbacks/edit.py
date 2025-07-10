@@ -493,9 +493,11 @@ def register_callbacks(app):
         password_data = {"new_password": new_password}
 
         try:
-            print(f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}")
-            
-            resp = requests.post(
+            print(
+                f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}"
+            )
+
+            resp = requests.patch(
                 f"{API_BASE}/user/{user_id}/change-password",
                 json=password_data,
                 headers=headers,

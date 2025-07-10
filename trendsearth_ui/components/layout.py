@@ -71,6 +71,81 @@ def login_layout():
         [
             # Hidden store to prevent callback errors
             dcc.Store(id="active-tab-store", data=None, storage_type="memory"),
+            # Forgot password modal
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Forgot Password"),
+                        close_button=True,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            # Form section (visible initially)
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Enter your email address and we'll send you instructions to reset your password."
+                                    ),
+                                    dbc.Label("Email Address"),
+                                    dbc.Input(
+                                        id="forgot-password-email",
+                                        type="email",
+                                        placeholder="Enter your email address",
+                                        className="mb-3",
+                                    ),
+                                ],
+                                id="forgot-password-form",
+                                style={"display": "block"},
+                            ),
+                            # Alert section (for messages)
+                            dbc.Alert(
+                                id="forgot-password-alert",
+                                is_open=False,
+                                dismissable=False,  # Don't allow dismissing
+                                duration=None,  # Don't auto-dismiss
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            # Initial buttons (visible initially)
+                            html.Div(
+                                [
+                                    dbc.Button(
+                                        "Cancel",
+                                        id="cancel-forgot-password",
+                                        color="secondary",
+                                        className="me-2",
+                                    ),
+                                    dbc.Button(
+                                        "Send Reset Instructions",
+                                        id="send-reset-btn",
+                                        color="primary",
+                                    ),
+                                ],
+                                id="forgot-password-initial-buttons",
+                                style={"display": "block"},
+                            ),
+                            # Success button (hidden initially)
+                            html.Div(
+                                [
+                                    dbc.Button(
+                                        "OK",
+                                        id="forgot-password-ok-btn",
+                                        color="primary",
+                                    ),
+                                ],
+                                id="forgot-password-success-buttons",
+                                style={"display": "none"},
+                            ),
+                        ]
+                    ),
+                ],
+                id="forgot-password-modal",
+                is_open=False,
+                centered=True,
+                backdrop="static",
+            ),
             dbc.Row(
                 [
                     dbc.Col(
@@ -145,6 +220,21 @@ def login_layout():
                                                     className="mt-2",
                                                     n_clicks=0,
                                                     style={"width": "100%"},
+                                                ),
+                                                html.Div(
+                                                    [
+                                                        html.A(
+                                                            "Forgot your password?",
+                                                            id="forgot-password-link",
+                                                            href="#",
+                                                            className="text-primary",
+                                                            style={
+                                                                "textDecoration": "none",
+                                                                "fontSize": "14px",
+                                                            },
+                                                        ),
+                                                    ],
+                                                    className="text-center mt-3",
                                                 ),
                                                 html.Div(
                                                     id="login-feedback",
@@ -266,6 +356,10 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
+                                id="users-tab-li",
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for admin
                             ),
                             html.Li(
                                 [
@@ -277,6 +371,10 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
+                                id="scripts-tab-li",
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for admin
                             ),
                             html.Li(
                                 [
@@ -301,6 +399,10 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
+                                id="status-tab-li",
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for admin
                             ),
                             html.Li(
                                 [

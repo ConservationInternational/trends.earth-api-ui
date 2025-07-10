@@ -218,13 +218,13 @@ class TestProfileIntegration:
             callback_map = str(getattr(dash_app, "_callback_map", {}))
         assert "profile" in callback_map.lower() or "update-profile" in callback_map
 
-    @patch("trendsearth_ui.callbacks.profile.requests.put")
-    def test_password_change_callback_exists(self, mock_put, dash_app):
+    @patch("trendsearth_ui.callbacks.profile.requests.patch")
+    def test_password_change_callback_exists(self, mock_patch, dash_app):
         """Test that password change callback is registered."""
         # Mock successful password change response
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_put.return_value = mock_response  # Check that password change callback is registered
+        mock_patch.return_value = mock_response  # Check that password change callback is registered
         # Use callback_map instead of _callback_map for newer Dash versions
         try:
             callback_map = str(dash_app.callback_map)

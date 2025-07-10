@@ -87,6 +87,24 @@ class TestLoginLayout:
         assert "login-btn" in layout_str
         assert "login-alert" in layout_str
 
+        # Should contain forgot password components
+        assert "forgot-password-link" in layout_str
+        assert "forgot-password-modal" in layout_str
+        assert "forgot-password-email" in layout_str
+        assert "send-reset-btn" in layout_str
+        assert "cancel-forgot-password" in layout_str
+        assert "forgot-password-alert" in layout_str
+
+    def test_login_layout_forgot_password_text(self):
+        """Test that login layout contains forgot password text and functionality."""
+        layout = login_layout()
+        layout_str = str(layout)
+
+        # Should contain forgot password text
+        assert "Forgot your password?" in layout_str
+        assert "Send Reset Instructions" in layout_str
+        assert "Enter your email address" in layout_str
+
     def test_login_layout_logo(self):
         """Test that login layout contains logo."""
         layout = login_layout()

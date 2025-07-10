@@ -115,12 +115,12 @@ def register_callbacks(app):
             )
 
         headers = {"Authorization": f"Bearer {token}"}
-        password_data = {"current_password": current_password, "new_password": new_password}
+        password_data = {"old_password": current_password, "new_password": new_password}
 
         try:
             print(f"🔐 Attempting password change for user: {user_data.get('email', 'unknown')}")
-            
-            resp = requests.post(
+
+            resp = requests.patch(
                 f"{API_BASE}/user/me/change-password",
                 json=password_data,
                 headers=headers,

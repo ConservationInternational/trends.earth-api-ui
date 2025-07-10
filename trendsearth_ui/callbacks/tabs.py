@@ -56,15 +56,42 @@ def register_callbacks(app):
         if tab == "profile":
             return profile_tab_content(user_data or {})
         elif tab == "scripts":
-            return scripts_tab_content()
+            # Only allow admin users to access scripts tab
+            if role == "ADMIN":
+                return scripts_tab_content()
+            else:
+                return html.Div(
+                    [
+                        html.H4("Access Denied"),
+                        html.P("Administrator privileges required to access script management."),
+                    ]
+                )
         elif tab == "executions":
             return executions_tab_content()
         elif tab == "users":
-            return users_tab_content()
+            # Only allow admin users to access users tab
+            if role == "ADMIN":
+                return users_tab_content()
+            else:
+                return html.Div(
+                    [
+                        html.H4("Access Denied"),
+                        html.P("Administrator privileges required to access user management."),
+                    ]
+                )
         elif tab == "admin":
             return admin_tab_content(role == "ADMIN")
         elif tab == "status":
-            return status_tab_content(role == "ADMIN")
+            # Only allow admin users to access status tab
+            if role == "ADMIN":
+                return status_tab_content(role == "ADMIN")
+            else:
+                return html.Div(
+                    [
+                        html.H4("Access Denied"),
+                        html.P("Administrator privileges required to access system status."),
+                    ]
+                )
         return html.Div("Unknown tab.")
 
     # Remove the now-unnecessary update_profile_tab_on_user_change callback

@@ -8,7 +8,7 @@ from ..utils import parse_date
 
 
 def format_duration(duration_seconds):
-    """Format duration from seconds to Hours:Seconds format."""
+    """Format duration from seconds to Hours:Minutes:Seconds format."""
     if duration_seconds is None or duration_seconds == 0:
         return "-"
 
@@ -18,11 +18,10 @@ def format_duration(duration_seconds):
 
         hours = duration_seconds // 3600
         remaining_seconds = duration_seconds % 3600
+        minutes = remaining_seconds // 60
+        seconds = remaining_seconds % 60
 
-        if hours > 0:
-            return f"{hours}:{remaining_seconds:02d}"
-        else:
-            return f"0:{remaining_seconds:02d}"
+        return f"{hours}:{minutes:02d}:{seconds:02d}"
     except (ValueError, TypeError):
         return "-"
 
@@ -168,7 +167,7 @@ def register_callbacks(app):
                 row["logs"] = "Show Logs"
                 row["map"] = "Show Map"
 
-                # Format duration in Hours:Seconds format
+                # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
                     row["duration"] = format_duration(row.get("duration"))
 
@@ -245,7 +244,7 @@ def register_callbacks(app):
             row["logs"] = "Show Logs"
             row["map"] = "Show Map"
 
-            # Format duration in Hours:Seconds format
+            # Format duration in Hours:Minutes:Seconds format
             if "duration" in row:
                 row["duration"] = format_duration(row.get("duration"))
 
@@ -316,7 +315,7 @@ def register_callbacks(app):
                 row["logs"] = "Show Logs"
                 row["map"] = "Show Map"
 
-                # Format duration in Hours:Seconds format
+                # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
                     row["duration"] = format_duration(row.get("duration"))
 

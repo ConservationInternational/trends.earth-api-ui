@@ -2,13 +2,14 @@
 
 from datetime import datetime, timedelta
 import json
+import re
 
 from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
 import requests
 
 from ..components import dashboard_layout, login_layout
-from ..config import AUTH_URL
+from ..config import API_BASE, AUTH_URL
 from ..utils import (
     create_auth_cookie_data,
     extract_auth_from_cookie,
@@ -254,3 +255,191 @@ def register_callbacks(app):
             ],
             className="d-flex align-items-center",
         )
+
+    @app.callback(
+        Output("forgot-password-modal", "is_open"),
+        [
+            Input("forgot-password-link", "n_clicks"),
+            Input("cancel-forgot-password", "n_clicks"),
+            Input("forgot-password-ok-btn", "n_clicks"),
+        ],
+        [State("forgot-password-modal", "is_open")],
+        prevent_initial_call=True,
+    )
+    def toggle_forgot_password_modal(_forgot_link_clicks, _cancel_clicks, _ok_clicks, is_open):
+        """Toggle the forgot password modal."""
+        ctx = callback_context
+        if not ctx.triggered:
+            return is_open
+
+        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+        if trigger_id == "forgot-password-link":
+            return True
+        elif trigger_id in ["cancel-forgot-password", "forgot-password-ok-btn"]:
+            return False
+
+        return is_open
+
+    @app.callback(
+        [
+            Output("forgot-password-alert", "children"),
+            Output("forgot-password-alert", "color"),
+            Output("forgot-password-alert", "is_open"),
+            Output("forgot-password-email", "value"),
+            Output("forgot-password-form", "style"),
+            Output("forgot-password-initial-buttons", "style"),
+            Output("forgot-password-success-buttons", "style"),
+        ],
+        [Input("send-reset-btn", "n_clicks")],
+        [State("forgot-password-email", "value")],
+        prevent_initial_call=True,
+    )
+    def send_password_reset(n_clicks, email):
+        """Send password reset instructions to user's email."""
+        if not n_clicks:
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+        if not email:
+            return (
+                "Please enter your email address.",
+                "warning",
+                True,
+                no_update,
+                {"display": "block"},  # Keep form visible
+                {"display": "block"},  # Keep initial buttons visible
+                {"display": "none"},  # Keep success buttons hidden
+            )
+
+        # Validate email format
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_pattern, email):
+            return (
+                "Please enter a valid email address.",
+                "warning",
+                True,
+                no_update,
+                {"display": "block"},  # Keep form visible
+                {"display": "block"},  # Keep initial buttons visible
+                {"display": "none"},  # Keep success buttons hidden
+            )
+
+        try:
+            print(f"🔐 Attempting password recovery for email: {email}")
+
+            # Use the email as the user_id parameter in the endpoint
+            resp = requests.post(
+                f"{API_BASE}/user/{email}/recover-password",
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                print(f"✅ Password recovery email sent to: {email}")
+                return (
+                    f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
+                    "success",
+                    True,
+                    "",  # Clear the email field
+                    {"display": "none"},  # Hide form
+                    {"display": "none"},  # Hide initial buttons
+                    {"display": "block"},  # Show success buttons (OK button)
+                )
+            elif resp.status_code == 404:
+                print(f"❌ User not found with email: {email}")
+                # Return the same message as success to prevent email enumeration
+                return (
+                    f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
+                    "success",
+                    True,
+                    "",  # Clear the email field
+                    {"display": "none"},  # Hide form
+                    {"display": "none"},  # Hide initial buttons
+                    {"display": "block"},  # Show success buttons (OK button)
+                )
+            else:
+                print(f"❌ Password recovery failed with status: {resp.status_code}")
+                error_msg = "Failed to send password recovery email."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("msg", error_msg)
+                    print(f"🔍 API error response: {error_data}")
+                except Exception:
+                    pass
+                return (
+                    f"{error_msg} Please try again later.",
+                    "danger",
+                    True,
+                    no_update,
+                    {"display": "block"},  # Keep form visible
+                    {"display": "block"},  # Keep initial buttons visible
+                    {"display": "none"},  # Keep success buttons hidden
+                )
+
+        except requests.exceptions.Timeout:
+            print("⏰ Password recovery request timed out")
+            return (
+                "Request timed out. Please try again later.",
+                "danger",
+                True,
+                no_update,
+                {"display": "block"},  # Keep form visible
+                {"display": "block"},  # Keep initial buttons visible
+                {"display": "none"},  # Keep success buttons hidden
+            )
+        except requests.exceptions.ConnectionError:
+            print("❌ Connection error during password recovery")
+            return (
+                "Cannot connect to the server. Please check your internet connection and try again.",
+                "danger",
+                True,
+                no_update,
+                {"display": "block"},  # Keep form visible
+                {"display": "block"},  # Keep initial buttons visible
+                {"display": "none"},  # Keep success buttons hidden
+            )
+        except Exception as e:
+            print(f"💥 Error during password recovery: {str(e)}")
+            return (
+                f"An error occurred: {str(e)}. Please try again later.",
+                "danger",
+                True,
+                no_update,
+                {"display": "block"},  # Keep form visible
+                {"display": "block"},  # Keep initial buttons visible
+                {"display": "none"},  # Keep success buttons hidden
+            )
+
+    @app.callback(
+        [
+            Output("forgot-password-form", "style", allow_duplicate=True),
+            Output("forgot-password-initial-buttons", "style", allow_duplicate=True),
+            Output("forgot-password-success-buttons", "style", allow_duplicate=True),
+            Output("forgot-password-alert", "is_open", allow_duplicate=True),
+            Output("forgot-password-email", "value", allow_duplicate=True),
+        ],
+        [Input("forgot-password-modal", "is_open")],
+        prevent_initial_call=True,
+    )
+    def reset_modal_state(is_open):
+        """Reset modal state when it opens."""
+        if is_open:
+            # Reset to initial state when modal opens
+            return (
+                {"display": "block"},  # Show form
+                {"display": "block"},  # Show initial buttons
+                {"display": "none"},  # Hide success buttons
+                False,  # Hide alert
+                "",  # Clear email field
+            )
+        return no_update, no_update, no_update, no_update, no_update
+
+    @app.callback(
+        Output("forgot-password-modal", "is_open", allow_duplicate=True),
+        [Input("forgot-password-ok-btn", "n_clicks")],
+        prevent_initial_call=True,
+    )
+    def close_modal_on_ok(n_clicks):
+        """Close the modal when OK button is clicked."""
+        if n_clicks:
+            return False
+        return no_update
