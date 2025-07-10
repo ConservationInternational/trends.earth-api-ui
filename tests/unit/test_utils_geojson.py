@@ -263,7 +263,17 @@ class TestCreateMinimap:
         assert result is not None
         assert hasattr(result, "children")
         if hasattr(result, "children") and result.children:
-            assert len(result.children) == 1  # Should contain one minimap element
+            assert len(result.children) == 2  # Should contain minimap and close button
+
+            # First child should be the map
+            minimap_element = result.children[0]
+            assert hasattr(
+                minimap_element, "children"
+            )  # Map should have children (TileLayer, etc.)
+
+            # Second child should be the close button
+            close_button = result.children[1]
+            assert hasattr(close_button, "id")  # Close button should have an ID
 
     def test_create_minimap_low_zoom(self):
         """Test minimap with low zoom level."""

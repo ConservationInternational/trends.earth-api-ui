@@ -256,18 +256,122 @@ def register_callbacks(app):
                         "executions_active": latest_status.get("executions_active", 0),
                         "executions_ready": latest_status.get("executions_ready", 0),
                         "executions_running": latest_status.get("executions_running", 0),
-                        "executions_finished": latest_status.get("executions_finished", 0),
-                        "executions_failed": latest_status.get("executions_failed", 0),
                         "executions_count": latest_status.get("executions_count", 0),
                         "users_count": latest_status.get("users_count", 0),
                         "scripts_count": latest_status.get("scripts_count", 0),
                         "memory_available_percent": latest_status.get(
                             "memory_available_percent", 0
                         ),
-                        "memory_used_percent": 100
-                        - latest_status.get("memory_available_percent", 0),
-                        "cpu_usage_percent": latest_status.get("cpu_usage_percent", 0),
+                        # CPU and memory percentages will be calculated as 10-minute averages below
                     }
+
+                    # Calculate 24-hour cumulative totals for finished and failed executions
+                    try:
+                        # Get 24-hour window data for cumulative calculations
+                        now = datetime.now()
+                        start_24h = now - timedelta(hours=24)
+
+                        cumulative_resp = requests.get(
+                            f"{API_BASE}/status",
+                            headers=headers,
+                            params={
+                                "per_page": 144,  # Every 10 minutes for 24 hours
+                                "start_date": start_24h.isoformat(),
+                                "sort": "timestamp",
+                            },
+                            timeout=3,  # Short timeout for this additional request
+                        )
+
+                        executions_finished_24h = 0
+                        executions_failed_24h = 0
+
+                        if cumulative_resp.status_code == 200:
+                            cumulative_data = cumulative_resp.json().get("data", [])
+                            if cumulative_data:
+                                # Calculate true cumulative totals by summing all 2-minute period totals
+                                for entry in cumulative_data:
+                                    # Each entry contains totals for a 2-minute period, so sum them all
+                                    executions_finished_24h += entry.get("executions_finished", 0)
+                                    executions_failed_24h += entry.get("executions_failed", 0)
+
+                        # If cumulative calculation fails, fall back to current values
+                        if cumulative_resp.status_code != 200 or not cumulative_data:
+                            executions_finished_24h = latest_status.get("executions_finished", 0)
+                            executions_failed_24h = latest_status.get("executions_failed", 0)
+
+                    except Exception:
+                        # Fallback to current status values if cumulative calculation fails
+                        executions_finished_24h = latest_status.get("executions_finished", 0)
+                        executions_failed_24h = latest_status.get("executions_failed", 0)
+
+                    # Add 24-hour totals to metrics
+                    metrics["executions_finished_24h"] = executions_finished_24h
+                    metrics["executions_failed_24h"] = executions_failed_24h
+
+                    # Calculate percentages within each execution group
+                    # Active executions total (for percentage calculations within active box)
+                    active_total = max(
+                        1,
+                        metrics["executions_active"]
+                        + metrics["executions_ready"]
+                        + metrics["executions_running"],
+                    )
+
+                    # Completed executions total (for percentage calculations within completed box)
+                    completed_total = max(
+                        1, metrics["executions_finished_24h"] + metrics["executions_failed_24h"]
+                    )
+
+                    # Calculate 10-minute averages for CPU and memory usage
+                    try:
+                        # Get 10-minute window data for average calculations
+                        now = datetime.now()
+                        start_10m = now - timedelta(minutes=10)
+
+                        avg_resp = requests.get(
+                            f"{API_BASE}/status",
+                            headers=headers,
+                            params={
+                                "per_page": 10,  # Last 10 data points (approximately 10 minutes)
+                                "start_date": start_10m.isoformat(),
+                                "sort": "timestamp",
+                            },
+                            timeout=3,  # Short timeout for this additional request
+                        )
+
+                        cpu_usage_avg = latest_status.get("cpu_usage_percent", 0)
+                        memory_used_avg = 100 - latest_status.get("memory_available_percent", 0)
+
+                        if avg_resp.status_code == 200:
+                            avg_data = avg_resp.json().get("data", [])
+                            if avg_data and len(avg_data) > 1:
+                                # Calculate averages from the 10-minute data
+                                cpu_values = []
+                                memory_values = []
+
+                                for entry in avg_data:
+                                    cpu_val = entry.get("cpu_usage_percent")
+                                    memory_available = entry.get("memory_available_percent")
+
+                                    if cpu_val is not None:
+                                        cpu_values.append(cpu_val)
+                                    if memory_available is not None:
+                                        memory_values.append(100 - memory_available)
+
+                                # Calculate averages if we have valid data
+                                if cpu_values:
+                                    cpu_usage_avg = sum(cpu_values) / len(cpu_values)
+                                if memory_values:
+                                    memory_used_avg = sum(memory_values) / len(memory_values)
+
+                    except Exception:
+                        # Fallback to current status values if average calculation fails
+                        cpu_usage_avg = latest_status.get("cpu_usage_percent", 0)
+                        memory_used_avg = 100 - latest_status.get("memory_available_percent", 0)
+
+                    # Update metrics with averaged values
+                    metrics["cpu_usage_percent"] = cpu_usage_avg
+                    metrics["memory_used_percent"] = memory_used_avg
 
                     # Determine system health based on metrics
                     health_status = "Healthy"
@@ -296,7 +400,7 @@ def register_callbacks(app):
                                     ),
                                     html.Div(
                                         [
-                                            html.H6("CPU Usage", className="mb-2"),
+                                            html.H6("CPU Usage (10-min avg)", className="mb-2"),
                                             html.H4(
                                                 f"{metrics['cpu_usage_percent']:.1f}%",
                                                 className="text-info",
@@ -306,7 +410,7 @@ def register_callbacks(app):
                                     ),
                                     html.Div(
                                         [
-                                            html.H6("Memory Used", className="mb-2"),
+                                            html.H6("Memory Used (10-min avg)", className="mb-2"),
                                             html.H4(
                                                 f"{metrics['memory_used_percent']:.1f}%",
                                                 className="text-info",
@@ -330,80 +434,162 @@ def register_callbacks(app):
                                 [
                                     html.H5(
                                         "Current Execution Status",
-                                        className="text-center mb-3 text-muted",
+                                        className="text-center mb-4 text-muted",
                                     ),
-                                    # Calculate total for percentage calculations
+                                    # Side-by-side execution groups
                                     html.Div(
                                         [
+                                            # Active Executions Group (Left side)
                                             html.Div(
                                                 [
-                                                    html.H6("Active", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["executions_active"]),
-                                                        className="text-primary",
-                                                    ),
-                                                    html.Small(
-                                                        f"{(metrics['executions_active'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
-                                                        className="text-muted",
+                                                    html.Div(
+                                                        [
+                                                            html.H6(
+                                                                "Active Executions",
+                                                                className="text-center mb-3 text-primary fw-bold",
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    html.Div(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Pending",
+                                                                                className="mb-2",
+                                                                            ),
+                                                                            html.H4(
+                                                                                str(
+                                                                                    metrics[
+                                                                                        "executions_active"
+                                                                                    ]
+                                                                                ),
+                                                                                className="text-primary",
+                                                                            ),
+                                                                            html.Small(
+                                                                                f"{(metrics['executions_active'] / active_total * 100):.1f}%",
+                                                                                className="text-muted",
+                                                                            ),
+                                                                        ],
+                                                                        className="col-4 text-center mb-3",
+                                                                    ),
+                                                                    html.Div(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Ready",
+                                                                                className="mb-2",
+                                                                            ),
+                                                                            html.H4(
+                                                                                str(
+                                                                                    metrics[
+                                                                                        "executions_ready"
+                                                                                    ]
+                                                                                ),
+                                                                                className="text-warning",
+                                                                            ),
+                                                                            html.Small(
+                                                                                f"{(metrics['executions_ready'] / active_total * 100):.1f}%",
+                                                                                className="text-muted",
+                                                                            ),
+                                                                        ],
+                                                                        className="col-4 text-center mb-3",
+                                                                    ),
+                                                                    html.Div(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Running",
+                                                                                className="mb-2",
+                                                                            ),
+                                                                            html.H4(
+                                                                                str(
+                                                                                    metrics[
+                                                                                        "executions_running"
+                                                                                    ]
+                                                                                ),
+                                                                                className="text-info",
+                                                                            ),
+                                                                            html.Small(
+                                                                                f"{(metrics['executions_running'] / active_total * 100):.1f}%",
+                                                                                className="text-muted",
+                                                                            ),
+                                                                        ],
+                                                                        className="col-4 text-center mb-3",
+                                                                    ),
+                                                                ],
+                                                                className="row",
+                                                            ),
+                                                        ],
+                                                        className="p-3 rounded",
+                                                        style={"border": "1px solid #dee2e6"},
                                                     ),
                                                 ],
-                                                className="col-md text-center mb-3",
+                                                className="col-md-6 mb-3",
                                             ),
+                                            # Completed Executions Group (Right side)
                                             html.Div(
                                                 [
-                                                    html.H6("Ready", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["executions_ready"]),
-                                                        className="text-warning",
-                                                    ),
-                                                    html.Small(
-                                                        f"{(metrics['executions_ready'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
-                                                        className="text-muted",
+                                                    html.Div(
+                                                        [
+                                                            html.H6(
+                                                                "Completed Executions",
+                                                                className="text-center mb-3 text-secondary fw-bold",
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    html.Div(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Finished",
+                                                                                className="mb-2",
+                                                                            ),
+                                                                            html.H4(
+                                                                                str(
+                                                                                    metrics[
+                                                                                        "executions_finished_24h"
+                                                                                    ]
+                                                                                ),
+                                                                                className="text-success",
+                                                                            ),
+                                                                            html.Small(
+                                                                                f"{(metrics['executions_finished_24h'] / completed_total * 100):.1f}%",
+                                                                                className="text-muted",
+                                                                            ),
+                                                                        ],
+                                                                        className="col-6 text-center mb-3",
+                                                                    ),
+                                                                    html.Div(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Failed",
+                                                                                className="mb-2",
+                                                                            ),
+                                                                            html.H4(
+                                                                                str(
+                                                                                    metrics[
+                                                                                        "executions_failed_24h"
+                                                                                    ]
+                                                                                ),
+                                                                                className="text-danger",
+                                                                            ),
+                                                                            html.Small(
+                                                                                f"{(metrics['executions_failed_24h'] / completed_total * 100):.1f}%",
+                                                                                className="text-muted",
+                                                                            ),
+                                                                        ],
+                                                                        className="col-6 text-center mb-3",
+                                                                    ),
+                                                                ],
+                                                                className="row",
+                                                            ),
+                                                            html.Hr(className="mt-3 mb-2"),
+                                                            html.Small(
+                                                                "24-hour totals",
+                                                                className="text-muted text-center d-block",
+                                                            ),
+                                                        ],
+                                                        className="p-3 rounded",
+                                                        style={"border": "1px solid #dee2e6"},
                                                     ),
                                                 ],
-                                                className="col-md text-center mb-3",
-                                            ),
-                                            html.Div(
-                                                [
-                                                    html.H6("Running", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["executions_running"]),
-                                                        className="text-info",
-                                                    ),
-                                                    html.Small(
-                                                        f"{(metrics['executions_running'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
-                                                        className="text-muted",
-                                                    ),
-                                                ],
-                                                className="col-md text-center mb-3",
-                                            ),
-                                            html.Div(
-                                                [
-                                                    html.H6("Finished", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["executions_finished"]),
-                                                        className="text-success",
-                                                    ),
-                                                    html.Small(
-                                                        f"{(metrics['executions_finished'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
-                                                        className="text-muted",
-                                                    ),
-                                                ],
-                                                className="col-md text-center mb-3",
-                                            ),
-                                            html.Div(
-                                                [
-                                                    html.H6("Failed", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["executions_failed"]),
-                                                        className="text-danger",
-                                                    ),
-                                                    html.Small(
-                                                        f"{(metrics['executions_failed'] / max(1, metrics['executions_active'] + metrics['executions_ready'] + metrics['executions_running'] + metrics['executions_finished'] + metrics['executions_failed']) * 100):.1f}%",
-                                                        className="text-muted",
-                                                    ),
-                                                ],
-                                                className="col-md text-center mb-3",
+                                                className="col-md-6 mb-3",
                                             ),
                                         ],
                                         className="row",
@@ -704,67 +890,66 @@ def register_callbacks(app):
             # Create charts with optimized rendering
             charts = []
 
-            # 1. Execution Status Chart with single y-axis (always show this)
-            execution_fig = go.Figure()
+            # Calculate cumulative totals for finished and failed executions
+            if len(df) > 0:
+                # Since each data point represents totals for a 2-minute period,
+                # calculate cumulative sums by adding all the period totals
+                df = df.sort_values("timestamp")  # Ensure proper ordering
 
-            # Add all execution traces on the same y-axis
-            execution_fig.add_trace(
+                # Calculate running cumulative sums by adding each 2-minute period total
+                df["executions_finished_cumulative"] = df["executions_finished"].cumsum()
+                df["executions_failed_cumulative"] = df["executions_failed"].cumsum()
+            else:
+                # Initialize empty cumulative columns for empty DataFrame
+                df = pd.DataFrame(
+                    {
+                        "timestamp": [],
+                        "executions_finished_cumulative": [],
+                        "executions_failed_cumulative": [],
+                    }
+                )
+
+            # 1. Active Execution Status Chart (Pending, Ready, Running)
+            active_fig = go.Figure()
+
+            # Add active execution traces only
+            active_fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
                     y=df["executions_active"],
-                    name="executions_active",
+                    name="Pending",
                     line={"color": "#17a2b8"},
                     mode="lines",
                 )
             )
 
-            execution_fig.add_trace(
+            active_fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
                     y=df["executions_ready"],
-                    name="executions_ready",
+                    name="Ready",
                     line={"color": "#ffc107"},
                     mode="lines",
                 )
             )
 
-            execution_fig.add_trace(
+            active_fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
                     y=df["executions_running"],
-                    name="executions_running",
+                    name="Running",
                     line={"color": "#28a745"},
                     mode="lines",
                 )
             )
 
-            execution_fig.add_trace(
-                go.Scatter(
-                    x=df["timestamp"],
-                    y=df["executions_finished"],
-                    name="executions_finished",
-                    line={"color": "#6c757d"},
-                    mode="lines",
-                )
-            )
-
-            execution_fig.add_trace(
-                go.Scatter(
-                    x=df["timestamp"],
-                    y=df["executions_failed"],
-                    name="executions_failed",
-                    line={"color": "#dc3545"},
-                    mode="lines",
-                )
-            )
-
-            # Update layout
-            execution_fig.update_layout(
-                title=f"Execution Counts - {title_suffix}",
+            # Update layout for active executions
+            active_fig.update_layout(
+                title=f"Active Execution Counts - {title_suffix}",
                 height=300,
                 showlegend=True,
                 xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
-                yaxis_title="Execution Count",
+                yaxis_title="Active Execution Count",
                 hovermode="x unified",
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
@@ -773,9 +958,9 @@ def register_callbacks(app):
             charts.append(
                 html.Div(
                     [
-                        html.H6("Execution Status Over Time"),
+                        html.H6("Active Executions Over Time"),
                         dcc.Graph(
-                            figure=execution_fig,
+                            figure=active_fig,
                             config={"displayModeBar": False, "responsive": True},
                         ),
                     ],
@@ -783,7 +968,58 @@ def register_callbacks(app):
                 )
             )
 
-            # 2. System Resource Usage Chart (only if data exists)
+            # 2. Completed Execution Cumulative Chart (Finished and Failed)
+            completed_fig = go.Figure()
+
+            completed_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_finished_cumulative"],
+                    name="Finished (Cumulative)",
+                    line={"color": "#28a745"},
+                    mode="lines",
+                    fill=None,
+                )
+            )
+
+            completed_fig.add_trace(
+                go.Scatter(
+                    x=df["timestamp"],
+                    y=df["executions_failed_cumulative"],
+                    name="Failed (Cumulative)",
+                    line={"color": "#dc3545"},
+                    mode="lines",
+                    fill=None,
+                )
+            )
+
+            # Update layout for completed executions
+            completed_fig.update_layout(
+                title=f"Completed Executions (Cumulative) - {title_suffix}",
+                height=300,
+                showlegend=True,
+                xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
+                yaxis_title="Cumulative Count",
+                hovermode="x unified",
+                margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
+                yaxis={"rangemode": "tozero"},  # Start y-axis from zero
+            )
+
+            charts.append(
+                html.Div(
+                    [
+                        html.H6("Completed Executions Over Time (Cumulative)"),
+                        dcc.Graph(
+                            figure=completed_fig,
+                            config={"displayModeBar": False, "responsive": True},
+                        ),
+                    ],
+                    className="mb-3",
+                )
+            )
+
+            # 3. System Resource Usage Chart (only if data exists)
             if df["cpu_usage_percent"].max() > 0 or df["memory_used_percent"].max() > 0:
                 resource_fig = px.line(
                     df,
@@ -829,7 +1065,7 @@ def register_callbacks(app):
                     )
                 )
 
-            # 3. Users and Scripts Chart with dual y-axes (only for longer time periods to reduce clutter)
+            # 4. Users and Scripts Chart with dual y-axes (only for longer time periods to reduce clutter)
             if time_period in ["week", "month"] and (
                 df["users_count"].max() > 0 or df["scripts_count"].max() > 0
             ):
