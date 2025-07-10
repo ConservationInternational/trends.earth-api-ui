@@ -529,20 +529,8 @@ def status_tab_content(is_admin):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "Last Hour",
-                                                        className="nav-link active",
-                                                        id="status-tab-hour",
-                                                        **{"data-tab": "hour"},
-                                                        style={"cursor": "pointer"},
-                                                    )
-                                                ],
-                                                className="nav-item",
-                                            ),
-                                            html.Li(
-                                                [
-                                                    html.A(
                                                         "Last 24 Hours",
-                                                        className="nav-link",
+                                                        className="nav-link active",
                                                         id="status-tab-day",
                                                         **{"data-tab": "day"},
                                                         style={"cursor": "pointer"},
@@ -579,7 +567,7 @@ def status_tab_content(is_admin):
                                         id="status-time-tabs",
                                     ),
                                     # Hidden store to track active tab
-                                    dcc.Store(id="status-time-tabs-store", data="hour"),
+                                    dcc.Store(id="status-time-tabs-store", data="day"),
                                 ],
                                 className="mb-3",
                             ),

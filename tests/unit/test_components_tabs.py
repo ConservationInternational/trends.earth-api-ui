@@ -214,13 +214,11 @@ class TestStatusTabContent:
         assert "nav-link" in content_str
 
         # Should contain all time period tabs
-        assert "Last Hour" in content_str
         assert "Last 24 Hours" in content_str
         assert "Last Week" in content_str
         assert "Last Month" in content_str
 
         # Should contain all tab IDs
-        assert "status-tab-hour" in content_str
         assert "status-tab-day" in content_str
         assert "status-tab-week" in content_str
         assert "status-tab-month" in content_str

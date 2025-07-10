@@ -30,7 +30,6 @@ class TestStatusTabStructure:
         content_str = str(content)
 
         # Should contain all time period tabs
-        assert "Last Hour" in content_str
         assert "Last 24 Hours" in content_str
         assert "Last Week" in content_str
         assert "Last Month" in content_str
@@ -41,7 +40,6 @@ class TestStatusTabStructure:
         content_str = str(content)
 
         # Should contain all tab IDs
-        assert "status-tab-hour" in content_str
         assert "status-tab-day" in content_str
         assert "status-tab-week" in content_str
         assert "status-tab-month" in content_str
@@ -59,7 +57,7 @@ class TestStatusTabStructure:
         content = status_tab_content(is_admin=True)
         content_str = str(content)
 
-        # Should have "Last Hour" as the default active tab
+        # Should have "Last 24 Hours" as the default active tab
         # Look for the active class on the first tab
         assert "nav-link active" in content_str
 
@@ -123,10 +121,10 @@ class TestStatusTabCallbacks:
         tab_switching_callback = None
         for call in callback_calls:
             outputs = call[0][0] if call[0] else []
-            if isinstance(outputs, list) and len(outputs) >= 5:
+            if isinstance(outputs, list) and len(outputs) >= 4:
                 # Check if this looks like our tab switching callback
                 output_strs = [str(output) for output in outputs]
-                if any("status-tab-hour" in s for s in output_strs):
+                if any("status-tab-day" in s for s in output_strs):
                     tab_switching_callback = call
                     break
 
@@ -156,28 +154,22 @@ class TestStatusTabCallbacks:
         tab_switch_func = callback_functions.get("switch_status_time_tabs")
         assert tab_switch_func is not None, "Tab switching function should exist"
 
-        # Test hour tab click
-        mock_ctx.triggered = [{"prop_id": "status-tab-hour.n_clicks"}]
-        result = tab_switch_func(1, 0, 0, 0)
-        expected = ("nav-link active", "nav-link", "nav-link", "nav-link", "hour")
-        assert result == expected
-
         # Test day tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-day.n_clicks"}]
-        result = tab_switch_func(0, 1, 0, 0)
-        expected = ("nav-link", "nav-link active", "nav-link", "nav-link", "day")
+        result = tab_switch_func(1, 0, 0)
+        expected = ("nav-link active", "nav-link", "nav-link", "day")
         assert result == expected
 
         # Test week tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-week.n_clicks"}]
-        result = tab_switch_func(0, 0, 1, 0)
-        expected = ("nav-link", "nav-link", "nav-link active", "nav-link", "week")
+        result = tab_switch_func(0, 1, 0)
+        expected = ("nav-link", "nav-link active", "nav-link", "week")
         assert result == expected
 
         # Test month tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-month.n_clicks"}]
-        result = tab_switch_func(0, 0, 0, 1)
-        expected = ("nav-link", "nav-link", "nav-link", "nav-link active", "month")
+        result = tab_switch_func(0, 0, 1)
+        expected = ("nav-link", "nav-link", "nav-link active", "month")
         assert result == expected
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
@@ -320,8 +312,8 @@ class TestStatusTabsErrorHandling:
 
         # Test with no trigger
         mock_ctx.triggered = []
-        result = tab_switch_func(0, 0, 0, 0)
-        expected = ("nav-link active", "nav-link", "nav-link", "nav-link", "hour")
+        result = tab_switch_func(0, 0, 0)
+        expected = ("nav-link active", "nav-link", "nav-link", "day")
         assert result == expected
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
@@ -467,9 +459,8 @@ class TestStatusTabsErrorHandling:
                 # Should contain total executions count
                 assert "Total Executions" in result_str
 
-                # Should still contain users and scripts
+                # Should contain users
                 assert "Users" in result_str
-                assert "Scripts" in result_str
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):

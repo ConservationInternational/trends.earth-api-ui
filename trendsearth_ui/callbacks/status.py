@@ -1,17 +1,21 @@
 """Status dashboard callbacks."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import requests
 
 from ..config import API_BASE
-from ..utils.timezone_utils import format_local_time, get_chart_axis_label, get_safe_timezone
+from ..utils.timezone_utils import (
+    convert_utc_to_local,
+    format_local_time,
+    get_chart_axis_label,
+    get_safe_timezone,
+)
 
 # Simple in-memory cache for status data with TTL
 _status_cache = {
@@ -258,7 +262,6 @@ def register_callbacks(app):
                         "executions_running": latest_status.get("executions_running", 0),
                         "executions_count": latest_status.get("executions_count", 0),
                         "users_count": latest_status.get("users_count", 0),
-                        "scripts_count": latest_status.get("scripts_count", 0),
                         "memory_available_percent": latest_status.get(
                             "memory_available_percent", 0
                         ),
@@ -267,16 +270,16 @@ def register_callbacks(app):
 
                     # Calculate 24-hour cumulative totals for finished and failed executions
                     try:
-                        # Get 24-hour window data for cumulative calculations
-                        now = datetime.now()
-                        start_24h = now - timedelta(hours=24)
+                        # Get 24-hour window data for cumulative calculations using UTC time
+                        now_utc = datetime.now(timezone.utc)
+                        start_24h_utc = now_utc - timedelta(hours=24)
 
                         cumulative_resp = requests.get(
                             f"{API_BASE}/status",
                             headers=headers,
                             params={
-                                "per_page": 144,  # Every 10 minutes for 24 hours
-                                "start_date": start_24h.isoformat(),
+                                "per_page": 720,  # Every 2 minutes for 24 hours (24*60/2 = 720)
+                                "start_date": start_24h_utc.isoformat(),
                                 "sort": "timestamp",
                             },
                             timeout=3,  # Short timeout for this additional request
@@ -324,16 +327,16 @@ def register_callbacks(app):
 
                     # Calculate 10-minute averages for CPU and memory usage
                     try:
-                        # Get 10-minute window data for average calculations
-                        now = datetime.now()
-                        start_10m = now - timedelta(minutes=10)
+                        # Get 10-minute window data for average calculations using UTC time
+                        now_utc_avg = datetime.now(timezone.utc)
+                        start_10m_utc = now_utc_avg - timedelta(minutes=10)
 
                         avg_resp = requests.get(
                             f"{API_BASE}/status",
                             headers=headers,
                             params={
                                 "per_page": 10,  # Last 10 data points (approximately 10 minutes)
-                                "start_date": start_10m.isoformat(),
+                                "start_date": start_10m_utc.isoformat(),
                                 "sort": "timestamp",
                             },
                             timeout=3,  # Short timeout for this additional request
@@ -529,7 +532,7 @@ def register_callbacks(app):
                                                     html.Div(
                                                         [
                                                             html.H6(
-                                                                "Completed Executions",
+                                                                "Completed Executions (past 24 hours)",
                                                                 className="text-center mb-3 text-secondary fw-bold",
                                                             ),
                                                             html.Div(
@@ -579,11 +582,6 @@ def register_callbacks(app):
                                                                 ],
                                                                 className="row",
                                                             ),
-                                                            html.Hr(className="mt-3 mb-2"),
-                                                            html.Small(
-                                                                "24-hour totals",
-                                                                className="text-muted text-center d-block",
-                                                            ),
                                                         ],
                                                         className="p-3 rounded",
                                                         style={"border": "1px solid #dee2e6"},
@@ -614,7 +612,7 @@ def register_callbacks(app):
                                                         className="text-info",
                                                     ),
                                                 ],
-                                                className="col-md-4 text-center",
+                                                className="col-md-6 text-center",
                                             ),
                                             html.Div(
                                                 [
@@ -624,17 +622,7 @@ def register_callbacks(app):
                                                         className="text-secondary",
                                                     ),
                                                 ],
-                                                className="col-md-4 text-center",
-                                            ),
-                                            html.Div(
-                                                [
-                                                    html.H6("Scripts", className="mb-2"),
-                                                    html.H4(
-                                                        str(metrics["scripts_count"]),
-                                                        className="text-secondary",
-                                                    ),
-                                                ],
-                                                className="col-md-4 text-center",
+                                                className="col-md-6 text-center",
                                             ),
                                         ],
                                         className="row",
@@ -740,27 +728,24 @@ def register_callbacks(app):
         headers = {"Authorization": f"Bearer {token}"}
 
         # Calculate time range based on selected period with optimized data points
-        now = datetime.now()
-        if time_period == "hour":
-            start_time = now - timedelta(hours=1)
-            title_suffix = "Last Hour"
-            per_page = 30  # Reduced for faster loading
-        elif time_period == "day":
-            start_time = now - timedelta(days=1)
+        # Use UTC time for API requests to ensure consistent time range calculations
+        now_utc = datetime.now(timezone.utc)
+        if time_period == "day":
+            start_time_utc = now_utc - timedelta(days=1)
             title_suffix = "Last 24 Hours"
-            per_page = 72  # Every 20 minutes for 24 hours
+            per_page = 720  # Every 2 minutes for 24 hours (24*60/2 = 720)
         elif time_period == "week":
-            start_time = now - timedelta(weeks=1)
+            start_time_utc = now_utc - timedelta(weeks=1)
             title_suffix = "Last Week"
-            per_page = 168  # Every hour for a week
+            per_page = 5040  # Every 2 minutes for a week (7*24*60/2 = 5040)
         elif time_period == "month":
-            start_time = now - timedelta(days=30)
+            start_time_utc = now_utc - timedelta(days=30)
             title_suffix = "Last Month"
-            per_page = 360  # Every 2 hours for a month
+            per_page = 21600  # Every 2 minutes for 30 days (30*24*60/2 = 21600)
         else:
-            start_time = now - timedelta(hours=1)
-            title_suffix = "Last Hour"
-            per_page = 30
+            start_time_utc = now_utc - timedelta(days=1)
+            title_suffix = "Last 24 Hours"
+            per_page = 720
 
         try:
             # Check cache first (unless it's a manual refresh)
@@ -769,7 +754,7 @@ def register_callbacks(app):
                 ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
             )
 
-            start_time_rounded = start_time.replace(minute=0, second=0, microsecond=0)
+            start_time_rounded = start_time_utc.replace(minute=0, second=0, microsecond=0)
             cache_key = f"status_chart_{time_period}_{start_time_rounded.isoformat()}"
 
             if not is_manual_refresh:
@@ -799,7 +784,7 @@ def register_callbacks(app):
                 return error_result
 
             # Fetch status data from the status endpoint with optimized parameters
-            start_time_str = start_time.isoformat()
+            start_time_str = start_time_utc.isoformat()
             params = {
                 "per_page": per_page,
                 "start_date": start_time_str,
@@ -832,6 +817,10 @@ def register_callbacks(app):
             result = resp.json()
             status_logs = result.get("data", [])
 
+            # Calculate display time range for chart axis
+            start_time_local, _ = convert_utc_to_local(start_time_utc, safe_timezone)
+            end_time_local, _ = convert_utc_to_local(now_utc, safe_timezone)
+
             if not status_logs:
                 return html.Div(
                     [
@@ -853,11 +842,15 @@ def register_callbacks(app):
                 timestamp = log.get("timestamp")
                 if timestamp:
                     try:
-                        # Keep timestamps as UTC datetime objects for plotting
+                        # Parse UTC timestamp and convert to user's local timezone for chart display
                         dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+
+                        # Convert to user's local timezone for chart display
+                        dt_local, _ = convert_utc_to_local(dt_utc, safe_timezone)
+
                         df_data.append(
                             {
-                                "timestamp": dt_utc,
+                                "timestamp": dt_local,  # Use local time for chart display
                                 "executions_active": log.get("executions_active", 0),
                                 "executions_ready": log.get("executions_ready", 0),
                                 "executions_running": log.get("executions_running", 0),
@@ -865,7 +858,6 @@ def register_callbacks(app):
                                 "executions_failed": log.get("executions_failed", 0),
                                 "executions_count": log.get("executions_count", 0),
                                 "users_count": log.get("users_count", 0),
-                                "scripts_count": log.get("scripts_count", 0),
                                 "memory_available_percent": log.get("memory_available_percent", 0),
                                 "memory_used_percent": 100 - log.get("memory_available_percent", 0),
                                 "cpu_usage_percent": log.get("cpu_usage_percent", 0),
@@ -887,16 +879,26 @@ def register_callbacks(app):
 
             df = pd.DataFrame(df_data)
 
+            # Determine appropriate x-axis tick format based on time period
+            if time_period == "day":
+                tick_format = "%H:%M\n%m/%d"  # Show time and date for 24 hours
+            elif time_period in ["week", "month"]:
+                tick_format = "%m/%d"  # Show only date for week and month
+            else:
+                tick_format = "%H:%M\n%m/%d"  # Default fallback
+
             # Create charts with optimized rendering
             charts = []
 
             # Calculate cumulative totals for finished and failed executions
             if len(df) > 0:
-                # Since each data point represents totals for a 2-minute period,
-                # calculate cumulative sums by adding all the period totals
-                df = df.sort_values("timestamp")  # Ensure proper ordering
+                # Ensure proper chronological ordering for cumulative calculation
+                df = df.sort_values("timestamp")
 
-                # Calculate running cumulative sums by adding each 2-minute period total
+                # The API logs contain counts of executions that finished/failed during each 2-minute period.
+                # To show cumulative totals over the selected time range, we sum up all the period counts.
+                # This gives us the total number of executions that completed (finished or failed)
+                # from the start of the time period up to each point in time.
                 df["executions_finished_cumulative"] = df["executions_finished"].cumsum()
                 df["executions_failed_cumulative"] = df["executions_failed"].cumsum()
             else:
@@ -945,14 +947,17 @@ def register_callbacks(app):
 
             # Update layout for active executions
             active_fig.update_layout(
-                title=f"Active Execution Counts - {title_suffix}",
                 height=300,
                 showlegend=True,
                 xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
                 yaxis_title="Active Execution Count",
                 hovermode="x unified",
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
+                xaxis={
+                    "type": "date",
+                    "tickformat": tick_format,
+                    "range": [start_time_local, end_time_local],  # Ensure full time range is shown
+                },
             )
 
             charts.append(
@@ -979,6 +984,10 @@ def register_callbacks(app):
                     line={"color": "#28a745"},
                     mode="lines",
                     fill=None,
+                    hovertemplate="<b>Finished</b><br>"
+                    + "Time: %{x}<br>"
+                    + "Cumulative Count: %{y}<br>"
+                    + "<extra></extra>",
                 )
             )
 
@@ -990,19 +999,26 @@ def register_callbacks(app):
                     line={"color": "#dc3545"},
                     mode="lines",
                     fill=None,
+                    hovertemplate="<b>Failed</b><br>"
+                    + "Time: %{x}<br>"
+                    + "Cumulative Count: %{y}<br>"
+                    + "<extra></extra>",
                 )
             )
 
             # Update layout for completed executions
             completed_fig.update_layout(
-                title=f"Completed Executions (Cumulative) - {title_suffix}",
                 height=300,
                 showlegend=True,
                 xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
                 yaxis_title="Cumulative Count",
                 hovermode="x unified",
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
+                xaxis={
+                    "type": "date",
+                    "tickformat": tick_format,
+                    "range": [start_time_local, end_time_local],  # Ensure full time range is shown
+                },
                 yaxis={"rangemode": "tozero"},  # Start y-axis from zero
             )
 
@@ -1025,7 +1041,6 @@ def register_callbacks(app):
                     df,
                     x="timestamp",
                     y=["cpu_usage_percent", "memory_used_percent"],
-                    title=f"System Resource Usage - {title_suffix}",
                     labels={"timestamp": "Time", "value": "Percentage", "variable": "Resource"},
                 )
 
@@ -1037,7 +1052,14 @@ def register_callbacks(app):
                     hovermode="x unified",
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
                     yaxis={"range": [0, 100]},
-                    xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
+                    xaxis={
+                        "type": "date",
+                        "tickformat": tick_format,
+                        "range": [
+                            start_time_local,
+                            end_time_local,
+                        ],  # Ensure full time range is shown
+                    },
                 )
 
                 # Color mapping for resources
@@ -1065,63 +1087,46 @@ def register_callbacks(app):
                     )
                 )
 
-            # 4. Users and Scripts Chart with dual y-axes (only for longer time periods to reduce clutter)
-            if time_period in ["week", "month"] and (
-                df["users_count"].max() > 0 or df["scripts_count"].max() > 0
-            ):
-                # Create subplot with secondary y-axis for Users and Scripts
-                entities_fig = make_subplots(specs=[[{"secondary_y": True}]])
+            # 4. Users Chart
+            if time_period in ["day", "week", "month"] and df["users_count"].max() > 0:
+                # Create simple line chart for Users
+                users_fig = go.Figure()
 
-                # Add users count on left y-axis
-                entities_fig.add_trace(
+                # Add users count trace
+                users_fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
                         y=df["users_count"],
-                        name="users_count",
+                        name="Users",
                         line={"color": "#28a745"},
                         mode="lines",
-                    ),
-                    secondary_y=False,
+                    )
                 )
-
-                # Add scripts count on right y-axis
-                entities_fig.add_trace(
-                    go.Scatter(
-                        x=df["timestamp"],
-                        y=df["scripts_count"],
-                        name="scripts_count",
-                        line={"color": "#fd7e14"},
-                        mode="lines",
-                    ),
-                    secondary_y=True,
-                )
-
-                # Set y-axes titles
-                entities_fig.update_yaxes(title_text="Users Count", secondary_y=False)
-                entities_fig.update_yaxes(title_text="Scripts Count", secondary_y=True)
 
                 # Update layout
-                entities_fig.update_layout(
-                    title=f"Users and Scripts Count - {title_suffix}",
+                users_fig.update_layout(
                     height=300,
                     showlegend=True,
                     xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
+                    yaxis_title="Users Count",
                     hovermode="x unified",
-                    margin={
-                        "l": 40,
-                        "r": 60,
-                        "t": 40,
-                        "b": 40,
-                    },  # More right margin for secondary y-axis
-                    xaxis={"type": "date", "tickformat": "%H:%M\n%m/%d"},
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    xaxis={
+                        "type": "date",
+                        "tickformat": tick_format,
+                        "range": [
+                            start_time_local,
+                            end_time_local,
+                        ],  # Ensure full time range is shown
+                    },
                 )
 
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Users and Scripts Count"),
+                            html.H6("Users Count"),
                             dcc.Graph(
-                                figure=entities_fig,
+                                figure=users_fig,
                                 config={"displayModeBar": False, "responsive": True},
                             ),
                         ],
@@ -1203,38 +1208,35 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("status-tab-hour", "className"),
             Output("status-tab-day", "className"),
             Output("status-tab-week", "className"),
             Output("status-tab-month", "className"),
             Output("status-time-tabs-store", "data"),
         ],
         [
-            Input("status-tab-hour", "n_clicks"),
             Input("status-tab-day", "n_clicks"),
             Input("status-tab-week", "n_clicks"),
             Input("status-tab-month", "n_clicks"),
         ],
         prevent_initial_call=True,
     )
-    def switch_status_time_tabs(_hour_clicks, _day_clicks, _week_clicks, _month_clicks):
+    def switch_status_time_tabs(_day_clicks, _week_clicks, _month_clicks):
         """Handle tab switching for status time period tabs."""
         ctx = callback_context
         if not ctx.triggered:
-            return "nav-link active", "nav-link", "nav-link", "nav-link", "hour"
+            return "nav-link active", "nav-link", "nav-link", "day"
 
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Define tab mapping
         tab_map = {
-            "status-tab-hour": ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link")),
-            "status-tab-day": ("day", ("nav-link", "nav-link active", "nav-link", "nav-link")),
-            "status-tab-week": ("week", ("nav-link", "nav-link", "nav-link active", "nav-link")),
-            "status-tab-month": ("month", ("nav-link", "nav-link", "nav-link", "nav-link active")),
+            "status-tab-day": ("day", ("nav-link active", "nav-link", "nav-link")),
+            "status-tab-week": ("week", ("nav-link", "nav-link active", "nav-link")),
+            "status-tab-month": ("month", ("nav-link", "nav-link", "nav-link active")),
         }
 
         active_tab, classes = tab_map.get(
-            trigger_id, ("hour", ("nav-link active", "nav-link", "nav-link", "nav-link"))
+            trigger_id, ("day", ("nav-link active", "nav-link", "nav-link"))
         )
 
-        return classes[0], classes[1], classes[2], classes[3], active_tab
+        return classes[0], classes[1], classes[2], active_tab
