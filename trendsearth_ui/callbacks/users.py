@@ -61,9 +61,9 @@ def register_callbacks(app):
             if sort_sql:
                 params["sort"] = ",".join(sort_sql)
 
-            # Build SQL-style filter string (Admin only)
+            # Build SQL-style filter string (Admin/SuperAdmin only)
             filter_sql = []
-            if role == "ADMIN":  # Only admins can use filters
+            if role in ["ADMIN", "SUPERADMIN"]:  # Only admins and superadmins can use filters
                 for field, config in filter_model.items():
                     if config.get("filterType") == "text":
                         filter_type = config.get("type", "contains")
@@ -114,14 +114,14 @@ def register_callbacks(app):
             total_rows = result.get("total", 0)
             print(f"DEBUG: Received {len(users)} users, total: {total_rows}")
 
-            # Check if user is admin to add edit buttons
-            is_admin = role == "ADMIN"
+            # Check if user is superadmin to add edit buttons - only superadmins can edit users
+            is_superadmin = role == "SUPERADMIN"
 
             tabledata = []
             for user_row in users:
                 row = user_row.copy()
-                # Only add edit button for admin users
-                if is_admin:
+                # Only add edit button for superadmin users
+                if is_superadmin:
                     row["edit"] = "Edit"
                 for date_col in ["created_at", "updated_at"]:
                     if date_col in row:
@@ -189,14 +189,14 @@ def register_callbacks(app):
             users = result.get("data", [])
             total_rows = result.get("total", 0)
 
-            # Check if user is admin to add edit buttons
-            is_admin = role == "ADMIN"
+            # Check if user is superadmin to add edit buttons - only superadmins can edit users
+            is_superadmin = role == "SUPERADMIN"
 
             tabledata = []
             for user_row in users:
                 row = user_row.copy()
-                # Only add edit button for admin users
-                if is_admin:
+                # Only add edit button for superadmin users
+                if is_superadmin:
                     row["edit"] = "Edit"
                 for date_col in ["created_at", "updated_at"]:
                     if date_col in row:

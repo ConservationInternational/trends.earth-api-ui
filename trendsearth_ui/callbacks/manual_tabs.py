@@ -20,7 +20,7 @@ def register_callbacks(app):
         if not token:
             return {"display": "none"}
 
-        if role == "ADMIN":
+        if role in ["ADMIN", "SUPERADMIN"]:
             return {"display": "block"}
         else:
             return {"display": "none"}
@@ -39,7 +39,7 @@ def register_callbacks(app):
         if not token:
             return {"display": "none"}
 
-        if role == "ADMIN":
+        if role == "SUPERADMIN":
             return {"display": "block"}
         else:
             return {"display": "none"}
@@ -58,7 +58,7 @@ def register_callbacks(app):
         if not token:
             return {"display": "none"}
 
-        if role == "ADMIN":
+        if role in ["ADMIN", "SUPERADMIN"]:
             return {"display": "block"}
         else:
             return {"display": "none"}
@@ -77,7 +77,7 @@ def register_callbacks(app):
         if not token:
             return {"display": "none"}
 
-        if role == "ADMIN":
+        if role in ["ADMIN", "SUPERADMIN"]:
             return {"display": "block"}
         else:
             return {"display": "none"}

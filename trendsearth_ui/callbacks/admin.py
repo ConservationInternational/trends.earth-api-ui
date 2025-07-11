@@ -72,10 +72,10 @@ def register_callbacks(app):
 
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        # Check admin permissions
-        if user_role != "ADMIN":
+        # Check superadmin permissions for user creation
+        if user_role != "SUPERADMIN":
             return (
-                "Access denied. Admin privileges required.",
+                "Access denied. Super administrator privileges required.",
                 "danger",
                 True,
                 no_update,
@@ -351,10 +351,10 @@ def register_callbacks(app):
 
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        # Check admin permissions
-        if user_role != "ADMIN":
+        # Check admin permissions for script management
+        if user_role not in ["ADMIN", "SUPERADMIN"]:
             return (
-                "Access denied. Admin privileges required.",
+                "Access denied. Administrator privileges required.",
                 "danger",
                 True,
                 no_update,

@@ -32,7 +32,7 @@ def register_callbacks(app):
     def open_edit_user_modal(cell_clicked, role, token, table_state):
         """Open edit user modal from user table."""
         print(f"🔧 USER EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
-        if not cell_clicked or role != "ADMIN":
+        if not cell_clicked or role != "SUPERADMIN":
             return False, None, "", "", "", "", "USER", "", ""
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "", "", "USER", "", ""
@@ -111,7 +111,7 @@ def register_callbacks(app):
     )
     def open_edit_script_modal(cell_clicked, role, token, table_state):
         print(f"🔧 SCRIPT EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
-        if not cell_clicked or role != "ADMIN":
+        if not cell_clicked or role not in ["ADMIN", "SUPERADMIN"]:
             return False, None, "", "", "DRAFT"
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "DRAFT"
@@ -304,7 +304,7 @@ def register_callbacks(app):
     )
     def open_delete_user_modal(delete_clicks, user_data, role):
         """Open delete user confirmation modal."""
-        if not delete_clicks or role != "ADMIN" or not user_data:
+        if not delete_clicks or role != "SUPERADMIN" or not user_data:
             return False, "", "", None
 
         return (
@@ -342,7 +342,7 @@ def register_callbacks(app):
     )
     def confirm_delete_user(confirm_clicks, user_data, token, role, current_refresh_clicks):
         """Confirm and execute user deletion."""
-        if not confirm_clicks or role != "ADMIN" or not user_data or not token:
+        if not confirm_clicks or role != "SUPERADMIN" or not user_data or not token:
             return no_update, no_update, no_update
 
         user_id = user_data.get("id")
@@ -383,7 +383,7 @@ def register_callbacks(app):
     )
     def open_delete_script_modal(n_clicks, script_data, role):
         """Open delete script confirmation modal."""
-        if not n_clicks or role != "ADMIN" or not script_data:
+        if not n_clicks or role not in ["ADMIN", "SUPERADMIN"] or not script_data:
             return False, None, ""
 
         script_name = script_data.get("name", "Unknown Script")
@@ -417,7 +417,7 @@ def register_callbacks(app):
     )
     def delete_script(n_clicks, script_data, token, role, current_refresh_clicks):
         """Delete script after confirmation."""
-        if not n_clicks or role != "ADMIN" or not script_data or not token:
+        if not n_clicks or role not in ["ADMIN", "SUPERADMIN"] or not script_data or not token:
             return no_update, no_update, no_update
 
         script_id = script_data.get("id")

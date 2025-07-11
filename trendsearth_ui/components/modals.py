@@ -159,6 +159,7 @@ def edit_user_modal():
                                                 options=[
                                                     {"label": "User", "value": "USER"},
                                                     {"label": "Admin", "value": "ADMIN"},
+                                                    {"label": "Super Admin", "value": "SUPERADMIN"},
                                                 ],
                                                 value="USER",
                                             ),

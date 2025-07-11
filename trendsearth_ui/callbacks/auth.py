@@ -242,8 +242,8 @@ def register_callbacks(app):
         display_name = user_name if user_name else user_email
 
         # Add role badge
-        role_color = "primary" if role == "ADMIN" else "secondary"
-        role_text = role.title() if role else "User"
+        role_color = "primary" if role in ["ADMIN", "SUPERADMIN"] else "secondary"
+        role_text = "Super Admin" if role == "SUPERADMIN" else (role.title() if role else "User")
 
         return html.Div(
             [

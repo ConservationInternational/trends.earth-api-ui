@@ -47,8 +47,11 @@ def register_callbacks(app):
             params = {
                 "page": page,
                 "per_page": page_size,
-                "include": "user_name",
             }
+
+            # Add admin-only fields if user is admin or superadmin
+            if role in ["ADMIN", "SUPERADMIN"]:
+                params["include"] = "user_name"
 
             # Build SQL-style sort string
             sort_sql = []
@@ -115,7 +118,7 @@ def register_callbacks(app):
             print(f"DEBUG: Received {len(scripts)} scripts, total: {total_rows}")
 
             # Check if user is admin to add edit buttons
-            is_admin = role == "ADMIN"
+            is_admin = role in ["ADMIN", "SUPERADMIN"]
 
             tabledata = []
             for script_row in scripts:
@@ -172,8 +175,11 @@ def register_callbacks(app):
             params = {
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
-                "include": "user_name",
             }
+
+            # Add admin-only fields if user is admin or superadmin
+            if role in ["ADMIN", "SUPERADMIN"]:
+                params["include"] = "user_name"
 
             # Preserve existing sort and filter settings if available
             if table_state:
@@ -192,7 +198,7 @@ def register_callbacks(app):
             total_rows = result.get("total", 0)
 
             # Check if user is admin to add edit buttons
-            is_admin = role == "ADMIN"
+            is_admin = role in ["ADMIN", "SUPERADMIN"]
 
             tabledata = []
             for script_row in scripts:

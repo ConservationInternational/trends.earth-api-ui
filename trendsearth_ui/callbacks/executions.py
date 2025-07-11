@@ -38,11 +38,12 @@ def register_callbacks(app):
         Input("executions-table", "getRowsRequest"),
         [
             State("token-store", "data"),
+            State("role-store", "data"),
             State("user-timezone-store", "data"),
         ],
         prevent_initial_call=False,
     )
-    def get_execution_rows(request, token, user_timezone):
+    def get_execution_rows(request, token, role, user_timezone):
         """Get execution data for ag-grid with infinite row model."""
         try:
             if not token:
@@ -63,8 +64,12 @@ def register_callbacks(app):
                 "page": page,
                 "per_page": page_size,
                 "exclude": "params,results",
-                "include": "user_name,script_name,user_email,user_id,duration",
+                "include": "script_name,user_id,duration",
             }
+
+            # Add admin-only fields if user is admin or superadmin
+            if role in ["ADMIN", "SUPERADMIN"]:
+                params["include"] += ",user_name,user_email"
 
             # Build SQL-style sort string
             sort_sql = []
@@ -203,12 +208,13 @@ def register_callbacks(app):
         Input("refresh-executions-btn", "n_clicks"),
         [
             State("token-store", "data"),
+            State("role-store", "data"),
             State("executions-table-state", "data"),
             State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_executions_table(n_clicks, token, table_state, user_timezone):
+    def refresh_executions_table(n_clicks, token, role, table_state, user_timezone):
         """Manually refresh the executions table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0, 0
@@ -221,8 +227,12 @@ def register_callbacks(app):
             "page": 1,
             "per_page": DEFAULT_PAGE_SIZE,
             "exclude": "params,results",
-            "include": "script_name,user_name,user_email,user_id,duration",
+            "include": "script_name,user_id,duration",
         }
+
+        # Add admin-only fields if user is admin or superadmin
+        if role in ["ADMIN", "SUPERADMIN"]:
+            params["include"] += ",user_name,user_email"
 
         # Preserve existing sort and filter settings if available
         if table_state:
@@ -270,13 +280,16 @@ def register_callbacks(app):
         Input("executions-auto-refresh-interval", "n_intervals"),
         [
             State("token-store", "data"),
+            State("role-store", "data"),
             State("active-tab-store", "data"),
             State("executions-table-state", "data"),  # Preserve existing table state
             State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def auto_refresh_executions_table(_n_intervals, token, active_tab, table_state, user_timezone):
+    def auto_refresh_executions_table(
+        _n_intervals, token, role, active_tab, table_state, user_timezone
+    ):
         """Auto-refresh the executions table with preserved sorting/filtering state."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
@@ -293,8 +306,12 @@ def register_callbacks(app):
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
                 "exclude": "params,results",
-                "include": "script_name,user_name,user_email,user_id,duration",
+                "include": "script_name,user_id,duration",
             }
+
+            # Add admin-only fields if user is admin or superadmin
+            if role in ["ADMIN", "SUPERADMIN"]:
+                params["include"] += ",user_name,user_email"
 
             # Preserve existing sort and filter settings if available
             if table_state:

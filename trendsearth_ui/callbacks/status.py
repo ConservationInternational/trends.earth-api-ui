@@ -186,7 +186,7 @@ def register_callbacks(app):
     ):
         """Update the status summary from the status endpoint with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
-        if not token or role != "ADMIN":
+        if not token or role not in ["ADMIN", "SUPERADMIN"]:
             return no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
@@ -596,7 +596,8 @@ def register_callbacks(app):
                             html.Div(
                                 [
                                     html.H5(
-                                        "Summary Totals (all time)", className="text-center mb-3 text-muted"
+                                        "Summary Totals (all time)",
+                                        className="text-center mb-3 text-muted",
                                     ),
                                     html.Div(
                                         [
@@ -711,7 +712,7 @@ def register_callbacks(app):
     ):
         """Update the status charts based on selected time period with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
-        if not token or role != "ADMIN":
+        if not token or role not in ["ADMIN", "SUPERADMIN"]:
             return no_update
 
         # Only update when status tab is active to avoid unnecessary API calls

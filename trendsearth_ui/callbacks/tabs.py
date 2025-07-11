@@ -57,7 +57,7 @@ def register_callbacks(app):
             return profile_tab_content(user_data or {})
         elif tab == "scripts":
             # Only allow admin users to access scripts tab
-            if role == "ADMIN":
+            if role in ["ADMIN", "SUPERADMIN"]:
                 return scripts_tab_content()
             else:
                 return html.Div(
@@ -70,7 +70,7 @@ def register_callbacks(app):
             return executions_tab_content()
         elif tab == "users":
             # Only allow admin users to access users tab
-            if role == "ADMIN":
+            if role in ["ADMIN", "SUPERADMIN"]:
                 return users_tab_content()
             else:
                 return html.Div(
@@ -80,11 +80,11 @@ def register_callbacks(app):
                     ]
                 )
         elif tab == "admin":
-            return admin_tab_content(role == "ADMIN")
+            return admin_tab_content(role, role in ["ADMIN", "SUPERADMIN"])
         elif tab == "status":
             # Only allow admin users to access status tab
-            if role == "ADMIN":
-                return status_tab_content(role == "ADMIN")
+            if role in ["ADMIN", "SUPERADMIN"]:
+                return status_tab_content(role in ["ADMIN", "SUPERADMIN"])
             else:
                 return html.Div(
                     [

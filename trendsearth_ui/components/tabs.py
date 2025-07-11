@@ -609,7 +609,7 @@ def status_tab_content(is_admin):
     )
 
 
-def admin_tab_content(is_admin):
+def admin_tab_content(role, is_admin):
     """Create the admin tab content with forms for creating users and uploading scripts."""
     if not is_admin:
         return html.Div(
@@ -639,168 +639,186 @@ def admin_tab_content(is_admin):
                     )
                 ]
             ),
-            # Create New User Section
-            dbc.Card(
+            # Create New User Section (SUPERADMIN only)
+            *(
                 [
-                    dbc.CardHeader(
-                        html.H4(
-                            [
-                                html.I(className="fas fa-user-plus me-2"),
-                                "Create New User",
-                            ]
-                        )
-                    ),
-                    dbc.CardBody(
+                    dbc.Card(
                         [
-                            dbc.Form(
+                            dbc.CardHeader(
+                                html.H4(
+                                    [
+                                        html.I(className="fas fa-user-plus me-2"),
+                                        "Create New User",
+                                    ]
+                                )
+                            ),
+                            dbc.CardBody(
                                 [
-                                    dbc.Row(
+                                    dbc.Form(
                                         [
-                                            dbc.Col(
+                                            dbc.Row(
                                                 [
-                                                    dbc.Label("Name *"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-name",
-                                                        type="text",
-                                                        placeholder="Enter full name",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Email *"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-email",
-                                                        type="email",
-                                                        placeholder="Enter email address",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Password *"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-password",
-                                                        type="password",
-                                                        placeholder="Set password for user",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Confirm Password *"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-confirm-password",
-                                                        type="password",
-                                                        placeholder="Confirm password",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Institution"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-institution",
-                                                        type="text",
-                                                        placeholder="Enter institution/organization",
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Country"),
-                                                    dbc.Input(
-                                                        id="admin-new-user-country",
-                                                        type="text",
-                                                        placeholder="Enter country",
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Role *"),
-                                                    dbc.Select(
-                                                        id="admin-new-user-role",
-                                                        options=[
-                                                            {"label": "User", "value": "USER"},
-                                                            {"label": "Admin", "value": "ADMIN"},
-                                                        ],
-                                                        value="USER",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Button(
+                                                    dbc.Col(
                                                         [
-                                                            html.I(
-                                                                className="fas fa-user-plus me-2"
+                                                            dbc.Label("Name *"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-name",
+                                                                type="text",
+                                                                placeholder="Enter full name",
+                                                                required=True,
                                                             ),
-                                                            "Create User",
                                                         ],
-                                                        id="admin-create-user-btn",
-                                                        color="success",
-                                                        className="me-2",
+                                                        width=6,
                                                     ),
-                                                    dbc.Button(
+                                                    dbc.Col(
                                                         [
-                                                            html.I(className="fas fa-eraser me-2"),
-                                                            "Clear Form",
+                                                            dbc.Label("Email *"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-email",
+                                                                type="email",
+                                                                placeholder="Enter email address",
+                                                                required=True,
+                                                            ),
                                                         ],
-                                                        id="admin-clear-user-form-btn",
-                                                        color="secondary",
-                                                        outline=True,
+                                                        width=6,
                                                     ),
                                                 ],
-                                                width=12,
+                                                className="mb-3",
                                             ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Alert(
-                                        id="admin-create-user-alert",
-                                        is_open=False,
-                                        dismissable=True,
-                                        duration=5000,
-                                    ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Password *"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-password",
+                                                                type="password",
+                                                                placeholder="Set password for user",
+                                                                required=True,
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Confirm Password *"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-confirm-password",
+                                                                type="password",
+                                                                placeholder="Confirm password",
+                                                                required=True,
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Institution"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-institution",
+                                                                type="text",
+                                                                placeholder="Enter institution/organization",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Country"),
+                                                            dbc.Input(
+                                                                id="admin-new-user-country",
+                                                                type="text",
+                                                                placeholder="Enter country",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Role *"),
+                                                            dbc.Select(
+                                                                id="admin-new-user-role",
+                                                                options=[
+                                                                    {
+                                                                        "label": "User",
+                                                                        "value": "USER",
+                                                                    },
+                                                                    {
+                                                                        "label": "Admin",
+                                                                        "value": "ADMIN",
+                                                                    },
+                                                                    {
+                                                                        "label": "Super Admin",
+                                                                        "value": "SUPERADMIN",
+                                                                    },
+                                                                ],
+                                                                value="USER",
+                                                                required=True,
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Button(
+                                                                [
+                                                                    html.I(
+                                                                        className="fas fa-user-plus me-2"
+                                                                    ),
+                                                                    "Create User",
+                                                                ],
+                                                                id="admin-create-user-btn",
+                                                                color="success",
+                                                                className="me-2",
+                                                            ),
+                                                            dbc.Button(
+                                                                [
+                                                                    html.I(
+                                                                        className="fas fa-eraser me-2"
+                                                                    ),
+                                                                    "Clear Form",
+                                                                ],
+                                                                id="admin-clear-user-form-btn",
+                                                                color="secondary",
+                                                                outline=True,
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Alert(
+                                                id="admin-create-user-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=5000,
+                                            ),
+                                        ]
+                                    )
                                 ]
-                            )
-                        ]
-                    ),
-                ],
-                className="mb-4",
+                            ),
+                        ],
+                        className="mb-4",
+                    )
+                ]
+                if role == "SUPERADMIN"
+                else []
             ),
             # Upload New Script Section
             dbc.Card(
