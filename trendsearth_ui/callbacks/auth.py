@@ -247,7 +247,7 @@ def register_callbacks(app):
 
         return html.Div(
             [
-                html.Span(f"Welcome, {display_name}", className="me-2"),
+                html.Span(f"Welcome, {display_name}", className="me-2 fw-bold text-white"),
                 html.Span(
                     role_text,
                     className=f"badge bg-{role_color}",

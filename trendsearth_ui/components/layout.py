@@ -320,7 +320,12 @@ def dashboard_layout():
             ),
             color="dark",
             dark=True,
-            style={"backgroundColor": "#495057"},
+            style={
+                "backgroundColor": "#495057",
+                "width": "100vw",
+                "marginLeft": "calc(-50vw + 50%)",
+                "marginRight": "calc(-50vw + 50%)",
+            },
             className="mb-3",
         ),
         dbc.Alert(
