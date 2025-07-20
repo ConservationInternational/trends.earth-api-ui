@@ -1,9 +1,8 @@
 """Executions table callbacks."""
 
 from dash import Input, Output, State, no_update
-import requests
 
-from ..config import API_BASE, DEFAULT_PAGE_SIZE
+from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 
 
@@ -157,8 +156,9 @@ def register_callbacks(app):
             if filter_sql:
                 params["filter"] = ",".join(filter_sql)
 
-            headers = {"Authorization": f"Bearer {token}"}
-            resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/execution", token, params=params)
 
             if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, {}, 0
@@ -241,7 +241,9 @@ def register_callbacks(app):
             if table_state.get("filter_sql"):
                 params["filter"] = table_state["filter_sql"]
 
-        resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
+        from ..utils.helpers import make_authenticated_request
+
+        resp = make_authenticated_request("/execution", token, params=params)
 
         if resp.status_code != 200:
             return {"rowData": [], "rowCount": 0}, {}, 0, 0
@@ -320,7 +322,9 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/execution", token, params=params)
 
             if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, table_state or {}, 0

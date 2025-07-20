@@ -18,13 +18,16 @@ def test_cookie_functions():
     print("Testing cookie utility functions...")
 
     # Test data
-    test_token = "test_token_123"
+    test_access_token = "test_access_token_123"
+    test_refresh_token = "test_refresh_token_456"
     test_email = "test@example.com"
     test_user_data = {"id": 1, "email": "test@example.com", "name": "Test User", "role": "USER"}
 
     # Test creating cookie data
     print("\n1. Testing create_auth_cookie_data...")
-    cookie_data = create_auth_cookie_data(test_token, test_email, test_user_data)
+    cookie_data = create_auth_cookie_data(
+        test_access_token, test_refresh_token, test_email, test_user_data
+    )
     print(f"   Created cookie data: {cookie_data.keys()}")
     print(f"   Expiration: {cookie_data.get('expires_at')}")
 
@@ -35,8 +38,9 @@ def test_cookie_functions():
 
     # Test extraction
     print("\n3. Testing extract_auth_from_cookie...")
-    token, email, user_data = extract_auth_from_cookie(cookie_data)
-    print(f"   Extracted token: {token[:10]}... (truncated)")
+    access_token, refresh_token, email, user_data = extract_auth_from_cookie(cookie_data)
+    print(f"   Extracted access token: {access_token[:10]}... (truncated)")
+    print(f"   Extracted refresh token: {refresh_token[:10]}... (truncated)")
     print(f"   Extracted email: {email}")
     print(f"   Extracted user name: {user_data.get('name')}")
 

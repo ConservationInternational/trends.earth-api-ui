@@ -13,13 +13,25 @@ from .geojson import (
     get_geometry_from_geojson,
     get_tile_layer,
 )
-from .helpers import get_user_info, parse_date, safe_table_data
+from .helpers import (
+    get_user_info,
+    logout_all_devices,
+    logout_user,
+    make_authenticated_request,
+    parse_date,
+    refresh_access_token,
+    safe_table_data,
+)
 from .json_utils import render_json_tree
 
 __all__ = [
     "parse_date",
     "safe_table_data",
     "get_user_info",
+    "refresh_access_token",
+    "logout_user",
+    "logout_all_devices",
+    "make_authenticated_request",
     "ensure_geojson_feature",
     "get_geometry_from_geojson",
     "extract_coordinates_from_geometry",

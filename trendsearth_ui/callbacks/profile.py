@@ -1,9 +1,6 @@
 """Profile and password change callbacks."""
 
 from dash import Input, Output, State, no_update
-import requests
-
-from ..config import API_BASE
 
 
 def register_callbacks(app):
@@ -41,10 +38,13 @@ def register_callbacks(app):
             if not user_id:
                 return "User ID not found in user data.", "danger", True, no_update
 
-            resp = requests.patch(
-                f"{API_BASE}/user/me",
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                "/user/me",
+                token,
+                method="PATCH",
                 json=update_data,
-                headers=headers,
                 timeout=10,
             )
 
@@ -120,10 +120,13 @@ def register_callbacks(app):
         try:
             print(f"🔐 Attempting password change for user: {user_data.get('email', 'unknown')}")
 
-            resp = requests.patch(
-                f"{API_BASE}/user/me/change-password",
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                "/user/me/change-password",
+                token,
+                method="PATCH",
                 json=password_data,
-                headers=headers,
                 timeout=10,
             )
 

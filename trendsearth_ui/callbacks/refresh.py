@@ -1,9 +1,7 @@
 """Log refresh and countdown callbacks."""
 
 from dash import Input, Output, State, callback_context, html, no_update
-import requests
 
-from ..config import API_BASE
 from ..utils import parse_date
 
 
@@ -20,10 +18,19 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("json-modal", "is_open"),
             State("user-timezone-store", "data"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_logs(_refresh_clicks, _n_intervals, log_context, token, modal_open, user_timezone):
+    def refresh_logs(
+        _refresh_clicks,
+        _n_intervals,
+        log_context,
+        token,
+        modal_open,
+        user_timezone,
+        api_environment,
+    ):
         """Refresh logs in the modal."""
         if not modal_open or not log_context or not token:
             return no_update, no_update, no_update
@@ -35,13 +42,25 @@ def register_callbacks(app):
         if not log_type or not log_id:
             return no_update, no_update, no_update
 
+        from ..utils.helpers import make_authenticated_request
+
         # Fetch logs based on type
-        if log_type == "execution":
-            resp = requests.get(f"{API_BASE}/execution/{log_id}/log", headers=headers)
-        elif log_type == "script":
-            resp = requests.get(f"{API_BASE}/script/{log_id}/log", headers=headers)
-        else:
-            return no_update, no_update, no_update
+        try:
+            if log_type == "execution":
+                resp = make_authenticated_request(f"/execution/{log_id}/log", token)
+            elif log_type == "script":
+                resp = make_authenticated_request(f"/script/{log_id}/log", token)
+            else:
+                return no_update, no_update, no_update
+        except Exception as e:
+            return (
+                html.Pre(
+                    f"Failed to fetch logs: {str(e)}",
+                    style={"color": "red", "white-space": "pre-wrap"},
+                ),
+                {"logs": f"Error: {str(e)}"},
+                0,
+            )
 
         if resp.status_code != 200:
             return (

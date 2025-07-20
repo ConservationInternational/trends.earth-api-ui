@@ -4,7 +4,14 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 
 from ..callbacks.timezone import get_timezone_components
-from ..config import APP_TITLE, LOGO_HEIGHT, LOGO_SQUARE_URL, LOGO_URL
+from ..config import (
+    API_ENVIRONMENTS,
+    APP_TITLE,
+    DEFAULT_API_ENVIRONMENT,
+    LOGO_HEIGHT,
+    LOGO_SQUARE_URL,
+    LOGO_URL,
+)
 from .modals import (
     delete_script_modal,
     delete_user_modal,
@@ -30,6 +37,7 @@ def create_main_layout():
             dcc.Store(id="token-store"),
             dcc.Store(id="role-store"),
             dcc.Store(id="user-store"),
+            dcc.Store(id="api-environment-store", data=DEFAULT_API_ENVIRONMENT),
             dcc.Store(id="json-modal-data"),
             dcc.Store(id="scripts-raw-data"),
             dcc.Store(id="users-raw-data"),
@@ -71,6 +79,9 @@ def login_layout():
         [
             # Hidden store to prevent callback errors
             dcc.Store(id="active-tab-store", data=None, storage_type="memory"),
+            dcc.Store(
+                id="api-environment-store", data=DEFAULT_API_ENVIRONMENT, storage_type="memory"
+            ),
             # Forgot password modal
             dbc.Modal(
                 [
@@ -194,6 +205,30 @@ def login_layout():
                                                                 id="login-password",
                                                                 type="password",
                                                                 placeholder="Enter password",
+                                                            ),
+                                                            width=9,
+                                                        ),
+                                                    ],
+                                                    className="mb-3",
+                                                ),
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Label("API Environment", width=3),
+                                                        dbc.Col(
+                                                            dcc.Dropdown(
+                                                                id="api-environment-dropdown",
+                                                                options=[
+                                                                    {
+                                                                        "label": env_config[
+                                                                            "display_name"
+                                                                        ],
+                                                                        "value": env_key,
+                                                                    }
+                                                                    for env_key, env_config in API_ENVIRONMENTS.items()
+                                                                ],
+                                                                value=DEFAULT_API_ENVIRONMENT,
+                                                                clearable=False,
+                                                                style={"fontSize": "14px"},
                                                             ),
                                                             width=9,
                                                         ),
@@ -429,8 +464,9 @@ def dashboard_layout():
             id="main-panel",
             is_open=True,
         ),
-        # Hidden store to track active tab
+        # Hidden stores
         dcc.Store(id="active-tab-store", data="executions"),
+        dcc.Store(id="api-environment-store", storage_type="memory"),  # Don't set default data here
     ]
     print(f"🏗️ Dashboard layout created with {len(layout)} components:")
     for i, component in enumerate(layout):

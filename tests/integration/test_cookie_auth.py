@@ -21,13 +21,16 @@ try:
     print("✅ Successfully imported cookie utilities")
 
     # Test cookie creation
-    test_token = "test_jwt_token_123"
+    test_access_token = "test_jwt_access_token_123"
+    test_refresh_token = "test_refresh_token_456"
     test_email = "user@example.com"
     test_user_data = {"id": "123", "email": "user@example.com", "name": "Test User", "role": "USER"}
 
-    # Create cookie data
-    cookie_data = create_auth_cookie_data(test_token, test_email, test_user_data)
-    print("✅ Cookie data created successfully")
+    # Create cookie data with refresh token
+    cookie_data = create_auth_cookie_data(
+        test_access_token, test_refresh_token, test_email, test_user_data
+    )
+    print("✅ Cookie data created successfully with refresh token")
     print(f"   Cookie expires at: {cookie_data['expires_at']}")
 
     # Test cookie validation
@@ -35,10 +38,14 @@ try:
     print(f"✅ Cookie validation: {is_valid}")
 
     # Test data extraction
-    extracted_token, extracted_email, extracted_user_data = extract_auth_from_cookie(cookie_data)
+    extracted_access_token, extracted_refresh_token, extracted_email, extracted_user_data = (
+        extract_auth_from_cookie(cookie_data)
+    )
     print("✅ Cookie data extraction successful")
-    if extracted_token:
-        print(f"   Token: {extracted_token[:20]}...")
+    if extracted_access_token:
+        print(f"   Access Token: {extracted_access_token[:20]}...")
+    if extracted_refresh_token:
+        print(f"   Refresh Token: {extracted_refresh_token[:20]}...")
     if extracted_email:
         print(f"   Email: {extracted_email}")
     if extracted_user_data and "name" in extracted_user_data:
@@ -50,10 +57,11 @@ try:
 
     print("\n🎉 All cookie functionality tests passed!")
     print("\n📋 Implementation Summary:")
-    print("- ✅ Added dash-extensions dependency")
-    print("- ✅ Created cookie utility functions")
-    print("- ✅ Updated main layout with Cookie component")
-    print("- ✅ Enhanced authentication callbacks for cookie handling")
+    print("- ✅ Added refresh token support to authentication system")
+    print("- ✅ Updated cookie utilities to handle access and refresh tokens")
+    print("- ✅ Implemented automatic token refresh functionality")
+    print("- ✅ Added proper logout with API token revocation")
+    print("- ✅ Enhanced authentication callbacks for refresh token handling")
     print("- ✅ Added 'Remember me' checkbox to login form")
     print("- ✅ Added logout button to profile tab")
     print("- ✅ Implemented automatic login restoration from cookies")
@@ -61,11 +69,12 @@ try:
 
     print("\n🔧 How it works:")
     print("1. User logs in and checks 'Remember me for 6 hours'")
-    print("2. Authentication data is saved in a browser cookie")
+    print("2. Access and refresh tokens are saved in a browser cookie")
     print("3. When user returns, app automatically checks for valid cookie")
-    print("4. If cookie is valid and not expired, user is auto-logged in")
-    print("5. Email field is pre-populated from expired cookies")
-    print("6. User can manually logout to clear the cookie")
+    print("4. If cookie is valid but access token expired, it's automatically refreshed")
+    print("5. If refresh fails, user is redirected to login page")
+    print("6. Email field is pre-populated from expired cookies")
+    print("7. User can manually logout to revoke tokens and clear the cookie")
 
 except ImportError as e:
     print(f"❌ Import error: {e}")

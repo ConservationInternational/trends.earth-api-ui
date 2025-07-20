@@ -9,7 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 
-from ..config import API_BASE
+from ..config import get_api_base
 from ..utils.timezone_utils import (
     convert_utc_to_local,
     format_local_time,
@@ -52,7 +52,7 @@ def set_cached_data(cache_key, data, ttl=None):
         _status_cache[cache_key]["ttl"] = ttl
 
 
-def is_status_endpoint_available(token):
+def is_status_endpoint_available(token, api_environment="production"):
     """Check if the status endpoint is available (cached for 5 minutes)."""
     cached_availability = get_cached_data("status_available")
     if cached_availability is not None:
@@ -61,7 +61,7 @@ def is_status_endpoint_available(token):
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
-            f"{API_BASE}/status",
+            f"{get_api_base(api_environment)}/status",
             headers=headers,
             params={"per_page": 1},
             timeout=3,  # Very short timeout for availability check
@@ -74,12 +74,12 @@ def is_status_endpoint_available(token):
         return False
 
 
-def get_fallback_summary(token, user_timezone="UTC"):
+def get_fallback_summary(token, api_environment="production", user_timezone="UTC"):
     """Get basic system info as fallback when status endpoint is unavailable."""
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
-            f"{API_BASE}/execution",
+            f"{get_api_base(api_environment)}/execution",
             headers=headers,
             params={
                 "per_page": 1,
@@ -178,11 +178,12 @@ def register_callbacks(app):
             State("active-tab-store", "data"),
             State("user-timezone-store", "data"),
             State("role-store", "data"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=False,  # Allow initial call to load status when tab is first accessed
     )
     def update_status_summary(
-        _n_intervals, _refresh_clicks, token, active_tab, user_timezone, role
+        _n_intervals, _refresh_clicks, token, active_tab, user_timezone, role, api_environment
     ):
         """Update the status summary from the status endpoint with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
@@ -208,8 +209,8 @@ def register_callbacks(app):
                 return cached_data
 
         # Quick check if status endpoint is available
-        if not is_status_endpoint_available(token):
-            fallback_result = get_fallback_summary(token, safe_timezone)
+        if not is_status_endpoint_available(token, api_environment):
+            fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
             set_cached_data("summary", fallback_result, ttl=20)  # Shorter cache for fallback
             return fallback_result
 
@@ -218,7 +219,7 @@ def register_callbacks(app):
         try:
             # Get the latest status data from the status endpoint with optimized parameters
             resp = requests.get(
-                f"{API_BASE}/status",
+                f"{get_api_base(api_environment)}/status",
                 headers=headers,
                 params={"per_page": 1, "sort": "-timestamp"},
                 timeout=5,  # Reduced from 10 seconds
@@ -275,7 +276,7 @@ def register_callbacks(app):
                         start_24h_utc = now_utc - timedelta(hours=24)
 
                         cumulative_resp = requests.get(
-                            f"{API_BASE}/status",
+                            f"{get_api_base(api_environment)}/status",
                             headers=headers,
                             params={
                                 "per_page": 720,  # Every 2 minutes for 24 hours (24*60/2 = 720)
@@ -332,7 +333,7 @@ def register_callbacks(app):
                         start_10m_utc = now_utc_avg - timedelta(minutes=10)
 
                         avg_resp = requests.get(
-                            f"{API_BASE}/status",
+                            f"{get_api_base(api_environment)}/status",
                             headers=headers,
                             params={
                                 "per_page": 10,  # Last 10 data points (approximately 10 minutes)
@@ -704,11 +705,19 @@ def register_callbacks(app):
             State("active-tab-store", "data"),
             State("user-timezone-store", "data"),
             State("role-store", "data"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=False,  # Allow initial call to load status when tab is first accessed
     )
     def update_status_charts(
-        _n_intervals, _refresh_clicks, time_period, token, active_tab, user_timezone, role
+        _n_intervals,
+        _refresh_clicks,
+        time_period,
+        token,
+        active_tab,
+        user_timezone,
+        role,
+        api_environment,
     ):
         """Update the status charts based on selected time period with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
@@ -730,19 +739,19 @@ def register_callbacks(app):
         if time_period == "day":
             start_time_utc = now_utc - timedelta(days=1)
             title_suffix = "Last 24 Hours"
-            per_page = 720  # Every 2 minutes for 24 hours (24*60/2 = 720)
+            total_records_needed = 720  # Every 2 minutes for 24 hours (24*60/2 = 720)
         elif time_period == "week":
             start_time_utc = now_utc - timedelta(weeks=1)
             title_suffix = "Last Week"
-            per_page = 5040  # Every 2 minutes for a week (7*24*60/2 = 5040)
+            total_records_needed = 5040  # Every 2 minutes for a week (7*24*60/2 = 5040)
         elif time_period == "month":
             start_time_utc = now_utc - timedelta(days=30)
             title_suffix = "Last Month"
-            per_page = 21600  # Every 2 minutes for 30 days (30*24*60/2 = 21600)
+            total_records_needed = 21600  # Every 2 minutes for 30 days (30*24*60/2 = 21600)
         else:
             start_time_utc = now_utc - timedelta(days=1)
             title_suffix = "Last 24 Hours"
-            per_page = 720
+            total_records_needed = 720
 
         try:
             # Check cache first (unless it's a manual refresh)
@@ -760,7 +769,7 @@ def register_callbacks(app):
                     return cached_data[cache_key]
 
             # Quick check if status endpoint is available
-            if not is_status_endpoint_available(token):
+            if not is_status_endpoint_available(token, api_environment):
                 error_result = html.Div(
                     [
                         html.H5(f"System Status Trends - {title_suffix}", className="mb-3"),
@@ -780,39 +789,99 @@ def register_callbacks(app):
                 set_cached_data("charts", cached_charts, ttl=60)
                 return error_result
 
-            # Fetch status data from the status endpoint with optimized parameters
+            # Fetch status data from the status endpoint with pagination for larger datasets
             start_time_str = start_time_utc.isoformat()
-            params = {
-                "per_page": per_page,
-                "start_date": start_time_str,
-                "sort": "timestamp",  # Sort by timestamp ascending for proper chart ordering
-            }
 
-            resp = requests.get(
-                f"{API_BASE}/status",
-                headers=headers,
-                params=params,
-                timeout=7,  # Reduced timeout
-            )
+            # API has a maximum limit of 10,000 records per request, so we need pagination only for month view
+            max_per_page = 10000
+            all_status_logs = []
 
-            if resp.status_code != 200:
-                error_result = html.Div(
-                    [
-                        html.H5(f"System Status Trends - {title_suffix}", className="mb-3"),
-                        html.Div(
-                            f"Failed to fetch status data. Status: {resp.status_code}",
-                            className="alert alert-warning",
-                        ),
-                        html.Small(
-                            "The status endpoint may not be available or you may need admin privileges.",
-                            className="text-muted",
-                        ),
-                    ]
+            if total_records_needed <= max_per_page:
+                # Single request for day and week views
+                params = {
+                    "per_page": total_records_needed,
+                    "start_date": start_time_str,
+                    "sort": "timestamp",  # Sort by timestamp ascending for proper chart ordering
+                }
+
+                resp = requests.get(
+                    f"{get_api_base(api_environment)}/status",
+                    headers=headers,
+                    params=params,
+                    timeout=10,  # Increased timeout for larger requests
                 )
-                return error_result
 
-            result = resp.json()
-            status_logs = result.get("data", [])
+                if resp.status_code != 200:
+                    error_result = html.Div(
+                        [
+                            html.H5(f"System Status Trends - {title_suffix}", className="mb-3"),
+                            html.Div(
+                                f"Failed to fetch status data. Status: {resp.status_code}",
+                                className="alert alert-warning",
+                            ),
+                            html.Small(
+                                "The status endpoint may not be available or you may need admin privileges.",
+                                className="text-muted",
+                            ),
+                        ]
+                    )
+                    return error_result
+
+                result = resp.json()
+                all_status_logs = result.get("data", [])
+            else:
+                # Multiple requests needed for month view (21,600 records)
+                pages_needed = (
+                    total_records_needed + max_per_page - 1
+                ) // max_per_page  # Ceiling division
+
+                for page in range(1, pages_needed + 1):
+                    params = {
+                        "page": page,
+                        "per_page": max_per_page,
+                        "start_date": start_time_str,
+                        "sort": "timestamp",  # Sort by timestamp ascending for proper chart ordering
+                    }
+
+                    resp = requests.get(
+                        f"{get_api_base(api_environment)}/status",
+                        headers=headers,
+                        params=params,
+                        timeout=15,  # Longer timeout for paginated requests
+                    )
+
+                    if resp.status_code != 200:
+                        # If any page fails, return error with what we've collected so far
+                        if not all_status_logs:
+                            error_result = html.Div(
+                                [
+                                    html.H5(
+                                        f"System Status Trends - {title_suffix}", className="mb-3"
+                                    ),
+                                    html.Div(
+                                        f"Failed to fetch status data (page {page}). Status: {resp.status_code}",
+                                        className="alert alert-warning",
+                                    ),
+                                    html.Small(
+                                        "The status endpoint may not be available or you may need admin privileges.",
+                                        className="text-muted",
+                                    ),
+                                ]
+                            )
+                            return error_result
+                        else:
+                            # Use partial data if we got some pages successfully
+                            break
+
+                    result = resp.json()
+                    page_data = result.get("data", [])
+                    all_status_logs.extend(page_data)
+
+                    # If we got fewer records than requested, we've reached the end
+                    if len(page_data) < max_per_page:
+                        break
+
+            status_logs = all_status_logs
 
             # Calculate display time range for chart axis
             start_time_local, _ = convert_utc_to_local(start_time_utc, safe_timezone)

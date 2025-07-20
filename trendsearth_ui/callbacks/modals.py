@@ -1,9 +1,7 @@
 """Modal callbacks for JSON display, logs, and downloads."""
 
 from dash import Input, Output, State, html, no_update
-import requests
 
-from ..config import API_BASE
 from ..utils import parse_date, render_json_tree
 
 
@@ -58,8 +56,9 @@ def register_callbacks(app):
                 )
 
             try:
+                from ..utils.helpers import make_authenticated_request
+
                 # Calculate which page this row is on
-                headers = {"Authorization": f"Bearer {token}"}
                 page_size = 50  # This should match DEFAULT_PAGE_SIZE
                 page = (row_index // page_size) + 1
                 row_in_page = row_index % page_size
@@ -79,7 +78,7 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
+                resp = make_authenticated_request("/execution", token, params=params)
                 if resp.status_code != 200:
                     return (
                         True,
@@ -131,13 +130,13 @@ def register_callbacks(app):
             )
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
+            from ..utils.helpers import make_authenticated_request
 
             if col == "params":
                 # Always fetch params from the individual execution endpoint
-                resp = requests.get(
-                    f"{API_BASE}/execution/{execution_id}",
-                    headers=headers,
+                resp = make_authenticated_request(
+                    f"/execution/{execution_id}",
+                    token,
                     params={"include": "params"},
                 )
                 if resp.status_code != 200:
@@ -185,9 +184,9 @@ def register_callbacks(app):
 
             elif col == "results":
                 # Always fetch results from the individual execution endpoint
-                resp = requests.get(
-                    f"{API_BASE}/execution/{execution_id}",
-                    headers=headers,
+                resp = make_authenticated_request(
+                    f"/execution/{execution_id}",
+                    token,
                     params={"include": "results"},
                 )
                 if resp.status_code != 200:
@@ -234,19 +233,23 @@ def register_callbacks(app):
                 )
 
             elif col == "logs":
+                from ..utils.helpers import make_authenticated_request
+
                 # For logs, try the execution-specific endpoint first
-                resp = requests.get(f"{API_BASE}/execution/{execution_id}/log", headers=headers)
+                resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
+
                 if resp.status_code != 200:
                     # Fall back to general log endpoint with execution_id parameter
-                    resp = requests.get(
-                        f"{API_BASE}/log",
-                        headers=headers,
+                    resp = make_authenticated_request(
+                        "/log",
+                        token,
                         params={
                             "execution_id": execution_id,
                             "per_page": 50,
                             "sort": "register_date",
                         },
                     )
+
                     if resp.status_code != 200:
                         return (
                             True,
@@ -343,8 +346,9 @@ def register_callbacks(app):
             return html.P("No execution context available")
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-            resp = requests.get(f"{API_BASE}/execution/{execution_id}/log", headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
 
             if resp.status_code != 200:
                 return html.P(f"Failed to fetch logs: {resp.status_code}")
@@ -439,8 +443,9 @@ def register_callbacks(app):
                 )
 
             try:
+                from ..utils.helpers import make_authenticated_request
+
                 # Calculate which page this row is on
-                headers = {"Authorization": f"Bearer {token}"}
                 page_size = 50  # This should match DEFAULT_PAGE_SIZE
                 page = (row_index // page_size) + 1
                 row_in_page = row_index % page_size
@@ -454,7 +459,7 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+                resp = make_authenticated_request("/script", token, params=params)
                 if resp.status_code != 200:
                     return (
                         True,
@@ -497,10 +502,11 @@ def register_callbacks(app):
             return True, "Could not get script ID.", None, "Error", {"display": "none"}, True, None
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
+            from ..utils.helpers import make_authenticated_request
 
-            # Get the logs for this script
-            resp = requests.get(f"{API_BASE}/script/{script_id}/log", headers=headers)
+            # Get the logs for this script with automatic token refresh
+            resp = make_authenticated_request(f"/script/{script_id}/log", token)
+
             if resp.status_code != 200:
                 return (
                     True,

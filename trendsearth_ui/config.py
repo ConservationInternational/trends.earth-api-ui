@@ -1,8 +1,66 @@
 """Configuration settings for the Trends.Earth API Dashboard."""
 
 # API Configuration
-API_BASE = "https://api.trends.earth/api/v1"
-AUTH_URL = "https://api.trends.earth/auth"
+# Default API environment (can be overridden by user selection)
+DEFAULT_API_ENVIRONMENT = "production"
+
+# API Environment configurations
+API_ENVIRONMENTS = {
+    "production": {
+        "base": "https://api.trends.earth/api/v1",
+        "auth": "https://api.trends.earth/auth",
+        "display_name": "Production (api.trends.earth)",
+    },
+    "staging": {
+        "base": "https://api-staging.trends.earth/api/v1",
+        "auth": "https://api-staging.trends.earth/auth",
+        "display_name": "Staging (api-staging.trends.earth)",
+    },
+}
+
+# Legacy constants for backward compatibility (using default environment)
+API_BASE = API_ENVIRONMENTS[DEFAULT_API_ENVIRONMENT]["base"]
+AUTH_URL = API_ENVIRONMENTS[DEFAULT_API_ENVIRONMENT]["auth"]
+
+
+def get_api_base(environment=None):
+    """Get API base URL for the specified environment."""
+    env = environment or DEFAULT_API_ENVIRONMENT
+    return API_ENVIRONMENTS.get(env, API_ENVIRONMENTS[DEFAULT_API_ENVIRONMENT])["base"]
+
+
+def get_auth_url(environment=None):
+    """Get authentication URL for the specified environment."""
+    env = environment or DEFAULT_API_ENVIRONMENT
+    return API_ENVIRONMENTS.get(env, API_ENVIRONMENTS[DEFAULT_API_ENVIRONMENT])["auth"]
+
+
+def get_current_api_environment():
+    """Get the current API environment from cookie or default."""
+    try:
+        import json
+
+        from flask import request
+
+        auth_cookie = request.cookies.get("auth_token")
+        if auth_cookie:
+            cookie_data = json.loads(auth_cookie)
+            if cookie_data and isinstance(cookie_data, dict):
+                return cookie_data.get("api_environment", DEFAULT_API_ENVIRONMENT)
+    except Exception:
+        pass
+    return DEFAULT_API_ENVIRONMENT
+
+
+def get_current_api_base():
+    """Get the current API base URL based on current environment."""
+    return get_api_base(get_current_api_environment())
+
+
+def get_current_auth_url():
+    """Get the current auth URL based on current environment."""
+    return get_auth_url(get_current_api_environment())
+
 
 # App Configuration
 APP_TITLE = "Trends.Earth API Dashboard"

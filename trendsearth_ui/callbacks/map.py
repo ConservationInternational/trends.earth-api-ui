@@ -1,9 +1,6 @@
 """Map modal callbacks."""
 
 from dash import MATCH, Input, Output, State, html, no_update
-import requests
-
-from ..config import API_BASE
 
 
 def register_callbacks(app):
@@ -62,7 +59,10 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                resp = requests.get(f"{API_BASE}/execution", params=params, headers=headers)
+                # Get execution data using the authenticated helper
+                from ..utils.helpers import make_authenticated_request
+
+                resp = make_authenticated_request("/execution", token, params=params)
                 if resp.status_code != 200:
                     return (
                         False,
@@ -94,10 +94,12 @@ def register_callbacks(app):
         try:
             headers = {"Authorization": f"Bearer {token}"}
 
+            from ..utils.helpers import make_authenticated_request
+
             # First try with include=params
-            resp = requests.get(
-                f"{API_BASE}/execution/{execution_id}",
-                headers=headers,
+            resp = make_authenticated_request(
+                f"/execution/{execution_id}",
+                token,
                 params={"include": "params"},
             )
 
@@ -124,7 +126,7 @@ def register_callbacks(app):
 
             # If no params with include, try without include parameter
             if not params_data:
-                resp2 = requests.get(f"{API_BASE}/execution/{execution_id}", headers=headers)
+                resp2 = make_authenticated_request(f"/execution/{execution_id}", token)
 
                 if resp2.status_code == 200:
                     execution_response2 = resp2.json()

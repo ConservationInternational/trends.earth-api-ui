@@ -1,9 +1,8 @@
 """Scripts table callbacks."""
 
 from dash import Input, Output, State
-import requests
 
-from ..config import API_BASE, DEFAULT_PAGE_SIZE
+from ..config import DEFAULT_PAGE_SIZE, get_api_base
 from ..utils import parse_date
 
 
@@ -21,14 +20,12 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("role-store", "data"),
             State("user-timezone-store", "data"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=False,
     )
-    def get_scripts_rows(request, token, role, user_timezone):
+    def get_scripts_rows(request, token, role, user_timezone, api_environment):
         """Get scripts data for ag-grid with infinite row model with server-side operations."""
-        print(
-            f"DEBUG: get_scripts_rows called with request={request}, token={bool(token)}, role={role}"
-        )
         try:
             if not token:
                 return {"rowData": [], "rowCount": 0}, {}, 0
@@ -103,19 +100,22 @@ def register_callbacks(app):
             if filter_sql:
                 params["filter"] = ",".join(filter_sql)
 
-            headers = {"Authorization": f"Bearer {token}"}
-            resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
-            print(f"DEBUG: API call to {API_BASE}/script with params {params}")
-            print(f"DEBUG: Response status: {resp.status_code}")
+            # Get the API base URL for the user's selected environment
+            api_base = get_api_base(api_environment)
+
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/script", token, params=params)
 
             if resp.status_code != 200:
-                print(f"DEBUG: API call failed with status {resp.status_code}")
+                return {"rowData": [], "rowCount": 0}, {}, 0
+
+            if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()
             scripts = result.get("data", [])
             total_rows = result.get("total", 0)
-            print(f"DEBUG: Received {len(scripts)} scripts, total: {total_rows}")
 
             # Check if user is admin to add edit buttons
             is_admin = role in ["ADMIN", "SUPERADMIN"]
@@ -140,7 +140,6 @@ def register_callbacks(app):
                 "filter_sql": ",".join(filter_sql) if filter_sql else None,
             }
 
-            print(f"DEBUG: Returning {len(tabledata)} scripts to ag-grid, rowCount: {total_rows}")
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:
@@ -159,10 +158,11 @@ def register_callbacks(app):
             State("role-store", "data"),
             State("scripts-table-state", "data"),
             State("user-timezone-store", "data"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_scripts_table(n_clicks, token, role, table_state, user_timezone):
+    def refresh_scripts_table(n_clicks, token, role, table_state, user_timezone, api_environment):
         """Manually refresh the scripts table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0
@@ -188,7 +188,9 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/script", token, params=params)
 
             if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, {}, 0

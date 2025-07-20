@@ -5,8 +5,6 @@ import base64
 from dash import Input, Output, State, callback_context, html, no_update
 import requests
 
-from ..config import API_BASE
-
 
 def register_callbacks(app):
     """Register admin-related callbacks."""
@@ -148,8 +146,10 @@ def register_callbacks(app):
                     "is_active": True,
                 }
 
-                response = requests.post(
-                    f"{API_BASE}/user", json=user_data, headers=headers, timeout=10
+                from ..utils.helpers import make_authenticated_request
+
+                response = make_authenticated_request(
+                    "/user", token, method="POST", json=user_data, timeout=10
                 )
 
                 if response.status_code in [200, 201]:
@@ -398,8 +398,10 @@ def register_callbacks(app):
                 # Create multipart form data
                 files = {"file": (filename, decoded_content)}
 
-                response = requests.post(
-                    f"{API_BASE}/script", data=script_data, files=files, headers=headers, timeout=30
+                from ..utils.helpers import make_authenticated_request
+
+                response = make_authenticated_request(
+                    "/script", token, method="POST", data=script_data, files=files, timeout=30
                 )
 
                 if response.status_code in [200, 201]:
@@ -523,8 +525,10 @@ def register_callbacks(app):
         try:
             headers = {"Authorization": f"Bearer {token}"}
 
+            from ..utils.helpers import make_authenticated_request
+
             # Get user count
-            user_response = requests.get(f"{API_BASE}/user?per_page=1", headers=headers, timeout=5)
+            user_response = make_authenticated_request("/user?per_page=1", token, timeout=5)
             total_users = (
                 user_response.json().get("total", 0)
                 if user_response.status_code == 200
@@ -532,9 +536,7 @@ def register_callbacks(app):
             )
 
             # Get script count
-            script_response = requests.get(
-                f"{API_BASE}/script?per_page=1", headers=headers, timeout=5
-            )
+            script_response = make_authenticated_request("/script?per_page=1", token, timeout=5)
             total_scripts = (
                 script_response.json().get("total", 0)
                 if script_response.status_code == 200
@@ -542,8 +544,8 @@ def register_callbacks(app):
             )
 
             # Get active execution count
-            exec_response = requests.get(
-                f"{API_BASE}/execution?status=RUNNING&per_page=1", headers=headers, timeout=5
+            exec_response = make_authenticated_request(
+                "/execution?status=RUNNING&per_page=1", token, timeout=5
             )
             active_executions = (
                 exec_response.json().get("total", 0)

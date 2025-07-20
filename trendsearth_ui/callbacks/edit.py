@@ -1,9 +1,6 @@
 """Edit modal callbacks for users and scripts."""
 
 from dash import Input, Output, State, no_update
-import requests
-
-from ..config import API_BASE
 
 
 def register_callbacks(app):
@@ -67,7 +64,9 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            resp = requests.get(f"{API_BASE}/user", params=params, headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/user", token, params=params)
             if resp.status_code != 200:
                 print(f"❌ Failed to fetch user data: {resp.text}")
                 return False, None, "", "", "", "", "USER", "", ""
@@ -146,7 +145,9 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            resp = requests.get(f"{API_BASE}/script", params=params, headers=headers)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request("/script", token, params=params)
             if resp.status_code != 200:
                 print(f"❌ Failed to fetch script data: {resp.text}")
                 return False, None, "", "", "DRAFT"
@@ -227,11 +228,13 @@ def register_callbacks(app):
             "country": country,
             "role": role,
         }
-        headers = {"Authorization": f"Bearer {token}"}
-        resp = requests.patch(
-            f"{API_BASE}/user/{user_id}",
+        from ..utils.helpers import make_authenticated_request
+
+        resp = make_authenticated_request(
+            f"/user/{user_id}",
+            token,
+            method="PATCH",
             json=update_data,
-            headers=headers,
             timeout=10,
         )
 
@@ -275,11 +278,13 @@ def register_callbacks(app):
             "description": description,
             "status": status,
         }
-        headers = {"Authorization": f"Bearer {token}"}
-        resp = requests.patch(
-            f"{API_BASE}/script/{script_id}",
+        from ..utils.helpers import make_authenticated_request
+
+        resp = make_authenticated_request(
+            f"/script/{script_id}",
+            token,
+            method="PATCH",
             json=update_data,
-            headers=headers,
             timeout=10,
         )
 
@@ -351,8 +356,11 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-            resp = requests.delete(f"{API_BASE}/user/{user_id}", headers=headers, timeout=10)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                f"/user/{user_id}", token, method="DELETE", timeout=10
+            )
 
             if resp.status_code in [200, 204]:
                 print(f"✅ User {user_id} deleted successfully")
@@ -425,8 +433,11 @@ def register_callbacks(app):
             return False, no_update, no_update
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-            resp = requests.delete(f"{API_BASE}/script/{script_id}", headers=headers, timeout=10)
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                f"/script/{script_id}", token, method="DELETE", timeout=10
+            )
 
             if resp.status_code in [200, 204]:
                 print(f"✅ Script {script_id} deleted successfully")
@@ -489,7 +500,6 @@ def register_callbacks(app):
         if not user_id:
             return "User ID not found.", "danger", True, no_update, no_update
 
-        headers = {"Authorization": f"Bearer {token}"}
         password_data = {"new_password": new_password}
 
         try:
@@ -497,10 +507,13 @@ def register_callbacks(app):
                 f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}"
             )
 
-            resp = requests.patch(
-                f"{API_BASE}/user/{user_id}/change-password",
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                f"/user/{user_id}/change-password",
+                token,
+                method="PATCH",
                 json=password_data,
-                headers=headers,
                 timeout=10,
             )
 
