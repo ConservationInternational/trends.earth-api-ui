@@ -29,13 +29,12 @@ def register_callbacks(app):
         token,
         modal_open,
         user_timezone,
-        api_environment,
+        _api_environment,
     ):
         """Refresh logs in the modal."""
         if not modal_open or not log_context or not token:
             return no_update, no_update, no_update
 
-        headers = {"Authorization": f"Bearer {token}"}
         log_type = log_context.get("type")
         log_id = log_context.get("id")
 

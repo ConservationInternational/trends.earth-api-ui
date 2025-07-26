@@ -135,7 +135,6 @@ def register_callbacks(app):
 
             try:
                 # Create user via API
-                headers = {"Authorization": f"Bearer {token}"}
                 user_data = {
                     "name": name.strip(),
                     "email": email.strip().lower(),
@@ -387,7 +386,6 @@ def register_callbacks(app):
                 content_string = contents.split(",")[1]
                 decoded_content = base64.b64decode(content_string)
 
-                headers = {"Authorization": f"Bearer {token}"}
                 script_data = {
                     "name": name.strip(),
                     "description": description.strip() if description else "",
@@ -523,8 +521,6 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-
             from ..utils.helpers import make_authenticated_request
 
             # Get user count

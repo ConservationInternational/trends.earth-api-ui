@@ -304,10 +304,7 @@ def make_authenticated_request(
     from ..config import get_current_api_base
 
     # If URL is relative (starts with /), prepend the current API base
-    if url.startswith("/"):
-        full_url = get_current_api_base() + url
-    else:
-        full_url = url
+    full_url = get_current_api_base() + url if url.startswith("/") else url
 
     headers = kwargs.get("headers", {})
     headers["Authorization"] = f"Bearer {token}"

@@ -30,7 +30,6 @@ def register_callbacks(app):
         if not name:
             return "Name is required.", "danger", True, no_update
 
-        headers = {"Authorization": f"Bearer {token}"}
         update_data = {"name": name, "institution": institution or ""}
 
         try:
@@ -114,7 +113,6 @@ def register_callbacks(app):
                 no_update,
             )
 
-        headers = {"Authorization": f"Bearer {token}"}
         password_data = {"old_password": current_password, "new_password": new_password}
 
         try:

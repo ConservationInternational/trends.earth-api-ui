@@ -2,7 +2,7 @@
 
 from dash import Input, Output, State
 
-from ..config import DEFAULT_PAGE_SIZE, get_api_base
+from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 
 
@@ -24,7 +24,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=False,
     )
-    def get_users_rows(request, token, role, user_timezone, api_environment):
+    def get_users_rows(request, token, role, user_timezone, _api_environment):
         """Get users data for ag-grid with infinite row model with server-side operations."""
         try:
             if not token:
@@ -97,9 +97,6 @@ def register_callbacks(app):
             if filter_sql:
                 params["filter"] = ",".join(filter_sql)
 
-            # Get the API base URL for the user's selected environment
-            api_base = get_api_base(api_environment)
-
             from ..utils.helpers import make_authenticated_request
 
             resp = make_authenticated_request("/user", token, params=params)
@@ -157,7 +154,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def refresh_users_table(n_clicks, token, role, table_state, user_timezone, api_environment):
+    def refresh_users_table(n_clicks, token, role, table_state, user_timezone, _api_environment):
         """Manually refresh the users table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0
@@ -165,8 +162,6 @@ def register_callbacks(app):
         try:
             # For infinite row model, we need to trigger a refresh by clearing the cache
             # This is done by returning a fresh response for the first page
-            headers = {"Authorization": f"Bearer {token}"}
-
             params = {
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
@@ -178,9 +173,6 @@ def register_callbacks(app):
                     params["sort"] = table_state["sort_sql"]
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
-
-            # Get the API base URL for the user's selected environment
-            api_base = get_api_base(api_environment)
 
             from ..utils.helpers import make_authenticated_request
 

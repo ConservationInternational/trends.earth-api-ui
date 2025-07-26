@@ -50,7 +50,6 @@ def register_callbacks(app):
                 return False, None, "", "", "", "", "USER", "", ""
 
             # Calculate which page this row is on
-            headers = {"Authorization": f"Bearer {token}"}
             page_size = 50  # This should match your cacheBlockSize
             page = (row_index // page_size) + 1
             row_in_page = row_index % page_size
@@ -131,7 +130,6 @@ def register_callbacks(app):
                 return False, None, "", "", "DRAFT"
 
             # Calculate which page this row is on
-            headers = {"Authorization": f"Bearer {token}"}
             page_size = 50  # This should match your cacheBlockSize
             page = (row_index // page_size) + 1
             row_in_page = row_index % page_size

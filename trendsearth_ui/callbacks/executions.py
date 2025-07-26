@@ -221,8 +221,6 @@ def register_callbacks(app):
 
         # For infinite row model, we need to trigger a refresh by clearing the cache
         # This is done by returning a fresh response for the first page
-        headers = {"Authorization": f"Bearer {token}"}
-
         params = {
             "page": 1,
             "per_page": DEFAULT_PAGE_SIZE,
@@ -302,8 +300,6 @@ def register_callbacks(app):
             return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-
             params = {
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,

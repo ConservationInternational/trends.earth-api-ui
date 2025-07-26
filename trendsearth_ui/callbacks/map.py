@@ -40,7 +40,6 @@ def register_callbacks(app):
 
             try:
                 # Calculate which page this row is on
-                headers = {"Authorization": f"Bearer {token}"}
                 page_size = 50  # This should match DEFAULT_PAGE_SIZE
                 page = (row_index // page_size) + 1
                 row_in_page = row_index % page_size
@@ -92,8 +91,6 @@ def register_callbacks(app):
 
         print(f"DEBUG: Fetching execution details for ID: {execution_id}")
         try:
-            headers = {"Authorization": f"Bearer {token}"}
-
             from ..utils.helpers import make_authenticated_request
 
             # First try with include=params
