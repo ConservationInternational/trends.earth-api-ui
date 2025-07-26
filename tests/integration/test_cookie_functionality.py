@@ -38,7 +38,9 @@ def test_cookie_functions():
 
     # Test extraction
     print("\n3. Testing extract_auth_from_cookie...")
-    access_token, refresh_token, email, user_data, api_environment = extract_auth_from_cookie(cookie_data)
+    access_token, refresh_token, email, user_data, api_environment = extract_auth_from_cookie(
+        cookie_data
+    )
     print(f"   Extracted access token: {access_token[:10]}... (truncated)")
     print(f"   Extracted refresh token: {refresh_token[:10]}... (truncated)")
     print(f"   Extracted email: {email}")

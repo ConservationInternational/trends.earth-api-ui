@@ -81,57 +81,83 @@ def register_callbacks(app):
                     f"🍪 Restored authentication from cookie for: {stored_email} (Environment: {stored_api_environment})"
                 )
 
-                # Try to refresh the access token to ensure it's still valid
-                # Use the stored API environment for the refresh call
-                new_access_token, expires_in = refresh_access_token(
-                    stored_refresh_token, stored_api_environment
-                )
-                if new_access_token:
-                    print("🔄 Access token refreshed successfully during page load")
-                    # Update cookie with new access token and extend expiration
-                    ctx = callback_context
-                    if hasattr(ctx, "response") and ctx.response:
-                        new_cookie_data = create_auth_cookie_data(
+                # Check if token is still fresh before attempting to refresh
+                should_refresh = True
+                expires_at = cookie_data.get("expires_at")
+                if expires_at:
+                    try:
+                        expiration = datetime.fromisoformat(expires_at)
+                        time_until_expiry = expiration - datetime.now()
+                        # If token expires in more than 4 minutes, don't refresh (it's fresh)
+                        if time_until_expiry.total_seconds() > 240:  # 4 minutes
+                            should_refresh = False
+                    except Exception as e:
+                        print(f"Error parsing token expiration during page load: {e}")
+
+                # Only refresh if token is close to expiry or expired
+                if should_refresh:
+                    # Try to refresh the access token to ensure it's still valid
+                    # Use the stored API environment for the refresh call
+                    new_access_token, expires_in = refresh_access_token(
+                        stored_refresh_token, stored_api_environment
+                    )
+                    if new_access_token:
+                        print("🔄 Access token refreshed successfully during page load")
+                        # Update cookie with new access token and extend expiration
+                        ctx = callback_context
+                        if hasattr(ctx, "response") and ctx.response:
+                            new_cookie_data = create_auth_cookie_data(
+                                new_access_token,
+                                stored_refresh_token,
+                                stored_email,
+                                stored_user_data,
+                                stored_api_environment,
+                            )
+                            cookie_value = json.dumps(new_cookie_data)
+                            expiration = datetime.now() + timedelta(days=30)
+                            ctx.response.set_cookie(
+                                "auth_token",
+                                cookie_value,
+                                expires=expiration,
+                                httponly=True,
+                                secure=False,  # Set to True in production with HTTPS
+                                samesite="Lax",
+                            )
+                            print("🍪 Extended authentication cookie during page load")
+                        role = stored_user_data.get("role", "USER")
+                        return (
+                            dashboard_layout(),
+                            False,
                             new_access_token,
-                            stored_refresh_token,
-                            stored_email,
+                            role,
                             stored_user_data,
                             stored_api_environment,
                         )
-                        cookie_value = json.dumps(new_cookie_data)
-                        expiration = datetime.now() + timedelta(days=30)
-                        ctx.response.set_cookie(
-                            "auth_token",
-                            cookie_value,
-                            expires=expiration,
-                            httponly=True,
-                            secure=False,  # Set to True in production with HTTPS
-                            samesite="Lax",
-                        )
-                        print("🍪 Extended authentication cookie during page load")
+                    else:
+                        # Failed to refresh token, clear invalid cookie
+                        print("❌ Failed to refresh access token during page load, clearing cookie")
+                        ctx = callback_context
+                        if hasattr(ctx, "response") and ctx.response:
+                            ctx.response.set_cookie(
+                                "auth_token",
+                                "",
+                                expires=0,
+                                httponly=True,
+                                secure=False,
+                                samesite="Lax",
+                            )
+                            print("🍪 Cleared invalid authentication cookie")
+                else:
+                    # Token is still fresh, use existing token without refreshing
                     role = stored_user_data.get("role", "USER")
                     return (
                         dashboard_layout(),
                         False,
-                        new_access_token,
+                        stored_access_token,
                         role,
                         stored_user_data,
                         stored_api_environment,
                     )
-                else:
-                    print("❌ Failed to refresh access token during page load, clearing cookie")
-                    # Clear invalid cookie
-                    ctx = callback_context
-                    if hasattr(ctx, "response") and ctx.response:
-                        ctx.response.set_cookie(
-                            "auth_token",
-                            "",
-                            expires=0,
-                            httponly=True,
-                            secure=False,
-                            samesite="Lax",
-                        )
-                        print("🍪 Cleared invalid authentication cookie")
 
         # No valid authentication found, show login page
         return login_layout(), True, None, None, None, "production"
@@ -404,8 +430,7 @@ def register_callbacks(app):
         # Display name if available, otherwise email
         display_name = user_name if user_name else user_email
 
-        # Add role badge
-        role_color = "primary" if role in ["ADMIN", "SUPERADMIN"] else "secondary"
+        # Add role badge with consistent styling
         role_text = "Super Admin" if role == "SUPERADMIN" else (role.title() if role else "User")
 
         return html.Div(
@@ -413,11 +438,30 @@ def register_callbacks(app):
                 html.Span(f"Welcome, {display_name}", className="me-2 fw-bold text-white"),
                 html.Span(
                     role_text,
-                    className=f"badge bg-{role_color}",
+                    className="badge",
+                    style={"fontSize": "12px", "backgroundColor": "#6c757d", "color": "white"},
                 ),
             ],
             className="d-flex align-items-center",
         )
+
+    @app.callback(
+        Output("environment-indicator", "children"),
+        [Input("api-environment-store", "data")],
+        prevent_initial_call=True,
+    )
+    def update_environment_indicator(api_environment):
+        """Update the environment indicator in the header."""
+        if not api_environment:
+            return ""
+
+        # Return the appropriate environment label
+        if api_environment == "production":
+            return "Production"
+        elif api_environment == "staging":
+            return "Staging"
+        else:
+            return api_environment.title()
 
     @app.callback(
         Output("forgot-password-modal", "is_open"),
@@ -632,6 +676,7 @@ def register_callbacks(app):
         # Check if we have a refresh token and API environment in cookie
         refresh_token = None
         api_environment = None
+        expires_at = None
         try:
             auth_cookie = request.cookies.get("auth_token")
             if auth_cookie:
@@ -639,12 +684,24 @@ def register_callbacks(app):
                 if cookie_data and isinstance(cookie_data, dict):
                     refresh_token = cookie_data.get("refresh_token")
                     api_environment = cookie_data.get("api_environment", "production")
+                    expires_at = cookie_data.get("expires_at")
         except Exception as e:
             print(f"Error reading refresh token from cookie: {e}")
             return no_update
 
         if not refresh_token:
             return no_update
+
+        # Check if token is still fresh (within last 30 seconds) to avoid unnecessary refreshes
+        if expires_at:
+            try:
+                expiration = datetime.fromisoformat(expires_at)
+                time_until_expiry = expiration - datetime.now()
+                # If token expires in more than 4.5 minutes, don't refresh (it's fresh)
+                if time_until_expiry.total_seconds() > 270:  # 4.5 minutes
+                    return no_update
+            except Exception as e:
+                print(f"Error parsing token expiration: {e}")
 
         # Try to refresh the token using the stored API environment
         new_access_token, expires_in = refresh_access_token(refresh_token, api_environment)
@@ -718,7 +775,11 @@ def register_callbacks(app):
                     expires_at = cookie_data.get("expires_at")
                     if expires_at:
                         expiration = datetime.fromisoformat(expires_at)
-                        if datetime.now() >= expiration:
+                        # If token is still fresh (more than 3 minutes until expiry), skip refresh
+                        time_until_expiry = expiration - datetime.now()
+                        if time_until_expiry.total_seconds() > 180:  # 3 minutes
+                            return no_update, no_update
+                        elif datetime.now() >= expiration:
                             print("🍪 Cookie has expired, clearing session")
                             return None, None
         except Exception as e:

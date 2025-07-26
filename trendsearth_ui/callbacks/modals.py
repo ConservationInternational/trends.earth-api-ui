@@ -235,6 +235,15 @@ def register_callbacks(app):
             elif col == "logs":
                 from ..utils.helpers import make_authenticated_request
 
+                # Get execution status from row data for auto-refresh control
+                execution_status = None
+                if row_data:
+                    execution_status = row_data.get("status")
+
+                # If we don't have status from row_data, we can try to fetch it
+                if not execution_status and "execution_data" in locals():
+                    execution_status = execution_data.get("status")
+
                 # For logs, try the execution-specific endpoint first
                 resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
 
@@ -258,7 +267,12 @@ def register_callbacks(app):
                             f"Execution {execution_id} - Logs",
                             {"display": "none"},
                             True,
-                            {"execution_id": execution_id, "type": "logs"},
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                            },
                         )
 
                 result = resp.json()
@@ -316,7 +330,12 @@ def register_callbacks(app):
                     f"Execution {execution_id} - Logs",
                     {"display": "inline-block"},
                     False,
-                    {"execution_id": execution_id, "type": "logs"},
+                    {
+                        "execution_id": execution_id,
+                        "type": "execution",
+                        "id": execution_id,
+                        "status": execution_status,
+                    },
                 )
 
         except Exception as e:

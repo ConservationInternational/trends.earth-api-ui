@@ -319,7 +319,16 @@ def dashboard_layout():
                                     ),
                                     dbc.NavbarBrand(
                                         APP_TITLE,
-                                        className="fw-bold",
+                                        className="fw-bold me-2",
+                                    ),
+                                    html.Span(
+                                        id="environment-indicator",
+                                        className="badge me-2",
+                                        style={
+                                            "fontSize": "12px",
+                                            "backgroundColor": "#6c757d",
+                                            "color": "white",
+                                        },
                                     ),
                                 ],
                                 width="auto",
