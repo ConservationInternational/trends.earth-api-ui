@@ -23,8 +23,9 @@ def create_auth_cookie_data(
     Returns:
         Dictionary containing auth data with expiration timestamp
     """
-    # Set expiration to 12 hours from now
-    expiration = datetime.now() + timedelta(hours=12)
+    # Set expiration to 30 days from now for "remember me" functionality
+    # This allows refresh tokens to keep users logged in for an extended period
+    expiration = datetime.now() + timedelta(days=30)
 
     return {
         "access_token": access_token,

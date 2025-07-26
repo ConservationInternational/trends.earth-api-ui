@@ -240,7 +240,7 @@ def login_layout():
                                                         dbc.Col(
                                                             dbc.Checkbox(
                                                                 id="remember-me-checkbox",
-                                                                label="Remember me for 12 hours",
+                                                                label="Remember me (keep me logged in)",
                                                                 value=True,
                                                             ),
                                                             width=12,
@@ -467,6 +467,12 @@ def dashboard_layout():
         # Hidden stores
         dcc.Store(id="active-tab-store", data="executions"),
         dcc.Store(id="api-environment-store", storage_type="memory"),  # Don't set default data here
+        # Proactive token refresh interval (every 5 minutes)
+        dcc.Interval(
+            id="token-refresh-interval",
+            interval=5 * 60 * 1000,  # 5 minutes in milliseconds
+            n_intervals=0,
+        ),
     ]
     print(f"🏗️ Dashboard layout created with {len(layout)} components:")
     for i, component in enumerate(layout):
