@@ -392,7 +392,7 @@ class TestStatusTabsErrorHandling:
             with patch(
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN")
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 result_str = str(result)
 
                 # Should contain execution status section content (without main header)
@@ -450,7 +450,7 @@ class TestStatusTabsErrorHandling:
             with patch(
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN")
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 result_str = str(result)
 
                 # Should contain summary totals section header
@@ -514,7 +514,7 @@ class TestStatusTabsErrorHandling:
             with patch(
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN")
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 result_str = str(result)
 
                 # Should contain section headers (Updated: main "Execution Status" header removed)

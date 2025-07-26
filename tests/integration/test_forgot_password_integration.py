@@ -87,11 +87,11 @@ class TestForgotPasswordIntegration:
                 mock_response.status_code = 200
                 mock_post.return_value = mock_response
 
-                result_success = send_reset_callback(1, "existing@example.com")
+                result_success = send_reset_callback(1, "existing@example.com", "production")
 
                 # Test not found case
                 mock_response.status_code = 404
-                result_not_found = send_reset_callback(1, "nonexistent@example.com")
+                result_not_found = send_reset_callback(1, "nonexistent@example.com", "production")
 
                 # Both should return identical success messages (ignoring the email address)
                 # The important part is that both return the same message format and type
@@ -154,7 +154,7 @@ class TestForgotPasswordIntegration:
                 mock_post.return_value = mock_response
 
                 # Execute the callback
-                send_reset_callback(1, test_email)
+                send_reset_callback(1, test_email, "production")
 
                 # Verify the correct URL was called
                 mock_post.assert_called_once_with(

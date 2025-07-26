@@ -1,5 +1,6 @@
 """Executions table callbacks."""
 
+import requests
 from dash import Input, Output, State, no_update
 
 from ..config import DEFAULT_PAGE_SIZE

@@ -1,5 +1,6 @@
 """Profile and password change callbacks."""
 
+import requests
 from dash import Input, Output, State, no_update
 
 

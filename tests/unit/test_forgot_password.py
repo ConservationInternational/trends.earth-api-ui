@@ -120,7 +120,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with valid email
-        result = reset_callback["func"](1, "test@example.com")
+        result = reset_callback["func"](1, "test@example.com", "production")
 
         # Should return success message with 7 values
         assert len(result) == 7
@@ -149,7 +149,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with email that doesn't exist
-        result = reset_callback["func"](1, "nonexistent@example.com")
+        result = reset_callback["func"](1, "nonexistent@example.com", "production")
 
         # Should return the same success message to prevent email enumeration with 7 values
         assert len(result) == 7
@@ -172,7 +172,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with invalid email
-        result = reset_callback["func"](1, "invalid-email")
+        result = reset_callback["func"](1, "invalid-email", "production")
 
         # Should return validation error with 7 values
         assert len(result) == 7
@@ -191,7 +191,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with empty email
-        result = reset_callback["func"](1, "")
+        result = reset_callback["func"](1, "", "production")
 
         # Should return validation error with 7 values
         assert len(result) == 7
@@ -214,7 +214,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with valid email but network error
-        result = reset_callback["func"](1, "test@example.com")
+        result = reset_callback["func"](1, "test@example.com", "production")
 
         # Should return network error message with 7 values
         assert len(result) == 7
@@ -239,7 +239,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with valid email but timeout
-        result = reset_callback["func"](1, "test@example.com")
+        result = reset_callback["func"](1, "test@example.com", "production")
 
         # Should return timeout error message with 7 values
         assert len(result) == 7
@@ -264,7 +264,7 @@ class TestForgotPasswordCallbacks:
         )
 
         # Test with valid email but connection error
-        result = reset_callback["func"](1, "test@example.com")
+        result = reset_callback["func"](1, "test@example.com", "production")
 
         # Should return connection error message with 7 values
         assert len(result) == 7
