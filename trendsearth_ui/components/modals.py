@@ -483,3 +483,67 @@ def delete_script_modal():
         id="delete-script-modal",
         is_open=False,
     )
+
+
+def reset_rate_limits_modal():
+    """Create the rate limiting reset confirmation modal."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("⚠️ Reset Rate Limits")),
+            dbc.ModalBody(
+                [
+                    html.Div(
+                        [
+                            html.H5(
+                                "Warning: This action cannot be undone!",
+                                className="text-danger mb-3",
+                            ),
+                            html.P(
+                                "You are about to reset all rate limits for the entire API system. This will:",
+                                className="mb-2",
+                            ),
+                            html.Ul(
+                                [
+                                    html.Li("Clear all current rate limiting restrictions"),
+                                    html.Li(
+                                        "Allow all users to make unlimited requests temporarily"
+                                    ),
+                                    html.Li("Reset all rate limit counters to zero"),
+                                    html.Li("Potentially increase server load significantly"),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Alert(
+                                [
+                                    html.I(className="fas fa-exclamation-triangle me-2"),
+                                    "This is a system-wide operation that affects all users and should only be used in emergency situations or for maintenance purposes.",
+                                ],
+                                color="warning",
+                                className="mb-3",
+                            ),
+                            html.P(
+                                "Are you sure you want to proceed?", className="fw-bold text-center"
+                            ),
+                        ]
+                    )
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Cancel",
+                        id="cancel-reset-rate-limits",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        [html.I(className="fas fa-refresh me-2"), "Reset Rate Limits"],
+                        id="confirm-reset-rate-limits",
+                        color="danger",
+                    ),
+                ]
+            ),
+        ],
+        id="reset-rate-limits-modal",
+        is_open=False,
+    )

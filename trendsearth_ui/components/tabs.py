@@ -826,6 +826,169 @@ def admin_tab_content(role, is_admin):
                 if role == "SUPERADMIN"
                 else []
             ),
+            # Rate Limiting Reset Section (SUPERADMIN only)
+            *(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4(
+                                    [
+                                        html.I(className="fas fa-tachometer-alt me-2"),
+                                        "Rate Limiting Management",
+                                    ]
+                                )
+                            ),
+                            dbc.CardBody(
+                                [
+                                    # Rate Limiting Status Summary
+                                    html.Div(
+                                        [
+                                            html.H5("System Status", className="mb-3"),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dbc.CardBody(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Rate Limiting",
+                                                                                className="card-title",
+                                                                            ),
+                                                                            html.H4(
+                                                                                id="rate-limit-status",
+                                                                                children="Loading...",
+                                                                                className="text-primary",
+                                                                            ),
+                                                                        ]
+                                                                    )
+                                                                ],
+                                                                className="text-center",
+                                                            )
+                                                        ],
+                                                        width=3,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dbc.CardBody(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Storage Type",
+                                                                                className="card-title",
+                                                                            ),
+                                                                            html.H4(
+                                                                                id="rate-limit-storage",
+                                                                                children="Loading...",
+                                                                                className="text-info",
+                                                                            ),
+                                                                        ]
+                                                                    )
+                                                                ],
+                                                                className="text-center",
+                                                            )
+                                                        ],
+                                                        width=3,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dbc.CardBody(
+                                                                        [
+                                                                            html.H6(
+                                                                                "Active Limits",
+                                                                                className="card-title",
+                                                                            ),
+                                                                            html.H4(
+                                                                                id="rate-limit-count",
+                                                                                children="0",
+                                                                                className="text-warning",
+                                                                            ),
+                                                                        ]
+                                                                    )
+                                                                ],
+                                                                className="text-center",
+                                                            )
+                                                        ],
+                                                        width=3,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Button(
+                                                                [
+                                                                    html.I(
+                                                                        className="fas fa-refresh me-2"
+                                                                    ),
+                                                                    "Refresh Status",
+                                                                ],
+                                                                id="refresh-rate-limit-status-btn",
+                                                                color="outline-primary",
+                                                                className="w-100",
+                                                            ),
+                                                        ],
+                                                        width=3,
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                        ]
+                                    ),
+                                    # Active Rate Limits Table
+                                    html.Div(
+                                        [
+                                            html.H5("Active Rate Limits", className="mb-3"),
+                                            html.Div(
+                                                id="rate-limits-table-container",
+                                                children=[
+                                                    html.Div(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-spinner fa-spin me-2"
+                                                            ),
+                                                            "Loading active rate limits...",
+                                                        ],
+                                                        className="text-center text-muted p-4",
+                                                    )
+                                                ],
+                                            ),
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                    # Reset Rate Limits Section
+                                    html.Hr(),
+                                    html.H5("Reset Rate Limits", className="mb-3"),
+                                    html.P(
+                                        "Reset all rate limits for the API. This will clear all rate limiting restrictions for all users and endpoints.",
+                                        className="mb-3",
+                                    ),
+                                    dbc.Button(
+                                        [
+                                            html.I(className="fas fa-refresh me-2"),
+                                            "Reset All Rate Limits",
+                                        ],
+                                        id="admin-reset-rate-limits-btn",
+                                        color="warning",
+                                        className="me-2",
+                                    ),
+                                    dbc.Alert(
+                                        id="admin-reset-rate-limits-alert",
+                                        is_open=False,
+                                        dismissable=True,
+                                        duration=5000,
+                                    ),
+                                ]
+                            ),
+                        ],
+                        className="mb-4",
+                    ),
+                ]
+                if role == "SUPERADMIN"
+                else []
+            ),
             # Upload New Script Section
             dbc.Card(
                 [

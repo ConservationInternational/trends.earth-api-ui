@@ -19,6 +19,7 @@ from .modals import (
     edit_user_modal,
     json_modal,
     map_modal,
+    reset_rate_limits_modal,
 )
 
 
@@ -68,6 +69,7 @@ def create_main_layout():
             map_modal(),
             delete_user_modal(),
             delete_script_modal(),
+            reset_rate_limits_modal(),
         ],
         fluid=True,
     )
