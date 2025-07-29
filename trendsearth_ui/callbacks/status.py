@@ -164,11 +164,87 @@ def get_fallback_summary(token, api_environment="production", user_timezone="UTC
         )
 
 
+def fetch_deployment_info(api_environment="production"):
+    """Fetch deployment information from api-health endpoint."""
+    try:
+        resp = requests.get(f"{get_api_base(api_environment)}/api-health", timeout=5)
+        if resp.status_code == 200:
+            data = resp.json()
+            deployment = data.get("deployment")
+            if not deployment:
+                return html.Div(
+                    [
+                        html.I(className="fas fa-info-circle me-2 text-warning"),
+                        "Deployment information not available.",
+                    ],
+                    className="text-center text-muted p-3",
+                )
+
+            # Extract deployment details
+            environment = deployment.get("environment", "N/A")
+            branch = deployment.get("branch", "N/A")
+            commit_sha = deployment.get("commit_sha", "N/A")
+            short_commit = commit_sha[:7] if commit_sha != "N/A" else "N/A"
+
+            return html.Div(
+                [
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-server me-2"),
+                                    html.Strong("Environment: "),
+                                    html.Span(environment, className="text-primary"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-code-branch me-2"),
+                                    html.Strong("Branch: "),
+                                    html.Span(branch, className="text-info"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-hashtag me-2"),
+                                    html.Strong("Commit: "),
+                                    html.Span(short_commit, className="text-success"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                        ],
+                        className="row",
+                    )
+                ]
+            )
+        else:
+            return html.Div(
+                [
+                    html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
+                    f"Failed to fetch deployment info. Status: {resp.status_code}",
+                ],
+                className="text-center text-muted p-3",
+            )
+    except requests.exceptions.RequestException as e:
+        return html.Div(
+            [
+                html.I(className="fas fa-wifi me-2 text-danger"),
+                f"Error fetching deployment info: {str(e)}",
+            ],
+            className="text-center text-muted p-3",
+        )
+
+
 def register_callbacks(app):
     """Register status dashboard callbacks."""
 
     @app.callback(
-        Output("status-summary", "children"),
+        [
+            Output("status-summary", "children"),
+            Output("deployment-info-summary", "children"),
+        ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
@@ -188,11 +264,11 @@ def register_callbacks(app):
         """Update the status summary from the status endpoint with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return no_update
+            return no_update, no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
-            return no_update
+            return no_update, no_update
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -204,15 +280,20 @@ def register_callbacks(app):
         )
 
         if not is_manual_refresh:
-            cached_data = get_cached_data("summary")
-            if cached_data is not None:
-                return cached_data
+            cached_summary = get_cached_data("summary")
+            cached_deployment = get_cached_data("deployment")
+            if cached_summary is not None and cached_deployment is not None:
+                return cached_summary, cached_deployment
+
+        # Fetch deployment info from api-health endpoint
+        deployment_info = fetch_deployment_info(api_environment)
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token, api_environment):
             fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
             set_cached_data("summary", fallback_result, ttl=20)  # Shorter cache for fallback
-            return fallback_result
+            set_cached_data("deployment", deployment_info, ttl=300)  # Cache deployment for 5 min
+            return fallback_result, deployment_info
 
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -632,7 +713,8 @@ def register_callbacks(app):
 
                     # Cache the result for longer since we got valid data
                     set_cached_data("summary", summary, ttl=30)
-                    return summary
+                    set_cached_data("deployment", deployment_info, ttl=300)
+                    return summary, deployment_info
                 else:
                     result = html.Div(
                         [
@@ -644,12 +726,14 @@ def register_callbacks(app):
                         ]
                     )
                     set_cached_data("summary", result, ttl=10)
-                    return result
+                    set_cached_data("deployment", deployment_info, ttl=300)
+                    return result, deployment_info
             else:
                 # Fallback to basic system info
-                fallback_result = get_fallback_summary(token)
+                fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
                 set_cached_data("summary", fallback_result, ttl=15)
-                return fallback_result
+                set_cached_data("deployment", deployment_info, ttl=300)
+                return fallback_result, deployment_info
 
         except requests.exceptions.Timeout:
             error_result = html.Div(
@@ -665,7 +749,8 @@ def register_callbacks(app):
                 ]
             )
             set_cached_data("summary", error_result, ttl=5)  # Short cache for errors
-            return error_result
+            set_cached_data("deployment", deployment_info, ttl=300)
+            return error_result, deployment_info
         except requests.exceptions.ConnectionError:
             error_result = html.Div(
                 [
@@ -680,7 +765,8 @@ def register_callbacks(app):
                 ]
             )
             set_cached_data("summary", error_result, ttl=5)
-            return error_result
+            set_cached_data("deployment", deployment_info, ttl=300)
+            return error_result, deployment_info
         except Exception as e:
             error_result = html.Div(
                 [
@@ -691,7 +777,8 @@ def register_callbacks(app):
                 ]
             )
             set_cached_data("summary", error_result, ttl=5)
-            return error_result
+            set_cached_data("deployment", deployment_info, ttl=300)
+            return error_result, deployment_info
 
     @app.callback(
         Output("status-charts", "children"),

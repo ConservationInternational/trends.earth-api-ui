@@ -540,9 +540,11 @@ def register_callbacks(app):
                 else "Error"
             )
 
-            # Get active execution count
+            # Get active execution count (READY, RUNNING, and PENDING)
             exec_response = make_authenticated_request(
-                "/execution?status=RUNNING&per_page=1", token, timeout=5
+                "/execution?filter=status=READY,status=RUNNING,status=PENDING&per_page=1",
+                token,
+                timeout=5,
             )
             active_executions = (
                 exec_response.json().get("total", 0)

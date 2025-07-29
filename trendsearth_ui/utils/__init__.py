@@ -23,6 +23,13 @@ from .helpers import (
     safe_table_data,
 )
 from .json_utils import render_json_tree
+from .jwt_helpers import (
+    debug_token_expiration,
+    get_token_expiration,
+    get_token_info,
+    is_token_expired,
+    should_refresh_token,
+)
 
 __all__ = [
     "parse_date",
@@ -42,4 +49,9 @@ __all__ = [
     "is_auth_cookie_valid",
     "extract_auth_from_cookie",
     "clear_auth_cookie_data",
+    "should_refresh_token",
+    "get_token_expiration",
+    "get_token_info",
+    "is_token_expired",
+    "debug_token_expiration",
 ]

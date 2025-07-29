@@ -517,7 +517,15 @@ def status_tab_content(is_admin):
                                 ],
                                 type="default",
                                 color="#007bff",
-                            )
+                            ),
+                            html.Hr(),
+                            html.H5("Deployment Information", className="card-title mt-4"),
+                            dcc.Loading(
+                                id="loading-deployment-info",
+                                children=[html.Div(id="deployment-info-summary")],
+                                type="default",
+                                color="#007bff",
+                            ),
                         ]
                     ),
                 ],

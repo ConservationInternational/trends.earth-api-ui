@@ -17,6 +17,7 @@ from ..utils import (
     is_auth_cookie_valid,
     logout_user,
     refresh_access_token,
+    should_refresh_token,
 )
 
 
@@ -81,21 +82,11 @@ def register_callbacks(app):
                     f"🍪 Restored authentication from cookie for: {stored_email} (Environment: {stored_api_environment})"
                 )
 
-                # Check if token is still fresh before attempting to refresh
-                should_refresh = True
-                expires_at = cookie_data.get("expires_at")
-                if expires_at:
-                    try:
-                        expiration = datetime.fromisoformat(expires_at)
-                        time_until_expiry = expiration - datetime.now()
-                        # If token expires in more than 4 minutes, don't refresh (it's fresh)
-                        if time_until_expiry.total_seconds() > 240:  # 4 minutes
-                            should_refresh = False
-                    except Exception as e:
-                        print(f"Error parsing token expiration during page load: {e}")
+                # Check if the JWT access token needs to be refreshed (based on token expiration, not cookie expiration)
+                needs_refresh = should_refresh_token(stored_access_token, buffer_minutes=5)
 
-                # Only refresh if token is close to expiry or expired
-                if should_refresh:
+                if needs_refresh:
+                    print("🔄 Access token is expired or close to expiry, refreshing...")
                     # Try to refresh the access token to ensure it's still valid
                     # Use the stored API environment for the refresh call
                     new_access_token, expires_in = refresh_access_token(
@@ -149,6 +140,7 @@ def register_callbacks(app):
                             print("🍪 Cleared invalid authentication cookie")
                 else:
                     # Token is still fresh, use existing token without refreshing
+                    print("✅ Access token is still fresh, no refresh needed")
                     role = stored_user_data.get("role", "USER")
                     return (
                         dashboard_layout(),
@@ -673,10 +665,15 @@ def register_callbacks(app):
         if not current_token:
             return no_update
 
+        # Check if the JWT access token needs to be refreshed
+        needs_refresh = should_refresh_token(current_token, buffer_minutes=5)
+
+        if not needs_refresh:
+            return no_update
+
         # Check if we have a refresh token and API environment in cookie
         refresh_token = None
         api_environment = None
-        expires_at = None
         try:
             auth_cookie = request.cookies.get("auth_token")
             if auth_cookie:
@@ -684,24 +681,12 @@ def register_callbacks(app):
                 if cookie_data and isinstance(cookie_data, dict):
                     refresh_token = cookie_data.get("refresh_token")
                     api_environment = cookie_data.get("api_environment", "production")
-                    expires_at = cookie_data.get("expires_at")
         except Exception as e:
             print(f"Error reading refresh token from cookie: {e}")
             return no_update
 
         if not refresh_token:
             return no_update
-
-        # Check if token is still fresh (within last 30 seconds) to avoid unnecessary refreshes
-        if expires_at:
-            try:
-                expiration = datetime.fromisoformat(expires_at)
-                time_until_expiry = expiration - datetime.now()
-                # If token expires in more than 4.5 minutes, don't refresh (it's fresh)
-                if time_until_expiry.total_seconds() > 270:  # 4.5 minutes
-                    return no_update
-            except Exception as e:
-                print(f"Error parsing token expiration: {e}")
 
         # Try to refresh the token using the stored API environment
         new_access_token, expires_in = refresh_access_token(refresh_token, api_environment)
@@ -759,6 +744,12 @@ def register_callbacks(app):
         if not current_token or not user_data:
             return no_update, no_update
 
+        # Check if the JWT access token needs to be refreshed
+        needs_refresh = should_refresh_token(current_token, buffer_minutes=5)
+
+        if not needs_refresh:
+            return no_update, no_update
+
         # Check if we have a refresh token and API environment in cookie
         refresh_token = None
         api_environment = None
@@ -771,17 +762,16 @@ def register_callbacks(app):
                     refresh_token = cookie_data.get("refresh_token")
                     api_environment = cookie_data.get("api_environment", "production")
 
-                    # Check if cookie is still valid (not expired)
+                    # Check if cookie itself has expired (30-day limit)
                     expires_at = cookie_data.get("expires_at")
                     if expires_at:
-                        expiration = datetime.fromisoformat(expires_at)
-                        # If token is still fresh (more than 3 minutes until expiry), skip refresh
-                        time_until_expiry = expiration - datetime.now()
-                        if time_until_expiry.total_seconds() > 180:  # 3 minutes
-                            return no_update, no_update
-                        elif datetime.now() >= expiration:
-                            print("🍪 Cookie has expired, clearing session")
-                            return None, None
+                        try:
+                            cookie_expiration = datetime.fromisoformat(expires_at)
+                            if datetime.now() >= cookie_expiration:
+                                print("🍪 Cookie has expired, clearing session")
+                                return None, None
+                        except Exception as e:
+                            print(f"Error parsing cookie expiration: {e}")
         except Exception as e:
             print(f"Error reading refresh token from cookie during proactive refresh: {e}")
             return no_update, no_update

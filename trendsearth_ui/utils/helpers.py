@@ -314,14 +314,22 @@ def make_authenticated_request(
     resp = getattr(requests, method.lower())(full_url, **kwargs)
 
     # If authentication failed, try to refresh the token and retry
+    # Look for 401 Unauthorized or 422 with signature-related errors
     if resp.status_code in [401, 422] and "signature" in resp.text.lower():
         import json
 
         from flask import request
 
+        from .jwt_helpers import should_refresh_token
+
         print(
             f"🔄 Authentication failed for {method} {full_url} (status: {resp.status_code}), attempting token refresh..."
         )
+
+        # Check if the token actually needs refreshing (might be an API issue, not token expiry)
+        if not should_refresh_token(token, buffer_minutes=1):
+            print("⚠️ Token appears to still be valid, API authentication issue may be server-side")
+            return resp  # Return original response if token seems fine
 
         # Try to get refresh token from cookie
         refresh_token = None
