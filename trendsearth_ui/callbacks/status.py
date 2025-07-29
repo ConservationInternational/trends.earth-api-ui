@@ -562,9 +562,33 @@ def fetch_swarm_info(token, api_environment="production"):
                     ]
                 )
 
+                # Add capacity alerts if needed
+                capacity_alerts = []
+                if overall_capacity_used >= 90:
+                    capacity_alerts.append(
+                        html.Div(
+                            [
+                                html.I(className="fas fa-exclamation-triangle me-2"),
+                                f"Critical: Swarm capacity at {overall_capacity_used:.1f}%. Consider adding more nodes.",
+                            ],
+                            className="alert alert-danger alert-sm mb-2",
+                        )
+                    )
+                elif overall_capacity_used >= 75:
+                    capacity_alerts.append(
+                        html.Div(
+                            [
+                                html.I(className="fas fa-exclamation-circle me-2"),
+                                f"Warning: Swarm capacity at {overall_capacity_used:.1f}%. Monitor closely.",
+                            ],
+                            className="alert alert-warning alert-sm mb-2",
+                        )
+                    )
+
                 return html.Div(
                     [
                         enhanced_swarm_summary,
+                        *capacity_alerts,  # Add any capacity alerts
                         html.Hr(),
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
