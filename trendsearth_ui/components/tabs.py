@@ -26,9 +26,26 @@ def executions_tab_content():
     ]
 
     style_data_conditional = [
-        {"condition": "params.data.status === 'FAILED'", "style": {"backgroundColor": "#F8D7DA"}},
-        {"condition": "params.data.status === 'FINISHED'", "style": {"backgroundColor": "#D1E7DD"}},
-        {"condition": "params.data.status === 'RUNNING'", "style": {"backgroundColor": "#CCE5FF"}},
+        {
+            "condition": "params.data.status === 'FAILED'",
+            "style": {"backgroundColor": "#F8D7DA", "color": "#721C24"},
+        },
+        {
+            "condition": "params.data.status === 'FINISHED'",
+            "style": {"backgroundColor": "#D1E7DD", "color": "#0F5132"},
+        },
+        {
+            "condition": "params.data.status === 'RUNNING'",
+            "style": {"backgroundColor": "#CCE5FF", "color": "#084298"},
+        },
+        {
+            "condition": "params.data.status === 'READY'",
+            "style": {"backgroundColor": "#FFF3CD", "color": "#664D03"},
+        },
+        {
+            "condition": "params.data.status === 'PENDING'",
+            "style": {"backgroundColor": "#E2E3E5", "color": "#495057"},
+        },
     ]
 
     return html.Div(
@@ -196,10 +213,36 @@ def scripts_tab_content():
     style_data_conditional = [
         {
             "condition": "params.data.status === 'PUBLISHED'",
-            "style": {"backgroundColor": "#D1E7DD"},
+            "style": {"backgroundColor": "#D1E7DD", "color": "#0F5132"},
         },
-        {"condition": "params.data.status === 'DRAFT'", "style": {"backgroundColor": "#FFF3CD"}},
-        {"condition": "params.data.status === 'ARCHIVED'", "style": {"backgroundColor": "#F8D7DA"}},
+        {
+            "condition": "params.data.status === 'DRAFT'",
+            "style": {"backgroundColor": "#FFF3CD", "color": "#664D03"},
+        },
+        {
+            "condition": "params.data.status === 'ARCHIVED'",
+            "style": {"backgroundColor": "#F8D7DA", "color": "#721C24"},
+        },
+        {
+            "condition": "params.data.status === 'SUCCESS'",
+            "style": {"backgroundColor": "#D1E7DD", "color": "#0F5132"},
+        },
+        {
+            "condition": "params.data.status === 'FAIL'",
+            "style": {"backgroundColor": "#F8D7DA", "color": "#721C24"},
+        },
+        {
+            "condition": "params.data.status === 'BUILDING'",
+            "style": {"backgroundColor": "#CCE5FF", "color": "#084298"},
+        },
+        {
+            "condition": "params.data.status === 'ACTIVE'",
+            "style": {"backgroundColor": "#D1E7DD", "color": "#0F5132"},
+        },
+        {
+            "condition": "params.data.status === 'INACTIVE'",
+            "style": {"backgroundColor": "#E2E3E5", "color": "#495057"},
+        },
     ]
 
     return html.Div(
@@ -1033,10 +1076,9 @@ def admin_tab_content(role, is_admin):
                                                         id="admin-new-script-status",
                                                         options=[
                                                             {"label": "Draft", "value": "DRAFT"},
-                                                            {"label": "Active", "value": "ACTIVE"},
                                                             {
-                                                                "label": "Inactive",
-                                                                "value": "INACTIVE",
+                                                                "label": "Published",
+                                                                "value": "PUBLISHED",
                                                             },
                                                         ],
                                                         value="DRAFT",
