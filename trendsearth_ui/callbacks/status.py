@@ -272,6 +272,164 @@ def fetch_deployment_info(api_environment="production"):
         )
 
 
+def fetch_swarm_info(token, api_environment="production"):
+    """Fetch Docker Swarm information from status/swarm endpoint."""
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        resp = requests.get(
+            f"{get_api_base(api_environment)}/status/swarm", 
+            headers=headers, 
+            timeout=5
+        )
+        
+        if resp.status_code == 200:
+            data = resp.json().get("data", {})
+            
+            swarm_active = data.get("swarm_active", False)
+            total_nodes = data.get("total_nodes", 0)
+            total_managers = data.get("total_managers", 0)
+            total_workers = data.get("total_workers", 0)
+            nodes = data.get("nodes", [])
+            
+            if not swarm_active:
+                return html.Div(
+                    [
+                        html.I(className="fas fa-exclamation-circle me-2 text-warning"),
+                        "Docker Swarm is not active.",
+                    ],
+                    className="text-center text-muted p-3",
+                )
+            
+            # Create swarm summary section
+            swarm_summary = html.Div([
+                html.Div([
+                    html.Div([
+                        html.I(className="fas fa-server me-2"),
+                        html.Strong("Total Nodes: "),
+                        html.Span(str(total_nodes), className="text-primary"),
+                    ], className="col-md-4 text-center mb-2"),
+                    html.Div([
+                        html.I(className="fas fa-crown me-2"),
+                        html.Strong("Managers: "),
+                        html.Span(str(total_managers), className="text-success"),
+                    ], className="col-md-4 text-center mb-2"),
+                    html.Div([
+                        html.I(className="fas fa-users me-2"),
+                        html.Strong("Workers: "),
+                        html.Span(str(total_workers), className="text-info"),
+                    ], className="col-md-4 text-center mb-2"),
+                ], className="row mb-3")
+            ])
+            
+            # Create nodes table if we have node information
+            if nodes:
+                # Create table headers
+                table_header = html.Thead([
+                    html.Tr([
+                        html.Th("Hostname", className="text-center"),
+                        html.Th("Role", className="text-center"),
+                        html.Th("Status", className="text-center"),
+                        html.Th("Availability", className="text-center"),
+                        html.Th("CPU Cores", className="text-center"),
+                        html.Th("Memory (GB)", className="text-center"),
+                        html.Th("Running Tasks", className="text-center"),
+                        html.Th("Available Capacity", className="text-center"),
+                    ])
+                ])
+                
+                # Create table rows
+                table_rows = []
+                for node in nodes:
+                    hostname = node.get("hostname", "Unknown")
+                    role = node.get("role", "Unknown")
+                    state = node.get("state", "Unknown")
+                    availability = node.get("availability", "Unknown")
+                    cpu_count = node.get("cpu_count", 0)
+                    memory_gb = node.get("memory_gb", 0)
+                    running_tasks = node.get("running_tasks", 0)
+                    available_capacity = node.get("available_capacity", 0)
+                    is_leader = node.get("is_leader", False)
+                    
+                    # Style role cell based on role and leadership
+                    role_content = role.title()
+                    if is_leader:
+                        role_content += " (Leader)"
+                        role_class = "text-warning fw-bold"
+                    elif role.lower() == "manager":
+                        role_class = "text-success fw-bold"
+                    else:
+                        role_class = "text-info"
+                    
+                    # Style status cell based on state
+                    if state.lower() == "ready":
+                        state_class = "text-success"
+                    elif state.lower() == "down":
+                        state_class = "text-danger"
+                    else:
+                        state_class = "text-warning"
+                    
+                    # Style availability cell
+                    if availability.lower() == "active":
+                        avail_class = "text-success"
+                    elif availability.lower() == "drain":
+                        avail_class = "text-warning"
+                    else:
+                        avail_class = "text-danger"
+                    
+                    table_rows.append(
+                        html.Tr([
+                            html.Td(hostname, className="text-center"),
+                            html.Td(role_content, className=f"text-center {role_class}"),
+                            html.Td(state.title(), className=f"text-center {state_class}"),
+                            html.Td(availability.title(), className=f"text-center {avail_class}"),
+                            html.Td(f"{cpu_count:.1f}", className="text-center"),
+                            html.Td(f"{memory_gb:.1f}", className="text-center"),
+                            html.Td(str(running_tasks), className="text-center"),
+                            html.Td(str(available_capacity), className="text-center"),
+                        ])
+                    )
+                
+                table_body = html.Tbody(table_rows)
+                nodes_table = html.Table(
+                    [table_header, table_body],
+                    className="table table-striped table-hover table-sm mt-3"
+                )
+                
+                return html.Div([
+                    swarm_summary,
+                    html.Hr(),
+                    html.H6("Swarm Nodes", className="mb-3"),
+                    html.Div([nodes_table], className="table-responsive")
+                ])
+            else:
+                return swarm_summary
+                
+        elif resp.status_code == 403:
+            return html.Div(
+                [
+                    html.I(className="fas fa-lock me-2 text-warning"),
+                    "Access denied. Admin privileges required for swarm information.",
+                ],
+                className="text-center text-muted p-3",
+            )
+        else:
+            return html.Div(
+                [
+                    html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
+                    f"Failed to fetch swarm info. Status: {resp.status_code}",
+                ],
+                className="text-center text-muted p-3",
+            )
+    except requests.exceptions.RequestException as e:
+        return html.Div(
+            [
+                html.I(className="fas fa-wifi me-2 text-danger"),
+                f"Error fetching swarm info: {str(e)}",
+            ],
+            className="text-center text-muted p-3",
+        )
+
+
 def register_callbacks(app):
     """Register status dashboard callbacks."""
 
@@ -279,6 +437,7 @@ def register_callbacks(app):
         [
             Output("status-summary", "children"),
             Output("deployment-info-summary", "children"),
+            Output("swarm-info-summary", "children"),
         ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
@@ -299,11 +458,11 @@ def register_callbacks(app):
         """Update the status summary from the status endpoint with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return no_update, no_update
+            return no_update, no_update, no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
-            return no_update, no_update
+            return no_update, no_update, no_update
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -317,18 +476,23 @@ def register_callbacks(app):
         if not is_manual_refresh:
             cached_summary = get_cached_data("summary")
             cached_deployment = get_cached_data("deployment")
-            if cached_summary is not None and cached_deployment is not None:
-                return cached_summary, cached_deployment
+            cached_swarm = get_cached_data("swarm")
+            if cached_summary is not None and cached_deployment is not None and cached_swarm is not None:
+                return cached_summary, cached_deployment, cached_swarm
 
         # Fetch deployment info from api-health endpoint
         deployment_info = fetch_deployment_info(api_environment)
+        
+        # Fetch Docker Swarm information
+        swarm_info = fetch_swarm_info(token, api_environment)
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token, api_environment):
             fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
             set_cached_data("summary", fallback_result, ttl=20)  # Shorter cache for fallback
             set_cached_data("deployment", deployment_info, ttl=300)  # Cache deployment for 5 min
-            return fallback_result, deployment_info
+            set_cached_data("swarm", swarm_info, ttl=300)  # Cache swarm for 5 min
+            return fallback_result, deployment_info, swarm_info
 
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -379,10 +543,6 @@ def register_callbacks(app):
                         "executions_running": latest_status.get("executions_running", 0),
                         "executions_count": latest_status.get("executions_count", 0),
                         "users_count": latest_status.get("users_count", 0),
-                        "memory_available_percent": latest_status.get(
-                            "memory_available_percent", 0
-                        ),
-                        # CPU and memory percentages will be calculated as 10-minute averages below
                     }
 
                     # Calculate 24-hour cumulative totals for finished and failed executions
@@ -442,67 +602,25 @@ def register_callbacks(app):
                         1, metrics["executions_finished_24h"] + metrics["executions_failed_24h"]
                     )
 
-                    # Calculate 10-minute averages for CPU and memory usage
-                    try:
-                        # Get 10-minute window data for average calculations using UTC time
-                        now_utc_avg = datetime.now(timezone.utc)
-                        start_10m_utc = now_utc_avg - timedelta(minutes=10)
-
-                        avg_resp = requests.get(
-                            f"{get_api_base(api_environment)}/status",
-                            headers=headers,
-                            params={
-                                "per_page": 10,  # Last 10 data points (approximately 10 minutes)
-                                "start_date": start_10m_utc.isoformat(),
-                                "sort": "timestamp",
-                            },
-                            timeout=3,  # Short timeout for this additional request
-                        )
-
-                        cpu_usage_avg = latest_status.get("cpu_usage_percent", 0)
-                        memory_used_avg = 100 - latest_status.get("memory_available_percent", 0)
-
-                        if avg_resp.status_code == 200:
-                            avg_data = avg_resp.json().get("data", [])
-                            if avg_data and len(avg_data) > 1:
-                                # Calculate averages from the 10-minute data
-                                cpu_values = []
-                                memory_values = []
-
-                                for entry in avg_data:
-                                    cpu_val = entry.get("cpu_usage_percent")
-                                    memory_available = entry.get("memory_available_percent")
-
-                                    if cpu_val is not None:
-                                        cpu_values.append(cpu_val)
-                                    if memory_available is not None:
-                                        memory_values.append(100 - memory_available)
-
-                                # Calculate averages if we have valid data
-                                if cpu_values:
-                                    cpu_usage_avg = sum(cpu_values) / len(cpu_values)
-                                if memory_values:
-                                    memory_used_avg = sum(memory_values) / len(memory_values)
-
-                    except Exception:
-                        # Fallback to current status values if average calculation fails
-                        cpu_usage_avg = latest_status.get("cpu_usage_percent", 0)
-                        memory_used_avg = 100 - latest_status.get("memory_available_percent", 0)
-
-                    # Update metrics with averaged values
-                    metrics["cpu_usage_percent"] = cpu_usage_avg
-                    metrics["memory_used_percent"] = memory_used_avg
-
-                    # Determine system health based on metrics
+                    # Determine system health based on execution metrics
                     health_status = "Healthy"
                     health_color = "success"
 
-                    if metrics["cpu_usage_percent"] > 90 or metrics["memory_used_percent"] > 90:
-                        health_status = "Critical"
-                        health_color = "danger"
-                    elif metrics["cpu_usage_percent"] > 75 or metrics["memory_used_percent"] > 75:
+                    # Simple health check based on active executions and failure rate
+                    total_active = metrics["executions_active"] + metrics["executions_ready"] + metrics["executions_running"]
+                    if total_active > 50:  # High load
                         health_status = "Warning"
                         health_color = "warning"
+                    
+                    # Check failure rate if we have completed executions
+                    if completed_total > 1:
+                        failure_rate = metrics["executions_failed_24h"] / completed_total * 100
+                        if failure_rate > 50:  # High failure rate
+                            health_status = "Critical"
+                            health_color = "danger"
+                        elif failure_rate > 25:  # Moderate failure rate
+                            health_status = "Warning"
+                            health_color = "warning"
 
                     summary = html.Div(
                         [
@@ -516,34 +634,14 @@ def register_callbacks(app):
                                                 className=f"badge bg-{health_color} fs-6 px-3 py-2",
                                             ),
                                         ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("CPU Usage (10-min avg)", className="mb-2"),
-                                            html.H4(
-                                                f"{metrics['cpu_usage_percent']:.1f}%",
-                                                className="text-info",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Memory Used (10-min avg)", className="mb-2"),
-                                            html.H4(
-                                                f"{metrics['memory_used_percent']:.1f}%",
-                                                className="text-info",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
+                                        className="col-md-6 text-center",
                                     ),
                                     html.Div(
                                         [
                                             html.H6("Last Updated", className="mb-2"),
                                             formatted_date,
                                         ],
-                                        className="col-md-3 text-center",
+                                        className="col-md-6 text-center",
                                     ),
                                 ],
                                 className="row mb-4",
@@ -749,7 +847,8 @@ def register_callbacks(app):
                     # Cache the result for longer since we got valid data
                     set_cached_data("summary", summary, ttl=30)
                     set_cached_data("deployment", deployment_info, ttl=300)
-                    return summary, deployment_info
+                    set_cached_data("swarm", swarm_info, ttl=300)
+                    return summary, deployment_info, swarm_info
                 else:
                     result = html.Div(
                         [
@@ -762,13 +861,15 @@ def register_callbacks(app):
                     )
                     set_cached_data("summary", result, ttl=10)
                     set_cached_data("deployment", deployment_info, ttl=300)
-                    return result, deployment_info
+                    set_cached_data("swarm", swarm_info, ttl=300)
+                    return result, deployment_info, swarm_info
             else:
                 # Fallback to basic system info
                 fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
                 set_cached_data("summary", fallback_result, ttl=15)
                 set_cached_data("deployment", deployment_info, ttl=300)
-                return fallback_result, deployment_info
+                set_cached_data("swarm", swarm_info, ttl=300)
+                return fallback_result, deployment_info, swarm_info
 
         except requests.exceptions.Timeout:
             error_result = html.Div(
@@ -785,7 +886,8 @@ def register_callbacks(app):
             )
             set_cached_data("summary", error_result, ttl=5)  # Short cache for errors
             set_cached_data("deployment", deployment_info, ttl=300)
-            return error_result, deployment_info
+            set_cached_data("swarm", swarm_info, ttl=300)
+            return error_result, deployment_info, swarm_info
         except requests.exceptions.ConnectionError:
             error_result = html.Div(
                 [
@@ -801,7 +903,8 @@ def register_callbacks(app):
             )
             set_cached_data("summary", error_result, ttl=5)
             set_cached_data("deployment", deployment_info, ttl=300)
-            return error_result, deployment_info
+            set_cached_data("swarm", swarm_info, ttl=300)
+            return error_result, deployment_info, swarm_info
         except Exception as e:
             error_result = html.Div(
                 [
@@ -813,7 +916,8 @@ def register_callbacks(app):
             )
             set_cached_data("summary", error_result, ttl=5)
             set_cached_data("deployment", deployment_info, ttl=300)
-            return error_result, deployment_info
+            set_cached_data("swarm", swarm_info, ttl=300)
+            return error_result, deployment_info, swarm_info
 
     @app.callback(
         Output("status-charts", "children"),
@@ -1046,9 +1150,6 @@ def register_callbacks(app):
                                 "executions_failed": log.get("executions_failed", 0),
                                 "executions_count": log.get("executions_count", 0),
                                 "users_count": log.get("users_count", 0),
-                                "memory_available_percent": log.get("memory_available_percent", 0),
-                                "memory_used_percent": 100 - log.get("memory_available_percent", 0),
-                                "cpu_usage_percent": log.get("cpu_usage_percent", 0),
                             }
                         )
                     except Exception:
@@ -1223,59 +1324,7 @@ def register_callbacks(app):
                 )
             )
 
-            # 3. System Resource Usage Chart (only if data exists)
-            if df["cpu_usage_percent"].max() > 0 or df["memory_used_percent"].max() > 0:
-                resource_fig = px.line(
-                    df,
-                    x="timestamp",
-                    y=["cpu_usage_percent", "memory_used_percent"],
-                    labels={"timestamp": "Time", "value": "Percentage", "variable": "Resource"},
-                )
-
-                resource_fig.update_layout(
-                    height=300,
-                    showlegend=True,
-                    xaxis_title=get_chart_axis_label(safe_timezone, "Time"),
-                    yaxis_title="Percentage (%)",
-                    hovermode="x unified",
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                    yaxis={"range": [0, 100]},
-                    xaxis={
-                        "type": "date",
-                        "tickformat": tick_format,
-                        "range": [
-                            start_time_local,
-                            end_time_local,
-                        ],  # Ensure full time range is shown
-                    },
-                )
-
-                # Color mapping for resources
-                resource_colors = {
-                    "cpu_usage_percent": "#dc3545",
-                    "memory_used_percent": "#17a2b8",
-                }
-
-                # Update trace colors
-                for trace in resource_fig.data:
-                    var_name = trace.name
-                    if var_name in resource_colors:
-                        trace.line.color = resource_colors[var_name]
-
-                charts.append(
-                    html.Div(
-                        [
-                            html.H6("System Resource Usage"),
-                            dcc.Graph(
-                                figure=resource_fig,
-                                config={"displayModeBar": False, "responsive": True},
-                            ),
-                        ],
-                        className="mb-3",
-                    )
-                )
-
-            # 4. Users Chart
+            # 3. Users Chart
             if time_period in ["day", "week", "month"] and df["users_count"].max() > 0:
                 # Create simple line chart for Users
                 users_fig = go.Figure()
