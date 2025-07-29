@@ -167,7 +167,13 @@ def get_fallback_summary(token, api_environment="production", user_timezone="UTC
 def fetch_deployment_info(api_environment="production"):
     """Fetch deployment information from api-health endpoint."""
     try:
-        resp = requests.get(f"{get_api_base(api_environment)}/api-health", timeout=5)
+        # Get base URL and construct root-level api-health endpoint
+        base_domain = get_api_base(api_environment)
+        # Extract base domain from API URL (remove /api/v1 part)
+        if "/api/v1" in base_domain:
+            base_domain = base_domain.replace("/api/v1", "")
+
+        resp = requests.get(f"{base_domain}/api-health", timeout=5)
         if resp.status_code == 200:
             data = resp.json()
             deployment = data.get("deployment")

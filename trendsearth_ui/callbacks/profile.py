@@ -1,7 +1,7 @@
 """Profile and password change callbacks."""
 
-import requests # noqa: F401
 from dash import Input, Output, State, no_update
+import requests  # noqa: F401
 
 
 def register_callbacks(app):

@@ -1,8 +1,7 @@
 """Executions table callbacks."""
 
-import requests # noqa: F401
-
 from dash import Input, Output, State, no_update
+import requests  # noqa: F401
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
