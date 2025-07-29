@@ -5,7 +5,6 @@ import time
 
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import requests
 
@@ -277,20 +276,18 @@ def fetch_swarm_info(token, api_environment="production"):
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
-            f"{get_api_base(api_environment)}/status/swarm", 
-            headers=headers, 
-            timeout=5
+            f"{get_api_base(api_environment)}/status/swarm", headers=headers, timeout=5
         )
-        
+
         if resp.status_code == 200:
             data = resp.json().get("data", {})
-            
+
             swarm_active = data.get("swarm_active", False)
             total_nodes = data.get("total_nodes", 0)
             total_managers = data.get("total_managers", 0)
             total_workers = data.get("total_workers", 0)
             nodes = data.get("nodes", [])
-            
+
             if not swarm_active:
                 return html.Div(
                     [
@@ -299,44 +296,62 @@ def fetch_swarm_info(token, api_environment="production"):
                     ],
                     className="text-center text-muted p-3",
                 )
-            
+
             # Create swarm summary section
-            swarm_summary = html.Div([
-                html.Div([
-                    html.Div([
-                        html.I(className="fas fa-server me-2"),
-                        html.Strong("Total Nodes: "),
-                        html.Span(str(total_nodes), className="text-primary"),
-                    ], className="col-md-4 text-center mb-2"),
-                    html.Div([
-                        html.I(className="fas fa-crown me-2"),
-                        html.Strong("Managers: "),
-                        html.Span(str(total_managers), className="text-success"),
-                    ], className="col-md-4 text-center mb-2"),
-                    html.Div([
-                        html.I(className="fas fa-users me-2"),
-                        html.Strong("Workers: "),
-                        html.Span(str(total_workers), className="text-info"),
-                    ], className="col-md-4 text-center mb-2"),
-                ], className="row mb-3")
-            ])
-            
+            swarm_summary = html.Div(
+                [
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-server me-2"),
+                                    html.Strong("Total Nodes: "),
+                                    html.Span(str(total_nodes), className="text-primary"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-crown me-2"),
+                                    html.Strong("Managers: "),
+                                    html.Span(str(total_managers), className="text-success"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-users me-2"),
+                                    html.Strong("Workers: "),
+                                    html.Span(str(total_workers), className="text-info"),
+                                ],
+                                className="col-md-4 text-center mb-2",
+                            ),
+                        ],
+                        className="row mb-3",
+                    )
+                ]
+            )
+
             # Create nodes table if we have node information
             if nodes:
                 # Create table headers
-                table_header = html.Thead([
-                    html.Tr([
-                        html.Th("Hostname", className="text-center"),
-                        html.Th("Role", className="text-center"),
-                        html.Th("Status", className="text-center"),
-                        html.Th("Availability", className="text-center"),
-                        html.Th("CPU Cores", className="text-center"),
-                        html.Th("Memory (GB)", className="text-center"),
-                        html.Th("Running Tasks", className="text-center"),
-                        html.Th("Available Capacity", className="text-center"),
-                    ])
-                ])
-                
+                table_header = html.Thead(
+                    [
+                        html.Tr(
+                            [
+                                html.Th("Hostname", className="text-center"),
+                                html.Th("Role", className="text-center"),
+                                html.Th("Status", className="text-center"),
+                                html.Th("Availability", className="text-center"),
+                                html.Th("CPU Cores", className="text-center"),
+                                html.Th("Memory (GB)", className="text-center"),
+                                html.Th("Running Tasks", className="text-center"),
+                                html.Th("Available Capacity", className="text-center"),
+                            ]
+                        )
+                    ]
+                )
+
                 # Create table rows
                 table_rows = []
                 for node in nodes:
@@ -349,7 +364,7 @@ def fetch_swarm_info(token, api_environment="production"):
                     running_tasks = node.get("running_tasks", 0)
                     available_capacity = node.get("available_capacity", 0)
                     is_leader = node.get("is_leader", False)
-                    
+
                     # Style role cell based on role and leadership
                     role_content = role.title()
                     if is_leader:
@@ -359,7 +374,7 @@ def fetch_swarm_info(token, api_environment="production"):
                         role_class = "text-success fw-bold"
                     else:
                         role_class = "text-info"
-                    
+
                     # Style status cell based on state
                     if state.lower() == "ready":
                         state_class = "text-success"
@@ -367,7 +382,7 @@ def fetch_swarm_info(token, api_environment="production"):
                         state_class = "text-danger"
                     else:
                         state_class = "text-warning"
-                    
+
                     # Style availability cell
                     if availability.lower() == "active":
                         avail_class = "text-success"
@@ -375,35 +390,41 @@ def fetch_swarm_info(token, api_environment="production"):
                         avail_class = "text-warning"
                     else:
                         avail_class = "text-danger"
-                    
+
                     table_rows.append(
-                        html.Tr([
-                            html.Td(hostname, className="text-center"),
-                            html.Td(role_content, className=f"text-center {role_class}"),
-                            html.Td(state.title(), className=f"text-center {state_class}"),
-                            html.Td(availability.title(), className=f"text-center {avail_class}"),
-                            html.Td(f"{cpu_count:.1f}", className="text-center"),
-                            html.Td(f"{memory_gb:.1f}", className="text-center"),
-                            html.Td(str(running_tasks), className="text-center"),
-                            html.Td(str(available_capacity), className="text-center"),
-                        ])
+                        html.Tr(
+                            [
+                                html.Td(hostname, className="text-center"),
+                                html.Td(role_content, className=f"text-center {role_class}"),
+                                html.Td(state.title(), className=f"text-center {state_class}"),
+                                html.Td(
+                                    availability.title(), className=f"text-center {avail_class}"
+                                ),
+                                html.Td(f"{cpu_count:.1f}", className="text-center"),
+                                html.Td(f"{memory_gb:.1f}", className="text-center"),
+                                html.Td(str(running_tasks), className="text-center"),
+                                html.Td(str(available_capacity), className="text-center"),
+                            ]
+                        )
                     )
-                
+
                 table_body = html.Tbody(table_rows)
                 nodes_table = html.Table(
                     [table_header, table_body],
-                    className="table table-striped table-hover table-sm mt-3"
+                    className="table table-striped table-hover table-sm mt-3",
                 )
-                
-                return html.Div([
-                    swarm_summary,
-                    html.Hr(),
-                    html.H6("Swarm Nodes", className="mb-3"),
-                    html.Div([nodes_table], className="table-responsive")
-                ])
+
+                return html.Div(
+                    [
+                        swarm_summary,
+                        html.Hr(),
+                        html.H6("Swarm Nodes", className="mb-3"),
+                        html.Div([nodes_table], className="table-responsive"),
+                    ]
+                )
             else:
                 return swarm_summary
-                
+
         elif resp.status_code == 403:
             return html.Div(
                 [
@@ -477,12 +498,16 @@ def register_callbacks(app):
             cached_summary = get_cached_data("summary")
             cached_deployment = get_cached_data("deployment")
             cached_swarm = get_cached_data("swarm")
-            if cached_summary is not None and cached_deployment is not None and cached_swarm is not None:
+            if (
+                cached_summary is not None
+                and cached_deployment is not None
+                and cached_swarm is not None
+            ):
                 return cached_summary, cached_deployment, cached_swarm
 
         # Fetch deployment info from api-health endpoint
         deployment_info = fetch_deployment_info(api_environment)
-        
+
         # Fetch Docker Swarm information
         swarm_info = fetch_swarm_info(token, api_environment)
 
@@ -607,11 +632,15 @@ def register_callbacks(app):
                     health_color = "success"
 
                     # Simple health check based on active executions and failure rate
-                    total_active = metrics["executions_active"] + metrics["executions_ready"] + metrics["executions_running"]
+                    total_active = (
+                        metrics["executions_active"]
+                        + metrics["executions_ready"]
+                        + metrics["executions_running"]
+                    )
                     if total_active > 50:  # High load
                         health_status = "Warning"
                         health_color = "warning"
-                    
+
                     # Check failure rate if we have completed executions
                     if completed_total > 1:
                         failure_rate = metrics["executions_failed_24h"] / completed_total * 100
