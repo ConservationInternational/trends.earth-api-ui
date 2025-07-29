@@ -56,20 +56,20 @@ def test_ag_grid_dashgridoptions_includes_text_selection():
         source_code = inspect.getsource(tabs)
 
         # Check that enableCellTextSelection and ensureDomOrder are configured
-        assert '"enableCellTextSelection": True' in source_code, (
-            "dashGridOptions should include enableCellTextSelection: True"
-        )
-        assert '"ensureDomOrder": True' in source_code, (
-            "dashGridOptions should include ensureDomOrder: True"
-        )
+        assert (
+            '"enableCellTextSelection": True' in source_code
+        ), "dashGridOptions should include enableCellTextSelection: True"
+        assert (
+            '"ensureDomOrder": True' in source_code
+        ), "dashGridOptions should include ensureDomOrder: True"
 
         # Check that it's applied to all three main tables
-        assert source_code.count('"enableCellTextSelection": True') >= 3, (
-            "Text selection should be enabled on all three tables"
-        )
-        assert source_code.count('"ensureDomOrder": True') >= 3, (
-            "ensureDomOrder should be enabled on all three tables"
-        )
+        assert (
+            source_code.count('"enableCellTextSelection": True') >= 3
+        ), "Text selection should be enabled on all three tables"
+        assert (
+            source_code.count('"ensureDomOrder": True') >= 3
+        ), "ensureDomOrder should be enabled on all three tables"
 
     except ImportError as e:
         pytest.skip(f"Could not import tabs module: {e}")
@@ -90,12 +90,12 @@ def test_no_custom_css_js_files():
     )
 
     # These files should NOT exist since we're using built-in AG Grid functionality
-    assert not os.path.exists(css_path), (
-        "Custom CSS file should not exist when using built-in AG Grid text selection"
-    )
-    assert not os.path.exists(js_path), (
-        "Custom JS file should not exist when using built-in AG Grid text selection"
-    )
+    assert not os.path.exists(
+        css_path
+    ), "Custom CSS file should not exist when using built-in AG Grid text selection"
+    assert not os.path.exists(
+        js_path
+    ), "Custom JS file should not exist when using built-in AG Grid text selection"
 
 
 def test_app_index_string_clean():
@@ -113,9 +113,9 @@ def test_app_index_string_clean():
 
         # Check that the index_string doesn't reference custom scripts
         index_string = app.app.index_string
-        assert "table-text-selection.js" not in index_string, (
-            "app.index_string should not reference custom JS files"
-        )
+        assert (
+            "table-text-selection.js" not in index_string
+        ), "app.index_string should not reference custom JS files"
 
     except ImportError as e:
         pytest.skip(f"Could not import app module: {e}")

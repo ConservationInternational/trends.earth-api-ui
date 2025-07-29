@@ -45,9 +45,12 @@ try:
     print(f"✅ Cookie validation: {is_valid}")
 
     print("\n3. Testing refresh token extraction...")
-    extracted_access_token, extracted_refresh_token, extracted_email, extracted_user_data = (
-        extract_auth_from_cookie(cookie_data)
-    )
+    (
+        extracted_access_token,
+        extracted_refresh_token,
+        extracted_email,
+        extracted_user_data,
+    ) = extract_auth_from_cookie(cookie_data)
     print("✅ Cookie data extraction successful")
     if extracted_access_token:
         print(f"   Access Token: {extracted_access_token[:20]}...")
