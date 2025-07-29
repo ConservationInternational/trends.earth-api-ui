@@ -345,8 +345,9 @@ def fetch_swarm_info(token, api_environment="production"):
                                 html.Th("Availability", className="text-center"),
                                 html.Th("CPU Cores", className="text-center"),
                                 html.Th("Memory (GB)", className="text-center"),
-                                html.Th("Running Tasks", className="text-center"),
-                                html.Th("Available Capacity", className="text-center"),
+                                html.Th("Tasks (Used/Max)", className="text-center"),
+                                html.Th("Capacity Used %", className="text-center"),
+                                html.Th("Available Tasks", className="text-center"),
                             ]
                         )
                     ]
@@ -354,6 +355,9 @@ def fetch_swarm_info(token, api_environment="production"):
 
                 # Create table rows
                 table_rows = []
+                total_used_capacity = 0
+                total_max_capacity = 0
+
                 for node in nodes:
                     hostname = node.get("hostname", "Unknown")
                     role = node.get("role", "Unknown")
@@ -362,8 +366,17 @@ def fetch_swarm_info(token, api_environment="production"):
                     cpu_count = node.get("cpu_count", 0)
                     memory_gb = node.get("memory_gb", 0)
                     running_tasks = node.get("running_tasks", 0)
+                    estimated_max_tasks = node.get("estimated_max_tasks", 0)
                     available_capacity = node.get("available_capacity", 0)
                     is_leader = node.get("is_leader", False)
+
+                    # Calculate capacity utilization
+                    if estimated_max_tasks > 0:
+                        capacity_used_percent = (running_tasks / estimated_max_tasks) * 100
+                        total_used_capacity += running_tasks
+                        total_max_capacity += estimated_max_tasks
+                    else:
+                        capacity_used_percent = 0
 
                     # Style role cell based on role and leadership
                     role_content = role.title()
@@ -391,6 +404,16 @@ def fetch_swarm_info(token, api_environment="production"):
                     else:
                         avail_class = "text-danger"
 
+                    # Style capacity utilization
+                    if capacity_used_percent >= 90:
+                        capacity_class = "text-danger fw-bold"
+                    elif capacity_used_percent >= 75:
+                        capacity_class = "text-warning fw-bold"
+                    elif capacity_used_percent >= 50:
+                        capacity_class = "text-primary"
+                    else:
+                        capacity_class = "text-success"
+
                     table_rows.append(
                         html.Tr(
                             [
@@ -402,11 +425,53 @@ def fetch_swarm_info(token, api_environment="production"):
                                 ),
                                 html.Td(f"{cpu_count:.1f}", className="text-center"),
                                 html.Td(f"{memory_gb:.1f}", className="text-center"),
-                                html.Td(str(running_tasks), className="text-center"),
+                                html.Td(
+                                    f"{running_tasks}/{estimated_max_tasks}",
+                                    className="text-center",
+                                ),
+                                html.Td(
+                                    html.Div(
+                                        [
+                                            html.Span(
+                                                f"{capacity_used_percent:.1f}%",
+                                                className=f"{capacity_class}",
+                                            ),
+                                            html.Div(
+                                                className="progress mt-1",
+                                                style={
+                                                    "height": "6px",
+                                                    "width": "60px",
+                                                    "margin": "0 auto",
+                                                },
+                                                children=[
+                                                    html.Div(
+                                                        className=f"progress-bar {'bg-danger' if capacity_used_percent >= 90 else 'bg-warning' if capacity_used_percent >= 75 else 'bg-primary' if capacity_used_percent >= 50 else 'bg-success'}",
+                                                        style={
+                                                            "width": f"{min(capacity_used_percent, 100)}%"
+                                                        },
+                                                        **{
+                                                            "aria-valuenow": capacity_used_percent,
+                                                            "aria-valuemin": 0,
+                                                            "aria-valuemax": 100,
+                                                        },
+                                                        role="progressbar",
+                                                    )
+                                                ],
+                                            ),
+                                        ]
+                                    ),
+                                    className="text-center",
+                                ),
                                 html.Td(str(available_capacity), className="text-center"),
                             ]
                         )
                     )
+
+                # Calculate overall swarm capacity utilization
+                if total_max_capacity > 0:
+                    overall_capacity_used = (total_used_capacity / total_max_capacity) * 100
+                else:
+                    overall_capacity_used = 0
 
                 table_body = html.Tbody(table_rows)
                 nodes_table = html.Table(
@@ -414,9 +479,92 @@ def fetch_swarm_info(token, api_environment="production"):
                     className="table table-striped table-hover table-sm mt-3",
                 )
 
+                # Enhanced swarm summary with detailed capacity information
+                enhanced_swarm_summary = html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-server me-2"),
+                                        html.Strong("Total Nodes: "),
+                                        html.Span(str(total_nodes), className="text-primary"),
+                                    ],
+                                    className="col-md-2 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-crown me-2"),
+                                        html.Strong("Managers: "),
+                                        html.Span(str(total_managers), className="text-success"),
+                                    ],
+                                    className="col-md-2 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-users me-2"),
+                                        html.Strong("Workers: "),
+                                        html.Span(str(total_workers), className="text-info"),
+                                    ],
+                                    className="col-md-2 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-tasks me-2"),
+                                        html.Strong("Tasks: "),
+                                        html.Span(
+                                            f"{total_used_capacity}/{total_max_capacity}",
+                                            className="text-primary fw-bold",
+                                        ),
+                                    ],
+                                    className="col-md-3 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-chart-pie me-2"),
+                                        html.Strong("Capacity: "),
+                                        html.Div(
+                                            [
+                                                html.Span(
+                                                    f"{overall_capacity_used:.1f}%",
+                                                    className="text-danger fw-bold"
+                                                    if overall_capacity_used >= 90
+                                                    else "text-warning fw-bold"
+                                                    if overall_capacity_used >= 75
+                                                    else "text-success fw-bold",
+                                                ),
+                                                html.Div(
+                                                    className="progress mt-1",
+                                                    style={"height": "8px", "width": "100%"},
+                                                    children=[
+                                                        html.Div(
+                                                            className=f"progress-bar {'bg-danger' if overall_capacity_used >= 90 else 'bg-warning' if overall_capacity_used >= 75 else 'bg-success'}",
+                                                            style={
+                                                                "width": f"{overall_capacity_used}%"
+                                                            },
+                                                            **{
+                                                                "aria-valuenow": overall_capacity_used,
+                                                                "aria-valuemin": 0,
+                                                                "aria-valuemax": 100,
+                                                            },
+                                                            role="progressbar",
+                                                        )
+                                                    ],
+                                                ),
+                                            ]
+                                        ),
+                                    ],
+                                    className="col-md-3 text-center mb-2",
+                                ),
+                            ],
+                            className="row mb-3",
+                        )
+                    ]
+                )
+
                 return html.Div(
                     [
-                        swarm_summary,
+                        enhanced_swarm_summary,
                         html.Hr(),
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
