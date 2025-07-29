@@ -393,7 +393,12 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                result_str = str(result)
+                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # We want to check the first output (summary)
+                summary_result = (
+                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
+                )
+                result_str = str(summary_result)
 
                 # Should contain execution status section content (without main header)
                 assert "Active Executions" in result_str
@@ -451,7 +456,12 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                result_str = str(result)
+                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # We want to check the first output (summary)
+                summary_result = (
+                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
+                )
+                result_str = str(summary_result)
 
                 # Should contain summary totals section header
                 assert "Summary Totals" in result_str
@@ -515,7 +525,12 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                result_str = str(result)
+                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # We want to check the first output (summary)
+                summary_result = (
+                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
+                )
+                result_str = str(summary_result)
 
                 # Should contain section headers (Updated: main "Execution Status" header removed)
                 assert "Active Executions" in result_str

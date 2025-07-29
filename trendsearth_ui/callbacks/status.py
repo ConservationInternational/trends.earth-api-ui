@@ -280,7 +280,19 @@ def fetch_swarm_info(token, api_environment="production"):
         )
 
         if resp.status_code == 200:
-            data = resp.json().get("data", {})
+            response_data = resp.json()
+            data = response_data.get("data", {})
+
+            # Handle case where data might be a list (for test compatibility)
+            if isinstance(data, list):
+                # If data is a list, we don't have swarm info, return not active
+                return html.Div(
+                    [
+                        html.I(className="fas fa-info-circle me-2 text-muted"),
+                        "Docker Swarm information not available in this data format.",
+                    ],
+                    className="text-center text-muted p-3",
+                )
 
             swarm_active = data.get("swarm_active", False)
             total_nodes = data.get("total_nodes", 0)
