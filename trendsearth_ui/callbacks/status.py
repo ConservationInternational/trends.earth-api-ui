@@ -192,6 +192,9 @@ def fetch_deployment_info(api_environment="production"):
             commit_sha = deployment.get("commit_sha", "N/A")
             short_commit = commit_sha[:7] if commit_sha != "N/A" else "N/A"
 
+            # GitHub repository base URL
+            github_repo_url = "https://github.com/ConservationInternational/trends.earth-api"
+
             return html.Div(
                 [
                     html.Div(
@@ -208,7 +211,19 @@ def fetch_deployment_info(api_environment="production"):
                                 [
                                     html.I(className="fas fa-code-branch me-2"),
                                     html.Strong("Branch: "),
-                                    html.Span(branch, className="text-info"),
+                                    html.A(
+                                        branch,
+                                        href=f"{github_repo_url}/tree/{branch}"
+                                        if branch != "N/A"
+                                        else "#",
+                                        target="_blank",
+                                        className="text-info text-decoration-none",
+                                        style={
+                                            "cursor": "pointer" if branch != "N/A" else "default"
+                                        },
+                                    )
+                                    if branch != "N/A"
+                                    else html.Span(branch, className="text-info"),
                                 ],
                                 className="col-md-4 text-center mb-2",
                             ),
@@ -216,7 +231,21 @@ def fetch_deployment_info(api_environment="production"):
                                 [
                                     html.I(className="fas fa-hashtag me-2"),
                                     html.Strong("Commit: "),
-                                    html.Span(short_commit, className="text-success"),
+                                    html.A(
+                                        short_commit,
+                                        href=f"{github_repo_url}/commit/{commit_sha}"
+                                        if commit_sha != "N/A"
+                                        else "#",
+                                        target="_blank",
+                                        className="text-success text-decoration-none",
+                                        style={
+                                            "cursor": "pointer"
+                                            if commit_sha != "N/A"
+                                            else "default"
+                                        },
+                                    )
+                                    if commit_sha != "N/A"
+                                    else html.Span(short_commit, className="text-success"),
                                 ],
                                 className="col-md-4 text-center mb-2",
                             ),
