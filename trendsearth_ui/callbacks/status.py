@@ -271,7 +271,7 @@ def fetch_deployment_info(api_environment="production"):
         )
 
 
-def fetch_swarm_info(token, api_environment="production"):
+def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
     """Fetch Docker Swarm information from status/swarm endpoint."""
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -282,6 +282,24 @@ def fetch_swarm_info(token, api_environment="production"):
         if resp.status_code == 200:
             response_data = resp.json()
             data = response_data.get("data", {})
+            cache_info = response_data.get("cache_info", {})
+
+            # Format cache timestamp for display
+            cached_at_str = ""
+            if cache_info and cache_info.get("cached_at"):
+                try:
+                    # Get safe timezone
+                    safe_timezone = get_safe_timezone(user_timezone)
+                    # Parse the ISO timestamp
+                    cached_at_utc = datetime.fromisoformat(cache_info["cached_at"].replace("Z", "+00:00"))
+                    # Convert to user's local time
+                    local_time_str, tz_abbrev = format_local_time(
+                        cached_at_utc, safe_timezone, include_seconds=True
+                    )
+                    cached_at_str = f" ({local_time_str} {tz_abbrev})"
+                except Exception:
+                    # Fallback to raw timestamp if parsing fails
+                    cached_at_str = f" ({cache_info.get('cached_at', '')})"
 
             # Handle case where data might be a list (for test compatibility)
             if isinstance(data, list):
@@ -292,7 +310,7 @@ def fetch_swarm_info(token, api_environment="production"):
                         "Docker Swarm information not available in this data format.",
                     ],
                     className="text-center text-muted p-3",
-                )
+                ), cached_at_str
 
             swarm_active = data.get("swarm_active", False)
             total_nodes = data.get("total_nodes", 0)
@@ -307,7 +325,7 @@ def fetch_swarm_info(token, api_environment="production"):
                         "Docker Swarm is not active.",
                     ],
                     className="text-center text-muted p-3",
-                )
+                ), cached_at_str
 
             # Create swarm summary section
             swarm_summary = html.Div(
@@ -718,9 +736,9 @@ def fetch_swarm_info(token, api_environment="production"):
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
                     ]
-                )
+                ), cached_at_str
             else:
-                return swarm_summary
+                return swarm_summary, cached_at_str
 
         elif resp.status_code == 403:
             return html.Div(
@@ -729,7 +747,7 @@ def fetch_swarm_info(token, api_environment="production"):
                     "Access denied. Admin privileges required for swarm information.",
                 ],
                 className="text-center text-muted p-3",
-            )
+            ), ""
         else:
             return html.Div(
                 [
@@ -737,7 +755,7 @@ def fetch_swarm_info(token, api_environment="production"):
                     f"Failed to fetch swarm info. Status: {resp.status_code}",
                 ],
                 className="text-center text-muted p-3",
-            )
+            ), ""
     except requests.exceptions.RequestException as e:
         return html.Div(
             [
@@ -745,7 +763,7 @@ def fetch_swarm_info(token, api_environment="production"):
                 f"Error fetching swarm info: {str(e)}",
             ],
             className="text-center text-muted p-3",
-        )
+        ), ""
 
 
 def register_callbacks(app):
@@ -756,6 +774,7 @@ def register_callbacks(app):
             Output("status-summary", "children"),
             Output("deployment-info-summary", "children"),
             Output("swarm-info-summary", "children"),
+            Output("swarm-status-title", "children"),
         ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
@@ -776,11 +795,11 @@ def register_callbacks(app):
         """Update the status summary from the status endpoint with caching."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -800,13 +819,19 @@ def register_callbacks(app):
                 and cached_deployment is not None
                 and cached_swarm is not None
             ):
-                return cached_summary, cached_deployment, cached_swarm
+                # Create swarm title (we need to get cached time, so fetch fresh for title)
+                _, swarm_cached_time = fetch_swarm_info(token, api_environment, safe_timezone)
+                swarm_title = html.H5(f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4")
+                return cached_summary, cached_deployment, cached_swarm, swarm_title
 
         # Fetch deployment info from api-health endpoint
         deployment_info = fetch_deployment_info(api_environment)
 
         # Fetch Docker Swarm information
-        swarm_info = fetch_swarm_info(token, api_environment)
+        swarm_info, swarm_cached_time = fetch_swarm_info(token, api_environment, safe_timezone)
+        
+        # Create swarm title with cached timestamp
+        swarm_title = html.H5(f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4")
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token, api_environment):
@@ -814,7 +839,7 @@ def register_callbacks(app):
             set_cached_data("summary", fallback_result, ttl=20)  # Shorter cache for fallback
             set_cached_data("deployment", deployment_info, ttl=300)  # Cache deployment for 5 min
             set_cached_data("swarm", swarm_info, ttl=300)  # Cache swarm for 5 min
-            return fallback_result, deployment_info, swarm_info
+            return fallback_result, deployment_info, swarm_info, swarm_title
 
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -1174,7 +1199,7 @@ def register_callbacks(app):
                     set_cached_data("summary", summary, ttl=30)
                     set_cached_data("deployment", deployment_info, ttl=300)
                     set_cached_data("swarm", swarm_info, ttl=300)
-                    return summary, deployment_info, swarm_info
+                    return summary, deployment_info, swarm_info, swarm_title
                 else:
                     result = html.Div(
                         [
@@ -1188,14 +1213,14 @@ def register_callbacks(app):
                     set_cached_data("summary", result, ttl=10)
                     set_cached_data("deployment", deployment_info, ttl=300)
                     set_cached_data("swarm", swarm_info, ttl=300)
-                    return result, deployment_info, swarm_info
+                    return result, deployment_info, swarm_info, swarm_title
             else:
                 # Fallback to basic system info
                 fallback_result = get_fallback_summary(token, api_environment, safe_timezone)
                 set_cached_data("summary", fallback_result, ttl=15)
                 set_cached_data("deployment", deployment_info, ttl=300)
                 set_cached_data("swarm", swarm_info, ttl=300)
-                return fallback_result, deployment_info, swarm_info
+                return fallback_result, deployment_info, swarm_info, swarm_title
 
         except requests.exceptions.Timeout:
             error_result = html.Div(
@@ -1213,7 +1238,7 @@ def register_callbacks(app):
             set_cached_data("summary", error_result, ttl=5)  # Short cache for errors
             set_cached_data("deployment", deployment_info, ttl=300)
             set_cached_data("swarm", swarm_info, ttl=300)
-            return error_result, deployment_info, swarm_info
+            return error_result, deployment_info, swarm_info, swarm_title
         except requests.exceptions.ConnectionError:
             error_result = html.Div(
                 [
@@ -1230,7 +1255,7 @@ def register_callbacks(app):
             set_cached_data("summary", error_result, ttl=5)
             set_cached_data("deployment", deployment_info, ttl=300)
             set_cached_data("swarm", swarm_info, ttl=300)
-            return error_result, deployment_info, swarm_info
+            return error_result, deployment_info, swarm_info, swarm_title
         except Exception as e:
             error_result = html.Div(
                 [
@@ -1243,7 +1268,7 @@ def register_callbacks(app):
             set_cached_data("summary", error_result, ttl=5)
             set_cached_data("deployment", deployment_info, ttl=300)
             set_cached_data("swarm", swarm_info, ttl=300)
-            return error_result, deployment_info, swarm_info
+            return error_result, deployment_info, swarm_info, swarm_title
 
     @app.callback(
         Output("status-charts", "children"),

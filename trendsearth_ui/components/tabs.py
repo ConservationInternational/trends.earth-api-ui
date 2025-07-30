@@ -570,7 +570,7 @@ def status_tab_content(is_admin):
                                 color="#007bff",
                             ),
                             html.Hr(),
-                            html.H5("Docker Swarm Status", className="card-title mt-4"),
+                            html.Div(id="swarm-status-title"),
                             dcc.Loading(
                                 id="loading-swarm-info",
                                 children=[html.Div(id="swarm-info-summary")],

@@ -393,7 +393,7 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
                     result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
@@ -456,7 +456,7 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
                     result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
@@ -525,7 +525,7 @@ class TestStatusTabsErrorHandling:
                 "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
             ):
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns three outputs: (summary, deployment_info, swarm_info)
+                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
                     result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
