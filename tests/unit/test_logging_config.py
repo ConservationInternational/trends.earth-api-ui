@@ -18,6 +18,10 @@ from trendsearth_ui.utils.logging_config import (
 def test_setup_logging_without_rollbar():
     """Test logging setup without Rollbar token."""
     with patch.dict(os.environ, {}, clear=True):
+        # Clear any existing handlers to ensure clean test
+        logger = logging.getLogger("trendsearth_ui")
+        logger.handlers.clear()
+
         logger = setup_logging()
         assert logger.name == "trendsearth_ui"
         assert logger.level == logging.INFO
@@ -27,10 +31,16 @@ def test_setup_logging_without_rollbar():
 def test_setup_logging_with_rollbar():
     """Test logging setup with Rollbar token."""
     with patch("rollbar.init") as mock_rollbar_init, patch(
-        "rollbar.logger.RollbarHandler"
+        "trendsearth_ui.utils.logging_config.RollbarHandler"
     ) as mock_rollbar_handler:
         mock_handler = MagicMock()
+        # Configure the mock handler to have a proper level attribute
+        mock_handler.level = logging.WARNING
         mock_rollbar_handler.return_value = mock_handler
+
+        # Clear any existing handlers to ensure clean test
+        logger = logging.getLogger("trendsearth_ui")
+        logger.handlers.clear()
 
         logger = setup_logging("test_token")
 
@@ -45,6 +55,10 @@ def test_setup_logging_with_rollbar():
 def test_setup_logging_rollbar_failure():
     """Test logging setup when Rollbar initialization fails."""
     with patch("rollbar.init", side_effect=Exception("Rollbar error")):
+        # Clear any existing handlers to ensure clean test
+        logger = logging.getLogger("trendsearth_ui")
+        logger.handlers.clear()
+
         logger = setup_logging("test_token")
         assert logger.name == "trendsearth_ui"
         # Should still work even if Rollbar fails
@@ -90,6 +104,10 @@ def test_environment_variables():
             "GIT_BRANCH": "feature/test",
         },
     ), patch("rollbar.init") as mock_rollbar_init:
+        # Clear any existing handlers to ensure clean test
+        logger = logging.getLogger("trendsearth_ui")
+        logger.handlers.clear()
+
         setup_logging("test_token")
 
         # Verify environment variables were passed to Rollbar

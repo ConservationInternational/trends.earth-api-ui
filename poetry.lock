@@ -1419,19 +1419,18 @@ files = [
 
 [[package]]
 name = "rollbar"
-version = "0.16.3"
+version = "1.3.0"
 description = "Easy and powerful exception tracking with Rollbar. Send messages and exceptions with arbitrary context, get back aggregates, and debug production issues quickly."
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "rollbar-0.16.3-py3-none-any.whl", hash = "sha256:f06e23b36d7d1b547f32f287da9367b9bf53319f611da0ec9e891859507ac94e"},
-    {file = "rollbar-0.16.3.tar.gz", hash = "sha256:02313dfc60710ec736ab033d0f8c969d857a8b991cd67e0c1a91620e8a04ede2"},
+    {file = "rollbar-1.3.0-py3-none-any.whl", hash = "sha256:d800c4265a4d5aae547cb3f29e48414b6d4fedaa7f679cd0fd64dac16a1eded3"},
+    {file = "rollbar-1.3.0.tar.gz", hash = "sha256:519402eac39bcc4fa484821872f6bb18497fb7b6c81167047867d17714d3b379"},
 ]
 
 [package.dependencies]
-requests = {version = ">=0.12.1", markers = "python_version >= \"3.6\""}
-six = ">=1.9.0"
+requests = ">=0.12.1"
 
 [[package]]
 name = "ruff"
@@ -1752,4 +1751,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "fe608f254403bd4e7c5ff2ae4d1b7948421780f279da81dfec2557fec3a4f36d"
+content-hash = "a819751a614fb8c3db526881bb3a1f11714c415e66d436a85fbd2656454cb766"
