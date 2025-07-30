@@ -17,6 +17,13 @@ from .config import APP_HOST, APP_PORT, APP_TITLE
 # Import deployment utilities
 from .utils.deployment_info import get_health_response
 
+# Import logging configuration
+from .utils.logging_config import setup_logging
+
+# Initialize logging with Rollbar if token is available
+rollbar_token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
+logger = setup_logging(rollbar_token)
+
 server = flask.Flask(__name__)
 
 # Configure assets directory
@@ -66,7 +73,13 @@ app.index_string = """
 @server.route("/api-ui-health")
 def health_check():
     """Health check endpoint with deployment information."""
-    return get_health_response(), 200
+    try:
+        return get_health_response(), 200
+    except Exception as e:
+        from .utils.logging_config import log_exception
+
+        log_exception(logger, f"Health check endpoint error: {str(e)}")
+        return {"status": "error", "message": "Health check failed"}, 500
 
 
 @server.route("/favicon.ico")
@@ -82,15 +95,49 @@ def serve_assets(filename):
 # Create the main layout
 app.layout = create_main_layout()
 
+
+# Add global error handlers
+@server.errorhandler(500)
+def internal_error(error):
+    """Handle internal server errors."""
+    from .utils.logging_config import log_exception
+
+    log_exception(logger, f"Internal server error: {str(error)}")
+    return {"status": "error", "message": "Internal server error"}, 500
+
+
+@server.errorhandler(Exception)
+def handle_exception(e):
+    """Handle uncaught exceptions."""
+    from .utils.logging_config import log_exception
+
+    log_exception(logger, f"Uncaught exception: {str(e)}")
+    # Return JSON error response for API endpoints or HTML for regular pages
+    if flask.request.path.startswith("/api"):
+        return {"status": "error", "message": "An unexpected error occurred"}, 500
+    else:
+        return "An unexpected error occurred", 500
+
+
 # Register all callbacks
 register_all_callbacks(app)
 
 
 def main():
     """Main entry point for console script."""
-    print("Starting Trends.Earth API Dashboard...")
-    print(f"Access the app at: http://{APP_HOST}:{APP_PORT}")
-    print("Debug mode: True")
+    logger.info("Starting Trends.Earth API Dashboard...")
+    logger.info(f"Access the app at: http://{APP_HOST}:{APP_PORT}")
+    logger.info("Debug mode: True")
+
+    # Log deployment information
+    deployment_info = get_health_response()["deployment"]
+    logger.info(f"Deployment info: {deployment_info}")
+
+    if rollbar_token:
+        logger.info("Rollbar error tracking is enabled")
+    else:
+        logger.warning("Rollbar error tracking is disabled (no ROLLBAR_ACCESS_TOKEN provided)")
+
     app.run(debug=True, host=APP_HOST, port=APP_PORT, use_reloader=False)
 
 

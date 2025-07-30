@@ -11,12 +11,19 @@ A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin f
 
 ## 🚀 Deployment
 
-This application supports automatic deployment to Amazon EC2 instances using GitHub Actions. See [EC2_DEPLOYMENT_SETUP.md](EC2_DEPLOYMENT_SETUP.md) for detailed setup instructions.
+This application supports automatic deployment to Amazon EC2 instances using GitHub Actions. 
+
+### Configuration Documentation:
+- **[DEPLOYMENT_SECRETS.md](DEPLOYMENT_SECRETS.md)** - Required GitHub secrets and environment variables
+- **[EC2_DEPLOYMENT_SETUP.md](EC2_DEPLOYMENT_SETUP.md)** - Detailed EC2 setup instructions
 
 ### Available Deployment Workflows:
 - **Basic Deployment** (`deploy.yml`) - Simple deployment with process management
 - **Production Deployment** (`deploy-production.yml`) - Advanced deployment with systemd, versioning, and rollback capability
 - **Rollback** (`rollback.yml`) - Manual rollback to previous deployments
+
+### Error Tracking
+The application includes integrated Rollbar error tracking for production monitoring and debugging.
 
 ## Features
 

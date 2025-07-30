@@ -38,6 +38,7 @@ jobs:
           --build-arg GIT_BRANCH="${{ github.ref_name }}" \
           --build-arg GIT_COMMIT="${{ github.sha }}" \
           --build-arg DEPLOYMENT_ENVIRONMENT="production" \
+          --build-arg ROLLBAR_ACCESS_TOKEN="${{ secrets.ROLLBAR_ACCESS_TOKEN }}" \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         
@@ -167,4 +168,41 @@ jobs:
           echo "Check the logs above for details."
           echo "You may need to check ECS service logs in AWS Console."
           echo "Consider rolling back if necessary."
+        fi
+
+    - name: Notify Rollbar of deployment
+      if: always()
+      run: |
+        # Notify Rollbar of deployment status (success or failure)
+        if [ -n "${{ secrets.ROLLBAR_ACCESS_TOKEN }}" ]; then
+          echo "📡 Notifying Rollbar of deployment..."
+          
+          if [ "${{ job.status }}" = "success" ]; then
+            DEPLOY_STATUS="succeeded"
+            COMMENT="Deployed via GitHub Actions from branch ${{ github.ref_name }}"
+          else
+            DEPLOY_STATUS="failed"
+            COMMENT="Deployment failed via GitHub Actions from branch ${{ github.ref_name }}"
+          fi
+          
+          RESPONSE=$(curl -s -X POST https://api.rollbar.com/api/1/deploy/ \
+            -H "X-Rollbar-Access-Token: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "environment": "production",
+              "revision": "${{ github.sha }}",
+              "rollbar_name": "${{ github.actor }}",
+              "local_username": "${{ github.actor }}",
+              "comment": "'"$COMMENT"'",
+              "status": "'"$DEPLOY_STATUS"'"
+            }')
+          
+          if echo "$RESPONSE" | grep -q '"err":0'; then
+            echo "✅ Rollbar deployment notification sent successfully"
+          else
+            echo "⚠️ Failed to notify Rollbar of deployment"
+            echo "Response: $RESPONSE"
+          fi
+        else
+          echo "⚠️ ROLLBAR_ACCESS_TOKEN not configured, skipping Rollbar notification"
         fi

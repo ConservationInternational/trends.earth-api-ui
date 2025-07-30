@@ -291,7 +291,9 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                     # Get safe timezone
                     safe_timezone = get_safe_timezone(user_timezone)
                     # Parse the ISO timestamp
-                    cached_at_utc = datetime.fromisoformat(cache_info["cached_at"].replace("Z", "+00:00"))
+                    cached_at_utc = datetime.fromisoformat(
+                        cache_info["cached_at"].replace("Z", "+00:00")
+                    )
                     # Convert to user's local time
                     local_time_str, tz_abbrev = format_local_time(
                         cached_at_utc, safe_timezone, include_seconds=True
@@ -821,7 +823,9 @@ def register_callbacks(app):
             ):
                 # Create swarm title (we need to get cached time, so fetch fresh for title)
                 _, swarm_cached_time = fetch_swarm_info(token, api_environment, safe_timezone)
-                swarm_title = html.H5(f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4")
+                swarm_title = html.H5(
+                    f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
+                )
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
         # Fetch deployment info from api-health endpoint
@@ -829,9 +833,11 @@ def register_callbacks(app):
 
         # Fetch Docker Swarm information
         swarm_info, swarm_cached_time = fetch_swarm_info(token, api_environment, safe_timezone)
-        
+
         # Create swarm title with cached timestamp
-        swarm_title = html.H5(f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4")
+        swarm_title = html.H5(
+            f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
+        )
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token, api_environment):

@@ -19,6 +19,10 @@ from ..utils import (
     refresh_access_token,
     should_refresh_token,
 )
+from ..utils.logging_config import get_logger, log_exception
+
+# Get the configured logger
+logger = get_logger()
 
 
 def register_callbacks(app):
@@ -303,7 +307,7 @@ def register_callbacks(app):
                 True,
             )
         except requests.exceptions.ConnectionError:
-            print("❌ Connection error during login")
+            logger.warning("Connection error during login attempt")
             return (
                 None,
                 None,
@@ -314,7 +318,7 @@ def register_callbacks(app):
                 True,
             )
         except Exception as e:
-            print(f"❌ Login error: {str(e)}")
+            log_exception(logger, f"Unexpected error during login: {str(e)}")
             return (None, None, None, None, f"Login failed: {str(e)}", "danger", True)
 
     @app.callback(

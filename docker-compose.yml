@@ -8,6 +8,7 @@ services:
         GIT_BRANCH: ${GIT_BRANCH:-development}
         GIT_COMMIT: ${GIT_COMMIT:-local}
         DEPLOYMENT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT:-development}
+        ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN:-}
     ports:
       - "8000:8000"
     environment:
