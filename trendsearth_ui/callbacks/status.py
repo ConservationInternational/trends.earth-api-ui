@@ -360,6 +360,7 @@ def fetch_swarm_info(token, api_environment="production"):
                                 html.Th("CPU Used %", className="text-center"),
                                 html.Th("Memory Used %", className="text-center"),
                                 html.Th("Tasks", className="text-center"),
+                                html.Th("Available Tasks", className="text-center"),
                             ]
                         )
                     ]
@@ -372,6 +373,7 @@ def fetch_swarm_info(token, api_environment="production"):
                 total_memory_used = 0
                 total_memory_available = 0
                 total_running_tasks = 0
+                total_available_tasks = 0
 
                 for node in nodes:
                     hostname = node.get("hostname", "Unknown")
@@ -384,7 +386,7 @@ def fetch_swarm_info(token, api_environment="production"):
                     available_capacity = node.get("available_capacity", 0)
                     is_leader = node.get("is_leader", False)
                     is_manager = node.get("is_manager", False)
-                    
+
                     # Get resource usage data
                     resource_usage = node.get("resource_usage", {})
                     used_cpu_percent = resource_usage.get("used_cpu_percent", 0)
@@ -396,6 +398,7 @@ def fetch_swarm_info(token, api_environment="production"):
 
                     # Accumulate totals for swarm-wide statistics
                     total_running_tasks += running_tasks
+                    total_available_tasks += available_capacity
                     if used_cpu_nanos > 0 and available_cpu_nanos > 0:
                         total_cpu_used += used_cpu_nanos
                         total_cpu_available += available_cpu_nanos
@@ -527,6 +530,7 @@ def fetch_swarm_info(token, api_environment="production"):
                                     className="text-center",
                                 ),
                                 html.Td(str(running_tasks), className="text-center"),
+                                html.Td(str(available_capacity), className="text-center"),
                             ]
                         )
                     )
@@ -535,9 +539,13 @@ def fetch_swarm_info(token, api_environment="production"):
                 overall_cpu_used = 0
                 overall_memory_used = 0
                 if total_cpu_available > 0:
-                    overall_cpu_used = (total_cpu_used / (total_cpu_used + total_cpu_available)) * 100
+                    overall_cpu_used = (
+                        total_cpu_used / (total_cpu_used + total_cpu_available)
+                    ) * 100
                 if total_memory_available > 0:
-                    overall_memory_used = (total_memory_used / (total_memory_used + total_memory_available)) * 100
+                    overall_memory_used = (
+                        total_memory_used / (total_memory_used + total_memory_available)
+                    ) * 100
 
                 table_body = html.Tbody(table_rows)
                 nodes_table = html.Table(
@@ -574,6 +582,11 @@ def fetch_swarm_info(token, api_environment="production"):
                                     ],
                                     className="col-md-2 text-center mb-2",
                                 ),
+                            ],
+                            className="row mb-3",
+                        ),
+                        html.Div(
+                            [
                                 html.Div(
                                     [
                                         html.I(className="fas fa-tasks me-2"),
@@ -583,7 +596,18 @@ def fetch_swarm_info(token, api_environment="production"):
                                             className="text-primary fw-bold",
                                         ),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-3 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-plus-circle me-2"),
+                                        html.Strong("Available Tasks: "),
+                                        html.Span(
+                                            str(total_available_tasks),
+                                            className="text-success fw-bold",
+                                        ),
+                                    ],
+                                    className="col-md-3 text-center mb-2",
                                 ),
                                 html.Div(
                                     [
@@ -605,9 +629,7 @@ def fetch_swarm_info(token, api_environment="production"):
                                                     children=[
                                                         html.Div(
                                                             className=f"progress-bar {'bg-danger' if overall_cpu_used >= 90 else 'bg-warning' if overall_cpu_used >= 75 else 'bg-success'}",
-                                                            style={
-                                                                "width": f"{overall_cpu_used}%"
-                                                            },
+                                                            style={"width": f"{overall_cpu_used}%"},
                                                             **{
                                                                 "aria-valuenow": overall_cpu_used,
                                                                 "aria-valuemin": 0,
@@ -620,7 +642,7 @@ def fetch_swarm_info(token, api_environment="production"):
                                             ]
                                         ),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-3 text-center mb-2",
                                 ),
                                 html.Div(
                                     [
@@ -657,11 +679,11 @@ def fetch_swarm_info(token, api_environment="production"):
                                             ]
                                         ),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-3 text-center mb-2",
                                 ),
                             ],
                             className="row mb-3",
-                        )
+                        ),
                     ]
                 )
 
