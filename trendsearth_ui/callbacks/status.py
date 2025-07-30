@@ -346,7 +346,7 @@ def fetch_swarm_info(token, api_environment="production"):
 
             # Create nodes table if we have node information
             if nodes:
-                # Create table headers
+                # Create table headers - updated for new resource data
                 table_header = html.Thead(
                     [
                         html.Tr(
@@ -357,9 +357,9 @@ def fetch_swarm_info(token, api_environment="production"):
                                 html.Th("Availability", className="text-center"),
                                 html.Th("CPU Cores", className="text-center"),
                                 html.Th("Memory (GB)", className="text-center"),
-                                html.Th("Tasks (Used/Max)", className="text-center"),
-                                html.Th("Capacity Used %", className="text-center"),
-                                html.Th("Available Tasks", className="text-center"),
+                                html.Th("CPU Used %", className="text-center"),
+                                html.Th("Memory Used %", className="text-center"),
+                                html.Th("Tasks", className="text-center"),
                             ]
                         )
                     ]
@@ -367,8 +367,11 @@ def fetch_swarm_info(token, api_environment="production"):
 
                 # Create table rows
                 table_rows = []
-                total_used_capacity = 0
-                total_max_capacity = 0
+                total_cpu_used = 0
+                total_cpu_available = 0
+                total_memory_used = 0
+                total_memory_available = 0
+                total_running_tasks = 0
 
                 for node in nodes:
                     hostname = node.get("hostname", "Unknown")
@@ -378,24 +381,34 @@ def fetch_swarm_info(token, api_environment="production"):
                     cpu_count = node.get("cpu_count", 0)
                     memory_gb = node.get("memory_gb", 0)
                     running_tasks = node.get("running_tasks", 0)
-                    estimated_max_tasks = node.get("estimated_max_tasks", 0)
                     available_capacity = node.get("available_capacity", 0)
                     is_leader = node.get("is_leader", False)
+                    is_manager = node.get("is_manager", False)
+                    
+                    # Get resource usage data
+                    resource_usage = node.get("resource_usage", {})
+                    used_cpu_percent = resource_usage.get("used_cpu_percent", 0)
+                    used_memory_percent = resource_usage.get("used_memory_percent", 0)
+                    used_cpu_nanos = resource_usage.get("used_cpu_nanos", 0)
+                    available_cpu_nanos = resource_usage.get("available_cpu_nanos", 0)
+                    used_memory_bytes = resource_usage.get("used_memory_bytes", 0)
+                    available_memory_bytes = resource_usage.get("available_memory_bytes", 0)
 
-                    # Calculate capacity utilization
-                    if estimated_max_tasks > 0:
-                        capacity_used_percent = (running_tasks / estimated_max_tasks) * 100
-                        total_used_capacity += running_tasks
-                        total_max_capacity += estimated_max_tasks
-                    else:
-                        capacity_used_percent = 0
+                    # Accumulate totals for swarm-wide statistics
+                    total_running_tasks += running_tasks
+                    if used_cpu_nanos > 0 and available_cpu_nanos > 0:
+                        total_cpu_used += used_cpu_nanos
+                        total_cpu_available += available_cpu_nanos
+                    if used_memory_bytes > 0 and available_memory_bytes > 0:
+                        total_memory_used += used_memory_bytes
+                        total_memory_available += available_memory_bytes
 
                     # Style role cell based on role and leadership
                     role_content = role.title()
                     if is_leader:
                         role_content += " (Leader)"
                         role_class = "text-warning fw-bold"
-                    elif role.lower() == "manager":
+                    elif is_manager or role.lower() == "manager":
                         role_class = "text-success fw-bold"
                     else:
                         role_class = "text-info"
@@ -416,15 +429,25 @@ def fetch_swarm_info(token, api_environment="production"):
                     else:
                         avail_class = "text-danger"
 
-                    # Style capacity utilization
-                    if capacity_used_percent >= 90:
-                        capacity_class = "text-danger fw-bold"
-                    elif capacity_used_percent >= 75:
-                        capacity_class = "text-warning fw-bold"
-                    elif capacity_used_percent >= 50:
-                        capacity_class = "text-primary"
+                    # Style CPU utilization
+                    if used_cpu_percent >= 90:
+                        cpu_class = "text-danger fw-bold"
+                    elif used_cpu_percent >= 75:
+                        cpu_class = "text-warning fw-bold"
+                    elif used_cpu_percent >= 50:
+                        cpu_class = "text-primary"
                     else:
-                        capacity_class = "text-success"
+                        cpu_class = "text-success"
+
+                    # Style memory utilization
+                    if used_memory_percent >= 90:
+                        memory_class = "text-danger fw-bold"
+                    elif used_memory_percent >= 75:
+                        memory_class = "text-warning fw-bold"
+                    elif used_memory_percent >= 50:
+                        memory_class = "text-primary"
+                    else:
+                        memory_class = "text-success"
 
                     table_rows.append(
                         html.Tr(
@@ -438,15 +461,11 @@ def fetch_swarm_info(token, api_environment="production"):
                                 html.Td(f"{cpu_count:.1f}", className="text-center"),
                                 html.Td(f"{memory_gb:.1f}", className="text-center"),
                                 html.Td(
-                                    f"{running_tasks}/{estimated_max_tasks}",
-                                    className="text-center",
-                                ),
-                                html.Td(
                                     html.Div(
                                         [
                                             html.Span(
-                                                f"{capacity_used_percent:.1f}%",
-                                                className=f"{capacity_class}",
+                                                f"{used_cpu_percent:.1f}%",
+                                                className=f"{cpu_class}",
                                             ),
                                             html.Div(
                                                 className="progress mt-1",
@@ -457,12 +476,12 @@ def fetch_swarm_info(token, api_environment="production"):
                                                 },
                                                 children=[
                                                     html.Div(
-                                                        className=f"progress-bar {'bg-danger' if capacity_used_percent >= 90 else 'bg-warning' if capacity_used_percent >= 75 else 'bg-primary' if capacity_used_percent >= 50 else 'bg-success'}",
+                                                        className=f"progress-bar {'bg-danger' if used_cpu_percent >= 90 else 'bg-warning' if used_cpu_percent >= 75 else 'bg-primary' if used_cpu_percent >= 50 else 'bg-success'}",
                                                         style={
-                                                            "width": f"{min(capacity_used_percent, 100)}%"
+                                                            "width": f"{min(used_cpu_percent, 100)}%"
                                                         },
                                                         **{
-                                                            "aria-valuenow": capacity_used_percent,
+                                                            "aria-valuenow": used_cpu_percent,
                                                             "aria-valuemin": 0,
                                                             "aria-valuemax": 100,
                                                         },
@@ -474,16 +493,51 @@ def fetch_swarm_info(token, api_environment="production"):
                                     ),
                                     className="text-center",
                                 ),
-                                html.Td(str(available_capacity), className="text-center"),
+                                html.Td(
+                                    html.Div(
+                                        [
+                                            html.Span(
+                                                f"{used_memory_percent:.1f}%",
+                                                className=f"{memory_class}",
+                                            ),
+                                            html.Div(
+                                                className="progress mt-1",
+                                                style={
+                                                    "height": "6px",
+                                                    "width": "60px",
+                                                    "margin": "0 auto",
+                                                },
+                                                children=[
+                                                    html.Div(
+                                                        className=f"progress-bar {'bg-danger' if used_memory_percent >= 90 else 'bg-warning' if used_memory_percent >= 75 else 'bg-primary' if used_memory_percent >= 50 else 'bg-success'}",
+                                                        style={
+                                                            "width": f"{min(used_memory_percent, 100)}%"
+                                                        },
+                                                        **{
+                                                            "aria-valuenow": used_memory_percent,
+                                                            "aria-valuemin": 0,
+                                                            "aria-valuemax": 100,
+                                                        },
+                                                        role="progressbar",
+                                                    )
+                                                ],
+                                            ),
+                                        ]
+                                    ),
+                                    className="text-center",
+                                ),
+                                html.Td(str(running_tasks), className="text-center"),
                             ]
                         )
                     )
 
-                # Calculate overall swarm capacity utilization
-                if total_max_capacity > 0:
-                    overall_capacity_used = (total_used_capacity / total_max_capacity) * 100
-                else:
-                    overall_capacity_used = 0
+                # Calculate overall swarm resource utilization
+                overall_cpu_used = 0
+                overall_memory_used = 0
+                if total_cpu_available > 0:
+                    overall_cpu_used = (total_cpu_used / (total_cpu_used + total_cpu_available)) * 100
+                if total_memory_available > 0:
+                    overall_memory_used = (total_memory_used / (total_memory_used + total_memory_available)) * 100
 
                 table_body = html.Tbody(table_rows)
                 nodes_table = html.Table(
@@ -491,7 +545,7 @@ def fetch_swarm_info(token, api_environment="production"):
                     className="table table-striped table-hover table-sm mt-3",
                 )
 
-                # Enhanced swarm summary with detailed capacity information
+                # Enhanced swarm summary with detailed resource information
                 enhanced_swarm_summary = html.Div(
                     [
                         html.Div(
@@ -523,26 +577,26 @@ def fetch_swarm_info(token, api_environment="production"):
                                 html.Div(
                                     [
                                         html.I(className="fas fa-tasks me-2"),
-                                        html.Strong("Tasks: "),
+                                        html.Strong("Active Tasks: "),
                                         html.Span(
-                                            f"{total_used_capacity}/{total_max_capacity}",
+                                            str(total_running_tasks),
                                             className="text-primary fw-bold",
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-2 text-center mb-2",
                                 ),
                                 html.Div(
                                     [
-                                        html.I(className="fas fa-chart-pie me-2"),
-                                        html.Strong("Capacity: "),
+                                        html.I(className="fas fa-microchip me-2"),
+                                        html.Strong("CPU Usage: "),
                                         html.Div(
                                             [
                                                 html.Span(
-                                                    f"{overall_capacity_used:.1f}%",
+                                                    f"{overall_cpu_used:.1f}%",
                                                     className="text-danger fw-bold"
-                                                    if overall_capacity_used >= 90
+                                                    if overall_cpu_used >= 90
                                                     else "text-warning fw-bold"
-                                                    if overall_capacity_used >= 75
+                                                    if overall_cpu_used >= 75
                                                     else "text-success fw-bold",
                                                 ),
                                                 html.Div(
@@ -550,12 +604,12 @@ def fetch_swarm_info(token, api_environment="production"):
                                                     style={"height": "8px", "width": "100%"},
                                                     children=[
                                                         html.Div(
-                                                            className=f"progress-bar {'bg-danger' if overall_capacity_used >= 90 else 'bg-warning' if overall_capacity_used >= 75 else 'bg-success'}",
+                                                            className=f"progress-bar {'bg-danger' if overall_cpu_used >= 90 else 'bg-warning' if overall_cpu_used >= 75 else 'bg-success'}",
                                                             style={
-                                                                "width": f"{overall_capacity_used}%"
+                                                                "width": f"{overall_cpu_used}%"
                                                             },
                                                             **{
-                                                                "aria-valuenow": overall_capacity_used,
+                                                                "aria-valuenow": overall_cpu_used,
                                                                 "aria-valuemin": 0,
                                                                 "aria-valuemax": 100,
                                                             },
@@ -566,7 +620,44 @@ def fetch_swarm_info(token, api_environment="production"):
                                             ]
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-2 text-center mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-memory me-2"),
+                                        html.Strong("Memory Usage: "),
+                                        html.Div(
+                                            [
+                                                html.Span(
+                                                    f"{overall_memory_used:.1f}%",
+                                                    className="text-danger fw-bold"
+                                                    if overall_memory_used >= 90
+                                                    else "text-warning fw-bold"
+                                                    if overall_memory_used >= 75
+                                                    else "text-success fw-bold",
+                                                ),
+                                                html.Div(
+                                                    className="progress mt-1",
+                                                    style={"height": "8px", "width": "100%"},
+                                                    children=[
+                                                        html.Div(
+                                                            className=f"progress-bar {'bg-danger' if overall_memory_used >= 90 else 'bg-warning' if overall_memory_used >= 75 else 'bg-success'}",
+                                                            style={
+                                                                "width": f"{overall_memory_used}%"
+                                                            },
+                                                            **{
+                                                                "aria-valuenow": overall_memory_used,
+                                                                "aria-valuemin": 0,
+                                                                "aria-valuemax": 100,
+                                                            },
+                                                            role="progressbar",
+                                                        )
+                                                    ],
+                                                ),
+                                            ]
+                                        ),
+                                    ],
+                                    className="col-md-2 text-center mb-2",
                                 ),
                             ],
                             className="row mb-3",
@@ -574,24 +665,24 @@ def fetch_swarm_info(token, api_environment="production"):
                     ]
                 )
 
-                # Add capacity alerts if needed
-                capacity_alerts = []
-                if overall_capacity_used >= 90:
-                    capacity_alerts.append(
+                # Add resource alerts if needed
+                resource_alerts = []
+                if overall_cpu_used >= 90 or overall_memory_used >= 90:
+                    resource_alerts.append(
                         html.Div(
                             [
                                 html.I(className="fas fa-exclamation-triangle me-2"),
-                                f"Critical: Swarm capacity at {overall_capacity_used:.1f}%. Consider adding more nodes.",
+                                f"Critical: Swarm resources at high usage (CPU: {overall_cpu_used:.1f}%, Memory: {overall_memory_used:.1f}%). Consider adding more capacity.",
                             ],
                             className="alert alert-danger alert-sm mb-2",
                         )
                     )
-                elif overall_capacity_used >= 75:
-                    capacity_alerts.append(
+                elif overall_cpu_used >= 75 or overall_memory_used >= 75:
+                    resource_alerts.append(
                         html.Div(
                             [
                                 html.I(className="fas fa-exclamation-circle me-2"),
-                                f"Warning: Swarm capacity at {overall_capacity_used:.1f}%. Monitor closely.",
+                                f"Warning: Swarm resources at moderate usage (CPU: {overall_cpu_used:.1f}%, Memory: {overall_memory_used:.1f}%). Monitor closely.",
                             ],
                             className="alert alert-warning alert-sm mb-2",
                         )
@@ -600,7 +691,7 @@ def fetch_swarm_info(token, api_environment="production"):
                 return html.Div(
                     [
                         enhanced_swarm_summary,
-                        *capacity_alerts,  # Add any capacity alerts
+                        *resource_alerts,  # Add any resource alerts
                         html.Hr(),
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
