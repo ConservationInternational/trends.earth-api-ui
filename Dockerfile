@@ -1,5 +1,15 @@
 FROM python:3.12-slim
 
+# Accept build arguments for git information
+ARG GIT_BRANCH=unknown
+ARG GIT_COMMIT=unknown
+ARG DEPLOYMENT_ENVIRONMENT=production
+
+# Set environment variables from build args
+ENV GIT_BRANCH=${GIT_BRANCH}
+ENV GIT_COMMIT=${GIT_COMMIT}
+ENV DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT}
+
 # Install build tools and dependencies
 RUN apt-get update && apt-get install -y build-essential gcc && rm -rf /var/lib/apt/lists/*
 

@@ -2,7 +2,12 @@ version: '3.8'
 
 services:
   trendsearth-ui:
-    build: .
+    build: 
+      context: .
+      args:
+        GIT_BRANCH: ${GIT_BRANCH:-development}
+        GIT_COMMIT: ${GIT_COMMIT:-local}
+        DEPLOYMENT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT:-development}
     ports:
       - "8000:8000"
     environment:

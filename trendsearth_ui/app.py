@@ -14,6 +14,9 @@ from .components import create_main_layout
 # Import configuration
 from .config import APP_HOST, APP_PORT, APP_TITLE
 
+# Import deployment utilities
+from .utils.deployment_info import get_health_response
+
 server = flask.Flask(__name__)
 
 # Configure assets directory
@@ -62,7 +65,8 @@ app.index_string = """
 
 @server.route("/api-ui-health")
 def health_check():
-    return {"status": "healthy"}, 200
+    """Health check endpoint with deployment information."""
+    return get_health_response(), 200
 
 
 @server.route("/favicon.ico")
