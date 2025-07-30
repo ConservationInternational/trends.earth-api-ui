@@ -4,13 +4,14 @@ FROM python:3.12-slim
 ARG GIT_BRANCH=unknown
 ARG GIT_COMMIT=unknown
 ARG DEPLOYMENT_ENVIRONMENT=production
-ARG ROLLBAR_ACCESS_TOKEN=""
 
 # Set environment variables from build args
 ENV GIT_BRANCH=${GIT_BRANCH}
 ENV GIT_COMMIT=${GIT_COMMIT}
 ENV DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT}
-ENV ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN}
+
+# Note: ROLLBAR_ACCESS_TOKEN is set at runtime via ECS task definition
+# to avoid exposing secrets in the Docker image layers
 
 # Install build tools and dependencies
 RUN apt-get update && apt-get install -y build-essential gcc && rm -rf /var/lib/apt/lists/*

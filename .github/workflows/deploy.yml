@@ -38,7 +38,6 @@ jobs:
           --build-arg GIT_BRANCH="${{ github.ref_name }}" \
           --build-arg GIT_COMMIT="${{ github.sha }}" \
           --build-arg DEPLOYMENT_ENVIRONMENT="production" \
-          --build-arg ROLLBAR_ACCESS_TOKEN="${{ secrets.ROLLBAR_ACCESS_TOKEN }}" \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         
@@ -53,7 +52,18 @@ jobs:
       run: |
         # Create a new task definition file with the updated image URI
         # Note that we are using the build sha as the image tag
-        sed "s|\"image\": \"[^\"]*\"|\"image\": \"${{ steps.build-image.outputs.image }}\"|g" .aws/task-definition.json > .aws/task-definition-new.json
+        sed "s|\"image\": \"[^\"]*\"|\"image\": \"${{ steps.build-image.outputs.image }}\"|g" .aws/task-definition.json > .aws/task-definition-temp.json
+        
+        # Add ROLLBAR_ACCESS_TOKEN to environment variables if the secret is available
+        if [ -n "${{ secrets.ROLLBAR_ACCESS_TOKEN }}" ]; then
+          # Use jq to add the ROLLBAR_ACCESS_TOKEN environment variable
+          jq '.containerDefinitions[0].environment += [{"name": "ROLLBAR_ACCESS_TOKEN", "value": "${{ secrets.ROLLBAR_ACCESS_TOKEN }}"}]' .aws/task-definition-temp.json > .aws/task-definition-new.json
+          echo "✅ Added ROLLBAR_ACCESS_TOKEN to task definition"
+        else
+          mv .aws/task-definition-temp.json .aws/task-definition-new.json
+          echo "⚠️ ROLLBAR_ACCESS_TOKEN not configured, skipping Rollbar environment variable"
+        fi
+        
         echo "task-definition=.aws/task-definition-new.json" >> $GITHUB_OUTPUT
 
     - name: Deploy Amazon ECS task definition
