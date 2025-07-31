@@ -308,10 +308,27 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                 # If data is a list, we don't have swarm info, return not active
                 return html.Div(
                     [
-                        html.I(className="fas fa-info-circle me-2 text-muted"),
-                        "Docker Swarm information not available in this data format.",
-                    ],
-                    className="text-center text-muted p-3",
+                        html.Div(
+                            [
+                                html.I(className="fas fa-info-circle me-2 text-muted"),
+                                "Docker Swarm information not available in this data format.",
+                            ],
+                            className="text-center text-muted p-3",
+                        ),
+                        # Add cache update time at the bottom
+                        html.Div(
+                            [
+                                html.I(className="fas fa-clock me-1"),
+                                html.Small(
+                                    f"Last updated{cached_at_str}"
+                                    if cached_at_str
+                                    else "Last updated: Just now",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-end mt-2 small",
+                        ),
+                    ]
                 ), cached_at_str
 
             swarm_active = data.get("swarm_active", False)
@@ -323,10 +340,27 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
             if not swarm_active:
                 return html.Div(
                     [
-                        html.I(className="fas fa-exclamation-circle me-2 text-warning"),
-                        "Docker Swarm is not active.",
-                    ],
-                    className="text-center text-muted p-3",
+                        html.Div(
+                            [
+                                html.I(className="fas fa-exclamation-circle me-2 text-warning"),
+                                "Docker Swarm is not active.",
+                            ],
+                            className="text-center text-muted p-3",
+                        ),
+                        # Add cache update time at the bottom
+                        html.Div(
+                            [
+                                html.I(className="fas fa-clock me-1"),
+                                html.Small(
+                                    f"Last updated{cached_at_str}"
+                                    if cached_at_str
+                                    else "Last updated: Just now",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-end mt-2 small",
+                        ),
+                    ]
                 ), cached_at_str
 
             # Create swarm summary section
@@ -737,34 +771,100 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         html.Hr(),
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
+                        # Add cache update time at the bottom
+                        html.Div(
+                            [
+                                html.I(className="fas fa-clock me-1"),
+                                html.Small(
+                                    f"Last updated{cached_at_str}"
+                                    if cached_at_str
+                                    else "Last updated: Just now",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-end mt-2 small",
+                        ),
                     ]
                 ), cached_at_str
             else:
-                return swarm_summary, cached_at_str
+                return html.Div(
+                    [
+                        swarm_summary,
+                        # Add cache update time at the bottom
+                        html.Div(
+                            [
+                                html.I(className="fas fa-clock me-1"),
+                                html.Small(
+                                    f"Last updated{cached_at_str}"
+                                    if cached_at_str
+                                    else "Last updated: Just now",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-end mt-2 small",
+                        ),
+                    ]
+                ), cached_at_str
 
         elif resp.status_code == 403:
             return html.Div(
                 [
-                    html.I(className="fas fa-lock me-2 text-warning"),
-                    "Access denied. Admin privileges required for swarm information.",
-                ],
-                className="text-center text-muted p-3",
+                    html.Div(
+                        [
+                            html.I(className="fas fa-lock me-2 text-warning"),
+                            "Access denied. Admin privileges required for swarm information.",
+                        ],
+                        className="text-center text-muted p-3",
+                    ),
+                    # Add timestamp even for errors
+                    html.Div(
+                        [
+                            html.I(className="fas fa-clock me-1"),
+                            html.Small("Checked: Just now", className="text-muted"),
+                        ],
+                        className="text-end mt-2 small",
+                    ),
+                ]
             ), ""
         else:
             return html.Div(
                 [
-                    html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
-                    f"Failed to fetch swarm info. Status: {resp.status_code}",
-                ],
-                className="text-center text-muted p-3",
+                    html.Div(
+                        [
+                            html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
+                            f"Failed to fetch swarm info. Status: {resp.status_code}",
+                        ],
+                        className="text-center text-muted p-3",
+                    ),
+                    # Add timestamp even for errors
+                    html.Div(
+                        [
+                            html.I(className="fas fa-clock me-1"),
+                            html.Small("Checked: Just now", className="text-muted"),
+                        ],
+                        className="text-end mt-2 small",
+                    ),
+                ]
             ), ""
     except requests.exceptions.RequestException as e:
         return html.Div(
             [
-                html.I(className="fas fa-wifi me-2 text-danger"),
-                f"Error fetching swarm info: {str(e)}",
-            ],
-            className="text-center text-muted p-3",
+                html.Div(
+                    [
+                        html.I(className="fas fa-wifi me-2 text-danger"),
+                        f"Error fetching swarm info: {str(e)}",
+                    ],
+                    className="text-center text-muted p-3",
+                ),
+                # Add timestamp even for errors
+                html.Div(
+                    [
+                        html.I(className="fas fa-clock me-1"),
+                        html.Small("Checked: Just now", className="text-muted"),
+                    ],
+                    className="text-end mt-2 small",
+                ),
+            ]
         ), ""
 
 
