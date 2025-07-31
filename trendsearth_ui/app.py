@@ -36,6 +36,8 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
     assets_folder=assets_dir,
     assets_url_path="/assets/",
+    requests_pathname_prefix="/",  # Ensure proper pathname prefix
+    url_base_pathname="/",        # Ensure proper base pathname
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
         {
@@ -97,6 +99,32 @@ app.layout = create_main_layout()
 
 
 # Add global error handlers
+@server.errorhandler(405)
+def method_not_allowed(error):
+    """Handle 405 Method Not Allowed errors."""
+    from .utils.logging_config import log_exception
+    
+    # Log the request details to help debug
+    request_info = f"Path: {flask.request.path}, Method: {flask.request.method}"
+    if flask.request.headers.get('Content-Type'):
+        request_info += f", Content-Type: {flask.request.headers.get('Content-Type')}"
+    if flask.request.headers.get('User-Agent'):
+        request_info += f", User-Agent: {flask.request.headers.get('User-Agent')[:100]}"
+    
+    # Log available routes for debugging
+    route_info = []
+    for rule in server.url_map.iter_rules():
+        route_info.append(f"{rule.rule} -> {list(rule.methods)}")
+    
+    log_exception(logger, f"405 Method Not Allowed: {request_info}")
+    log_exception(logger, f"Available routes: {'; '.join(route_info[:10])}")  # Log first 10 routes
+    
+    # Return JSON error response for API endpoints or HTML for regular pages
+    if flask.request.path.startswith("/api") or flask.request.headers.get('Content-Type', '').startswith('application/json'):
+        return {"status": "error", "message": f"Method {flask.request.method} not allowed for {flask.request.path}"}, 405
+    else:
+        return f"Method {flask.request.method} not allowed for {flask.request.path}", 405
+
 @server.errorhandler(500)
 def internal_error(error):
     """Handle internal server errors."""

@@ -5,7 +5,9 @@ bind = "0.0.0.0:8000"
 backlog = 2048
 
 # Worker processes
-workers = 4
+# NOTE: Dash applications require a single worker due to in-memory state and callback routing
+# Multiple workers cause 405 Method Not Allowed errors for Dash internal routes
+workers = 1  # Use single worker to avoid Dash callback issues
 worker_class = "sync"
 worker_connections = 1000
 timeout = 120

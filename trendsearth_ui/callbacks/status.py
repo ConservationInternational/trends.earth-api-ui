@@ -318,15 +318,18 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         # Add cache update time at the bottom
                         html.Div(
                             [
-                                html.I(className="fas fa-clock me-1"),
-                                html.Small(
-                                    f"Last updated{cached_at_str}"
-                                    if cached_at_str
-                                    else "Last updated: Just now",
-                                    className="text-muted",
+                                html.Hr(className="mt-2 mb-2"),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-clock me-2 text-primary"),
+                                        html.Span(
+                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
+                                            className="text-muted"
+                                        )
+                                    ],
+                                    className="text-center"
                                 ),
-                            ],
-                            className="text-end mt-2 small",
+                            ]
                         ),
                     ]
                 ), cached_at_str
@@ -350,15 +353,18 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         # Add cache update time at the bottom
                         html.Div(
                             [
-                                html.I(className="fas fa-clock me-1"),
-                                html.Small(
-                                    f"Last updated{cached_at_str}"
-                                    if cached_at_str
-                                    else "Last updated: Just now",
-                                    className="text-muted",
+                                html.Hr(className="mt-2 mb-2"),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-clock me-2 text-primary"),
+                                        html.Span(
+                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
+                                            className="text-muted"
+                                        )
+                                    ],
+                                    className="text-center"
                                 ),
-                            ],
-                            className="text-end mt-2 small",
+                            ]
                         ),
                     ]
                 ), cached_at_str
@@ -610,35 +616,37 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                 # Enhanced swarm summary with detailed resource information
                 enhanced_swarm_summary = html.Div(
                     [
+                        # First row: Basic node counts
                         html.Div(
                             [
                                 html.Div(
                                     [
                                         html.I(className="fas fa-server me-2"),
                                         html.Strong("Total Nodes: "),
-                                        html.Span(str(total_nodes), className="text-primary"),
+                                        html.Span(str(total_nodes), className="text-primary fw-bold"),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-4 text-center mb-3",
                                 ),
                                 html.Div(
                                     [
                                         html.I(className="fas fa-crown me-2"),
                                         html.Strong("Managers: "),
-                                        html.Span(str(total_managers), className="text-success"),
+                                        html.Span(str(total_managers), className="text-success fw-bold"),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-4 text-center mb-3",
                                 ),
                                 html.Div(
                                     [
                                         html.I(className="fas fa-users me-2"),
                                         html.Strong("Workers: "),
-                                        html.Span(str(total_workers), className="text-info"),
+                                        html.Span(str(total_workers), className="text-info fw-bold"),
                                     ],
-                                    className="col-md-2 text-center mb-2",
+                                    className="col-md-4 text-center mb-3",
                                 ),
                             ],
                             className="row mb-3",
                         ),
+                        # Second row: Task information
                         html.Div(
                             [
                                 html.Div(
@@ -650,7 +658,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                             className="text-primary fw-bold",
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-6 text-center mb-3",
                                 ),
                                 html.Div(
                                     [
@@ -661,8 +669,14 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                             className="text-success fw-bold",
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-6 text-center mb-3",
                                 ),
+                            ],
+                            className="row mb-3",
+                        ),
+                        # Third row: Resource usage with progress bars
+                        html.Div(
+                            [
                                 html.Div(
                                     [
                                         html.I(className="fas fa-microchip me-2"),
@@ -678,8 +692,8 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                                     else "text-success fw-bold",
                                                 ),
                                                 html.Div(
-                                                    className="progress mt-1",
-                                                    style={"height": "8px", "width": "100%"},
+                                                    className="progress mt-2",
+                                                    style={"height": "10px", "width": "100%"},
                                                     children=[
                                                         html.Div(
                                                             className=f"progress-bar {'bg-danger' if overall_cpu_used >= 90 else 'bg-warning' if overall_cpu_used >= 75 else 'bg-success'}",
@@ -696,7 +710,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                             ]
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-6 mb-3",
                                 ),
                                 html.Div(
                                     [
@@ -713,8 +727,8 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                                     else "text-success fw-bold",
                                                 ),
                                                 html.Div(
-                                                    className="progress mt-1",
-                                                    style={"height": "8px", "width": "100%"},
+                                                    className="progress mt-2",
+                                                    style={"height": "10px", "width": "100%"},
                                                     children=[
                                                         html.Div(
                                                             className=f"progress-bar {'bg-danger' if overall_memory_used >= 90 else 'bg-warning' if overall_memory_used >= 75 else 'bg-success'}",
@@ -733,10 +747,10 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                             ]
                                         ),
                                     ],
-                                    className="col-md-3 text-center mb-2",
+                                    className="col-md-6 mb-3",
                                 ),
                             ],
-                            className="row mb-3",
+                            className="row",
                         ),
                     ]
                 )
@@ -771,18 +785,21 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         html.Hr(),
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
-                        # Add cache update time at the bottom
+                        # Add cache update time at the bottom - more prominent
                         html.Div(
                             [
-                                html.I(className="fas fa-clock me-1"),
-                                html.Small(
-                                    f"Last updated{cached_at_str}"
-                                    if cached_at_str
-                                    else "Last updated: Just now",
-                                    className="text-muted",
+                                html.Hr(className="mt-3 mb-2"),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-clock me-2 text-primary"),
+                                        html.Span(
+                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
+                                            className="text-muted"
+                                        )
+                                    ],
+                                    className="text-center"
                                 ),
-                            ],
-                            className="text-end mt-2 small",
+                            ]
                         ),
                     ]
                 ), cached_at_str
@@ -790,18 +807,21 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                 return html.Div(
                     [
                         swarm_summary,
-                        # Add cache update time at the bottom
+                        # Add cache update time at the bottom - more prominent
                         html.Div(
                             [
-                                html.I(className="fas fa-clock me-1"),
-                                html.Small(
-                                    f"Last updated{cached_at_str}"
-                                    if cached_at_str
-                                    else "Last updated: Just now",
-                                    className="text-muted",
+                                html.Hr(className="mt-3 mb-2"),
+                                html.Div(
+                                    [
+                                        html.I(className="fas fa-clock me-2 text-primary"),
+                                        html.Span(
+                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
+                                            className="text-muted"
+                                        )
+                                    ],
+                                    className="text-center"
                                 ),
-                            ],
-                            className="text-end mt-2 small",
+                            ]
                         ),
                     ]
                 ), cached_at_str
