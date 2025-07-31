@@ -323,11 +323,13 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-clock me-2 text-primary"),
                                         html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
-                                            className="text-muted"
-                                        )
+                                            f"Last updated: {cached_at_str.strip('() ')}"
+                                            if cached_at_str
+                                            else "Last updated: Just now",
+                                            className="text-muted",
+                                        ),
                                     ],
-                                    className="text-center"
+                                    className="text-center",
                                 ),
                             ]
                         ),
@@ -358,11 +360,13 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-clock me-2 text-primary"),
                                         html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
-                                            className="text-muted"
-                                        )
+                                            f"Last updated: {cached_at_str.strip('() ')}"
+                                            if cached_at_str
+                                            else "Last updated: Just now",
+                                            className="text-muted",
+                                        ),
                                     ],
-                                    className="text-center"
+                                    className="text-center",
                                 ),
                             ]
                         ),
@@ -623,7 +627,9 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-server me-2"),
                                         html.Strong("Total Nodes: "),
-                                        html.Span(str(total_nodes), className="text-primary fw-bold"),
+                                        html.Span(
+                                            str(total_nodes), className="text-primary fw-bold"
+                                        ),
                                     ],
                                     className="col-md-4 text-center mb-3",
                                 ),
@@ -631,7 +637,9 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-crown me-2"),
                                         html.Strong("Managers: "),
-                                        html.Span(str(total_managers), className="text-success fw-bold"),
+                                        html.Span(
+                                            str(total_managers), className="text-success fw-bold"
+                                        ),
                                     ],
                                     className="col-md-4 text-center mb-3",
                                 ),
@@ -639,7 +647,9 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-users me-2"),
                                         html.Strong("Workers: "),
-                                        html.Span(str(total_workers), className="text-info fw-bold"),
+                                        html.Span(
+                                            str(total_workers), className="text-info fw-bold"
+                                        ),
                                     ],
                                     className="col-md-4 text-center mb-3",
                                 ),
@@ -793,11 +803,13 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-clock me-2 text-primary"),
                                         html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
-                                            className="text-muted"
-                                        )
+                                            f"Last updated: {cached_at_str.strip('() ')}"
+                                            if cached_at_str
+                                            else "Last updated: Just now",
+                                            className="text-muted",
+                                        ),
                                     ],
-                                    className="text-center"
+                                    className="text-center",
                                 ),
                             ]
                         ),
@@ -815,11 +827,13 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                                     [
                                         html.I(className="fas fa-clock me-2 text-primary"),
                                         html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}" if cached_at_str else "Last updated: Just now",
-                                            className="text-muted"
-                                        )
+                                            f"Last updated: {cached_at_str.strip('() ')}"
+                                            if cached_at_str
+                                            else "Last updated: Just now",
+                                            className="text-muted",
+                                        ),
                                     ],
-                                    className="text-center"
+                                    className="text-center",
                                 ),
                             ]
                         ),
