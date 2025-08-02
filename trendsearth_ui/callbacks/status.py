@@ -273,6 +273,76 @@ def fetch_deployment_info(api_environment="production"):
 
 def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
     """Fetch Docker Swarm information from status/swarm endpoint."""
+
+    def format_cache_timestamp(cache_info, user_timezone):
+        """Helper function to format cache timestamp from API response."""
+        if not cache_info or not cache_info.get("cached_at"):
+            return ""
+
+        try:
+            # Get safe timezone
+            safe_timezone = get_safe_timezone(user_timezone)
+            # Parse the ISO timestamp
+            cached_at_utc = datetime.fromisoformat(cache_info["cached_at"].replace("Z", "+00:00"))
+            # Convert to user's local time
+            local_time_str, tz_abbrev = format_local_time(
+                cached_at_utc, safe_timezone, include_seconds=True
+            )
+            return f" ({local_time_str} {tz_abbrev})"
+        except Exception:
+            # Fallback to raw timestamp if parsing fails
+            return f" ({cache_info.get('cached_at', '')})"
+
+    def create_timestamp_display(cached_at_str):
+        """Helper function to create timestamp display HTML."""
+        return html.Div(
+            [
+                html.Hr(className="mt-2 mb-2"),
+                html.Div(
+                    [
+                        html.I(className="fas fa-clock me-2 text-primary"),
+                        html.Span(
+                            f"Last updated: {cached_at_str.strip('() ')}"
+                            if cached_at_str
+                            else "Last updated: Time not available",
+                            className="text-muted",
+                        ),
+                    ],
+                    className="text-center",
+                ),
+            ]
+        )
+
+    def create_prominent_timestamp_display(cached_at_str):
+        """Helper function to create prominent timestamp display HTML for main sections."""
+        return html.Div(
+            [
+                html.Hr(className="mt-3 mb-2"),
+                html.Div(
+                    [
+                        html.I(className="fas fa-clock me-2 text-primary"),
+                        html.Span(
+                            f"Last updated: {cached_at_str.strip('() ')}"
+                            if cached_at_str
+                            else "Last updated: Time not available",
+                            className="text-muted",
+                        ),
+                    ],
+                    className="text-center",
+                ),
+            ]
+        )
+
+    def create_error_timestamp_display():
+        """Helper function to create error timestamp display HTML."""
+        return html.Div(
+            [
+                html.I(className="fas fa-clock me-1"),
+                html.Small("Checked: Time not available", className="text-muted"),
+            ],
+            className="text-end mt-2 small",
+        )
+
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
@@ -285,23 +355,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
             cache_info = response_data.get("cache_info", {})
 
             # Format cache timestamp for display
-            cached_at_str = ""
-            if cache_info and cache_info.get("cached_at"):
-                try:
-                    # Get safe timezone
-                    safe_timezone = get_safe_timezone(user_timezone)
-                    # Parse the ISO timestamp
-                    cached_at_utc = datetime.fromisoformat(
-                        cache_info["cached_at"].replace("Z", "+00:00")
-                    )
-                    # Convert to user's local time
-                    local_time_str, tz_abbrev = format_local_time(
-                        cached_at_utc, safe_timezone, include_seconds=True
-                    )
-                    cached_at_str = f" ({local_time_str} {tz_abbrev})"
-                except Exception:
-                    # Fallback to raw timestamp if parsing fails
-                    cached_at_str = f" ({cache_info.get('cached_at', '')})"
+            cached_at_str = format_cache_timestamp(cache_info, user_timezone)
 
             # Handle case where data might be a list (for test compatibility)
             if isinstance(data, list):
@@ -316,23 +370,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                             className="text-center text-muted p-3",
                         ),
                         # Add cache update time at the bottom
-                        html.Div(
-                            [
-                                html.Hr(className="mt-2 mb-2"),
-                                html.Div(
-                                    [
-                                        html.I(className="fas fa-clock me-2 text-primary"),
-                                        html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}"
-                                            if cached_at_str
-                                            else "Last updated: Just now",
-                                            className="text-muted",
-                                        ),
-                                    ],
-                                    className="text-center",
-                                ),
-                            ]
-                        ),
+                        create_timestamp_display(cached_at_str),
                     ]
                 ), cached_at_str
 
@@ -353,23 +391,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                             className="text-center text-muted p-3",
                         ),
                         # Add cache update time at the bottom
-                        html.Div(
-                            [
-                                html.Hr(className="mt-2 mb-2"),
-                                html.Div(
-                                    [
-                                        html.I(className="fas fa-clock me-2 text-primary"),
-                                        html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}"
-                                            if cached_at_str
-                                            else "Last updated: Just now",
-                                            className="text-muted",
-                                        ),
-                                    ],
-                                    className="text-center",
-                                ),
-                            ]
-                        ),
+                        create_timestamp_display(cached_at_str),
                     ]
                 ), cached_at_str
 
@@ -796,23 +818,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         html.H6("Swarm Nodes", className="mb-3"),
                         html.Div([nodes_table], className="table-responsive"),
                         # Add cache update time at the bottom - more prominent
-                        html.Div(
-                            [
-                                html.Hr(className="mt-3 mb-2"),
-                                html.Div(
-                                    [
-                                        html.I(className="fas fa-clock me-2 text-primary"),
-                                        html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}"
-                                            if cached_at_str
-                                            else "Last updated: Just now",
-                                            className="text-muted",
-                                        ),
-                                    ],
-                                    className="text-center",
-                                ),
-                            ]
-                        ),
+                        create_prominent_timestamp_display(cached_at_str),
                     ]
                 ), cached_at_str
             else:
@@ -820,23 +826,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                     [
                         swarm_summary,
                         # Add cache update time at the bottom - more prominent
-                        html.Div(
-                            [
-                                html.Hr(className="mt-3 mb-2"),
-                                html.Div(
-                                    [
-                                        html.I(className="fas fa-clock me-2 text-primary"),
-                                        html.Span(
-                                            f"Last updated: {cached_at_str.strip('() ')}"
-                                            if cached_at_str
-                                            else "Last updated: Just now",
-                                            className="text-muted",
-                                        ),
-                                    ],
-                                    className="text-center",
-                                ),
-                            ]
-                        ),
+                        create_prominent_timestamp_display(cached_at_str),
                     ]
                 ), cached_at_str
 
@@ -851,13 +841,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         className="text-center text-muted p-3",
                     ),
                     # Add timestamp even for errors
-                    html.Div(
-                        [
-                            html.I(className="fas fa-clock me-1"),
-                            html.Small("Checked: Just now", className="text-muted"),
-                        ],
-                        className="text-end mt-2 small",
-                    ),
+                    create_error_timestamp_display(),
                 ]
             ), ""
         else:
@@ -871,13 +855,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         className="text-center text-muted p-3",
                     ),
                     # Add timestamp even for errors
-                    html.Div(
-                        [
-                            html.I(className="fas fa-clock me-1"),
-                            html.Small("Checked: Just now", className="text-muted"),
-                        ],
-                        className="text-end mt-2 small",
-                    ),
+                    create_error_timestamp_display(),
                 ]
             ), ""
     except requests.exceptions.RequestException as e:
@@ -891,13 +869,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                     className="text-center text-muted p-3",
                 ),
                 # Add timestamp even for errors
-                html.Div(
-                    [
-                        html.I(className="fas fa-clock me-1"),
-                        html.Small("Checked: Just now", className="text-muted"),
-                    ],
-                    className="text-end mt-2 small",
-                ),
+                create_error_timestamp_display(),
             ]
         ), ""
 
