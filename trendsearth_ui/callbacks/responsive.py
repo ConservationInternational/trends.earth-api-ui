@@ -40,19 +40,36 @@ def register_responsive_callbacks(app):
             tab_class += " multi-row"
         return tab_class
 
+    # Individual callbacks for each table scroll hint to avoid missing component errors
     @app.callback(
-        [
-            Output("executions-table-scroll-hint", "style", allow_duplicate=True),
-            Output("users-table-scroll-hint", "style", allow_duplicate=True),
-            Output("scripts-table-scroll-hint", "style", allow_duplicate=True),
-        ],
+        Output("executions-table-scroll-hint", "style", allow_duplicate=True),
         Input("is-mobile-store", "data"),
         prevent_initial_call=True,
     )
-    def update_scroll_hints(is_mobile):
-        """Show/hide scroll hints based on device type."""
+    def update_executions_scroll_hint(is_mobile):
+        """Show/hide executions table scroll hint based on device type."""
         if is_mobile is None:
-            return no_update, no_update, no_update
+            return no_update
+        return {"display": "block"} if is_mobile else {"display": "none"}
 
-        hint_style = {"display": "block"} if is_mobile else {"display": "none"}
-        return hint_style, hint_style, hint_style
+    @app.callback(
+        Output("users-table-scroll-hint", "style", allow_duplicate=True),
+        Input("is-mobile-store", "data"),
+        prevent_initial_call=True,
+    )
+    def update_users_scroll_hint(is_mobile):
+        """Show/hide users table scroll hint based on device type."""
+        if is_mobile is None:
+            return no_update
+        return {"display": "block"} if is_mobile else {"display": "none"}
+
+    @app.callback(
+        Output("scripts-table-scroll-hint", "style", allow_duplicate=True),
+        Input("is-mobile-store", "data"),
+        prevent_initial_call=True,
+    )
+    def update_scripts_scroll_hint(is_mobile):
+        """Show/hide scripts table scroll hint based on device type."""
+        if is_mobile is None:
+            return no_update
+        return {"display": "block"} if is_mobile else {"display": "none"}

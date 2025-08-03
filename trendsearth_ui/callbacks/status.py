@@ -302,7 +302,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                     [
                         html.I(className="fas fa-clock me-2 text-primary"),
                         html.Span(
-                            f"Last updated: {cached_at_str.strip('() ')}"
+                            f"Last updated: {cached_at_str}"
                             if cached_at_str
                             else "Last updated: Time not available",
                             className="text-muted",
@@ -322,7 +322,7 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                     [
                         html.I(className="fas fa-clock me-2 text-primary"),
                         html.Span(
-                            f"Last updated: {cached_at_str.strip('() ')}"
+                            f"Last updated: {cached_at_str}"
                             if cached_at_str
                             else "Last updated: Time not available",
                             className="text-muted",
@@ -352,7 +352,8 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
         if resp.status_code == 200:
             response_data = resp.json()
             data = response_data.get("data", {})
-            cache_info = response_data.get("cache_info", {})
+            # Look for cache_info inside the data object, not at the top level
+            cache_info = data.get("cache_info", {})
 
             # Format cache timestamp for display
             cached_at_str = format_cache_timestamp(cache_info, user_timezone)
