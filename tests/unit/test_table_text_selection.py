@@ -63,13 +63,20 @@ def test_ag_grid_dashgridoptions_includes_text_selection():
             '"ensureDomOrder": True' in source_code
         ), "dashGridOptions should include ensureDomOrder: True"
 
-        # Check that it's applied to all three main tables
+        # Check that all three main tables use the create_responsive_table function
+        # which applies the text selection configuration
         assert (
-            source_code.count('"enableCellTextSelection": True') >= 3
-        ), "Text selection should be enabled on all three tables"
+            source_code.count("create_responsive_table(") >= 3
+        ), "All three main tables should use create_responsive_table function"
         assert (
-            source_code.count('"ensureDomOrder": True') >= 3
-        ), "ensureDomOrder should be enabled on all three tables"
+            'table_id="executions-table"' in source_code
+        ), "Executions table should use create_responsive_table"
+        assert (
+            'table_id="users-table"' in source_code
+        ), "Users table should use create_responsive_table"
+        assert (
+            'table_id="scripts-table"' in source_code
+        ), "Scripts table should use create_responsive_table"
 
     except ImportError as e:
         pytest.skip(f"Could not import tabs module: {e}")

@@ -352,14 +352,11 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
         if resp.status_code == 200:
             response_data = resp.json()
             data = response_data.get("data", {})
-            # Look for cache_info inside the data object, not at the top level
-            cache_info = data.get("cache_info", {})
-
-            # Format cache timestamp for display
-            cached_at_str = format_cache_timestamp(cache_info, user_timezone)
 
             # Handle case where data might be a list (for test compatibility)
             if isinstance(data, list):
+                # If data is a list, we don't have swarm info or cache_info
+                cached_at_str = ""
                 # If data is a list, we don't have swarm info, return not active
                 return html.Div(
                     [
@@ -374,6 +371,12 @@ def fetch_swarm_info(token, api_environment="production", user_timezone="UTC"):
                         create_timestamp_display(cached_at_str),
                     ]
                 ), cached_at_str
+
+            # Look for cache_info inside the data object, not at the top level
+            cache_info = data.get("cache_info", {})
+
+            # Format cache timestamp for display
+            cached_at_str = format_cache_timestamp(cache_info, user_timezone)
 
             swarm_active = data.get("swarm_active", False)
             total_nodes = data.get("total_nodes", 0)

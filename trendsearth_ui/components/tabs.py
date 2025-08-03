@@ -26,9 +26,11 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         "defaultColDef": {"resizable": True, "sortable": True, "filter": True},
         "columnSize": "sizeToFit",
         "rowModelType": "infinite",
-        "dashGridOptions": get_responsive_grid_options(
-            is_mobile=False
-        ),  # Will be updated by callback
+        "dashGridOptions": {
+            **get_responsive_grid_options(is_mobile=False),  # Will be updated by callback
+            "enableCellTextSelection": True,
+            "ensureDomOrder": True,
+        },
         "style": {"height": height},
     }
 
