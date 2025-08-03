@@ -12,6 +12,7 @@ from ..config import (
     LOGO_SQUARE_URL,
     LOGO_URL,
 )
+from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     delete_script_modal,
     delete_user_modal,
@@ -27,6 +28,9 @@ def create_main_layout():
     """Create the main application layout with all stores and modals."""
     # Get timezone detection components
     timezone_components = get_timezone_components()
+
+    # Get mobile detection components
+    mobile_components = create_mobile_detection_components()
 
     return dbc.Container(
         [
@@ -62,6 +66,8 @@ def create_main_layout():
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             # Timezone detection components
             *timezone_components,
+            # Mobile detection components
+            *mobile_components,
             # Modals
             json_modal(),
             edit_user_modal(),
@@ -392,10 +398,10 @@ def dashboard_layout():
                                         "Executions",
                                         id="executions-tab-btn",
                                         className="nav-link active",
-                                        **{"data-tab": "executions"},
                                     )
                                 ],
                                 className="nav-item",
+                                **{"data-tab": "executions"},
                             ),
                             html.Li(
                                 [
@@ -403,7 +409,6 @@ def dashboard_layout():
                                         "Users",
                                         id="users-tab-btn",
                                         className="nav-link",
-                                        **{"data-tab": "users"},
                                     )
                                 ],
                                 className="nav-item",
@@ -411,6 +416,7 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
+                                **{"data-tab": "users"},
                             ),
                             html.Li(
                                 [
@@ -418,7 +424,6 @@ def dashboard_layout():
                                         "Scripts",
                                         id="scripts-tab-btn",
                                         className="nav-link",
-                                        **{"data-tab": "scripts"},
                                     )
                                 ],
                                 className="nav-item",
@@ -426,6 +431,7 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
+                                **{"data-tab": "scripts"},
                             ),
                             html.Li(
                                 [
@@ -433,12 +439,12 @@ def dashboard_layout():
                                         "Admin",
                                         id="admin-tab-btn",
                                         className="nav-link",
-                                        **{"data-tab": "admin"},
                                     )
                                 ],
                                 className="nav-item",
                                 id="admin-tab-li",
                                 style={"display": "none"},  # Hidden by default
+                                **{"data-tab": "admin"},
                             ),
                             html.Li(
                                 [
@@ -446,7 +452,6 @@ def dashboard_layout():
                                         "Status",
                                         id="status-tab-btn",
                                         className="nav-link",
-                                        **{"data-tab": "status"},
                                     )
                                 ],
                                 className="nav-item",
@@ -454,6 +459,7 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
+                                **{"data-tab": "status"},
                             ),
                             html.Li(
                                 [
@@ -461,10 +467,10 @@ def dashboard_layout():
                                         "Profile",
                                         id="profile-tab-btn",
                                         className="nav-link",
-                                        **{"data-tab": "profile"},
                                     )
                                 ],
                                 className="nav-item",
+                                **{"data-tab": "profile"},
                             ),
                         ],
                         className="nav nav-tabs",

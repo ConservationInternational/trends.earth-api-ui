@@ -1,0 +1,222 @@
+/* Mobile Responsive Styles for Trends.Earth API Dashboard */
+
+/* Mobile-first approach */
+@media (max-width: 768px) {
+    /* Tab navigation improvements for mobile */
+    .nav-tabs {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        margin-bottom: 1rem !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+    
+    .nav-tabs .nav-item {
+        flex: 1 1 auto !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .nav-tabs .nav-link {
+        font-size: 0.85rem !important;
+        padding: 0.5rem 0.3rem !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        border: 1px solid transparent !important;
+        border-radius: 0.25rem 0.25rem 0 0 !important;
+    }
+    
+    /* Two-row layout for tabs when there are many */
+    .nav-tabs.multi-row {
+        flex-wrap: wrap !important;
+    }
+    
+    .nav-tabs.multi-row .nav-item {
+        flex: 1 1 calc(50% - 0.5rem) !important;
+        margin: 0.25rem !important;
+    }
+    
+    /* AG-Grid mobile optimizations */
+    .ag-theme-alpine {
+        font-size: 12px !important;
+    }
+    
+    .ag-header-cell {
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+    
+    .ag-cell {
+        font-size: 12px !important;
+        padding: 4px 2px !important;
+        line-height: 1.2 !important;
+    }
+    
+    /* Ensure horizontal scrolling works on mobile */
+    .ag-body-horizontal-scroll {
+        display: block !important;
+        height: 16px !important;
+    }
+    
+    .ag-horizontal-left-spacer,
+    .ag-horizontal-right-spacer {
+        min-width: 0 !important;
+    }
+    
+    /* Mobile table container */
+    .mobile-table-container {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Button groups on mobile */
+    .btn-group {
+        flex-wrap: wrap !important;
+    }
+    
+    .btn-group .btn {
+        font-size: 0.8rem !important;
+        padding: 0.375rem 0.5rem !important;
+    }
+    
+    /* Responsive columns */
+    .col-auto {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+    
+    /* Navbar adjustments */
+    .navbar-brand {
+        font-size: 1rem !important;
+    }
+    
+    /* Header user info on mobile */
+    #header-user-info {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Modal adjustments for mobile */
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+    
+    .modal-body {
+        padding: 1rem 0.5rem !important;
+    }
+    
+    /* Status cards on mobile */
+    .card {
+        margin-bottom: 1rem !important;
+    }
+    
+    .card-body {
+        padding: 0.75rem !important;
+    }
+    
+    /* Form controls on mobile */
+    .form-control, .form-select {
+        font-size: 14px !important;
+    }
+    
+    /* Alert adjustments */
+    .alert {
+        padding: 0.5rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .nav-tabs .nav-link {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+    
+    .ag-theme-alpine {
+        font-size: 13px !important;
+    }
+    
+    .ag-header-cell {
+        font-size: 12px !important;
+        padding: 6px 4px !important;
+    }
+    
+    .ag-cell {
+        font-size: 13px !important;
+        padding: 6px 4px !important;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+    /* Default styles for desktop */
+    .nav-tabs .nav-link {
+        font-size: 1rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+}
+
+/* Utility classes for responsive design */
+.mobile-only {
+    display: none !important;
+}
+
+.desktop-only {
+    display: block !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block !important;
+    }
+    
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+/* Horizontal scrolling indicator for tables */
+.table-scroll-hint {
+    display: none;
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-align: center;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-top: none;
+}
+
+@media (max-width: 768px) {
+    .table-scroll-hint {
+        display: block;
+    }
+}
+
+/* Pinned columns styling */
+.ag-pinned-left-cols-container {
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Touch-friendly styling for mobile */
+@media (max-width: 768px) {
+    .ag-cell, .ag-header-cell {
+        min-height: 32px !important;
+    }
+    
+    /* Increase touch targets */
+    .btn, .nav-link {
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Better spacing for touch */
+    .nav-tabs {
+        gap: 2px !important;
+    }
+}

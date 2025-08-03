@@ -2,17 +2,22 @@
 
 import importlib
 
+from ..utils.mobile_utils import register_mobile_callbacks
 from . import status
 
 
 def register_all_callbacks(app):
     """Register all callbacks with the Dash app."""
-    # First register status callbacks directly
+    # First register mobile detection callbacks
+    register_mobile_callbacks()
+
+    # Register status callbacks directly
     status.register_callbacks(app)
 
     # Use importlib to dynamically import other modules to avoid circular imports
     callback_modules = [
         "timezone",  # Add timezone first for early detection
+        "responsive",  # Add responsive callbacks early
         "auth",
         "manual_tabs",  # Add manual tabs before tabs
         "tabs",
@@ -33,6 +38,8 @@ def register_all_callbacks(app):
             module = importlib.import_module(f".{module_name}", package="trendsearth_ui.callbacks")
             if hasattr(module, "register_callbacks"):
                 module.register_callbacks(app)
+            elif hasattr(module, "register_responsive_callbacks"):
+                module.register_responsive_callbacks(app)
             else:
                 print(f"Warning: Module {module_name} does not have register_callbacks function")
         except ImportError as e:

@@ -4,27 +4,54 @@ from dash import dcc, html
 import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 
-from ..config import DEFAULT_PAGE_SIZE, EXECUTIONS_REFRESH_INTERVAL, STATUS_REFRESH_INTERVAL
+from ..config import EXECUTIONS_REFRESH_INTERVAL, STATUS_REFRESH_INTERVAL
+from ..utils.mobile_utils import get_mobile_column_config, get_responsive_grid_options
+
+
+def create_responsive_table(table_id, table_type, style_data_conditional=None, height="800px"):
+    """Create a responsive AG-Grid table with mobile-optimized columns."""
+    # Get column configuration
+    column_config = get_mobile_column_config()
+    config = column_config.get(table_type, {})
+
+    # Combine primary and secondary columns
+    primary_cols = config.get("primary_columns", [])
+    secondary_cols = config.get("secondary_columns", [])
+    all_columns = primary_cols + secondary_cols
+
+    # Base AG-Grid configuration
+    base_config = {
+        "id": table_id,
+        "columnDefs": all_columns,
+        "defaultColDef": {"resizable": True, "sortable": True, "filter": True},
+        "columnSize": "sizeToFit",
+        "rowModelType": "infinite",
+        "dashGridOptions": get_responsive_grid_options(
+            is_mobile=False
+        ),  # Will be updated by callback
+        "style": {"height": height},
+    }
+
+    # Add style conditions if provided
+    if style_data_conditional:
+        base_config["getRowStyle"] = {"styleConditions": style_data_conditional}
+
+    return html.Div(
+        [
+            dag.AgGrid(**base_config),
+            # Mobile scroll hint
+            html.Div(
+                "← Scroll horizontally to view more columns →",
+                className="table-scroll-hint",
+                id=f"{table_id}-scroll-hint",
+            ),
+        ],
+        className="mobile-table-container",
+    )
 
 
 def executions_tab_content():
     """Create the executions tab content."""
-    column_defs = [
-        {"headerName": "Script Name", "field": "script_name"},
-        {"headerName": "User Name", "field": "user_name"},
-        {"headerName": "User Email", "field": "user_email"},
-        {"headerName": "User ID", "field": "user_id"},
-        {"headerName": "Status", "field": "status"},
-        {"headerName": "Start Date", "field": "start_date", "filter": "agDateColumnFilter"},
-        {"headerName": "End Date", "field": "end_date", "filter": "agDateColumnFilter"},
-        {"headerName": "Duration", "field": "duration"},
-        {"headerName": "ID", "field": "id"},
-        {"headerName": "Params", "field": "params", "sortable": False, "filter": False},
-        {"headerName": "Results", "field": "results", "sortable": False, "filter": False},
-        {"headerName": "Logs", "field": "logs", "sortable": False, "filter": False},
-        {"headerName": "Map", "field": "map", "sortable": False, "filter": False},
-    ]
-
     style_data_conditional = [
         {
             "condition": "params.data.status === 'FAILED'",
@@ -97,23 +124,10 @@ def executions_tab_content():
                 ],
                 className="justify-content-between",
             ),
-            dag.AgGrid(
-                id="executions-table",
-                columnDefs=column_defs,
-                defaultColDef={"resizable": True, "sortable": True, "filter": True},
-                columnSize="sizeToFit",
-                rowModelType="infinite",
-                dashGridOptions={
-                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
-                    "maxBlocksInCache": 2,
-                    "blockLoadDebounceMillis": 500,
-                    "purgeClosedRowNodes": True,
-                    "maxConcurrentDatasourceRequests": 1,
-                    "enableCellTextSelection": True,
-                    "ensureDomOrder": True,
-                },
-                getRowStyle={"styleConditions": style_data_conditional},
-                style={"height": "800px"},
+            create_responsive_table(
+                table_id="executions-table",
+                table_type="executions",
+                style_data_conditional=style_data_conditional,
             ),
             dcc.Interval(
                 id="executions-auto-refresh-interval",
@@ -131,18 +145,6 @@ def executions_tab_content():
 
 def users_tab_content():
     """Create the users tab content."""
-    column_defs = [
-        {"headerName": "User Email", "field": "email"},
-        {"headerName": "User ID", "field": "id"},
-        {"headerName": "Name", "field": "name"},
-        {"headerName": "Institution", "field": "institution"},
-        {"headerName": "Country", "field": "country"},
-        {"headerName": "Role", "field": "role"},
-        {"headerName": "Created At", "field": "created_at", "filter": "agDateColumnFilter"},
-        {"headerName": "Updated At", "field": "updated_at", "filter": "agDateColumnFilter"},
-        {"headerName": "Edit", "field": "edit", "sortable": False, "filter": False},
-    ]
-
     return html.Div(
         [
             dbc.Row(
@@ -175,41 +177,13 @@ def users_tab_content():
                     ),
                 ]
             ),
-            dag.AgGrid(
-                id="users-table",
-                columnDefs=column_defs,
-                defaultColDef={"resizable": True, "sortable": True, "filter": True},
-                columnSize="sizeToFit",
-                rowModelType="infinite",
-                dashGridOptions={
-                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
-                    "maxBlocksInCache": 2,
-                    "blockLoadDebounceMillis": 500,
-                    "purgeClosedRowNodes": True,
-                    "maxConcurrentDatasourceRequests": 1,
-                    "enableCellTextSelection": True,
-                    "ensureDomOrder": True,
-                },
-                style={"height": "800px"},
-            ),
+            create_responsive_table(table_id="users-table", table_type="users"),
         ]
     )
 
 
 def scripts_tab_content():
     """Create the scripts tab content."""
-    column_defs = [
-        {"headerName": "Script Name", "field": "name"},
-        {"headerName": "User Name", "field": "user_name"},
-        {"headerName": "Description", "field": "description"},
-        {"headerName": "Status", "field": "status"},
-        {"headerName": "Created At", "field": "created_at", "filter": "agDateColumnFilter"},
-        {"headerName": "Updated At", "field": "updated_at", "filter": "agDateColumnFilter"},
-        {"headerName": "ID", "field": "id"},
-        {"headerName": "Logs", "field": "logs", "sortable": False, "filter": False},
-        {"headerName": "Edit", "field": "edit", "sortable": False, "filter": False},
-    ]
-
     style_data_conditional = [
         {
             "condition": "params.data.status === 'PUBLISHED'",
@@ -277,23 +251,10 @@ def scripts_tab_content():
                     ),
                 ]
             ),
-            dag.AgGrid(
-                id="scripts-table",
-                columnDefs=column_defs,
-                defaultColDef={"resizable": True, "sortable": True, "filter": True},
-                columnSize="sizeToFit",
-                rowModelType="infinite",
-                dashGridOptions={
-                    "cacheBlockSize": DEFAULT_PAGE_SIZE,
-                    "maxBlocksInCache": 2,
-                    "blockLoadDebounceMillis": 500,
-                    "purgeClosedRowNodes": True,
-                    "maxConcurrentDatasourceRequests": 1,
-                    "enableCellTextSelection": True,
-                    "ensureDomOrder": True,
-                },
-                getRowStyle={"styleConditions": style_data_conditional},
-                style={"height": "800px"},
+            create_responsive_table(
+                table_id="scripts-table",
+                table_type="scripts",
+                style_data_conditional=style_data_conditional,
             ),
         ]
     )
