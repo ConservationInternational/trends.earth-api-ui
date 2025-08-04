@@ -174,6 +174,9 @@ def register_callbacks(app):
                 row["params"] = "Show Params"
                 row["results"] = "Show Results"
                 row["logs"] = "Show Logs"
+                # Add docker logs column for admin/superadmin users only
+                if role in ["ADMIN", "SUPERADMIN"]:
+                    row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
 
                 # Format duration in Hours:Minutes:Seconds format
@@ -257,6 +260,9 @@ def register_callbacks(app):
             row["params"] = "Show Params"
             row["results"] = "Show Results"
             row["logs"] = "Show Logs"
+            # Add docker logs column for admin/superadmin users only
+            if role in ["ADMIN", "SUPERADMIN"]:
+                row["docker_logs"] = "Show Docker Logs"
             row["map"] = "Show Map"
 
             # Format duration in Hours:Minutes:Seconds format
@@ -336,6 +342,9 @@ def register_callbacks(app):
                 row["params"] = "Show Params"
                 row["results"] = "Show Results"
                 row["logs"] = "Show Logs"
+                # Add docker logs column for admin/superadmin users only
+                if role in ["ADMIN", "SUPERADMIN"]:
+                    row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
 
                 # Format duration in Hours:Minutes:Seconds format

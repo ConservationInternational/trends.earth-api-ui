@@ -37,6 +37,9 @@ def register_callbacks(app):
 
         log_type = log_context.get("type")
         log_id = log_context.get("id")
+        log_subtype = log_context.get(
+            "log_type", "regular"
+        )  # For execution logs: "regular" or "docker"
 
         if not log_type or not log_id:
             return no_update, no_update, no_update
@@ -46,7 +49,10 @@ def register_callbacks(app):
         # Fetch logs based on type
         try:
             if log_type == "execution":
-                resp = make_authenticated_request(f"/execution/{log_id}/log", token)
+                if log_subtype == "docker":
+                    resp = make_authenticated_request(f"/execution/{log_id}/docker-logs", token)
+                else:
+                    resp = make_authenticated_request(f"/execution/{log_id}/log", token)
             elif log_type == "script":
                 resp = make_authenticated_request(f"/script/{log_id}/log", token)
             else:
@@ -84,21 +90,27 @@ def register_callbacks(app):
             parsed_logs = []
             for log in logs_data:
                 if isinstance(log, dict):
-                    register_date = log.get("register_date", "")
-                    level = log.get("level", "")
-                    text = log.get("text", "")
-
-                    # Parse and format the date
-                    formatted_date = parse_date(register_date, user_timezone) or register_date
-
-                    # Create formatted log line
-                    log_line = f"{formatted_date} - {level} - {text}"
-                    parsed_logs.append((register_date, log_line))
+                    # Handle different log formats based on log type
+                    if log_type == "execution" and log_subtype == "docker":
+                        # Docker logs format: created_at and text
+                        timestamp = log.get("created_at", "")
+                        text = log.get("text", "")
+                        formatted_date = parse_date(timestamp, user_timezone) or timestamp
+                        log_line = f"{formatted_date} - {text}"
+                        parsed_logs.append((timestamp, log_line))
+                    else:
+                        # Regular logs format: register_date, level, text
+                        register_date = log.get("register_date", "")
+                        level = log.get("level", "")
+                        text = log.get("text", "")
+                        formatted_date = parse_date(register_date, user_timezone) or register_date
+                        log_line = f"{formatted_date} - {level} - {text}"
+                        parsed_logs.append((register_date, log_line))
                 else:
                     # Fallback for non-dict log entries
                     parsed_logs.append(("", str(log)))
 
-            # Sort by register_date in descending order
+            # Sort by timestamp in descending order
             parsed_logs.sort(key=lambda x: x[0], reverse=True)
             logs_content = "\n".join([log_line for _, log_line in parsed_logs])
         else:

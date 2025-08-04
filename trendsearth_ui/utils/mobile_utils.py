@@ -135,6 +135,16 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
+                    "headerName": "Docker Logs",
+                    "field": "docker_logs",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "sortable": False,
+                    "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
+                },
+                {
                     "headerName": "Map",
                     "field": "map",
                     "flex": 1,
@@ -303,8 +313,6 @@ def get_mobile_column_config():
             ],
         },
     }
-
-
 
 
 def register_mobile_callbacks():

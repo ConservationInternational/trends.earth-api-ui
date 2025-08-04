@@ -400,7 +400,7 @@ def register_callbacks(app):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         col = cell.get("colId")
-        if col not in ("params", "results", "logs"):
+        if col not in ("params", "results", "logs", "docker_logs"):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         # Try to get row data from cell click event first
@@ -698,6 +698,95 @@ def register_callbacks(app):
                     {
                         "execution_id": execution_id,
                         "type": "execution",
+                        "log_type": "regular",
+                        "id": execution_id,
+                        "status": execution_status,
+                    },
+                )
+
+            elif col == "docker_logs":
+                from ..utils.helpers import make_authenticated_request
+
+                # Get execution status from row data for auto-refresh control
+                execution_status = None
+                if row_data:
+                    execution_status = row_data.get("status")
+
+                # For docker logs, use the specific docker logs endpoint
+                resp = make_authenticated_request(f"/execution/{execution_id}/docker-logs", token)
+
+                if resp.status_code != 200:
+                    return (
+                        True,
+                        f"Failed to fetch docker logs: {resp.status_code} - {resp.text}",
+                        None,
+                        f"Execution {execution_id} - Docker Logs",
+                        {"display": "none"},
+                        True,
+                        {
+                            "execution_id": execution_id,
+                            "type": "execution",
+                            "id": execution_id,
+                            "status": execution_status,
+                        },
+                    )
+
+                result = resp.json()
+                docker_logs = result.get("data", [])
+
+                if not docker_logs:
+                    log_content = html.P("No docker logs found for this execution.")
+                else:
+                    # Parse and format docker logs using the same format as regular logs
+                    if isinstance(docker_logs, list):
+                        parsed_logs = []
+                        for log in docker_logs:
+                            if isinstance(log, dict):
+                                created_at = log.get("created_at", "")
+                                text = log.get("text", "")
+
+                                # Parse and format the date
+                                formatted_date = parse_date(created_at, user_timezone) or created_at
+
+                                # Create formatted log line
+                                log_line = f"{formatted_date} - {text}"
+                                parsed_logs.append((created_at, log_line))
+                            else:
+                                # Fallback for non-dict log entries
+                                parsed_logs.append(("", str(log)))
+
+                        # Sort by created_at in descending order
+                        parsed_logs.sort(key=lambda x: x[0], reverse=True)
+                        logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                        log_content = html.Pre(
+                            logs_content,
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
+                        )
+                    else:
+                        log_content = html.Pre(
+                            str(docker_logs),
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
+                        )
+
+                return (
+                    True,
+                    log_content,
+                    None,
+                    f"Execution {execution_id} - Docker Logs",
+                    {"display": "inline-block"},
+                    False,
+                    {
+                        "execution_id": execution_id,
+                        "type": "execution",
+                        "log_type": "docker",
                         "id": execution_id,
                         "status": execution_status,
                     },
@@ -726,35 +815,64 @@ def register_callbacks(app):
             return no_update
 
         execution_id = log_context.get("execution_id")
+        log_type = log_context.get("log_type", "regular")
         if not execution_id:
             return html.P("No execution context available")
 
         try:
             from ..utils.helpers import make_authenticated_request
 
-            resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
+            # Use different endpoints based on log type
+            if log_type == "docker":
+                resp = make_authenticated_request(f"/execution/{execution_id}/docker-logs", token)
+            else:
+                resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
 
             if resp.status_code != 200:
-                return html.P(f"Failed to fetch logs: {resp.status_code}")
+                log_type_name = "docker logs" if log_type == "docker" else "logs"
+                return html.P(f"Failed to fetch {log_type_name}: {resp.status_code}")
 
             logs_data = resp.json()
             logs = logs_data.get("data", [])
 
             if not logs:
-                return html.P("No logs available")
+                log_type_name = "docker logs" if log_type == "docker" else "logs"
+                return html.P(f"No {log_type_name} available")
 
-            log_content = html.Div(
-                [
-                    html.Div(
-                        [
-                            html.Strong(f"[{log.get('timestamp', 'Unknown')}] "),
-                            html.Span(log.get("text", "")),
-                        ],
-                        style={"marginBottom": "10px", "fontFamily": "monospace"},
-                    )
-                    for log in logs
-                ]
-            )
+            # Format logs based on type
+            if log_type == "docker":
+                # Docker logs format: created_at and text
+                log_content = html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Strong(f"[{log.get('created_at', 'Unknown')}] "),
+                                html.Span(log.get("text", "")),
+                            ],
+                            style={"marginBottom": "10px", "fontFamily": "monospace"},
+                        )
+                        for log in logs
+                    ]
+                )
+            else:
+                # Regular logs format: timestamp/register_date, level, text
+                log_content = html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Strong(
+                                    f"[{log.get('timestamp', log.get('register_date', 'Unknown'))}] "
+                                ),
+                                html.Span(
+                                    f"{log.get('level', 'INFO')} - " if log.get("level") else ""
+                                ),
+                                html.Span(log.get("text", "")),
+                            ],
+                            style={"marginBottom": "10px", "fontFamily": "monospace"},
+                        )
+                        for log in logs
+                    ]
+                )
 
             return log_content
 
