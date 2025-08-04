@@ -305,53 +305,6 @@ def get_mobile_column_config():
     }
 
 
-def get_responsive_grid_options(is_mobile=False):
-    """Get responsive AG-Grid options based on device type."""
-    base_options = {
-        "cacheBlockSize": 50,
-        "maxBlocksInCache": 2,
-        "blockLoadDebounceMillis": 500,
-        "purgeClosedRowNodes": True,
-        "maxConcurrentDatasourceRequests": 1,
-        "enableCellTextSelection": True,
-        "ensureDomOrder": True,
-        "animateRows": False,  # Disable animations for better performance
-        "suppressMenuHide": True,  # Keep menu visible
-        "suppressColumnVirtualisation": False,
-    }
-
-    if is_mobile:
-        # Mobile-specific options with AG-Grid responsive features
-        base_options.update(
-            {
-                "suppressColumnVirtualisation": True,  # Show all columns, allow horizontal scroll
-                "suppressHorizontalScroll": False,  # Enable horizontal scrolling
-                "alwaysShowHorizontalScroll": True,  # Always show horizontal scroll bar
-                "suppressRowVirtualisation": False,  # Keep row virtualization for performance
-                "rowHeight": 40,  # Larger row height for touch targets
-                "headerHeight": 36,  # Larger header height for touch targets
-                "animateRows": False,  # Disable animations on mobile
-                "suppressColumnMoveAnimation": True,  # Disable column move animations
-                "suppressScrollOnNewData": True,  # Don't auto-scroll on new data
-                "suppressDragLeaveHidesColumns": True,  # Don't hide columns when dragging
-                "suppressColumnResize": False,  # Allow column resizing
-                "suppressAutoSize": False,  # Allow auto-sizing
-                "skipHeaderOnAutoSize": False,  # Include header when auto-sizing
-                "suppressSizeToFit": False,  # Enable size to fit
-            }
-        )
-    else:
-        # Desktop options (no enterprise features)
-        base_options.update(
-            {
-                "suppressHorizontalScroll": False,
-                "rowHeight": 32,
-                "headerHeight": 32,
-                "suppressColumnResize": False,
-            }
-        )
-
-    return base_options
 
 
 def register_mobile_callbacks():
