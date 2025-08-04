@@ -102,9 +102,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=False,  # Allow initial call to set default tab
     )
-    def switch_tabs(
-        _exec_clicks, _users_clicks, _scripts_clicks, _admin_clicks, _status_clicks, _profile_clicks
-    ):
+    def switch_tabs(*_clicks):
         """Handle tab switching by updating button classes and active tab store."""
         ctx = callback_context
         if not ctx.triggered:
@@ -134,8 +132,8 @@ def register_callbacks(app):
         # Get the active tab
         active_tab = tab_map.get(trigger_id, "executions")
 
-        # Set classes - active tab gets "nav-link active", others get "nav-link"
-        classes = []
+        # Set classes for nav links
+        nav_classes = []
         for btn_id in [
             "executions-tab-btn",
             "users-tab-btn",
@@ -144,11 +142,21 @@ def register_callbacks(app):
             "status-tab-btn",
             "profile-tab-btn",
         ]:
-            if btn_id == trigger_id:
-                classes.append("nav-link active")
+            base_tab = btn_id.replace("-tab-btn", "")
+            if base_tab == active_tab:
+                nav_classes.append("nav-link active")
             else:
-                classes.append("nav-link")
+                nav_classes.append("nav-link")
 
         print(f"🔄 Tab switched to: {active_tab}")
 
-        return classes[0], classes[1], classes[2], classes[3], classes[4], classes[5], active_tab
+        # Return all classes and active tab
+        return (
+            nav_classes[0],
+            nav_classes[1],
+            nav_classes[2],
+            nav_classes[3],
+            nav_classes[4],
+            nav_classes[5],
+            active_tab,
+        )

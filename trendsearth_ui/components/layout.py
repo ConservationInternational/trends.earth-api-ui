@@ -14,6 +14,7 @@ from ..config import (
 )
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
+    access_control_modal,
     delete_script_modal,
     delete_user_modal,
     edit_script_modal,
@@ -72,6 +73,7 @@ def create_main_layout():
             json_modal(),
             edit_user_modal(),
             edit_script_modal(),
+            access_control_modal(),
             map_modal(),
             delete_user_modal(),
             delete_script_modal(),
@@ -390,6 +392,7 @@ def dashboard_layout():
         dbc.Collapse(
             html.Div(
                 [
+                    # Navigation tabs - responsive design with Bootstrap classes
                     html.Ul(
                         [
                             html.Li(
@@ -401,7 +404,6 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
-                                **{"data-tab": "executions"},
                             ),
                             html.Li(
                                 [
@@ -416,7 +418,6 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
-                                **{"data-tab": "users"},
                             ),
                             html.Li(
                                 [
@@ -431,7 +432,6 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
-                                **{"data-tab": "scripts"},
                             ),
                             html.Li(
                                 [
@@ -443,8 +443,9 @@ def dashboard_layout():
                                 ],
                                 className="nav-item",
                                 id="admin-tab-li",
-                                style={"display": "none"},  # Hidden by default
-                                **{"data-tab": "admin"},
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for admin
                             ),
                             html.Li(
                                 [
@@ -459,7 +460,6 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
-                                **{"data-tab": "status"},
                             ),
                             html.Li(
                                 [
@@ -470,12 +470,14 @@ def dashboard_layout():
                                     )
                                 ],
                                 className="nav-item",
-                                **{"data-tab": "profile"},
                             ),
                         ],
-                        className="nav nav-tabs",
                         id="tabs-nav",
+                        className="nav nav-tabs",
+                        style={"flexWrap": "wrap"},
                     ),
+                    # Tab content will be inserted here by callbacks
+                    html.Div(id="tab-content-dynamic"),
                 ]
             ),
             id="main-panel",

@@ -121,6 +121,39 @@ def register_callbacks(app):
             for script_row in scripts:
                 row = script_row.copy()
                 row["logs"] = "Show Logs"
+
+                # Add access control status indicator
+                script_id = row.get("id")
+                if script_id:
+                    try:
+                        # Check if script has access control restrictions
+                        ac_resp = make_authenticated_request(f"/script/{script_id}/access", token)
+                        if ac_resp.status_code == 200:
+                            ac_data = ac_resp.json().get("data", {})
+                            is_restricted = ac_data.get("restricted", False)
+                            if is_restricted:
+                                allowed_roles = ac_data.get("allowed_roles", [])
+                                allowed_users = ac_data.get("allowed_users", [])
+                                if allowed_roles and allowed_users:
+                                    row["access_control"] = "🔒 Role, User"
+                                elif allowed_roles:
+                                    row["access_control"] = "🔒 Role"
+                                elif allowed_users:
+                                    row["access_control"] = "🔒 User"
+                                else:
+                                    row["access_control"] = "🔒 Restricted"
+                            else:
+                                row["access_control"] = "🔓 Open"
+                        elif ac_resp.status_code == 404:
+                            # 404 means no access control configured, so it's unrestricted
+                            row["access_control"] = "🔓 Open"
+                        else:
+                            row["access_control"] = "❓ Unknown"
+                    except Exception:
+                        row["access_control"] = "❓ Unknown"
+                else:
+                    row["access_control"] = "❓ Unknown"
+
                 # Only add edit button for admin users
                 if is_admin:
                     row["edit"] = "Edit"
@@ -202,6 +235,39 @@ def register_callbacks(app):
             for script_row in scripts:
                 row = script_row.copy()
                 row["logs"] = "Show Logs"
+
+                # Add access control status indicator
+                script_id = row.get("id")
+                if script_id:
+                    try:
+                        # Check if script has access control restrictions
+                        ac_resp = make_authenticated_request(f"/script/{script_id}/access", token)
+                        if ac_resp.status_code == 200:
+                            ac_data = ac_resp.json().get("data", {})
+                            is_restricted = ac_data.get("restricted", False)
+                            if is_restricted:
+                                allowed_roles = ac_data.get("allowed_roles", [])
+                                allowed_users = ac_data.get("allowed_users", [])
+                                if allowed_roles and allowed_users:
+                                    row["access_control"] = "🔒 Role, User"
+                                elif allowed_roles:
+                                    row["access_control"] = "🔒 Role"
+                                elif allowed_users:
+                                    row["access_control"] = "🔒 User"
+                                else:
+                                    row["access_control"] = "🔒 Restricted"
+                            else:
+                                row["access_control"] = "🔓 Open"
+                        elif ac_resp.status_code == 404:
+                            # 404 means no access control configured, so it's unrestricted
+                            row["access_control"] = "🔓 Open"
+                        else:
+                            row["access_control"] = "❓ Unknown"
+                    except Exception:
+                        row["access_control"] = "❓ Unknown"
+                else:
+                    row["access_control"] = "❓ Unknown"
+
                 # Only add edit button for admin users
                 if is_admin:
                     row["edit"] = "Edit"

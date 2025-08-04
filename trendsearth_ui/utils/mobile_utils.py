@@ -27,122 +27,278 @@ def get_mobile_column_config():
     return {
         "executions": {
             "primary_columns": [
-                {"headerName": "Script", "field": "script_name", "width": 150, "pinned": "left"},
-                {"headerName": "Status", "field": "status", "width": 100, "pinned": "left"},
+                {
+                    "headerName": "Script",
+                    "field": "script_name",
+                    "flex": 2,
+                    "minWidth": 200,
+                    "pinned": "left",
+                    "cellStyle": {"fontSize": "10px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "User",
+                    "field": "user_name",
+                    "flex": 1.5,
+                    "minWidth": 150,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Email",
+                    "field": "user_email",
+                    "flex": 2,
+                    "minWidth": 250,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
                 {
                     "headerName": "Start",
                     "field": "start_date",
-                    "width": 120,
+                    "flex": 1.5,
+                    "minWidth": 160,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
-            ],
-            "secondary_columns": [
-                {"headerName": "User", "field": "user_name", "width": 120},
-                {"headerName": "Email", "field": "user_email", "width": 180},
                 {
                     "headerName": "End",
                     "field": "end_date",
-                    "width": 120,
+                    "flex": 1.5,
+                    "minWidth": 160,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
-                {"headerName": "Duration", "field": "duration", "width": 100},
-                {"headerName": "ID", "field": "id", "width": 80},
-                {"headerName": "User ID", "field": "user_id", "width": 80},
+                {
+                    "headerName": "Duration",
+                    "field": "duration",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Status",
+                    "field": "status",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+            ],
+            "secondary_columns": [
+                {
+                    "headerName": "ID",
+                    "field": "id",
+                    "flex": 0.5,
+                    "minWidth": 80,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "User ID",
+                    "field": "user_id",
+                    "flex": 0.5,
+                    "minWidth": 80,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
+                },
                 {
                     "headerName": "Params",
                     "field": "params",
-                    "width": 80,
+                    "flex": 1,
+                    "minWidth": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
                 },
                 {
                     "headerName": "Results",
                     "field": "results",
-                    "width": 80,
+                    "flex": 1,
+                    "minWidth": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
                 },
                 {
                     "headerName": "Logs",
                     "field": "logs",
-                    "width": 80,
+                    "flex": 1,
+                    "minWidth": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
                 },
                 {
                     "headerName": "Map",
                     "field": "map",
-                    "width": 80,
+                    "flex": 1,
+                    "minWidth": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
                 },
             ],
         },
         "users": {
             "primary_columns": [
-                {"headerName": "Email", "field": "email", "width": 200, "pinned": "left"},
-                {"headerName": "Name", "field": "name", "width": 150, "pinned": "left"},
-                {"headerName": "Role", "field": "role", "width": 100},
-            ],
-            "secondary_columns": [
-                {"headerName": "Institution", "field": "institution", "width": 180},
-                {"headerName": "Country", "field": "country", "width": 120},
+                {
+                    "headerName": "Email",
+                    "field": "email",
+                    "flex": 2,
+                    "minWidth": 250,
+                    "pinned": "left",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Name",
+                    "field": "name",
+                    "flex": 1.5,
+                    "minWidth": 180,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Institution",
+                    "field": "institution",
+                    "flex": 1.5,
+                    "minWidth": 200,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Country",
+                    "field": "country",
+                    "flex": 1,
+                    "minWidth": 150,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
                 {
                     "headerName": "Created",
                     "field": "created_at",
-                    "width": 120,
+                    "flex": 1,
+                    "minWidth": 150,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
                 {
                     "headerName": "Updated",
                     "field": "updated_at",
-                    "width": 120,
+                    "flex": 1,
+                    "minWidth": 150,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
-                {"headerName": "ID", "field": "id", "width": 80},
+                {
+                    "headerName": "Role",
+                    "field": "role",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
+            ],
+            "secondary_columns": [
+                {"headerName": "ID", "field": "id", "width": 80, "cellStyle": {"fontSize": "11px"}},
                 {
                     "headerName": "Edit",
                     "field": "edit",
-                    "width": 80,
+                    "width": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
                 },
             ],
         },
         "scripts": {
             "primary_columns": [
-                {"headerName": "Name", "field": "name", "width": 150, "pinned": "left"},
-                {"headerName": "Status", "field": "status", "width": 100, "pinned": "left"},
-                {"headerName": "User", "field": "user_name", "width": 120},
-            ],
-            "secondary_columns": [
-                {"headerName": "Description", "field": "description", "width": 200},
+                {
+                    "headerName": "Name",
+                    "field": "name",
+                    "flex": 2,
+                    "minWidth": 200,
+                    "pinned": "left",
+                    "cellStyle": {"fontSize": "10px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Access",
+                    "field": "access_control",
+                    "flex": 1,
+                    "minWidth": 100,
+                    "cellStyle": {"fontSize": "11px", "textAlign": "center", "cursor": "pointer"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Status",
+                    "field": "status",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
+                },
                 {
                     "headerName": "Created",
                     "field": "created_at",
-                    "width": 120,
+                    "flex": 1,
+                    "minWidth": 150,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
                 {
                     "headerName": "Updated",
                     "field": "updated_at",
-                    "width": 120,
+                    "flex": 1,
+                    "minWidth": 150,
                     "filter": "agDateColumnFilter",
+                    "cellStyle": {"fontSize": "12px"},
+                    "resizable": True,
                 },
-                {"headerName": "ID", "field": "id", "width": 80},
+            ],
+            "secondary_columns": [
+                {
+                    "headerName": "User",
+                    "field": "user_name",
+                    "flex": 1,
+                    "minWidth": 150,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Description",
+                    "field": "description",
+                    "flex": 2,
+                    "minWidth": 200,
+                    "cellStyle": {"fontSize": "11px"},
+                    "resizable": True,
+                },
+                {"headerName": "ID", "field": "id", "width": 80, "cellStyle": {"fontSize": "11px"}},
                 {
                     "headerName": "Logs",
                     "field": "logs",
-                    "width": 80,
+                    "width": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
                 },
                 {
                     "headerName": "Edit",
                     "field": "edit",
-                    "width": 80,
+                    "width": 100,
                     "sortable": False,
                     "filter": False,
+                    "cellStyle": {"fontSize": "11px"},
                 },
             ],
         },
@@ -159,18 +315,39 @@ def get_responsive_grid_options(is_mobile=False):
         "maxConcurrentDatasourceRequests": 1,
         "enableCellTextSelection": True,
         "ensureDomOrder": True,
-        "suppressHorizontalScroll": False,
+        "animateRows": False,  # Disable animations for better performance
+        "suppressMenuHide": True,  # Keep menu visible
         "suppressColumnVirtualisation": False,
     }
 
     if is_mobile:
-        # Mobile-specific options
+        # Mobile-specific options with AG-Grid responsive features
         base_options.update(
             {
                 "suppressColumnVirtualisation": True,  # Show all columns, allow horizontal scroll
                 "suppressHorizontalScroll": False,  # Enable horizontal scrolling
                 "alwaysShowHorizontalScroll": True,  # Always show horizontal scroll bar
                 "suppressRowVirtualisation": False,  # Keep row virtualization for performance
+                "rowHeight": 40,  # Larger row height for touch targets
+                "headerHeight": 36,  # Larger header height for touch targets
+                "animateRows": False,  # Disable animations on mobile
+                "suppressColumnMoveAnimation": True,  # Disable column move animations
+                "suppressScrollOnNewData": True,  # Don't auto-scroll on new data
+                "suppressDragLeaveHidesColumns": True,  # Don't hide columns when dragging
+                "suppressColumnResize": False,  # Allow column resizing
+                "suppressAutoSize": False,  # Allow auto-sizing
+                "skipHeaderOnAutoSize": False,  # Include header when auto-sizing
+                "suppressSizeToFit": False,  # Enable size to fit
+            }
+        )
+    else:
+        # Desktop options (no enterprise features)
+        base_options.update(
+            {
+                "suppressHorizontalScroll": False,
+                "rowHeight": 32,
+                "headerHeight": 32,
+                "suppressColumnResize": False,
             }
         )
 

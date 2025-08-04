@@ -330,6 +330,31 @@ def edit_script_modal():
                                 ],
                                 className="mb-3",
                             ),
+                            html.Hr(),
+                            html.H6("Access Control", className="mb-3"),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-shield-alt me-2"),
+                                                    "Manage Access Control",
+                                                ],
+                                                id="open-access-control",
+                                                color="info",
+                                                outline=True,
+                                                className="w-100",
+                                            ),
+                                            dbc.FormText(
+                                                "Click to view and modify script access permissions"
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
                         ]
                     )
                 ]
@@ -482,6 +507,225 @@ def delete_script_modal():
         ],
         id="delete-script-modal",
         is_open=False,
+    )
+
+
+def access_control_modal():
+    """Create the access control modal for scripts."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [
+                        html.I(className="fas fa-shield-alt me-2"),
+                        "Script Access Control",
+                    ]
+                )
+            ),
+            dbc.ModalBody(
+                [
+                    dcc.Store(id="access-control-script-data"),
+                    dbc.Alert(
+                        id="access-control-alert",
+                        is_open=False,
+                        dismissable=True,
+                    ),
+                    html.Div(
+                        [
+                            html.H6("Current Access Settings", className="mb-3"),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Script Name"),
+                                            html.P(
+                                                id="access-control-script-name", className="fw-bold"
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Access Status"),
+                                            html.P(id="access-control-status", className="fw-bold"),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            html.Hr(),
+                            html.H6("Modify Access Settings", className="mb-3"),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Access Type"),
+                                            dbc.RadioItems(
+                                                id="access-control-type",
+                                                options=[
+                                                    {
+                                                        "label": "Open (All authenticated users)",
+                                                        "value": "unrestricted",
+                                                    },
+                                                    {
+                                                        "label": "Role-based restrictions",
+                                                        "value": "role_restricted",
+                                                    },
+                                                    {
+                                                        "label": "User-specific restrictions",
+                                                        "value": "user_restricted",
+                                                    },
+                                                    {
+                                                        "label": "Role and User restrictions",
+                                                        "value": "role_and_user_restricted",
+                                                    },
+                                                ],
+                                                value="unrestricted",
+                                                className="mb-3",
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Allowed Roles"),
+                                            dcc.Dropdown(
+                                                id="access-control-roles",
+                                                options=[
+                                                    {"label": "User", "value": "USER"},
+                                                    {"label": "Admin", "value": "ADMIN"},
+                                                    {"label": "Super Admin", "value": "SUPERADMIN"},
+                                                ],
+                                                multi=True,
+                                                placeholder="Select roles (leave empty to remove role restrictions)",
+                                            ),
+                                            dbc.FormText(
+                                                "Only users with these roles can access the script"
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                                id="access-control-roles-section",
+                                style={"display": "none"},
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Allowed Users"),
+                                            html.Div(
+                                                id="current-selected-users",
+                                                className="mb-2",
+                                                children=[
+                                                    dbc.Alert(
+                                                        "No users currently selected",
+                                                        color="light",
+                                                        className="mb-0 text-muted small",
+                                                    )
+                                                ],
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.InputGroup(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="user-search-input",
+                                                                        placeholder="Type user name or email to search...",
+                                                                        debounce=True,
+                                                                    ),
+                                                                    dbc.Button(
+                                                                        [
+                                                                            html.I(
+                                                                                className="fas fa-search me-1"
+                                                                            ),
+                                                                            "Search",
+                                                                        ],
+                                                                        id="user-search-btn",
+                                                                        color="primary",
+                                                                        outline=True,
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-2",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            html.Div(
+                                                                dbc.Spinner(
+                                                                    html.Div(
+                                                                        id="user-search-spinner"
+                                                                    ),
+                                                                    size="sm",
+                                                                    color="primary",
+                                                                ),
+                                                                id="user-search-loading",
+                                                                style={"display": "none"},
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-2",
+                                            ),
+                                            dcc.Dropdown(
+                                                id="access-control-users",
+                                                options=[],
+                                                multi=True,
+                                                searchable=False,
+                                                placeholder="Search for users above, then select from results...",
+                                                optionHeight=50,
+                                                maxHeight=200,
+                                            ),
+                                            dbc.FormText(
+                                                "Search for users by name or email, then select specific users that can access the script"
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                                id="access-control-users-section",
+                                style={"display": "none"},
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Cancel", id="cancel-access-control", className="me-1", outline=True
+                    ),
+                    dbc.Button(
+                        "Clear All Restrictions",
+                        id="clear-access-restrictions",
+                        color="warning",
+                        className="me-1",
+                        outline=True,
+                    ),
+                    dbc.Button("Save Changes", id="save-access-control", color="primary"),
+                ]
+            ),
+        ],
+        id="access-control-modal",
+        is_open=False,
+        size="lg",
     )
 
 

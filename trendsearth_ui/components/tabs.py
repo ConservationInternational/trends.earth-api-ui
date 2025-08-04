@@ -19,19 +19,27 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
     secondary_cols = config.get("secondary_columns", [])
     all_columns = primary_cols + secondary_cols
 
+    # Get base responsive grid options
+    base_grid_options = get_responsive_grid_options(is_mobile=False)  # Default to desktop
+
     # Base AG-Grid configuration
     base_config = {
         "id": table_id,
         "columnDefs": all_columns,
-        "defaultColDef": {"resizable": True, "sortable": True, "filter": True},
-        "columnSize": "sizeToFit",
-        "rowModelType": "infinite",
-        "dashGridOptions": {
-            **get_responsive_grid_options(is_mobile=False),  # Will be updated by callback
-            "enableCellTextSelection": True,
-            "ensureDomOrder": True,
+        "defaultColDef": {
+            "resizable": True,
+            "sortable": True,
+            "filter": True,
+            "minWidth": 50,
+            "suppressSizeToFit": False,
+            "wrapText": True,
+            "autoHeight": False,
         },
-        "style": {"height": height},
+        "columnSize": "responsiveSizeToFit",
+        "rowModelType": "infinite",
+        "dashGridOptions": base_grid_options,
+        "style": {"height": height, "width": "100%"},
+        "className": "ag-theme-alpine",
     }
 
     # Add style conditions if provided
@@ -46,6 +54,7 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
                 "← Scroll horizontally to view more columns →",
                 className="table-scroll-hint",
                 id=f"{table_id}-scroll-hint",
+                style={"display": "none"},  # Hidden by default, shown by callback
             ),
         ],
         className="mobile-table-container",
