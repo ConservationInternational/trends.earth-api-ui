@@ -414,7 +414,9 @@ def register_callbacks(app):
 
         # If we don't have execution_id from row data, fall back to pagination approach
         if not execution_id:
-            print(f"DEBUG: No execution_id from row_data, falling back to pagination for column {col}")
+            print(
+                f"DEBUG: No execution_id from row_data, falling back to pagination for column {col}"
+            )
             row_index = cell.get("rowIndex")
             if row_index is None:
                 print(f"DEBUG: No row_index available in cell click event: {cell}")
@@ -427,7 +429,7 @@ def register_callbacks(app):
                     True,
                     None,
                 )
-            
+
             # Additional safety check for unreasonable row index values
             if row_index < 0 or row_index > 100000:  # Reasonable upper limit
                 print(f"DEBUG: Unreasonable row_index value: {row_index}")
@@ -464,7 +466,9 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                print(f"DEBUG: Fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}")
+                print(
+                    f"DEBUG: Fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                )
                 resp = make_authenticated_request("/execution", token, params=params)
                 if resp.status_code != 200:
                     return (
@@ -493,10 +497,14 @@ def register_callbacks(app):
 
                 execution_data = executions[row_in_page]
                 execution_id = execution_data.get("id")
-                
+
                 # Add verification logging
-                print(f"DEBUG: Found execution_id {execution_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}")
-                print(f"DEBUG: Execution data: script_name={execution_data.get('script_name')}, status={execution_data.get('status')}")
+                print(
+                    f"DEBUG: Found execution_id {execution_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                )
+                print(
+                    f"DEBUG: Execution data: script_name={execution_data.get('script_name')}, status={execution_data.get('status')}"
+                )
 
             except Exception as e:
                 print(f"DEBUG: Exception in pagination fallback: {str(e)}")
@@ -521,14 +529,16 @@ def register_callbacks(app):
                 True,
                 None,
             )
-        
+
         print(f"DEBUG: Proceeding to fetch {col} data for execution_id {execution_id}")
-        
+
         # Verify the execution exists before fetching logs to prevent wrong execution issues
         try:
             from ..utils.helpers import make_authenticated_request
-            
-            verification_resp = make_authenticated_request(f"/execution/{execution_id}", token, params={"include": "id,script_name,status"})
+
+            verification_resp = make_authenticated_request(
+                f"/execution/{execution_id}", token, params={"include": "id,script_name,status"}
+            )
             if verification_resp.status_code == 404:
                 print(f"DEBUG: Execution {execution_id} not found - may be invalid ID")
                 return (
@@ -547,7 +557,9 @@ def register_callbacks(app):
                     exec_info = verification_data["data"]
                 else:
                     exec_info = verification_data
-                print(f"DEBUG: Verified execution {execution_id}: script={exec_info.get('script_name')}, status={exec_info.get('status')}")
+                print(
+                    f"DEBUG: Verified execution {execution_id}: script={exec_info.get('script_name')}, status={exec_info.get('status')}"
+                )
             else:
                 print(f"DEBUG: Unexpected verification response: {verification_resp.status_code}")
         except Exception as e:
@@ -1119,7 +1131,7 @@ def register_callbacks(app):
 
         # If we don't have row data or script_id, fall back to pagination approach
         if not script_id:
-            print(f"DEBUG: No script_id from row_data, falling back to pagination for script logs")
+            print("DEBUG: No script_id from row_data, falling back to pagination for script logs")
             row_index = cell.get("rowIndex")
             if row_index is None:
                 print(f"DEBUG: No row_index available in script logs cell click event: {cell}")
@@ -1132,7 +1144,7 @@ def register_callbacks(app):
                     True,
                     None,
                 )
-            
+
             # Additional safety check for unreasonable row index values
             if row_index < 0 or row_index > 100000:  # Reasonable upper limit
                 print(f"DEBUG: Unreasonable row_index value in scripts: {row_index}")
@@ -1163,7 +1175,9 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                print(f"DEBUG: Script logs fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}")
+                print(
+                    f"DEBUG: Script logs fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                )
                 resp = make_authenticated_request("/script", token, params=params)
                 if resp.status_code != 200:
                     return (
@@ -1191,10 +1205,14 @@ def register_callbacks(app):
 
                 script = scripts[row_in_page]
                 script_id = script.get("id")
-                
+
                 # Add verification logging
-                print(f"DEBUG: Found script_id {script_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}")
-                print(f"DEBUG: Script data: name={script.get('name')}, user_name={script.get('user_name')}")
+                print(
+                    f"DEBUG: Found script_id {script_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                )
+                print(
+                    f"DEBUG: Script data: name={script.get('name')}, user_name={script.get('user_name')}"
+                )
 
             except Exception as e:
                 print(f"DEBUG: Exception in script pagination fallback: {str(e)}")
@@ -1209,7 +1227,7 @@ def register_callbacks(app):
                 )
 
         if not script_id:
-            print(f"DEBUG: Final check - no script_id available for script logs")
+            print("DEBUG: Final check - no script_id available for script logs")
             return True, "Could not get script ID.", None, "Error", {"display": "none"}, True, None
 
         print(f"DEBUG: Proceeding to fetch script logs for script_id {script_id}")
