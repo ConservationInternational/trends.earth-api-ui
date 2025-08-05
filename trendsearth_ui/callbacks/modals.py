@@ -718,16 +718,18 @@ def register_callbacks(app):
                     # For docker logs, use the specific docker logs endpoint with longer timeout
                     print(f"Fetching docker logs for execution {execution_id}")
                     resp = make_authenticated_request(
-                        f"/execution/{execution_id}/docker-logs", 
-                        token, 
-                        timeout=30  # 30 second timeout for docker logs
+                        f"/execution/{execution_id}/docker-logs",
+                        token,
+                        timeout=30,  # 30 second timeout for docker logs
                     )
                     print(f"Docker logs API response: {resp.status_code}")
 
                     if resp.status_code == 403:
                         return (
                             True,
-                            html.P("Access denied. Docker logs are only available to admin and superadmin users."),
+                            html.P(
+                                "Access denied. Docker logs are only available to admin and superadmin users."
+                            ),
                             None,
                             f"Execution {execution_id} - Docker Logs",
                             {"display": "none"},
@@ -743,7 +745,9 @@ def register_callbacks(app):
                     elif resp.status_code == 404:
                         return (
                             True,
-                            html.P("Docker logs not found for this execution. The execution may not have docker logs available."),
+                            html.P(
+                                "Docker logs not found for this execution. The execution may not have docker logs available."
+                            ),
                             None,
                             f"Execution {execution_id} - Docker Logs",
                             {"display": "none"},
@@ -762,7 +766,7 @@ def register_callbacks(app):
                             error_detail = resp.text[:200]  # Limit error text length
                             if error_detail:
                                 error_text += f": {error_detail}"
-                        except:
+                        except Exception:
                             pass
                         return (
                             True,
@@ -919,7 +923,11 @@ def register_callbacks(app):
 
                             # Parse and format the date
                             from ..utils import parse_date
-                            formatted_date = parse_date(created_at, log_context.get("user_timezone")) or created_at
+
+                            formatted_date = (
+                                parse_date(created_at, log_context.get("user_timezone"))
+                                or created_at
+                            )
 
                             # Create formatted log line
                             log_line = f"{formatted_date} - {text}"
@@ -960,7 +968,11 @@ def register_callbacks(app):
 
                             # Parse and format the date
                             from ..utils import parse_date
-                            formatted_date = parse_date(register_date, log_context.get("user_timezone")) or register_date
+
+                            formatted_date = (
+                                parse_date(register_date, log_context.get("user_timezone"))
+                                or register_date
+                            )
 
                             # Create formatted log line
                             log_line = f"{formatted_date} - {level} - {text}"
@@ -1284,7 +1296,6 @@ def register_callbacks(app):
             return [], {"display": "none"}
 
     @app.callback(
-        Output("access-control-users", "options", allow_duplicate=True),
         Output("user-search-input", "value", allow_duplicate=True),
         [
             Input("access-control-modal", "is_open"),
@@ -1293,8 +1304,9 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def clear_user_search_on_modal_change(_is_open, _access_type):
-        """Clear user search when modal opens or access type changes."""
-        return [], ""
+        """Clear user search input when modal opens or access type changes."""
+        # Only clear the search input, preserve the user options and selections
+        return ""
 
     # Legacy callback decorators for backward compatibility (these won't be executed)
 
