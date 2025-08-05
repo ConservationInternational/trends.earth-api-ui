@@ -21,6 +21,9 @@ def get_responsive_grid_options(is_mobile=False):
         "animateRows": False,  # Disable animations for better performance
         "suppressMenuHide": True,  # Keep menu visible
         "suppressColumnVirtualisation": False,
+        # Force horizontal scroll to always be visible
+        "suppressHorizontalScroll": False,
+        "alwaysShowHorizontalScroll": True,
     }
 
     if is_mobile:
@@ -28,9 +31,6 @@ def get_responsive_grid_options(is_mobile=False):
         base_options.update(
             {
                 "suppressColumnVirtualisation": True,  # Show all columns, allow horizontal scroll
-                "suppressHorizontalScroll": False,  # Enable horizontal scrolling
-                "alwaysShowHorizontalScroll": True,  # Always show horizontal scroll bar
-                "suppressRowVirtualisation": False,  # Keep row virtualization for performance
                 "rowHeight": 40,  # Larger row height for touch targets
                 "headerHeight": 36,  # Larger header height for touch targets
                 "animateRows": False,  # Disable animations on mobile
@@ -44,13 +44,15 @@ def get_responsive_grid_options(is_mobile=False):
             }
         )
     else:
-        # Desktop options (no enterprise features)
+        # Desktop options - ensure horizontal scrolling works properly
         base_options.update(
             {
-                "suppressHorizontalScroll": False,
                 "rowHeight": 32,
                 "headerHeight": 32,
                 "suppressColumnResize": False,
+                # Desktop-specific scrolling options
+                "suppressColumnVirtualisation": False,
+                "suppressSizeToFit": True,  # Disable auto-fit to allow horizontal scroll
             }
         )
 
@@ -80,15 +82,22 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
             "sortable": True,
             "filter": True,
             "minWidth": 50,
-            "suppressSizeToFit": False,
+            "suppressSizeToFit": True,  # Prevent auto-sizing that can hide scroll
             "wrapText": True,
             "autoHeight": False,
         },
-        "columnSize": "responsiveSizeToFit",
+        "columnSize": "sizeToFit"
+        if not all_columns or len(all_columns) <= 5
+        else "autoSize",  # Use autoSize for many columns
         "rowModelType": "infinite",
         "dashGridOptions": base_grid_options,
-        "style": {"height": height, "width": "100%"},
-        "className": "ag-theme-alpine",
+        "style": {
+            "height": height,
+            "width": "100%",
+            "overflowX": "auto",  # Force horizontal scroll
+            "overflowY": "auto",  # Force vertical scroll
+        },
+        "className": "ag-theme-alpine responsive-table",
     }
 
     # Add style conditions if provided
@@ -106,7 +115,12 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
                 style={"display": "none"},  # Hidden by default, shown by callback
             ),
         ],
-        className="mobile-table-container",
+        className="table-container",
+        style={
+            "width": "100%",
+            "overflowX": "auto",  # Ensure container allows horizontal overflow
+            "overflowY": "hidden",  # Container doesn't need vertical overflow
+        },
     )
 
 
