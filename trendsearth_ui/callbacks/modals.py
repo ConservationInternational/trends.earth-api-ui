@@ -637,6 +637,7 @@ def register_callbacks(app):
                                 "type": "execution",
                                 "id": execution_id,
                                 "status": execution_status,
+                                "user_timezone": user_timezone,
                             },
                         )
 
@@ -701,6 +702,7 @@ def register_callbacks(app):
                         "log_type": "regular",
                         "id": execution_id,
                         "status": execution_status,
+                        "user_timezone": user_timezone,
                     },
                 )
 
@@ -712,13 +714,77 @@ def register_callbacks(app):
                 if row_data:
                     execution_status = row_data.get("status")
 
-                # For docker logs, use the specific docker logs endpoint
-                resp = make_authenticated_request(f"/execution/{execution_id}/docker-logs", token)
+                try:
+                    # For docker logs, use the specific docker logs endpoint with longer timeout
+                    print(f"Fetching docker logs for execution {execution_id}")
+                    resp = make_authenticated_request(
+                        f"/execution/{execution_id}/docker-logs", 
+                        token, 
+                        timeout=30  # 30 second timeout for docker logs
+                    )
+                    print(f"Docker logs API response: {resp.status_code}")
 
-                if resp.status_code != 200:
+                    if resp.status_code == 403:
+                        return (
+                            True,
+                            html.P("Access denied. Docker logs are only available to admin and superadmin users."),
+                            None,
+                            f"Execution {execution_id} - Docker Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+                    elif resp.status_code == 404:
+                        return (
+                            True,
+                            html.P("Docker logs not found for this execution. The execution may not have docker logs available."),
+                            None,
+                            f"Execution {execution_id} - Docker Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+                    elif resp.status_code != 200:
+                        error_text = f"HTTP {resp.status_code}"
+                        try:
+                            error_detail = resp.text[:200]  # Limit error text length
+                            if error_detail:
+                                error_text += f": {error_detail}"
+                        except:
+                            pass
+                        return (
+                            True,
+                            f"Failed to fetch docker logs: {error_text}",
+                            None,
+                            f"Execution {execution_id} - Docker Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+
+                except Exception as e:
+                    print(f"Exception while fetching docker logs: {str(e)}")
                     return (
                         True,
-                        f"Failed to fetch docker logs: {resp.status_code} - {resp.text}",
+                        f"Error fetching docker logs: {str(e)}",
                         None,
                         f"Execution {execution_id} - Docker Logs",
                         {"display": "none"},
@@ -728,6 +794,7 @@ def register_callbacks(app):
                             "type": "execution",
                             "id": execution_id,
                             "status": execution_status,
+                            "user_timezone": user_timezone,
                         },
                     )
 
@@ -789,6 +856,7 @@ def register_callbacks(app):
                         "log_type": "docker",
                         "id": execution_id,
                         "status": execution_status,
+                        "user_timezone": user_timezone,
                     },
                 )
 
@@ -841,38 +909,86 @@ def register_callbacks(app):
 
             # Format logs based on type
             if log_type == "docker":
-                # Docker logs format: created_at and text
-                log_content = html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.Strong(f"[{log.get('created_at', 'Unknown')}] "),
-                                html.Span(log.get("text", "")),
-                            ],
-                            style={"marginBottom": "10px", "fontFamily": "monospace"},
-                        )
-                        for log in logs
-                    ]
-                )
+                # Docker logs format: created_at and text (same format as main docker logs display)
+                if isinstance(logs, list):
+                    parsed_logs = []
+                    for log in logs:
+                        if isinstance(log, dict):
+                            created_at = log.get("created_at", "")
+                            text = log.get("text", "")
+
+                            # Parse and format the date
+                            from ..utils import parse_date
+                            formatted_date = parse_date(created_at, log_context.get("user_timezone")) or created_at
+
+                            # Create formatted log line
+                            log_line = f"{formatted_date} - {text}"
+                            parsed_logs.append((created_at, log_line))
+                        else:
+                            # Fallback for non-dict log entries
+                            parsed_logs.append(("", str(log)))
+
+                    # Sort by created_at in descending order
+                    parsed_logs.sort(key=lambda x: x[0], reverse=True)
+                    logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                    log_content = html.Pre(
+                        logs_content,
+                        style={
+                            "whiteSpace": "pre-wrap",
+                            "fontSize": "12px",
+                            "fontFamily": "monospace",
+                        },
+                    )
+                else:
+                    log_content = html.Pre(
+                        str(logs),
+                        style={
+                            "whiteSpace": "pre-wrap",
+                            "fontSize": "12px",
+                            "fontFamily": "monospace",
+                        },
+                    )
             else:
-                # Regular logs format: timestamp/register_date, level, text
-                log_content = html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.Strong(
-                                    f"[{log.get('timestamp', log.get('register_date', 'Unknown'))}] "
-                                ),
-                                html.Span(
-                                    f"{log.get('level', 'INFO')} - " if log.get("level") else ""
-                                ),
-                                html.Span(log.get("text", "")),
-                            ],
-                            style={"marginBottom": "10px", "fontFamily": "monospace"},
-                        )
-                        for log in logs
-                    ]
-                )
+                # Regular logs format: register_date, level, text (same format as main logs display)
+                if isinstance(logs, list):
+                    parsed_logs = []
+                    for log in logs:
+                        if isinstance(log, dict):
+                            register_date = log.get("register_date", "")
+                            level = log.get("level", "INFO")
+                            text = log.get("text", "")
+
+                            # Parse and format the date
+                            from ..utils import parse_date
+                            formatted_date = parse_date(register_date, log_context.get("user_timezone")) or register_date
+
+                            # Create formatted log line
+                            log_line = f"{formatted_date} - {level} - {text}"
+                            parsed_logs.append((register_date, log_line))
+                        else:
+                            # Fallback for non-dict log entries
+                            parsed_logs.append(("", str(log)))
+
+                    # Sort by register_date in descending order
+                    parsed_logs.sort(key=lambda x: x[0], reverse=True)
+                    logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                    log_content = html.Pre(
+                        logs_content,
+                        style={
+                            "whiteSpace": "pre-wrap",
+                            "fontSize": "12px",
+                            "fontFamily": "monospace",
+                        },
+                    )
+                else:
+                    log_content = html.Pre(
+                        str(logs),
+                        style={
+                            "whiteSpace": "pre-wrap",
+                            "fontSize": "12px",
+                            "fontFamily": "monospace",
+                        },
+                    )
 
             return log_content
 
