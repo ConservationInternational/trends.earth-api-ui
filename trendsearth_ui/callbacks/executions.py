@@ -1,10 +1,10 @@
 """Executions table callbacks."""
 
-from dash import Input, Output, State, no_update
+from dash import Input, Output, State, html, no_update
 import requests  # noqa: F401
 
 from ..config import DEFAULT_PAGE_SIZE
-from ..utils import parse_date
+from ..utils import make_authenticated_request, parse_date
 
 
 def format_duration(duration_seconds):
@@ -178,6 +178,13 @@ def register_callbacks(app):
                 if role in ["ADMIN", "SUPERADMIN"]:
                     row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
+                # Add actions field for the custom cell renderer
+                status = row.get("status", "")
+                cancellable_statuses = ["PENDING", "READY", "RUNNING"]
+                if status in cancellable_statuses:
+                    row["actions"] = "🛑 Cancel"
+                else:
+                    row["actions"] = "✅ Complete"
 
                 # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
@@ -264,6 +271,13 @@ def register_callbacks(app):
             if role in ["ADMIN", "SUPERADMIN"]:
                 row["docker_logs"] = "Show Docker Logs"
             row["map"] = "Show Map"
+            # Add actions field for the custom cell renderer
+            status = row.get("status", "")
+            cancellable_statuses = ["PENDING", "READY", "RUNNING"]
+            if status in cancellable_statuses:
+                row["actions"] = "🛑 Cancel"
+            else:
+                row["actions"] = "✅ Complete"
 
             # Format duration in Hours:Minutes:Seconds format
             if "duration" in row:
@@ -346,6 +360,13 @@ def register_callbacks(app):
                 if role in ["ADMIN", "SUPERADMIN"]:
                     row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
+                # Add actions field for the custom cell renderer
+                status = row.get("status", "")
+                cancellable_statuses = ["PENDING", "READY", "RUNNING"]
+                if status in cancellable_statuses:
+                    row["actions"] = "🛑 Cancel"
+                else:
+                    row["actions"] = "✅ Complete"
 
                 # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
@@ -390,6 +411,412 @@ def register_callbacks(app):
     def update_executions_total_display(total_count):
         """Update the executions total count display."""
         return f"Total: {total_count:,}"
+
+    @app.callback(
+        [
+            Output("cancel-execution-modal", "is_open"),
+            Output("cancel-execution-id", "children"),
+            Output("cancel-execution-script", "children"),
+            Output("cancel-execution-status", "children"),
+            Output("cancel-execution-store", "data"),
+        ],
+        Input("executions-table", "cellClicked"),
+        [
+            State("cancel-execution-modal", "is_open"),
+            State("token-store", "data"),
+            State("executions-table-state", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def show_cancel_confirmation_modal(cell, is_open, token, table_state):
+        """Show the cancel confirmation modal when cancel button is clicked."""
+        print("🎯 Cancel modal callback triggered!")
+        print(f"   Cell: {cell}")
+
+        if not cell:
+            print("❌ No cell data, returning current state")
+            return is_open, no_update, no_update, no_update, no_update
+
+        col = cell.get("colId")
+        print(f"   Column ID: {col}")
+
+        if col != "actions":
+            print("❌ Column is not 'actions', returning current state")
+            return is_open, no_update, no_update, no_update, no_update
+
+        # Get row data - this should work exactly like the logs callback
+        row_data = cell.get("data")
+        execution_id = None
+        script_name = "Unknown Script"
+        status = "Unknown"
+
+        print(f"   Row data from cell: {row_data}")
+
+        if row_data:
+            execution_id = row_data.get("id")
+            script_name = row_data.get("script_name", "Unknown Script")
+            status = row_data.get("status", "Unknown")
+            print(
+                f"   ✅ Got data from cell - ID: {execution_id}, Script: {script_name}, Status: {status}"
+            )
+        else:
+            print("🔍 No row data in cell, trying API fallback like logs callback...")
+
+            # Use exact same pattern as logs callback - get row index and try pagination
+            row_index = cell.get("rowIndex", 0)
+
+            # Calculate which page this row is on (same logic as logs callback)
+            page_size = 50  # This should match DEFAULT_PAGE_SIZE
+            page = (row_index // page_size) + 1
+            row_in_page = row_index % page_size
+
+            print(f"   Row index: {row_index}")
+            print(f"   Page: {page}, row_in_page: {row_in_page}")
+
+            if token:
+                try:
+                    # Build params exactly like logs callback does
+                    params = {
+                        "page": page,
+                        "per_page": page_size,
+                        "exclude": "params,results",
+                        "include": "script_name,user_name,user_email,user_id,duration",
+                    }
+
+                    # Add table state params exactly like logs callback
+                    if table_state:
+                        if table_state.get("sort_sql"):
+                            params["sort"] = table_state["sort_sql"]
+                        if table_state.get("filter_sql"):
+                            params["filter"] = table_state["filter_sql"]
+
+                    print(f"   API params: {params}")
+
+                    # Make API request exactly like logs callback
+                    response = make_authenticated_request(
+                        "/execution",
+                        token,
+                        method="GET",
+                        params=params,
+                        timeout=10,
+                    )
+
+                    print(f"   API response status: {response.status_code}")
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = data.get(
+                            "data", []
+                        )  # Note: logs callback uses "data" not "results"
+                        print(f"   Found {len(results)} executions on page {page}")
+
+                        # Get the specific execution at the row_in_page index
+                        if row_in_page < len(results):
+                            execution = results[row_in_page]
+                            execution_id = execution.get("id")
+                            script_name = execution.get("script_name", "Unknown Script")
+                            status = execution.get("status", "Unknown")
+                            print(
+                                f"   ✅ Found execution at row_in_page {row_in_page} - ID: {execution_id}, Script: {script_name}, Status: {status}"
+                            )
+                        else:
+                            print(
+                                f"   ❌ Row {row_in_page} not found in page with {len(results)} executions"
+                            )
+                    else:
+                        print(f"   ❌ API request failed: {response.status_code}")
+
+                except Exception as e:
+                    print(f"   ❌ Error in API fallback: {str(e)}")
+
+        if not execution_id:
+            print("❌ Still no execution_id found, returning current state")
+            return is_open, no_update, no_update, no_update, no_update
+
+        print(f"✅ Success! Opening modal for execution {execution_id}")
+
+        execution_data = {
+            "id": execution_id,
+            "script": script_name,
+            "status": status,
+        }
+
+        return True, execution_id, script_name, status, execution_data
+
+    @app.callback(
+        Output("cancel-execution-modal", "is_open", allow_duplicate=True),
+        Input("cancel-execution-close-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def close_cancel_modal(n_clicks):
+        """Close the cancel confirmation modal."""
+        if n_clicks:
+            return False
+        return no_update
+
+    @app.callback(
+        [
+            Output("cancel-execution-modal", "is_open", allow_duplicate=True),
+            Output("cancel-execution-result-modal", "is_open"),
+            Output("cancel-execution-result-body", "children"),
+            Output("executions-table", "getRowsResponse", allow_duplicate=True),
+        ],
+        Input("cancel-execution-confirm-btn", "n_clicks"),
+        [
+            State("cancel-execution-store", "data"),
+            State("token-store", "data"),
+            State("executions-table-state", "data"),
+            State("role-store", "data"),
+            State("user-timezone-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def cancel_execution(n_clicks, execution_data, token, table_state, role, user_timezone):
+        """Cancel the execution and show the result."""
+        if not n_clicks or not execution_data or not token:
+            return no_update, no_update, no_update, no_update
+
+        execution_id = execution_data.get("id")
+        if not execution_id:
+            return no_update, no_update, no_update, no_update
+
+        try:
+            from ..utils.helpers import make_authenticated_request
+
+            # Make the cancel request
+            resp = make_authenticated_request(
+                f"/execution/{execution_id}/cancel", token, method="POST"
+            )
+
+            if resp.status_code == 200:
+                result = resp.json()
+                execution_info = result.get("data", {}).get("execution", {})
+                cancellation_details = result.get("data", {}).get("cancellation_details", {})
+
+                # Format the result for display
+                result_content = []
+
+                # Execution info
+                result_content.extend(
+                    [
+                        html.H5("Execution Cancelled Successfully", className="text-success mb-3"),
+                        html.Div(
+                            [
+                                html.Strong("Execution ID: "),
+                                html.Span(execution_info.get("id", "Unknown")),
+                            ],
+                            className="mb-2",
+                        ),
+                        html.Div(
+                            [
+                                html.Strong("Script: "),
+                                html.Span(execution_info.get("script_id", "Unknown")),
+                            ],
+                            className="mb-2",
+                        ),
+                        html.Div(
+                            [
+                                html.Strong("Previous Status: "),
+                                html.Span(cancellation_details.get("previous_status", "Unknown")),
+                            ],
+                            className="mb-2",
+                        ),
+                        html.Div(
+                            [
+                                html.Strong("New Status: "),
+                                html.Span(
+                                    execution_info.get("status", "Unknown"),
+                                    className="text-danger fw-bold",
+                                ),
+                            ],
+                            className="mb-4",
+                        ),
+                    ]
+                )
+
+                # Docker service info
+                docker_stopped = cancellation_details.get("docker_service_stopped", False)
+                container_stopped = cancellation_details.get("docker_container_stopped", False)
+
+                result_content.extend(
+                    [
+                        html.H6("Infrastructure Cleanup", className="mb-2"),
+                        html.Div(
+                            [
+                                html.I(
+                                    className=f"fas fa-{'check text-success' if docker_stopped else 'times text-danger'} me-2"
+                                ),
+                                f"Docker service {'stopped' if docker_stopped else 'not found/stopped'}",
+                            ],
+                            className="mb-1",
+                        ),
+                        html.Div(
+                            [
+                                html.I(
+                                    className=f"fas fa-{'check text-success' if container_stopped else 'times text-warning'} me-2"
+                                ),
+                                f"Docker container {'stopped' if container_stopped else 'not found/stopped'}",
+                            ],
+                            className="mb-3",
+                        ),
+                    ]
+                )
+
+                # GEE tasks info
+                gee_tasks = cancellation_details.get("gee_tasks_cancelled", [])
+                if gee_tasks:
+                    result_content.extend(
+                        [
+                            html.H6("Google Earth Engine Tasks", className="mb-2"),
+                            html.Div(
+                                [
+                                    html.P(
+                                        f"Found and processed {len(gee_tasks)} GEE tasks:",
+                                        className="mb-2",
+                                    ),
+                                ]
+                            ),
+                        ]
+                    )
+
+                    for task in gee_tasks:
+                        task_success = task.get("success", False)
+                        result_content.append(
+                            html.Div(
+                                [
+                                    html.I(
+                                        className=f"fas fa-{'check text-success' if task_success else 'times text-danger'} me-2"
+                                    ),
+                                    html.Code(task.get("task_id", "Unknown"), className="me-2"),
+                                    html.Span(
+                                        f"Status: {task.get('status', 'Unknown')}",
+                                        className="text-muted",
+                                    ),
+                                    html.Div(task.get("error", ""), className="text-danger small")
+                                    if task.get("error")
+                                    else None,
+                                ],
+                                className="mb-1",
+                            )
+                        )
+                else:
+                    result_content.append(
+                        html.Div(
+                            [
+                                html.H6("Google Earth Engine Tasks", className="mb-2"),
+                                html.P(
+                                    "No GEE tasks found in execution logs.", className="text-muted"
+                                ),
+                            ],
+                            className="mb-3",
+                        )
+                    )
+
+                # Errors if any
+                errors = cancellation_details.get("errors", [])
+                if errors:
+                    result_content.extend(
+                        [
+                            html.H6("Errors Encountered", className="mb-2 text-warning"),
+                            html.Ul([html.Li(error, className="text-warning") for error in errors]),
+                        ]
+                    )
+
+            else:
+                # Error response
+                error_data = (
+                    resp.json() if resp.headers.get("content-type") == "application/json" else {}
+                )
+                result_content = [
+                    html.H5("Cancellation Failed", className="text-danger mb-3"),
+                    html.Div(
+                        [
+                            html.Strong("Error: "),
+                            html.Span(error_data.get("detail", f"HTTP {resp.status_code}")),
+                        ],
+                        className="mb-2",
+                    ),
+                    html.Div(
+                        [html.Strong("Execution ID: "), html.Span(execution_id)], className="mb-2"
+                    ),
+                ]
+
+            # Refresh the table data
+            params = {
+                "page": 1,
+                "per_page": DEFAULT_PAGE_SIZE,
+                "exclude": "params,results",
+                "include": "script_name,user_id,duration",
+            }
+
+            # Add admin-only fields if user is admin or superadmin
+            if role in ["ADMIN", "SUPERADMIN"]:
+                params["include"] += ",user_name,user_email"
+
+            # Preserve existing sort and filter settings if available
+            if table_state:
+                if table_state.get("sort_sql"):
+                    params["sort"] = table_state["sort_sql"]
+                if table_state.get("filter_sql"):
+                    params["filter"] = table_state["filter_sql"]
+
+            refresh_resp = make_authenticated_request("/execution", token, params=params)
+            table_response = {"rowData": [], "rowCount": 0}
+
+            if refresh_resp.status_code == 200:
+                refresh_result = refresh_resp.json()
+                refresh_executions = refresh_result.get("data", [])
+                total_rows = refresh_result.get("total", 0)
+
+                tabledata = []
+                for exec_row in refresh_executions:
+                    row = exec_row.copy()
+                    row["params"] = "Show Params"
+                    row["results"] = "Show Results"
+                    row["logs"] = "Show Logs"
+                    if role in ["ADMIN", "SUPERADMIN"]:
+                        row["docker_logs"] = "Show Docker Logs"
+                    row["map"] = "Show Map"
+                    # Add actions field for the custom cell renderer
+                    status = row.get("status", "")
+                    cancellable_statuses = ["PENDING", "READY", "RUNNING"]
+                    if status in cancellable_statuses:
+                        row["actions"] = "🛑 Cancel"
+                    else:
+                        row["actions"] = "✅ Complete"
+
+                    if "duration" in row:
+                        row["duration"] = format_duration(row.get("duration"))
+
+                    for date_col in ["start_date", "end_date"]:
+                        if date_col in row:
+                            row[date_col] = parse_date(row.get(date_col), user_timezone)
+                    tabledata.append(row)
+
+                table_response = {"rowData": tabledata, "rowCount": total_rows}
+
+            return False, True, result_content, table_response
+
+        except Exception as e:
+            error_content = [
+                html.H5("Cancellation Failed", className="text-danger mb-3"),
+                html.Div([html.Strong("Error: "), html.Span(str(e))], className="mb-2"),
+                html.Div(
+                    [html.Strong("Execution ID: "), html.Span(execution_id)], className="mb-2"
+                ),
+            ]
+            return False, True, error_content, no_update
+
+    @app.callback(
+        Output("cancel-execution-result-modal", "is_open", allow_duplicate=True),
+        Input("cancel-result-close-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def close_cancel_result_modal(n_clicks):
+        """Close the cancel result modal."""
+        if n_clicks:
+            return False
+        return no_update
 
 
 # Legacy callback decorators for backward compatibility (these won't be executed)

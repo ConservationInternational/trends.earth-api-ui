@@ -30,9 +30,10 @@ def test_setup_logging_without_rollbar():
 
 def test_setup_logging_with_rollbar():
     """Test logging setup with Rollbar token."""
-    with patch("rollbar.init") as mock_rollbar_init, patch(
-        "trendsearth_ui.utils.logging_config.RollbarHandler"
-    ) as mock_rollbar_handler:
+    with (
+        patch("rollbar.init") as mock_rollbar_init,
+        patch("trendsearth_ui.utils.logging_config.RollbarHandler") as mock_rollbar_handler,
+    ):
         mock_handler = MagicMock()
         # Configure the mock handler to have a proper level attribute
         mock_handler.level = logging.WARNING
@@ -72,9 +73,11 @@ def test_get_logger():
 
 def test_log_functions():
     """Test log wrapper functions."""
-    with patch("rollbar._initialized", True), patch(
-        "rollbar.report_exc_info"
-    ) as mock_exc_info, patch("rollbar.report_message") as mock_message:
+    with (
+        patch("rollbar._initialized", True),
+        patch("rollbar.report_exc_info") as mock_exc_info,
+        patch("rollbar.report_message") as mock_message,
+    ):
         logger = MagicMock()
 
         # Test log_exception
@@ -95,15 +98,18 @@ def test_log_functions():
 
 def test_environment_variables():
     """Test that environment variables are properly used."""
-    with patch.dict(
-        os.environ,
-        {
-            "LOG_LEVEL": "DEBUG",
-            "DEPLOYMENT_ENVIRONMENT": "staging",
-            "GIT_COMMIT": "abc123",
-            "GIT_BRANCH": "feature/test",
-        },
-    ), patch("rollbar.init") as mock_rollbar_init:
+    with (
+        patch.dict(
+            os.environ,
+            {
+                "LOG_LEVEL": "DEBUG",
+                "DEPLOYMENT_ENVIRONMENT": "staging",
+                "GIT_COMMIT": "abc123",
+                "GIT_BRANCH": "feature/test",
+            },
+        ),
+        patch("rollbar.init") as mock_rollbar_init,
+    ):
         # Clear any existing handlers to ensure clean test
         logger = logging.getLogger("trendsearth_ui")
         logger.handlers.clear()

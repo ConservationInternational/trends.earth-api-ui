@@ -117,6 +117,6 @@ def test_inset_map_marker_positions():
     ]
     arr = np.array(poly_coords)
     expected_centroid = [float(arr[:, 0].mean()), float(arr[:, 1].mean())]
-    assert any(
-        np.allclose(pos, expected_centroid, atol=1e-4) for pos in marker_positions
-    ), "Inset map should show the polygon centroid."
+    assert any(np.allclose(pos, expected_centroid, atol=1e-4) for pos in marker_positions), (
+        "Inset map should show the polygon centroid."
+    )

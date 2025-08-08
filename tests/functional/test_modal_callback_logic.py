@@ -476,9 +476,9 @@ class TestTableStateLogic:
             page = (row_index // page_size) + 1
             row_in_page = row_index % page_size
 
-            assert (
-                page == expected_page
-            ), f"Row {row_index}: expected page {expected_page}, got {page}"
-            assert (
-                row_in_page == expected_row_in_page
-            ), f"Row {row_index}: expected row_in_page {expected_row_in_page}, got {row_in_page}"
+            assert page == expected_page, (
+                f"Row {row_index}: expected page {expected_page}, got {page}"
+            )
+            assert row_in_page == expected_row_in_page, (
+                f"Row {row_index}: expected row_in_page {expected_row_in_page}, got {row_in_page}"
+            )

@@ -86,6 +86,21 @@ def get_mobile_column_config():
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
                 },
+                {
+                    "headerName": "Actions",
+                    "field": "actions",
+                    "flex": 1,
+                    "minWidth": 120,
+                    "sortable": False,
+                    "filter": False,
+                    "cellStyle": {
+                        "fontSize": "12px",
+                        "cursor": "pointer",
+                        "textAlign": "center",
+                        "color": "#dc3545",
+                        "fontWeight": "bold",
+                    },
+                },
             ],
             "secondary_columns": [
                 {

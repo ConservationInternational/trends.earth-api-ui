@@ -203,6 +203,79 @@ def executions_tab_content():
                 table_type="executions",
                 style_data_conditional=style_data_conditional,
             ),
+            # Cancel execution confirmation modal
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Cancel Execution"),
+                        close_button=True,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            html.P(
+                                "Are you sure you want to cancel this execution?",
+                                className="mb-3",
+                            ),
+                            html.Div(
+                                [
+                                    html.Strong("Execution ID: "),
+                                    html.Span(id="cancel-execution-id"),
+                                ],
+                                className="mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.Strong("Script: "),
+                                    html.Span(id="cancel-execution-script"),
+                                ],
+                                className="mb-2",
+                            ),
+                            html.Div(
+                                [
+                                    html.Strong("Status: "),
+                                    html.Span(id="cancel-execution-status"),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Alert(
+                                "This action cannot be undone.",
+                                color="warning",
+                                className="mb-0",
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button(
+                                "Cancel",
+                                id="cancel-execution-close-btn",
+                                color="secondary",
+                                className="me-2",
+                            ),
+                            dbc.Button(
+                                [
+                                    html.I(className="fas fa-stop me-2"),
+                                    "Confirm Cancel",
+                                ],
+                                id="cancel-execution-confirm-btn",
+                                color="danger",
+                            ),
+                        ]
+                    ),
+                ],
+                id="cancel-execution-modal",
+                is_open=False,
+                backdrop="static",
+                keyboard=False,
+            ),
+            # Alert for cancel operation feedback
+            dbc.Alert(
+                id="cancel-execution-alert",
+                is_open=False,
+                dismissable=True,
+                duration=5000,
+                style={"position": "fixed", "top": "20px", "right": "20px", "zIndex": 9999},
+            ),
             dcc.Interval(
                 id="executions-auto-refresh-interval",
                 interval=EXECUTIONS_REFRESH_INTERVAL,
@@ -212,6 +285,21 @@ def executions_tab_content():
                 id="executions-countdown-interval",
                 interval=1000,  # 1 second for countdown
                 n_intervals=0,
+            ),
+            # Store to hold execution data for cancel operation
+            dcc.Store(id="cancel-execution-store"),
+            # Modal to display cancellation results
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle("Cancellation Result"), close_button=True),
+                    dbc.ModalBody(id="cancel-execution-result-body"),
+                    dbc.ModalFooter(
+                        dbc.Button("Close", id="cancel-result-close-btn", color="secondary")
+                    ),
+                ],
+                id="cancel-execution-result-modal",
+                is_open=False,
+                size="lg",
             ),
         ]
     )
