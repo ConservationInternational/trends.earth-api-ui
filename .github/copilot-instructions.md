@@ -154,7 +154,7 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 
 **API Documentation**:
 - **Swagger/OpenAPI**: https://api.trends.earth/swagger.json
-- **Interactive docs**: Available at API base URLs with `/docs` or `/swagger` paths
+- **Interactive docs**: https://api.trends.earth/api/docs/
 - **API Repository**: https://github.com/ConservationInternational/trends.earth-API
 
 **Finding API Routes**:
