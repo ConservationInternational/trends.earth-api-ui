@@ -145,6 +145,24 @@ tests/
 - **Authentication**: JWT-based with configurable endpoints
 - **Environment switching**: Via config or user selection
 
+### Backend API Information
+This UI connects to the Trends.Earth REST API, which provides the core functionality for land degradation monitoring and analysis.
+
+**API Endpoints**:
+- **Production**: https://api.trends.earth/ (base) | https://api.trends.earth/api/v1 (API endpoints)
+- **Staging**: https://api-staging.trends.earth/ (base) | https://api-staging.trends.earth/api/v1 (API endpoints)
+
+**API Documentation**:
+- **Swagger/OpenAPI**: https://api.trends.earth/swagger.json
+- **Interactive docs**: Available at API base URLs with `/docs` or `/swagger` paths
+- **API Repository**: https://github.com/ConservationInternational/trends.earth-API
+
+**Finding API Routes**:
+1. **Swagger JSON**: Download from https://api.trends.earth/swagger.json for complete API specification
+2. **Source code**: Browse the API repository for route definitions in Python FastAPI format
+3. **Local config**: Check `trendsearth_ui/config.py` for currently used endpoints
+4. **Integration tests**: Review `tests/integration/` for examples of API usage patterns
+
 ### Deployment
 - **Development**: Python + Dash development server (port 8050)
 - **Production**: Docker + Gunicorn (port 8000, single worker)
