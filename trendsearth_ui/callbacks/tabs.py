@@ -84,7 +84,7 @@ def register_callbacks(app):
         elif tab == "status":
             # Only allow admin users to access status tab
             if role in ["ADMIN", "SUPERADMIN"]:
-                return status_tab_content(role in ["ADMIN", "SUPERADMIN"])
+                return status_tab_content(role in ["ADMIN", "SUPERADMIN"], role)
             else:
                 return html.Div(
                     [
