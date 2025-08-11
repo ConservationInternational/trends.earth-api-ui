@@ -611,7 +611,7 @@ def profile_tab_content(user_data):
     )
 
 
-def status_tab_content(is_admin):
+def status_tab_content(is_admin, role=None):
     """Create the status tab content."""
     if not is_admin:
         return html.Div(
@@ -622,6 +622,9 @@ def status_tab_content(is_admin):
                 )
             ]
         )
+
+    # Check if user is SUPERADMIN for enhanced statistics
+    is_superadmin = role == "SUPERADMIN"
 
     return html.Div(
         [
@@ -704,6 +707,68 @@ def status_tab_content(is_admin):
                     ),
                 ],
                 className="mb-4",
+            ),
+            # Enhanced Statistics Card (SUPERADMIN only)
+            *(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4([
+                                    html.I(className="fas fa-chart-bar me-2"),
+                                    "Enhanced Statistics"
+                                ])
+                            ),
+                            dbc.CardBody(
+                                [
+                                    # Dashboard summary cards
+                                    html.Div(
+                                        [
+                                            html.H5("System Overview", className="mb-3"),
+                                            dcc.Loading(
+                                                id="loading-stats-summary",
+                                                children=[html.Div(id="stats-summary-cards")],
+                                                type="default",
+                                                color="#007bff",
+                                            ),
+                                        ],
+                                        className="mb-4"
+                                    ),
+                                    html.Hr(),
+                                    # User geographic map
+                                    html.Div(
+                                        [
+                                            html.H5("User Geographic Distribution", className="mb-3"),
+                                            dcc.Loading(
+                                                id="loading-stats-map",
+                                                children=[html.Div(id="stats-user-map")],
+                                                type="default",
+                                                color="#007bff",
+                                            ),
+                                        ],
+                                        className="mb-4"
+                                    ),
+                                    html.Hr(),
+                                    # Additional statistics charts
+                                    html.Div(
+                                        [
+                                            html.H5("Detailed Analytics", className="mb-3"),
+                                            dcc.Loading(
+                                                id="loading-stats-charts",
+                                                children=[html.Div(id="stats-additional-charts")],
+                                                type="default",
+                                                color="#007bff",
+                                            ),
+                                        ]
+                                    ),
+                                ]
+                            ),
+                        ],
+                        className="mb-4",
+                    )
+                ]
+                if is_superadmin
+                else []
             ),
             # Status charts
             dbc.Card(

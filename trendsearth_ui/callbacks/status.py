@@ -9,6 +9,19 @@ import plotly.graph_objects as go
 import requests
 
 from ..config import get_api_base
+from ..utils.stats_utils import (
+    check_stats_access,
+    fetch_dashboard_stats,
+    fetch_execution_stats,
+    fetch_user_stats,
+    map_period_to_api_period,
+)
+from ..utils.stats_visualizations import (
+    create_dashboard_summary_cards,
+    create_execution_statistics_chart,
+    create_user_geographic_map,
+    create_user_statistics_chart,
+)
 from ..utils.timezone_utils import (
     convert_utc_to_local,
     format_local_time,
@@ -1944,3 +1957,134 @@ def register_callbacks(app):
         )
 
         return classes[0], classes[1], classes[2], active_tab
+
+
+    # Enhanced Statistics Callbacks for SUPERADMIN users
+    @app.callback(
+        [
+            Output("stats-summary-cards", "children"),
+            Output("stats-user-map", "children"),
+            Output("stats-additional-charts", "children"),
+        ],
+        [
+            Input("status-auto-refresh-interval", "n_intervals"),
+            Input("refresh-status-btn", "n_clicks"),
+            Input("status-time-tabs-store", "data"),
+        ],
+        [
+            State("token-store", "data"),
+            State("active-tab-store", "data"),
+            State("user-timezone-store", "data"),
+            State("role-store", "data"),
+            State("api-environment-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def update_enhanced_statistics(
+        _n_intervals,
+        _refresh_clicks,
+        time_period,
+        token,
+        active_tab,
+        _user_timezone,  # Prefixed with underscore to indicate it's unused
+        role,
+        api_environment,
+    ):
+        """Update enhanced statistics for SUPERADMIN users."""
+        # Guard: Skip if not logged in or not SUPERADMIN
+        if not token or role != "SUPERADMIN":
+            return no_update, no_update, no_update
+
+        # Only update when status tab is active
+        if active_tab != "status":
+            return no_update, no_update, no_update
+
+        # Check if user has access to stats endpoints
+        if not check_stats_access(token, api_environment):
+            access_denied_msg = html.Div(
+                [
+                    html.P("Enhanced statistics are not available.", className="text-warning text-center"),
+                    html.Small("Stats endpoints may not be accessible or enabled.", className="text-muted text-center d-block")
+                ],
+                className="p-4"
+            )
+            return access_denied_msg, access_denied_msg, access_denied_msg
+
+        # Map UI period to API period
+        api_period = map_period_to_api_period(time_period)
+
+        # Determine title suffix for charts
+        title_suffixes = {
+            "day": " (Last 24 Hours)",
+            "week": " (Last Week)",
+            "month": " (Last Month)"
+        }
+        title_suffix = title_suffixes.get(time_period, "")
+
+        try:
+            # Fetch dashboard stats for summary cards
+            dashboard_data = fetch_dashboard_stats(
+                token, api_environment, api_period,
+                include_sections=["summary", "trends", "geographic"]
+            )
+
+            # Create summary cards
+            if dashboard_data:
+                summary_cards = create_dashboard_summary_cards(dashboard_data)
+            else:
+                summary_cards = html.Div(
+                    "Dashboard statistics not available.",
+                    className="text-muted text-center p-4"
+                )
+
+            # Fetch user stats for geographic map
+            user_data = fetch_user_stats(
+                token, api_environment, api_period,
+                group_by="day" if time_period == "day" else "week"
+            )
+
+            # Create user geographic map
+            if user_data:
+                user_map = create_user_geographic_map(user_data, title_suffix)
+            else:
+                user_map = html.Div(
+                    "User geographic data not available.",
+                    className="text-muted text-center p-4"
+                )
+
+            # Fetch execution stats for additional charts
+            execution_data = fetch_execution_stats(
+                token, api_environment, api_period,
+                group_by="hour" if time_period == "day" else "day"
+            )
+
+            # Create additional charts
+            additional_charts = []
+
+            # Execution statistics
+            if execution_data:
+                exec_charts = create_execution_statistics_chart(execution_data, title_suffix)
+                additional_charts.extend(exec_charts)
+
+            # User statistics
+            if user_data:
+                user_charts = create_user_statistics_chart(user_data, title_suffix)
+                additional_charts.extend(user_charts)
+
+            if not additional_charts:
+                additional_charts = [html.Div(
+                    "Additional statistics not available for this period.",
+                    className="text-muted text-center p-4"
+                )]
+
+            return summary_cards, user_map, html.Div(additional_charts)
+
+        except Exception as e:
+            error_msg = html.Div(
+                [
+                    html.P("Error loading enhanced statistics.", className="text-danger text-center"),
+                    html.Small(f"Error: {str(e)}", className="text-muted text-center d-block")
+                ],
+                className="p-4"
+            )
+            return error_msg, error_msg, error_msg
