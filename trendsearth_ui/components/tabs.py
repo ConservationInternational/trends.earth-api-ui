@@ -714,10 +714,12 @@ def status_tab_content(is_admin, role=None):
                     dbc.Card(
                         [
                             dbc.CardHeader(
-                                html.H4([
-                                    html.I(className="fas fa-chart-bar me-2"),
-                                    "Enhanced Statistics"
-                                ])
+                                html.H4(
+                                    [
+                                        html.I(className="fas fa-chart-bar me-2"),
+                                        "Enhanced Statistics",
+                                    ]
+                                )
                             ),
                             dbc.CardBody(
                                 [
@@ -732,13 +734,15 @@ def status_tab_content(is_admin, role=None):
                                                 color="#007bff",
                                             ),
                                         ],
-                                        className="mb-4"
+                                        className="mb-4",
                                     ),
                                     html.Hr(),
                                     # User geographic map
                                     html.Div(
                                         [
-                                            html.H5("User Geographic Distribution", className="mb-3"),
+                                            html.H5(
+                                                "User Geographic Distribution", className="mb-3"
+                                            ),
                                             dcc.Loading(
                                                 id="loading-stats-map",
                                                 children=[html.Div(id="stats-user-map")],
@@ -746,7 +750,7 @@ def status_tab_content(is_admin, role=None):
                                                 color="#007bff",
                                             ),
                                         ],
-                                        className="mb-4"
+                                        className="mb-4",
                                     ),
                                     html.Hr(),
                                     # Additional statistics charts

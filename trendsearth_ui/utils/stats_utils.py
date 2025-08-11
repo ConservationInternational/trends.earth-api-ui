@@ -25,12 +25,18 @@ def get_cached_stats_data(cache_key, period=None, ttl=None):
     # For data that varies by period, use period as sub-key
     if period:
         cache_data = cache_entry.get("data", {})
-        if (isinstance(cache_data, dict) and period in cache_data and
-                current_time - cache_entry.get("timestamp", 0) < ttl):
+        if (
+            isinstance(cache_data, dict)
+            and period in cache_data
+            and current_time - cache_entry.get("timestamp", 0) < ttl
+        ):
             return cache_data[period]
     else:
         # For non-period specific data
-        if cache_entry.get("data") is not None and current_time - cache_entry.get("timestamp", 0) < ttl:
+        if (
+            cache_entry.get("data") is not None
+            and current_time - cache_entry.get("timestamp", 0) < ttl
+        ):
             return cache_entry["data"]
 
     return None
@@ -55,7 +61,9 @@ def set_cached_stats_data(cache_key, data, period=None, ttl=None):
         _stats_cache[cache_key]["ttl"] = ttl
 
 
-def fetch_dashboard_stats(token, api_environment="production", period="last_week", include_sections=None):
+def fetch_dashboard_stats(
+    token, api_environment="production", period="last_week", include_sections=None
+):
     """
     Fetch dashboard statistics from the API.
 
@@ -84,7 +92,7 @@ def fetch_dashboard_stats(token, api_environment="production", period="last_week
             f"{get_api_base(api_environment)}/stats/dashboard",
             headers=headers,
             params=params,
-            timeout=10
+            timeout=10,
         )
 
         if resp.status_code == 200:
@@ -99,7 +107,9 @@ def fetch_dashboard_stats(token, api_environment="production", period="last_week
         return None
 
 
-def fetch_user_stats(token, api_environment="production", period="last_week", group_by="day", country=None):
+def fetch_user_stats(
+    token, api_environment="production", period="last_week", group_by="day", country=None
+):
     """
     Fetch user statistics from the API.
 
@@ -132,7 +142,7 @@ def fetch_user_stats(token, api_environment="production", period="last_week", gr
             f"{get_api_base(api_environment)}/stats/users",
             headers=headers,
             params=params,
-            timeout=10
+            timeout=10,
         )
 
         if resp.status_code == 200:
@@ -147,8 +157,14 @@ def fetch_user_stats(token, api_environment="production", period="last_week", gr
         return None
 
 
-def fetch_execution_stats(token, api_environment="production", period="last_week", group_by="day",
-                         task_type=None, status=None):
+def fetch_execution_stats(
+    token,
+    api_environment="production",
+    period="last_week",
+    group_by="day",
+    task_type=None,
+    status=None,
+):
     """
     Fetch execution statistics from the API.
 
@@ -184,7 +200,7 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
             f"{get_api_base(api_environment)}/stats/executions",
             headers=headers,
             params=params,
-            timeout=10
+            timeout=10,
         )
 
         if resp.status_code == 200:
@@ -209,11 +225,7 @@ def map_period_to_api_period(period):
     Returns:
         str: API period parameter
     """
-    mapping = {
-        "day": "last_day",
-        "week": "last_week",
-        "month": "last_month"
-    }
+    mapping = {"day": "last_day", "week": "last_week", "month": "last_month"}
     return mapping.get(period, "last_week")
 
 
@@ -231,9 +243,7 @@ def check_stats_access(token, api_environment="production"):
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
-            f"{get_api_base(api_environment)}/stats/health",
-            headers=headers,
-            timeout=5
+            f"{get_api_base(api_environment)}/stats/health", headers=headers, timeout=5
         )
         return resp.status_code == 200
     except Exception:

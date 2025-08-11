@@ -1958,7 +1958,6 @@ def register_callbacks(app):
 
         return classes[0], classes[1], classes[2], active_tab
 
-
     # Enhanced Statistics Callbacks for SUPERADMIN users
     @app.callback(
         [
@@ -2003,10 +2002,16 @@ def register_callbacks(app):
         if not check_stats_access(token, api_environment):
             access_denied_msg = html.Div(
                 [
-                    html.P("Enhanced statistics are not available.", className="text-warning text-center"),
-                    html.Small("Stats endpoints may not be accessible or enabled.", className="text-muted text-center d-block")
+                    html.P(
+                        "Enhanced statistics are not available.",
+                        className="text-warning text-center",
+                    ),
+                    html.Small(
+                        "Stats endpoints may not be accessible or enabled.",
+                        className="text-muted text-center d-block",
+                    ),
                 ],
-                className="p-4"
+                className="p-4",
             )
             return access_denied_msg, access_denied_msg, access_denied_msg
 
@@ -2017,15 +2022,17 @@ def register_callbacks(app):
         title_suffixes = {
             "day": " (Last 24 Hours)",
             "week": " (Last Week)",
-            "month": " (Last Month)"
+            "month": " (Last Month)",
         }
         title_suffix = title_suffixes.get(time_period, "")
 
         try:
             # Fetch dashboard stats for summary cards
             dashboard_data = fetch_dashboard_stats(
-                token, api_environment, api_period,
-                include_sections=["summary", "trends", "geographic"]
+                token,
+                api_environment,
+                api_period,
+                include_sections=["summary", "trends", "geographic"],
             )
 
             # Create summary cards
@@ -2033,14 +2040,15 @@ def register_callbacks(app):
                 summary_cards = create_dashboard_summary_cards(dashboard_data)
             else:
                 summary_cards = html.Div(
-                    "Dashboard statistics not available.",
-                    className="text-muted text-center p-4"
+                    "Dashboard statistics not available.", className="text-muted text-center p-4"
                 )
 
             # Fetch user stats for geographic map
             user_data = fetch_user_stats(
-                token, api_environment, api_period,
-                group_by="day" if time_period == "day" else "week"
+                token,
+                api_environment,
+                api_period,
+                group_by="day" if time_period == "day" else "week",
             )
 
             # Create user geographic map
@@ -2048,14 +2056,15 @@ def register_callbacks(app):
                 user_map = create_user_geographic_map(user_data, title_suffix)
             else:
                 user_map = html.Div(
-                    "User geographic data not available.",
-                    className="text-muted text-center p-4"
+                    "User geographic data not available.", className="text-muted text-center p-4"
                 )
 
             # Fetch execution stats for additional charts
             execution_data = fetch_execution_stats(
-                token, api_environment, api_period,
-                group_by="hour" if time_period == "day" else "day"
+                token,
+                api_environment,
+                api_period,
+                group_by="hour" if time_period == "day" else "day",
             )
 
             # Create additional charts
@@ -2072,19 +2081,23 @@ def register_callbacks(app):
                 additional_charts.extend(user_charts)
 
             if not additional_charts:
-                additional_charts = [html.Div(
-                    "Additional statistics not available for this period.",
-                    className="text-muted text-center p-4"
-                )]
+                additional_charts = [
+                    html.Div(
+                        "Additional statistics not available for this period.",
+                        className="text-muted text-center p-4",
+                    )
+                ]
 
             return summary_cards, user_map, html.Div(additional_charts)
 
         except Exception as e:
             error_msg = html.Div(
                 [
-                    html.P("Error loading enhanced statistics.", className="text-danger text-center"),
-                    html.Small(f"Error: {str(e)}", className="text-muted text-center d-block")
+                    html.P(
+                        "Error loading enhanced statistics.", className="text-danger text-center"
+                    ),
+                    html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
                 ],
-                className="p-4"
+                className="p-4",
             )
             return error_msg, error_msg, error_msg
