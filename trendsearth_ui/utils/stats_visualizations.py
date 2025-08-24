@@ -17,8 +17,26 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
         dcc.Graph: Plotly map figure
     """
     try:
+        # Handle error responses from API
+        if user_stats_data and user_stats_data.get("error", False):
+            error_msg = user_stats_data.get("message", "Unknown API error")
+            status_code = user_stats_data.get("status_code", "unknown")
+
+            return html.Div(
+                [
+                    html.P(
+                        "No geographic user data available.", className="text-muted text-center"
+                    ),
+                    html.Small(
+                        f"API Error ({status_code}): {error_msg}",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
+
         # Extract geographic data from user stats
-        data = user_stats_data.get("data", {})
+        data = user_stats_data.get("data", {}) if user_stats_data else {}
         geographic_data = data.get("geographic", {})
 
         if not geographic_data:
@@ -66,7 +84,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                     f"{country}: {count} users" for country, count in zip(countries, user_counts)
                 ],
                 hovertemplate="<b>%{text}</b><extra></extra>",
-                colorbar={"title": "Number of Users", "titleside": "right"},
+                colorbar={"title": "Number of Users"},
             )
         )
 
@@ -101,7 +119,28 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
         list: List of chart components
     """
     try:
-        data = execution_stats_data.get("data", {})
+        # Handle error responses from API
+        if execution_stats_data and execution_stats_data.get("error", False):
+            error_msg = execution_stats_data.get("message", "Unknown API error")
+            status_code = execution_stats_data.get("status_code", "unknown")
+
+            return [
+                html.Div(
+                    [
+                        html.P(
+                            "No chart data available for this period.",
+                            className="text-muted text-center",
+                        ),
+                        html.Small(
+                            f"API Error ({status_code}): {error_msg}",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        data = execution_stats_data.get("data", {}) if execution_stats_data else {}
 
         if not data:
             return [
@@ -287,7 +326,28 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
         list: List of chart components
     """
     try:
-        data = user_stats_data.get("data", {})
+        # Handle error responses from API
+        if user_stats_data and user_stats_data.get("error", False):
+            error_msg = user_stats_data.get("message", "Unknown API error")
+            status_code = user_stats_data.get("status_code", "unknown")
+
+            return [
+                html.Div(
+                    [
+                        html.P(
+                            "No chart data available for this period.",
+                            className="text-muted text-center",
+                        ),
+                        html.Small(
+                            f"API Error ({status_code}): {error_msg}",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        data = user_stats_data.get("data", {}) if user_stats_data else {}
 
         if not data:
             return [
@@ -453,7 +513,20 @@ def create_dashboard_summary_cards(dashboard_stats_data):
         html.Div: Summary cards layout
     """
     try:
-        data = dashboard_stats_data.get("data", {})
+        # Handle error responses from API
+        if dashboard_stats_data and dashboard_stats_data.get("error", False):
+            error_msg = dashboard_stats_data.get("message", "Unknown API error")
+            status_code = dashboard_stats_data.get("status_code", "unknown")
+
+            return html.Div(
+                [
+                    html.P("Dashboard statistics not available.", className="text-muted text-center"),
+                    html.Small(f"API Error ({status_code}): {error_msg}", className="text-muted text-center d-block"),
+                ],
+                className="p-4"
+            )
+
+        data = dashboard_stats_data.get("data", {}) if dashboard_stats_data else {}
         summary = data.get("summary", {})
 
         if not summary:
