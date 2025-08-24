@@ -86,11 +86,8 @@ class TestEnhancedStatsIntegration:
         # Should contain the data store for tab state
         assert "status-time-tabs-store" in content_str
 
-    @patch("trendsearth_ui.callbacks.status.check_stats_access")
-    def test_enhanced_stats_callback_admin_access(self, mock_check_stats):
-        """Test that the enhanced statistics callback works for ADMIN users."""
-        mock_check_stats.return_value = True
-
+    def test_enhanced_stats_callback_admin_access(self):
+        """Test that the enhanced statistics callback works for SUPERADMIN users only."""
         # Create a mock app
         app = MagicMock()
         app.callback = MagicMock()

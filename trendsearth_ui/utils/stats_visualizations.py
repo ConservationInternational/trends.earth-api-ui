@@ -10,17 +10,30 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
     Create a geographic map showing countries from which recent users have joined.
 
     Args:
-        user_stats_data: User statistics data from the API
+        user_stats_data: User statistics data from the API or error response structure
         title_suffix: Additional text for the chart title
 
     Returns:
-        dcc.Graph: Plotly map figure
+        dcc.Graph: Plotly map figure or error message div
     """
     try:
-        # Handle error responses from API
-        if user_stats_data and user_stats_data.get("error", False):
-            error_msg = user_stats_data.get("message", "Unknown API error")
-            status_code = user_stats_data.get("status_code", "unknown")
+        # Handle error response structure
+        if not user_stats_data or user_stats_data.get("error", False):
+            error_msg = (
+                user_stats_data.get("message", "No data available")
+                if user_stats_data
+                else "No data available"
+            )
+            status_code = (
+                user_stats_data.get("status_code", "unknown") if user_stats_data else "unknown"
+            )
+
+            if status_code == 403:
+                error_detail = "You need SUPERADMIN privileges to access geographic user data."
+            elif status_code == 401:
+                error_detail = "Authentication failed. Please log in again."
+            else:
+                error_detail = f"Geographic user data unavailable: {error_msg}"
 
             return html.Div(
                 [
@@ -28,7 +41,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                         "No geographic user data available.", className="text-muted text-center"
                     ),
                     html.Small(
-                        f"API Error ({status_code}): {error_msg}",
+                        error_detail,
                         className="text-muted text-center d-block",
                     ),
                 ],
@@ -36,7 +49,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
             )
 
         # Extract geographic data from user stats
-        data = user_stats_data.get("data", {}) if user_stats_data else {}
+        data = user_stats_data.get("data", {})
         geographic_data = data.get("geographic", {})
 
         if not geographic_data:
@@ -84,7 +97,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                     f"{country}: {count} users" for country, count in zip(countries, user_counts)
                 ],
                 hovertemplate="<b>%{text}</b><extra></extra>",
-                colorbar={"title": "Number of Users"},
+                colorbar={"title": "Number of Users", "titleside": "right"},
             )
         )
 
@@ -112,27 +125,41 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
     Create execution statistics charts showing trends and distribution.
 
     Args:
-        execution_stats_data: Execution statistics data from the API
+        execution_stats_data: Execution statistics data from the API or error response structure
         title_suffix: Additional text for the chart title
 
     Returns:
         list: List of chart components
     """
     try:
-        # Handle error responses from API
-        if execution_stats_data and execution_stats_data.get("error", False):
-            error_msg = execution_stats_data.get("message", "Unknown API error")
-            status_code = execution_stats_data.get("status_code", "unknown")
+        # Handle error response structure
+        if not execution_stats_data or execution_stats_data.get("error", False):
+            error_msg = (
+                execution_stats_data.get("message", "No data available")
+                if execution_stats_data
+                else "No data available"
+            )
+            status_code = (
+                execution_stats_data.get("status_code", "unknown")
+                if execution_stats_data
+                else "unknown"
+            )
+
+            if status_code == 403:
+                error_detail = "You need SUPERADMIN privileges to access execution statistics."
+            elif status_code == 401:
+                error_detail = "Authentication failed. Please log in again."
+            else:
+                error_detail = f"Execution statistics unavailable: {error_msg}"
 
             return [
                 html.Div(
                     [
                         html.P(
-                            "No chart data available for this period.",
-                            className="text-muted text-center",
+                            "No execution statistics available.", className="text-muted text-center"
                         ),
                         html.Small(
-                            f"API Error ({status_code}): {error_msg}",
+                            error_detail,
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -140,7 +167,7 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                 )
             ]
 
-        data = execution_stats_data.get("data", {}) if execution_stats_data else {}
+        data = execution_stats_data.get("data", {})
 
         if not data:
             return [
@@ -319,27 +346,37 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
     Create user statistics charts showing registration trends.
 
     Args:
-        user_stats_data: User statistics data from the API
+        user_stats_data: User statistics data from the API or error response structure
         title_suffix: Additional text for the chart title
 
     Returns:
         list: List of chart components
     """
     try:
-        # Handle error responses from API
-        if user_stats_data and user_stats_data.get("error", False):
-            error_msg = user_stats_data.get("message", "Unknown API error")
-            status_code = user_stats_data.get("status_code", "unknown")
+        # Handle error response structure
+        if not user_stats_data or user_stats_data.get("error", False):
+            error_msg = (
+                user_stats_data.get("message", "No data available")
+                if user_stats_data
+                else "No data available"
+            )
+            status_code = (
+                user_stats_data.get("status_code", "unknown") if user_stats_data else "unknown"
+            )
+
+            if status_code == 403:
+                error_detail = "You need SUPERADMIN privileges to access user statistics."
+            elif status_code == 401:
+                error_detail = "Authentication failed. Please log in again."
+            else:
+                error_detail = f"User statistics unavailable: {error_msg}"
 
             return [
                 html.Div(
                     [
-                        html.P(
-                            "No chart data available for this period.",
-                            className="text-muted text-center",
-                        ),
+                        html.P("No user statistics available.", className="text-muted text-center"),
                         html.Small(
-                            f"API Error ({status_code}): {error_msg}",
+                            error_detail,
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -347,7 +384,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
                 )
             ]
 
-        data = user_stats_data.get("data", {}) if user_stats_data else {}
+        data = user_stats_data.get("data", {})
 
         if not data:
             return [
@@ -507,26 +544,41 @@ def create_dashboard_summary_cards(dashboard_stats_data):
     Create summary cards from dashboard statistics.
 
     Args:
-        dashboard_stats_data: Dashboard statistics data from the API
+        dashboard_stats_data: Dashboard statistics data from the API or error response structure
 
     Returns:
         html.Div: Summary cards layout
     """
     try:
-        # Handle error responses from API
-        if dashboard_stats_data and dashboard_stats_data.get("error", False):
-            error_msg = dashboard_stats_data.get("message", "Unknown API error")
-            status_code = dashboard_stats_data.get("status_code", "unknown")
+        # Handle error response structure
+        if not dashboard_stats_data or dashboard_stats_data.get("error", False):
+            error_msg = (
+                dashboard_stats_data.get("message", "No data available")
+                if dashboard_stats_data
+                else "No data available"
+            )
+            status_code = (
+                dashboard_stats_data.get("status_code", "unknown")
+                if dashboard_stats_data
+                else "unknown"
+            )
+
+            if status_code == 403:
+                error_detail = "You need SUPERADMIN privileges to access dashboard statistics."
+            elif status_code == 401:
+                error_detail = "Authentication failed. Please log in again."
+            else:
+                error_detail = f"Dashboard statistics unavailable: {error_msg}"
 
             return html.Div(
                 [
-                    html.P("Dashboard statistics not available.", className="text-muted text-center"),
-                    html.Small(f"API Error ({status_code}): {error_msg}", className="text-muted text-center d-block"),
+                    html.P("No dashboard summary available.", className="text-muted text-center"),
+                    html.Small(error_detail, className="text-muted text-center d-block"),
                 ],
-                className="p-4"
+                className="p-4",
             )
 
-        data = dashboard_stats_data.get("data", {}) if dashboard_stats_data else {}
+        data = dashboard_stats_data.get("data", {})
         summary = data.get("summary", {})
 
         if not summary:

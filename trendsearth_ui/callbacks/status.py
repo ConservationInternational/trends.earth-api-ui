@@ -10,7 +10,6 @@ import requests
 
 from ..config import get_api_base
 from ..utils.stats_utils import (
-    check_stats_access,
     fetch_dashboard_stats,
     fetch_execution_stats,
     fetch_user_stats,
@@ -2015,8 +2014,8 @@ def register_callbacks(app):
         else:
             logger.warning("Enhanced stats update: Token is None or empty!")
 
-        # Guard: Skip if not logged in or not ADMIN/SUPERADMIN
-        if not token or role not in ["ADMIN", "SUPERADMIN"]:
+        # Guard: Skip if not logged in or not SUPERADMIN (API requires SUPERADMIN only)
+        if not token or role != "SUPERADMIN":
             logger.warning(
                 f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}"
             )
@@ -2046,91 +2045,10 @@ def register_callbacks(app):
         if active_tab != "status":
             return no_update, no_update, no_update
 
-        # Check if user has access to stats endpoints
-        logger.info("Enhanced stats: Checking stats access...")
-        stats_access, access_error = check_stats_access(token, api_environment)
-        logger.info(
-            f"Enhanced stats: Access check result - access: {stats_access}, error: {access_error}"
-        )
-
-        if not stats_access:
-            # Provide more specific error messages based on the type of error
-            if "Authentication error" in access_error and "Not enough segments" in access_error:
-                detailed_error = html.Div(
-                    [
-                        html.P(
-                            "Enhanced statistics are not available.",
-                            className="text-warning text-center",
-                        ),
-                        html.Small(
-                            [
-                                "Authentication token appears to be corrupted. ",
-                                html.Strong("Possible solutions:"),
-                                html.Br(),
-                                "• Try refreshing the page",
-                                html.Br(),
-                                "• Log out and log back in",
-                                html.Br(),
-                                "• Clear browser cookies and cache",
-                                html.Br(),
-                                html.Br(),
-                                f"Technical details: {access_error}",
-                            ],
-                            className="text-muted text-center d-block",
-                        ),
-                    ],
-                    className="p-4",
-                )
-            elif "SUPERADMIN privileges required" in access_error:
-                detailed_error = html.Div(
-                    [
-                        html.P(
-                            "Enhanced statistics are not available.",
-                            className="text-warning text-center",
-                        ),
-                        html.Small(
-                            [
-                                "Your account does not have sufficient privileges. ",
-                                html.Strong("Enhanced statistics require SUPERADMIN access."),
-                                html.Br(),
-                                html.Br(),
-                                "Contact your system administrator to upgrade your account permissions.",
-                                html.Br(),
-                                html.Br(),
-                                f"Current access level: {role} (SUPERADMIN required)",
-                            ],
-                            className="text-muted text-center d-block",
-                        ),
-                    ],
-                    className="p-4",
-                )
-            else:
-                detailed_error = html.Div(
-                    [
-                        html.P(
-                            "Enhanced statistics are not available.",
-                            className="text-warning text-center",
-                        ),
-                        html.Small(
-                            [
-                                "Unable to access enhanced statistics. ",
-                                html.Strong("This may be due to:"),
-                                html.Br(),
-                                "• Insufficient user privileges (SUPERADMIN required)",
-                                html.Br(),
-                                "• API server connectivity issues",
-                                html.Br(),
-                                "• Authentication session problems",
-                                html.Br(),
-                                html.Br(),
-                                f"Technical details: {access_error}",
-                            ],
-                            className="text-muted text-center d-block",
-                        ),
-                    ],
-                    className="p-4",
-                )
-            return detailed_error, detailed_error, detailed_error
+        # Skip the check_stats_access call since it creates a circular dependency
+        # (it tries to access /stats/health which also requires SUPERADMIN privileges)
+        # Instead, we'll let the actual API calls handle authentication errors
+        logger.info("Enhanced stats: Proceeding with API calls (SUPERADMIN role verified)")
 
         # Map UI period to API period
         api_period = map_period_to_api_period(time_period)
@@ -2166,7 +2084,9 @@ def register_callbacks(app):
                     logger.error(f"Enhanced stats: Dashboard API error {status_code}: {error_msg}")
 
                     if status_code == 403:
-                        error_detail = "You need SUPERADMIN privileges to access dashboard statistics."
+                        error_detail = (
+                            "You need SUPERADMIN privileges to access dashboard statistics."
+                        )
                     elif status_code == 401:
                         error_detail = "Authentication failed. Please log in again."
                     elif status_code == 422:
@@ -2213,7 +2133,9 @@ def register_callbacks(app):
                     logger.error(f"Enhanced stats: API error {status_code}: {error_msg}")
 
                     if status_code == 403:
-                        error_detail = "You need SUPERADMIN privileges to access geographic user data."
+                        error_detail = (
+                            "You need SUPERADMIN privileges to access geographic user data."
+                        )
                     elif status_code == 401:
                         error_detail = "Authentication failed. Please log in again."
                     elif status_code == 422:
@@ -2258,7 +2180,9 @@ def register_callbacks(app):
                 if execution_data and execution_data.get("error", False):
                     error_msg = execution_data.get("message", "Unknown API error")
                     status_code = execution_data.get("status_code", "unknown")
-                    logger.error(f"Enhanced stats: Execution data API error {status_code}: {error_msg}")
+                    logger.error(
+                        f"Enhanced stats: Execution data API error {status_code}: {error_msg}"
+                    )
                 else:
                     logger.warning("Enhanced stats: No execution data available")
 
@@ -2279,7 +2203,9 @@ def register_callbacks(app):
                     logger.error(f"Enhanced stats: User data API error {status_code}: {error_msg}")
 
                     if status_code == 403:
-                        error_detail = "You need SUPERADMIN privileges to access detailed analytics."
+                        error_detail = (
+                            "You need SUPERADMIN privileges to access detailed analytics."
+                        )
                     elif status_code == 401:
                         error_detail = "Authentication failed. Please log in again."
                     elif status_code == 422:

@@ -130,19 +130,14 @@ def fetch_dashboard_stats(
                 "error": True,
                 "status_code": resp.status_code,
                 "message": error_text,
-                "data": {}
+                "data": {},
             }
 
     except Exception as e:
         # Log the error for debugging with enhanced information
         logger.error(f"Dashboard stats: Exception occurred - {str(e)}")
         # Return a structured error response instead of None
-        return {
-            "error": True,
-            "status_code": "exception",
-            "message": str(e),
-            "data": {}
-        }
+        return {"error": True, "status_code": "exception", "message": str(e), "data": {}}
 
 
 def fetch_user_stats(
@@ -211,19 +206,14 @@ def fetch_user_stats(
                 "error": True,
                 "status_code": resp.status_code,
                 "message": error_text,
-                "data": {}
+                "data": {},
             }
 
     except Exception as e:
         # Log the error for debugging with enhanced information
         logger.error(f"User stats: Exception occurred - {str(e)}")
         # Return a structured error response instead of None
-        return {
-            "error": True,
-            "status_code": "exception",
-            "message": str(e),
-            "data": {}
-        }
+        return {"error": True, "status_code": "exception", "message": str(e), "data": {}}
 
 
 def fetch_execution_stats(
@@ -283,16 +273,14 @@ def fetch_execution_stats(
 
             logger = logging.getLogger(__name__)
             error_text = resp.text[:500] if resp.text else "No response text"
-            logger.error(
-                f"Failed to fetch execution stats: {resp.status_code} - {error_text}"
-            )
+            logger.error(f"Failed to fetch execution stats: {resp.status_code} - {error_text}")
 
             # Return a structured error response instead of None
             return {
                 "error": True,
                 "status_code": resp.status_code,
                 "message": error_text,
-                "data": {}
+                "data": {},
             }
 
     except Exception as e:
@@ -303,12 +291,7 @@ def fetch_execution_stats(
         logger.error(f"Exception fetching execution stats: {str(e)}")
 
         # Return a structured error response instead of None
-        return {
-            "error": True,
-            "status_code": "exception",
-            "message": str(e),
-            "data": {}
-        }
+        return {"error": True, "status_code": "exception", "message": str(e), "data": {}}
 
 
 def map_period_to_api_period(period):
