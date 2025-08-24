@@ -178,13 +178,7 @@ def register_callbacks(app):
                 if role in ["ADMIN", "SUPERADMIN"]:
                     row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
-                # Add actions field for the custom cell renderer
-                status = row.get("status", "")
-                cancellable_statuses = ["PENDING", "READY", "RUNNING"]
-                if status in cancellable_statuses:
-                    row["actions"] = "🛑 Cancel"
-                else:
-                    row["actions"] = "✅ Complete"
+                # No longer adding actions field since we're using status column for cancellation
 
                 # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
@@ -271,13 +265,7 @@ def register_callbacks(app):
             if role in ["ADMIN", "SUPERADMIN"]:
                 row["docker_logs"] = "Show Docker Logs"
             row["map"] = "Show Map"
-            # Add actions field for the custom cell renderer
-            status = row.get("status", "")
-            cancellable_statuses = ["PENDING", "READY", "RUNNING"]
-            if status in cancellable_statuses:
-                row["actions"] = "🛑 Cancel"
-            else:
-                row["actions"] = "✅ Complete"
+            # No longer adding actions field since we're using status column for cancellation
 
             # Format duration in Hours:Minutes:Seconds format
             if "duration" in row:
@@ -360,13 +348,7 @@ def register_callbacks(app):
                 if role in ["ADMIN", "SUPERADMIN"]:
                     row["docker_logs"] = "Show Docker Logs"
                 row["map"] = "Show Map"
-                # Add actions field for the custom cell renderer
-                status = row.get("status", "")
-                cancellable_statuses = ["PENDING", "READY", "RUNNING"]
-                if status in cancellable_statuses:
-                    row["actions"] = "🛑 Cancel"
-                else:
-                    row["actions"] = "✅ Complete"
+                # No longer adding actions field since we're using status column for cancellation
 
                 # Format duration in Hours:Minutes:Seconds format
                 if "duration" in row:
@@ -425,11 +407,13 @@ def register_callbacks(app):
             State("cancel-execution-modal", "is_open"),
             State("token-store", "data"),
             State("executions-table-state", "data"),
+            State("user-store", "data"),
+            State("role-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def show_cancel_confirmation_modal(cell, is_open, token, table_state):
-        """Show the cancel confirmation modal when cancel button is clicked."""
+    def show_cancel_confirmation_modal(cell, is_open, token, table_state, user_data, role):
+        """Show the cancel confirmation modal when status is clicked for cancellable executions."""
         print("🎯 Cancel modal callback triggered!")
         print(f"   Cell: {cell}")
 
@@ -440,15 +424,16 @@ def register_callbacks(app):
         col = cell.get("colId")
         print(f"   Column ID: {col}")
 
-        if col != "actions":
-            print("❌ Column is not 'actions', returning current state")
+        if col != "status":
+            print("❌ Column is not 'status', returning current state")
             return is_open, no_update, no_update, no_update, no_update
 
-        # Get row data - this should work exactly like the logs callback
+        # Get row data
         row_data = cell.get("data")
         execution_id = None
         script_name = "Unknown Script"
         status = "Unknown"
+        execution_user_id = None
 
         print(f"   Row data from cell: {row_data}")
 
@@ -456,8 +441,9 @@ def register_callbacks(app):
             execution_id = row_data.get("id")
             script_name = row_data.get("script_name", "Unknown Script")
             status = row_data.get("status", "Unknown")
+            execution_user_id = row_data.get("user_id")
             print(
-                f"   ✅ Got data from cell - ID: {execution_id}, Script: {script_name}, Status: {status}"
+                f"   ✅ Got data from cell - ID: {execution_id}, Script: {script_name}, Status: {status}, User: {execution_user_id}"
             )
         else:
             print("🔍 No row data in cell, trying API fallback like logs callback...")
@@ -516,8 +502,9 @@ def register_callbacks(app):
                             execution_id = execution.get("id")
                             script_name = execution.get("script_name", "Unknown Script")
                             status = execution.get("status", "Unknown")
+                            execution_user_id = execution.get("user_id")
                             print(
-                                f"   ✅ Found execution at row_in_page {row_in_page} - ID: {execution_id}, Script: {script_name}, Status: {status}"
+                                f"   ✅ Found execution at row_in_page {row_in_page} - ID: {execution_id}, Script: {script_name}, Status: {status}, User: {execution_user_id}"
                             )
                         else:
                             print(
@@ -533,7 +520,25 @@ def register_callbacks(app):
             print("❌ Still no execution_id found, returning current state")
             return is_open, no_update, no_update, no_update, no_update
 
-        print(f"✅ Success! Opening modal for execution {execution_id}")
+        # Check if status is cancellable
+        cancellable_statuses = ["READY", "PENDING", "RUNNING"]
+        if status not in cancellable_statuses:
+            print(f"❌ Status '{status}' is not cancellable, returning current state")
+            return is_open, no_update, no_update, no_update, no_update
+
+        # Check permissions: user can cancel their own tasks OR user is admin/superadmin
+        current_user_id = user_data.get("id") if user_data else None
+        is_admin = role in ["ADMIN", "SUPERADMIN"] if role else False
+
+        if not is_admin and execution_user_id != current_user_id:
+            print(
+                f"❌ Permission denied: user {current_user_id} cannot cancel execution by user {execution_user_id}"
+            )
+            return is_open, no_update, no_update, no_update, no_update
+
+        print(
+            f"✅ Permission granted and status is cancellable! Opening modal for execution {execution_id}"
+        )
 
         execution_data = {
             "id": execution_id,
@@ -777,13 +782,7 @@ def register_callbacks(app):
                     if role in ["ADMIN", "SUPERADMIN"]:
                         row["docker_logs"] = "Show Docker Logs"
                     row["map"] = "Show Map"
-                    # Add actions field for the custom cell renderer
-                    status = row.get("status", "")
-                    cancellable_statuses = ["PENDING", "READY", "RUNNING"]
-                    if status in cancellable_statuses:
-                        row["actions"] = "🛑 Cancel"
-                    else:
-                        row["actions"] = "✅ Complete"
+                    # No longer adding actions field since we're using status column for cancellation
 
                     if "duration" in row:
                         row["duration"] = format_duration(row.get("duration"))
