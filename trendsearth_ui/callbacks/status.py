@@ -1990,31 +1990,139 @@ def register_callbacks(app):
         api_environment,
     ):
         """Update enhanced statistics for ADMIN and SUPERADMIN users."""
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        # Enhanced logging for debugging token issues
+        logger.info(f"Enhanced stats update: role={role}, active_tab={active_tab}")
+        logger.info(f"Enhanced stats update: token present={'Yes' if token else 'No'}")
+        logger.info(f"Enhanced stats update: api_environment={api_environment}")
+
+        if token:
+            token_length = len(token)
+            token_segments = len(token.split('.'))
+            logger.info(f"Enhanced stats update: token length={token_length}, segments={token_segments}")
+
+            # Log first and last few characters for debugging (without exposing full token)
+            if len(token) > 20:
+                token_preview = f"{token[:10]}...{token[-10:]}"
+            else:
+                token_preview = f"{token[:5]}...{token[-5:]}"
+            logger.info(f"Enhanced stats update: token preview={token_preview}")
+        else:
+            logger.warning("Enhanced stats update: Token is None or empty!")
+
         # Guard: Skip if not logged in or not ADMIN/SUPERADMIN
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
+            logger.warning(f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}")
             return no_update, no_update, no_update
 
-        # Only update when status tab is active
-        if active_tab != "status":
-            return no_update, no_update, no_update
-
-        # Check if user has access to stats endpoints
-        stats_access, access_error = check_stats_access(token, api_environment)
-        if not stats_access:
-            access_denied_msg = html.Div(
+        # Additional token validation
+        if not token or not isinstance(token, str) or len(token.split('.')) != 3:
+            logger.error(f"Enhanced stats: Invalid token format - token type: {type(token)}, segments: {len(token.split('.')) if token else 0}")
+            error_msg = html.Div(
                 [
                     html.P(
                         "Enhanced statistics are not available.",
                         className="text-warning text-center",
                     ),
                     html.Small(
-                        access_error,
+                        "Authentication token is invalid or corrupted. Please try logging out and logging back in.",
                         className="text-muted text-center d-block",
                     ),
                 ],
                 className="p-4",
             )
-            return access_denied_msg, access_denied_msg, access_denied_msg
+            return error_msg, error_msg, error_msg
+
+        # Only update when status tab is active
+        if active_tab != "status":
+            return no_update, no_update, no_update
+
+        # Check if user has access to stats endpoints
+        logger.info("Enhanced stats: Checking stats access...")
+        stats_access, access_error = check_stats_access(token, api_environment)
+        logger.info(f"Enhanced stats: Access check result - access: {stats_access}, error: {access_error}")
+
+        if not stats_access:
+            # Provide more specific error messages based on the type of error
+            if "Authentication error" in access_error and "Not enough segments" in access_error:
+                detailed_error = html.Div(
+                    [
+                        html.P(
+                            "Enhanced statistics are not available.",
+                            className="text-warning text-center",
+                        ),
+                        html.Small(
+                            [
+                                "Authentication token appears to be corrupted. ",
+                                html.Strong("Possible solutions:"),
+                                html.Br(),
+                                "• Try refreshing the page",
+                                html.Br(),
+                                "• Log out and log back in",
+                                html.Br(),
+                                "• Clear browser cookies and cache",
+                                html.Br(),
+                                html.Br(),
+                                f"Technical details: {access_error}",
+                            ],
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            elif "SUPERADMIN privileges required" in access_error:
+                detailed_error = html.Div(
+                    [
+                        html.P(
+                            "Enhanced statistics are not available.",
+                            className="text-warning text-center",
+                        ),
+                        html.Small(
+                            [
+                                "Your account does not have sufficient privileges. ",
+                                html.Strong("Enhanced statistics require SUPERADMIN access."),
+                                html.Br(),
+                                html.Br(),
+                                "Contact your system administrator to upgrade your account permissions.",
+                                html.Br(),
+                                html.Br(),
+                                f"Current access level: {role} (SUPERADMIN required)",
+                            ],
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            else:
+                detailed_error = html.Div(
+                    [
+                        html.P(
+                            "Enhanced statistics are not available.",
+                            className="text-warning text-center",
+                        ),
+                        html.Small(
+                            [
+                                "Unable to access enhanced statistics. ",
+                                html.Strong("This may be due to:"),
+                                html.Br(),
+                                "• Insufficient user privileges (SUPERADMIN required)",
+                                html.Br(),
+                                "• API server connectivity issues",
+                                html.Br(),
+                                "• Authentication session problems",
+                                html.Br(),
+                                html.Br(),
+                                f"Technical details: {access_error}",
+                            ],
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            return detailed_error, detailed_error, detailed_error
 
         # Map UI period to API period
         api_period = map_period_to_api_period(time_period)
@@ -2039,12 +2147,25 @@ def register_callbacks(app):
             # Create summary cards
             if dashboard_data:
                 summary_cards = create_dashboard_summary_cards(dashboard_data)
+                logger.info("Enhanced stats: Dashboard summary cards created successfully")
             else:
+                logger.warning("Enhanced stats: No dashboard data available")
                 summary_cards = html.Div(
-                    "Dashboard statistics not available.", className="text-muted text-center p-4"
+                    [
+                        html.P(
+                            "Dashboard statistics not available.",
+                            className="text-muted text-center",
+                        ),
+                        html.Small(
+                            "This may be due to no data for the selected period or API access restrictions.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4"
                 )
 
             # Fetch user stats for geographic map
+            logger.info(f"Enhanced stats: Fetching user stats for period {api_period}")
             user_data = fetch_user_stats(
                 token,
                 api_environment,
@@ -2055,7 +2176,9 @@ def register_callbacks(app):
             # Create user geographic map
             if user_data:
                 user_map = create_user_geographic_map(user_data, title_suffix)
+                logger.info("Enhanced stats: User geographic map created successfully")
             else:
+                logger.warning("Enhanced stats: No user geographic data available")
                 user_map = html.Div(
                     [
                         html.P(
@@ -2063,7 +2186,17 @@ def register_callbacks(app):
                             className="text-muted text-center",
                         ),
                         html.Small(
-                            "This may be due to API access restrictions or no user data for the selected period.",
+                            [
+                                "This may be due to:",
+                                html.Br(),
+                                "• No user location data for the selected time period",
+                                html.Br(),
+                                "• User location tracking not configured",
+                                html.Br(),
+                                "• API access restrictions",
+                                html.Br(),
+                                "• Data processing delays",
+                            ],
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -2071,6 +2204,7 @@ def register_callbacks(app):
                 )
 
             # Fetch execution stats for additional charts
+            logger.info(f"Enhanced stats: Fetching execution stats for period {api_period}")
             execution_data = fetch_execution_stats(
                 token,
                 api_environment,
@@ -2085,22 +2219,38 @@ def register_callbacks(app):
             if execution_data:
                 exec_charts = create_execution_statistics_chart(execution_data, title_suffix)
                 additional_charts.extend(exec_charts)
+                logger.info("Enhanced stats: Execution charts created successfully")
+            else:
+                logger.warning("Enhanced stats: No execution data available")
 
             # User statistics
             if user_data:
                 user_charts = create_user_statistics_chart(user_data, title_suffix)
                 additional_charts.extend(user_charts)
+                logger.info("Enhanced stats: User charts created successfully")
 
             if not additional_charts:
+                logger.warning("Enhanced stats: No additional charts data available")
                 additional_charts = [
                     html.Div(
                         [
                             html.P(
-                                "Additional statistics not available for this period.",
+                                "Detailed analytics not available for this period.",
                                 className="text-muted text-center",
                             ),
                             html.Small(
-                                "This may be due to API access restrictions, no data for the selected period, or data format issues.",
+                                [
+                                    "This may be due to:",
+                                    html.Br(),
+                                    "• No execution or user activity data for the selected time period",
+                                    html.Br(),
+                                    "• API access restrictions or server processing delays",
+                                    html.Br(),
+                                    "• Data collection not configured or temporarily unavailable",
+                                    html.Br(),
+                                    html.Br(),
+                                    f"Selected period: {time_period.title()}{title_suffix}",
+                                ],
                                 className="text-muted text-center d-block",
                             ),
                         ],
@@ -2108,6 +2258,7 @@ def register_callbacks(app):
                     )
                 ]
 
+            logger.info("Enhanced stats: Successfully completed stats update")
             return summary_cards, user_map, html.Div(additional_charts)
 
         except Exception as e:
