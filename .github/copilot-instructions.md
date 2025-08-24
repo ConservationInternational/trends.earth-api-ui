@@ -137,6 +137,7 @@ tests/
 ### Code Quality
 - **Linting**: Ruff with strict configuration (line length 100, comprehensive rules)
 - **Formatting**: Ruff format (double quotes, 4-space indent)
+- **PR Requirements**: `ruff check` and `ruff format --check` MUST always pass on any new PR
 - **Testing**: Comprehensive test coverage with unit/integration/functional split
 - **Markers**: Tests use pytest markers (`unit`, `integration`, `functional`, `slow`)
 
@@ -193,9 +194,11 @@ For any new coding session:
 1. ✅ `poetry install --with dev`
 2. ✅ `poetry run python -m pytest tests/unit/ -v` (quick validation)
 3. ✅ `poetry run ruff check trendsearth_ui/ tests/` (linting check)
-4. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
-5. ✅ Make your changes
-6. ✅ `poetry run python -m pytest tests/unit/ -v` (validate changes)
-7. ✅ `poetry run ruff check --fix trendsearth_ui/ tests/` (fix any linting)
+4. ✅ `poetry run ruff format --check trendsearth_ui/ tests/` (formatting check)
+5. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
+6. ✅ Make your changes
+7. ✅ `poetry run python -m pytest tests/unit/ -v` (validate changes)
+8. ✅ `poetry run ruff check --fix trendsearth_ui/ tests/` (fix any linting)
+9. ✅ `poetry run ruff format trendsearth_ui/ tests/` (format code)
 
 **Time estimates**: Setup (2-3 min), Unit tests (30s), Linting (10s), App startup (10s)
