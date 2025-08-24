@@ -103,13 +103,17 @@ def fetch_dashboard_stats(
         else:
             # Log the error for debugging
             import logging
+
             logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to fetch dashboard stats: {resp.status_code} - {resp.text[:200]}")
+            logger.warning(
+                f"Failed to fetch dashboard stats: {resp.status_code} - {resp.text[:200]}"
+            )
             return None
 
     except Exception as e:
         # Log the error for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"Exception fetching dashboard stats: {str(e)}")
         return None
@@ -161,6 +165,7 @@ def fetch_user_stats(
         else:
             # Log the error for debugging
             import logging
+
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to fetch user stats: {resp.status_code} - {resp.text[:200]}")
             return None
@@ -168,6 +173,7 @@ def fetch_user_stats(
     except Exception as e:
         # Log the error for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"Exception fetching user stats: {str(e)}")
         return None
@@ -227,13 +233,17 @@ def fetch_execution_stats(
         else:
             # Log the error for debugging
             import logging
+
             logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to fetch execution stats: {resp.status_code} - {resp.text[:200]}")
+            logger.warning(
+                f"Failed to fetch execution stats: {resp.status_code} - {resp.text[:200]}"
+            )
             return None
 
     except Exception as e:
         # Log the error for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"Exception fetching execution stats: {str(e)}")
         return None
@@ -275,6 +285,7 @@ def check_stats_access(token, api_environment="production"):
 
         # Log the access check result for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.info(f"Stats access check: {resp.status_code} for /stats/health")
 
@@ -297,6 +308,7 @@ def check_stats_access(token, api_environment="production"):
     except Exception as e:
         # Log the error for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"Exception checking stats access: {str(e)}")
         return False, f"Connection error: {str(e)}"
