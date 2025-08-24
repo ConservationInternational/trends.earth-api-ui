@@ -25,7 +25,7 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("role-store", "data"),
         ],
-        prevent_initial_call=True,
+        prevent_initial_call=False,
     )
     def render_tab(tab, user_data, token, role):
         from dash import no_update
