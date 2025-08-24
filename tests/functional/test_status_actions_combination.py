@@ -1,7 +1,8 @@
 """Test the combination of status and actions columns in executions table."""
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -62,16 +63,14 @@ class TestStatusActionsCombination:
         assert status_column is not None, "Status column should exist"
 
         # Check that there's NO actions column
-        actions_column = next(
-            (col for col in primary_columns if col["field"] == "actions"), None
-        )
+        actions_column = next((col for col in primary_columns if col["field"] == "actions"), None)
         assert actions_column is None, "Actions column should not exist"
 
         # Check that status column has cursor pointer (indicating clickability)
         assert "cursor" in status_column.get("cellStyle", {}), "Status column should be clickable"
-        assert (
-            status_column["cellStyle"]["cursor"] == "pointer"
-        ), "Status column should have pointer cursor"
+        assert status_column["cellStyle"]["cursor"] == "pointer", (
+            "Status column should have pointer cursor"
+        )
 
     def test_status_click_permission_own_task_regular_user(
         self, mock_cell_click_status_ready, mock_user_data
@@ -92,9 +91,9 @@ class TestStatusActionsCombination:
         assert status in cancellable_statuses, "Status should be cancellable"
 
         # Check permission (own task)
-        assert (
-            is_admin or execution_user_id == current_user_id
-        ), "User should have permission to cancel their own task"
+        assert is_admin or execution_user_id == current_user_id, (
+            "User should have permission to cancel their own task"
+        )
 
     def test_status_click_permission_denied_other_user_task(
         self, mock_cell_click_status_ready, mock_other_user_data
@@ -111,9 +110,9 @@ class TestStatusActionsCombination:
         # Check permission (other user's task)
         assert execution_user_id != current_user_id, "Should be different users"
         assert not is_admin, "Should not be admin"
-        assert not (
-            is_admin or execution_user_id == current_user_id
-        ), "User should NOT have permission to cancel other user's task"
+        assert not (is_admin or execution_user_id == current_user_id), (
+            "User should NOT have permission to cancel other user's task"
+        )
 
     def test_status_click_permission_admin_can_cancel_any_task(
         self, mock_cell_click_status_ready, mock_other_user_data
@@ -130,9 +129,9 @@ class TestStatusActionsCombination:
         # Check permission (admin can cancel any task)
         assert execution_user_id != current_user_id, "Should be different users"
         assert is_admin, "Should be admin"
-        assert (
-            is_admin or execution_user_id == current_user_id
-        ), "Admin should have permission to cancel any user's task"
+        assert is_admin or execution_user_id == current_user_id, (
+            "Admin should have permission to cancel any user's task"
+        )
 
     def test_status_click_non_cancellable_status(self, mock_cell_click_status_finished):
         """Test that finished status is not cancellable."""
