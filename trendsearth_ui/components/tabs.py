@@ -708,7 +708,6 @@ def status_tab_content(is_admin, role=None):
                 ],
                 className="mb-4",
             ),
-
             # Status charts
             dbc.Card(
                 [

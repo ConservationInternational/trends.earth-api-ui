@@ -108,15 +108,17 @@ class TestEnhancedStatsIntegration:
         for call in callback_calls:
             if len(call[0]) > 0:  # Check if there are positional arguments
                 outputs = call[0][0]  # First argument should be outputs
-                if hasattr(outputs, '__iter__'):
+                if hasattr(outputs, "__iter__"):
                     output_ids = []
                     for output in outputs:
-                        if hasattr(output, 'component_id'):
+                        if hasattr(output, "component_id"):
                             output_ids.append(output.component_id)
 
-                    if ('stats-summary-cards' in output_ids and
-                        'stats-user-map' in output_ids and
-                        'stats-additional-charts' in output_ids):
+                    if (
+                        "stats-summary-cards" in output_ids
+                        and "stats-user-map" in output_ids
+                        and "stats-additional-charts" in output_ids
+                    ):
                         enhanced_stats_registered = True
                         break
 
