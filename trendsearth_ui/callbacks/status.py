@@ -10,6 +10,7 @@ import requests
 
 from ..config import get_api_base
 from ..utils.stats_utils import (
+    check_stats_access,
     fetch_dashboard_stats,
     fetch_execution_stats,
     fetch_user_stats,
@@ -2014,8 +2015,8 @@ def register_callbacks(app):
         else:
             logger.warning("Enhanced stats update: Token is None or empty!")
 
-        # Guard: Skip if not logged in or not SUPERADMIN (API requires SUPERADMIN only)
-        if not token or role != "SUPERADMIN":
+        # Guard: Skip if not logged in or not ADMIN/SUPERADMIN (consistent with UI access control)
+        if not token or role not in ["ADMIN", "SUPERADMIN"]:
             logger.warning(
                 f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}"
             )
@@ -2045,10 +2046,26 @@ def register_callbacks(app):
         if active_tab != "status":
             return no_update, no_update, no_update
 
-        # Skip the check_stats_access call since it creates a circular dependency
-        # (it tries to access /stats/health which also requires SUPERADMIN privileges)
-        # Instead, we'll let the actual API calls handle authentication errors
-        logger.info("Enhanced stats: Proceeding with API calls (SUPERADMIN role verified)")
+        # Check if user has proper access to stats endpoints
+        access_granted, access_message = check_stats_access(token, api_environment)
+        if not access_granted:
+            logger.warning(f"Enhanced stats: Access check failed - {access_message}")
+            error_msg = html.Div(
+                [
+                    html.P(
+                        "Enhanced statistics are not available.",
+                        className="text-warning text-center",
+                    ),
+                    html.Small(
+                        f"Access check failed: {access_message}",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
+            return error_msg, error_msg, error_msg
+
+        logger.info("Enhanced stats: Access granted, proceeding with API calls")
 
         # Map UI period to API period
         api_period = map_period_to_api_period(time_period)
@@ -2063,11 +2080,12 @@ def register_callbacks(app):
 
         try:
             # Fetch dashboard stats for summary cards
+            # Try without include_sections first to see if that's causing issues
             dashboard_data = fetch_dashboard_stats(
                 token,
                 api_environment,
                 api_period,
-                include_sections=["summary", "trends", "geographic"],
+                include_sections=None,  # Try without filtering to get all available data
             )
 
             # Create summary cards
