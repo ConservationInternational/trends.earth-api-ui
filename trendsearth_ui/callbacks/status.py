@@ -2153,11 +2153,29 @@ def register_callbacks(app):
             )
 
             # Create summary cards
-            if dashboard_data:
+            if dashboard_data and not dashboard_data.get("error", False):
                 summary_cards = create_dashboard_summary_cards(dashboard_data)
                 logger.info("Enhanced stats: Dashboard summary cards created successfully")
             else:
                 logger.warning("Enhanced stats: No dashboard data available")
+
+                # Show specific error message if we have API error information
+                if dashboard_data and dashboard_data.get("error", False):
+                    error_msg = dashboard_data.get("message", "Unknown API error")
+                    status_code = dashboard_data.get("status_code", "unknown")
+                    logger.error(f"Enhanced stats: Dashboard API error {status_code}: {error_msg}")
+
+                    if status_code == 403:
+                        error_detail = "You need SUPERADMIN privileges to access dashboard statistics."
+                    elif status_code == 401:
+                        error_detail = "Authentication failed. Please log in again."
+                    elif status_code == 422:
+                        error_detail = "Invalid authentication token format."
+                    else:
+                        error_detail = f"API error ({status_code}): {error_msg}"
+                else:
+                    error_detail = "No dashboard data available for the selected period."
+
                 summary_cards = html.Div(
                     [
                         html.P(
@@ -2165,7 +2183,7 @@ def register_callbacks(app):
                             className="text-muted text-center",
                         ),
                         html.Small(
-                            "This may be due to no data for the selected period or API access restrictions.",
+                            error_detail,
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -2182,29 +2200,37 @@ def register_callbacks(app):
             )
 
             # Create user geographic map
-            if user_data:
+            if user_data and not user_data.get("error", False):
                 user_map = create_user_geographic_map(user_data, title_suffix)
                 logger.info("Enhanced stats: User geographic map created successfully")
             else:
                 logger.warning("Enhanced stats: No user geographic data available")
+
+                # Show specific error message if we have API error information
+                if user_data and user_data.get("error", False):
+                    error_msg = user_data.get("message", "Unknown API error")
+                    status_code = user_data.get("status_code", "unknown")
+                    logger.error(f"Enhanced stats: API error {status_code}: {error_msg}")
+
+                    if status_code == 403:
+                        error_detail = "You need SUPERADMIN privileges to access geographic user data."
+                    elif status_code == 401:
+                        error_detail = "Authentication failed. Please log in again."
+                    elif status_code == 422:
+                        error_detail = "Invalid authentication token format."
+                    else:
+                        error_detail = f"API error ({status_code}): {error_msg}"
+                else:
+                    error_detail = "No user geographic data available for this period."
+
                 user_map = html.Div(
                     [
                         html.P(
-                            "User geographic data not available.",
+                            "No geographic user data available.",
                             className="text-muted text-center",
                         ),
                         html.Small(
-                            [
-                                "This may be due to:",
-                                html.Br(),
-                                "• No user location data for the selected time period",
-                                html.Br(),
-                                "• User location tracking not configured",
-                                html.Br(),
-                                "• API access restrictions",
-                                html.Br(),
-                                "• Data processing delays",
-                            ],
+                            error_detail,
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -2224,41 +2250,55 @@ def register_callbacks(app):
             additional_charts = []
 
             # Execution statistics
-            if execution_data:
+            if execution_data and not execution_data.get("error", False):
                 exec_charts = create_execution_statistics_chart(execution_data, title_suffix)
                 additional_charts.extend(exec_charts)
                 logger.info("Enhanced stats: Execution charts created successfully")
             else:
-                logger.warning("Enhanced stats: No execution data available")
+                if execution_data and execution_data.get("error", False):
+                    error_msg = execution_data.get("message", "Unknown API error")
+                    status_code = execution_data.get("status_code", "unknown")
+                    logger.error(f"Enhanced stats: Execution data API error {status_code}: {error_msg}")
+                else:
+                    logger.warning("Enhanced stats: No execution data available")
 
             # User statistics
-            if user_data:
+            if user_data and not user_data.get("error", False):
                 user_charts = create_user_statistics_chart(user_data, title_suffix)
                 additional_charts.extend(user_charts)
                 logger.info("Enhanced stats: User charts created successfully")
 
             if not additional_charts:
                 logger.warning("Enhanced stats: No additional charts data available")
+
+                # Check if we have specific error information
+                error_detail = None
+                if user_data and user_data.get("error", False):
+                    error_msg = user_data.get("message", "Unknown API error")
+                    status_code = user_data.get("status_code", "unknown")
+                    logger.error(f"Enhanced stats: User data API error {status_code}: {error_msg}")
+
+                    if status_code == 403:
+                        error_detail = "You need SUPERADMIN privileges to access detailed analytics."
+                    elif status_code == 401:
+                        error_detail = "Authentication failed. Please log in again."
+                    elif status_code == 422:
+                        error_detail = "Invalid authentication token format."
+                    else:
+                        error_detail = f"API error ({status_code}): {error_msg}"
+
+                if not error_detail:
+                    error_detail = f"No data available for the selected timeframe ({time_period.title()}{title_suffix})."
+
                 additional_charts = [
                     html.Div(
                         [
                             html.P(
-                                "Detailed analytics not available for this period.",
+                                "No chart data available for this period.",
                                 className="text-muted text-center",
                             ),
                             html.Small(
-                                [
-                                    "This may be due to:",
-                                    html.Br(),
-                                    "• No execution or user activity data for the selected time period",
-                                    html.Br(),
-                                    "• API access restrictions or server processing delays",
-                                    html.Br(),
-                                    "• Data collection not configured or temporarily unavailable",
-                                    html.Br(),
-                                    html.Br(),
-                                    f"Selected period: {time_period.title()}{title_suffix}",
-                                ],
+                                error_detail,
                                 className="text-muted text-center d-block",
                             ),
                         ],
