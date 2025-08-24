@@ -28,7 +28,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                         "No geographic user data available.", className="text-muted text-center"
                     ),
                     html.Small(
-                        "User location data may not be configured.",
+                        "User location data may not be configured, or you may need SUPERADMIN privileges to access this data.",
                         className="text-muted text-center d-block",
                     ),
                 ],
@@ -44,7 +44,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                 [
                     html.P("No country data available.", className="text-muted text-center"),
                     html.Small(
-                        "User country information not available for this period.",
+                        "User country information not available for this period. This may be due to insufficient privileges or no user data for the selected timeframe.",
                         className="text-muted text-center d-block",
                     ),
                 ],
@@ -245,8 +245,17 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
             if charts
             else [
                 html.Div(
-                    "No chart data available for this period.",
-                    className="text-muted text-center p-4",
+                    [
+                        html.P(
+                            "No chart data available for this period.",
+                            className="text-muted text-center",
+                        ),
+                        html.Small(
+                            "This may be due to insufficient privileges, no data for the selected timeframe, or API access restrictions.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
                 )
             ]
         )
@@ -403,8 +412,17 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
             if charts
             else [
                 html.Div(
-                    "No chart data available for this period.",
-                    className="text-muted text-center p-4",
+                    [
+                        html.P(
+                            "No chart data available for this period.",
+                            className="text-muted text-center",
+                        ),
+                        html.Small(
+                            "This may be due to insufficient privileges, no data for the selected timeframe, or API access restrictions.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
                 )
             ]
         )

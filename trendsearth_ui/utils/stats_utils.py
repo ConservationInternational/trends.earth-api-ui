@@ -262,23 +262,41 @@ def check_stats_access(token, api_environment="production"):
         api_environment: API environment (production/staging)
 
     Returns:
-        bool: True if user has access to stats endpoints
+        tuple: (bool, str) - (access_granted, error_message)
     """
+    if not token:
+        return False, "No authentication token provided"
+
     try:
         headers = {"Authorization": f"Bearer {token}"}
         resp = requests.get(
             f"{get_api_base(api_environment)}/stats/health", headers=headers, timeout=5
         )
+
         # Log the access check result for debugging
         import logging
         logger = logging.getLogger(__name__)
         logger.info(f"Stats access check: {resp.status_code} for /stats/health")
-        if resp.status_code != 200:
+
+        if resp.status_code == 200:
+            return True, "Access granted"
+        elif resp.status_code == 401:
+            logger.warning("Stats access denied: 401 - Authentication required")
+            return False, "Authentication required"
+        elif resp.status_code == 403:
+            logger.warning("Stats access denied: 403 - SUPERADMIN privileges required")
+            return False, "SUPERADMIN privileges required"
+        elif resp.status_code == 422:
+            error_detail = resp.text[:200] if resp.text else "Invalid token format"
+            logger.warning(f"Stats access denied: 422 - {error_detail}")
+            return False, f"Authentication error: {error_detail}"
+        else:
             logger.warning(f"Stats access denied: {resp.status_code} - {resp.text[:200]}")
-        return resp.status_code == 200
+            return False, f"Server error (status {resp.status_code})"
+
     except Exception as e:
         # Log the error for debugging
         import logging
         logger = logging.getLogger(__name__)
         logger.warning(f"Exception checking stats access: {str(e)}")
-        return False
+        return False, f"Connection error: {str(e)}"
