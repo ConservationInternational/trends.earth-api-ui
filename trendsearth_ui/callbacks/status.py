@@ -1958,7 +1958,7 @@ def register_callbacks(app):
 
         return classes[0], classes[1], classes[2], active_tab
 
-    # Enhanced Statistics Callbacks for SUPERADMIN users
+    # Enhanced Statistics Callbacks for ADMIN and SUPERADMIN users
     @app.callback(
         [
             Output("stats-summary-cards", "children"),
@@ -1989,9 +1989,9 @@ def register_callbacks(app):
         role,
         api_environment,
     ):
-        """Update enhanced statistics for SUPERADMIN users."""
-        # Guard: Skip if not logged in or not SUPERADMIN
-        if not token or role != "SUPERADMIN":
+        """Update enhanced statistics for ADMIN and SUPERADMIN users."""
+        # Guard: Skip if not logged in or not ADMIN/SUPERADMIN
+        if not token or role not in ["ADMIN", "SUPERADMIN"]:
             return no_update, no_update, no_update
 
         # Only update when status tab is active
