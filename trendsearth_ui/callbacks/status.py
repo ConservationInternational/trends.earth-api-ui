@@ -2001,8 +2001,10 @@ def register_callbacks(app):
 
         if token:
             token_length = len(token)
-            token_segments = len(token.split('.'))
-            logger.info(f"Enhanced stats update: token length={token_length}, segments={token_segments}")
+            token_segments = len(token.split("."))
+            logger.info(
+                f"Enhanced stats update: token length={token_length}, segments={token_segments}"
+            )
 
             # Log first and last few characters for debugging (without exposing full token)
             if len(token) > 20:
@@ -2015,12 +2017,16 @@ def register_callbacks(app):
 
         # Guard: Skip if not logged in or not ADMIN/SUPERADMIN
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            logger.warning(f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}")
+            logger.warning(
+                f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}"
+            )
             return no_update, no_update, no_update
 
         # Additional token validation
-        if not token or not isinstance(token, str) or len(token.split('.')) != 3:
-            logger.error(f"Enhanced stats: Invalid token format - token type: {type(token)}, segments: {len(token.split('.')) if token else 0}")
+        if not token or not isinstance(token, str) or len(token.split(".")) != 3:
+            logger.error(
+                f"Enhanced stats: Invalid token format - token type: {type(token)}, segments: {len(token.split('.')) if token else 0}"
+            )
             error_msg = html.Div(
                 [
                     html.P(
@@ -2043,7 +2049,9 @@ def register_callbacks(app):
         # Check if user has access to stats endpoints
         logger.info("Enhanced stats: Checking stats access...")
         stats_access, access_error = check_stats_access(token, api_environment)
-        logger.info(f"Enhanced stats: Access check result - access: {stats_access}, error: {access_error}")
+        logger.info(
+            f"Enhanced stats: Access check result - access: {stats_access}, error: {access_error}"
+        )
 
         if not stats_access:
             # Provide more specific error messages based on the type of error
@@ -2161,7 +2169,7 @@ def register_callbacks(app):
                             className="text-muted text-center d-block",
                         ),
                     ],
-                    className="p-4"
+                    className="p-4",
                 )
 
             # Fetch user stats for geographic map

@@ -128,9 +128,17 @@ tests/
 
 ### GitHub Workflows
 - `.github/workflows/tests.yml` - Run tests on Python 3.11, 3.12
-- `.github/workflows/quality.yml` - Ruff linting and formatting
+- `.github/workflows/quality.yml` - Ruff linting and formatting (**ENFORCED**)
 - `.github/workflows/deploy.yml` - AWS ECS deployment
 - `.github/workflows/rollback.yml` - Production rollback
+
+### Copilot Agent Workflow Integration
+**When using Copilot agents or automated tools:**
+1. **Always** run quality checks after making code changes and before using `report_progress`
+2. **Never** commit code that fails `ruff check` or `ruff format --check`
+3. **Use** `poetry run ruff check --fix` and `poetry run ruff format` to auto-fix issues
+4. **Verify** all checks pass with the verification commands before committing
+5. **Include** quality check results in PR descriptions when relevant
 
 ## Key Development Guidelines
 
@@ -140,6 +148,17 @@ tests/
 - **PR Requirements**: `ruff check` and `ruff format --check` MUST always pass on any new PR
 - **Testing**: Comprehensive test coverage with unit/integration/functional split
 - **Markers**: Tests use pytest markers (`unit`, `integration`, `functional`, `slow`)
+
+#### MANDATORY Code Quality Workflow
+**CRITICAL**: All code changes MUST pass these quality checks before any commit or PR:
+
+1. **Auto-fix linting issues**: `poetry run ruff check --fix trendsearth_ui/ tests/`
+2. **Auto-format code**: `poetry run ruff format trendsearth_ui/ tests/`
+3. **Verify linting passes**: `poetry run ruff check trendsearth_ui/ tests/`
+4. **Verify formatting passes**: `poetry run ruff format --check trendsearth_ui/ tests/`
+5. **Run unit tests**: `poetry run python -m pytest tests/unit/ -v`
+
+**If any step fails, fix the issues before proceeding. The GitHub Actions quality workflow will fail if these checks don't pass.**
 
 ### API Configuration
 - **Multi-environment**: Production and staging API environments
@@ -190,15 +209,22 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 
 ## Quick Start Checklist
 
-For any new coding session:
+**MANDATORY PRE-DEVELOPMENT SETUP:**
 1. ✅ `poetry install --with dev`
 2. ✅ `poetry run python -m pytest tests/unit/ -v` (quick validation)
 3. ✅ `poetry run ruff check trendsearth_ui/ tests/` (linting check)
 4. ✅ `poetry run ruff format --check trendsearth_ui/ tests/` (formatting check)
 5. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
+
+**DEVELOPMENT WORKFLOW:**
 6. ✅ Make your changes
-7. ✅ `poetry run python -m pytest tests/unit/ -v` (validate changes)
-8. ✅ `poetry run ruff check --fix trendsearth_ui/ tests/` (fix any linting)
-9. ✅ `poetry run ruff format trendsearth_ui/ tests/` (format code)
+7. ✅ **MANDATORY BEFORE ANY COMMIT:**
+   - `poetry run ruff check --fix trendsearth_ui/ tests/` (auto-fix linting)
+   - `poetry run ruff format trendsearth_ui/ tests/` (auto-format code)
+   - `poetry run ruff check trendsearth_ui/ tests/` (verify linting passes)
+   - `poetry run ruff format --check trendsearth_ui/ tests/` (verify formatting passes)
+   - `poetry run python -m pytest tests/unit/ -v` (validate changes)
 
 **Time estimates**: Setup (2-3 min), Unit tests (30s), Linting (10s), App startup (10s)
+
+**FAILURE POLICY**: If any quality check fails, the PR will be rejected by GitHub Actions. Always run the mandatory quality checks before using `report_progress` to commit changes.
