@@ -2058,7 +2058,10 @@ def register_callbacks(app):
             else:
                 user_map = html.Div(
                     [
-                        html.P("User geographic data not available.", className="text-muted text-center"),
+                        html.P(
+                            "User geographic data not available.",
+                            className="text-muted text-center",
+                        ),
                         html.Small(
                             "This may be due to API access restrictions or no user data for the selected period.",
                             className="text-muted text-center d-block",
