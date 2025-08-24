@@ -76,10 +76,25 @@ def fetch_dashboard_stats(
     Returns:
         dict: Dashboard statistics data or None if error
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     # Check cache first
     cached_data = get_cached_stats_data("dashboard", period)
     if cached_data is not None:
+        logger.info(f"Dashboard stats: Returning cached data for period {period}")
         return cached_data
+
+    # Enhanced logging for debugging
+    logger.info(f"Dashboard stats: Fetching data for period={period}, environment={api_environment}")
+    if token:
+        token_length = len(token)
+        token_segments = len(token.split('.'))
+        logger.info(f"Dashboard stats: token length={token_length}, segments={token_segments}")
+    else:
+        logger.warning("Dashboard stats: No token provided")
+        return None
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -88,34 +103,28 @@ def fetch_dashboard_stats(
         if include_sections:
             params["include"] = ",".join(include_sections)
 
-        resp = requests.get(
-            f"{get_api_base(api_environment)}/stats/dashboard",
-            headers=headers,
-            params=params,
-            timeout=10,
-        )
+        api_url = f"{get_api_base(api_environment)}/stats/dashboard"
+        logger.info(f"Dashboard stats: Making request to {api_url} with params {params}")
+
+        resp = requests.get(api_url, headers=headers, params=params, timeout=10)
+
+        logger.info(f"Dashboard stats: Response status {resp.status_code}")
 
         if resp.status_code == 200:
             data = resp.json()
+            logger.info(f"Dashboard stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
             # Cache the result
             set_cached_stats_data("dashboard", data, period, ttl=300)
             return data
         else:
             # Log the error for debugging
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                f"Failed to fetch dashboard stats: {resp.status_code} - {resp.text[:200]}"
-            )
+            error_text = resp.text[:500] if resp.text else "No response text"
+            logger.warning(f"Dashboard stats: Failed with status {resp.status_code} - {error_text}")
             return None
 
     except Exception as e:
         # Log the error for debugging
-        import logging
-
-        logger = logging.getLogger(__name__)
-        logger.warning(f"Exception fetching dashboard stats: {str(e)}")
+        logger.warning(f"Dashboard stats: Exception occurred - {str(e)}")
         return None
 
 
@@ -135,13 +144,21 @@ def fetch_user_stats(
     Returns:
         dict: User statistics data or None if error
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     # Create cache key based on parameters
     cache_period = f"{period}_{group_by}_{country or 'all'}"
 
     # Check cache first
     cached_data = get_cached_stats_data("users", cache_period)
     if cached_data is not None:
+        logger.info(f"User stats: Returning cached data for period {cache_period}")
         return cached_data
+
+    # Enhanced logging for debugging
+    logger.info(f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}")
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -150,32 +167,28 @@ def fetch_user_stats(
         if country:
             params["country"] = country
 
-        resp = requests.get(
-            f"{get_api_base(api_environment)}/stats/users",
-            headers=headers,
-            params=params,
-            timeout=10,
-        )
+        api_url = f"{get_api_base(api_environment)}/stats/users"
+        logger.info(f"User stats: Making request to {api_url} with params {params}")
+
+        resp = requests.get(api_url, headers=headers, params=params, timeout=10)
+
+        logger.info(f"User stats: Response status {resp.status_code}")
 
         if resp.status_code == 200:
             data = resp.json()
+            logger.info(f"User stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
             # Cache the result
             set_cached_stats_data("users", data, cache_period, ttl=300)
             return data
         else:
             # Log the error for debugging
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to fetch user stats: {resp.status_code} - {resp.text[:200]}")
+            error_text = resp.text[:500] if resp.text else "No response text"
+            logger.warning(f"User stats: Failed with status {resp.status_code} - {error_text}")
             return None
 
     except Exception as e:
         # Log the error for debugging
-        import logging
-
-        logger = logging.getLogger(__name__)
-        logger.warning(f"Exception fetching user stats: {str(e)}")
+        logger.warning(f"User stats: Exception occurred - {str(e)}")
         return None
 
 
@@ -274,41 +287,56 @@ def check_stats_access(token, api_environment="production"):
     Returns:
         tuple: (bool, str) - (access_granted, error_message)
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # Enhanced logging for token debugging
     if not token:
+        logger.warning("Stats access check: No token provided")
         return False, "No authentication token provided"
+
+    # Log token information for debugging (without exposing the actual token)
+    token_length = len(token) if token else 0
+    token_segments = len(token.split('.')) if token else 0
+    logger.info(f"Stats access check: Token length={token_length}, segments={token_segments}")
+
+    # Validate token format before making API call
+    if token_segments != 3:
+        logger.warning(f"Stats access check: Invalid JWT format - expected 3 segments, got {token_segments}")
+        return False, f"Invalid JWT token format (has {token_segments} segments, expected 3)"
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        resp = requests.get(
-            f"{get_api_base(api_environment)}/stats/health", headers=headers, timeout=5
-        )
+        api_url = f"{get_api_base(api_environment)}/stats/health"
+        logger.info(f"Stats access check: Making request to {api_url}")
+
+        resp = requests.get(api_url, headers=headers, timeout=5)
 
         # Log the access check result for debugging
-        import logging
-
-        logger = logging.getLogger(__name__)
         logger.info(f"Stats access check: {resp.status_code} for /stats/health")
 
         if resp.status_code == 200:
+            logger.info("Stats access check: Access granted")
             return True, "Access granted"
         elif resp.status_code == 401:
-            logger.warning("Stats access denied: 401 - Authentication required")
-            return False, "Authentication required"
+            error_detail = resp.text[:200] if resp.text else "Authentication required"
+            logger.warning(f"Stats access denied: 401 - {error_detail}")
+            return False, f"Authentication required: {error_detail}"
         elif resp.status_code == 403:
-            logger.warning("Stats access denied: 403 - SUPERADMIN privileges required")
-            return False, "SUPERADMIN privileges required"
+            error_detail = resp.text[:200] if resp.text else "SUPERADMIN privileges required"
+            logger.warning(f"Stats access denied: 403 - {error_detail}")
+            return False, f"SUPERADMIN privileges required: {error_detail}"
         elif resp.status_code == 422:
             error_detail = resp.text[:200] if resp.text else "Invalid token format"
             logger.warning(f"Stats access denied: 422 - {error_detail}")
             return False, f"Authentication error: {error_detail}"
         else:
-            logger.warning(f"Stats access denied: {resp.status_code} - {resp.text[:200]}")
-            return False, f"Server error (status {resp.status_code})"
+            error_detail = resp.text[:200] if resp.text else f"Server returned status {resp.status_code}"
+            logger.warning(f"Stats access denied: {resp.status_code} - {error_detail}")
+            return False, f"Server error (status {resp.status_code}): {error_detail}"
 
     except Exception as e:
         # Log the error for debugging
-        import logging
-
-        logger = logging.getLogger(__name__)
         logger.warning(f"Exception checking stats access: {str(e)}")
         return False, f"Connection error: {str(e)}"
