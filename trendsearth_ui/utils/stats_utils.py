@@ -101,9 +101,17 @@ def fetch_dashboard_stats(
             set_cached_stats_data("dashboard", data, period, ttl=300)
             return data
         else:
+            # Log the error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to fetch dashboard stats: {resp.status_code} - {resp.text[:200]}")
             return None
 
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Exception fetching dashboard stats: {str(e)}")
         return None
 
 
@@ -151,9 +159,17 @@ def fetch_user_stats(
             set_cached_stats_data("users", data, cache_period, ttl=300)
             return data
         else:
+            # Log the error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to fetch user stats: {resp.status_code} - {resp.text[:200]}")
             return None
 
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Exception fetching user stats: {str(e)}")
         return None
 
 
@@ -209,9 +225,17 @@ def fetch_execution_stats(
             set_cached_stats_data("executions", data, cache_period, ttl=300)
             return data
         else:
+            # Log the error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to fetch execution stats: {resp.status_code} - {resp.text[:200]}")
             return None
 
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Exception fetching execution stats: {str(e)}")
         return None
 
 
@@ -245,6 +269,16 @@ def check_stats_access(token, api_environment="production"):
         resp = requests.get(
             f"{get_api_base(api_environment)}/stats/health", headers=headers, timeout=5
         )
+        # Log the access check result for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Stats access check: {resp.status_code} for /stats/health")
+        if resp.status_code != 200:
+            logger.warning(f"Stats access denied: {resp.status_code} - {resp.text[:200]}")
         return resp.status_code == 200
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Exception checking stats access: {str(e)}")
         return False
