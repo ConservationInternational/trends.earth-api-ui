@@ -1999,7 +1999,8 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         # Check if user has access to stats endpoints
-        if not check_stats_access(token, api_environment):
+        stats_access, access_error = check_stats_access(token, api_environment)
+        if not stats_access:
             access_denied_msg = html.Div(
                 [
                     html.P(
@@ -2007,7 +2008,7 @@ def register_callbacks(app):
                         className="text-warning text-center",
                     ),
                     html.Small(
-                        "Stats endpoints may not be accessible or enabled.",
+                        access_error,
                         className="text-muted text-center d-block",
                     ),
                 ],
@@ -2056,7 +2057,14 @@ def register_callbacks(app):
                 user_map = create_user_geographic_map(user_data, title_suffix)
             else:
                 user_map = html.Div(
-                    "User geographic data not available.", className="text-muted text-center p-4"
+                    [
+                        html.P("User geographic data not available.", className="text-muted text-center"),
+                        html.Small(
+                            "This may be due to API access restrictions or no user data for the selected period.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
                 )
 
             # Fetch execution stats for additional charts
@@ -2083,8 +2091,17 @@ def register_callbacks(app):
             if not additional_charts:
                 additional_charts = [
                     html.Div(
-                        "Additional statistics not available for this period.",
-                        className="text-muted text-center p-4",
+                        [
+                            html.P(
+                                "Additional statistics not available for this period.",
+                                className="text-muted text-center",
+                            ),
+                            html.Small(
+                                "This may be due to API access restrictions, no data for the selected period, or data format issues.",
+                                className="text-muted text-center d-block",
+                            ),
+                        ],
+                        className="p-4",
                     )
                 ]
 
