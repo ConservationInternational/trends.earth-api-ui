@@ -87,10 +87,12 @@ def fetch_dashboard_stats(
         return cached_data
 
     # Enhanced logging for debugging
-    logger.info(f"Dashboard stats: Fetching data for period={period}, environment={api_environment}")
+    logger.info(
+        f"Dashboard stats: Fetching data for period={period}, environment={api_environment}"
+    )
     if token:
         token_length = len(token)
-        token_segments = len(token.split('.'))
+        token_segments = len(token.split("."))
         logger.info(f"Dashboard stats: token length={token_length}, segments={token_segments}")
     else:
         logger.warning("Dashboard stats: No token provided")
@@ -112,7 +114,9 @@ def fetch_dashboard_stats(
 
         if resp.status_code == 200:
             data = resp.json()
-            logger.info(f"Dashboard stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
+            logger.info(
+                f"Dashboard stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}"
+            )
             # Cache the result
             set_cached_stats_data("dashboard", data, period, ttl=300)
             return data
@@ -158,7 +162,9 @@ def fetch_user_stats(
         return cached_data
 
     # Enhanced logging for debugging
-    logger.info(f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}")
+    logger.info(
+        f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}"
+    )
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
@@ -176,7 +182,9 @@ def fetch_user_stats(
 
         if resp.status_code == 200:
             data = resp.json()
-            logger.info(f"User stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
+            logger.info(
+                f"User stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}"
+            )
             # Cache the result
             set_cached_stats_data("users", data, cache_period, ttl=300)
             return data
@@ -298,12 +306,14 @@ def check_stats_access(token, api_environment="production"):
 
     # Log token information for debugging (without exposing the actual token)
     token_length = len(token) if token else 0
-    token_segments = len(token.split('.')) if token else 0
+    token_segments = len(token.split(".")) if token else 0
     logger.info(f"Stats access check: Token length={token_length}, segments={token_segments}")
 
     # Validate token format before making API call
     if token_segments != 3:
-        logger.warning(f"Stats access check: Invalid JWT format - expected 3 segments, got {token_segments}")
+        logger.warning(
+            f"Stats access check: Invalid JWT format - expected 3 segments, got {token_segments}"
+        )
         return False, f"Invalid JWT token format (has {token_segments} segments, expected 3)"
 
     try:
@@ -332,7 +342,9 @@ def check_stats_access(token, api_environment="production"):
             logger.warning(f"Stats access denied: 422 - {error_detail}")
             return False, f"Authentication error: {error_detail}"
         else:
-            error_detail = resp.text[:200] if resp.text else f"Server returned status {resp.status_code}"
+            error_detail = (
+                resp.text[:200] if resp.text else f"Server returned status {resp.status_code}"
+            )
             logger.warning(f"Stats access denied: {resp.status_code} - {error_detail}")
             return False, f"Server error (status {resp.status_code}): {error_detail}"
 
