@@ -117,6 +117,29 @@ def fetch_dashboard_stats(
             logger.info(
                 f"Dashboard stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}"
             )
+
+            # Enhanced debugging: log the structure of the data to help diagnose issues
+            if isinstance(data, dict):
+                data_section = data.get("data", {})
+                if isinstance(data_section, dict):
+                    geographic_section = data_section.get("geographic", {})
+                    if isinstance(geographic_section, dict):
+                        countries_data = geographic_section.get("countries", {})
+                        logger.info(
+                            f"Dashboard stats: Geographic data structure - countries keys: {list(countries_data.keys()) if isinstance(countries_data, dict) else 'Not a dict'}"
+                        )
+                        logger.info(
+                            f"Dashboard stats: Geographic data structure - countries count: {len(countries_data) if isinstance(countries_data, dict) else 'N/A'}"
+                        )
+                    else:
+                        logger.warning(
+                            f"Dashboard stats: Geographic section is not a dict: {type(geographic_section)}"
+                        )
+                else:
+                    logger.warning(
+                        f"Dashboard stats: Data section is not a dict: {type(data_section)}"
+                    )
+
             # Cache the result
             set_cached_stats_data("dashboard", data, period, ttl=300)
             return data
@@ -193,6 +216,27 @@ def fetch_user_stats(
             logger.info(
                 f"User stats: Success - received data with keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}"
             )
+
+            # Enhanced debugging: log the structure of the data to help diagnose issues
+            if isinstance(data, dict):
+                data_section = data.get("data", {})
+                if isinstance(data_section, dict):
+                    geographic_section = data_section.get("geographic", {})
+                    if isinstance(geographic_section, dict):
+                        countries_data = geographic_section.get("countries", {})
+                        logger.info(
+                            f"User stats: Geographic data structure - countries keys: {list(countries_data.keys()) if isinstance(countries_data, dict) else 'Not a dict'}"
+                        )
+                        logger.info(
+                            f"User stats: Geographic data structure - countries count: {len(countries_data) if isinstance(countries_data, dict) else 'N/A'}"
+                        )
+                    else:
+                        logger.warning(
+                            f"User stats: Geographic section is not a dict: {type(geographic_section)}"
+                        )
+                else:
+                    logger.warning(f"User stats: Data section is not a dict: {type(data_section)}")
+
             # Cache the result
             set_cached_stats_data("users", data, cache_period, ttl=300)
             return data
