@@ -97,6 +97,51 @@ app.layout = create_main_layout()
 
 
 # Add global error handlers
+@server.errorhandler(400)
+def bad_request(error):  # noqa: ARG001
+    """Handle 400 Bad Request errors, especially JSON decode errors."""
+    from .utils.logging_config import log_exception
+
+    # Log detailed request information for debugging
+    request_info = f"Path: {flask.request.path}, Method: {flask.request.method}"
+    if flask.request.headers.get("Content-Type"):
+        request_info += f", Content-Type: {flask.request.headers.get('Content-Type')}"
+    if flask.request.headers.get("Content-Length"):
+        request_info += f", Content-Length: {flask.request.headers.get('Content-Length')}"
+    if flask.request.headers.get("User-Agent"):
+        request_info += f", User-Agent: {flask.request.headers.get('User-Agent')[:100]}"
+
+    # Try to safely read request data for debugging
+    request_data_info = ""
+    try:
+        # Get raw data without consuming the stream if possible
+        if hasattr(flask.request, "get_data"):
+            raw_data = flask.request.get_data(as_text=True)
+            if raw_data:
+                # Log first 200 chars of data for debugging, but don't log sensitive info
+                preview = raw_data[:200]
+                request_data_info = f", Data preview: {repr(preview)}"
+            else:
+                request_data_info = ", Data: <empty>"
+    except Exception as e:
+        request_data_info = f", Data read error: {str(e)}"
+
+    log_exception(logger, f"400 Bad Request: {request_info}{request_data_info}")
+
+    # Return JSON error response for API endpoints and Dash callbacks
+    if (
+        flask.request.path.startswith("/api")
+        or flask.request.path.startswith("/_dash-")
+        or flask.request.headers.get("Content-Type", "").startswith("application/json")
+    ):
+        return {
+            "status": "error",
+            "message": "Bad request: Invalid or malformed request data",
+        }, 400
+    else:
+        return "Bad request: Invalid or malformed request data", 400
+
+
 @server.errorhandler(405)
 def method_not_allowed(error):  # noqa: ARG001
     """Handle 405 Method Not Allowed errors."""
