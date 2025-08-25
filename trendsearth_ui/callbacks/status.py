@@ -2015,8 +2015,8 @@ def register_callbacks(app):
         else:
             logger.warning("Enhanced stats update: Token is None or empty!")
 
-        # Guard: Skip if not logged in or not ADMIN/SUPERADMIN (consistent with UI access control)
-        if not token or role not in ["ADMIN", "SUPERADMIN"]:
+        # Guard: Skip if not logged in or not SUPERADMIN (API requires SUPERADMIN only)
+        if not token or role != "SUPERADMIN":
             logger.warning(
                 f"Enhanced stats: Access denied - token present: {bool(token)}, role: {role}"
             )

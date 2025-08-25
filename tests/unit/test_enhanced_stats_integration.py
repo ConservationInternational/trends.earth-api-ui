@@ -16,8 +16,8 @@ class TestEnhancedStatsIntegration:
     """Test the integration of enhanced statistics in the status tab."""
 
     def test_enhanced_stats_components_in_status_tab(self):
-        """Test that enhanced statistics components are present in status tab for admin users."""
-        content = status_tab_content(is_admin=True, role="ADMIN")
+        """Test that enhanced statistics components are present in status tab for SUPERADMIN users."""
+        content = status_tab_content(is_admin=True, role="SUPERADMIN")
         content_str = str(content)
 
         # Should contain all three enhanced statistics components
@@ -56,7 +56,7 @@ class TestEnhancedStatsIntegration:
 
     def test_enhanced_stats_layout_structure(self):
         """Test the layout structure of enhanced statistics in the status tab."""
-        content = status_tab_content(is_admin=True, role="ADMIN")
+        content = status_tab_content(is_admin=True, role="SUPERADMIN")
         content_str = str(content)
 
         # Should have the enhanced statistics sections before the status trends
@@ -70,7 +70,7 @@ class TestEnhancedStatsIntegration:
 
     def test_time_period_tabs_still_present(self):
         """Test that time period tabs are still present and functional."""
-        content = status_tab_content(is_admin=True, role="ADMIN")
+        content = status_tab_content(is_admin=True, role="SUPERADMIN")
         content_str = str(content)
 
         # Should contain time period tabs
@@ -137,15 +137,19 @@ class TestEnhancedStatsIntegration:
 class TestEnhancedStatsAccessControl:
     """Test access control for enhanced statistics."""
 
-    def test_admin_has_access_to_enhanced_stats(self):
-        """Test that ADMIN users have access to enhanced statistics."""
+    def test_admin_has_no_access_to_enhanced_stats(self):
+        """Test that ADMIN users don't have access to enhanced statistics (API requires SUPERADMIN)."""
         content = status_tab_content(is_admin=True, role="ADMIN")
         content_str = str(content)
 
-        # Should contain enhanced statistics components
-        assert "stats-summary-cards" in content_str
-        assert "stats-user-map" in content_str
-        assert "stats-additional-charts" in content_str
+        # Should NOT contain enhanced statistics components for ADMIN users
+        assert "stats-summary-cards" not in content_str
+        assert "stats-user-map" not in content_str
+        assert "stats-additional-charts" not in content_str
+
+        # But should still show basic status functionality
+        assert "System Status Summary" in content_str
+        assert "System Status Trends" in content_str
 
     def test_superadmin_has_access_to_enhanced_stats(self):
         """Test that SUPERADMIN users have access to enhanced statistics."""

@@ -386,6 +386,8 @@ def check_stats_access(token, api_environment="production"):
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
+
+        # First try the most basic stats endpoint that should work
         api_url = f"{get_api_base(api_environment)}/stats/health"
         logger.info(f"Stats access check: Making request to {api_url}")
 
@@ -393,6 +395,10 @@ def check_stats_access(token, api_environment="production"):
 
         # Log the access check result for debugging
         logger.info(f"Stats access check: {resp.status_code} for /stats/health")
+
+        # Also log response content for debugging (first 200 chars)
+        response_preview = resp.text[:200] if resp.text else "No response body"
+        logger.info(f"Stats access check: Response preview: {response_preview}")
 
         if resp.status_code == 200:
             logger.info("Stats access check: Access granted")
