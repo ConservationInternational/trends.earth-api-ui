@@ -97,6 +97,36 @@ app.layout = create_main_layout()
 
 
 # Add global error handlers
+def _is_bot_request(user_agent: str) -> bool:
+    """Check if the User-Agent indicates a bot, scanner, or automated tool."""
+    if not user_agent:
+        return False
+
+    user_agent_lower = user_agent.lower()
+
+    # Known bot/scanner user agents that should not report to Rollbar
+    bot_indicators = [
+        "libredtail-http",
+        "python-requests",
+        "curl/",
+        "wget/",
+        "go-http-client",
+        "apache-httpclient",
+        "nikto",
+        "sqlmap",
+        "nuclei",
+        "masscan",
+        "nmap",
+        "scanner",
+        "bot",
+        "crawl",
+        "spider",
+        "scraper",
+    ]
+
+    return any(indicator in user_agent_lower for indicator in bot_indicators)
+
+
 @server.errorhandler(405)
 def method_not_allowed(error):  # noqa: ARG001
     """Handle 405 Method Not Allowed errors."""
@@ -109,13 +139,24 @@ def method_not_allowed(error):  # noqa: ARG001
     if flask.request.headers.get("User-Agent"):
         request_info += f", User-Agent: {flask.request.headers.get('User-Agent')[:100]}"
 
-    # Log available routes for debugging
-    route_info = []
-    for rule in server.url_map.iter_rules():
-        route_info.append(f"{rule.rule} -> {list(rule.methods)}")
+    # Check if this is a bot/scanner request
+    user_agent = flask.request.headers.get("User-Agent", "")
+    is_bot = _is_bot_request(user_agent)
 
-    log_exception(logger, f"405 Method Not Allowed: {request_info}")
-    log_exception(logger, f"Available routes: {'; '.join(route_info[:10])}")  # Log first 10 routes
+    if is_bot:
+        # For bot requests: log locally for debugging but don't report to Rollbar
+        logger.warning(f"405 Method Not Allowed (bot filtered): {request_info}")
+    else:
+        # For legitimate requests: log to both local and Rollbar
+        log_exception(logger, f"405 Method Not Allowed: {request_info}")
+
+        # Log available routes for debugging (only for legitimate requests to reduce noise)
+        route_info = []
+        for rule in server.url_map.iter_rules():
+            route_info.append(f"{rule.rule} -> {list(rule.methods)}")
+        log_exception(
+            logger, f"Available routes: {'; '.join(route_info[:10])}"
+        )  # Log first 10 routes
 
     # Return JSON error response for API endpoints or HTML for regular pages
     if flask.request.path.startswith("/api") or flask.request.headers.get(
