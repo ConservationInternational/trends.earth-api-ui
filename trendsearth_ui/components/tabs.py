@@ -623,8 +623,8 @@ def status_tab_content(is_admin, role=None):
             ]
         )
 
-    # Check if user is ADMIN for enhanced statistics
-    is_admin = role in ["ADMIN", "SUPERADMIN"]
+    # Check if user is SUPERADMIN for enhanced statistics
+    is_superadmin = role == "SUPERADMIN"
 
     return html.Div(
         [
@@ -808,7 +808,7 @@ def status_tab_content(is_admin, role=None):
                                     ),
                                     html.Hr(),
                                 ]
-                                if is_admin  # Show for all admin users
+                                if is_superadmin  # Show for SUPERADMIN users only
                                 else []
                             ),
                             # Status trends charts
