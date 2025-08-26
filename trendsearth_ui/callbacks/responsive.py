@@ -2,7 +2,7 @@
 
 from dash import Input, Output, no_update
 
-from ..utils.mobile_utils import get_responsive_grid_options
+from ..components.tabs import get_responsive_grid_options
 
 
 def register_responsive_callbacks(app):

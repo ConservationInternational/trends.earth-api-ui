@@ -65,7 +65,15 @@ def register_callbacks(app):
             # Build SQL-style filter string
             filter_sql = []
             for field, config in filter_model.items():
-                if config.get("filterType") == "text":
+                if config.get("filterType") == "set":
+                    # Set filters (checkboxes) - handle multiple selected values
+                    values = config.get("values", [])
+                    if values:
+                        # Create OR condition for multiple selected values
+                        value_conditions = [f"{field}='{val}'" for val in values]
+                        if value_conditions:
+                            filter_sql.append(f"({' OR '.join(value_conditions)})")
+                elif config.get("filterType") == "text":
                     filter_type = config.get("type", "contains")
                     val = config.get("filter", "").strip()
                     if val:
