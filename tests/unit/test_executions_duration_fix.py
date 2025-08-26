@@ -1,8 +1,10 @@
 """Tests for executions duration_raw fix."""
 
-import pytest
 from unittest.mock import patch
-from trendsearth_ui.callbacks.executions import process_execution_data, format_duration
+
+import pytest
+
+from trendsearth_ui.callbacks.executions import format_duration, process_execution_data
 
 
 class TestProcessExecutionData:
@@ -19,12 +21,12 @@ class TestProcessExecutionData:
                 "end_date": "2025-01-01T13:01:01Z",
             }
         ]
-        
+
         result = process_execution_data(executions, "USER", "UTC")
-        
+
         # Check that duration_raw was added to original data
         assert executions[0]["duration_raw"] == 3661
-        
+
         # Check that processed data has required fields
         assert len(result) == 1
         assert result[0]["duration"] == "1:01:01"  # Formatted
@@ -43,12 +45,12 @@ class TestProcessExecutionData:
                 # No duration field
             }
         ]
-        
+
         result = process_execution_data(executions, "USER", "UTC")
-        
+
         # Check that duration_raw was not added when duration is missing
         assert "duration_raw" not in executions[0]
-        
+
         # Check that processed data still works
         assert len(result) == 1
         assert result[0]["params"] == "Show Params"
@@ -63,12 +65,12 @@ class TestProcessExecutionData:
                 "start_date": "2025-01-01T12:00:00Z",
             }
         ]
-        
+
         result = process_execution_data(executions, "USER", "UTC")
-        
+
         # Check that duration_raw was not added when duration is None
         assert "duration_raw" not in executions[0]
-        
+
         # Check that processed data still works
         assert len(result) == 1
         assert result[0]["duration"] == "-"  # Formatted as dash
@@ -82,12 +84,12 @@ class TestProcessExecutionData:
                 "duration": 60,
             }
         ]
-        
+
         # Test admin user
         result_admin = process_execution_data(executions, "ADMIN", "UTC")
         assert "docker_logs" in result_admin[0]
         assert result_admin[0]["docker_logs"] == "Show Docker Logs"
-        
+
         # Test regular user
         result_user = process_execution_data(executions, "USER", "UTC")
         assert "docker_logs" not in result_user[0]
@@ -97,16 +99,16 @@ class TestProcessExecutionData:
         executions = [
             {
                 "id": "exec1",
-                "script_name": "test_script", 
+                "script_name": "test_script",
                 "status": "SUCCESS",
                 "user_id": "user123",
                 "custom_field": "custom_value",
                 "duration": 120,
             }
         ]
-        
+
         result = process_execution_data(executions, "USER", "UTC")
-        
+
         assert result[0]["id"] == "exec1"
         assert result[0]["script_name"] == "test_script"
         assert result[0]["status"] == "SUCCESS"
