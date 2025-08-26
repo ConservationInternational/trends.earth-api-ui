@@ -26,6 +26,45 @@ def format_duration(duration_seconds):
         return "-"
 
 
+def process_execution_data(executions, role, user_timezone):
+    """Process execution data consistently across all callbacks.
+
+    Args:
+        executions: List of execution dictionaries from API
+        role: User role for admin-specific fields
+        user_timezone: User's timezone for date formatting
+
+    Returns:
+        List of processed execution dictionaries ready for AG-Grid
+    """
+    # Add duration_raw field for filtering while keeping formatted display
+    for exec_row in executions:
+        if "duration" in exec_row and exec_row["duration"] is not None:
+            exec_row["duration_raw"] = exec_row["duration"]
+
+    tabledata = []
+    for exec_row in executions:
+        row = exec_row.copy()
+        row["params"] = "Show Params"
+        row["results"] = "Show Results"
+        row["logs"] = "Show Logs"
+        # Add docker logs column for admin/superadmin users only
+        if role in ["ADMIN", "SUPERADMIN"]:
+            row["docker_logs"] = "Show Docker Logs"
+        row["map"] = "Show Map"
+
+        # Format duration in Hours:Minutes:Seconds format
+        if "duration" in row:
+            row["duration"] = format_duration(row.get("duration"))
+
+        for date_col in ["start_date", "end_date"]:
+            if date_col in row:
+                row[date_col] = parse_date(row.get(date_col), user_timezone)
+        tabledata.append(row)
+
+    return tabledata
+
+
 def register_callbacks(app):
     """Register executions table callbacks."""
 
@@ -171,31 +210,8 @@ def register_callbacks(app):
             executions = result.get("data", [])
             total_rows = result.get("total", 0)
 
-            # Add duration_raw field for filtering while keeping formatted display
-            for exec_row in executions:
-                if "duration" in exec_row and exec_row["duration"] is not None:
-                    exec_row["duration_raw"] = exec_row["duration"]
-
-            tabledata = []
-            for exec_row in executions:
-                row = exec_row.copy()
-                row["params"] = "Show Params"
-                row["results"] = "Show Results"
-                row["logs"] = "Show Logs"
-                # Add docker logs column for admin/superadmin users only
-                if role in ["ADMIN", "SUPERADMIN"]:
-                    row["docker_logs"] = "Show Docker Logs"
-                row["map"] = "Show Map"
-                # No longer adding actions field since we're using status column for cancellation
-
-                # Format duration in Hours:Minutes:Seconds format
-                if "duration" in row:
-                    row["duration"] = format_duration(row.get("duration"))
-
-                for date_col in ["start_date", "end_date"]:
-                    if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col), user_timezone)
-                tabledata.append(row)
+            # Process execution data consistently
+            tabledata = process_execution_data(executions, role, user_timezone)
 
             # Store the current table state for use in modal callbacks
             table_state = {
@@ -263,26 +279,8 @@ def register_callbacks(app):
         executions = result.get("data", [])
         total_rows = result.get("total", 0)
 
-        tabledata = []
-        for exec_row in executions:
-            row = exec_row.copy()
-            row["params"] = "Show Params"
-            row["results"] = "Show Results"
-            row["logs"] = "Show Logs"
-            # Add docker logs column for admin/superadmin users only
-            if role in ["ADMIN", "SUPERADMIN"]:
-                row["docker_logs"] = "Show Docker Logs"
-            row["map"] = "Show Map"
-            # No longer adding actions field since we're using status column for cancellation
-
-            # Format duration in Hours:Minutes:Seconds format
-            if "duration" in row:
-                row["duration"] = format_duration(row.get("duration"))
-
-            for date_col in ["start_date", "end_date"]:
-                if date_col in row:
-                    row[date_col] = parse_date(row.get(date_col), user_timezone)
-            tabledata.append(row)
+        # Process execution data consistently
+        tabledata = process_execution_data(executions, role, user_timezone)
 
         # Reset countdown timer to 0 when manually refreshed
         # Return data with preserved table state
@@ -346,26 +344,8 @@ def register_callbacks(app):
             executions = result.get("data", [])
             total_rows = result.get("total", 0)
 
-            tabledata = []
-            for exec_row in executions:
-                row = exec_row.copy()
-                row["params"] = "Show Params"
-                row["results"] = "Show Results"
-                row["logs"] = "Show Logs"
-                # Add docker logs column for admin/superadmin users only
-                if role in ["ADMIN", "SUPERADMIN"]:
-                    row["docker_logs"] = "Show Docker Logs"
-                row["map"] = "Show Map"
-                # No longer adding actions field since we're using status column for cancellation
-
-                # Format duration in Hours:Minutes:Seconds format
-                if "duration" in row:
-                    row["duration"] = format_duration(row.get("duration"))
-
-                for date_col in ["start_date", "end_date"]:
-                    if date_col in row:
-                        row[date_col] = parse_date(row.get(date_col), user_timezone)
-                tabledata.append(row)
+            # Process execution data consistently
+            tabledata = process_execution_data(executions, role, user_timezone)
 
             # Preserve table state from current state
             return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
@@ -781,24 +761,8 @@ def register_callbacks(app):
                 refresh_executions = refresh_result.get("data", [])
                 total_rows = refresh_result.get("total", 0)
 
-                tabledata = []
-                for exec_row in refresh_executions:
-                    row = exec_row.copy()
-                    row["params"] = "Show Params"
-                    row["results"] = "Show Results"
-                    row["logs"] = "Show Logs"
-                    if role in ["ADMIN", "SUPERADMIN"]:
-                        row["docker_logs"] = "Show Docker Logs"
-                    row["map"] = "Show Map"
-                    # No longer adding actions field since we're using status column for cancellation
-
-                    if "duration" in row:
-                        row["duration"] = format_duration(row.get("duration"))
-
-                    for date_col in ["start_date", "end_date"]:
-                        if date_col in row:
-                            row[date_col] = parse_date(row.get(date_col), user_timezone)
-                    tabledata.append(row)
+                # Process execution data consistently
+                tabledata = process_execution_data(refresh_executions, role, user_timezone)
 
                 table_response = {"rowData": tabledata, "rowCount": total_rows}
 

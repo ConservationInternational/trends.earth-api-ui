@@ -83,7 +83,9 @@ def get_mobile_column_config():
                         "suppressAndOrCondition": True,
                     },
                     # Use valueGetter to provide raw numeric value for filtering/sorting
-                    "valueGetter": {"function": "params.data.duration_raw || params.data.duration"},
+                    "valueGetter": {
+                        "function": "(params.data && (params.data.duration_raw || params.data.duration)) || null"
+                    },
                     # Use cellRenderer to show formatted value
                     "cellRenderer": {
                         "function": "params.value ? (Math.floor(params.value/3600) + ':' + String(Math.floor((params.value%3600)/60)).padStart(2,'0') + ':' + String(params.value%60).padStart(2,'0')) : '-'"
