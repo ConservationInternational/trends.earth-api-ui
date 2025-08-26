@@ -86,11 +86,14 @@ def register_callbacks(app):
             # Build SQL-style filter string for general filters
             filter_sql = []
             for field, config in filter_model.items():
-                if field == "status" and config.get("filterType") == "text":
-                    # Status filter - can use either dedicated parameter or general filter
-                    val = config.get("filter", "").strip()
-                    if val and val.upper() in ["PENDING", "RUNNING", "FINISHED", "FAILED"]:
-                        filter_sql.append(f"status='{val.upper()}'")
+                if config.get("filterType") == "set":
+                    # Set filters (checkboxes) - handle multiple selected values
+                    values = config.get("values", [])
+                    if values:
+                        # Create OR condition for multiple selected values
+                        value_conditions = [f"{field}='{val}'" for val in values]
+                        if value_conditions:
+                            filter_sql.append(f"({' OR '.join(value_conditions)})")
                 elif config.get("filterType") == "text":
                     # General text filters (user_name, user_email, user_id, etc.)
                     filter_type = config.get("type", "contains")
@@ -107,7 +110,7 @@ def register_callbacks(app):
                         elif filter_type == "endsWith":
                             filter_sql.append(f"{field} like '%{val}'")
                 elif config.get("filterType") == "number":
-                    # Number filters
+                    # Number filters (for duration column)
                     filter_type = config.get("type", "equals")
                     val = config.get("filter")
                     if val is not None:
@@ -167,6 +170,11 @@ def register_callbacks(app):
             result = resp.json()
             executions = result.get("data", [])
             total_rows = result.get("total", 0)
+
+            # Add duration_raw field for filtering while keeping formatted display
+            for exec_row in executions:
+                if "duration" in exec_row and exec_row["duration"] is not None:
+                    exec_row["duration_raw"] = exec_row["duration"]
 
             tabledata = []
             for exec_row in executions:

@@ -77,6 +77,17 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
+                    "filter": "agNumberColumnFilter",
+                    "filterParams": {
+                        "allowedCharPattern": "[0-9]+",
+                        "suppressAndOrCondition": True,
+                    },
+                    # Use valueGetter to provide raw numeric value for filtering/sorting
+                    "valueGetter": {"function": "params.data.duration_raw || params.data.duration"},
+                    # Use cellRenderer to show formatted value
+                    "cellRenderer": {
+                        "function": "params.value ? (Math.floor(params.value/3600) + ':' + String(Math.floor((params.value%3600)/60)).padStart(2,'0') + ':' + String(params.value%60).padStart(2,'0')) : '-'"
+                    },
                 },
                 {
                     "headerName": "Status",
@@ -85,6 +96,13 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px", "cursor": "pointer"},
                     "resizable": True,
+                    "filter": "agSetColumnFilter",
+                    "filterParams": {
+                        "values": ["PENDING", "RUNNING", "SUCCESS", "FAILED", "CANCELLED"],
+                        "selectAllOnMiniFilter": True,
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                    },
                 },
             ],
             "secondary_columns": [
@@ -216,6 +234,13 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
+                    "filter": "agSetColumnFilter",
+                    "filterParams": {
+                        "values": ["USER", "ADMIN", "SUPERADMIN"],
+                        "selectAllOnMiniFilter": True,
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                    },
                 },
             ],
             "secondary_columns": [
@@ -248,6 +273,13 @@ def get_mobile_column_config():
                     "minWidth": 100,
                     "cellStyle": {"fontSize": "11px", "textAlign": "center", "cursor": "pointer"},
                     "resizable": True,
+                    "filter": "agSetColumnFilter",
+                    "filterParams": {
+                        "values": ["unrestricted", "role_restricted", "user_restricted"],
+                        "selectAllOnMiniFilter": True,
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                    },
                 },
                 {
                     "headerName": "Status",
@@ -256,6 +288,13 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
+                    "filter": "agSetColumnFilter",
+                    "filterParams": {
+                        "values": ["UPLOADED", "PUBLISHED", "UNPUBLISHED", "FAILED"],
+                        "selectAllOnMiniFilter": True,
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                    },
                 },
                 {
                     "headerName": "Created",
