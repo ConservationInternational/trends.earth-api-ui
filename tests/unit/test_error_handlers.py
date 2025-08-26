@@ -6,7 +6,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 # Import the actual app with error handlers and bot detection function
-from trendsearth_ui.app import _is_bot_request, app as main_app, server
+from trendsearth_ui.app import _is_bot_request, server
+from trendsearth_ui.app import app as main_app
 
 
 @pytest.fixture
