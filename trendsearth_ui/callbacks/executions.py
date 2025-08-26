@@ -79,10 +79,11 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("role-store", "data"),
             State("user-timezone-store", "data"),
+            State("executions-status-filter-selected", "data"),
         ],
         prevent_initial_call=False,
     )
-    def get_execution_rows(request, token, role, user_timezone):
+    def get_execution_rows(request, token, role, user_timezone, status_filter_selected):
         """Get execution data for ag-grid with infinite row model."""
         try:
             if not token:
@@ -98,6 +99,10 @@ def register_callbacks(app):
 
             sort_model = request.get("sortModel", [])
             filter_model = request.get("filterModel", {})
+
+            # Add custom filter to filter_model if active
+            if status_filter_selected:
+                filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
 
             params = {
                 "page": page,
@@ -240,10 +245,13 @@ def register_callbacks(app):
             State("role-store", "data"),
             State("executions-table-state", "data"),
             State("user-timezone-store", "data"),
+            State("executions-status-filter-selected", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_executions_table(n_clicks, token, role, table_state, user_timezone):
+    def refresh_executions_table(
+        n_clicks, token, role, table_state, user_timezone, status_filter_selected
+    ):
         """Manually refresh the executions table."""
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0, 0
@@ -267,6 +275,23 @@ def register_callbacks(app):
                 params["sort"] = table_state["sort_sql"]
             if table_state.get("filter_sql"):
                 params["filter"] = table_state["filter_sql"]
+
+        # Add custom filter from the status filter if active (similar to main callback)
+        if status_filter_selected and table_state:
+            # Add custom filter to existing table state filter logic
+            filter_model = table_state.get("filter_model", {})
+            filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
+            # Rebuild filter SQL from the updated filter model (simplified approach)
+            filter_sql = []
+            for field, config in filter_model.items():
+                if config.get("filterType") == "set":
+                    values = config.get("values", [])
+                    if values:
+                        value_conditions = [f"{field}='{val}'" for val in values]
+                        if value_conditions:
+                            filter_sql.append(f"({' OR '.join(value_conditions)})")
+            if filter_sql:
+                params["filter"] = ",".join(filter_sql)
 
         from ..utils.helpers import make_authenticated_request
 
@@ -299,11 +324,12 @@ def register_callbacks(app):
             State("active-tab-store", "data"),
             State("executions-table-state", "data"),  # Preserve existing table state
             State("user-timezone-store", "data"),
+            State("executions-status-filter-selected", "data"),
         ],
         prevent_initial_call=True,
     )
     def auto_refresh_executions_table(
-        _n_intervals, token, role, active_tab, table_state, user_timezone
+        _n_intervals, token, role, active_tab, table_state, user_timezone, status_filter_selected
     ):
         """Auto-refresh the executions table with preserved sorting/filtering state."""
         # Guard: Skip if not logged in (prevents execution after logout)
@@ -332,6 +358,23 @@ def register_callbacks(app):
                     params["sort"] = table_state["sort_sql"]
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
+
+            # Add custom filter from the status filter if active (similar to main callback)
+            if status_filter_selected and table_state:
+                # Add custom filter to existing table state filter logic
+                filter_model = table_state.get("filter_model", {})
+                filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
+                # Rebuild filter SQL from the updated filter model (simplified approach)
+                filter_sql = []
+                for field, config in filter_model.items():
+                    if config.get("filterType") == "set":
+                        values = config.get("values", [])
+                        if values:
+                            value_conditions = [f"{field}='{val}'" for val in values]
+                            if value_conditions:
+                                filter_sql.append(f"({' OR '.join(value_conditions)})")
+                if filter_sql:
+                    params["filter"] = ",".join(filter_sql)
 
             from ..utils.helpers import make_authenticated_request
 
