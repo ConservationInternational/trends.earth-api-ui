@@ -41,6 +41,8 @@ def register_callbacks(app):
             sort_model = request.get("sortModel", [])
             filter_model = request.get("filterModel", {})
 
+            # Skip custom filters for scripts for now
+
             params = {
                 "page": page,
                 "per_page": page_size,

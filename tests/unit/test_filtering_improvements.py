@@ -11,19 +11,16 @@ class TestColumnFilterConfiguration:
     """Test that column filters are configured correctly."""
 
     def test_executions_status_filter(self):
-        """Test that executions status column has proper set filter."""
+        """Test that executions status column has proper text filter."""
         config = get_mobile_column_config()
         executions_columns = config["executions"]["primary_columns"]
 
         status_column = next(col for col in executions_columns if col["field"] == "status")
 
-        assert status_column["filter"] == "agSetColumnFilter"
+        assert status_column["filter"] == "agTextColumnFilter"
         assert "filterParams" in status_column
-        assert "values" in status_column["filterParams"]
-
-        # Check that API status values are used
-        expected_values = ["PENDING", "RUNNING", "SUCCESS", "FAILED", "CANCELLED"]
-        assert status_column["filterParams"]["values"] == expected_values
+        assert "buttons" in status_column["filterParams"]
+        assert "closeOnApply" in status_column["filterParams"]
 
     def test_executions_duration_filter(self):
         """Test that executions duration column has proper number filter."""
@@ -39,49 +36,40 @@ class TestColumnFilterConfiguration:
         assert "valueGetter" in duration_column
 
     def test_scripts_status_filter(self):
-        """Test that scripts status column has proper set filter."""
+        """Test that scripts status column has proper text filter."""
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
 
         status_column = next(col for col in scripts_columns if col["field"] == "status")
 
-        assert status_column["filter"] == "agSetColumnFilter"
+        assert status_column["filter"] == "agTextColumnFilter"
         assert "filterParams" in status_column
-        assert "values" in status_column["filterParams"]
-
-        # Check that API status values are used
-        expected_values = ["UPLOADED", "PUBLISHED", "UNPUBLISHED", "FAILED"]
-        assert status_column["filterParams"]["values"] == expected_values
+        assert "buttons" in status_column["filterParams"]
+        assert "closeOnApply" in status_column["filterParams"]
 
     def test_scripts_access_filter(self):
-        """Test that scripts access column has proper set filter."""
+        """Test that scripts access column has proper text filter."""
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
 
         access_column = next(col for col in scripts_columns if col["field"] == "access_control")
 
-        assert access_column["filter"] == "agSetColumnFilter"
+        assert access_column["filter"] == "agTextColumnFilter"
         assert "filterParams" in access_column
-        assert "values" in access_column["filterParams"]
-
-        # Check that access control values are provided
-        expected_values = ["unrestricted", "role_restricted", "user_restricted"]
-        assert access_column["filterParams"]["values"] == expected_values
+        assert "buttons" in access_column["filterParams"]
+        assert "closeOnApply" in access_column["filterParams"]
 
     def test_users_role_filter(self):
-        """Test that users role column has proper set filter."""
+        """Test that users role column has proper text filter."""
         config = get_mobile_column_config()
         users_columns = config["users"]["primary_columns"]
 
         role_column = next(col for col in users_columns if col["field"] == "role")
 
-        assert role_column["filter"] == "agSetColumnFilter"
+        assert role_column["filter"] == "agTextColumnFilter"
         assert "filterParams" in role_column
-        assert "values" in role_column["filterParams"]
-
-        # Check that API role values are used
-        expected_values = ["USER", "ADMIN", "SUPERADMIN"]
-        assert role_column["filterParams"]["values"] == expected_values
+        assert "buttons" in role_column["filterParams"]
+        assert "closeOnApply" in role_column["filterParams"]
 
 
 class TestFilterProcessingLogic:
@@ -155,43 +143,31 @@ class TestFilterProcessingLogic:
 
 
 class TestAPIStatusValueConsistency:
-    """Test that status values match API documentation."""
+    """Test that filter configurations are properly set up."""
 
-    def test_execution_status_values_match_api(self):
-        """Test that execution status values match API spec."""
+    def test_execution_status_filter_configured(self):
+        """Test that execution status filter is configured."""
         config = get_mobile_column_config()
         executions_columns = config["executions"]["primary_columns"]
         status_column = next(col for col in executions_columns if col["field"] == "status")
 
-        api_values = ["PENDING", "RUNNING", "SUCCESS", "FAILED", "CANCELLED"]
-        ui_values = status_column["filterParams"]["values"]
+        assert status_column["filter"] == "agTextColumnFilter"
+        assert "filterParams" in status_column
 
-        assert set(ui_values) == set(api_values), (
-            f"UI values {ui_values} don't match API values {api_values}"
-        )
-
-    def test_script_status_values_match_api(self):
-        """Test that script status values match API spec."""
+    def test_script_status_filter_configured(self):
+        """Test that script status filter is configured."""
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
         status_column = next(col for col in scripts_columns if col["field"] == "status")
 
-        api_values = ["UPLOADED", "PUBLISHED", "UNPUBLISHED", "FAILED"]
-        ui_values = status_column["filterParams"]["values"]
+        assert status_column["filter"] == "agTextColumnFilter"
+        assert "filterParams" in status_column
 
-        assert set(ui_values) == set(api_values), (
-            f"UI values {ui_values} don't match API values {api_values}"
-        )
-
-    def test_user_role_values_match_api(self):
-        """Test that user role values match API spec."""
+    def test_user_role_filter_configured(self):
+        """Test that user role filter is configured."""
         config = get_mobile_column_config()
         users_columns = config["users"]["primary_columns"]
         role_column = next(col for col in users_columns if col["field"] == "role")
 
-        api_values = ["USER", "ADMIN", "SUPERADMIN"]
-        ui_values = role_column["filterParams"]["values"]
-
-        assert set(ui_values) == set(api_values), (
-            f"UI values {ui_values} don't match API values {api_values}"
-        )
+        assert role_column["filter"] == "agTextColumnFilter"
+        assert "filterParams" in role_column

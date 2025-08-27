@@ -1,5 +1,7 @@
 """Visualization utilities for stats charts and maps."""
 
+import logging
+
 from dash import dcc, html
 import pandas as pd
 import plotly.graph_objects as go
