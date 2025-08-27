@@ -3,24 +3,19 @@
 [![Tests](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml)
 [![Code Quality](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml)
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Deploy Status](https://img.shields.io/badge/deployment-EC2-orange.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy.yml)
+[![Deploy Status](https://img.shields.io/badge/deployment-ECS-orange.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy.yml)
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
 ## 🚀 Deployment
 
-This application supports automatic deployment to Amazon EC2 instances using GitHub Actions. 
-
-### Configuration Documentation:
-- **[DEPLOYMENT_SECRETS.md](DEPLOYMENT_SECRETS.md)** - Required GitHub secrets and environment variables
-- **[EC2_DEPLOYMENT_SETUP.md](EC2_DEPLOYMENT_SETUP.md)** - Detailed EC2 setup instructions
+This application supports automatic deployment to Amazon ECS using GitHub Actions. 
 
 ### Available Deployment Workflows:
-- **Basic Deployment** (`deploy.yml`) - Simple deployment with process management
-- **Production Deployment** (`deploy-production.yml`) - Advanced deployment with systemd, versioning, and rollback capability
-- **Rollback** (`rollback.yml`) - Manual rollback to previous deployments
+- **ECS Deployment** (`deploy.yml`) - Production deployment with ECS, Docker, health checks, and Rollbar integration
+- **Rollback** (`rollback.yml`) - Manual rollback to previous ECS deployments
 
 ### Error Tracking
 The application includes integrated Rollbar error tracking for production monitoring and debugging.
@@ -53,8 +48,8 @@ The application includes integrated Rollbar error tracking for production monito
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd trends-earth-api-viewer
+git clone https://github.com/ConservationInternational/trends.earth-api-ui.git
+cd trends.earth-api-ui
 ```
 
 ### 2. Install Poetry
@@ -73,17 +68,12 @@ poetry install
 
 ### 4. Run the app
 
-#### Development mode (Direct Python)
-```bash
-python -m trendsearth_ui.app
-```
-
-#### Development mode (Poetry - if Poetry is properly configured)
+#### Development mode (Recommended)
 ```bash
 poetry run python -m trendsearth_ui.app
 ```
 
-#### Using Poetry script (if Poetry is properly configured)
+#### Using Poetry script
 ```bash
 poetry run trendsearth-ui
 ```
@@ -99,14 +89,14 @@ docker run -p 8000:8000 trendsearth-ui
 
 #### Production mode (Docker Compose)
 ```bash
-# Run with docker-compose
-docker-compose up -d
+# Run with docker compose
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop
-docker-compose down
+docker compose down
 ```
 
 The app will be available at:
@@ -121,39 +111,39 @@ The project includes a comprehensive test suite with unit, integration, and func
 
 ### Running Tests Locally
 
-#### Install test dependencies
+#### Install test dependencies (if not using Poetry)
 ```bash
 pip install pytest pytest-mock pytest-cov
 ```
 
 #### Run all tests
 ```bash
-python -m pytest tests/ -v
+poetry run python -m pytest tests/ -v
 ```
 
 #### Run tests by category
 ```bash
 # Unit tests only
-python -m pytest tests/unit/ -v
+poetry run python -m pytest tests/unit/ -v
 
 # Integration tests only  
-python -m pytest tests/integration/ -v
+poetry run python -m pytest tests/integration/ -v
 
 # Functional tests only
-python -m pytest tests/functional/ -v
+poetry run python -m pytest tests/functional/ -v
 
 # Playwright end-to-end tests only
-python -m pytest tests/playwright/ -v --browser chromium
+poetry run python -m pytest tests/playwright/ -v --browser chromium
 ```
 
 #### Run tests with coverage
 ```bash
-python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=html --cov-report=term-missing
+poetry run python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=html --cov-report=term-missing
 ```
 
 #### Run specific test file
 ```bash
-python -m pytest tests/unit/test_config.py -v
+poetry run python -m pytest tests/unit/test_config.py -v
 ```
 
 ### Playwright End-to-End Testing
@@ -212,29 +202,41 @@ The project uses Ruff for both linting and code formatting:
 
 ```bash
 # Lint code with Ruff
-ruff check trendsearth_ui/ tests/
+poetry run ruff check trendsearth_ui/ tests/
 
 # Format code with Ruff
-ruff format trendsearth_ui/ tests/
+poetry run ruff format trendsearth_ui/ tests/
 
 # Fix auto-fixable issues
-ruff check --fix trendsearth_ui/ tests/
+poetry run ruff check --fix trendsearth_ui/ tests/
 ```
 
 ## Configuration
 
 ### Application Configuration
-The API endpoint and authentication URL are set in `app.py`:
+The API endpoints are configured in `trendsearth_ui/config.py` with support for multiple environments:
 
 ```python
-API_BASE_URL = "https://api.trends.earth/api/v1"
-AUTH_URL = "https://api.trends.earth/auth"
+API_ENVIRONMENTS = {
+    "production": {
+        "base": "https://api.trends.earth/api/v1",
+        "auth": "https://api.trends.earth/auth",
+        "display_name": "Production (api.trends.earth)",
+    },
+    "staging": {
+        "base": "https://api-staging.trends.earth/api/v1", 
+        "auth": "https://api-staging.trends.earth/auth",
+        "display_name": "Staging (api-staging.trends.earth)",
+    },
+}
 ```
+
+Users can switch between environments via the UI, with production as the default.
 
 ### Gunicorn Configuration
 Production deployment uses Gunicorn with the configuration in `gunicorn.conf.py`. 
 Key settings:
-- 4 worker processes
+- Single worker process (required for Dash callback routing)
 - 120 second timeout
 - Bound to 0.0.0.0:8000
 - Request logging enabled
