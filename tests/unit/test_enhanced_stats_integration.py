@@ -104,20 +104,28 @@ class TestEnhancedStatsIntegration:
 
         for call in callback_calls:
             if len(call[0]) > 0:  # Check if there are positional arguments
-                outputs = call[0][0]  # First argument should be outputs
-                if hasattr(outputs, "__iter__"):
-                    output_ids = []
-                    for output in outputs:
+                # Check if outputs are in a list (first argument) or individual arguments
+                first_arg = call[0][0]
+                output_ids = []
+
+                if hasattr(first_arg, "__iter__") and not hasattr(first_arg, "component_id"):
+                    # Outputs are in a list
+                    for output in first_arg:
                         if hasattr(output, "component_id"):
                             output_ids.append(output.component_id)
+                else:
+                    # Outputs are individual arguments
+                    for arg in call[0]:
+                        if hasattr(arg, "component_id"):
+                            output_ids.append(arg.component_id)
 
-                    if (
-                        "stats-summary-cards" in output_ids
-                        and "stats-user-map" in output_ids
-                        and "stats-additional-charts" in output_ids
-                    ):
-                        enhanced_stats_registered = True
-                        break
+                if (
+                    "stats-summary-cards" in output_ids
+                    and "stats-user-map" in output_ids
+                    and "stats-additional-charts" in output_ids
+                ):
+                    enhanced_stats_registered = True
+                    break
 
         assert enhanced_stats_registered, "Enhanced statistics callback should be registered"
 
