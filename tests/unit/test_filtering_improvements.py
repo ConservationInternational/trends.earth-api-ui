@@ -11,7 +11,7 @@ class TestColumnFilterConfiguration:
     """Test that column filters are configured correctly."""
 
     def test_executions_status_filter(self):
-        """Test that executions status column has proper text filter."""
+        """Test that executions status column has proper enhanced text filter."""
         config = get_mobile_column_config()
         executions_columns = config["executions"]["primary_columns"]
 
@@ -21,6 +21,10 @@ class TestColumnFilterConfiguration:
         assert "filterParams" in status_column
         assert "buttons" in status_column["filterParams"]
         assert "closeOnApply" in status_column["filterParams"]
+        assert "caseSensitive" in status_column["filterParams"]
+        assert status_column["filterParams"]["caseSensitive"] is False
+        assert "trimInput" in status_column["filterParams"]
+        assert status_column["filterParams"]["trimInput"] is True
 
     def test_executions_duration_filter(self):
         """Test that executions duration column has proper number filter."""
@@ -36,7 +40,7 @@ class TestColumnFilterConfiguration:
         assert "valueGetter" in duration_column
 
     def test_scripts_status_filter(self):
-        """Test that scripts status column has proper text filter."""
+        """Test that scripts status column has proper enhanced text filter."""
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
 
@@ -46,9 +50,13 @@ class TestColumnFilterConfiguration:
         assert "filterParams" in status_column
         assert "buttons" in status_column["filterParams"]
         assert "closeOnApply" in status_column["filterParams"]
+        assert "caseSensitive" in status_column["filterParams"]
+        assert status_column["filterParams"]["caseSensitive"] is False
+        assert "trimInput" in status_column["filterParams"]
+        assert status_column["filterParams"]["trimInput"] is True
 
     def test_scripts_access_filter(self):
-        """Test that scripts access column has proper text filter."""
+        """Test that scripts access column has proper enhanced text filter."""
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
 
@@ -58,9 +66,13 @@ class TestColumnFilterConfiguration:
         assert "filterParams" in access_column
         assert "buttons" in access_column["filterParams"]
         assert "closeOnApply" in access_column["filterParams"]
+        assert "caseSensitive" in access_column["filterParams"]
+        assert access_column["filterParams"]["caseSensitive"] is False
+        assert "trimInput" in access_column["filterParams"]
+        assert access_column["filterParams"]["trimInput"] is True
 
     def test_users_role_filter(self):
-        """Test that users role column has proper text filter."""
+        """Test that users role column has proper enhanced text filter."""
         config = get_mobile_column_config()
         users_columns = config["users"]["primary_columns"]
 
@@ -70,6 +82,10 @@ class TestColumnFilterConfiguration:
         assert "filterParams" in role_column
         assert "buttons" in role_column["filterParams"]
         assert "closeOnApply" in role_column["filterParams"]
+        assert "caseSensitive" in role_column["filterParams"]
+        assert role_column["filterParams"]["caseSensitive"] is False
+        assert "trimInput" in role_column["filterParams"]
+        assert role_column["filterParams"]["trimInput"] is True
 
 
 class TestFilterProcessingLogic:

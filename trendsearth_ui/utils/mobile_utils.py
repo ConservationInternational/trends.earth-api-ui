@@ -102,6 +102,9 @@ def get_mobile_column_config():
                     "filterParams": {
                         "buttons": ["clear", "apply"],
                         "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
                     },
                 },
             ],
@@ -238,6 +241,9 @@ def get_mobile_column_config():
                     "filterParams": {
                         "buttons": ["clear", "apply"],
                         "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
                     },
                 },
             ],
@@ -275,6 +281,9 @@ def get_mobile_column_config():
                     "filterParams": {
                         "buttons": ["clear", "apply"],
                         "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
                     },
                 },
                 {
@@ -288,6 +297,9 @@ def get_mobile_column_config():
                     "filterParams": {
                         "buttons": ["clear", "apply"],
                         "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
                     },
                 },
                 {

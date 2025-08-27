@@ -26,18 +26,17 @@ class TestTableColumnFilterIntegration:
         # Verify column definitions include filters
         column_defs = ag_grid.columnDefs
 
-        # Find status column and verify it has set filter
+        # Find status column and verify it has enhanced text filter
         status_col = next((col for col in column_defs if col["field"] == "status"), None)
         assert status_col is not None
-        assert status_col["filter"] == "agSetColumnFilter"
+        assert status_col["filter"] == "agTextColumnFilter"
         assert "filterParams" in status_col
-        assert status_col["filterParams"]["values"] == [
-            "PENDING",
-            "RUNNING",
-            "SUCCESS",
-            "FAILED",
-            "CANCELLED",
-        ]
+        # Verify enhanced text filter parameters
+        assert status_col["filterParams"]["caseSensitive"] is False
+        assert status_col["filterParams"]["trimInput"] is True
+        assert status_col["filterParams"]["debounceMs"] == 500
+        assert "buttons" in status_col["filterParams"]
+        assert "closeOnApply" in status_col["filterParams"]
 
         # Find duration column and verify it has number filter
         duration_col = next((col for col in column_defs if col["field"] == "duration"), None)
@@ -64,28 +63,29 @@ class TestTableColumnFilterIntegration:
         # Verify column definitions include filters
         column_defs = ag_grid.columnDefs
 
-        # Find status column and verify it has set filter
+        # Find status column and verify it has enhanced text filter
         status_col = next((col for col in column_defs if col["field"] == "status"), None)
         assert status_col is not None
-        assert status_col["filter"] == "agSetColumnFilter"
+        assert status_col["filter"] == "agTextColumnFilter"
         assert "filterParams" in status_col
-        assert status_col["filterParams"]["values"] == [
-            "UPLOADED",
-            "PUBLISHED",
-            "UNPUBLISHED",
-            "FAILED",
-        ]
+        # Verify enhanced text filter parameters
+        assert status_col["filterParams"]["caseSensitive"] is False
+        assert status_col["filterParams"]["trimInput"] is True
+        assert status_col["filterParams"]["debounceMs"] == 500
+        assert "buttons" in status_col["filterParams"]
+        assert "closeOnApply" in status_col["filterParams"]
 
-        # Find access control column and verify it has set filter
+        # Find access control column and verify it has enhanced text filter
         access_col = next((col for col in column_defs if col["field"] == "access_control"), None)
         assert access_col is not None
-        assert access_col["filter"] == "agSetColumnFilter"
+        assert access_col["filter"] == "agTextColumnFilter"
         assert "filterParams" in access_col
-        assert access_col["filterParams"]["values"] == [
-            "unrestricted",
-            "role_restricted",
-            "user_restricted",
-        ]
+        # Verify enhanced text filter parameters
+        assert access_col["filterParams"]["caseSensitive"] is False
+        assert access_col["filterParams"]["trimInput"] is True
+        assert access_col["filterParams"]["debounceMs"] == 500
+        assert "buttons" in access_col["filterParams"]
+        assert "closeOnApply" in access_col["filterParams"]
 
     def test_users_table_has_filter_config(self):
         """Test that users table has proper filter configuration."""
@@ -101,12 +101,17 @@ class TestTableColumnFilterIntegration:
         # Verify column definitions include filters
         column_defs = ag_grid.columnDefs
 
-        # Find role column and verify it has set filter
+        # Find role column and verify it has enhanced text filter
         role_col = next((col for col in column_defs if col["field"] == "role"), None)
         assert role_col is not None
-        assert role_col["filter"] == "agSetColumnFilter"
+        assert role_col["filter"] == "agTextColumnFilter"
         assert "filterParams" in role_col
-        assert role_col["filterParams"]["values"] == ["USER", "ADMIN", "SUPERADMIN"]
+        # Verify enhanced text filter parameters
+        assert role_col["filterParams"]["caseSensitive"] is False
+        assert role_col["filterParams"]["trimInput"] is True
+        assert role_col["filterParams"]["debounceMs"] == 500
+        assert "buttons" in role_col["filterParams"]
+        assert "closeOnApply" in role_col["filterParams"]
 
         # Find date columns and verify they have date filters
         created_col = next((col for col in column_defs if col["field"] == "created_at"), None)
@@ -161,24 +166,30 @@ class TestTableColumnFilterIntegration:
                     if "filterParams" in expected_col:
                         assert actual_col["filterParams"] == expected_col["filterParams"]
 
-    def test_set_filter_buttons_configuration(self):
-        """Test that set filters have proper button configuration."""
+    def test_enhanced_text_filter_configuration(self):
+        """Test that enhanced text filters have proper configuration."""
         config = get_mobile_column_config()
 
         for table_type in ["executions", "scripts", "users"]:
             columns = config[table_type]["primary_columns"]
 
             for col in columns:
-                if col.get("filter") == "agSetColumnFilter":
+                if col.get("filter") == "agTextColumnFilter" and col["field"] in [
+                    "status",
+                    "role",
+                    "access_control",
+                ]:
                     filter_params = col.get("filterParams", {})
 
-                    # Verify set filters have proper button configuration
+                    # Verify enhanced text filters have proper button configuration
                     assert "buttons" in filter_params
                     assert "clear" in filter_params["buttons"]
                     assert "apply" in filter_params["buttons"]
 
-                    # Verify other useful set filter options
-                    assert filter_params.get("selectAllOnMiniFilter") is True
+                    # Verify enhanced text filter options
+                    assert filter_params.get("caseSensitive") is False
+                    assert filter_params.get("trimInput") is True
+                    assert filter_params.get("debounceMs") == 500
                     assert filter_params.get("closeOnApply") is True
 
     def test_number_filter_configuration(self):
