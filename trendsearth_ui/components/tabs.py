@@ -112,9 +112,7 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
             condition = cond.get("condition", "false")
             style = cond.get("style", {})
             # Convert the Python dict to a JS object literal string
-            style_pairs = [
-                f"{key}: '{value}'" for key, value in style.items()
-            ]
+            style_pairs = [f"{key}: '{value}'" for key, value in style.items()]
             style_js = "{" + ", ".join(style_pairs) + "}"
             js_lines.append(f"  if ({condition}) return {style_js};")
         js_lines.append("  return null;")

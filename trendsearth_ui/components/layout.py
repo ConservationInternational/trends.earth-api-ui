@@ -480,7 +480,7 @@ def dashboard_layout():
             id="main-panel",
             is_open=True,
         ),
-    # Hidden stores are defined globally in the main layout; avoid duplicates here
+        # Hidden stores are defined globally in the main layout; avoid duplicates here
         # Proactive token refresh interval (every 5 minutes)
         dcc.Interval(
             id="token-refresh-interval",

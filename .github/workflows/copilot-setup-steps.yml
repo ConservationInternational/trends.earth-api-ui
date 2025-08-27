@@ -1,20 +1,18 @@
 name: "Trends.Earth API UI Development Environment Setup"
 
-# Manual workflow for setting up complete development environment
-# Can be triggered manually or used as reference for local setup
-"on":
+on:
   workflow_dispatch:
     inputs:
       python_version:
-        description: 'Python version to use'
+        description: "Python version to use"
         required: false
-        default: '3.12'
+        default: "3.12"
         type: choice
         options:
-        - '3.11'
-        - '3.12'
+          - "3.11"
+          - "3.12"
       install_browsers:
-        description: 'Install Playwright browsers'
+        description: "Install Playwright browsers"
         required: false
         default: true
         type: boolean
@@ -23,171 +21,66 @@ jobs:
   setup-environment:
     name: "Complete Development Environment Setup"
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: "Checkout repository"
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: "Set up Python environment"
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ inputs.python_version || '3.12' }}
-        cache: "pip"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python_version }}
+          cache: "pip"
 
-  - name: "Install Playwright browsers with dependencies"
-    run: |
-      # Install chromium browser with system dependencies for e2e testing
-      # Note: This may fail in restricted CI environments due to download limitations
-      if poetry run playwright install chromium --with-deps 2>/dev/null; then
-        echo "✅ Playwright browsers installed successfully"
-        echo "PLAYWRIGHT_BROWSERS_AVAILABLE=true" >> $GITHUB_ENV
-      else
-        echo "⚠️  Playwright browser installation failed (common in CI environments)"
-        echo "   This is likely due to firewall restrictions or download limitations"
-        echo "   Browser tests will be skipped but other functionality remains available"
-        echo "PLAYWRIGHT_BROWSERS_AVAILABLE=false" >> $GITHUB_ENV
-        
-        # Try alternative approach - install without system dependencies
-        echo "🔄 Trying alternative installation without system dependencies..."
-        if poetry run playwright install chromium 2>/dev/null; then
-          echo "✅ Playwright browsers installed (without system deps)"
-          echo "PLAYWRIGHT_BROWSERS_AVAILABLE=true" >> $GITHUB_ENV
-        else
-          echo "❌ All Playwright browser installation methods failed"
-          echo "   This is expected in restricted CI environments"
-          echo "   End-to-end tests will be automatically skipped"
-        fi
-      fi
-      
-      # Verify playwright installation (command should work even without browsers)
-      poetry run playwright --version
-    timeout-minutes: 15
-    description: "Install Playwright browsers and system dependencies required for end-to-end testing"
-    
-    - name: "Install Poetry"
-      uses: snok/install-poetry@v1
-      with:
-        version: latest
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-    - name: "Cache Poetry dependencies"
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pypoetry
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
 
-    - name: "Install Python dependencies"
-      run: |
-        poetry install --with dev
-        echo "✅ All dependencies including dev dependencies (pytest, ruff, playwright, selenium) installed"
+      - name: Install dependencies
+        run: |
+          poetry install --with dev
 
-    - name: "Install Playwright browsers with dependencies"
-      if: ${{ inputs.install_browsers != false }}
-      run: |
-        # Install chromium browser with system dependencies for e2e testing
-        # Note: This may fail in restricted CI environments due to download limitations
-        if poetry run playwright install chromium --with-deps; then
-          echo "✅ Playwright browsers installed successfully"
-        else
-          echo "⚠️  Playwright browser installation failed (common in CI environments)"
-          echo "   Browser tests will be skipped but other functionality remains available"
-        fi
-        
-        # Verify playwright installation (command should work even without browsers)
-        poetry run playwright --version
-      timeout-minutes: 15
+      - name: Install Playwright browsers (optional)
+        if: ${{ inputs.install_browsers != false }}
+        run: |
+          poetry run playwright install chromium --with-deps || true
+          poetry run playwright --version || true
+        timeout-minutes: 15
 
-    - name: "Verify core dependencies"
-      run: |
-        # Verify Python and Poetry setup
-        poetry --version
-        poetry run python --version
-        
-        # Verify core application can be imported
-        poetry run python -c "import trendsearth_ui; print('✅ Core application imports successfully')"
-        
-        # Verify key dependencies
-        poetry run python -c "import dash, pandas, requests; print('✅ Core runtime dependencies available')"
+      - name: Verify core setup
+        run: |
+          poetry --version
+          poetry run python --version
+          poetry run python -c "import trendsearth_ui; print('ok')"
 
-    - name: "Verify test dependencies"
-      run: |
-        # Verify pytest and testing tools
-        poetry run python -c "import pytest; print('✅ Pytest available')"
-        poetry run python -c "import pytest_mock; print('✅ Pytest-mock available')"
-        poetry run python -c "import pytest_cov; print('✅ Pytest-cov available')"
-        poetry run python -c "import selenium; print('✅ Selenium available')"
-        poetry run python -c "import playwright; print('✅ Playwright available')"
-        
-        # Test pytest configuration
-        poetry run pytest --version
+      - name: Verify Ruff
+        run: |
+          poetry run ruff --version
+          echo 'print("hello")' > /tmp/t.py
+          poetry run ruff check /tmp/t.py
+          poetry run ruff format /tmp/t.py
+          rm /tmp/t.py
 
-    - name: "Verify code quality tools"
-      run: |
-        # Verify Ruff installation and basic functionality
-        poetry run ruff --version
-        
-        # Test ruff check command
-        echo 'print("hello")' > /tmp/test_ruff.py
-        poetry run ruff check /tmp/test_ruff.py
-        echo "✅ Ruff check command working"
-        
-        # Test ruff format command
-        poetry run ruff format /tmp/test_ruff.py
-        echo "✅ Ruff format command working"
-        
-        # Clean up
-        rm /tmp/test_ruff.py
-        
-        echo "✅ Code quality tools (Ruff) are working correctly"
+      - name: Run a quick unit test
+        run: |
+          poetry run python -m pytest tests/unit/test_config.py -v --tb=short
 
-    - name: "Run quick validation tests"
-      run: |
-        # Run a subset of unit tests to verify the environment works
-        poetry run python -m pytest tests/unit/test_config.py -v --tb=short
-        
-        echo "✅ Basic test environment is working"
-
-    - name: "Verify Playwright browser functionality"
-      if: ${{ inputs.install_browsers != false }}
-      run: |
-        # Test that Playwright can launch browsers (if available)
-        poetry run python -c "
-        from playwright.sync_api import sync_playwright
-        import sys
-        try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                page = browser.new_page()
-                page.goto('data:text/html,<h1>Test</h1>')
-                browser.close()
-                print('✅ Playwright browser functionality verified')
-        except Exception as e:
-            print(f'⚠️  Playwright browser test failed: {e}')
-            print('   This is expected if browsers failed to install (e.g., in CI environments)')
-            print('   Other functionality remains available')
-            # Don't exit with error - this is optional
-        "
-
-    - name: "Display environment summary"
-      run: |
-        echo "🎉 Environment setup complete!"
-        echo ""
-        echo "📋 Environment Summary:"
-        echo "Python: $(poetry run python --version)"
-        echo "Poetry: $(poetry --version)"
-        echo "Pytest: $(poetry run pytest --version)"
-        echo "Ruff: $(poetry run ruff --version)"
-        echo "Playwright: $(poetry run playwright --version)"
-        echo ""
-        echo "🚀 Ready for development! Available commands:"
-        echo "  • Run tests: poetry run python -m pytest tests/ -v"
-        echo "  • Run unit tests: poetry run python -m pytest tests/unit/ -v"
-        echo "  • Run playwright tests: poetry run python -m pytest tests/playwright/ -v"
-        echo "  • Lint code: poetry run ruff check trendsearth_ui/ tests/"
-        echo "  • Format code: poetry run ruff format trendsearth_ui/ tests/"
-        echo "  • Run app: poetry run python -m trendsearth_ui.app"
-        echo ""
-        echo "📚 Documentation: See README.md for detailed usage instructions"
+      - name: Summary
+        run: |
+          echo "Setup complete"
+          echo "Python: $(poetry run python --version)"
+          echo "Poetry: $(poetry --version)"
+          echo "Pytest: $(poetry run pytest --version)"
+          echo "Ruff: $(poetry run ruff --version)"
+          poetry run playwright --version || echo "Playwright not available"

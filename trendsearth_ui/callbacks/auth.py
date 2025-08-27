@@ -42,9 +42,9 @@ def register_callbacks(app):
         [
             State("api-environment-store", "data"),
         ],
-    # Run on initial load so we render login or dashboard immediately
-    # (we intentionally allow the first call to render based on cookie/token state)
-    # prevent_initial_call=False is default; leaving it out triggers on startup
+        # Run on initial load so we render login or dashboard immediately
+        # (we intentionally allow the first call to render based on cookie/token state)
+        # prevent_initial_call=False is default; leaving it out triggers on startup
     )
     def display_page(_pathname, token, current_api_environment):
         """Display login or dashboard based on token-store state only."""
@@ -60,8 +60,13 @@ def register_callbacks(app):
             )
 
         # No token: show login and avoid writing stores to prevent loops
-        return login_layout(), False, no_update, no_update, no_update, (
-            current_api_environment or "production"
+        return (
+            login_layout(),
+            False,
+            no_update,
+            no_update,
+            no_update,
+            (current_api_environment or "production"),
         )
 
     @app.callback(

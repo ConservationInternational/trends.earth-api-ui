@@ -55,6 +55,47 @@ app.index_string = """
         <title>{%title%}</title>
         <link rel="icon" href="/favicon.ico" type="image/x-icon">
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <!-- Suppress noisy React warnings from third-party libraries (dbc, etc.) in dev -->
+        <script>
+        (function () {
+            try {
+                var patterns = [
+                    "Support for defaultProps will be removed from function components",
+                    "componentWillMount has been renamed",
+                    "componentWillReceiveProps has been renamed"
+                ];
+                var origError = window.console && window.console.error ? console.error.bind(console) : function () {};
+                var origWarn = window.console && window.console.warn ? console.warn.bind(console) : function () {};
+
+                function shouldFilter(args) {
+                    try {
+                        var msg = Array.prototype.join.call(args, " ");
+                        if (msg.indexOf("Warning:") !== -1) {
+                            for (var i = 0; i < patterns.length; i++) {
+                                if (msg.indexOf(patterns[i]) !== -1) {
+                                    return true;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // no-op
+                    }
+                    return false;
+                }
+
+                console.error = function () {
+                    if (shouldFilter(arguments)) { return; }
+                    return origError.apply(console, arguments);
+                };
+                console.warn = function () {
+                    if (shouldFilter(arguments)) { return; }
+                    return origWarn.apply(console, arguments);
+                };
+            } catch (e) {
+                // Swallow any errors here to avoid impacting app startup
+            }
+        })();
+        </script>
         {%favicon%}
         {%css%}
     </head>
@@ -139,7 +180,8 @@ def bad_request(error):  # noqa: ARG001
     if flask.request.headers.get("Content-Length"):
         request_info += f", Content-Length: {flask.request.headers.get('Content-Length')}"
     if flask.request.headers.get("User-Agent"):
-        request_info += f", User-Agent: {flask.request.headers.get('User-Agent')[:100]}"
+        ua_hdr = flask.request.headers.get("User-Agent")
+        request_info += f", User-Agent: {ua_hdr[:100] if ua_hdr else ''}"
 
     # Try to safely read request data for debugging
     request_data_info = ""
@@ -182,7 +224,8 @@ def method_not_allowed(error):  # noqa: ARG001
     if flask.request.headers.get("Content-Type"):
         request_info += f", Content-Type: {flask.request.headers.get('Content-Type')}"
     if flask.request.headers.get("User-Agent"):
-        request_info += f", User-Agent: {flask.request.headers.get('User-Agent')[:100]}"
+        ua_hdr = flask.request.headers.get("User-Agent")
+        request_info += f", User-Agent: {ua_hdr[:100] if ua_hdr else ''}"
 
     # Check if this is a bot/scanner request
     user_agent = flask.request.headers.get("User-Agent", "")
@@ -198,7 +241,8 @@ def method_not_allowed(error):  # noqa: ARG001
         # Log available routes for debugging (only for legitimate requests to reduce noise)
         route_info = []
         for rule in server.url_map.iter_rules():
-            route_info.append(f"{rule.rule} -> {list(rule.methods)}")
+            methods = sorted(rule.methods or [])
+            route_info.append(f"{rule.rule} -> {methods}")
         log_exception(
             logger, f"Available routes: {'; '.join(route_info[:10])}"
         )  # Log first 10 routes
