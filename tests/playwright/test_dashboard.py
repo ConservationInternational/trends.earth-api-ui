@@ -135,26 +135,32 @@ class TestExecutionsTab:
         executions_tab = authenticated_page.locator("text=Executions").first
         if executions_tab.is_visible():
             executions_tab.click()
-            authenticated_page.wait_for_timeout(2000)
+            # Wait longer for table to load as it might fetch data
+            authenticated_page.wait_for_timeout(5000)
 
             # Should show executions-related content
             execution_indicators = [
+                "[data-testid='executions-table']",  # Most specific first
                 "table",
                 ".ag-grid",
                 ".data-table",
                 "text=No executions",
-                "[data-testid='executions-table']",
                 "text=Loading",
             ]
 
             # At least one indicator should be visible
             found_indicator = False
             for indicator in execution_indicators:
-                if authenticated_page.locator(indicator).first.is_visible():
-                    found_indicator = True
-                    break
+                try:
+                    if authenticated_page.locator(indicator).first.is_visible(timeout=2000):
+                        found_indicator = True
+                        break
+                except Exception:
+                    continue
 
-            assert found_indicator, "Expected executions content not found"
+            assert found_indicator, (
+                f"Expected executions content not found. Checked: {execution_indicators}"
+            )
 
     def test_executions_table_interaction(self, authenticated_page: Page):
         """Test executions table interactions if data is present."""
@@ -164,18 +170,25 @@ class TestExecutionsTab:
         executions_tab = authenticated_page.locator("text=Executions").first
         if executions_tab.is_visible():
             executions_tab.click()
-            authenticated_page.wait_for_timeout(3000)
+            authenticated_page.wait_for_timeout(5000)
 
-            # If table is present, test basic interactions
-            table = authenticated_page.locator("table, .ag-grid").first
-            if table.is_visible():
-                # Test that table has some structure
+            # Wait specifically for the executions table
+            try:
+                table = authenticated_page.wait_for_selector(
+                    "[data-testid='executions-table']", timeout=5000
+                )
                 expect(table).to_be_visible()
+            except Exception:
+                # If table doesn't exist, check for AG-Grid or fallback
+                table = authenticated_page.locator("table, .ag-grid").first
+                if not table.is_visible():
+                    # No table found, test passes (might be empty state)
+                    return
 
-                # Look for common table elements
-                headers = authenticated_page.locator("th, .ag-header-cell")
-                if headers.count() > 0:
-                    expect(headers.first).to_be_visible()
+            # Look for common table elements only if table exists
+            headers = authenticated_page.locator("th, .ag-header-cell")
+            if headers.count() > 0:
+                expect(headers.first).to_be_visible()
 
 
 @pytest.mark.playwright
@@ -190,26 +203,32 @@ class TestScriptsTab:
         scripts_tab = authenticated_page.locator("text=Scripts").first
         if scripts_tab.is_visible():
             scripts_tab.click()
-            authenticated_page.wait_for_timeout(2000)
+            # Wait longer for table to load as it might fetch data
+            authenticated_page.wait_for_timeout(5000)
 
             # Should show scripts-related content
             script_indicators = [
+                "[data-testid='scripts-table']",  # Most specific first
                 "table",
                 ".ag-grid",
                 ".data-table",
                 "text=No scripts",
-                "[data-testid='scripts-table']",
                 "text=Loading",
             ]
 
             # At least one indicator should be visible
             found_indicator = False
             for indicator in script_indicators:
-                if authenticated_page.locator(indicator).first.is_visible():
-                    found_indicator = True
-                    break
+                try:
+                    if authenticated_page.locator(indicator).first.is_visible(timeout=2000):
+                        found_indicator = True
+                        break
+                except Exception:
+                    continue
 
-            assert found_indicator, "Expected scripts content not found"
+            assert found_indicator, (
+                f"Expected scripts content not found. Checked: {script_indicators}"
+            )
 
 
 @pytest.mark.playwright
@@ -224,26 +243,30 @@ class TestUsersTab:
         users_tab = authenticated_page.locator("text=Users").first
         if users_tab.is_visible():
             users_tab.click()
-            authenticated_page.wait_for_timeout(2000)
+            # Wait longer for table to load as it might fetch data
+            authenticated_page.wait_for_timeout(5000)
 
             # Should show users-related content
             user_indicators = [
+                "[data-testid='users-table']",  # Most specific first
                 "table",
                 ".ag-grid",
                 ".data-table",
                 "text=No users",
-                "[data-testid='users-table']",
                 "text=Loading",
             ]
 
             # At least one indicator should be visible
             found_indicator = False
             for indicator in user_indicators:
-                if authenticated_page.locator(indicator).first.is_visible():
-                    found_indicator = True
-                    break
+                try:
+                    if authenticated_page.locator(indicator).first.is_visible(timeout=2000):
+                        found_indicator = True
+                        break
+                except Exception:
+                    continue
 
-            assert found_indicator, "Expected users content not found"
+            assert found_indicator, f"Expected users content not found. Checked: {user_indicators}"
 
 
 @pytest.mark.playwright

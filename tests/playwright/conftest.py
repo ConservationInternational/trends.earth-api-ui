@@ -60,16 +60,18 @@ def live_server():
 
     # Check if server is responding
     base_url = "http://127.0.0.1:8050"
-    max_retries = 10
+    max_retries = 30  # Increase retries for reliability
     for i in range(max_retries):
         try:
-            response = requests.get(f"{base_url}/api-ui-health", timeout=5)
+            response = requests.get(f"{base_url}/api-ui-health", timeout=10)
             if response.status_code == 200:
+                print(f"✅ Server ready after {i + 1} attempts")
                 break
         except requests.exceptions.RequestException:
             if i == max_retries - 1:
+                print(f"❌ Server failed to start after {max_retries} attempts")
                 raise
-            time.sleep(1)
+            time.sleep(0.5)  # Wait shorter between retries
 
     yield base_url
 
@@ -136,7 +138,15 @@ def authenticated_page(page: Page, live_server):
     page.reload()
 
     # Wait for authentication to process and dashboard to load
-    page.wait_for_timeout(3000)
+    # Use a more reliable wait for dashboard content
+    try:
+        page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
+    except Exception as e:
+        # If dashboard doesn't load, check if we're still on login page
+        if page.locator("h4:has-text('Login')").is_visible():
+            raise RuntimeError("Authentication failed - still on login page") from e
+        else:
+            raise RuntimeError(f"Dashboard content not found: {e}") from e
 
     return page
 

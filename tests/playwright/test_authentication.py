@@ -88,9 +88,10 @@ class TestAuthenticationState:
         expect(app_page.locator("text=Status")).not_to_be_visible()
         expect(app_page.locator("text=Executions")).not_to_be_visible()
 
-        # Should not have authentication tokens in local storage
-        auth_token = app_page.evaluate("() => localStorage.getItem('auth_token')")
-        assert auth_token is None
+        # Should not have authentication cookies
+        cookies = app_page.context.cookies()
+        auth_cookies = [c for c in cookies if c["name"] == "auth_token"]
+        assert len(auth_cookies) == 0
 
     def test_authenticated_state(self, authenticated_page: Page):
         """Test app behavior when authenticated."""
@@ -107,12 +108,17 @@ class TestAuthenticationState:
         expect(authenticated_page.locator("text=Status")).to_be_visible()
         expect(authenticated_page.locator("text=Executions")).to_be_visible()
 
-        # Should have authentication data in local storage
-        auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
-        assert auth_token == "mock_token_12345"
+        # Should have authentication cookie
+        cookies = authenticated_page.context.cookies()
+        auth_cookies = [c for c in cookies if c["name"] == "auth_token"]
+        assert len(auth_cookies) == 1
 
-        user_role = authenticated_page.evaluate("() => localStorage.getItem('user_role')")
-        assert user_role == "ADMIN"
+        # Verify cookie contains expected mock data
+        import json
+
+        cookie_data = json.loads(auth_cookies[0]["value"])
+        assert cookie_data["access_token"] == "mock_token_12345"
+        assert cookie_data["user_data"]["role"] == "ADMIN"
 
     def test_logout_functionality(self, authenticated_page: Page):
         """Test logout functionality if available."""
@@ -127,9 +133,10 @@ class TestAuthenticationState:
             # Should redirect to login page
             expect(authenticated_page.locator("h4")).to_contain_text("Login")
 
-            # Should clear authentication data
-            auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
-            assert auth_token is None
+            # Should clear authentication cookie
+            cookies = authenticated_page.context.cookies()
+            auth_cookies = [c for c in cookies if c["name"] == "auth_token"]
+            assert len(auth_cookies) == 0
 
 
 @pytest.mark.playwright
@@ -204,21 +211,24 @@ class TestAuthenticationPersistence:
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
         expect(authenticated_page.locator("text=Dashboard")).to_be_visible()
 
-        # Authentication data should persist
-        auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
-        assert auth_token == "mock_token_12345"
+        # Authentication cookie should persist
+        cookies = authenticated_page.context.cookies()
+        auth_cookies = [c for c in cookies if c["name"] == "auth_token"]
+        assert len(auth_cookies) == 1
+
+        # Verify cookie contains expected mock data
+        import json
+
+        cookie_data = json.loads(auth_cookies[0]["value"])
+        assert cookie_data["access_token"] == "mock_token_12345"
 
     def test_session_cleanup_on_logout(self, authenticated_page: Page):
         """Test that session data is properly cleaned up on logout."""
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Clear authentication manually (simulating logout)
-        authenticated_page.evaluate("""
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_role');
-            localStorage.removeItem('user_data');
-        """)
+        # Clear authentication manually (simulating logout by removing cookie)
+        authenticated_page.context.clear_cookies()
 
         # Reload page
         authenticated_page.reload()
@@ -226,6 +236,7 @@ class TestAuthenticationPersistence:
         # Should redirect to login
         expect(authenticated_page.locator("h4")).to_contain_text("Login")
 
-        # Storage should be cleared
-        auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
-        assert auth_token is None
+        # Cookie should be cleared
+        cookies = authenticated_page.context.cookies()
+        auth_cookies = [c for c in cookies if c["name"] == "auth_token"]
+        assert len(auth_cookies) == 0
