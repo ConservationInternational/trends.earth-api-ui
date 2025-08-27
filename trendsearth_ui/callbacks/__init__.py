@@ -2,6 +2,7 @@
 
 import importlib
 
+from ..utils.custom_filters import register_filter_callbacks
 from ..utils.mobile_utils import register_mobile_callbacks
 from . import status
 
@@ -10,6 +11,9 @@ def register_all_callbacks(app):
     """Register all callbacks with the Dash app."""
     # First register mobile detection callbacks
     register_mobile_callbacks()
+
+    # Register custom filter callbacks
+    register_filter_callbacks(app)
 
     # Register status callbacks directly
     status.register_callbacks(app)

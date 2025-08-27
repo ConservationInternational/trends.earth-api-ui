@@ -5,6 +5,7 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 
 from ..config import EXECUTIONS_REFRESH_INTERVAL, STATUS_REFRESH_INTERVAL
+from ..utils.custom_filters import create_table_filters
 from ..utils.mobile_utils import get_mobile_column_config
 
 
@@ -198,6 +199,20 @@ def executions_tab_content():
                 ],
                 className="justify-content-between",
             ),
+            # Custom filters row
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.Div(
+                                create_table_filters("executions"),
+                                className="d-flex gap-3 mb-3",
+                            )
+                        ],
+                        width=12,
+                    )
+                ]
+            ),
             create_responsive_table(
                 table_id="executions-table",
                 table_type="executions",
@@ -339,6 +354,20 @@ def users_tab_content():
                     ),
                 ]
             ),
+            # Custom filters row
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.Div(
+                                create_table_filters("users"),
+                                className="d-flex gap-3 mb-3",
+                            )
+                        ],
+                        width=12,
+                    )
+                ]
+            ),
             create_responsive_table(table_id="users-table", table_type="users"),
         ]
     )
@@ -411,6 +440,20 @@ def scripts_tab_content():
                         ],
                         width=True,
                     ),
+                ]
+            ),
+            # Custom filters row
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.Div(
+                                create_table_filters("scripts"),
+                                className="d-flex gap-3 mb-3",
+                            )
+                        ],
+                        width=12,
+                    )
                 ]
             ),
             create_responsive_table(

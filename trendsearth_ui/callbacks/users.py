@@ -21,10 +21,11 @@ def register_callbacks(app):
             State("role-store", "data"),
             State("user-timezone-store", "data"),
             State("api-environment-store", "data"),
+            State("users-role-filter-selected", "data"),
         ],
         prevent_initial_call=False,
     )
-    def get_users_rows(request, token, role, user_timezone, _api_environment):
+    def get_users_rows(request, token, role, user_timezone, _api_environment, role_filter_selected):
         """Get users data for ag-grid with infinite row model with server-side operations."""
         try:
             if not token:
@@ -40,6 +41,10 @@ def register_callbacks(app):
 
             sort_model = request.get("sortModel", [])
             filter_model = request.get("filterModel", {})
+
+            # Add custom filter to filter_model if active
+            if role_filter_selected:
+                filter_model["role"] = {"filterType": "set", "values": role_filter_selected}
 
             params = {
                 "page": page,
