@@ -6,8 +6,11 @@ Tests the recently added table column filter checkbox functionality.
 from playwright.sync_api import Page, expect
 import pytest
 
+from .conftest import skip_if_no_browsers
+
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestTableColumnFilters:
     """Test table column filter functionality across different tables."""
 
@@ -244,6 +247,7 @@ class TestTableColumnFilters:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestTableFilterInteraction:
     """Test interactive filter functionality."""
 
@@ -384,6 +388,7 @@ class TestTableFilterInteraction:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestTableFilterAccessibility:
     """Test filter accessibility and usability features."""
 

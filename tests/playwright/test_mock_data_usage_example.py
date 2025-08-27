@@ -11,10 +11,12 @@ from tests.playwright.conftest import (
     generate_mock_scripts_data,
     generate_mock_status_data,
     generate_mock_users_data,
+    skip_if_no_browsers,
 )
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestMockDataUsageExamples:
     """Examples of how to use mock data functions in Playwright tests."""
 

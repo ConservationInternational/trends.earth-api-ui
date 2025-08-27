@@ -6,8 +6,11 @@ Tests dashboard tabs, navigation, and core dashboard features.
 from playwright.sync_api import Page, expect
 import pytest
 
+from .conftest import skip_if_no_browsers
+
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestDashboardNavigation:
     """Test dashboard navigation and tab functionality."""
 
@@ -60,6 +63,7 @@ class TestDashboardNavigation:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestStatusTab:
     """Test Status tab functionality."""
 
@@ -124,6 +128,7 @@ class TestStatusTab:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestExecutionsTab:
     """Test Executions tab functionality."""
 
@@ -192,6 +197,7 @@ class TestExecutionsTab:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestScriptsTab:
     """Test Scripts tab functionality."""
 
@@ -232,6 +238,7 @@ class TestScriptsTab:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestUsersTab:
     """Test Users tab functionality."""
 
@@ -270,6 +277,7 @@ class TestUsersTab:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestProfileTab:
     """Test Profile tab functionality."""
 
