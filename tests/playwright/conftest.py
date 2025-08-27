@@ -17,38 +17,28 @@ def pytest_configure(config):
     # Register the playwright marker to avoid warnings
     config.addinivalue_line("markers", "playwright: Playwright end-to-end tests")
 
-    # Check if playwright browsers are available
+    # Check if playwright browsers are available - FAIL if not available
     try:
         from playwright.sync_api import sync_playwright
 
         # Try to check if browsers are available
-        browser_available = False
         try:
             with sync_playwright() as p:
                 try:
                     browser = p.chromium.launch(headless=True)
                     browser.close()
-                    browser_available = True
+                    print("✅ Playwright browsers are available and ready")
                 except Exception as e:
-                    print(f"⚠️  Playwright browsers not available: {e}")
-                    print("ℹ️  Skipping playwright tests. Run 'playwright install' to fix.")
+                    print(f"❌ Playwright browsers not available: {e}")
+                    print("💡 Run 'playwright install chromium' to install browsers")
+                    raise RuntimeError(f"Playwright browsers not available: {e}") from e
         except Exception as e:
-            print(f"⚠️  Playwright browser check failed: {e}")
-            print("ℹ️  This is normal in environments where browsers can't be installed.")
+            print(f"❌ Playwright browser check failed: {e}")
+            raise RuntimeError(f"Playwright browser check failed: {e}") from e
 
-        if not browser_available:
-            # Skip all playwright tests by adding them to markexpr
-            if hasattr(config.option, "markexpr") and config.option.markexpr:
-                config.option.markexpr += " and not playwright"
-            else:
-                config.option.markexpr = "not playwright"
-
-    except ImportError:
-        print("⚠️  Playwright not installed, skipping playwright tests")
-        if hasattr(config.option, "markexpr") and config.option.markexpr:
-            config.option.markexpr += " and not playwright"
-        else:
-            config.option.markexpr = "not playwright"
+    except ImportError as e:
+        print("❌ Playwright not installed")
+        raise ImportError("Playwright not installed - required for playwright tests") from e
 
 
 @pytest.fixture(scope="session")
