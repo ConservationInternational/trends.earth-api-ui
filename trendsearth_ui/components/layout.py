@@ -479,7 +479,7 @@ def dashboard_layout():
                     # Tab content will be inserted here by callbacks
                     html.Div(id="tab-content-dynamic"),
                 ],
-                **{"data-testid": "dashboard-content"}
+                **{"data-testid": "dashboard-content"},
             ),
             id="main-panel",
             is_open=True,

@@ -116,6 +116,7 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
             ),
         ],
         className="table-container",
+        **{"data-testid": table_id},  # Add data-testid for playwright testing
         style={
             "width": "100%",
             "overflowX": "auto",  # Ensure container allows horizontal overflow
