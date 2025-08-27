@@ -135,7 +135,11 @@ def register_callbacks(app):
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
-                params={"per_page": 1, "sort": "-timestamp"},
+                params={
+                    "per_page": 1,
+                    "sort": "-timestamp",
+                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                },
                 timeout=5,  # Reduced from 10 seconds
             )
 
@@ -425,7 +429,11 @@ def register_callbacks(app):
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
-                params={"per_page": 1, "sort": "-timestamp"},
+                params={
+                    "per_page": 1,
+                    "sort": "-timestamp",
+                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                },
                 timeout=5,  # Reduced from 10 seconds
             )
 
