@@ -14,22 +14,41 @@ from trendsearth_ui.app import app
 
 def pytest_configure(config):
     """Configure pytest for playwright tests."""
+    # Register the playwright marker to avoid warnings
+    config.addinivalue_line("markers", "playwright: Playwright end-to-end tests")
+
     # Check if playwright browsers are available
     try:
         from playwright.sync_api import sync_playwright
 
-        with sync_playwright() as p:
-            try:
-                browser = p.chromium.launch(headless=True)
-                browser.close()
-            except Exception as e:
-                print(f"⚠️  Playwright browsers not available: {e}")
-                print("ℹ️  Skipping playwright tests. Run 'playwright install' to fix.")
-                # Mark all playwright tests as skipped
+        # Try to check if browsers are available
+        browser_available = False
+        try:
+            with sync_playwright() as p:
+                try:
+                    browser = p.chromium.launch(headless=True)
+                    browser.close()
+                    browser_available = True
+                except Exception as e:
+                    print(f"⚠️  Playwright browsers not available: {e}")
+                    print("ℹ️  Skipping playwright tests. Run 'playwright install' to fix.")
+        except Exception as e:
+            print(f"⚠️  Playwright browser check failed: {e}")
+            print("ℹ️  This is normal in environments where browsers can't be installed.")
+
+        if not browser_available:
+            # Skip all playwright tests by adding them to markexpr
+            if hasattr(config.option, "markexpr") and config.option.markexpr:
+                config.option.markexpr += " and not playwright"
+            else:
                 config.option.markexpr = "not playwright"
+
     except ImportError:
         print("⚠️  Playwright not installed, skipping playwright tests")
-        config.option.markexpr = "not playwright"
+        if hasattr(config.option, "markexpr") and config.option.markexpr:
+            config.option.markexpr += " and not playwright"
+        else:
+            config.option.markexpr = "not playwright"
 
 
 @pytest.fixture(scope="session")
