@@ -1,32 +1,38 @@
 name: "Trends.Earth API UI Development Environment Setup"
-description: "Complete development environment setup for Trends.Earth API UI with all test dependencies, Playwright browsers, code quality tools, and runtime dependencies"
 
-steps:
-  - name: "Set up Python environment"
-    uses: "actions/setup-python@v4"
-    with:
-      python-version: "3.12"  # Latest tested version (3.11-3.12 supported)
-      cache: "pip"
+# Manual workflow for setting up complete development environment
+# Can be triggered manually or used as reference for local setup
+"on":
+  workflow_dispatch:
+    inputs:
+      python_version:
+        description: 'Python version to use'
+        required: false
+        default: '3.12'
+        type: choice
+        options:
+        - '3.11'
+        - '3.12'
+      install_browsers:
+        description: 'Install Playwright browsers'
+        required: false
+        default: true
+        type: boolean
 
-  - name: "Install Poetry"
-    uses: "snok/install-poetry@v1"
-    with:
-      version: "latest"
-      virtualenvs-create: true
-      virtualenvs-in-project: true
+jobs:
+  setup-environment:
+    name: "Complete Development Environment Setup"
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: "Checkout repository"
+      uses: actions/checkout@v4
 
-  - name: "Cache Poetry dependencies"
-    uses: "actions/cache@v3"
-    with:
-      path: "~/.cache/pypoetry"
-      key: "${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}"
-      restore-keys: |
-        ${{ runner.os }}-poetry-
-
-  - name: "Install Python dependencies"
-    run: |
-      poetry install --with dev
-    description: "Install all dependencies including dev dependencies (pytest, ruff, playwright, selenium)"
+    - name: "Set up Python environment"
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python_version || '3.12' }}
+        cache: "pip"
 
   - name: "Install Playwright browsers with dependencies"
     run: |
@@ -57,153 +63,131 @@ steps:
       poetry run playwright --version
     timeout-minutes: 15
     description: "Install Playwright browsers and system dependencies required for end-to-end testing"
-
-  - name: "Verify core dependencies"
-    run: |
-      # Verify Python and Poetry setup
-      poetry --version
-      poetry run python --version
-      
-      # Verify core application can be imported
-      poetry run python -c "import trendsearth_ui; print('✅ Core application imports successfully')"
-      
-      # Verify key dependencies
-      poetry run python -c "import dash, pandas, requests; print('✅ Core runtime dependencies available')"
-    description: "Verify core application and runtime dependencies are properly installed"
-
-  - name: "Verify test dependencies"
-    run: |
-      # Verify pytest and testing tools
-      poetry run python -c "import pytest; print('✅ Pytest available')"
-      poetry run python -c "import pytest_mock; print('✅ Pytest-mock available')"
-      poetry run python -c "import pytest_cov; print('✅ Pytest-cov available')"
-      poetry run python -c "import selenium; print('✅ Selenium available')"
-      poetry run python -c "import playwright; print('✅ Playwright available')"
-      
-      # Test pytest configuration
-      poetry run pytest --version
-    description: "Verify all test framework dependencies are properly installed"
-
-  - name: "Verify code quality tools"
-    run: |
-      # Verify Ruff installation and basic functionality
-      poetry run ruff --version
-      
-      # Test ruff check command
-      echo 'print("hello")' > /tmp/test_ruff.py
-      poetry run ruff check /tmp/test_ruff.py
-      echo "✅ Ruff check command working"
-      
-      # Test ruff format command
-      poetry run ruff format /tmp/test_ruff.py
-      echo "✅ Ruff format command working"
-      
-      # Clean up
-      rm /tmp/test_ruff.py
-      
-      echo "✅ Code quality tools (Ruff) are working correctly"
-    description: "Verify Ruff linting and formatting tools are properly installed and functional"
-
-  - name: "Run quick validation tests"
-    run: |
-      # Run a subset of unit tests to verify the environment works
-      poetry run python -m pytest tests/unit/test_config.py -v --tb=short
-      
-      echo "✅ Basic test environment is working"
-    description: "Run basic unit tests to validate the complete setup"
-
-  - name: "Verify Playwright browser functionality"
-    run: |
-      # Test that Playwright can launch browsers (if available)
-      poetry run python -c "
-      from playwright.sync_api import sync_playwright
-      import sys
-      try:
-          with sync_playwright() as p:
-              browser = p.chromium.launch(headless=True)
-              page = browser.new_page()
-              page.goto('data:text/html,<h1>Test</h1>')
-              browser.close()
-              print('✅ Playwright browser functionality verified')
-      except Exception as e:
-          print(f'⚠️  Playwright browser test failed: {e}')
-          print('   This is expected if browsers failed to install (e.g., in CI environments)')
-          print('   Other functionality remains available')
-          # Don't exit with error - this is optional
-      "
-    description: "Verify Playwright browsers can be launched and basic functionality works (optional)"
-
-  - name: "Display environment summary"
-    run: |
-      echo "🎉 Environment setup complete!"
-      echo ""
-      echo "📋 Environment Summary:"
-      echo "Python: $(poetry run python --version)"
-      echo "Poetry: $(poetry --version)"
-      echo "Pytest: $(poetry run pytest --version)"
-      echo "Ruff: $(poetry run ruff --version)"
-      echo "Playwright: $(poetry run playwright --version)"
-      echo ""
-      echo "🚀 Ready for development! Available commands:"
-      echo "  • Run tests: poetry run python -m pytest tests/ -v"
-      echo "  • Run unit tests: poetry run python -m pytest tests/unit/ -v"
-      echo "  • Run playwright tests: poetry run python -m pytest tests/playwright/ -v"
-      echo "  • Lint code: poetry run ruff check trendsearth_ui/ tests/"
-      echo "  • Format code: poetry run ruff format trendsearth_ui/ tests/"
-      echo "  • Run app: poetry run python -m trendsearth_ui.app"
-      echo ""
-      echo "📚 Documentation: See README.md for detailed usage instructions"
-    description: "Display summary of installed tools and available commands"
-
-requirements:
-  system:
-    - "git"
-    - "curl"
-    - "build-essential (Linux) or equivalent build tools"
-  
-  python:
-    version: ">=3.10,<3.14"
-    preferred: "3.12"
-  
-  dependencies:
-    runtime:
-      - "dash >=2.17.0,<4.0.0"
-      - "dash-bootstrap-components ^1.6.0"
-      - "dash-ag-grid ^31.0.0"
-      - "pandas ^2.2.0"
-      - "requests ^2.31.0"
-      - "gunicorn ^23.0.0"
-      - "dash-leaflet ^0.1.23"
-      - "dash-extensions ^1.0.0"
-      - "rollbar ^1.3.0"
-      - "cachetools ^6.2.0"
-      - "pycountry ^24.6.1"
     
-    development:
-      - "pytest ^7.0.0"
-      - "pytest-mock ^3.10.0"
-      - "pytest-cov ^4.1.0"
-      - "ruff ^0.12.0"
-      - "selenium ^4.0.0"
-      - "playwright ^1.40.0"
-      - "pytest-playwright ^0.4.0"
-  
-  browsers:
-    - "Chromium (installed via Playwright)"
-    - "System dependencies for browser automation"
+    - name: "Install Poetry"
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
 
-validation:
-  commands:
-    - "poetry run python -c 'import trendsearth_ui'"
-    - "poetry run pytest tests/unit/test_config.py -v"
-    - "poetry run ruff --version"
-    - "poetry run playwright --version"
+    - name: "Cache Poetry dependencies"
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
 
-notes:
-  - "This setup installs all dependencies required for full development including end-to-end testing"
-  - "Playwright browsers are installed with system dependencies (--with-deps) for CI environments"
-  - "Playwright browser installation may fail in restricted CI environments due to download limitations - this is expected and non-critical"
-  - "Code quality checks (ruff) are mandatory - all changes must pass linting and formatting"
-  - "The setup is optimized with Poetry caching for faster subsequent runs"
-  - "Environment supports Python 3.11-3.12 with 3.12 recommended for latest features"
-  - "If Playwright browsers fail to install, all other functionality remains available - only e2e tests will be skipped"
+    - name: "Install Python dependencies"
+      run: |
+        poetry install --with dev
+        echo "✅ All dependencies including dev dependencies (pytest, ruff, playwright, selenium) installed"
+
+    - name: "Install Playwright browsers with dependencies"
+      if: ${{ inputs.install_browsers != false }}
+      run: |
+        # Install chromium browser with system dependencies for e2e testing
+        # Note: This may fail in restricted CI environments due to download limitations
+        if poetry run playwright install chromium --with-deps; then
+          echo "✅ Playwright browsers installed successfully"
+        else
+          echo "⚠️  Playwright browser installation failed (common in CI environments)"
+          echo "   Browser tests will be skipped but other functionality remains available"
+        fi
+        
+        # Verify playwright installation (command should work even without browsers)
+        poetry run playwright --version
+      timeout-minutes: 15
+
+    - name: "Verify core dependencies"
+      run: |
+        # Verify Python and Poetry setup
+        poetry --version
+        poetry run python --version
+        
+        # Verify core application can be imported
+        poetry run python -c "import trendsearth_ui; print('✅ Core application imports successfully')"
+        
+        # Verify key dependencies
+        poetry run python -c "import dash, pandas, requests; print('✅ Core runtime dependencies available')"
+
+    - name: "Verify test dependencies"
+      run: |
+        # Verify pytest and testing tools
+        poetry run python -c "import pytest; print('✅ Pytest available')"
+        poetry run python -c "import pytest_mock; print('✅ Pytest-mock available')"
+        poetry run python -c "import pytest_cov; print('✅ Pytest-cov available')"
+        poetry run python -c "import selenium; print('✅ Selenium available')"
+        poetry run python -c "import playwright; print('✅ Playwright available')"
+        
+        # Test pytest configuration
+        poetry run pytest --version
+
+    - name: "Verify code quality tools"
+      run: |
+        # Verify Ruff installation and basic functionality
+        poetry run ruff --version
+        
+        # Test ruff check command
+        echo 'print("hello")' > /tmp/test_ruff.py
+        poetry run ruff check /tmp/test_ruff.py
+        echo "✅ Ruff check command working"
+        
+        # Test ruff format command
+        poetry run ruff format /tmp/test_ruff.py
+        echo "✅ Ruff format command working"
+        
+        # Clean up
+        rm /tmp/test_ruff.py
+        
+        echo "✅ Code quality tools (Ruff) are working correctly"
+
+    - name: "Run quick validation tests"
+      run: |
+        # Run a subset of unit tests to verify the environment works
+        poetry run python -m pytest tests/unit/test_config.py -v --tb=short
+        
+        echo "✅ Basic test environment is working"
+
+    - name: "Verify Playwright browser functionality"
+      if: ${{ inputs.install_browsers != false }}
+      run: |
+        # Test that Playwright can launch browsers (if available)
+        poetry run python -c "
+        from playwright.sync_api import sync_playwright
+        import sys
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto('data:text/html,<h1>Test</h1>')
+                browser.close()
+                print('✅ Playwright browser functionality verified')
+        except Exception as e:
+            print(f'⚠️  Playwright browser test failed: {e}')
+            print('   This is expected if browsers failed to install (e.g., in CI environments)')
+            print('   Other functionality remains available')
+            # Don't exit with error - this is optional
+        "
+
+    - name: "Display environment summary"
+      run: |
+        echo "🎉 Environment setup complete!"
+        echo ""
+        echo "📋 Environment Summary:"
+        echo "Python: $(poetry run python --version)"
+        echo "Poetry: $(poetry --version)"
+        echo "Pytest: $(poetry run pytest --version)"
+        echo "Ruff: $(poetry run ruff --version)"
+        echo "Playwright: $(poetry run playwright --version)"
+        echo ""
+        echo "🚀 Ready for development! Available commands:"
+        echo "  • Run tests: poetry run python -m pytest tests/ -v"
+        echo "  • Run unit tests: poetry run python -m pytest tests/unit/ -v"
+        echo "  • Run playwright tests: poetry run python -m pytest tests/playwright/ -v"
+        echo "  • Lint code: poetry run ruff check trendsearth_ui/ tests/"
+        echo "  • Format code: poetry run ruff format trendsearth_ui/ tests/"
+        echo "  • Run app: poetry run python -m trendsearth_ui.app"
+        echo ""
+        echo "📚 Documentation: See README.md for detailed usage instructions"
