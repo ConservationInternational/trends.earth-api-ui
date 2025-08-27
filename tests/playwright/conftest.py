@@ -87,22 +87,57 @@ def app_page(page: Page, live_server):
 @pytest.fixture
 def authenticated_page(page: Page, live_server):
     """Navigate to app and simulate authentication (mocked)."""
+    # First navigate to the page
     page.goto(live_server)
 
-    # Mock authentication by setting local storage
-    page.evaluate("""
-        localStorage.setItem('auth_token', 'mock_token_12345');
-        localStorage.setItem('user_role', 'ADMIN');
-        localStorage.setItem('user_data', JSON.stringify({
-            id: 'test_user_123',
-            name: 'Test User',
-            email: 'test@example.com',
-            role: 'ADMIN'
-        }));
-    """)
+    # Wait for initial page load
+    page.wait_for_timeout(1000)
 
-    # Refresh to load with authentication
+    # Create mock auth cookie data that matches what the app expects
+    from datetime import datetime, timedelta
+    import json
+
+    # Mock auth data structure that matches create_auth_cookie_data
+    expiration = datetime.now() + timedelta(days=30)
+    auth_cookie_data = {
+        "access_token": "mock_token_12345",
+        "refresh_token": "mock_refresh_token_67890",
+        "email": "test@example.com",
+        "user_data": {
+            "id": "test_user_123",
+            "name": "Test User",
+            "email": "test@example.com",
+            "role": "ADMIN",
+        },
+        "api_environment": "production",
+        "expires_at": expiration.isoformat(),
+        "created_at": datetime.now().isoformat(),
+    }
+
+    # Set the HTTP cookie that the app recognizes
+    cookie_value = json.dumps(auth_cookie_data)
+
+    # Add the cookie to the browser context
+    page.context.add_cookies(
+        [
+            {
+                "name": "auth_token",
+                "value": cookie_value,
+                "domain": "127.0.0.1",
+                "path": "/",
+                "httpOnly": True,
+                "secure": False,
+                "sameSite": "Lax",
+            }
+        ]
+    )
+
+    # Reload page to trigger authentication check with cookie
     page.reload()
+
+    # Wait for authentication to process and dashboard to load
+    page.wait_for_timeout(3000)
+
     return page
 
 

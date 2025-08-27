@@ -14,7 +14,7 @@ class TestAppBasics:
     def test_app_loads_successfully(self, app_page: Page):
         """Test that the application loads successfully."""
         # Should show login page initially
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Should have email and password fields
         expect(app_page.locator("input[type='email']")).to_be_visible()
@@ -55,7 +55,7 @@ class TestAppBasics:
         page.goto(live_server)
 
         # Should still show login elements
-        expect(page.locator("h2")).to_contain_text("Login")
+        expect(page.locator("h4")).to_contain_text("Login")
         expect(page.locator("input[type='email']")).to_be_visible()
 
         # Test tablet viewport
@@ -63,14 +63,14 @@ class TestAppBasics:
         page.reload()
 
         # Should still work
-        expect(page.locator("h2")).to_contain_text("Login")
+        expect(page.locator("h4")).to_contain_text("Login")
 
         # Test desktop viewport
         page.set_viewport_size({"width": 1920, "height": 1080})
         page.reload()
 
         # Should still work
-        expect(page.locator("h2")).to_contain_text("Login")
+        expect(page.locator("h4")).to_contain_text("Login")
 
 
 @pytest.mark.playwright
@@ -80,31 +80,31 @@ class TestNavigation:
     def test_login_form_validation(self, app_page: Page):
         """Test login form validation."""
         # Try to submit empty form
-        app_page.locator("button[type='submit']").first.click()
+        app_page.locator("#login-btn").click()
 
         # Should still be on login page (no navigation due to validation)
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Fill in invalid email
         app_page.fill("input[type='email']", "invalid-email")
         app_page.fill("input[type='password']", "password123")
-        app_page.locator("button[type='submit']").first.click()
+        app_page.locator("#login-btn").click()
 
         # Should still be on login page
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
     def test_login_form_elements(self, app_page: Page):
         """Test login form has all necessary elements."""
         # Check email field properties
         email_input = app_page.locator("input[type='email']")
-        expect(email_input).to_have_attribute("placeholder", "Enter your email")
+        expect(email_input).to_have_attribute("placeholder", "Enter email")
 
         # Check password field properties
         password_input = app_page.locator("input[type='password']")
-        expect(password_input).to_have_attribute("placeholder", "Enter your password")
+        expect(password_input).to_have_attribute("placeholder", "Enter password")
 
         # Check forgot password link
-        expect(app_page.locator("text=Forgot password?")).to_be_visible()
+        expect(app_page.locator("text=Forgot your password?")).to_be_visible()
 
         # Check logo is present
         expect(app_page.locator("img")).to_be_visible()

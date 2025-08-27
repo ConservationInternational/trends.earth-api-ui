@@ -14,15 +14,15 @@ class TestAuthenticationFlow:
     def test_login_page_structure(self, app_page: Page):
         """Test login page has correct structure and elements."""
         # Check main heading
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Check form elements exist
         expect(app_page.locator("input[type='email']")).to_be_visible()
         expect(app_page.locator("input[type='password']")).to_be_visible()
-        expect(app_page.locator("button[type='submit']")).to_be_visible()
+        expect(app_page.locator("#login-btn")).to_be_visible()
 
         # Check additional elements
-        expect(app_page.locator("text=Forgot password?")).to_be_visible()
+        expect(app_page.locator("text=Forgot your password?")).to_be_visible()
         expect(app_page.locator("img")).to_be_visible()  # Logo
 
     def test_login_form_interaction(self, app_page: Page):
@@ -45,13 +45,13 @@ class TestAuthenticationFlow:
 
     def test_login_form_validation(self, app_page: Page):
         """Test client-side form validation."""
-        login_button = app_page.locator("button[type='submit']").first
+        login_button = app_page.locator("#login-btn")
 
         # Test empty form submission
         login_button.click()
 
         # Should still be on login page (validation prevented submission)
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Test invalid email format
         app_page.fill("input[type='email']", "invalid-email-format")
@@ -59,7 +59,7 @@ class TestAuthenticationFlow:
         login_button.click()
 
         # Should still be on login page
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
     def test_password_visibility_toggle(self, app_page: Page):
         """Test password field visibility toggle if present."""
@@ -81,7 +81,7 @@ class TestAuthenticationState:
     def test_unauthenticated_state(self, app_page: Page):
         """Test app behavior when not authenticated."""
         # Should show login page
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Should not show dashboard elements
         expect(app_page.locator("text=Dashboard")).not_to_be_visible()
@@ -101,7 +101,7 @@ class TestAuthenticationState:
         expect(authenticated_page.locator("text=Dashboard")).to_be_visible()
 
         # Should not see login form
-        expect(authenticated_page.locator("h2:has-text('Login')")).not_to_be_visible()
+        expect(authenticated_page.locator("h4:has-text('Login')")).not_to_be_visible()
 
         # Should see navigation tabs
         expect(authenticated_page.locator("text=Status")).to_be_visible()
@@ -125,7 +125,7 @@ class TestAuthenticationState:
             logout_button.click()
 
             # Should redirect to login page
-            expect(authenticated_page.locator("h2")).to_contain_text("Login")
+            expect(authenticated_page.locator("h4")).to_contain_text("Login")
 
             # Should clear authentication data
             auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
@@ -143,10 +143,10 @@ class TestAuthenticationErrors:
         app_page.fill("input[type='password']", "wrongpassword")
 
         # Submit form
-        app_page.locator("button[type='submit']").first.click()
+        app_page.locator("#login-btn").click()
 
         # Should remain on login page
-        expect(app_page.locator("h2")).to_contain_text("Login")
+        expect(app_page.locator("h4")).to_contain_text("Login")
 
         # Might show error message (wait briefly for it to appear)
         app_page.wait_for_timeout(2000)
@@ -175,13 +175,13 @@ class TestAuthenticationErrors:
         # Try to login
         page.fill("input[type='email']", "test@example.com")
         page.fill("input[type='password']", "password123")
-        page.locator("button[type='submit']").first.click()
+        page.locator("#login-btn").click()
 
         # Should handle gracefully - either show error or remain on login
         page.wait_for_timeout(3000)
 
         # Should still be on login page or show appropriate error
-        login_heading = page.locator("h2:has-text('Login')")
+        login_heading = page.locator("h4:has-text('Login')")
         assert login_heading.is_visible(), "Should remain on login page after network error"
 
 
@@ -224,7 +224,7 @@ class TestAuthenticationPersistence:
         authenticated_page.reload()
 
         # Should redirect to login
-        expect(authenticated_page.locator("h2")).to_contain_text("Login")
+        expect(authenticated_page.locator("h4")).to_contain_text("Login")
 
         # Storage should be cleared
         auth_token = authenticated_page.evaluate("() => localStorage.getItem('auth_token')")
