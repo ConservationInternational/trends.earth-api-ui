@@ -42,7 +42,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        poetry run python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=xml --cov-report=html
+        poetry run python -m pytest tests/ --ignore=tests/playwright -v --cov=trendsearth_ui --cov-report=xml --cov-report=html
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.11'
@@ -52,3 +52,42 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+
+  playwright-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Install dependencies
+      run: |
+        poetry install --with dev
+
+    - name: Install Playwright browsers
+      run: |
+        # Install chromium browser with dependencies
+        poetry run playwright install chromium --with-deps
+      timeout-minutes: 15
+
+    - name: Run Playwright tests
+      run: |
+        poetry run python -m pytest tests/playwright/ -v
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

@@ -141,6 +141,9 @@ python -m pytest tests/integration/ -v
 
 # Functional tests only
 python -m pytest tests/functional/ -v
+
+# Playwright end-to-end tests only
+python -m pytest tests/playwright/ -v --browser chromium
 ```
 
 #### Run tests with coverage
@@ -153,18 +156,53 @@ python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=html --cov-report=t
 python -m pytest tests/unit/test_config.py -v
 ```
 
+### Playwright End-to-End Testing
+
+The project includes Playwright tests for comprehensive end-to-end testing of the web application.
+
+#### Setup Playwright
+```bash
+# Install playwright browsers (required for local testing)
+poetry run playwright install
+
+# Or install specific browsers
+poetry run playwright install chromium
+```
+
+#### Run Playwright Tests
+```bash
+# Run all playwright tests
+poetry run python -m pytest tests/playwright/ -v --browser chromium
+
+# Run with multiple browsers
+poetry run python -m pytest tests/playwright/ -v --browser chromium --browser firefox
+
+# Run with headed browser (see the browser)
+poetry run python -m pytest tests/playwright/ -v --browser chromium --headed
+
+# Generate test report
+poetry run python -m pytest tests/playwright/ -v --browser chromium --html=playwright-report.html
+```
+
+#### Playwright Test Categories
+- **App Core Tests**: Basic application loading, navigation, and error handling
+- **Authentication Tests**: Login/logout flows and session management
+- **Dashboard Tests**: Tab navigation and dashboard functionality
+
 ### Test Structure
 
 - **`tests/unit/`** - Unit tests for individual components and utilities
 - **`tests/integration/`** - Integration tests for complete app functionality  
 - **`tests/functional/`** - Functional tests for specific features
+- **`tests/playwright/`** - End-to-end tests using Playwright for browser automation
 - **`tests/fixtures/`** - Shared test data and samples
 - **`conftest.py`** - Pytest configuration and fixtures
 
 ### Continuous Integration
 
 Tests and code quality checks are automatically run on GitHub Actions for:
-- **Tests**: Python versions 3.9, 3.11, 3.12 on all pushes to `main` and `develop` branches and pull requests
+- **Tests**: Python versions 3.11, 3.12 on all pushes to `master` and `develop` branches and pull requests
+- **Playwright Tests**: End-to-end testing with Chromium browser automation
 - **Code Quality**: Ruff linting and formatting checks
 - **Coverage**: Code coverage is tracked and reported to Codecov
 
