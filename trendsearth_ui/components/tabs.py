@@ -667,8 +667,8 @@ def status_tab_content(is_admin, role=None):
             ]
         )
 
-    # Check if user is an admin for enhanced statistics
-    is_admin_user = role in ["ADMIN", "SUPERADMIN"]
+    # Check if user is a superadmin for enhanced statistics (API requires SUPERADMIN)
+    is_admin_user = role == "SUPERADMIN"
 
     return html.Div(
         [
@@ -804,55 +804,67 @@ def status_tab_content(is_admin, role=None):
                                 ],
                                 className="mb-3",
                             ),
-                            # Enhanced statistics sections (ADMIN/SUPERADMIN only)
-                            html.Div(
+                            # Enhanced statistics sections (SUPERADMIN only)
+                            *(
                                 [
-                                    # System Overview
                                     html.Div(
                                         [
-                                            html.H5("System Overview", className="mb-3 mt-4"),
-                                            dcc.Loading(
-                                                id="loading-stats-summary",
-                                                children=[html.Div(id="stats-summary-cards")],
-                                                type="default",
-                                                color="#007bff",
+                                            # System Overview
+                                            html.Div(
+                                                [
+                                                    html.H5(
+                                                        "System Overview", className="mb-3 mt-4"
+                                                    ),
+                                                    dcc.Loading(
+                                                        id="loading-stats-summary",
+                                                        children=[
+                                                            html.Div(id="stats-summary-cards")
+                                                        ],
+                                                        type="default",
+                                                        color="#007bff",
+                                                    ),
+                                                ],
+                                                className="mb-4",
                                             ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Hr(),
-                                    # User geographic map
-                                    html.Div(
-                                        [
-                                            html.H5(
-                                                "User Geographic Distribution", className="mb-3"
+                                            html.Hr(),
+                                            # User geographic map
+                                            html.Div(
+                                                [
+                                                    html.H5(
+                                                        "User Geographic Distribution",
+                                                        className="mb-3",
+                                                    ),
+                                                    dcc.Loading(
+                                                        id="loading-stats-map",
+                                                        children=[html.Div(id="stats-user-map")],
+                                                        type="default",
+                                                        color="#007bff",
+                                                    ),
+                                                ],
+                                                className="mb-4",
                                             ),
-                                            dcc.Loading(
-                                                id="loading-stats-map",
-                                                children=[html.Div(id="stats-user-map")],
-                                                type="default",
-                                                color="#007bff",
+                                            html.Hr(),
+                                            # Additional statistics charts
+                                            html.Div(
+                                                [
+                                                    html.H5("Detailed Analytics", className="mb-3"),
+                                                    dcc.Loading(
+                                                        id="loading-stats-charts",
+                                                        children=[
+                                                            html.Div(id="stats-additional-charts")
+                                                        ],
+                                                        type="default",
+                                                        color="#007bff",
+                                                    ),
+                                                ],
+                                                className="mb-4",
                                             ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Hr(),
-                                    # Additional statistics charts
-                                    html.Div(
-                                        [
-                                            html.H5("Detailed Analytics", className="mb-3"),
-                                            dcc.Loading(
-                                                id="loading-stats-charts",
-                                                children=[html.Div(id="stats-additional-charts")],
-                                                type="default",
-                                                color="#007bff",
-                                            ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Hr(),
-                                ],
-                                style={"display": "block" if is_admin_user else "none"},
+                                            html.Hr(),
+                                        ]
+                                    )
+                                ]
+                                if is_admin_user
+                                else []
                             ),
                             # Status trends charts
                             html.H5("System Status Trends", className="mb-3"),

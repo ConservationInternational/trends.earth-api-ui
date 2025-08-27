@@ -135,7 +135,11 @@ def register_callbacks(app):
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
-                params={"per_page": 1, "sort": "-timestamp"},
+                params={
+                    "per_page": 1,
+                    "sort": "-timestamp",
+                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                },
                 timeout=5,  # Reduced from 10 seconds
             )
 
@@ -170,34 +174,92 @@ def register_callbacks(app):
                     except (ValueError, TypeError):
                         timestamp_display = "Invalid timestamp format"
 
-                    # Extract status details
-                    executions = latest_status.get("executions", {})
-                    users = latest_status.get("users", {})
-                    system = latest_status.get("system", {})
+                    # Extract status details for different sections
+                    executions_active = latest_status.get("executions_active", 0)
+                    executions_ready = latest_status.get("executions_ready", 0)
+                    executions_running = latest_status.get("executions_running", 0)
+                    executions_finished = latest_status.get("executions_finished", 0)
+                    users_count = latest_status.get("users_count", 0)
+                    scripts_count = latest_status.get("scripts_count", 0)
+                    memory_available_percent = latest_status.get("memory_available_percent", 0)
+                    cpu_usage_percent = latest_status.get("cpu_usage_percent", 0)
 
-                    # Create summary layout
+                    # Create summary layout with expected section headers
                     summary_layout = html.Div(
                         [
+                            # Active Executions Section
+                            html.H5("Active Executions", className="text-center mb-3 text-muted"),
                             html.Div(
                                 [
                                     html.Div(
                                         [
-                                            html.H6("Executions", className="mb-2"),
+                                            html.H6("Running", className="mb-2"),
                                             html.P(
-                                                f"Total: {executions.get('total', 0)}",
-                                                className="mb-1",
-                                            ),
-                                            html.P(
-                                                f"Running: {executions.get('running', 0)}",
+                                                str(executions_running),
                                                 className="text-primary mb-1",
                                             ),
+                                        ],
+                                        className="col-md-4 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Ready", className="mb-2"),
                                             html.P(
-                                                f"Finished: {executions.get('finished', 0)}",
+                                                str(executions_ready),
+                                                className="text-info mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-4 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Active Total", className="mb-2"),
+                                            html.P(
+                                                str(executions_active),
                                                 className="text-success mb-1",
                                             ),
+                                        ],
+                                        className="col-md-4 text-center",
+                                    ),
+                                ],
+                                className="row mb-4",
+                            ),
+                            # Completed Executions Section
+                            html.H5(
+                                "Completed Executions", className="text-center mb-3 text-muted"
+                            ),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H6("Finished", className="mb-2"),
                                             html.P(
-                                                f"Failed: {executions.get('failed', 0)}",
-                                                className="text-danger mb-1",
+                                                str(executions_finished),
+                                                className="text-success mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-6 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Last Updated", className="mb-2"),
+                                            timestamp_display,
+                                        ],
+                                        className="col-md-6 text-center",
+                                    ),
+                                ],
+                                className="row mb-4",
+                            ),
+                            # Summary Totals Section
+                            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H6("Total Executions", className="mb-2"),
+                                            html.P(
+                                                str(executions_active + executions_finished),
+                                                className="mb-1",
                                             ),
                                         ],
                                         className="col-md-3 text-center",
@@ -206,12 +268,18 @@ def register_callbacks(app):
                                         [
                                             html.H6("Users", className="mb-2"),
                                             html.P(
-                                                f"Total: {users.get('total', 0)}",
+                                                str(users_count),
                                                 className="mb-1",
                                             ),
+                                        ],
+                                        className="col-md-3 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Scripts", className="mb-2"),
                                             html.P(
-                                                f"Active (24h): {users.get('active_24h', 0)}",
-                                                className="text-info mb-1",
+                                                str(scripts_count),
+                                                className="mb-1",
                                             ),
                                         ],
                                         className="col-md-3 text-center",
@@ -220,26 +288,19 @@ def register_callbacks(app):
                                         [
                                             html.H6("System", className="mb-2"),
                                             html.P(
-                                                f"CPU: {system.get('cpu_percent', 0)}%",
+                                                f"CPU: {cpu_usage_percent}%",
                                                 className="mb-1",
                                             ),
                                             html.P(
-                                                f"Memory: {system.get('memory_percent', 0)}%",
+                                                f"Memory: {memory_available_percent}%",
                                                 className="mb-1",
                                             ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Last Updated", className="mb-2"),
-                                            timestamp_display,
                                         ],
                                         className="col-md-3 text-center",
                                     ),
                                 ],
                                 className="row",
-                            )
+                            ),
                         ]
                     )
                     set_cached_data("summary", summary_layout)
@@ -368,7 +429,11 @@ def register_callbacks(app):
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
-                params={"per_page": 1, "sort": "-timestamp"},
+                params={
+                    "per_page": 1,
+                    "sort": "-timestamp",
+                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                },
                 timeout=5,  # Reduced from 10 seconds
             )
 
@@ -663,49 +728,57 @@ def register_callbacks(app):
             )
 
     @app.callback(
-        Output("status-time-tabs-store", "data"),
+        [
+            Output("status-tab-day", "className"),
+            Output("status-tab-week", "className"),
+            Output("status-tab-month", "className"),
+            Output("status-time-tabs-store", "data"),
+        ],
         [
             Input("status-tab-day", "n_clicks"),
             Input("status-tab-week", "n_clicks"),
             Input("status-tab-month", "n_clicks"),
         ],
     )
-    def update_active_status_tab(_day_clicks, _week_clicks, _month_clicks):
-        """Update the hidden store with the active status tab."""
+    def switch_status_time_tabs(_day_clicks, _week_clicks, _month_clicks):
+        """Update the visual style of the active status tab and store the active tab."""
         ctx = callback_context
         if not ctx.triggered:
-            return "day"
+            return "nav-link active", "nav-link", "nav-link", "day"
+
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
         if button_id == "status-tab-week":
-            return "week"
+            return "nav-link", "nav-link active", "nav-link", "week"
         if button_id == "status-tab-month":
-            return "month"
-        return "day"
-
-    @app.callback(
-        [
-            Output("status-tab-day", "className"),
-            Output("status-tab-week", "className"),
-            Output("status-tab-month", "className"),
-        ],
-        [Input("status-time-tabs-store", "data")],
-    )
-    def update_status_tab_styles(active_tab):
-        """Update the visual style of the active status tab."""
-        if active_tab == "week":
-            return "nav-link", "nav-link active", "nav-link"
-        if active_tab == "month":
-            return "nav-link", "nav-link", "nav-link active"
-        return "nav-link active", "nav-link", "nav-link"
+            return "nav-link", "nav-link", "nav-link active", "month"
+        return "nav-link active", "nav-link", "nav-link", "day"
 
     @app.callback(
         Output("status-countdown", "children"),
-        Input("status-countdown-interval", "n_intervals"),
-        State("status-auto-refresh-interval", "interval"),
+        [
+            Input("status-countdown-interval", "n_intervals"),
+            Input("refresh-status-btn", "n_clicks"),
+        ],
+        [
+            State("active-tab-store", "data"),
+        ],
     )
-    def update_countdown(n, interval_ms):
+    def update_status_countdown(n_intervals, _refresh_clicks, active_tab):
         """Update the countdown timer display."""
-        if n is None:
+        ctx = callback_context
+
+        # If refresh button was clicked, reset to 60s
+        if ctx.triggered and any("refresh-status-btn" in t["prop_id"] for t in ctx.triggered):
             return "60s"
-        seconds_remaining = (interval_ms / 1000) - (n % (interval_ms / 1000))
-        return f"{int(seconds_remaining)}s"
+
+        # If not on status tab, return 60s
+        if active_tab != "status":
+            return "60s"
+
+        # Normal countdown progression
+        if n_intervals is None:
+            return "60s"
+
+        # Calculate remaining seconds (60 second intervals)
+        seconds_remaining = 60 - (n_intervals % 60)
+        return f"{seconds_remaining}s"
