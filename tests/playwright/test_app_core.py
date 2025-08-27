@@ -6,8 +6,11 @@ Tests basic app loading, navigation, and core features.
 from playwright.sync_api import Page, expect
 import pytest
 
+from .conftest import skip_if_no_browsers
+
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestAppBasics:
     """Test basic application functionality."""
 
@@ -74,6 +77,7 @@ class TestAppBasics:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestNavigation:
     """Test application navigation."""
 
@@ -127,6 +131,7 @@ class TestNavigation:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestErrorHandling:
     """Test error handling and edge cases."""
 

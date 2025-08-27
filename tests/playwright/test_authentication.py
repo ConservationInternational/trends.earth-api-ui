@@ -6,8 +6,11 @@ Tests login, logout, and authentication state management.
 from playwright.sync_api import Page, expect
 import pytest
 
+from .conftest import skip_if_no_browsers
+
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestAuthenticationFlow:
     """Test authentication workflows."""
 
@@ -75,6 +78,7 @@ class TestAuthenticationFlow:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestAuthenticationState:
     """Test authentication state management."""
 
@@ -140,6 +144,7 @@ class TestAuthenticationState:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestAuthenticationErrors:
     """Test authentication error scenarios."""
 
@@ -193,6 +198,7 @@ class TestAuthenticationErrors:
 
 
 @pytest.mark.playwright
+@skip_if_no_browsers
 class TestAuthenticationPersistence:
     """Test authentication persistence across sessions."""
 
