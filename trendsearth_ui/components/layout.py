@@ -284,8 +284,8 @@ def login_layout():
                                                 html.Div(
                                                     id="login-feedback",
                                                     style={
-                                                        "margin-top": "10px",
-                                                        "min-height": "20px",
+                                                        "marginTop": "10px",
+                                                        "minHeight": "20px",
                                                     },
                                                 ),
                                             ]

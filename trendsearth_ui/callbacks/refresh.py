@@ -61,7 +61,7 @@ def register_callbacks(app):
             return (
                 html.Pre(
                     f"Failed to fetch logs: {str(e)}",
-                    style={"color": "red", "white-space": "pre-wrap"},
+                    style={"color": "red", "whiteSpace": "pre-wrap"},
                 ),
                 {"logs": f"Error: {str(e)}"},
                 0,
