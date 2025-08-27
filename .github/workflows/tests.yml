@@ -76,7 +76,17 @@ jobs:
 
     - name: Install Playwright browsers
       run: |
-        poetry run playwright install --with-deps
+        # Install only chromium browser with dependencies and retry on failure
+        for i in {1..3}; do
+          if poetry run playwright install chromium --with-deps; then
+            echo "Browser installation successful on attempt $i"
+            break
+          else
+            echo "Browser installation failed on attempt $i, retrying..."
+            sleep 10
+          fi
+        done
+      timeout-minutes: 15
 
     - name: Run Playwright tests
       run: |

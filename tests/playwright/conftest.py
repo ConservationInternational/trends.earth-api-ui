@@ -12,6 +12,26 @@ import requests
 from trendsearth_ui.app import app
 
 
+def pytest_configure(config):
+    """Configure pytest for playwright tests."""
+    # Check if playwright browsers are available
+    try:
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            try:
+                browser = p.chromium.launch(headless=True)
+                browser.close()
+            except Exception as e:
+                print(f"⚠️  Playwright browsers not available: {e}")
+                print("ℹ️  Skipping playwright tests. Run 'playwright install' to fix.")
+                # Mark all playwright tests as skipped
+                config.option.markexpr = "not playwright"
+    except ImportError:
+        print("⚠️  Playwright not installed, skipping playwright tests")
+        config.option.markexpr = "not playwright"
+
+
 @pytest.fixture(scope="session")
 def live_server():
     """Start the Dash app in a separate thread for testing."""
