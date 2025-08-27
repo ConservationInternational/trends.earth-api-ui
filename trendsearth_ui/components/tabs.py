@@ -101,9 +101,23 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         "className": "ag-theme-alpine responsive-table",
     }
 
-    # Add style conditions if provided
+    # Add row styling via a proper JS function if provided
     if style_data_conditional:
-        base_config["getRowStyle"] = {"styleConditions": style_data_conditional}
+        # Build a JS function that returns a style object based on the provided conditions
+        js_lines = [
+            "function(params) {",
+            "  const d = (params && params.data) || {};",
+        ]
+        for cond in style_data_conditional:
+            condition = cond.get("condition", "false")
+            style = cond.get("style", {})
+            # Convert the Python dict to a JS object literal string
+            style_pairs = [f"{key}: '{value}'" for key, value in style.items()]
+            style_js = "{" + ", ".join(style_pairs) + "}"
+            js_lines.append(f"  if ({condition}) return {style_js};")
+        js_lines.append("  return null;")
+        js_lines.append("}")
+        base_config["getRowStyle"] = {"function": "\n".join(js_lines)}
 
     return html.Div(
         [

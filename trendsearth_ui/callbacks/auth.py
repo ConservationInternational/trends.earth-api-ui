@@ -12,9 +12,7 @@ from ..components import dashboard_layout, login_layout
 from ..config import get_api_base, get_auth_url
 from ..utils import (
     create_auth_cookie_data,
-    extract_auth_from_cookie,
     get_user_info,
-    is_auth_cookie_valid,
     logout_user,
     refresh_access_token,
     should_refresh_token,
@@ -32,28 +30,26 @@ def register_callbacks(app):
         [
             Output("page-content", "children"),
             Output("token-store", "clear_data"),
-            Output("token-store", "data", allow_duplicate=True),
-            Output("role-store", "data", allow_duplicate=True),
-            Output("user-store", "data", allow_duplicate=True),
-            Output("api-environment-store", "data", allow_duplicate=True),
+            Output("token-store", "data"),
+            Output("role-store", "data"),
+            Output("user-store", "data"),
+            Output("api-environment-store", "data"),
         ],
         [
+            Input("url", "pathname"),
             Input("token-store", "data"),
-            Input("url", "pathname"),  # Use URL pathname to trigger on page load
         ],
         [
             State("api-environment-store", "data"),
         ],
-        prevent_initial_call="initial_duplicate",
+        # Run on initial load so we render login or dashboard immediately
+        # (we intentionally allow the first call to render based on cookie/token state)
+        # prevent_initial_call=False is default; leaving it out triggers on startup
     )
-    def display_page(token, _pathname, current_api_environment):
-        """Display login or dashboard based on authentication status."""
-        # Check if we have a valid token in store
+    def display_page(_pathname, token, current_api_environment):
+        """Display login or dashboard based on token-store state only."""
         if token:
-            print("✅ Token found in store, displaying dashboard layout")
             dashboard = dashboard_layout()
-            print(f"🏗️ Dashboard layout created: {type(dashboard)}")
-            # Preserve the current API environment when showing dashboard
             return (
                 dashboard,
                 False,
@@ -63,106 +59,21 @@ def register_callbacks(app):
                 current_api_environment or "production",
             )
 
-        # If no token in store, check HTTP cookie for valid authentication
-        cookie_data = None
-        try:
-            auth_cookie = request.cookies.get("auth_token")
-            if auth_cookie:
-                cookie_data = json.loads(auth_cookie)
-        except Exception as e:
-            print(f"Error reading auth cookie: {e}")
-            cookie_data = None
-
-        if cookie_data and is_auth_cookie_valid(cookie_data):
-            (
-                stored_access_token,
-                stored_refresh_token,
-                stored_email,
-                stored_user_data,
-                stored_api_environment,
-            ) = extract_auth_from_cookie(cookie_data)
-            if stored_access_token and stored_refresh_token and stored_user_data:
-                print(
-                    f"🍪 Restored authentication from cookie for: {stored_email} (Environment: {stored_api_environment})"
-                )
-
-                # Check if the JWT access token needs to be refreshed (based on token expiration, not cookie expiration)
-                needs_refresh = should_refresh_token(stored_access_token, buffer_minutes=5)
-
-                if needs_refresh:
-                    print("🔄 Access token is expired or close to expiry, refreshing...")
-                    # Try to refresh the access token to ensure it's still valid
-                    # Use the stored API environment for the refresh call
-                    new_access_token, expires_in = refresh_access_token(
-                        stored_refresh_token, stored_api_environment
-                    )
-                    if new_access_token:
-                        print("🔄 Access token refreshed successfully during page load")
-                        # Update cookie with new access token and extend expiration
-                        ctx = callback_context
-                        if hasattr(ctx, "response") and ctx.response:
-                            new_cookie_data = create_auth_cookie_data(
-                                new_access_token,
-                                stored_refresh_token,
-                                stored_email,
-                                stored_user_data,
-                                stored_api_environment,
-                            )
-                            cookie_value = json.dumps(new_cookie_data)
-                            expiration = datetime.now() + timedelta(days=30)
-                            ctx.response.set_cookie(
-                                "auth_token",
-                                cookie_value,
-                                expires=expiration,
-                                httponly=True,
-                                secure=False,  # Set to True in production with HTTPS
-                                samesite="Lax",
-                            )
-                            print("🍪 Extended authentication cookie during page load")
-                        role = stored_user_data.get("role", "USER")
-                        return (
-                            dashboard_layout(),
-                            False,
-                            new_access_token,
-                            role,
-                            stored_user_data,
-                            stored_api_environment,
-                        )
-                    else:
-                        # Failed to refresh token, clear invalid cookie
-                        print("❌ Failed to refresh access token during page load, clearing cookie")
-                        ctx = callback_context
-                        if hasattr(ctx, "response") and ctx.response:
-                            ctx.response.set_cookie(
-                                "auth_token",
-                                "",
-                                expires=0,
-                                httponly=True,
-                                secure=False,
-                                samesite="Lax",
-                            )
-                            print("🍪 Cleared invalid authentication cookie")
-                else:
-                    # Token is still fresh, use existing token without refreshing
-                    print("✅ Access token is still fresh, no refresh needed")
-                    role = stored_user_data.get("role", "USER")
-                    return (
-                        dashboard_layout(),
-                        False,
-                        stored_access_token,
-                        role,
-                        stored_user_data,
-                        stored_api_environment,
-                    )
-
-        # No valid authentication found, show login page
-        return login_layout(), True, None, None, None, "production"
+        # No token: show login and avoid writing stores to prevent loops
+        return (
+            login_layout(),
+            False,
+            no_update,
+            no_update,
+            no_update,
+            (current_api_environment or "production"),
+        )
 
     @app.callback(
         [
-            Output("token-store", "data"),
-            Output("role-store", "data"),
-            Output("user-store", "data"),
+            Output("token-store", "data", allow_duplicate=True),
+            Output("role-store", "data", allow_duplicate=True),
+            Output("user-store", "data", allow_duplicate=True),
             Output("api-environment-store", "data", allow_duplicate=True),
             Output("login-alert", "children"),
             Output("login-alert", "color"),
@@ -358,7 +269,7 @@ def register_callbacks(app):
             # Call logout API to revoke refresh token
             if current_token and refresh_token_to_revoke:
                 logout_success = logout_user(
-                    current_token, refresh_token_to_revoke, api_environment
+                    current_token, refresh_token_to_revoke, api_environment or "production"
                 )
                 if logout_success:
                     print("✅ Successfully logged out from API")
@@ -693,7 +604,9 @@ def register_callbacks(app):
             return no_update
 
         # Try to refresh the token using the stored API environment
-        new_access_token, expires_in = refresh_access_token(refresh_token, api_environment)
+        new_access_token, expires_in = refresh_access_token(
+            refresh_token, api_environment or "production"
+        )
         if new_access_token and new_access_token != current_token:
             print("🔄 Auto-refreshed access token")
 
@@ -703,13 +616,17 @@ def register_callbacks(app):
                 if auth_cookie:
                     cookie_data = json.loads(auth_cookie)
                     if cookie_data:
-                        email = cookie_data.get("email")
-                        user_data = cookie_data.get("user_data")
+                        email = cookie_data.get("email") or ""
+                        user_data = cookie_data.get("user_data") or {}
 
                         ctx = callback_context
                         if hasattr(ctx, "response") and ctx.response:
                             new_cookie_data = create_auth_cookie_data(
-                                new_access_token, refresh_token, email, user_data, api_environment
+                                new_access_token,
+                                refresh_token,
+                                email,
+                                user_data,
+                                api_environment or "production",
                             )
                             cookie_value = json.dumps(new_cookie_data)
                             expiration = datetime.now() + timedelta(days=30)
@@ -724,9 +641,9 @@ def register_callbacks(app):
             except Exception as e:
                 print(f"Error updating cookie during auto-refresh: {e}")
 
-            return [new_access_token]
+            return new_access_token
 
-        return [no_update]
+        return no_update
 
     @app.callback(
         [
@@ -784,7 +701,9 @@ def register_callbacks(app):
             return no_update, no_update
 
         # Try to refresh the token proactively
-        new_access_token, expires_in = refresh_access_token(refresh_token, api_environment)
+        new_access_token, expires_in = refresh_access_token(
+            refresh_token, api_environment or "production"
+        )
         if new_access_token:
             if new_access_token != current_token:
                 print("🔄 Proactively refreshed access token")
@@ -792,8 +711,8 @@ def register_callbacks(app):
             # Always update cookie to extend session even if token didn't change
             try:
                 if cookie_data:
-                    email = cookie_data.get("email")
-                    stored_user_data = cookie_data.get("user_data")
+                    email = cookie_data.get("email") or ""
+                    stored_user_data = cookie_data.get("user_data") or {}
 
                     ctx = callback_context
                     if hasattr(ctx, "response") and ctx.response:
@@ -802,7 +721,7 @@ def register_callbacks(app):
                             refresh_token,
                             email,
                             stored_user_data,
-                            api_environment,
+                            api_environment or "production",
                         )
                         cookie_value = json.dumps(new_cookie_data)
                         expiration = datetime.now() + timedelta(days=30)

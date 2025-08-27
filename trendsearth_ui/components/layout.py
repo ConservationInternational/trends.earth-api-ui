@@ -35,7 +35,7 @@ def create_main_layout():
 
     return dbc.Container(
         [
-            html.Div(id="page-content"),
+            html.Div(id="page-content", children=login_layout()),
             html.Div(id="tab-content"),
             # URL component for navigation tracking
             dcc.Location(id="url", refresh=False),
@@ -87,11 +87,7 @@ def login_layout():
     """Create the login page layout."""
     return html.Div(
         [
-            # Hidden store to prevent callback errors
-            dcc.Store(id="active-tab-store", data=None, storage_type="memory"),
-            dcc.Store(
-                id="api-environment-store", data=DEFAULT_API_ENVIRONMENT, storage_type="memory"
-            ),
+            # Stores are defined globally in the main layout; avoid duplicates here
             # Forgot password modal
             dbc.Modal(
                 [
@@ -484,9 +480,7 @@ def dashboard_layout():
             id="main-panel",
             is_open=True,
         ),
-        # Hidden stores
-        dcc.Store(id="active-tab-store", data="executions"),
-        dcc.Store(id="api-environment-store", storage_type="memory"),  # Don't set default data here
+        # Hidden stores are defined globally in the main layout; avoid duplicates here
         # Proactive token refresh interval (every 5 minutes)
         dcc.Interval(
             id="token-refresh-interval",
