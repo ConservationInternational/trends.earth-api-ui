@@ -36,8 +36,7 @@ def register_callbacks(app):
                 from . import status
 
                 if hasattr(status, "_status_cache"):
-                    status._status_cache["summary"]["data"] = None
-                    status._status_cache["charts"]["data"] = {}
+                    status._status_cache.clear()
             except ImportError:
                 pass  # Status module may not be available
 

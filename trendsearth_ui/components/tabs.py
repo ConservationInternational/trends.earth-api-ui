@@ -666,8 +666,8 @@ def status_tab_content(is_admin, role=None):
             ]
         )
 
-    # Check if user is SUPERADMIN for enhanced statistics
-    is_superadmin = role == "SUPERADMIN"
+    # Check if user is an admin for enhanced statistics
+    is_admin_user = role in ["ADMIN", "SUPERADMIN"]
 
     return html.Div(
         [
@@ -804,7 +804,7 @@ def status_tab_content(is_admin, role=None):
                                 className="mb-3",
                             ),
                             # Enhanced statistics sections (ADMIN/SUPERADMIN only)
-                            *(
+                            html.Div(
                                 [
                                     # System Overview
                                     html.Div(
@@ -850,9 +850,8 @@ def status_tab_content(is_admin, role=None):
                                         className="mb-4",
                                     ),
                                     html.Hr(),
-                                ]
-                                if is_superadmin  # Show for SUPERADMIN users only
-                                else []
+                                ],
+                                style={"display": "block" if is_admin_user else "none"},
                             ),
                             # Status trends charts
                             html.H5("System Status Trends", className="mb-3"),
