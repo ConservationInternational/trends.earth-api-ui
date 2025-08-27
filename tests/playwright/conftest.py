@@ -159,3 +159,328 @@ def browser_context_args(browser_context_args):
         "viewport": {"width": 1280, "height": 720},
         "ignore_https_errors": True,
     }
+
+
+# Mock data generation functions for Playwright tests
+
+
+def generate_mock_executions_data(count=10, page=1, per_page=50):
+    """Generate mock execution data for Playwright tests."""
+    from datetime import datetime, timedelta
+    import random
+
+    statuses = ["FINISHED", "RUNNING", "FAILED", "QUEUED", "CANCELLED"]
+    script_names = [
+        "Land Degradation Analysis",
+        "Vegetation Index Calculation",
+        "Soil Erosion Assessment",
+        "Carbon Stock Monitoring",
+        "Drought Impact Analysis",
+        "Urban Expansion Detection",
+        "Forest Change Detection",
+        "Biodiversity Mapping",
+        "Agricultural Productivity",
+        "Water Quality Assessment",
+    ]
+    users = [
+        "Alice Johnson",
+        "Bob Smith",
+        "Carol Davis",
+        "David Wilson",
+        "Emma Brown",
+        "Frank Miller",
+        "Grace Lee",
+        "Henry Chen",
+        "Isabel Garcia",
+        "Jack Robinson",
+    ]
+
+    executions = []
+    base_date = datetime(2024, 1, 1)
+
+    for i in range(count):
+        status = random.choice(statuses)
+        start_date = base_date + timedelta(days=i, hours=random.randint(0, 23))
+        end_date = None
+        progress = 0
+
+        if status == "FINISHED":
+            end_date = start_date + timedelta(minutes=random.randint(30, 180))
+            progress = 100
+        elif status == "RUNNING":
+            progress = random.randint(10, 90)
+        elif status == "FAILED":
+            end_date = start_date + timedelta(minutes=random.randint(5, 60))
+            progress = random.randint(5, 50)
+
+        execution = {
+            "id": f"exec-{i + 1}",
+            "script_name": random.choice(script_names),
+            "user_name": random.choice(users),
+            "status": status,
+            "start_date": start_date.isoformat() + "Z",
+            "end_date": end_date.isoformat() + "Z" if end_date else None,
+            "progress": progress,
+        }
+        executions.append(execution)
+
+    return {
+        "data": executions,
+        "total": count * 3,  # Simulate more total records than current page
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+def generate_mock_scripts_data(count=10, page=1, per_page=50):
+    """Generate mock script data for Playwright tests."""
+    from datetime import datetime, timedelta
+    import random
+
+    statuses = ["PUBLISHED", "DRAFT", "ARCHIVED", "UNDER_REVIEW"]
+    script_names = [
+        "NDVI Time Series Analysis",
+        "Land Cover Classification",
+        "Soil Organic Carbon Estimation",
+        "Precipitation Trend Analysis",
+        "Deforestation Risk Assessment",
+        "Agricultural Yield Prediction",
+        "Wetland Monitoring System",
+        "Urban Heat Island Detection",
+        "Coastal Erosion Mapping",
+        "Grassland Productivity Index",
+    ]
+    descriptions = [
+        "Automated analysis of vegetation health indicators",
+        "Machine learning-based land cover mapping",
+        "Carbon stock assessment using satellite data",
+        "Climate trend analysis for agricultural planning",
+        "Early warning system for forest loss",
+        "Crop yield forecasting model",
+        "Wetland ecosystem health monitoring",
+        "Urban temperature analysis tool",
+        "Coastal change detection algorithm",
+        "Grassland productivity monitoring system",
+    ]
+    users = [
+        "Dr. Sarah Mitchell",
+        "Prof. Michael Thompson",
+        "Dr. Lisa Wang",
+        "Dr. James Rodriguez",
+        "Dr. Rachel Green",
+        "Prof. David Kim",
+        "Dr. Maria Santos",
+        "Dr. Ahmed Hassan",
+        "Dr. Jennifer Liu",
+        "Dr. Carlos Mendez",
+    ]
+
+    scripts = []
+    base_date = datetime(2024, 1, 1)
+
+    for i in range(count):
+        created_date = base_date + timedelta(days=i * 3, hours=random.randint(0, 23))
+        updated_date = created_date + timedelta(days=random.randint(0, 30))
+
+        script = {
+            "id": f"script-{i + 1}",
+            "name": script_names[i % len(script_names)],
+            "user_name": users[i % len(users)],
+            "description": descriptions[i % len(descriptions)],
+            "status": random.choice(statuses),
+            "created_at": created_date.isoformat() + "Z",
+            "updated_at": updated_date.isoformat() + "Z",
+        }
+        scripts.append(script)
+
+    return {
+        "data": scripts,
+        "total": count * 2,  # Simulate more total records than current page
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+def generate_mock_users_data(count=10, page=1, per_page=50):
+    """Generate mock user data for Playwright tests."""
+    from datetime import datetime, timedelta
+    import random
+
+    roles = ["USER", "ADMIN", "MODERATOR", "VIEWER"]
+    institutions = [
+        "Conservation International",
+        "World Wildlife Fund",
+        "UNEP",
+        "FAO",
+        "CIAT",
+        "CIFOR",
+        "ICRAF",
+        "NASA",
+        "ESA",
+        "USGS",
+        "University of Oxford",
+        "Stanford University",
+        "MIT",
+        "Harvard University",
+        "Cambridge University",
+    ]
+    countries = [
+        "United States",
+        "United Kingdom",
+        "Germany",
+        "France",
+        "Brazil",
+        "Kenya",
+        "South Africa",
+        "India",
+        "China",
+        "Australia",
+        "Canada",
+        "Mexico",
+        "Colombia",
+        "Indonesia",
+        "Philippines",
+    ]
+
+    first_names = [
+        "Alice",
+        "Bob",
+        "Carol",
+        "David",
+        "Emma",
+        "Frank",
+        "Grace",
+        "Henry",
+        "Isabel",
+        "Jack",
+        "Karen",
+        "Liam",
+        "Maria",
+        "Nathan",
+        "Olivia",
+        "Peter",
+    ]
+    last_names = [
+        "Johnson",
+        "Smith",
+        "Davis",
+        "Wilson",
+        "Brown",
+        "Miller",
+        "Lee",
+        "Chen",
+        "Garcia",
+        "Robinson",
+        "Anderson",
+        "Taylor",
+        "Thomas",
+        "Martinez",
+        "Clark",
+        "Lewis",
+    ]
+
+    users = []
+    base_date = datetime(2023, 6, 1)
+
+    for i in range(count):
+        first_name = random.choice(first_names)
+        last_name = random.choice(last_names)
+        name = f"{first_name} {last_name}"
+        email = f"{first_name.lower()}.{last_name.lower()}@example.com"
+
+        created_date = base_date + timedelta(days=i * 7, hours=random.randint(0, 23))
+        updated_date = created_date + timedelta(days=random.randint(1, 60))
+
+        user = {
+            "id": f"user-{i + 1}",
+            "email": email,
+            "name": name,
+            "institution": random.choice(institutions),
+            "country": random.choice(countries),
+            "role": random.choice(roles),
+            "created_at": created_date.isoformat() + "Z",
+            "updated_at": updated_date.isoformat() + "Z",
+        }
+        users.append(user)
+
+    return {
+        "data": users,
+        "total": count * 4,  # Simulate more total records than current page
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+def generate_mock_status_data():
+    """Generate mock status/system data for Playwright tests."""
+    from datetime import datetime
+    import random
+
+    # Generate mock system statistics
+    current_time = datetime.now()
+
+    # Mock execution statistics
+    total_executions = random.randint(150, 300)
+    running_executions = random.randint(5, 25)
+    finished_executions = random.randint(100, 200)
+    failed_executions = total_executions - running_executions - finished_executions
+
+    # Mock user statistics
+    total_users = random.randint(50, 150)
+    active_users_24h = random.randint(10, 40)
+
+    # Mock system metrics
+    cpu_usage = random.randint(15, 85)
+    memory_usage = random.randint(30, 90)
+
+    status_data = {
+        "data": {
+            "executions": {
+                "total": total_executions,
+                "running": running_executions,
+                "finished": finished_executions,
+                "failed": failed_executions,
+            },
+            "users": {
+                "total": total_users,
+                "active_24h": active_users_24h,
+            },
+            "system": {
+                "cpu_usage": cpu_usage,
+                "memory_usage": memory_usage,
+                "uptime": "15 days, 3 hours",
+                "version": "v2.1.0",
+            },
+            "last_updated": current_time.isoformat() + "Z",
+            "timestamp": current_time.isoformat() + "Z",
+        }
+    }
+
+    return status_data
+
+
+# Pytest fixtures for easy access to mock data in tests
+
+
+@pytest.fixture
+def mock_executions_data():
+    """Fixture providing mock executions data for Playwright tests."""
+    return generate_mock_executions_data()
+
+
+@pytest.fixture
+def mock_scripts_data():
+    """Fixture providing mock scripts data for Playwright tests."""
+    return generate_mock_scripts_data()
+
+
+@pytest.fixture
+def mock_users_data():
+    """Fixture providing mock users data for Playwright tests."""
+    return generate_mock_users_data()
+
+
+@pytest.fixture
+def mock_status_data():
+    """Fixture providing mock status data for Playwright tests."""
+    return generate_mock_status_data()
