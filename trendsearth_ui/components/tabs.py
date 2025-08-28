@@ -303,6 +303,9 @@ def executions_tab_content():
             ),
             # Store to hold execution data for cancel operation
             dcc.Store(id="cancel-execution-store"),
+            # Store components for status filter (needed by callbacks)
+            dcc.Store(id="executions-status-filter-selected", data=[]),
+            dcc.Store(id="executions-status-filter-active", data=False),
             # Modal to display cancellation results
             dbc.Modal(
                 [
