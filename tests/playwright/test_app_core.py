@@ -145,9 +145,7 @@ class TestErrorHandling:
 
         # The client-side router should handle the invalid route.
         # In our case, it should display the login page as a fallback.
-        expect(page.locator("h4:has-text('Login')")).to_be_visible(
-            timeout=5000
-        )
+        expect(page.locator("h4:has-text('Login')")).to_be_visible(timeout=5000)
         expect(page).to_have_url(f"{live_server}/this-route-does-not-exist")
 
     def test_javascript_enabled(self, app_page: Page):

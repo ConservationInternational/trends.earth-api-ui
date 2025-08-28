@@ -88,7 +88,7 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         },
         "columnSize": "sizeToFit"
         if not all_columns or len(all_columns) <= 5
-        else "autoSize",  # Use autoSize for many columns
+        else None,  # Use autoSize for many columns
         "rowModelType": "infinite",
         "dashGridOptions": base_grid_options,
         "style": {
@@ -100,23 +100,39 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         "className": "ag-theme-alpine responsive-table",
     }
 
-    # Add row styling via a proper JS function if provided
+    # Add row styling based on status using getRowStyle in dashGridOptions
     if style_data_conditional:
-        # Build a JS function that returns a style object based on the provided conditions
-        js_lines = [
-            "function(params) {",
-            "  const d = (params && params.data) || {};",
-        ]
+        # Create a JavaScript function string that returns inline styles
+        js_function_lines = []
         for cond in style_data_conditional:
             condition = cond.get("condition", "false")
             style = cond.get("style", {})
-            # Convert the Python dict to a JS object literal string
-            style_pairs = [f"{key}: '{value}'" for key, value in style.items()]
-            style_js = "{" + ", ".join(style_pairs) + "}"
-            js_lines.append(f"  if ({condition}) return {style_js};")
-        js_lines.append("  return null;")
-        js_lines.append("}")
-        base_config["getRowStyle"] = {"function": "\n".join(js_lines)}
+
+            if "params.data.status === '" in condition and style:
+                status_value = condition.split("params.data.status === '")[1].split("'")[0]
+                bg_color = style.get("backgroundColor", "")
+                text_color = style.get("color", "")
+
+                if bg_color and text_color:
+                    js_function_lines.append(
+                        f"if (params.data && params.data.status === '{status_value}') {{ "
+                        f"return {{backgroundColor: '{bg_color}', color: '{text_color}'}}; }}"
+                    )
+
+        if js_function_lines:
+            js_function = f"""
+function(params) {{
+    if (!params || !params.data) return null;
+    {" ".join(js_function_lines)}
+    return null;
+}}
+            """.strip()
+
+            # Add to dashGridOptions instead of base_config
+            base_grid_options["getRowStyle"] = js_function
+            print(
+                f"DEBUG: Added getRowStyle function with {len(js_function_lines)} conditions"
+            )  # Debug output
 
     return html.Div(
         [
@@ -327,6 +343,8 @@ def users_tab_content():
     """Create the users tab content."""
     return html.Div(
         [
+            # Store for users role filter state
+            dcc.Store(id="users-role-filter-selected", data=[]),
             dbc.Row(
                 [
                     dbc.Col(

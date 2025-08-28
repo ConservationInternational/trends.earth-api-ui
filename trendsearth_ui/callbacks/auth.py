@@ -52,8 +52,14 @@ def register_callbacks(app):
         # Test hook: allow mock auth via query param (used only in E2E tests)
         try:
             from flask import request as _rq
+
             if _rq.args.get("mock_auth") == "1":
-                user_data = {"id": "test_user_123", "name": "Test User", "email": "test@example.com", "role": "ADMIN"}
+                user_data = {
+                    "id": "test_user_123",
+                    "name": "Test User",
+                    "email": "test@example.com",
+                    "role": "ADMIN",
+                }
                 return (
                     dashboard_layout(),
                     False,
@@ -78,8 +84,9 @@ def register_callbacks(app):
 
         # If no token in store, try to initialize session from the cookie
         try:
-            from flask import request as _request
             import json as _json
+
+            from flask import request as _request
 
             auth_cookie = _request.cookies.get("auth_token")
             if auth_cookie:
@@ -88,7 +95,9 @@ def register_callbacks(app):
                     access_token = cookie_data.get("access_token")
                     user_data = cookie_data.get("user_data") or {}
                     role = user_data.get("role") if isinstance(user_data, dict) else None
-                    api_env = cookie_data.get("api_environment") or (current_api_environment or "production")
+                    api_env = cookie_data.get("api_environment") or (
+                        current_api_environment or "production"
+                    )
 
                     # If cookie has a valid token, hydrate stores and show dashboard
                     if access_token:
@@ -106,7 +115,7 @@ def register_callbacks(app):
         # If all checks fail, show the login page
         return (
             login_layout(),
-            True, # Clear stores
+            True,  # Clear stores
             None,
             None,
             None,
@@ -337,7 +346,7 @@ def register_callbacks(app):
         return (no_update, no_update, no_update, no_update, no_update)
 
     @app.callback(
-        [Output("login-email", "value")],
+        Output("login-email", "value"),
         [Input("page-content", "children")],
         prevent_initial_call=True,
     )
@@ -358,9 +367,9 @@ def register_callbacks(app):
             if cookie_data and isinstance(cookie_data, dict):
                 email_value = cookie_data.get("email", "")
                 if email_value:
-                    return [email_value]
+                    return email_value
 
-        return [""]
+        return ""
 
     @app.callback(
         Output("header-user-info", "children"),

@@ -6,12 +6,11 @@ import os
 import threading
 import time
 
+from playwright.sync_api import Page
 import pytest
 import requests
-from playwright.sync_api import Page
 
 from trendsearth_ui.app import app
-
 
 # Perform the Playwright browser availability check at import-time so that
 # skip markers created below see the correct state during collection.
@@ -106,6 +105,7 @@ def authenticated_page(page: Page, live_server):
     # Create mock auth cookie data that the app will recognize
     from datetime import datetime, timedelta
     import json
+
     from trendsearth_ui.utils import create_auth_cookie_data
 
     mock_user_data = {

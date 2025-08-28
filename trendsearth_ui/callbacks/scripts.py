@@ -115,9 +115,7 @@ def register_callbacks(app):
             resp = make_authenticated_request("/script", token, params=params)
 
             if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, {}, 0
-
-            if resp.status_code != 200:
+                print(f"Scripts API error: {resp.status_code} - {resp.text}")
                 return {"rowData": [], "rowCount": 0}, {}, 0
 
             result = resp.json()

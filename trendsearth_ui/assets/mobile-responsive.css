@@ -124,3 +124,99 @@
         visibility: visible !important;
     }
 }
+
+/* AG-Grid Row Status Colors - Execution Statuses */
+.ag-row.row-failed {
+    background-color: #F8D7DA !important;
+    color: #721C24 !important;
+}
+
+.ag-row.row-finished {
+    background-color: #D1E7DD !important;
+    color: #0F5132 !important;
+}
+
+.ag-row.row-running {
+    background-color: #CCE5FF !important;
+    color: #084298 !important;
+}
+
+.ag-row.row-ready {
+    background-color: #FFF3CD !important;
+    color: #664D03 !important;
+}
+
+.ag-row.row-pending {
+    background-color: #E2E3E5 !important;
+    color: #495057 !important;
+}
+
+/* AG-Grid Row Status Colors - Script Statuses */
+.ag-row.row-published {
+    background-color: #D1E7DD !important;
+    color: #0F5132 !important;
+}
+
+.ag-row.row-draft {
+    background-color: #FFF3CD !important;
+    color: #664D03 !important;
+}
+
+.ag-row.row-archived {
+    background-color: #F8D7DA !important;
+    color: #721C24 !important;
+}
+
+.ag-row.row-success {
+    background-color: #D1E7DD !important;
+    color: #0F5132 !important;
+}
+
+.ag-row.row-fail {
+    background-color: #F8D7DA !important;
+    color: #721C24 !important;
+}
+
+.ag-row.row-building {
+    background-color: #CCE5FF !important;
+    color: #084298 !important;
+}
+
+.ag-row.row-active {
+    background-color: #D1E7DD !important;
+    color: #0F5132 !important;
+}
+
+.ag-row.row-inactive {
+    background-color: #E2E3E5 !important;
+    color: #495057 !important;
+}
+
+/* Hover effects for all status rows */
+.ag-row.row-failed:hover,
+.ag-row.row-archived:hover,
+.ag-row.row-fail:hover {
+    background-color: #F5C2C7 !important;
+}
+
+.ag-row.row-finished:hover,
+.ag-row.row-published:hover,
+.ag-row.row-success:hover,
+.ag-row.row-active:hover {
+    background-color: #BADBCC !important;
+}
+
+.ag-row.row-running:hover,
+.ag-row.row-building:hover {
+    background-color: #B6D7FF !important;
+}
+
+.ag-row.row-ready:hover,
+.ag-row.row-draft:hover {
+    background-color: #FFECB5 !important;
+}
+
+.ag-row.row-pending:hover,
+.ag-row.row-inactive:hover {
+    background-color: #D3D3D4 !important;
+}
