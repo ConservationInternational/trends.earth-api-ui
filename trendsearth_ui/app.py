@@ -69,6 +69,10 @@ app.index_string = """
 
                 function shouldFilter(args) {
                     try {
+                        // Check if args is null, undefined, or not array-like
+                        if (!args || typeof args.length !== 'number') {
+                            return false;
+                        }
                         var msg = Array.prototype.join.call(args, " ");
                         if (msg.indexOf("Warning:") !== -1) {
                             for (var i = 0; i < patterns.length; i++) {
