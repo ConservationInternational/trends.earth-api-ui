@@ -173,12 +173,42 @@ def authenticated_page(page: Page, live_server):
 
         # Wait for admin tabs to become visible (indicating auth stores are populated)
         # This ensures tab visibility callbacks have executed
-        try:
-            page.wait_for_selector("#users-tab-btn:visible", timeout=5000)
-            print("✅ Admin tabs are visible - authentication fully initialized")
-        except Exception:
-            # Some tests might not need admin tabs visible, so this is a warning not an error
-            print("⚠️  Admin tabs not visible within 5s - tests may need to handle tab visibility")
+        # We need to wait for both users and status tabs since they should both be visible for ADMIN role
+        admin_tabs_visible = False
+        max_attempts = 3
+        attempt = 0
+
+        while not admin_tabs_visible and attempt < max_attempts:
+            try:
+                attempt += 1
+                print(f"🔄 Checking admin tab visibility (attempt {attempt}/{max_attempts})")
+
+                # Wait for both critical admin tabs to be visible
+                page.wait_for_selector("#users-tab-btn:visible", timeout=10000)
+                page.wait_for_selector("#status-tab-btn:visible", timeout=10000)
+
+                # Double check they're still visible (handle race conditions with token refresh)
+                if (
+                    page.locator("#users-tab-btn").is_visible()
+                    and page.locator("#status-tab-btn").is_visible()
+                ):
+                    admin_tabs_visible = True
+                    print("✅ Admin tabs are visible - authentication fully initialized")
+                else:
+                    print("⚠️  Admin tabs became hidden, retrying...")
+                    page.wait_for_timeout(2000)  # Wait 2s before retry
+
+            except Exception as e:
+                if attempt >= max_attempts:
+                    print(
+                        f"⚠️  Admin tabs not visible after {max_attempts} attempts - tests may need to handle tab visibility"
+                    )
+                    print(f"    Last error: {e}")
+                    # Don't fail here, some tests might not need admin tabs visible
+                    break
+                else:
+                    print(f"⚠️  Attempt {attempt} failed, retrying... ({e})")
+                    page.wait_for_timeout(3000)  # Wait 3s before retry
 
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
