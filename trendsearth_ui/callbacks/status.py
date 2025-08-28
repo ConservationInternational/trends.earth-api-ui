@@ -103,7 +103,7 @@ def register_callbacks(app):
                 and cached_swarm is not None
             ):
                 # Create swarm title (we need to get cached time, so fetch fresh for title)
-                _, swarm_cached_time = fetch_swarm_info()
+                _, swarm_cached_time = fetch_swarm_info(api_environment, token)
                 swarm_title = html.H5(
                     f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
                 )
@@ -113,7 +113,7 @@ def register_callbacks(app):
         deployment_info = fetch_deployment_info(api_environment, token)
 
         # Fetch Docker Swarm information
-        swarm_info, swarm_cached_time = fetch_swarm_info()
+        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
 
         # Create swarm title with cached timestamp
         swarm_title = html.H5(
@@ -383,7 +383,7 @@ def register_callbacks(app):
                 and cached_statistics is not None
             ):
                 # Create swarm title (we need to get cached time, so fetch fresh for title)
-                _, swarm_cached_time = fetch_swarm_info()
+                _, swarm_cached_time = fetch_swarm_info(api_environment, token)
                 swarm_title = html.H5(
                     f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
                 )
@@ -399,7 +399,7 @@ def register_callbacks(app):
         deployment_info = fetch_deployment_info(api_environment, token)
 
         # Fetch Docker Swarm information
-        swarm_info, swarm_cached_time = fetch_swarm_info()
+        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
 
         # Create swarm title with cached timestamp
         swarm_title = html.H5(

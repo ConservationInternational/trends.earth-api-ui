@@ -1,4 +1,4 @@
-"""Tests for status page fixes."""
+"""Tests for status page fixes using actual API endpoints."""
 
 from unittest.mock import Mock, patch
 
@@ -9,136 +9,195 @@ from trendsearth_ui.utils.status_helpers import fetch_deployment_info, fetch_swa
 
 
 class TestDeploymentInfoFixes:
-    """Test deployment information fixes."""
+    """Test deployment information fixes using actual API endpoints."""
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_api_health(self, mock_get):
-        """Test successful fetch from /api-health endpoint."""
+    def test_fetch_deployment_info_with_stats_health_success(self, mock_get):
+        """Test successful fetch from /api/v1/stats/health endpoint."""
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "version": "1.2.3",
-            "environment": "production",
-            "status": "ok",
-        }
+        mock_response.json.return_value = {"status": "ok"}
         mock_get.return_value = mock_response
 
         result = fetch_deployment_info("production", "test_token")
 
-        # Should contain the API health data
+        # Should contain the health status data
         result_str = str(result)
-        assert "API Version: 1.2.3" in result_str
-        assert "Environment: production" in result_str
-        assert "Status: ok" in result_str
-
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_fallback_endpoints(self, mock_get):
-        """Test fallback to other endpoints when /api-health fails."""
-        # First call fails (api-health)
-        # Second call succeeds (api-ui-health)
-        mock_responses = [
-            Mock(status_code=404),  # api-health fails
-            Mock(status_code=200),  # api-ui-health succeeds
-        ]
-        mock_responses[1].json.return_value = {
-            "deployment": {"environment": "staging", "branch": "main"},
-            "status": "ok",
-        }
-        mock_get.side_effect = mock_responses
-
-        result = fetch_deployment_info("staging", "test_token")
-
-        result_str = str(result)
-        assert "Environment: staging" in result_str
-        assert "Branch: main" in result_str
-        assert "Status: ok" in result_str
-
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_auth_fallback(self, mock_get):
-        """Test fallback to authenticated endpoint."""
-        # First two calls fail, third succeeds with auth
-        mock_responses = [
-            Mock(status_code=404),  # api-health fails
-            Mock(status_code=404),  # api-ui-health fails
-            Mock(status_code=200),  # /health with auth succeeds
-        ]
-        mock_responses[2].json.return_value = {
-            "status": "healthy",
-            "timestamp": "2023-01-01T12:00:00Z",
-        }
-        mock_get.side_effect = mock_responses
-
-        result = fetch_deployment_info("production", "test_token")
-
-        result_str = str(result)
-        assert "API Status: healthy" in result_str
         assert "Environment: Production" in result_str
+        assert "Health Status: OK" in result_str
+        assert "Stats Service: Available" in result_str
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_fallback_on_error(self, mock_get):
-        """Test fallback when all endpoints fail."""
+    def test_fetch_deployment_info_with_auth_error(self, mock_get):
+        """Test handling of authentication errors."""
+        mock_response = Mock()
+        mock_response.status_code = 401
+        mock_get.return_value = mock_response
+
+        result = fetch_deployment_info("production", "invalid_token")
+
+        result_str = str(result)
+        assert "Environment: Production" in result_str
+        assert "Authentication failed" in result_str
+        assert "Please check your login status" in result_str
+
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_deployment_info_with_access_denied(self, mock_get):
+        """Test handling of access denied errors."""
+        mock_response = Mock()
+        mock_response.status_code = 403
+        mock_get.return_value = mock_response
+
+        result = fetch_deployment_info("staging", "user_token")
+
+        result_str = str(result)
+        assert "Environment: Staging" in result_str
+        assert "Access denied" in result_str
+        assert "Admin privileges required" in result_str
+
+    def test_fetch_deployment_info_no_token(self):
+        """Test behavior when no token is provided."""
+        result = fetch_deployment_info("production", None)
+
+        result_str = str(result)
+        assert "Environment: Production" in result_str
+        assert "Authentication required" in result_str
+        assert "Please log in to view health status" in result_str
+
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_deployment_info_network_error(self, mock_get):
+        """Test handling of network errors."""
         mock_get.side_effect = requests.exceptions.RequestException("Network error")
 
         result = fetch_deployment_info("production", "test_token")
 
         result_str = str(result)
         assert "Environment: Production" in result_str
-        assert "API Status: Unknown" in result_str
-        assert "Deployment info not available" in result_str
+        assert "Connection Error" in result_str
+        assert "Unable to reach stats service" in result_str
 
 
 class TestSwarmInfoFixes:
-    """Test Docker swarm information fixes."""
+    """Test Docker swarm information fixes using actual API endpoints."""
 
-    def test_fetch_swarm_info_containerized_environment(self):
-        """Test swarm info for containerized environment."""
-        with (
-            patch("os.path.exists", return_value=True),
-            patch("os.environ.get") as mock_environ_get,
-            patch("platform.system", return_value="Linux"),
-            patch("platform.machine", return_value="x86_64"),
-            patch("platform.python_version", return_value="3.12.0"),
-        ):
-            mock_environ_get.side_effect = lambda key, default=None: {
-                "DOCKER_SWARM_MODE": "active",
-                "ECS_CONTAINER_METADATA_URI": "http://metadata",
-            }.get(key, default)
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_swarm_info_active_swarm(self, mock_get):
+        """Test swarm info for active Docker swarm."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "data": {
+                "swarm_active": True,
+                "total_nodes": 3,
+                "total_managers": 1,
+                "total_workers": 2,
+                "error": None,
+                "cache_info": {"cached_at": "2023-01-01T12:00:00Z"},
+                "nodes": [
+                    {
+                        "id": "node1",
+                        "hostname": "manager-01",
+                        "state": "ready",
+                        "cpu_count": 4.0,
+                        "memory_gb": 8.0,
+                    },
+                    {
+                        "id": "node2",
+                        "hostname": "worker-01",
+                        "state": "ready",
+                        "cpu_count": 2.0,
+                        "memory_gb": 4.0,
+                    },
+                ],
+            }
+        }
+        mock_get.return_value = mock_response
 
-            result, status = fetch_swarm_info()
+        result, status = fetch_swarm_info("production", "test_token")
 
-            result_str = str(result)
-            assert "Containerized environment detected" in result_str
-            assert "Swarm Mode: active" in result_str
-            assert "AWS ECS deployment" in result_str
-            assert "Platform: Linux (x86_64)" in result_str
-            assert status == " (Live)"
+        result_str = str(result)
+        assert "Swarm Active: Yes" in result_str
+        assert "Total Nodes: 3" in result_str
+        assert "Managers: 1, Workers: 2" in result_str
+        assert "Active Nodes: 2/3" in result_str
+        assert "Total Resources: 6.0 CPUs, 12.0GB" in result_str
+        assert "Cache Updated: 2023-01-01T12:00:00" in result_str
+        assert status == " (Live)"
 
-    def test_fetch_swarm_info_non_containerized_environment(self):
-        """Test swarm info for non-containerized environment."""
-        with (
-            patch("os.path.exists", return_value=False),
-            patch("os.environ.get", return_value=None),
-            patch("platform.system", return_value="Darwin"),
-            patch("platform.machine", return_value="arm64"),
-            patch("platform.python_version", return_value="3.12.0"),
-        ):
-            result, status = fetch_swarm_info()
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_swarm_info_inactive_swarm(self, mock_get):
+        """Test swarm info for inactive Docker swarm."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "data": {
+                "swarm_active": False,
+                "total_nodes": 0,
+                "total_managers": 0,
+                "total_workers": 0,
+                "error": "Not in swarm mode",
+                "cache_info": {"cached_at": "2023-01-01T12:00:00Z"},
+                "nodes": [],
+            }
+        }
+        mock_get.return_value = mock_response
 
-            result_str = str(result)
-            assert "Non-containerized environment" in result_str
-            assert "Platform: Darwin (arm64)" in result_str
-            assert "Python: 3.12.0" in result_str
-            assert status == " (Live)"
+        result, status = fetch_swarm_info("staging", "test_token")
 
-    def test_fetch_swarm_info_error_handling(self):
-        """Test swarm info error handling."""
-        with patch("platform.system", side_effect=Exception("Platform error")):
-            result, status = fetch_swarm_info()
+        result_str = str(result)
+        assert "Swarm Status: Not in swarm mode" in result_str
+        assert "Total Nodes: 0" in result_str
+        assert "Cache Updated: 2023-01-01T12:00:00" in result_str
+        assert status == " (Inactive)"
 
-            result_str = str(result)
-            assert "System information not available" in result_str
-            assert "Unable to detect deployment environment" in result_str
-            assert status == " (Error)"
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_swarm_info_auth_error(self, mock_get):
+        """Test swarm info authentication error."""
+        mock_response = Mock()
+        mock_response.status_code = 401
+        mock_get.return_value = mock_response
+
+        result, status = fetch_swarm_info("production", "invalid_token")
+
+        result_str = str(result)
+        assert "Authentication failed" in result_str
+        assert "Please check your login status" in result_str
+        assert status == " (Auth Error)"
+
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_swarm_info_access_denied(self, mock_get):
+        """Test swarm info access denied."""
+        mock_response = Mock()
+        mock_response.status_code = 403
+        mock_get.return_value = mock_response
+
+        result, status = fetch_swarm_info("production", "user_token")
+
+        result_str = str(result)
+        assert "Access denied" in result_str
+        assert "Admin privileges required" in result_str
+        assert status == " (Access Denied)"
+
+    def test_fetch_swarm_info_no_token(self):
+        """Test swarm info without token."""
+        result, status = fetch_swarm_info("production", None)
+
+        result_str = str(result)
+        assert "Swarm information requires authentication" in result_str
+        assert "Please log in to view swarm status" in result_str
+        assert status == " (Auth Required)"
+
+    @patch("trendsearth_ui.utils.status_helpers.requests.get")
+    def test_fetch_swarm_info_network_error(self, mock_get):
+        """Test swarm info network error handling."""
+        mock_get.side_effect = requests.exceptions.RequestException("Connection error")
+
+        result, status = fetch_swarm_info("production", "test_token")
+
+        result_str = str(result)
+        assert "Swarm Status: Connection Error" in result_str
+        assert "Unable to reach swarm status endpoint" in result_str
+        assert status == " (Connection Error)"
 
 
 class TestStatusChartsFixes:

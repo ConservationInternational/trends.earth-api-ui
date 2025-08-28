@@ -388,10 +388,19 @@ class TestStatusTabsErrorHandling:
             }
             mock_get.return_value = mock_response
 
-            # Mock the availability check
-            with patch(
-                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            # Mock the availability check and helper functions
+            with (
+                patch(
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
+                ),
+                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
+                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
             ):
+                # Mock the helper function returns
+                mock_deployment.return_value = "mock deployment info"
+                mock_swarm.return_value = ("mock swarm info", " (Live)")
+
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
@@ -451,10 +460,19 @@ class TestStatusTabsErrorHandling:
             }
             mock_get.return_value = mock_response
 
-            # Mock the availability check
-            with patch(
-                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            # Mock the availability check and helper functions
+            with (
+                patch(
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
+                ),
+                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
+                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
             ):
+                # Mock the helper function returns
+                mock_deployment.return_value = "mock deployment info"
+                mock_swarm.return_value = ("mock swarm info", " (Live)")
+
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
@@ -520,10 +538,19 @@ class TestStatusTabsErrorHandling:
             }
             mock_get.return_value = mock_response
 
-            # Mock the availability check
-            with patch(
-                "trendsearth_ui.callbacks.status.is_status_endpoint_available", return_value=True
+            # Mock the availability check and helper functions
+            with (
+                patch(
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
+                ),
+                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
+                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
             ):
+                # Mock the helper function returns
+                mock_deployment.return_value = "mock deployment info"
+                mock_swarm.return_value = ("mock swarm info", " (Live)")
+
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
