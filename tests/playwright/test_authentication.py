@@ -103,7 +103,9 @@ class TestAuthenticationState:
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
         # Should see dashboard navbar instead of login
-        expect(authenticated_page.locator(".navbar-brand")).to_contain_text("Dashboard")
+        expect(authenticated_page.locator(".navbar-brand")).to_contain_text(
+            "Trends.Earth API Dashboard"
+        )
 
         # Should not see login form
         expect(authenticated_page.locator("h4:has-text('Login')")).not_to_be_visible()
@@ -121,7 +123,7 @@ class TestAuthenticationState:
         import json
 
         cookie_data = json.loads(auth_cookies[0]["value"])
-        assert cookie_data["access_token"] == "mock_token_12345"
+        assert cookie_data["access_token"] == "mock_access_token_123"
         assert cookie_data["user_data"]["role"] == "ADMIN"
 
     def test_logout_functionality(self, authenticated_page: Page):
@@ -226,7 +228,7 @@ class TestAuthenticationPersistence:
         import json
 
         cookie_data = json.loads(auth_cookies[0]["value"])
-        assert cookie_data["access_token"] == "mock_token_12345"
+        assert cookie_data["access_token"] == "mock_access_token_123"
 
     def test_session_cleanup_on_logout(self, authenticated_page: Page):
         """Test that session data is properly cleaned up on logout."""
