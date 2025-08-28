@@ -19,10 +19,18 @@ try:
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            browser.close()
-            print("✅ Playwright browsers are available and ready")
-            os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
+            try:
+                # Try using Playwright's own chromium first
+                browser = p.chromium.launch(headless=True)
+                browser.close()
+                print("✅ Playwright chromium browser is available and ready")
+                os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
+            except Exception:
+                # Fall back to system Chrome if available
+                browser = p.chromium.launch(headless=True, channel="chrome")
+                browser.close()
+                print("✅ System Chrome browser is available and ready for Playwright")
+                os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
     except Exception as e:  # pragma: no cover - environment dependent
         print(f"⚠️  Playwright browsers not available: {e}")
         print("💡 This is common in CI environments with firewall restrictions")
@@ -40,6 +48,27 @@ def pytest_configure(config):
     """Configure pytest for playwright tests."""
     # Register the playwright marker to avoid warnings
     config.addinivalue_line("markers", "playwright: Playwright end-to-end tests")
+
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    """Configure browser to use system Chrome when Playwright browsers not available."""
+    if not browsers_available():
+        # Skip tests if browsers are not available
+        return browser_type_launch_args
+
+    # Try to use system Chrome if Playwright's chromium is not available
+    try:
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            # Test if Playwright's chromium works
+            browser = p.chromium.launch(headless=True, **browser_type_launch_args)
+            browser.close()
+            return browser_type_launch_args
+    except Exception:
+        # Fall back to system Chrome
+        return {**browser_type_launch_args, "channel": "chrome"}
 
 
 def browsers_available():
