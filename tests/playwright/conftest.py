@@ -141,6 +141,16 @@ def authenticated_page(page: Page, live_server):
     # Wait for the dashboard to load, confirming authentication worked
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
+
+        # Wait for admin tabs to become visible (indicating auth stores are populated)
+        # This ensures tab visibility callbacks have executed
+        try:
+            page.wait_for_selector("#users-tab-btn:visible", timeout=5000)
+            print("✅ Admin tabs are visible - authentication fully initialized")
+        except Exception:
+            # Some tests might not need admin tabs visible, so this is a warning not an error
+            print("⚠️  Admin tabs not visible within 5s - tests may need to handle tab visibility")
+
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
         if page.locator("h4:has-text('Login')").is_visible():
