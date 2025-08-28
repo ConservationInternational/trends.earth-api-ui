@@ -714,6 +714,10 @@ def register_callbacks(app):
     )
     def proactive_token_refresh(_n_intervals, current_token, user_data):
         """Proactively refresh access token every 5 minutes to keep users logged in."""
+        # Skip token refresh in test mode (when using mock tokens)
+        if current_token and current_token.startswith("mock_"):
+            return no_update, no_update
+
         # Only run if we have a token and user data (user is logged in)
         if not current_token or not user_data:
             return no_update, no_update

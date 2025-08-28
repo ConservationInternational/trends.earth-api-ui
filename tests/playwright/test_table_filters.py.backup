@@ -25,9 +25,9 @@ class TestTableColumnFilters:
 
         # Wait for the executions table to load and be ready
         try:
-            authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-            table = authenticated_page.locator("[data-testid='executions-table']")
+            table = authenticated_page.wait_for_selector(
+                "[data-testid='executions-table']", timeout=10000
+            )
             expect(table).to_be_visible()
         except Exception:
             # If specific table not found, try to find AG-Grid
@@ -72,7 +72,9 @@ class TestTableColumnFilters:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
+        authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         table = authenticated_page.locator("[data-testid='executions-table']")
         expect(table).to_be_visible()
 
@@ -108,38 +110,14 @@ class TestTableColumnFilters:
         scripts_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
-        # Wait for the scripts table container to load
-        try:
-            authenticated_page.wait_for_selector("[data-testid='scripts-table']", timeout=15000)
-            table_container = authenticated_page.locator("[data-testid='scripts-table']")
-            expect(table_container).to_be_visible()
-
-            # Wait for AG-Grid to initialize inside the container
-            authenticated_page.wait_for_selector(
-                "[data-testid='scripts-table'] .ag-grid", timeout=10000
-            )
-
-            # Wait for table headers to appear
-            authenticated_page.wait_for_selector(".ag-header", timeout=5000)
-
-        except Exception:
-            # If specific table not found, try to find any AG-Grid as fallback
-            try:
-                authenticated_page.wait_for_selector(".ag-grid", timeout=10000)
-                print("⚠️  Scripts table container not found, but AG-Grid is present")
-            except Exception:
-                print("⚠️  No AG-Grid found, scripts table may be empty or still loading")
-                return  # Skip test if no grid is available
+        # Wait for the scripts table to load
+        authenticated_page.wait_for_selector("[data-testid='scripts-table']", timeout=10000)
+        table = authenticated_page.locator("[data-testid='scripts-table']")
+        expect(table).to_be_visible()
 
         # Find the status column header and open filter menu
         status_header = authenticated_page.locator(".ag-header-cell:has-text('Status')")
-
-        try:
-            expect(status_header).to_be_visible(timeout=5000)
-        except Exception:
-            # If no Status column found, test passes (might be empty table)
-            print("⚠️  No Status column found, table may be empty")
-            return
+        expect(status_header).to_be_visible()
 
         # Click on the filter icon for status column
         filter_icon = status_header.locator(".ag-icon-filter")
@@ -149,15 +127,14 @@ class TestTableColumnFilters:
 
             # Check that set filter menu appears with checkboxes
             filter_menu = authenticated_page.locator(".ag-filter-wrapper")
-            if filter_menu.is_visible():
-                expect(filter_menu).to_be_visible()
+            expect(filter_menu).to_be_visible()
 
-                # Verify that script status filter values are present
-                expected_statuses = ["UPLOADED", "PUBLISHED", "UNPUBLISHED", "FAILED"]
-                for status in expected_statuses:
-                    status_option = filter_menu.locator(f"text={status}")
-                    if status_option.is_visible():
-                        expect(status_option).to_be_visible()
+            # Verify that script status filter values are present
+            expected_statuses = ["UPLOADED", "PUBLISHED", "UNPUBLISHED", "FAILED"]
+            for status in expected_statuses:
+                status_option = filter_menu.locator(f"text={status}")
+                if status_option.is_visible():
+                    expect(status_option).to_be_visible()
 
     def test_scripts_table_access_filter(self, authenticated_page: Page):
         """Test that scripts table access control column has working set filter."""
@@ -168,38 +145,14 @@ class TestTableColumnFilters:
         scripts_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
-        # Wait for the scripts table container to load
-        try:
-            authenticated_page.wait_for_selector("[data-testid='scripts-table']", timeout=15000)
-            table_container = authenticated_page.locator("[data-testid='scripts-table']")
-            expect(table_container).to_be_visible()
-
-            # Wait for AG-Grid to initialize inside the container
-            authenticated_page.wait_for_selector(
-                "[data-testid='scripts-table'] .ag-grid", timeout=10000
-            )
-
-            # Wait for table headers to appear
-            authenticated_page.wait_for_selector(".ag-header", timeout=5000)
-
-        except Exception:
-            # If specific table not found, try to find any AG-Grid as fallback
-            try:
-                authenticated_page.wait_for_selector(".ag-grid", timeout=10000)
-                print("⚠️  Scripts table container not found, but AG-Grid is present")
-            except Exception:
-                print("⚠️  No AG-Grid found, scripts table may be empty or still loading")
-                return  # Skip test if no grid is available
+        # Wait for the scripts table to load
+        authenticated_page.wait_for_selector("[data-testid='scripts-table']", timeout=10000)
+        table = authenticated_page.locator("[data-testid='scripts-table']")
+        expect(table).to_be_visible()
 
         # Find the access column header and open filter menu
         access_header = authenticated_page.locator(".ag-header-cell:has-text('Access')")
-
-        try:
-            expect(access_header).to_be_visible(timeout=5000)
-        except Exception:
-            # If no Access column found, test passes (might be empty table)
-            print("⚠️  No Access column found, table may be empty")
-            return
+        expect(access_header).to_be_visible()
 
         # Click on the filter icon for access column
         filter_icon = access_header.locator(".ag-icon-filter")
@@ -209,15 +162,14 @@ class TestTableColumnFilters:
 
             # Check that set filter menu appears with checkboxes
             filter_menu = authenticated_page.locator(".ag-filter-wrapper")
-            if filter_menu.is_visible():
-                expect(filter_menu).to_be_visible()
+            expect(filter_menu).to_be_visible()
 
-                # Verify that access control filter values are present
-                expected_access_types = ["unrestricted", "role_restricted", "user_restricted"]
-                for access_type in expected_access_types:
-                    access_option = filter_menu.locator(f"text={access_type}")
-                    if access_option.is_visible():
-                        expect(access_option).to_be_visible()
+            # Verify that access control filter values are present
+            expected_access_types = ["unrestricted", "role_restricted", "user_restricted"]
+            for access_type in expected_access_types:
+                access_option = filter_menu.locator(f"text={access_type}")
+                if access_option.is_visible():
+                    expect(access_option).to_be_visible()
 
     def test_users_table_role_filter(self, authenticated_page: Page):
         """Test that users table role column has working set filter."""
@@ -228,38 +180,14 @@ class TestTableColumnFilters:
         users_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
-        # Wait for the users table container to load
-        try:
-            authenticated_page.wait_for_selector("[data-testid='users-table']", timeout=15000)
-            table_container = authenticated_page.locator("[data-testid='users-table']")
-            expect(table_container).to_be_visible()
-
-            # Wait for AG-Grid to initialize inside the container
-            authenticated_page.wait_for_selector(
-                "[data-testid='users-table'] .ag-grid", timeout=10000
-            )
-
-            # Wait for table headers to appear
-            authenticated_page.wait_for_selector(".ag-header", timeout=5000)
-
-        except Exception:
-            # If specific table not found, try to find any AG-Grid as fallback
-            try:
-                authenticated_page.wait_for_selector(".ag-grid", timeout=10000)
-                print("⚠️  Users table container not found, but AG-Grid is present")
-            except Exception:
-                print("⚠️  No AG-Grid found, users table may be empty or still loading")
-                return  # Skip test if no grid is available
+        # Wait for the users table to load
+        authenticated_page.wait_for_selector("[data-testid='users-table']", timeout=10000)
+        table = authenticated_page.locator("[data-testid='users-table']")
+        expect(table).to_be_visible()
 
         # Find the role column header and open filter menu
         role_header = authenticated_page.locator(".ag-header-cell:has-text('Role')")
-
-        try:
-            expect(role_header).to_be_visible(timeout=5000)
-        except Exception:
-            # If no Role column found, test passes (might be empty table)
-            print("⚠️  No Role column found, table may be empty")
-            return
+        expect(role_header).to_be_visible()
 
         # Click on the filter icon for role column
         filter_icon = role_header.locator(".ag-icon-filter")
@@ -269,15 +197,14 @@ class TestTableColumnFilters:
 
             # Check that set filter menu appears with checkboxes
             filter_menu = authenticated_page.locator(".ag-filter-wrapper")
-            if filter_menu.is_visible():
-                expect(filter_menu).to_be_visible()
+            expect(filter_menu).to_be_visible()
 
-                # Verify that role filter values are present
-                expected_roles = ["USER", "ADMIN", "SUPERADMIN"]
-                for role in expected_roles:
-                    role_option = filter_menu.locator(f"text={role}")
-                    if role_option.is_visible():
-                        expect(role_option).to_be_visible()
+            # Verify that role filter values are present
+            expected_roles = ["USER", "ADMIN", "SUPERADMIN"]
+            for role in expected_roles:
+                role_option = filter_menu.locator(f"text={role}")
+                if role_option.is_visible():
+                    expect(role_option).to_be_visible()
 
     def test_date_column_filters(self, authenticated_page: Page):
         """Test that date columns have working date filters."""
@@ -289,9 +216,9 @@ class TestTableColumnFilters:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Test start date column filter
@@ -338,9 +265,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Find the status column header and open filter menu
@@ -379,9 +306,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Apply status filter first
@@ -429,9 +356,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Apply a filter
@@ -478,40 +405,17 @@ class TestTableFilterAccessibility:
         executions_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
-        # Wait for the executions table container to load
-        try:
-            authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=15000)
-            table_container = authenticated_page.locator("[data-testid='executions-table']")
-            expect(table_container).to_be_visible()
-
-            # Wait for AG-Grid to initialize inside the container
-            authenticated_page.wait_for_selector(
-                "[data-testid='executions-table'] .ag-grid", timeout=10000
-            )
-
-            # Wait for table headers to appear and be stable
-            authenticated_page.wait_for_selector(".ag-header", timeout=5000)
-            authenticated_page.wait_for_timeout(2000)  # Additional wait for stability
-
-        except Exception:
-            # If specific table not found, try to find any AG-Grid as fallback
-            try:
-                authenticated_page.wait_for_selector(".ag-grid", timeout=10000)
-                print("⚠️  Executions table container not found, but AG-Grid is present")
-            except Exception:
-                print("⚠️  No AG-Grid found, executions table may be empty or still loading")
-                return  # Skip test if no grid is available
+        # Wait for the executions table to load
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
+        expect(table).to_be_visible()
 
         # Test keyboard access to status filter
         status_header = authenticated_page.locator(".ag-header-cell:has-text('Status')")
-
-        try:
-            # Wait for the header to be stable before attempting to focus
-            expect(status_header).to_be_visible(timeout=5000)
-            authenticated_page.wait_for_timeout(1000)  # Wait for element to be stable
-
+        if status_header.is_visible():
             # Focus the header and use Enter to open filter
-            status_header.focus(timeout=10000)  # Use timeout to handle potential detachment
+            status_header.focus()
             authenticated_page.keyboard.press("Tab")  # Navigate to filter icon
             authenticated_page.keyboard.press("Enter")  # Open filter
             authenticated_page.wait_for_timeout(1000)
@@ -522,11 +426,6 @@ class TestTableFilterAccessibility:
                 # Use Escape to close
                 authenticated_page.keyboard.press("Escape")
                 authenticated_page.wait_for_timeout(500)
-
-        except Exception as e:
-            # If element detachment occurs, this is a known issue with AG-Grid
-            print(f"⚠️  Keyboard navigation test skipped due to element instability: {e}")
-            # Don't fail the test, as this is a limitation of AG-Grid's dynamic rendering
 
     def test_filter_mobile_responsiveness(self, authenticated_page: Page):
         """Test that filters work on mobile viewport."""
@@ -541,9 +440,9 @@ class TestTableFilterAccessibility:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Test that filters are still accessible on mobile

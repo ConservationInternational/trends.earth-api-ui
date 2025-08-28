@@ -16,7 +16,7 @@ def register_callbacks(app):
     """Register tab rendering callbacks."""
 
     @app.callback(
-        Output("tab-content", "children"),
+        Output("tab-content-dynamic", "children"),
         [
             Input("active-tab-store", "data"),
             Input("user-store", "data"),

@@ -19,10 +19,18 @@ try:
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            browser.close()
-            print("✅ Playwright browsers are available and ready")
-            os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
+            try:
+                # Try using Playwright's own chromium first
+                browser = p.chromium.launch(headless=True)
+                browser.close()
+                print("✅ Playwright chromium browser is available and ready")
+                os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
+            except Exception:
+                # Fall back to system Chrome if available
+                browser = p.chromium.launch(headless=True, channel="chrome")
+                browser.close()
+                print("✅ System Chrome browser is available and ready for Playwright")
+                os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
     except Exception as e:  # pragma: no cover - environment dependent
         print(f"⚠️  Playwright browsers not available: {e}")
         print("💡 This is common in CI environments with firewall restrictions")
@@ -40,6 +48,27 @@ def pytest_configure(config):
     """Configure pytest for playwright tests."""
     # Register the playwright marker to avoid warnings
     config.addinivalue_line("markers", "playwright: Playwright end-to-end tests")
+
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    """Configure browser to use system Chrome when Playwright browsers not available."""
+    if not browsers_available():
+        # Skip tests if browsers are not available
+        return browser_type_launch_args
+
+    # Try to use system Chrome if Playwright's chromium is not available
+    try:
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            # Test if Playwright's chromium works
+            browser = p.chromium.launch(headless=True, **browser_type_launch_args)
+            browser.close()
+            return browser_type_launch_args
+    except Exception:
+        # Fall back to system Chrome
+        return {**browser_type_launch_args, "channel": "chrome"}
 
 
 def browsers_available():
@@ -144,12 +173,42 @@ def authenticated_page(page: Page, live_server):
 
         # Wait for admin tabs to become visible (indicating auth stores are populated)
         # This ensures tab visibility callbacks have executed
-        try:
-            page.wait_for_selector("#users-tab-btn:visible", timeout=5000)
-            print("✅ Admin tabs are visible - authentication fully initialized")
-        except Exception:
-            # Some tests might not need admin tabs visible, so this is a warning not an error
-            print("⚠️  Admin tabs not visible within 5s - tests may need to handle tab visibility")
+        # We need to wait for both users and status tabs since they should both be visible for ADMIN role
+        admin_tabs_visible = False
+        max_attempts = 3
+        attempt = 0
+
+        while not admin_tabs_visible and attempt < max_attempts:
+            try:
+                attempt += 1
+                print(f"🔄 Checking admin tab visibility (attempt {attempt}/{max_attempts})")
+
+                # Wait for both critical admin tabs to be visible
+                page.wait_for_selector("#users-tab-btn:visible", timeout=10000)
+                page.wait_for_selector("#status-tab-btn:visible", timeout=10000)
+
+                # Double check they're still visible (handle race conditions with token refresh)
+                if (
+                    page.locator("#users-tab-btn").is_visible()
+                    and page.locator("#status-tab-btn").is_visible()
+                ):
+                    admin_tabs_visible = True
+                    print("✅ Admin tabs are visible - authentication fully initialized")
+                else:
+                    print("⚠️  Admin tabs became hidden, retrying...")
+                    page.wait_for_timeout(2000)  # Wait 2s before retry
+
+            except Exception as e:
+                if attempt >= max_attempts:
+                    print(
+                        f"⚠️  Admin tabs not visible after {max_attempts} attempts - tests may need to handle tab visibility"
+                    )
+                    print(f"    Last error: {e}")
+                    # Don't fail here, some tests might not need admin tabs visible
+                    break
+                else:
+                    print(f"⚠️  Attempt {attempt} failed, retrying... ({e})")
+                    page.wait_for_timeout(3000)  # Wait 3s before retry
 
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
