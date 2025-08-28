@@ -25,7 +25,7 @@ def register_callbacks(app):
         prevent_initial_call=False,
     )
     def get_scripts_rows(request, token, role, user_timezone, _api_environment):
-        """Get scripts data for ag-grid with infinite row model with server-side operations."""
+        """Get scripts data for ag-grid with infinite row model."""
         try:
             if not token:
                 return {"rowData": [], "rowCount": 0}, {}, 0
@@ -46,11 +46,11 @@ def register_callbacks(app):
             params = {
                 "page": page,
                 "per_page": page_size,
+                "include": "user_name,access_control",
             }
 
             # Add admin-only fields if user is admin or superadmin
-            if role in ["ADMIN", "SUPERADMIN"]:
-                params["include"] = "user_name"
+            # Note: access_control is now included in the main params above
 
             # Build SQL-style sort string
             sort_sql = []
@@ -131,36 +131,21 @@ def register_callbacks(app):
                 row["logs"] = "Show Logs"
 
                 # Add access control status indicator
-                script_id = row.get("id")
-                if script_id:
-                    try:
-                        # Check if script has access control restrictions
-                        ac_resp = make_authenticated_request(f"/script/{script_id}/access", token)
-                        if ac_resp.status_code == 200:
-                            ac_data = ac_resp.json().get("data", {})
-                            is_restricted = ac_data.get("restricted", False)
-                            if is_restricted:
-                                allowed_roles = ac_data.get("allowed_roles", [])
-                                allowed_users = ac_data.get("allowed_users", [])
-                                if allowed_roles and allowed_users:
-                                    row["access_control"] = "🔒 Role, User"
-                                elif allowed_roles:
-                                    row["access_control"] = "🔒 Role"
-                                elif allowed_users:
-                                    row["access_control"] = "🔒 User"
-                                else:
-                                    row["access_control"] = "🔒 Restricted"
-                            else:
-                                row["access_control"] = "🔓 Open"
-                        elif ac_resp.status_code == 404:
-                            # 404 means no access control configured, so it's unrestricted
-                            row["access_control"] = "🔓 Open"
-                        else:
-                            row["access_control"] = "❓ Unknown"
-                    except Exception:
-                        row["access_control"] = "❓ Unknown"
+                # Access control fields are now included directly in the script object via include parameter
+                is_restricted = script_row.get("restricted", False)
+                if is_restricted:
+                    allowed_roles = script_row.get("allowed_roles", [])
+                    allowed_users = script_row.get("allowed_users", [])
+                    if allowed_roles and allowed_users:
+                        row["access_control"] = "🔒 Role, User"
+                    elif allowed_roles:
+                        row["access_control"] = "🔒 Role"
+                    elif allowed_users:
+                        row["access_control"] = "🔒 User"
+                    else:
+                        row["access_control"] = "🔒 Restricted"
                 else:
-                    row["access_control"] = "❓ Unknown"
+                    row["access_control"] = "🔓 Open"
 
                 # Only add edit button for admin users
                 if is_admin:
@@ -212,11 +197,11 @@ def register_callbacks(app):
             params = {
                 "page": 1,
                 "per_page": DEFAULT_PAGE_SIZE,
+                "include": "user_name,access_control",
             }
 
             # Add admin-only fields if user is admin or superadmin
-            if role in ["ADMIN", "SUPERADMIN"]:
-                params["include"] = "user_name"
+            # Note: access_control is now included in the main params above
 
             # Preserve existing sort and filter settings if available
             if table_state:
@@ -245,36 +230,21 @@ def register_callbacks(app):
                 row["logs"] = "Show Logs"
 
                 # Add access control status indicator
-                script_id = row.get("id")
-                if script_id:
-                    try:
-                        # Check if script has access control restrictions
-                        ac_resp = make_authenticated_request(f"/script/{script_id}/access", token)
-                        if ac_resp.status_code == 200:
-                            ac_data = ac_resp.json().get("data", {})
-                            is_restricted = ac_data.get("restricted", False)
-                            if is_restricted:
-                                allowed_roles = ac_data.get("allowed_roles", [])
-                                allowed_users = ac_data.get("allowed_users", [])
-                                if allowed_roles and allowed_users:
-                                    row["access_control"] = "🔒 Role, User"
-                                elif allowed_roles:
-                                    row["access_control"] = "🔒 Role"
-                                elif allowed_users:
-                                    row["access_control"] = "🔒 User"
-                                else:
-                                    row["access_control"] = "🔒 Restricted"
-                            else:
-                                row["access_control"] = "🔓 Open"
-                        elif ac_resp.status_code == 404:
-                            # 404 means no access control configured, so it's unrestricted
-                            row["access_control"] = "🔓 Open"
-                        else:
-                            row["access_control"] = "❓ Unknown"
-                    except Exception:
-                        row["access_control"] = "❓ Unknown"
+                # Access control fields are now included directly in the script object via include parameter
+                is_restricted = script_row.get("restricted", False)
+                if is_restricted:
+                    allowed_roles = script_row.get("allowed_roles", [])
+                    allowed_users = script_row.get("allowed_users", [])
+                    if allowed_roles and allowed_users:
+                        row["access_control"] = "🔒 Role, User"
+                    elif allowed_roles:
+                        row["access_control"] = "🔒 Role"
+                    elif allowed_users:
+                        row["access_control"] = "🔒 User"
+                    else:
+                        row["access_control"] = "🔒 Restricted"
                 else:
-                    row["access_control"] = "❓ Unknown"
+                    row["access_control"] = "🔓 Open"
 
                 # Only add edit button for admin users
                 if is_admin:

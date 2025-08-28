@@ -351,7 +351,7 @@ def register_callbacks(app):
         prevent_initial_call=False,
     )
     def update_status_and_statistics(
-        _n_intervals, _refresh_clicks, token, active_tab, user_timezone, role, api_environment
+        _n_intervals, _refresh_clicks, token, active_tab, _user_timezone, role, api_environment
     ):
         """Update the status summary and enhanced statistics."""
         # Guard: Skip if not logged in (prevents execution after logout)
@@ -362,9 +362,6 @@ def register_callbacks(app):
         if active_tab != "status":
             return no_update, no_update, no_update
 
-        # Get safe timezone
-        safe_timezone = get_safe_timezone(user_timezone)
-
         # Check cache first (unless it's a manual refresh)
         ctx = callback_context
         is_manual_refresh = (
@@ -372,51 +369,13 @@ def register_callbacks(app):
         )
 
         if not is_manual_refresh:
-            cached_summary = get_cached_data("summary")
-            cached_deployment = get_cached_data("deployment")
-            cached_swarm = get_cached_data("swarm")
             cached_statistics = _stats_cache.get("stats_summary")
-            if (
-                cached_summary is not None
-                and cached_deployment is not None
-                and cached_swarm is not None
-                and cached_statistics is not None
-            ):
-                # Create swarm title (we need to get cached time, so fetch fresh for title)
-                _, swarm_cached_time = fetch_swarm_info(api_environment, token)
-                swarm_title = html.H5(
-                    f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
-                )
-                return (
-                    cached_summary,
-                    cached_deployment,
-                    cached_swarm,
-                    swarm_title,
-                    *cached_statistics,
-                )
-
-        # Fetch deployment info from api-health endpoint
-        deployment_info = fetch_deployment_info(api_environment, token)
-
-        # Fetch Docker Swarm information
-        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
-
-        # Create swarm title with cached timestamp
-        swarm_title = html.H5(
-            f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
-        )
+            if cached_statistics is not None:
+                return cached_statistics
 
         # Quick check if status endpoint is available
         if not is_status_endpoint_available(token, api_environment):
-            fallback_result = get_fallback_summary()
-            set_cached_data("summary", fallback_result)  # Shorter cache for fallback
-            set_cached_data("deployment", deployment_info)  # Cache deployment for 5 min
-            set_cached_data("swarm", swarm_info)  # Cache swarm for 5 min
             return (
-                fallback_result,
-                deployment_info,
-                swarm_info,
-                swarm_title,
                 no_update,
                 no_update,
                 no_update,
@@ -440,110 +399,6 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 status_data = resp.json().get("data", [])
                 if status_data:
-                    latest_status = status_data[0]
-                    timestamp = latest_status.get("timestamp", "")
-
-                    # Format the timestamp - show local time on top, UTC in parentheses
-                    try:
-                        if timestamp:
-                            dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                            utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
-
-                            # Use Python to convert UTC to user's local time
-                            local_time_str, tz_abbrev = format_local_time(
-                                dt_utc, safe_timezone, include_seconds=True
-                            )
-
-                            timestamp_display = html.Div(
-                                [
-                                    html.Div(
-                                        f"{local_time_str} {tz_abbrev}",
-                                        className="fw-bold text-primary",
-                                    ),
-                                    html.Div(f"({utc_time_str})", className="text-muted small"),
-                                ]
-                            )
-                        else:
-                            timestamp_display = "Not available"
-                    except (ValueError, TypeError):
-                        timestamp_display = "Invalid timestamp format"
-
-                    # Extract status details
-                    executions = latest_status.get("executions", {})
-                    users = latest_status.get("users", {})
-                    system = latest_status.get("system", {})
-
-                    # Create summary layout
-                    summary_layout = html.Div(
-                        [
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Executions", className="mb-2"),
-                                            html.P(
-                                                f"Total: {executions.get('total', 0)}",
-                                                className="mb-1",
-                                            ),
-                                            html.P(
-                                                f"Running: {executions.get('running', 0)}",
-                                                className="text-primary mb-1",
-                                            ),
-                                            html.P(
-                                                f"Finished: {executions.get('finished', 0)}",
-                                                className="text-success mb-1",
-                                            ),
-                                            html.P(
-                                                f"Failed: {executions.get('failed', 0)}",
-                                                className="text-danger mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Users", className="mb-2"),
-                                            html.P(
-                                                f"Total: {users.get('total', 0)}",
-                                                className="mb-1",
-                                            ),
-                                            html.P(
-                                                f"Active (24h): {users.get('active_24h', 0)}",
-                                                className="text-info mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("System", className="mb-2"),
-                                            html.P(
-                                                f"CPU: {system.get('cpu_percent', 0)}%",
-                                                className="mb-1",
-                                            ),
-                                            html.P(
-                                                f"Memory: {system.get('memory_percent', 0)}%",
-                                                className="mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Last Updated", className="mb-2"),
-                                            timestamp_display,
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                ],
-                                className="row",
-                            )
-                        ]
-                    )
-                    set_cached_data("summary", summary_layout)
-                    set_cached_data("deployment", deployment_info)
-                    set_cached_data("swarm", swarm_info)
-
                     # Fetch enhanced statistics
                     dashboard_stats = fetch_dashboard_stats(token, api_environment, "last_day")
                     user_stats = fetch_user_stats(token, api_environment, "last_day")
@@ -559,59 +414,24 @@ def register_callbacks(app):
                     _stats_cache["stats_summary"] = (cards, user_map, additional_charts)
 
                     return (
-                        summary_layout,
-                        deployment_info,
-                        swarm_info,
-                        swarm_title,
                         cards,
                         user_map,
                         additional_charts,
                     )
                 else:
-                    no_data_result = html.Div(
-                        "No status data available.", className="text-center text-muted"
-                    )
-                    set_cached_data("summary", no_data_result)
-                    set_cached_data("deployment", deployment_info)
-                    set_cached_data("swarm", swarm_info)
                     return (
-                        no_data_result,
-                        deployment_info,
-                        swarm_info,
-                        swarm_title,
                         no_update,
                         no_update,
                         no_update,
                     )
             else:
-                error_result = html.Div(
-                    f"Error fetching status: {resp.status_code}",
-                    className="text-center text-danger",
-                )
-                set_cached_data("summary", error_result)
-                set_cached_data("deployment", deployment_info)
-                set_cached_data("swarm", swarm_info)
                 return (
-                    error_result,
-                    deployment_info,
-                    swarm_info,
-                    swarm_title,
                     no_update,
                     no_update,
                     no_update,
                 )
-        except requests.exceptions.RequestException as e:
-            error_result = html.Div(
-                f"Error fetching status: {e}", className="text-center text-danger"
-            )
-            set_cached_data("summary", error_result)
-            set_cached_data("deployment", deployment_info)
-            set_cached_data("swarm", swarm_info)
+        except requests.exceptions.RequestException:
             return (
-                error_result,
-                deployment_info,
-                swarm_info,
-                swarm_title,
                 no_update,
                 no_update,
                 no_update,
