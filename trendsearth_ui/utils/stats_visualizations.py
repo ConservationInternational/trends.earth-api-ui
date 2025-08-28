@@ -1457,9 +1457,59 @@ def create_docker_swarm_status_table(swarm_data):
 
         table_body = html.Tbody(table_rows)
 
+        # Calculate swarm summary statistics using actual resource usage data
+        total_cpu = sum(node.get("cpu_count", 0) for node in nodes)
+        total_memory_gb = sum(node.get("memory_gb", 0) for node in nodes)
+        total_running_tasks = sum(node.get("running_tasks", 0) for node in nodes)
+
+        # Calculate actual resource usage from nodes that have resource_usage data
+        total_used_cpu_nanos = 0
+        total_used_memory_bytes = 0
+        total_available_cpu_nanos = 0
+        total_available_memory_bytes = 0
+        total_available_capacity = 0
+
+        for node in nodes:
+            resource_usage = node.get("resource_usage", {})
+            if resource_usage:
+                # Use actual resource usage data from the API
+                total_used_cpu_nanos += resource_usage.get("used_cpu_nanos", 0)
+                total_used_memory_bytes += resource_usage.get("used_memory_bytes", 0)
+                total_available_cpu_nanos += resource_usage.get("available_cpu_nanos", 0)
+                total_available_memory_bytes += resource_usage.get("available_memory_bytes", 0)
+
+            # Sum up the available capacity calculated by the API (based on 1e8 units per task)
+            total_available_capacity += node.get("available_capacity", 0)
+
+        # Convert to human-readable units
+        used_cpu_cores = total_used_cpu_nanos / 1_000_000_000  # nanoseconds to cores
+        used_memory_gb = total_used_memory_bytes / (1024**3)  # bytes to GB
+        available_cpu_cores = total_available_cpu_nanos / 1_000_000_000
+        available_memory_gb = total_available_memory_bytes / (1024**3)
+
+        # Calculate total possible capacity (running + available)
+        total_possible_capacity = total_running_tasks + total_available_capacity
+
+        # Create summary section with actual resource usage
+        summary_section = html.Div(
+            [
+                html.P(
+                    f"Total Resources: {total_cpu:.1f} CPUs ({used_cpu_cores:.1f} used, {available_cpu_cores:.1f} available), "
+                    f"{total_memory_gb:.1f} GB Memory ({used_memory_gb:.1f} GB used, {available_memory_gb:.1f} GB available)",
+                    className="mb-1",
+                ),
+                html.P(
+                    f"Tasks: {total_running_tasks} running | Capacity: {total_possible_capacity} total tasks ({total_available_capacity} additional)",
+                    className="mb-0 text-muted",
+                ),
+            ],
+            className="mb-3 p-2 bg-light rounded",
+        )
+
         return html.Div(
             [
                 html.H4("Docker Swarm Nodes", className="mb-3"),
+                summary_section,
                 html.Div(
                     [
                         html.Table(

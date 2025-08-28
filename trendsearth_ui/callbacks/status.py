@@ -102,8 +102,27 @@ def register_callbacks(app):
                 and cached_deployment is not None
                 and cached_swarm is not None
             ):
-                # Use generic title for cached data
-                swarm_title = html.H5("Docker Swarm Status (Cached)", className="card-title mt-4")
+                # Even for cached data, get the fresh timestamp from swarm endpoint
+                try:
+                    headers = {"Authorization": f"Bearer {token}"} if token else {}
+                    resp = requests.get(
+                        f"{get_api_base(api_environment)}/status/swarm",
+                        headers=headers,
+                        timeout=5,
+                    )
+                    if resp.status_code == 200:
+                        swarm_data = resp.json().get("data", {})
+                        cache_info = swarm_data.get("cache_info", {})
+                        cached_at = cache_info.get("cached_at", "")
+                        swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else ""
+                    else:
+                        swarm_cached_time = ""
+                except Exception:
+                    swarm_cached_time = ""
+
+                swarm_title = html.H5(
+                    f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
+                )
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
         # Fetch deployment info from api-health endpoint
