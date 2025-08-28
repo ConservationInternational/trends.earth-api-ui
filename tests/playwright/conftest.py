@@ -2,14 +2,39 @@
 Playwright configuration and fixtures for Trends.Earth API UI tests.
 """
 
+import os
 import threading
 import time
 
-from playwright.sync_api import Page
 import pytest
 import requests
+from playwright.sync_api import Page
 
 from trendsearth_ui.app import app
+
+
+# Perform the Playwright browser availability check at import-time so that
+# skip markers created below see the correct state during collection.
+try:
+    from playwright.sync_api import sync_playwright
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            browser.close()
+            print("✅ Playwright browsers are available and ready")
+            os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
+    except Exception as e:  # pragma: no cover - environment dependent
+        print(f"⚠️  Playwright browsers not available: {e}")
+        print("💡 This is common in CI environments with firewall restrictions")
+        print("💡 Playwright tests will be automatically skipped")
+        print("💡 To install browsers locally, run: poetry run playwright install chromium")
+        os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "false"
+except ImportError as e:
+    # Playwright package itself is required for these tests
+    print("❌ Playwright not installed")
+    print("💡 Install with: poetry add --group dev pytest-playwright playwright")
+    raise ImportError("Playwright not installed - required for playwright tests") from e
 
 
 def pytest_configure(config):
@@ -17,58 +42,9 @@ def pytest_configure(config):
     # Register the playwright marker to avoid warnings
     config.addinivalue_line("markers", "playwright: Playwright end-to-end tests")
 
-    # Check if playwright browsers are available - Skip tests gracefully if not available
-    try:
-        from playwright.sync_api import sync_playwright
-
-        # Try to check if browsers are available
-        try:
-            with sync_playwright() as p:
-                try:
-                    browser = p.chromium.launch(headless=True)
-                    browser.close()
-                    print("✅ Playwright browsers are available and ready")
-                    # Store browser availability for test skipping
-                    import os
-
-                    os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "true"
-                except Exception as e:
-                    print(f"⚠️  Playwright browsers not available: {e}")
-                    print("💡 This is common in CI environments with firewall restrictions")
-                    print("💡 Playwright tests will be automatically skipped")
-                    print(
-                        "💡 To install browsers locally, run: poetry run playwright install chromium"
-                    )
-
-                    # Store browser unavailability for test skipping
-                    import os
-
-                    os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "false"
-
-                    # Add pytest marker for skipping all playwright tests
-                    config.addinivalue_line(
-                        "markers", "skipif_no_browsers: skip if browsers not available"
-                    )
-        except Exception as e:
-            print(f"⚠️  Playwright browser check failed: {e}")
-            print("💡 This is expected in restricted environments")
-            print("💡 Playwright tests will be automatically skipped")
-
-            # Store browser unavailability for test skipping
-            import os
-
-            os.environ["PLAYWRIGHT_BROWSERS_AVAILABLE"] = "false"
-
-    except ImportError as e:
-        print("❌ Playwright not installed")
-        print("💡 This is unexpected - Playwright should be available in dev environment")
-        raise ImportError("Playwright not installed - required for playwright tests") from e
-
 
 def browsers_available():
     """Check if Playwright browsers are available."""
-    import os
-
     return os.environ.get("PLAYWRIGHT_BROWSERS_AVAILABLE", "false").lower() == "true"
 
 
@@ -126,38 +102,28 @@ def app_page(page: Page, live_server):
 
 @pytest.fixture
 def authenticated_page(page: Page, live_server):
-    """Navigate to app and simulate authentication (mocked)."""
-    # First navigate to the page
-    page.goto(live_server)
-
-    # Wait for initial page load
-    page.wait_for_timeout(1000)
-
-    # Create mock auth cookie data that matches what the app expects
+    """Navigate to app and simulate authentication by setting a cookie."""
+    # Create mock auth cookie data that the app will recognize
     from datetime import datetime, timedelta
     import json
+    from trendsearth_ui.utils import create_auth_cookie_data
 
-    # Mock auth data structure that matches create_auth_cookie_data
-    expiration = datetime.now() + timedelta(days=30)
-    auth_cookie_data = {
-        "access_token": "mock_token_12345",
-        "refresh_token": "mock_refresh_token_67890",
+    mock_user_data = {
+        "id": "test_user_123",
+        "name": "Test User",
         "email": "test@example.com",
-        "user_data": {
-            "id": "test_user_123",
-            "name": "Test User",
-            "email": "test@example.com",
-            "role": "ADMIN",
-        },
-        "api_environment": "production",
-        "expires_at": expiration.isoformat(),
-        "created_at": datetime.now().isoformat(),
+        "role": "ADMIN",
     }
+    cookie_data = create_auth_cookie_data(
+        "mock_access_token_123",
+        "mock_refresh_token_456",
+        "test@example.com",
+        mock_user_data,
+        "production",
+    )
+    cookie_value = json.dumps(cookie_data)
 
-    # Set the HTTP cookie that the app recognizes
-    cookie_value = json.dumps(auth_cookie_data)
-
-    # Add the cookie to the browser context
+    # Add the cookie to the browser context before navigating
     page.context.add_cookies(
         [
             {
@@ -165,26 +131,24 @@ def authenticated_page(page: Page, live_server):
                 "value": cookie_value,
                 "domain": "127.0.0.1",
                 "path": "/",
-                "httpOnly": True,
-                "secure": False,
-                "sameSite": "Lax",
             }
         ]
     )
 
-    # Reload page to trigger authentication check with cookie
-    page.reload()
+    # Navigate to the root of the app
+    page.goto(live_server)
 
-    # Wait for authentication to process and dashboard to load
-    # Use a more reliable wait for dashboard content
+    # Wait for the dashboard to load, confirming authentication worked
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
         if page.locator("h4:has-text('Login')").is_visible():
-            raise RuntimeError("Authentication failed - still on login page") from e
+            raise RuntimeError(
+                "Authentication via cookie failed - app is still on the login page."
+            ) from e
         else:
-            raise RuntimeError(f"Dashboard content not found: {e}") from e
+            raise RuntimeError(f"Dashboard content not found after setting auth cookie: {e}") from e
 
     return page
 

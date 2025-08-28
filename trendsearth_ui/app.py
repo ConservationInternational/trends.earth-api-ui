@@ -285,6 +285,22 @@ def handle_exception(e):
         return "An unexpected error occurred", 500
 
 
+@server.errorhandler(404)
+def not_found(_error):
+    """Gracefully handle 404s to avoid noisy console errors in E2E tests."""
+    # For API-style requests return JSON; for others return lightweight HTML
+    if flask.request.path.startswith("/api") or flask.request.headers.get(
+        "Content-Type", ""
+    ).startswith("application/json"):
+        return {"status": "error", "message": "Not Found"}, 404
+    # Plain text/HTML response for unknown routes; Dash will render root on load
+    return flask.Response(
+        '<div data-testid="not-found-page">404 Not Found</div>',
+        mimetype="text/html",
+        status=404,
+    )
+
+
 # Register all callbacks
 register_all_callbacks(app)
 

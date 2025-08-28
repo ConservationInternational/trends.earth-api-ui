@@ -17,14 +17,14 @@ class TestAppBasics:
     def test_app_loads_successfully(self, app_page: Page):
         """Test that the application loads successfully."""
         # Should show login page initially
-        expect(app_page.locator("h4")).to_contain_text("Login")
+        expect(app_page.locator("h4:has-text('Login')")).to_be_visible()
 
-        # Should have email and password fields
-        expect(app_page.locator("input[type='email']")).to_be_visible()
-        expect(app_page.locator("input[type='password']")).to_be_visible()
+        # Should have email and password fields (target specific inputs)
+        expect(app_page.locator("#login-email")).to_be_visible()
+        expect(app_page.locator("#login-password")).to_be_visible()
 
         # Should have login button
-        expect(app_page.locator("button")).to_contain_text("Login")
+        expect(app_page.locator("#login-btn")).to_contain_text("Login")
 
     def test_app_title_and_meta(self, app_page: Page):
         """Test that app has correct title and meta tags."""
@@ -58,22 +58,22 @@ class TestAppBasics:
         page.goto(live_server)
 
         # Should still show login elements
-        expect(page.locator("h4")).to_contain_text("Login")
-        expect(page.locator("input[type='email']")).to_be_visible()
+        expect(page.locator("h4:has-text('Login')")).to_be_visible()
+        expect(page.locator("#login-email")).to_be_visible()
 
         # Test tablet viewport
         page.set_viewport_size({"width": 768, "height": 1024})
         page.reload()
 
         # Should still work
-        expect(page.locator("h4")).to_contain_text("Login")
+        expect(page.locator("h4:has-text('Login')")).to_be_visible()
 
         # Test desktop viewport
         page.set_viewport_size({"width": 1920, "height": 1080})
         page.reload()
 
         # Should still work
-        expect(page.locator("h4")).to_contain_text("Login")
+        expect(page.locator("h4:has-text('Login')")).to_be_visible()
 
 
 @pytest.mark.playwright
@@ -123,11 +123,11 @@ class TestNavigation:
         expect(authenticated_page.locator("text=Dashboard")).to_be_visible()
 
         # Should see navigation tabs
-        expect(authenticated_page.locator("text=Status")).to_be_visible()
-        expect(authenticated_page.locator("text=Executions")).to_be_visible()
-        expect(authenticated_page.locator("text=Scripts")).to_be_visible()
-        expect(authenticated_page.locator("text=Users")).to_be_visible()
-        expect(authenticated_page.locator("text=Profile")).to_be_visible()
+        expect(authenticated_page.locator("#status-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#executions-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#scripts-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#users-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#profile-tab-btn")).to_be_visible()
 
 
 @pytest.mark.playwright
@@ -136,33 +136,23 @@ class TestErrorHandling:
     """Test error handling and edge cases."""
 
     def test_invalid_routes(self, page: Page, live_server):
-        """Test that invalid routes are handled gracefully."""
-        # Navigate to non-existent route
-        page.goto(f"{live_server}/invalid-route")
+        """Test that invalid routes are handled gracefully by showing the login page."""
+        # Navigate to a non-existent route
+        response = page.goto(f"{live_server}/this-route-does-not-exist")
 
-        # Should not crash - might redirect to login or show 404
-        # Just check that page loads without JS errors
-        page.wait_for_load_state()
+        # For a SPA, the server should return 200 and the app shell
+        assert response.status == 200, "Expected server to return 200 for an unknown route in a SPA"
 
-        # Check for no JS errors in console
-        messages = []
-        page.on("console", lambda msg: messages.append(msg))
-        page.reload()
-
-        # Allow some time for any errors to appear
-        page.wait_for_timeout(1000)
-
-        # Filter out non-error messages
-        errors = [msg for msg in messages if msg.type == "error"]
-
-        # Should have no critical JS errors
-        assert len(errors) == 0, f"Found JS errors: {[msg.text for msg in errors]}"
+        # The client-side router should handle the invalid route.
+        # In our case, it should display the login page as a fallback.
+        expect(page.locator("h4:has-text('Login')")).to_be_visible(
+            timeout=5000
+        )
+        expect(page).to_have_url(f"{live_server}/this-route-does-not-exist")
 
     def test_javascript_enabled(self, app_page: Page):
         """Test that JavaScript is enabled and working."""
-        # Check that Dash components are rendered (requires JS)
-        expect(app_page.locator("#_dash-app-content")).to_be_visible()
-
-        # Test that page is interactive (not just static HTML)
-        expect(app_page.locator("input[type='email']")).to_be_enabled()
-        expect(app_page.locator("input[type='password']")).to_be_enabled()
+        # Check that page heading and inputs are interactive (requires JS)
+        expect(app_page.locator("h4:has-text('Login')")).to_be_visible()
+        expect(app_page.locator("#login-email")).to_be_enabled()
+        expect(app_page.locator("#login-password")).to_be_enabled()

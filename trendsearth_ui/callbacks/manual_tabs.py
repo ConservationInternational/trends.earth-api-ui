@@ -39,7 +39,8 @@ def register_callbacks(app):
         if not token:
             return {"display": "none"}
 
-        if role == "SUPERADMIN":
+        # Allow both ADMIN and SUPERADMIN to access Users tab (aligns with README/tests)
+        if role in ["ADMIN", "SUPERADMIN"]:
             return {"display": "block"}
         else:
             return {"display": "none"}
