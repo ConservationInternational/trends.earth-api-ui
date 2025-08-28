@@ -110,7 +110,7 @@ def register_callbacks(app):
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
         # Fetch deployment info from api-health endpoint
-        deployment_info = fetch_deployment_info(api_environment)
+        deployment_info = fetch_deployment_info(api_environment, token)
 
         # Fetch Docker Swarm information
         swarm_info, swarm_cached_time = fetch_swarm_info()
@@ -396,7 +396,7 @@ def register_callbacks(app):
                 )
 
         # Fetch deployment info from api-health endpoint
-        deployment_info = fetch_deployment_info(api_environment)
+        deployment_info = fetch_deployment_info(api_environment, token)
 
         # Fetch Docker Swarm information
         swarm_info, swarm_cached_time = fetch_swarm_info()
@@ -620,7 +620,7 @@ def register_callbacks(app):
     @app.callback(
         Output("status-charts", "children"),
         [
-            Input("active-tab-store", "data"),
+            Input("status-time-tabs-store", "data"),
             Input("status-countdown-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
         ],
@@ -628,14 +628,19 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("user-timezone-store", "data"),
             State("api-environment-store", "data"),
+            State("active-tab-store", "data"),
         ],
     )
     def update_status_charts(
-        active_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment
+        time_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment, active_tab
     ):
         """Update the status charts for the selected time range."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
+            return no_update
+
+        # Only update when status tab is active to avoid unnecessary API calls
+        if active_tab != "status":
             return no_update
 
         headers = {"Authorization": f"Bearer {token}"}
@@ -645,9 +650,11 @@ def register_callbacks(app):
 
         # Define time ranges for API query
         end_time = datetime.now(timezone.utc)
-        if active_tab == "month":
+        if time_tab == "month":
             start_time = end_time - timedelta(days=30)
-        else:
+        elif time_tab == "week":
+            start_time = end_time - timedelta(days=7)
+        else:  # Default to day
             start_time = end_time - timedelta(days=1)
 
         # Format for API query
@@ -686,38 +693,79 @@ def register_callbacks(app):
 
             # Create charts
             charts = []
-            status_metrics = {
-                "Executions": {"running": "primary", "finished": "success", "failed": "danger"},
-                "Users": {"active_24h": "info"},
-                "System": {"cpu_percent": "warning", "memory_percent": "secondary"},
-            }
 
-            for category, metrics in status_metrics.items():
+            # Map status data fields to chart categories
+            chart_configs = [
+                {
+                    "title": "Executions Status",
+                    "metrics": [
+                        {"field": "executions_running", "name": "Running", "color": "primary"},
+                        {"field": "executions_finished", "name": "Finished", "color": "success"},
+                        {"field": "executions_active", "name": "Active", "color": "warning"},
+                    ],
+                    "y_title": "Count",
+                },
+                {
+                    "title": "Users Activity",
+                    "metrics": [
+                        {"field": "users_count", "name": "Total Users", "color": "info"},
+                    ],
+                    "y_title": "Count",
+                },
+                {
+                    "title": "System Resources",
+                    "metrics": [
+                        {"field": "cpu_usage_percent", "name": "CPU Usage", "color": "warning"},
+                        {
+                            "field": "memory_available_percent",
+                            "name": "Memory Available",
+                            "color": "success",
+                        },
+                    ],
+                    "y_title": "Percentage",
+                },
+            ]
+
+            for config in chart_configs:
                 fig = go.Figure()
-                for metric, color in metrics.items():
-                    # Extract nested data from DataFrame
-                    values = df[category.lower()].apply(lambda x, m=metric: x.get(m, 0))
-                    fig.add_trace(
-                        go.Scatter(
-                            x=df["local_timestamp"],
-                            y=values,
-                            mode="lines+markers",
-                            name=metric.replace("_", " ").title(),
-                            line={"color": f"var(--bs-{color})"},
-                            marker={"size": 4},
+                has_data = False
+
+                for metric in config["metrics"]:
+                    field = metric["field"]
+                    if field in df.columns:
+                        values = df[field].fillna(0)
+                        if values.sum() > 0 or len(values) > 0:  # Only add if there's some data
+                            has_data = True
+                            fig.add_trace(
+                                go.Scatter(
+                                    x=df["local_timestamp"],
+                                    y=values,
+                                    mode="lines+markers",
+                                    name=metric["name"],
+                                    line={"color": f"var(--bs-{metric['color']})"},
+                                    marker={"size": 4},
+                                )
+                            )
+
+                if has_data:
+                    fig.update_layout(
+                        title=config["title"],
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis_title=config["y_title"],
+                        margin={"l": 40, "r": 20, "t": 40, "b": 30},
+                        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02},
+                        template="plotly_white",
+                        height=300,
+                    )
+                    charts.append(dcc.Graph(figure=fig))
+                else:
+                    # Add placeholder if no data
+                    charts.append(
+                        html.Div(
+                            f"No data available for {config['title']}",
+                            className="text-center text-muted p-3 border rounded",
                         )
                     )
-
-                fig.update_layout(
-                    title=f"{category} Status",
-                    xaxis_title=get_chart_axis_label(safe_timezone),
-                    yaxis_title="Count" if category != "System" else "Percentage",
-                    margin={"l": 40, "r": 20, "t": 40, "b": 30},
-                    legend={"orientation": "h", "yanchor": "bottom", "y": 1.02},
-                    template="plotly_white",
-                    height=300,
-                )
-                charts.append(dcc.Graph(figure=fig))
 
             return html.Div(charts)
 
