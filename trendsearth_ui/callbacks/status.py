@@ -16,14 +16,14 @@ from ..utils.stats_utils import (
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
+    create_deployment_information,
+    create_docker_swarm_status_table,
     create_execution_statistics_chart,
     create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
 from ..utils.status_helpers import (
-    fetch_deployment_info,
-    fetch_swarm_info,
     get_fallback_summary,
     is_status_endpoint_available,
 )
@@ -102,18 +102,71 @@ def register_callbacks(app):
                 and cached_deployment is not None
                 and cached_swarm is not None
             ):
-                # Create swarm title (we need to get cached time, so fetch fresh for title)
-                _, swarm_cached_time = fetch_swarm_info(api_environment, token)
-                swarm_title = html.H5(
-                    f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
-                )
+                # Use generic title for cached data
+                swarm_title = html.H5("Docker Swarm Status (Cached)", className="card-title mt-4")
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
         # Fetch deployment info from api-health endpoint
-        deployment_info = fetch_deployment_info(api_environment, token)
+        deployment_info = create_deployment_information(api_environment)
 
         # Fetch Docker Swarm information
-        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
+        try:
+            # Fetch raw swarm data from API
+            headers = {"Authorization": f"Bearer {token}"} if token else {}
+            resp = requests.get(
+                f"{get_api_base(api_environment)}/status/swarm",
+                headers=headers,
+                timeout=5,
+            )
+
+            if resp.status_code == 200:
+                swarm_data = resp.json().get("data", {})
+                swarm_info = create_docker_swarm_status_table(swarm_data)
+                cache_info = swarm_data.get("cache_info", {})
+                cached_at = cache_info.get("cached_at", "")
+                swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else ""
+            elif resp.status_code == 401:
+                # Handle authentication error
+                swarm_info = html.Div(
+                    [
+                        html.P("Authentication failed", className="mb-1 text-warning"),
+                        html.P("Please check your login status", className="mb-1 text-muted"),
+                    ]
+                )
+                swarm_cached_time = " (Auth Error)"
+            elif resp.status_code == 403:
+                # Handle permission error
+                swarm_info = html.Div(
+                    [
+                        html.P("Access denied", className="mb-1 text-warning"),
+                        html.P(
+                            "Admin privileges required for swarm status",
+                            className="mb-1 text-muted",
+                        ),
+                    ]
+                )
+                swarm_cached_time = " (Access Denied)"
+            else:
+                # Handle other errors
+                swarm_info = html.Div(
+                    [
+                        html.P(
+                            f"Swarm Status: Error ({resp.status_code})",
+                            className="mb-1 text-danger",
+                        ),
+                        html.P("Unable to retrieve swarm information", className="mb-1 text-muted"),
+                    ]
+                )
+                swarm_cached_time = " (Error)"
+        except Exception:
+            # Handle connection errors
+            swarm_info = html.Div(
+                [
+                    html.P("Swarm Status: Connection Error", className="mb-1 text-danger"),
+                    html.P("Unable to reach swarm status endpoint", className="mb-1 text-muted"),
+                ]
+            )
+            swarm_cached_time = " (Connection Error)"
 
         # Create swarm title with cached timestamp
         swarm_title = html.H5(

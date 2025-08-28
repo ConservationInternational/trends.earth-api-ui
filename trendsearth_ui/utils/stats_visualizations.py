@@ -1202,3 +1202,283 @@ def create_dashboard_summary_cards(dashboard_stats_data):
             ],
             className="p-4",
         )
+
+
+def create_deployment_information(api_environment="production"):
+    """
+    Create deployment information section showing API and API UI details.
+
+    Args:
+        api_environment: Environment to fetch deployment info from
+
+    Returns:
+        html.Div: Deployment information cards
+    """
+    import logging
+
+    import requests
+
+    from trendsearth_ui.config import get_api_base
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Get API deployment information
+        api_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
+        try:
+            # API health endpoint is at root level, not under /api/v1
+            api_base_root = get_api_base(api_environment).replace("/api/v1", "")
+            resp = requests.get(f"{api_base_root}/api-health", timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                deployment = data.get("deployment", {})
+                api_info = {
+                    "environment": deployment.get("environment", "Unknown"),
+                    "branch": deployment.get("branch", "Unknown"),
+                    "commit_sha": deployment.get("commit_sha", "Unknown")[:8]
+                    if deployment.get("commit_sha", "Unknown") != "Unknown"
+                    else "Unknown",
+                }
+        except Exception as e:
+            logger.warning(f"Could not fetch API deployment info: {e}")
+
+        # Get API UI deployment information
+        ui_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
+        try:
+            resp = requests.get(
+                f"{get_api_base(api_environment).replace('/api/v1', '')}/api-ui-health", timeout=5
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                deployment = data.get("deployment", {})
+                ui_info = {
+                    "environment": deployment.get("environment", "Unknown"),
+                    "branch": deployment.get("branch", "Unknown"),
+                    "commit_sha": deployment.get("commit_sha", "Unknown")[:8]
+                    if deployment.get("commit_sha", "Unknown") != "Unknown"
+                    else "Unknown",
+                }
+        except Exception as e:
+            logger.warning(f"Could not fetch API UI deployment info: {e}")
+
+        return html.Div(
+            [
+                html.H4("Deployment Information", className="mb-3"),
+                html.Div(
+                    [
+                        # API Information Card
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.H6("Trends.Earth API", className="card-title"),
+                                                html.P(
+                                                    f"Environment: {api_info['environment']}",
+                                                    className="mb-1",
+                                                ),
+                                                html.P(
+                                                    f"Branch: {api_info['branch']}",
+                                                    className="mb-1",
+                                                ),
+                                                html.P(
+                                                    f"Commit: {api_info['commit_sha']}",
+                                                    className="mb-0",
+                                                ),
+                                            ],
+                                            className="card-body",
+                                        )
+                                    ],
+                                    className="card",
+                                ),
+                            ],
+                            className="col-md-6 mb-3",
+                        ),
+                        # API UI Information Card
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.H6(
+                                                    "Trends.Earth API UI", className="card-title"
+                                                ),
+                                                html.P(
+                                                    f"Environment: {ui_info['environment']}",
+                                                    className="mb-1",
+                                                ),
+                                                html.P(
+                                                    f"Branch: {ui_info['branch']}", className="mb-1"
+                                                ),
+                                                html.P(
+                                                    f"Commit: {ui_info['commit_sha']}",
+                                                    className="mb-0",
+                                                ),
+                                            ],
+                                            className="card-body",
+                                        )
+                                    ],
+                                    className="card",
+                                ),
+                            ],
+                            className="col-md-6 mb-3",
+                        ),
+                    ],
+                    className="row",
+                ),
+            ]
+        )
+
+    except Exception as e:
+        return html.Div(
+            [
+                html.H4("Deployment Information", className="mb-3"),
+                html.P(
+                    "Error fetching deployment information.", className="text-danger text-center"
+                ),
+                html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
+            ],
+            className="p-4",
+        )
+
+
+def create_docker_swarm_status_table(swarm_data):
+    """
+    Create a table showing Docker swarm nodes and their details.
+
+    Args:
+        swarm_data: Docker swarm data from the API
+
+    Returns:
+        html.Div: Table showing swarm node details
+    """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        if not swarm_data or not isinstance(swarm_data, dict):
+            return html.Div(
+                [
+                    html.P("No swarm data available.", className="text-muted text-center"),
+                ],
+                className="p-4",
+            )
+
+        # Handle error response structure
+        if swarm_data.get("error", False):
+            error_msg = swarm_data.get("message", "No swarm data available")
+            return html.Div(
+                [
+                    html.P("Docker swarm status unavailable.", className="text-muted text-center"),
+                    html.Small(f"Error: {error_msg}", className="text-muted text-center d-block"),
+                ],
+                className="p-4",
+            )
+
+        # Extract swarm information directly (data layer already extracted in callback)
+        nodes = swarm_data.get("nodes", [])
+        swarm_active = swarm_data.get("swarm_active", False)
+
+        if not swarm_active:
+            error_msg = swarm_data.get("error", "Swarm not active")
+            return html.Div(
+                [
+                    html.P(
+                        f"Docker Swarm Status: {error_msg}", className="text-warning text-center"
+                    ),
+                    html.P("No nodes to display.", className="text-muted text-center"),
+                ],
+                className="p-4",
+            )
+
+        if not nodes:
+            return html.Div(
+                [
+                    html.P("No swarm nodes available.", className="text-muted text-center"),
+                ],
+                className="p-4",
+            )
+
+        # Create table headers
+        table_header = html.Thead(
+            [
+                html.Tr(
+                    [
+                        html.Th("Hostname", scope="col"),
+                        html.Th("Role", scope="col"),
+                        html.Th("State", scope="col"),
+                        html.Th("Availability", scope="col"),
+                        html.Th("CPU", scope="col"),
+                        html.Th("Memory (GB)", scope="col"),
+                        html.Th("Running Tasks", scope="col"),
+                        html.Th("Leader", scope="col"),
+                    ]
+                )
+            ]
+        )
+
+        # Create table rows
+        table_rows = []
+        for node in nodes:
+            # Determine state color
+            state = node.get("state", "unknown")
+            state_class = "text-success" if state == "ready" else "text-warning"
+
+            # Determine role color and badge
+            role = node.get("role", "worker")
+            is_manager = node.get("is_manager", False)
+            role_class = "badge bg-primary" if is_manager else "badge bg-secondary"
+
+            # Leader indicator
+            is_leader = node.get("is_leader", False)
+            leader_indicator = "✓" if is_leader else "-"
+            leader_class = "text-success fw-bold" if is_leader else "text-muted"
+
+            # Availability color
+            availability = node.get("availability", "unknown")
+            avail_class = "text-success" if availability == "active" else "text-warning"
+
+            row = html.Tr(
+                [
+                    html.Td(node.get("hostname", "Unknown")),
+                    html.Td(html.Span(role.title(), className=role_class)),
+                    html.Td(state.title(), className=state_class),
+                    html.Td(availability.title(), className=avail_class),
+                    html.Td(f"{node.get('cpu_count', 0):.1f}"),
+                    html.Td(f"{node.get('memory_gb', 0):.1f}"),
+                    html.Td(str(node.get("running_tasks", 0))),
+                    html.Td(leader_indicator, className=leader_class),
+                ]
+            )
+            table_rows.append(row)
+
+        table_body = html.Tbody(table_rows)
+
+        return html.Div(
+            [
+                html.H4("Docker Swarm Nodes", className="mb-3"),
+                html.Div(
+                    [
+                        html.Table(
+                            [table_header, table_body],
+                            className="table table-striped table-hover",
+                        )
+                    ],
+                    className="table-responsive",
+                ),
+            ]
+        )
+
+    except Exception as e:
+        logger.error(f"Error creating Docker swarm status table: {e}")
+        return html.Div(
+            [
+                html.H4("Docker Swarm Nodes", className="mb-3"),
+                html.P("Error creating swarm status table.", className="text-danger text-center"),
+                html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
+            ],
+            className="p-4",
+        )
