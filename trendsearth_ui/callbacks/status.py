@@ -380,6 +380,21 @@ def register_callbacks(app):
                     user_stats = fetch_user_stats(token, api_environment, api_period)
                     execution_stats = fetch_execution_stats(token, api_environment, api_period)
 
+                    # Debug logging to see what we actually get
+                    import logging
+
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"Dashboard stats type: {type(dashboard_stats)}")
+                    logger.info(f"User stats type: {type(user_stats)}")
+                    logger.info(f"Execution stats type: {type(execution_stats)}")
+
+                    if isinstance(dashboard_stats, dict):
+                        logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
+                    if isinstance(user_stats, dict):
+                        logger.info(f"User stats keys: {list(user_stats.keys())}")
+                    if isinstance(execution_stats, dict):
+                        logger.info(f"Execution stats keys: {list(execution_stats.keys())}")
+
                     # Format and cache the enhanced statistics with period-specific key
                     # Get the latest status for scripts count
                     latest_status = status_data[0] if status_data else {}

@@ -29,15 +29,32 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
             )
 
         # Handle error response structure
-        if not user_stats_data or user_stats_data.get("error", False):
-            error_msg = (
-                user_stats_data.get("message", "No data available")
-                if user_stats_data
-                else "No data available"
+        if not user_stats_data:
+            return html.Div(
+                [
+                    html.P("No geographic data available.", className="text-muted text-center"),
+                    html.Small("No data provided.", className="text-muted text-center d-block"),
+                ],
+                className="p-4",
             )
-            status_code = (
-                user_stats_data.get("status_code", "unknown") if user_stats_data else "unknown"
+
+        # Check if data is a list (unexpected format) and handle gracefully
+        if isinstance(user_stats_data, list):
+            return html.Div(
+                [
+                    html.P("No geographic data available.", className="text-muted text-center"),
+                    html.Small(
+                        "Received unexpected data format from API.",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
             )
+
+        # Handle error response structure (should be a dict)
+        if user_stats_data.get("error", False):
+            error_msg = user_stats_data.get("message", "No data available")
+            status_code = user_stats_data.get("status_code", "unknown")
 
             if status_code == 403:
                 error_detail = "You need SUPERADMIN privileges to access geographic user data."
@@ -86,8 +103,26 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
             )
 
         # Process geographic data - expect format like:
-        # {"countries": {"US": 45, "CA": 12, "GB": 8, ...}}
+        # {"top_countries": [{"country": "US", "count": 45}, {"country": "CA", "count": 12}, ...]}
+        # or {"countries": {"US": 45, "CA": 12, "GB": 8, ...}}
         countries_data = geographic_data.get("countries", {})
+        top_countries_data = geographic_data.get("top_countries", [])
+
+        logger.info(f"Countries data: {countries_data}")
+        logger.info(f"Top countries data: {top_countries_data}")
+
+        # Handle both possible formats
+        if top_countries_data and isinstance(top_countries_data, list):
+            # Convert list format to dict format
+            countries_data = {}
+            for item in top_countries_data:
+                if isinstance(item, dict):
+                    country = item.get("country", item.get("country_code", ""))
+                    count = item.get("user_count", item.get("count", 0))
+                    if country:
+                        countries_data[country] = count
+
+        logger.info(f"Final countries data: {countries_data}")
 
         if not countries_data:
             return html.Div(
@@ -101,22 +136,120 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                 className="p-4",
             )
 
-        # Convert to lists for plotly
-        countries = list(countries_data.keys())
-        user_counts = list(countries_data.values())
+        # Country name to ISO-3 code mapping for common countries
+        country_code_mapping = {
+            "China": "CHN",
+            "Mozambique": "MOZ",
+            "United States": "USA",
+            "United States of America": "USA",
+            "Canada": "CAN",
+            "United Kingdom": "GBR",
+            "Germany": "DEU",
+            "France": "FRA",
+            "Japan": "JPN",
+            "Brazil": "BRA",
+            "India": "IND",
+            "Australia": "AUS",
+            "South Africa": "ZAF",
+            "Mexico": "MEX",
+            "Russia": "RUS",
+            "Italy": "ITA",
+            "Spain": "ESP",
+            "Netherlands": "NLD",
+            "Sweden": "SWE",
+            "Norway": "NOR",
+            "Denmark": "DNK",
+            "Finland": "FIN",
+            "Kenya": "KEN",
+            "Nigeria": "NGA",
+            "Egypt": "EGY",
+            "Argentina": "ARG",
+            "Chile": "CHL",
+            "Peru": "PER",
+            "Colombia": "COL",
+            "Ecuador": "ECU",
+            "Bolivia": "BOL",
+            "Venezuela": "VEN",
+            "Thailand": "THA",
+            "Indonesia": "IDN",
+            "Philippines": "PHL",
+            "Malaysia": "MYS",
+            "Singapore": "SGP",
+            "Vietnam": "VNM",
+            "South Korea": "KOR",
+            "Turkey": "TUR",
+            "Poland": "POL",
+            "Czech Republic": "CZE",
+            "Hungary": "HUN",
+            "Romania": "ROU",
+            "Bulgaria": "BGR",
+            "Greece": "GRC",
+            "Portugal": "PRT",
+            "Belgium": "BEL",
+            "Austria": "AUT",
+            "Switzerland": "CHE",
+            "Ireland": "IRL",
+            "New Zealand": "NZL",
+            "Israel": "ISR",
+            "Morocco": "MAR",
+            "Algeria": "DZA",
+            "Tunisia": "TUN",
+            "Ghana": "GHA",
+            "Ethiopia": "ETH",
+            "Tanzania": "TZA",
+            "Uganda": "UGA",
+            "Rwanda": "RWA",
+            "Zambia": "ZMB",
+            "Zimbabwe": "ZWE",
+            "Botswana": "BWA",
+            "Namibia": "NAM",
+            "Madagascar": "MDG",
+        }
+
+        # Convert country names to ISO-3 codes and filter valid ones
+        iso_countries = []
+        iso_counts = []
+        country_labels = []
+
+        for country, count in countries_data.items():
+            iso_code = country_code_mapping.get(country)
+            if iso_code:
+                iso_countries.append(iso_code)
+                iso_counts.append(count)
+                country_labels.append(f"{country}: {count} users")
+            else:
+                logger.warning(f"No ISO-3 code mapping found for country: {country}")
+
+        logger.info(f"Mapped to ISO codes: {dict(zip(iso_countries, iso_counts))}")
+
+        if not iso_countries:
+            return html.Div(
+                [
+                    html.P(
+                        "No mappable country data available.", className="text-muted text-center"
+                    ),
+                    html.Small(
+                        f"Countries found: {', '.join(countries_data.keys())}. These countries need ISO-3 code mapping.",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
 
         # Create the choropleth map
         fig = go.Figure(
             data=go.Choropleth(
-                locations=countries,
-                z=user_counts,
+                locations=iso_countries,
+                z=iso_counts,
                 locationmode="ISO-3",
                 colorscale="Blues",
-                text=[
-                    f"{country}: {count} users" for country, count in zip(countries, user_counts)
-                ],
+                text=country_labels,
                 hovertemplate="<b>%{text}</b><extra></extra>",
-                colorbar={"title": "Number of Users", "titleside": "right"},
+                colorbar={
+                    "title": {"text": "Number of Users", "side": "right"},
+                    "thickness": 15,
+                    "len": 0.8,
+                },
             )
         )
 
@@ -246,40 +379,157 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
 
         charts = []
 
-        # 1. Task Performance (instead of status distribution)
-        # API has 'task_performance' instead of 'status_distribution'
-        task_performance_data = data.get("task_performance", {})
-        if task_performance_data:
-            # Check if there's status information in task_performance
-            status_data = task_performance_data.get("by_status", {})
-            if status_data:
-                statuses = list(status_data.keys())
-                counts = list(status_data.values())
+        # 1. Task Performance - handle actual data structure
+        # API returns a list of task objects, not a dict with by_status
+        task_performance_data = data.get("task_performance", [])
+        logger.info(f"Task performance data: {task_performance_data}")
 
-                # Create pie chart for status distribution
-                fig_pie = go.Figure(
+        if task_performance_data and isinstance(task_performance_data, list):
+            # Create a chart showing tasks by execution count
+            task_names = []
+            execution_counts = []
+            success_rates = []
+
+            for task in task_performance_data[:10]:  # Top 10 tasks
+                if isinstance(task, dict):
+                    name = task.get("task", "Unknown")
+                    total_execs = task.get("total_executions", 0)
+                    success_rate = task.get("success_rate", 0)
+
+                    task_names.append(name)
+                    execution_counts.append(total_execs)
+                    success_rates.append(success_rate)
+
+            if task_names and execution_counts:
+                # Create horizontal bar chart for task performance
+                fig_tasks = go.Figure(
                     data=[
-                        go.Pie(
-                            labels=statuses,
-                            values=counts,
-                            hole=0.3,
-                            hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>",
+                        go.Bar(
+                            x=execution_counts,
+                            y=task_names,
+                            orientation="h",
+                            hovertemplate="<b>%{y}</b><br>Executions: %{x}<br>Success Rate: %{customdata}%<extra></extra>",
+                            customdata=success_rates,
                         )
                     ]
                 )
 
-                fig_pie.update_layout(
-                    title=f"Execution Status Distribution{title_suffix}",
-                    height=300,
+                fig_tasks.update_layout(
+                    title="Task Performance by Execution Count",
+                    xaxis_title="Number of Executions",
+                    height=max(300, len(task_names) * 30),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 )
 
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Execution Status Distribution"),
+                            html.H6("Task Performance"),
                             dcc.Graph(
-                                figure=fig_pie, config={"displayModeBar": False, "responsive": True}
+                                figure=fig_tasks,
+                                config={"displayModeBar": False, "responsive": True},
+                            ),
+                        ],
+                        className="mb-3",
+                    )
+                )
+
+            # Create a second chart for task duration
+            if task_names:
+                durations = []
+                for task in task_performance_data[:10]:  # Top 10 tasks
+                    if isinstance(task, dict):
+                        # Convert duration from string to float, handling potential formats
+                        duration_str = task.get("avg_duration_minutes", "0")
+                        try:
+                            if isinstance(duration_str, str):
+                                duration = float(duration_str)
+                            else:
+                                duration = float(duration_str) if duration_str else 0
+                        except (ValueError, TypeError):
+                            duration = 0
+                        durations.append(duration)
+
+                # Create horizontal bar chart for task duration
+                fig_duration = go.Figure(
+                    data=[
+                        go.Bar(
+                            x=durations,
+                            y=task_names,
+                            orientation="h",
+                            hovertemplate="<b>%{y}</b><br>Avg Duration: %{x:.1f} minutes<br>Success Rate: %{customdata}%<extra></extra>",
+                            customdata=success_rates,
+                            marker_color="lightcoral",
+                        )
+                    ]
+                )
+
+                fig_duration.update_layout(
+                    title="Average Task Duration",
+                    xaxis_title="Average Duration (minutes)",
+                    height=max(300, len(task_names) * 30),
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                )
+
+                charts.append(
+                    html.Div(
+                        [
+                            html.H6("Task Duration Analysis"),
+                            dcc.Graph(
+                                figure=fig_duration,
+                                config={"displayModeBar": False, "responsive": True},
+                            ),
+                        ],
+                        className="mb-3",
+                    )
+                )
+
+                # Create a combined scatter plot for execution count vs duration
+                fig_combined = go.Figure()
+
+                fig_combined.add_trace(
+                    go.Scatter(
+                        x=durations,
+                        y=execution_counts,
+                        mode="markers+text",
+                        text=task_names,
+                        textposition="top center",
+                        hovertemplate="<b>%{text}</b><br>Duration: %{x:.1f} minutes<br>Executions: %{y}<br>Success Rate: %{customdata}%<extra></extra>",
+                        customdata=success_rates,
+                        marker={
+                            "size": [max(8, min(20, count / 2)) for count in execution_counts],
+                            "color": success_rates,
+                            "colorscale": "RdYlGn",
+                            "showscale": True,
+                            "colorbar": {
+                                "title": {"text": "Success Rate (%)", "side": "right"},
+                                "thickness": 15,
+                                "len": 0.8,
+                            },
+                        },
+                    )
+                )
+
+                fig_combined.update_layout(
+                    title="Task Performance Overview: Duration vs Execution Count",
+                    xaxis_title="Average Duration (minutes)",
+                    yaxis_title="Total Executions",
+                    height=400,
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    showlegend=False,
+                )
+
+                charts.append(
+                    html.Div(
+                        [
+                            html.H6("Task Performance Overview"),
+                            html.P(
+                                "Bubble size indicates execution count, color indicates success rate.",
+                                className="text-muted small mb-2",
+                            ),
+                            dcc.Graph(
+                                figure=fig_combined,
+                                config={"displayModeBar": False, "responsive": True},
                             ),
                         ],
                         className="mb-3",
