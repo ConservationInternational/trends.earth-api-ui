@@ -87,10 +87,10 @@ class TestAuthenticationState:
         # Should show login page
         expect(app_page.locator("h4")).to_contain_text("Login")
 
-        # Should not show dashboard elements
-        expect(app_page.locator("text=Dashboard")).not_to_be_visible()
-        expect(app_page.locator("text=Status")).not_to_be_visible()
-        expect(app_page.locator("text=Executions")).not_to_be_visible()
+        # Should not show dashboard elements (use specific selectors)
+        expect(app_page.locator("[data-testid='dashboard-content']")).not_to_be_visible()
+        expect(app_page.locator("#status-tab-btn")).not_to_be_visible()
+        expect(app_page.locator("#executions-tab-btn")).not_to_be_visible()
 
         # Should not have authentication cookies
         cookies = app_page.context.cookies()
@@ -102,15 +102,15 @@ class TestAuthenticationState:
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Should see dashboard instead of login
-        expect(authenticated_page.locator("text=Dashboard")).to_be_visible()
+        # Should see dashboard navbar instead of login
+        expect(authenticated_page.locator(".navbar-brand")).to_contain_text("Dashboard")
 
         # Should not see login form
         expect(authenticated_page.locator("h4:has-text('Login')")).not_to_be_visible()
 
-        # Should see navigation tabs
-        expect(authenticated_page.locator("text=Status")).to_be_visible()
-        expect(authenticated_page.locator("text=Executions")).to_be_visible()
+        # Should see navigation tabs (be specific about tab buttons vs table headers)
+        expect(authenticated_page.locator("#status-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#executions-tab-btn")).to_be_visible()
 
         # Should have authentication cookie
         cookies = authenticated_page.context.cookies()

@@ -105,7 +105,7 @@ class TestTableColumnFilters:
         # Navigate to scripts tab
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        scripts_tab = authenticated_page.locator("text=Scripts").first
+        scripts_tab = authenticated_page.locator("#scripts-tab-btn")
         scripts_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
@@ -139,7 +139,7 @@ class TestTableColumnFilters:
         # Navigate to scripts tab
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        scripts_tab = authenticated_page.locator("text=Scripts").first
+        scripts_tab = authenticated_page.locator("#scripts-tab-btn")
         scripts_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
@@ -173,7 +173,7 @@ class TestTableColumnFilters:
         # Navigate to users tab
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        users_tab = authenticated_page.locator("text=Users").first
+        users_tab = authenticated_page.locator("#users-tab-btn")
         users_tab.click()
         authenticated_page.wait_for_timeout(3000)
 
@@ -373,7 +373,7 @@ class TestTableFilterInteraction:
                         authenticated_page.wait_for_timeout(1000)
 
         # Switch to another tab
-        scripts_tab = authenticated_page.locator("text=Scripts").first
+        scripts_tab = authenticated_page.locator("#scripts-tab-btn")
         if scripts_tab.is_visible():
             scripts_tab.click()
             authenticated_page.wait_for_timeout(2000)
