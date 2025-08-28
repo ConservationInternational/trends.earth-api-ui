@@ -19,23 +19,29 @@ class TestDashboardNavigation:
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Check main tabs
-        expect(authenticated_page.locator("text=Status")).to_be_visible()
-        expect(authenticated_page.locator("text=Executions")).to_be_visible()
-        expect(authenticated_page.locator("text=Scripts")).to_be_visible()
-        expect(authenticated_page.locator("text=Users")).to_be_visible()
-        expect(authenticated_page.locator("text=Profile")).to_be_visible()
+        # Check main tab buttons (use specific IDs to avoid strict mode violations)
+        expect(authenticated_page.locator("#status-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#executions-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#scripts-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#users-tab-btn")).to_be_visible()
+        expect(authenticated_page.locator("#profile-tab-btn")).to_be_visible()
 
     def test_tab_navigation(self, authenticated_page: Page):
         """Test navigation between dashboard tabs."""
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Test clicking on different tabs
-        tabs_to_test = ["Status", "Executions", "Scripts", "Users", "Profile"]
+        # Test clicking on different tabs (use specific tab button IDs)
+        tab_buttons = [
+            "#status-tab-btn",
+            "#executions-tab-btn",
+            "#scripts-tab-btn",
+            "#users-tab-btn",
+            "#profile-tab-btn",
+        ]
 
-        for tab_name in tabs_to_test:
-            tab = authenticated_page.locator(f"text={tab_name}").first
+        for tab_button_id in tab_buttons:
+            tab = authenticated_page.locator(tab_button_id)
             if tab.is_visible():
                 tab.click()
 
