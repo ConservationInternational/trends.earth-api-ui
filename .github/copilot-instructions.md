@@ -13,7 +13,25 @@ This is a **Dash-based web application** for viewing and managing the Trends.Ear
 ## Required Build and Development Steps
 
 ### 1. Environment Setup
-**ALWAYS run these steps in order before any development:**
+
+#### For GitHub Copilot Agents and Automated Tools
+**IMPORTANT**: Agents should use the provided GitHub Actions workflow for environment setup to avoid network issues and ensure consistent configuration.
+
+**Recommended Approach**: Use the `copilot-setup-steps.yml` workflow in `.github/workflows/` which handles:
+- Python setup with proper caching
+- Poetry installation with virtual environment configuration
+- Dependency installation with `poetry install --with dev`
+- Playwright browser installation with network failure handling
+- Environment verification
+
+**After the workflow runs successfully, agents should assume the following tools are available:**
+- ✅ **Poetry** - Available and configured with dependencies installed
+- ✅ **Playwright browsers** - Available for end-to-end testing (unless explicitly skipped)
+- ✅ **Python environment** - Configured with all required packages
+- ✅ **Development tools** - Ruff, pytest, and other dev dependencies ready
+
+#### Manual Setup (Local Development)
+If you need to set up the environment manually (e.g., for local development), run these steps in order:
 
 ```bash
 # 1. Install Poetry (if not available)
@@ -100,9 +118,11 @@ docker compose down
 
 4. **Docker Compose**: Available as `docker compose` (not `docker-compose`).
 
-5. **Docker build**: May fail in restricted network environments due to SSL certificate issues when installing Poetry. Local builds work normally.
+5. **Network restrictions for agents**: The `copilot-setup-steps.yml` workflow is specifically designed to handle network restrictions and firewall issues common in CI/automated environments. Agents should use this workflow rather than attempting manual installations that may fail due to network constraints.
 
-6. **Playwright browser installation**: May fail in restricted network environments (CI/firewall restrictions). When this happens, Playwright tests are automatically skipped with appropriate messages. Local installation typically works normally.
+6. **Docker build**: May fail in restricted network environments due to SSL certificate issues when installing Poetry. Local builds work normally.
+
+7. **Playwright browser installation**: May fail in restricted network environments (CI/firewall restrictions). The `copilot-setup-steps.yml` workflow handles this gracefully with fallbacks. When Playwright browsers are not available, tests are automatically skipped with appropriate messages.
 
 ## Project Architecture and Layout
 
@@ -142,6 +162,17 @@ tests/
 
 ### Copilot Agent Workflow Integration
 **When using Copilot agents or automated tools:**
+
+#### Environment Setup for Agents
+1. **Prefer** the `copilot-setup-steps.yml` GitHub Actions workflow for environment setup
+2. **Assume** Poetry and Playwright browsers are available after successful workflow execution
+3. **Verify** environment status with simple checks rather than reinstalling tools:
+   ```bash
+   poetry --version  # Should work if environment is set up
+   poetry run playwright --version || echo "Playwright may not be available (normal in restricted environments)"
+   ```
+
+#### Code Quality Workflow
 1. **Always** run quality checks after making code changes and before using `report_progress`
 2. **Never** commit code that fails `ruff check` or `ruff format --check`
 3. **Use** `poetry run ruff check --fix` and `poetry run ruff format` to auto-fix issues
@@ -218,7 +249,16 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 
 ## Quick Start Checklist
 
-**MANDATORY PRE-DEVELOPMENT SETUP:**
+### For Copilot Agents (Recommended)
+**PREFERRED SETUP METHOD**: Use the `copilot-setup-steps.yml` GitHub Actions workflow
+1. ✅ Trigger the `copilot-setup-steps.yml` workflow (handles Poetry, dependencies, Playwright)
+2. ✅ Verify environment: `poetry --version && poetry run python --version`
+3. ✅ Run quick validation: `poetry run python -m pytest tests/unit/ -v` 
+4. ✅ Check code quality: `poetry run ruff check trendsearth_ui/ tests/`
+5. ✅ Verify app runs: `poetry run python -m trendsearth_ui.app`
+
+### Manual Setup (Local Development Only)
+**MANUAL SETUP** (only if workflow is not available):
 1. ✅ `poetry install --with dev`
 2. ✅ `poetry run playwright install` (required for end-to-end tests)
 3. ✅ `poetry run python -m pytest tests/unit/ -v` (quick validation)
@@ -226,15 +266,16 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 5. ✅ `poetry run ruff format --check trendsearth_ui/ tests/` (formatting check)
 6. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
 
+### Development Workflow (All Environments)
 **DEVELOPMENT WORKFLOW:**
-6. ✅ Make your changes
-7. ✅ **MANDATORY BEFORE ANY COMMIT:**
+1. ✅ Make your changes
+2. ✅ **MANDATORY BEFORE ANY COMMIT:**
    - `poetry run ruff check --fix trendsearth_ui/ tests/` (auto-fix linting)
    - `poetry run ruff format trendsearth_ui/ tests/` (auto-format code)
    - `poetry run ruff check trendsearth_ui/ tests/` (verify linting passes)
    - `poetry run ruff format --check trendsearth_ui/ tests/` (verify formatting passes)
    - `poetry run python -m pytest tests/unit/ -v` (validate changes)
 
-**Time estimates**: Setup (2-3 min), Unit tests (30s), Linting (10s), App startup (10s)
+**Time estimates**: Workflow setup (2-3 min), Unit tests (30s), Linting (10s), App startup (10s)
 
 **FAILURE POLICY**: If any quality check fails, the PR will be rejected by GitHub Actions. Always run the mandatory quality checks before using `report_progress` to commit changes.
