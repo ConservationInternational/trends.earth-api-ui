@@ -45,15 +45,19 @@ class TestDashboardNavigation:
             if tab.is_visible():
                 tab.click()
 
-                # Wait for tab content to load
-                authenticated_page.wait_for_timeout(1000)
+                # Wait for tab content to load and become visible
+                authenticated_page.wait_for_timeout(2000)  # Give more time for content to load
+
+                # Wait specifically for tab content to have actual content (not just be present)
+                authenticated_page.wait_for_function(
+                    "document.querySelector('#tab-content') && document.querySelector('#tab-content').children.length > 0",
+                    timeout=10000,
+                )
 
                 # Verify tab is active/selected (checking for common active indicators)
                 # The exact selector depends on the UI framework being used
                 # Just verify that content area is visible after click
-                content_area = authenticated_page.locator(
-                    "[data-testid='tab-content'], .tab-content, [role='tabpanel']"
-                )
+                content_area = authenticated_page.locator("#tab-content")
                 expect(content_area).to_be_visible()
 
     def test_default_tab_active(self, authenticated_page: Page):
@@ -61,10 +65,14 @@ class TestDashboardNavigation:
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Should have some tab content visible by default
-        content_area = authenticated_page.locator(
-            "[data-testid='tab-content'], .tab-content, [role='tabpanel']"
+        # Wait for initial tab content to be populated
+        authenticated_page.wait_for_function(
+            "document.querySelector('#tab-content') && document.querySelector('#tab-content').children.length > 0",
+            timeout=10000,
         )
+
+        # Should have some tab content visible by default
+        content_area = authenticated_page.locator("#tab-content")
         expect(content_area).to_be_visible()
 
 
