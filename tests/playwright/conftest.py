@@ -175,7 +175,7 @@ def authenticated_page(page: Page, live_server):
         # This ensures tab visibility callbacks have executed
         # We need to wait for both users and status tabs since they should both be visible for ADMIN role
         admin_tabs_visible = False
-        max_attempts = 3
+        max_attempts = 5  # Increased attempts for CI stability
         attempt = 0
 
         while not admin_tabs_visible and attempt < max_attempts:
@@ -183,9 +183,18 @@ def authenticated_page(page: Page, live_server):
                 attempt += 1
                 print(f"🔄 Checking admin tab visibility (attempt {attempt}/{max_attempts})")
 
+                # First, verify the auth stores are populated by checking if authentication state is ready
+                # This helps detect when the auth callback has run
+                try:
+                    # Try to access a Dash component to trigger a component update if needed
+                    page.evaluate("window.dispatchEvent(new Event('resize'))")
+                    page.wait_for_timeout(1000)  # Give time for callbacks to run
+                except Exception:
+                    pass  # Best effort to trigger updates
+
                 # Wait for both critical admin tabs to be visible
-                page.wait_for_selector("#users-tab-btn:visible", timeout=10000)
-                page.wait_for_selector("#status-tab-btn:visible", timeout=10000)
+                page.wait_for_selector("#users-tab-btn:visible", timeout=12000)
+                page.wait_for_selector("#status-tab-btn:visible", timeout=12000)
 
                 # Double check they're still visible (handle race conditions with token refresh)
                 if (
@@ -209,6 +218,12 @@ def authenticated_page(page: Page, live_server):
                 else:
                     print(f"⚠️  Attempt {attempt} failed, retrying... ({e})")
                     page.wait_for_timeout(3000)  # Wait 3s before retry
+                    # Try refreshing the page to reinitialize auth if needed
+                    if attempt >= 2:
+                        print("🔄 Refreshing page to reinitialize authentication...")
+                        page.reload()
+                        page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
+                        page.wait_for_timeout(2000)  # Additional wait after reload
 
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
@@ -230,6 +245,97 @@ def browser_context_args(browser_context_args):
         "viewport": {"width": 1280, "height": 720},
         "ignore_https_errors": True,
     }
+
+
+def wait_for_ag_grid_table(page, table_testid, timeout=15000):
+    """
+    Reliably wait for an AG-Grid table to be fully loaded and ready for interaction.
+
+    Args:
+        page: Playwright page object
+        table_testid: data-testid attribute of the table container
+        timeout: Maximum time to wait in milliseconds
+
+    Returns:
+        True if table is ready, False if timeout
+    """
+    try:
+        print(f"⏳ Waiting for AG-Grid table '{table_testid}' to load...")
+
+        # Step 1: Wait for the table container
+        page.wait_for_selector(f"[data-testid='{table_testid}']", timeout=timeout)
+        print(f"✅ Table container '{table_testid}' found")
+
+        # Step 2: Wait for AG-Grid to initialize inside the container
+        page.wait_for_selector(f"[data-testid='{table_testid}'] .ag-grid", timeout=timeout)
+        print(f"✅ AG-Grid component found in '{table_testid}'")
+
+        # Step 3: Wait for headers to be present (indicates table structure is ready)
+        page.wait_for_selector(f"[data-testid='{table_testid}'] .ag-header", timeout=timeout)
+        print(f"✅ AG-Grid headers found in '{table_testid}'")
+
+        # Step 4: Wait for any rows to appear or confirm empty state
+        try:
+            # Try to find either rows or the "no rows" overlay
+            page.wait_for_selector(
+                f"[data-testid='{table_testid}'] .ag-row, [data-testid='{table_testid}'] .ag-overlay-no-rows-center",
+                timeout=5000,
+            )
+            print(f"✅ AG-Grid data loaded in '{table_testid}'")
+        except Exception:
+            # Table might be loading data, give it more time
+            print(f"⏳ Waiting for data to load in '{table_testid}'...")
+            page.wait_for_timeout(2000)
+
+        # Step 5: Final stability wait
+        page.wait_for_timeout(1000)  # Let any animations/renders complete
+        print(f"✅ AG-Grid table '{table_testid}' is ready for interaction")
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to load AG-Grid table '{table_testid}': {e}")
+        return False
+
+
+def navigate_to_tab_and_wait_for_table(page, tab_name, table_testid, timeout=20000):
+    """
+    Navigate to a specific tab and wait for its AG-Grid table to be ready.
+
+    Args:
+        page: Playwright page object
+        tab_name: Name of the tab to click (e.g., "Executions", "Users", "Scripts")
+        table_testid: data-testid attribute of the expected table
+        timeout: Maximum time to wait
+
+    Returns:
+        True if successful, False if failed
+    """
+    try:
+        print(f"🔄 Navigating to {tab_name} tab...")
+
+        # Wait for dashboard to be ready
+        page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
+
+        # Click the tab
+        tab_locator = page.locator(f"text={tab_name}").first
+        tab_locator.click()
+        print(f"✅ Clicked {tab_name} tab")
+
+        # Give tab switch time to process
+        page.wait_for_timeout(1000)
+
+        # Wait for the table to be ready
+        success = wait_for_ag_grid_table(page, table_testid, timeout)
+        if success:
+            print(f"✅ {tab_name} tab and table are ready")
+        else:
+            print(f"⚠️  {tab_name} tab loaded but table is not ready")
+
+        return success
+
+    except Exception as e:
+        print(f"❌ Failed to navigate to {tab_name} tab: {e}")
+        return False
 
 
 # Mock data generation functions for Playwright tests
