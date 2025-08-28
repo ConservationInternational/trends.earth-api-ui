@@ -23,13 +23,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug workflow context
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Trigger: ${{ github.event.action || 'N/A' }}"
+          echo "Python version input: ${{ inputs.python_version || 'default (3.12)' }}"
+          echo "Install browsers input: ${{ inputs.install_browsers || 'default (true)' }}"
+          echo "GitHub runner OS: ${{ runner.os }}"
+          echo "Working directory: $(pwd)"
+        
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ inputs.python_version || '3.12' }}
           cache: "pip"
 
       - name: Install Poetry
@@ -49,38 +58,51 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "Installing Python dependencies with Poetry..."
           poetry install --with dev
+          echo "✅ Dependencies installed successfully"
 
       - name: Install Playwright browsers (optional)
         if: ${{ inputs.install_browsers != false }}
         run: |
-          poetry run playwright install chromium --with-deps || true
-          poetry run playwright --version || true
+          echo "Installing Playwright browsers..."
+          poetry run playwright install chromium --with-deps || echo "Playwright installation failed or skipped"
+          poetry run playwright --version || echo "Playwright not available"
         timeout-minutes: 15
 
       - name: Verify core setup
         run: |
-          poetry --version
-          poetry run python --version
-          poetry run python -c "import trendsearth_ui; print('ok')"
+          echo "🔍 Verifying core development environment setup..."
+          echo "Poetry version: $(poetry --version)"
+          echo "Python version: $(poetry run python --version)"
+          echo "Testing trendsearth_ui import..."
+          poetry run python -c "import trendsearth_ui; print('✅ trendsearth_ui module imported successfully')"
 
       - name: Verify Ruff
         run: |
-          poetry run ruff --version
-          echo 'print("hello")' > /tmp/t.py
-          poetry run ruff check /tmp/t.py
-          poetry run ruff format /tmp/t.py
-          rm /tmp/t.py
+          echo "🔍 Verifying Ruff (linter/formatter)..."
+          echo "Ruff version: $(poetry run ruff --version)"
+          echo "Testing Ruff functionality..."
+          echo 'print("hello")' > /tmp/test_ruff.py
+          poetry run ruff check /tmp/test_ruff.py
+          poetry run ruff format /tmp/test_ruff.py
+          rm /tmp/test_ruff.py
+          echo "✅ Ruff working correctly"
 
       - name: Run a quick unit test
         run: |
+          echo "🔍 Running quick unit test to verify functionality..."
           poetry run python -m pytest tests/unit/test_config.py -v --tb=short
+          echo "✅ Unit tests passed"
 
       - name: Summary
         run: |
-          echo "Setup complete"
+          echo "🎉 Development Environment Setup Complete!"
+          echo "=================================="
           echo "Python: $(poetry run python --version)"
           echo "Poetry: $(poetry --version)"
           echo "Pytest: $(poetry run pytest --version)"
           echo "Ruff: $(poetry run ruff --version)"
-          poetry run playwright --version || echo "Playwright not available"
+          poetry run playwright --version || echo "Playwright: Not installed"
+          echo "=================================="
+          echo "✅ Environment is ready for development"
