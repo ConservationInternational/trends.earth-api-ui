@@ -702,6 +702,26 @@ def status_tab_content(is_admin, role=None):
                     dbc.CardHeader(html.H4("System Status Summary")),
                     dbc.CardBody(
                         [
+                            # System Overview section (SUPERADMIN only) - moved to top
+                            *(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H5("System Overview", className="mb-3"),
+                                            dcc.Loading(
+                                                id="loading-system-overview",
+                                                children=[html.Div(id="system-overview-content")],
+                                                type="default",
+                                                color="#007bff",
+                                            ),
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                    html.Hr(),
+                                ]
+                                if is_admin_user
+                                else []
+                            ),
                             dcc.Loading(
                                 id="loading-status-summary",
                                 children=[
@@ -801,24 +821,6 @@ def status_tab_content(is_admin, role=None):
                                 [
                                     html.Div(
                                         [
-                                            # System Overview
-                                            html.Div(
-                                                [
-                                                    html.H5(
-                                                        "System Overview", className="mb-3 mt-4"
-                                                    ),
-                                                    dcc.Loading(
-                                                        id="loading-stats-summary",
-                                                        children=[
-                                                            html.Div(id="stats-summary-cards")
-                                                        ],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
-                                                ],
-                                                className="mb-4",
-                                            ),
-                                            html.Hr(),
                                             # User geographic map
                                             html.Div(
                                                 [

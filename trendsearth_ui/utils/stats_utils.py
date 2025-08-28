@@ -63,7 +63,7 @@ def set_cached_stats_data(cache_key, data, period=None, ttl=None):
 
 def check_stats_access(role):
     """Check if the user role has access to statistics."""
-    return role in ["ADMIN", "SUPERADMIN"]
+    return role == "SUPERADMIN"  # Only SUPERADMIN users can access stats endpoints
 
 
 def map_period_to_api_period(ui_period):
@@ -134,18 +134,26 @@ def fetch_dashboard_stats(
             return data
         elif resp.status_code == 401:
             logger.warning("Dashboard stats: Unauthorized access (401). Check token.")
-            return {"error": "Unauthorized access"}
+            return {"error": True, "message": "Unauthorized access", "status_code": 401}
         elif resp.status_code == 403:
             logger.warning("Dashboard stats: Forbidden access (403). Check permissions.")
-            return {"error": "Forbidden access"}
+            return {
+                "error": True,
+                "message": "Forbidden access - SUPERADMIN privileges required",
+                "status_code": 403,
+            }
         else:
             logger.error(
                 f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
             )
-            return {"error": f"API error with status code {resp.status_code}"}
+            return {
+                "error": True,
+                "message": f"API error with status code {resp.status_code}",
+                "status_code": resp.status_code,
+            }
     except requests.exceptions.RequestException as e:
         logger.error(f"Dashboard stats: Request failed: {e}")
-        return {"error": f"Request failed: {e}"}
+        return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
 def fetch_user_stats(token, api_environment="production", period="last_week"):
@@ -193,14 +201,28 @@ def fetch_user_stats(token, api_environment="production", period="last_week"):
             set_cached_stats_data("users", data, period)
             logger.info(f"User stats: Successfully fetched and cached data for {period}")
             return data
+        elif resp.status_code == 401:
+            logger.warning("User stats: Unauthorized access (401). Check token.")
+            return {"error": True, "message": "Unauthorized access", "status_code": 401}
+        elif resp.status_code == 403:
+            logger.warning("User stats: Forbidden access (403). Check permissions.")
+            return {
+                "error": True,
+                "message": "Forbidden access - SUPERADMIN privileges required",
+                "status_code": 403,
+            }
         else:
             logger.error(
                 f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
             )
-            return {"error": f"API error with status code {resp.status_code}"}
+            return {
+                "error": True,
+                "message": f"API error with status code {resp.status_code}",
+                "status_code": resp.status_code,
+            }
     except requests.exceptions.RequestException as e:
         logger.error(f"User stats: Request failed: {e}")
-        return {"error": f"Request failed: {e}"}
+        return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
 def fetch_execution_stats(token, api_environment="production", period="last_week"):
@@ -250,11 +272,25 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
             set_cached_stats_data("executions", data, period)
             logger.info(f"Execution stats: Successfully fetched and cached data for {period}")
             return data
+        elif resp.status_code == 401:
+            logger.warning("Execution stats: Unauthorized access (401). Check token.")
+            return {"error": True, "message": "Unauthorized access", "status_code": 401}
+        elif resp.status_code == 403:
+            logger.warning("Execution stats: Forbidden access (403). Check permissions.")
+            return {
+                "error": True,
+                "message": "Forbidden access - SUPERADMIN privileges required",
+                "status_code": 403,
+            }
         else:
             logger.error(
                 f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
             )
-            return {"error": f"API error with status code {resp.status_code}"}
+            return {
+                "error": True,
+                "message": f"API error with status code {resp.status_code}",
+                "status_code": resp.status_code,
+            }
     except requests.exceptions.RequestException as e:
         logger.error(f"Execution stats: Request failed: {e}")
-        return {"error": f"Request failed: {e}"}
+        return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

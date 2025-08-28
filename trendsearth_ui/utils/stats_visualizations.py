@@ -16,7 +16,18 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
     Returns:
         dcc.Graph: Plotly map figure or error message div
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     try:
+        # Debug logging - show what we actually received
+        logger.info(f"User geographic map: Received data type: {type(user_stats_data)}")
+        if user_stats_data:
+            logger.info(
+                f"User geographic map: Data keys: {list(user_stats_data.keys()) if isinstance(user_stats_data, dict) else 'Not a dict'}"
+            )
+
         # Handle error response structure
         if not user_stats_data or user_stats_data.get("error", False):
             error_msg = (
@@ -50,7 +61,15 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
 
         # Extract geographic data from user stats
         data = user_stats_data.get("data", {})
-        geographic_data = data.get("geographic", {})
+        logger.info(
+            f"User geographic map: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+        )
+
+        # API uses 'geographic_distribution' not 'geographic'
+        geographic_data = data.get("geographic_distribution", {})
+        logger.info(
+            f"User geographic map: Geographic section keys: {list(geographic_data.keys()) if isinstance(geographic_data, dict) else 'No geographic section'}"
+        )
 
         if not geographic_data:
             return html.Div(
@@ -131,19 +150,56 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
     Returns:
         list: List of chart components
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     try:
+        # Debug logging - show what we actually received
+        logger.info(f"Execution statistics: Received data type: {type(execution_stats_data)}")
+        if execution_stats_data:
+            logger.info(
+                f"Execution statistics: Data keys: {list(execution_stats_data.keys()) if isinstance(execution_stats_data, dict) else 'Not a dict'}"
+            )
+
         # Handle error response structure
-        if not execution_stats_data or execution_stats_data.get("error", False):
-            error_msg = (
-                execution_stats_data.get("message", "No data available")
-                if execution_stats_data
-                else "No data available"
-            )
-            status_code = (
-                execution_stats_data.get("status_code", "unknown")
-                if execution_stats_data
-                else "unknown"
-            )
+        if not execution_stats_data:
+            return [
+                html.Div(
+                    [
+                        html.P(
+                            "No execution statistics available.", className="text-muted text-center"
+                        ),
+                        html.Small(
+                            "No data provided.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        # Check if data is a list (unexpected format) and handle gracefully
+        if isinstance(execution_stats_data, list):
+            return [
+                html.Div(
+                    [
+                        html.P(
+                            "No execution statistics available.", className="text-muted text-center"
+                        ),
+                        html.Small(
+                            "Received unexpected data format from API.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        # Handle error response structure (should be a dict)
+        if execution_stats_data.get("error", False):
+            error_msg = execution_stats_data.get("message", "No data available")
+            status_code = execution_stats_data.get("status_code", "unknown")
 
             if status_code == 403:
                 error_detail = "You need SUPERADMIN privileges to access execution statistics."
@@ -168,6 +224,9 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
             ]
 
         data = execution_stats_data.get("data", {})
+        logger.info(
+            f"Execution statistics: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+        )
 
         if not data:
             return [
@@ -187,44 +246,49 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
 
         charts = []
 
-        # 1. Execution Status Distribution
-        status_data = data.get("status_distribution", {})
-        if status_data:
-            statuses = list(status_data.keys())
-            counts = list(status_data.values())
+        # 1. Task Performance (instead of status distribution)
+        # API has 'task_performance' instead of 'status_distribution'
+        task_performance_data = data.get("task_performance", {})
+        if task_performance_data:
+            # Check if there's status information in task_performance
+            status_data = task_performance_data.get("by_status", {})
+            if status_data:
+                statuses = list(status_data.keys())
+                counts = list(status_data.values())
 
-            # Create pie chart for status distribution
-            fig_pie = go.Figure(
-                data=[
-                    go.Pie(
-                        labels=statuses,
-                        values=counts,
-                        hole=0.3,
-                        hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>",
-                    )
-                ]
-            )
-
-            fig_pie.update_layout(
-                title=f"Execution Status Distribution{title_suffix}",
-                height=300,
-                margin={"l": 40, "r": 40, "t": 40, "b": 40},
-            )
-
-            charts.append(
-                html.Div(
-                    [
-                        html.H6("Execution Status Distribution"),
-                        dcc.Graph(
-                            figure=fig_pie, config={"displayModeBar": False, "responsive": True}
-                        ),
-                    ],
-                    className="mb-3",
+                # Create pie chart for status distribution
+                fig_pie = go.Figure(
+                    data=[
+                        go.Pie(
+                            labels=statuses,
+                            values=counts,
+                            hole=0.3,
+                            hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>",
+                        )
+                    ]
                 )
-            )
 
-        # 2. Execution Trends Over Time
-        trends_data = data.get("trends", [])
+                fig_pie.update_layout(
+                    title=f"Execution Status Distribution{title_suffix}",
+                    height=300,
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                )
+
+                charts.append(
+                    html.Div(
+                        [
+                            html.H6("Execution Status Distribution"),
+                            dcc.Graph(
+                                figure=fig_pie, config={"displayModeBar": False, "responsive": True}
+                            ),
+                        ],
+                        className="mb-3",
+                    )
+                )
+
+        # 2. Time Series Trends (instead of trends)
+        # API has 'time_series' instead of 'trends'
+        trends_data = data.get("time_series", [])
         if trends_data:
             # Convert to DataFrame for easier handling
             df = pd.DataFrame(trends_data)
@@ -267,44 +331,55 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                     )
                 )
 
-        # 3. Task Type Distribution (if available)
-        task_types_data = data.get("task_types", {})
-        if task_types_data:
-            task_names = list(task_types_data.keys())
-            task_counts = list(task_types_data.values())
+        # 3. Top Users (instead of task types)
+        # API has 'top_users' instead of 'task_types'
+        top_users_data = data.get("top_users", [])
+        if top_users_data and isinstance(top_users_data, list):
+            # Extract user data for chart
+            user_names = []
+            execution_counts = []
 
-            # Create horizontal bar chart for task types
-            fig_tasks = go.Figure(
-                data=[
-                    go.Bar(
-                        x=task_counts,
-                        y=task_names,
-                        orientation="h",
-                        hovertemplate="<b>%{y}</b><br>Executions: %{x}<extra></extra>",
-                    )
-                ]
-            )
+            for user_data in top_users_data[:10]:  # Top 10 users
+                if isinstance(user_data, dict):
+                    name = user_data.get("name", user_data.get("email", "Unknown"))
+                    count = user_data.get("execution_count", user_data.get("count", 0))
+                    user_names.append(name)
+                    execution_counts.append(count)
 
-            fig_tasks.update_layout(
-                title=f"Popular Task Types{title_suffix}",
-                xaxis_title="Number of Executions",
-                height=max(
-                    300, len(task_names) * 30
-                ),  # Dynamic height based on number of task types
-                margin={"l": 40, "r": 40, "t": 40, "b": 40},
-            )
-
-            charts.append(
-                html.Div(
-                    [
-                        html.H6("Task Type Distribution"),
-                        dcc.Graph(
-                            figure=fig_tasks, config={"displayModeBar": False, "responsive": True}
-                        ),
-                    ],
-                    className="mb-3",
+            if user_names and execution_counts:
+                # Create horizontal bar chart for top users
+                fig_users = go.Figure(
+                    data=[
+                        go.Bar(
+                            x=execution_counts,
+                            y=user_names,
+                            orientation="h",
+                            hovertemplate="<b>%{y}</b><br>Executions: %{x}<extra></extra>",
+                        )
+                    ]
                 )
-            )
+
+                fig_users.update_layout(
+                    title=f"Top Users by Execution Count{title_suffix}",
+                    xaxis_title="Number of Executions",
+                    height=max(
+                        300, len(user_names) * 30
+                    ),  # Dynamic height based on number of users
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                )
+
+                charts.append(
+                    html.Div(
+                        [
+                            html.H6("Top Users by Activity"),
+                            dcc.Graph(
+                                figure=fig_users,
+                                config={"displayModeBar": False, "responsive": True},
+                            ),
+                        ],
+                        className="mb-3",
+                    )
+                )
 
         return (
             charts
@@ -354,15 +429,39 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
     """
     try:
         # Handle error response structure
-        if not user_stats_data or user_stats_data.get("error", False):
-            error_msg = (
-                user_stats_data.get("message", "No data available")
-                if user_stats_data
-                else "No data available"
-            )
-            status_code = (
-                user_stats_data.get("status_code", "unknown") if user_stats_data else "unknown"
-            )
+        if not user_stats_data:
+            return [
+                html.Div(
+                    [
+                        html.P("No user statistics available.", className="text-muted text-center"),
+                        html.Small(
+                            "No data provided.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        # Check if data is a list (unexpected format) and handle gracefully
+        if isinstance(user_stats_data, list):
+            return [
+                html.Div(
+                    [
+                        html.P("No user statistics available.", className="text-muted text-center"),
+                        html.Small(
+                            "Received unexpected data format from API.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+            ]
+
+        # Handle error response structure (should be a dict)
+        if user_stats_data.get("error", False):
+            error_msg = user_stats_data.get("message", "No data available")
+            status_code = user_stats_data.get("status_code", "unknown")
 
             if status_code == 403:
                 error_detail = "You need SUPERADMIN privileges to access user statistics."
@@ -397,7 +496,8 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
         charts = []
 
         # 1. User Registration Trends
-        trends_data = data.get("trends", [])
+        # API uses 'registration_trends' instead of 'trends'
+        trends_data = data.get("registration_trends", [])
         if trends_data:
             df = pd.DataFrame(trends_data)
 
@@ -461,9 +561,10 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
                 )
 
         # 2. Top Countries by User Count
-        geographic_data = data.get("geographic", {})
+        # API uses 'geographic_distribution' instead of 'geographic'
+        geographic_data = data.get("geographic_distribution", {})
         if geographic_data:
-            countries_data = geographic_data.get("countries", {})
+            countries_data = geographic_data.get("countries", geographic_data.get("by_country", {}))
             if countries_data:
                 # Sort and take top 10 countries
                 sorted_countries = sorted(countries_data.items(), key=lambda x: x[1], reverse=True)[
@@ -539,6 +640,165 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
         ]
 
 
+def create_system_overview(dashboard_stats_data, status_data=None):
+    """
+    Create system overview content with key metrics including total scripts.
+
+    Args:
+        dashboard_stats_data: Dashboard statistics data from the API or error response structure
+        status_data: Status data from the status endpoint (optional, contains scripts_count)
+
+    Returns:
+        html.Div: System overview content
+    """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Debug logging - show what we actually received
+        logger.info(f"System overview: Received data type: {type(dashboard_stats_data)}")
+        if dashboard_stats_data:
+            logger.info(
+                f"System overview: Data keys: {list(dashboard_stats_data.keys()) if isinstance(dashboard_stats_data, dict) else 'Not a dict'}"
+            )
+
+        # Handle error response structure
+        if not dashboard_stats_data or dashboard_stats_data.get("error", False):
+            error_msg = (
+                dashboard_stats_data.get("message", "No data available")
+                if dashboard_stats_data
+                else "No data available"
+            )
+            status_code = (
+                dashboard_stats_data.get("status_code", "unknown")
+                if dashboard_stats_data
+                else "unknown"
+            )
+
+            if status_code == 403:
+                error_detail = "You need SUPERADMIN privileges to access system overview."
+            elif status_code == 401:
+                error_detail = "Authentication failed. Please log in again."
+            else:
+                error_detail = f"System overview unavailable: {error_msg}"
+
+            return html.Div(
+                [
+                    html.P("System overview not available.", className="text-muted"),
+                    html.Small(error_detail, className="text-muted"),
+                ],
+                className="p-3",
+            )
+
+        data = dashboard_stats_data.get("data", {})
+        logger.info(
+            f"System overview: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+        )
+
+        summary = data.get("summary", {})
+        logger.info(
+            f"System overview: Summary section keys: {list(summary.keys()) if isinstance(summary, dict) else 'No summary section'}"
+        )
+
+        if not summary:
+            return html.Div("No system data available.", className="text-muted p-3")
+
+        # Extract summary metrics - use actual API field names
+        total_users = summary.get("total_users", 0)
+        total_executions = summary.get(
+            "total_jobs", 0
+        )  # API uses 'total_jobs' not 'total_executions'
+
+        # Get scripts count from status data if available, otherwise try dashboard stats
+        total_scripts = 0
+        if status_data:
+            total_scripts = status_data.get("scripts_count", 0)
+        else:
+            total_scripts = summary.get("total_scripts", 0)  # Fallback to dashboard stats
+
+        recent_executions = summary.get("jobs_last_day", 0)  # Recent activity
+        recent_users = summary.get("users_last_day", 0)  # Recent user activity
+
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Span("Total Users: ", className="fw-bold"),
+                                        html.Span(
+                                            f"{total_users:,}", className="text-primary fw-bold"
+                                        ),
+                                    ],
+                                    className="mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.Span("Total Scripts: ", className="fw-bold"),
+                                        html.Span(
+                                            f"{total_scripts:,}", className="text-info fw-bold"
+                                        ),
+                                    ],
+                                    className="mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.Span("Total Executions: ", className="fw-bold"),
+                                        html.Span(
+                                            f"{total_executions:,}",
+                                            className="text-success fw-bold",
+                                        ),
+                                    ],
+                                    className="mb-2",
+                                ),
+                            ],
+                            className="col-md-6",
+                        ),
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Span("Recent Users (24h): ", className="fw-bold"),
+                                        html.Span(
+                                            f"{recent_users:,}", className="text-warning fw-bold"
+                                        ),
+                                    ],
+                                    className="mb-2",
+                                ),
+                                html.Div(
+                                    [
+                                        html.Span("Recent Executions (24h): ", className="fw-bold"),
+                                        html.Span(
+                                            f"{recent_executions:,}",
+                                            className="text-secondary fw-bold",
+                                        ),
+                                    ],
+                                    className="mb-2",
+                                ),
+                            ],
+                            className="col-md-6",
+                        ),
+                    ],
+                    className="row",
+                ),
+            ],
+            className="p-3 bg-light rounded",
+        )
+
+    except Exception as e:
+        logger.error(f"Error creating system overview: {str(e)}")
+        return html.Div(
+            [
+                html.P("Error loading system overview.", className="text-danger"),
+                html.Small(f"Error: {str(e)}", className="text-muted"),
+            ],
+            className="p-3",
+        )
+
+
 def create_dashboard_summary_cards(dashboard_stats_data):
     """
     Create summary cards from dashboard statistics.
@@ -549,7 +809,18 @@ def create_dashboard_summary_cards(dashboard_stats_data):
     Returns:
         html.Div: Summary cards layout
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     try:
+        # Debug logging - show what we actually received
+        logger.info(f"Dashboard summary cards: Received data type: {type(dashboard_stats_data)}")
+        if dashboard_stats_data:
+            logger.info(
+                f"Dashboard summary cards: Data keys: {list(dashboard_stats_data.keys()) if isinstance(dashboard_stats_data, dict) else 'Not a dict'}"
+            )
+
         # Handle error response structure
         if not dashboard_stats_data or dashboard_stats_data.get("error", False):
             error_msg = (
@@ -579,16 +850,25 @@ def create_dashboard_summary_cards(dashboard_stats_data):
             )
 
         data = dashboard_stats_data.get("data", {})
+        logger.info(
+            f"Dashboard summary cards: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+        )
+
         summary = data.get("summary", {})
+        logger.info(
+            f"Dashboard summary cards: Summary section keys: {list(summary.keys()) if isinstance(summary, dict) else 'No summary section'}"
+        )
 
         if not summary:
             return html.Div("No summary data available.", className="text-muted text-center p-4")
 
-        # Extract summary metrics
+        # Extract summary metrics - use actual API field names
         total_users = summary.get("total_users", 0)
-        total_executions = summary.get("total_executions", 0)
-        active_executions = summary.get("active_executions", 0)
-        recent_users = summary.get("recent_users", 0)
+        total_executions = summary.get(
+            "total_jobs", 0
+        )  # API uses 'total_jobs' not 'total_executions'
+        active_executions = summary.get("jobs_last_day", 0)  # Use recent jobs as proxy for active
+        recent_users = summary.get("users_last_day", 0)  # API uses 'users_last_day'
 
         return html.Div(
             [

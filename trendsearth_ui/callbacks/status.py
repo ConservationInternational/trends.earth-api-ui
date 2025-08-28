@@ -16,8 +16,8 @@ from ..utils.stats_utils import (
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
-    create_dashboard_summary_cards,
     create_execution_statistics_chart,
+    create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
@@ -179,10 +179,6 @@ def register_callbacks(app):
                     executions_ready = latest_status.get("executions_ready", 0)
                     executions_running = latest_status.get("executions_running", 0)
                     executions_finished = latest_status.get("executions_finished", 0)
-                    users_count = latest_status.get("users_count", 0)
-                    scripts_count = latest_status.get("scripts_count", 0)
-                    memory_available_percent = latest_status.get("memory_available_percent", 0)
-                    cpu_usage_percent = latest_status.get("cpu_usage_percent", 0)
 
                     # Create summary layout with expected section headers
                     summary_layout = html.Div(
@@ -250,57 +246,6 @@ def register_callbacks(app):
                                 ],
                                 className="row mb-4",
                             ),
-                            # Summary Totals Section
-                            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Total Executions", className="mb-2"),
-                                            html.P(
-                                                str(executions_active + executions_finished),
-                                                className="mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Users", className="mb-2"),
-                                            html.P(
-                                                str(users_count),
-                                                className="mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Scripts", className="mb-2"),
-                                            html.P(
-                                                str(scripts_count),
-                                                className="mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("System", className="mb-2"),
-                                            html.P(
-                                                f"CPU: {cpu_usage_percent}%",
-                                                className="mb-1",
-                                            ),
-                                            html.P(
-                                                f"Memory: {memory_available_percent}%",
-                                                className="mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-3 text-center",
-                                    ),
-                                ],
-                                className="row",
-                            ),
                         ]
                     )
                     set_cached_data("summary", summary_layout)
@@ -334,12 +279,13 @@ def register_callbacks(app):
             return error_result, deployment_info, swarm_info, swarm_title
 
     @app.callback(
-        Output("stats-summary-cards", "children"),
+        Output("system-overview-content", "children"),
         Output("stats-user-map", "children"),
         Output("stats-additional-charts", "children"),
         [
-            Input("status-countdown-interval", "n_intervals"),
+            Input("status-auto-refresh-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
+            Input("status-time-tabs-store", "data"),  # Add time period selection
         ],
         [
             State("token-store", "data"),
@@ -351,7 +297,14 @@ def register_callbacks(app):
         prevent_initial_call=False,
     )
     def update_status_and_statistics(
-        _n_intervals, _refresh_clicks, token, active_tab, _user_timezone, role, api_environment
+        _n_intervals,
+        _refresh_clicks,
+        time_period,
+        token,
+        active_tab,
+        _user_timezone,
+        role,
+        api_environment,
     ):
         """Update the status summary and enhanced statistics."""
         # Guard: Skip if not logged in (prevents execution after logout)
@@ -362,14 +315,37 @@ def register_callbacks(app):
         if active_tab != "status":
             return no_update, no_update, no_update
 
-        # Check cache first (unless it's a manual refresh)
+        # Check if user has required permissions for enhanced stats (SUPERADMIN only)
+        if role != "SUPERADMIN":
+            # Show permission message for enhanced stats
+            permission_msg = html.Div(
+                [
+                    html.P("Enhanced Statistics", className="text-muted text-center"),
+                    html.Small(
+                        "SUPERADMIN privileges required to access detailed analytics.",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
+            return permission_msg, permission_msg, [permission_msg]
+
+        # Map UI time period to API period
+        api_period_map = {"day": "last_day", "week": "last_week", "month": "last_month"}
+        api_period = api_period_map.get(time_period, "last_day")
+
+        # Check cache first (unless it's a manual refresh or time period changed)
         ctx = callback_context
         is_manual_refresh = (
             ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
         )
+        is_time_period_change = (
+            ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "status-time-tabs-store"
+        )
 
-        if not is_manual_refresh:
-            cached_statistics = _stats_cache.get("stats_summary")
+        cache_key = f"stats_summary_{api_period}"
+        if not is_manual_refresh and not is_time_period_change:
+            cached_statistics = _stats_cache.get(cache_key)
             if cached_statistics is not None:
                 return cached_statistics
 
@@ -399,22 +375,24 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 status_data = resp.json().get("data", [])
                 if status_data:
-                    # Fetch enhanced statistics
-                    dashboard_stats = fetch_dashboard_stats(token, api_environment, "last_day")
-                    user_stats = fetch_user_stats(token, api_environment, "last_day")
-                    execution_stats = fetch_execution_stats(token, api_environment, "last_day")
+                    # Fetch enhanced statistics for SUPERADMIN users with selected time period
+                    dashboard_stats = fetch_dashboard_stats(token, api_environment, api_period)
+                    user_stats = fetch_user_stats(token, api_environment, api_period)
+                    execution_stats = fetch_execution_stats(token, api_environment, api_period)
 
-                    # Format and cache the enhanced statistics
-                    cards = create_dashboard_summary_cards(dashboard_stats)
+                    # Format and cache the enhanced statistics with period-specific key
+                    # Get the latest status for scripts count
+                    latest_status = status_data[0] if status_data else {}
+                    system_overview = create_system_overview(dashboard_stats, latest_status)
                     user_map = create_user_geographic_map(user_stats)
                     additional_charts = create_user_statistics_chart(
                         user_stats
                     ) + create_execution_statistics_chart(execution_stats)
 
-                    _stats_cache["stats_summary"] = (cards, user_map, additional_charts)
+                    _stats_cache[cache_key] = (system_overview, user_map, additional_charts)
 
                     return (
-                        cards,
+                        system_overview,
                         user_map,
                         additional_charts,
                     )
@@ -441,7 +419,7 @@ def register_callbacks(app):
         Output("status-charts", "children"),
         [
             Input("status-time-tabs-store", "data"),
-            Input("status-countdown-interval", "n_intervals"),
+            Input("status-auto-refresh-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
         ],
         [
