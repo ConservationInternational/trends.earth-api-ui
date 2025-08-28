@@ -250,48 +250,48 @@ def browser_context_args(browser_context_args):
 def wait_for_ag_grid_table(page, table_testid, timeout=15000):
     """
     Reliably wait for an AG-Grid table to be fully loaded and ready for interaction.
-    
+
     Args:
         page: Playwright page object
         table_testid: data-testid attribute of the table container
         timeout: Maximum time to wait in milliseconds
-        
+
     Returns:
         True if table is ready, False if timeout
     """
     try:
         print(f"⏳ Waiting for AG-Grid table '{table_testid}' to load...")
-        
+
         # Step 1: Wait for the table container
         page.wait_for_selector(f"[data-testid='{table_testid}']", timeout=timeout)
         print(f"✅ Table container '{table_testid}' found")
-        
-        # Step 2: Wait for AG-Grid to initialize inside the container  
+
+        # Step 2: Wait for AG-Grid to initialize inside the container
         page.wait_for_selector(f"[data-testid='{table_testid}'] .ag-grid", timeout=timeout)
         print(f"✅ AG-Grid component found in '{table_testid}'")
-        
+
         # Step 3: Wait for headers to be present (indicates table structure is ready)
         page.wait_for_selector(f"[data-testid='{table_testid}'] .ag-header", timeout=timeout)
         print(f"✅ AG-Grid headers found in '{table_testid}'")
-        
+
         # Step 4: Wait for any rows to appear or confirm empty state
         try:
             # Try to find either rows or the "no rows" overlay
             page.wait_for_selector(
                 f"[data-testid='{table_testid}'] .ag-row, [data-testid='{table_testid}'] .ag-overlay-no-rows-center",
-                timeout=5000
+                timeout=5000,
             )
             print(f"✅ AG-Grid data loaded in '{table_testid}'")
         except Exception:
             # Table might be loading data, give it more time
             print(f"⏳ Waiting for data to load in '{table_testid}'...")
             page.wait_for_timeout(2000)
-            
+
         # Step 5: Final stability wait
         page.wait_for_timeout(1000)  # Let any animations/renders complete
         print(f"✅ AG-Grid table '{table_testid}' is ready for interaction")
         return True
-        
+
     except Exception as e:
         print(f"❌ Failed to load AG-Grid table '{table_testid}': {e}")
         return False
@@ -300,39 +300,39 @@ def wait_for_ag_grid_table(page, table_testid, timeout=15000):
 def navigate_to_tab_and_wait_for_table(page, tab_name, table_testid, timeout=20000):
     """
     Navigate to a specific tab and wait for its AG-Grid table to be ready.
-    
+
     Args:
         page: Playwright page object
         tab_name: Name of the tab to click (e.g., "Executions", "Users", "Scripts")
         table_testid: data-testid attribute of the expected table
         timeout: Maximum time to wait
-        
+
     Returns:
         True if successful, False if failed
     """
     try:
         print(f"🔄 Navigating to {tab_name} tab...")
-        
+
         # Wait for dashboard to be ready
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
-        
+
         # Click the tab
         tab_locator = page.locator(f"text={tab_name}").first
         tab_locator.click()
         print(f"✅ Clicked {tab_name} tab")
-        
+
         # Give tab switch time to process
         page.wait_for_timeout(1000)
-        
+
         # Wait for the table to be ready
         success = wait_for_ag_grid_table(page, table_testid, timeout)
         if success:
             print(f"✅ {tab_name} tab and table are ready")
         else:
             print(f"⚠️  {tab_name} tab loaded but table is not ready")
-            
+
         return success
-        
+
     except Exception as e:
         print(f"❌ Failed to navigate to {tab_name} tab: {e}")
         return False

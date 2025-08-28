@@ -17,7 +17,7 @@ class TestTableColumnFilters:
     def test_executions_table_status_filter(self, authenticated_page: Page):
         """Test that executions table status column has working set filter."""
         from .conftest import navigate_to_tab_and_wait_for_table
-        
+
         # Navigate to executions tab and wait for table
         success = navigate_to_tab_and_wait_for_table(
             authenticated_page, "Executions", "executions-table"
@@ -54,7 +54,7 @@ class TestTableColumnFilters:
     def test_executions_table_duration_filter(self, authenticated_page: Page):
         """Test that executions table duration column has working number filter."""
         from .conftest import navigate_to_tab_and_wait_for_table
-        
+
         # Navigate to executions tab and wait for table
         success = navigate_to_tab_and_wait_for_table(
             authenticated_page, "Executions", "executions-table"
@@ -88,7 +88,7 @@ class TestTableColumnFilters:
     def test_scripts_table_status_filter(self, authenticated_page: Page):
         """Test that scripts table status column has working set filter."""
         from .conftest import wait_for_ag_grid_table
-        
+
         # Wait for dashboard to be ready
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
