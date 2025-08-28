@@ -25,9 +25,9 @@ class TestTableColumnFilters:
 
         # Wait for the executions table to load and be ready
         try:
-            authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-            table = authenticated_page.locator("[data-testid='executions-table']")
+            table = authenticated_page.wait_for_selector(
+                "[data-testid='executions-table']", timeout=10000
+            )
             expect(table).to_be_visible()
         except Exception:
             # If specific table not found, try to find AG-Grid
@@ -72,7 +72,9 @@ class TestTableColumnFilters:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
+        authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         table = authenticated_page.locator("[data-testid='executions-table']")
         expect(table).to_be_visible()
 
@@ -214,9 +216,9 @@ class TestTableColumnFilters:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Test start date column filter
@@ -263,9 +265,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Find the status column header and open filter menu
@@ -304,9 +306,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Apply status filter first
@@ -354,9 +356,9 @@ class TestTableFilterInteraction:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Apply a filter
@@ -404,9 +406,9 @@ class TestTableFilterAccessibility:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Test keyboard access to status filter
@@ -438,9 +440,9 @@ class TestTableFilterAccessibility:
         authenticated_page.wait_for_timeout(3000)
 
         # Wait for the executions table to load
-        authenticated_page.wait_for_selector("[data-testid='executions-table']", timeout=10000)
-
-        table = authenticated_page.locator("[data-testid='executions-table']")
+        table = authenticated_page.wait_for_selector(
+            "[data-testid='executions-table']", timeout=10000
+        )
         expect(table).to_be_visible()
 
         # Test that filters are still accessible on mobile
