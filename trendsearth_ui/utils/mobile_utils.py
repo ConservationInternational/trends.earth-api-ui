@@ -82,7 +82,7 @@ def get_mobile_column_config():
                         "suppressAndOrCondition": True,
                         "allowedCharPattern": "\\d\\-\\.",
                     },
-                    "valueGetter": {"function": "params.data.duration_raw || 0"},
+                    "valueGetter": {"function": "(params.data && params.data.duration_raw) || 0"},
                 },
                 {
                     "headerName": "Status",

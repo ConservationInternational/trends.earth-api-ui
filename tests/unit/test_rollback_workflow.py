@@ -10,7 +10,7 @@ def test_rollback_workflow_syntax():
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
     # Just check that the file can be read and has basic YAML structure
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # Basic YAML structure checks
@@ -24,7 +24,7 @@ def test_rollback_workflow_structure():
     """Test that the rollback workflow has the expected structure."""
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # Check basic structure exists
@@ -42,7 +42,7 @@ def test_rollback_workflow_required_steps():
     """Test that the rollback workflow has all required steps."""
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # Check required steps exist
@@ -65,7 +65,7 @@ def test_rollback_workflow_secrets():
     """Test that the rollback workflow references the expected secrets."""
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # Check that required secrets are referenced
@@ -86,7 +86,7 @@ def test_rollback_workflow_no_ec2_references():
     """Test that the rollback workflow has no EC2-specific references."""
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # These should not appear in an ECS rollback workflow
@@ -110,7 +110,7 @@ def test_rollback_workflow_health_check_url():
     """Test that the rollback workflow uses the correct health check endpoint."""
     workflow_path = Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback.yml"
 
-    with open(workflow_path) as f:
+    with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
     # Should use correct health endpoint and load balancer URL approach
