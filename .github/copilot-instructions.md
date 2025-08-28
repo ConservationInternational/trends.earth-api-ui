@@ -22,11 +22,14 @@ pip install poetry
 # 2. Install dependencies (REQUIRED before any other steps)
 poetry install --with dev
 
-# 3. Verify installation worked
+# 3. Install Playwright browsers (REQUIRED for end-to-end testing)
+poetry run playwright install
+
+# 4. Verify installation worked
 poetry run python --version
 ```
 
-**Critical**: Poetry must be installed and dependencies installed before running any tests, linting, or app commands.
+**Critical**: Poetry must be installed and dependencies installed before running any tests, linting, or app commands. Playwright browsers are required for running the full test suite including end-to-end tests.
 
 ### 2. Build and Validation Commands
 
@@ -40,6 +43,9 @@ poetry run python -m pytest tests/ -v
 
 # Tests with coverage
 poetry run python -m pytest tests/ -v --cov=trendsearth_ui --cov-report=html
+
+# Playwright end-to-end tests (requires browsers installed)
+poetry run python -m pytest tests/playwright/ -v --browser chromium
 ```
 
 **Linting and formatting** (ALWAYS passes on clean repo):
@@ -95,6 +101,8 @@ docker compose down
 4. **Docker Compose**: Available as `docker compose` (not `docker-compose`).
 
 5. **Docker build**: May fail in restricted network environments due to SSL certificate issues when installing Poetry. Local builds work normally.
+
+6. **Playwright browser installation**: May fail in restricted network environments (CI/firewall restrictions). When this happens, Playwright tests are automatically skipped with appropriate messages. Local installation typically works normally.
 
 ## Project Architecture and Layout
 
@@ -193,6 +201,7 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 - **Core**: dash, dash-bootstrap-components, pandas, requests
 - **Maps**: dash-leaflet, dash-extensions
 - **Dev**: pytest, pytest-mock, pytest-cov, ruff, selenium
+- **E2E Testing**: playwright, pytest-playwright (requires browser installation)
 - **Production**: gunicorn, rollbar
 
 ## File Locations Reference
@@ -211,10 +220,11 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 
 **MANDATORY PRE-DEVELOPMENT SETUP:**
 1. ✅ `poetry install --with dev`
-2. ✅ `poetry run python -m pytest tests/unit/ -v` (quick validation)
-3. ✅ `poetry run ruff check trendsearth_ui/ tests/` (linting check)
-4. ✅ `poetry run ruff format --check trendsearth_ui/ tests/` (formatting check)
-5. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
+2. ✅ `poetry run playwright install` (required for end-to-end tests)
+3. ✅ `poetry run python -m pytest tests/unit/ -v` (quick validation)
+4. ✅ `poetry run ruff check trendsearth_ui/ tests/` (linting check)
+5. ✅ `poetry run ruff format --check trendsearth_ui/ tests/` (formatting check)
+6. ✅ `poetry run python -m trendsearth_ui.app` (test app runs)
 
 **DEVELOPMENT WORKFLOW:**
 6. ✅ Make your changes
