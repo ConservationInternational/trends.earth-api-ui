@@ -77,12 +77,6 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
-                    "filter": "agNumberColumnFilter",
-                    "filterParams": {
-                        "suppressAndOrCondition": True,
-                        "allowedCharPattern": "\\d\\-\\.",
-                    },
-                    "valueGetter": {"function": "(params.data && params.data.duration_raw) || 0"},
                 },
                 {
                     "headerName": "Status",
