@@ -551,8 +551,8 @@ def register_callbacks(app):
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
                 params={
-                    "timestamp_gte": start_iso,
-                    "timestamp_lte": end_iso,
+                    "start_date": start_iso,
+                    "end_date": end_iso,
                     "per_page": 1000,  # Fetch up to 1000 data points
                     "sort": "timestamp",  # Sort by timestamp ascending
                 },
@@ -572,86 +572,799 @@ def register_callbacks(app):
             df["timestamp"] = pd.to_datetime(df["timestamp"])
 
             # Convert UTC timestamps to user's local timezone for plotting
-            df["local_timestamp"] = df["timestamp"].apply(
-                lambda x: convert_utc_to_local(x, safe_timezone)
-            )
+            # IMPORTANT: This was creating tuples, let's fix it to return proper datetime objects
+            local_timestamps = []
+            for timestamp in df["timestamp"]:
+                local_dt, tz_abbrev = convert_utc_to_local(timestamp, safe_timezone)
+                local_timestamps.append(local_dt)  # Only append the datetime object, not the tuple
+
+            df["local_timestamp"] = pd.to_datetime(local_timestamps)
+
+            # Debug: Log what data we received
+            logger.info(f"Status data received: {len(status_data)} records")
+            if status_data:
+                logger.info(f"Available columns: {list(df.columns)}")
+                logger.info(f"Sample data (first record): {status_data[0]}")
+                # Check specific fields we need
+                first_record = status_data[0]
+                execution_fields = [
+                    "executions_running",
+                    "executions_ready",
+                    "executions_pending",  # Add pending for future API support
+                    "executions_finished",
+                    "executions_failed",
+                    "executions_cancelled",
+                    "executions_active",
+                ]
+                logger.info("Execution field values in first record:")
+                for field in execution_fields:
+                    value = first_record.get(field, "MISSING")
+                    logger.info(f"  {field}: {value}")
+
+                # Check what actual data is available
+                logger.info("Other available fields:")
+                other_fields = ["executions_count", "scripts_count", "users_count"]
+                for field in other_fields:
+                    value = first_record.get(field, "MISSING")
+                    logger.info(f"  {field}: {value}")
+            else:
+                logger.warning("No status data records returned from API")
 
             # Create charts
             charts = []
 
-            # Map status data fields to chart categories
-            chart_configs = [
-                {
-                    "title": "Executions Status",
-                    "metrics": [
-                        {"field": "executions_running", "name": "Running", "color": "primary"},
-                        {"field": "executions_finished", "name": "Finished", "color": "success"},
-                        {"field": "executions_active", "name": "Active", "color": "warning"},
-                    ],
-                    "y_title": "Count",
-                },
-                {
-                    "title": "Users Activity",
-                    "metrics": [
-                        {"field": "users_count", "name": "Total Users", "color": "info"},
-                    ],
-                    "y_title": "Count",
-                },
-                {
-                    "title": "System Resources",
-                    "metrics": [
-                        {"field": "cpu_usage_percent", "name": "CPU Usage", "color": "warning"},
-                        {
-                            "field": "memory_available_percent",
-                            "name": "Memory Available",
-                            "color": "success",
-                        },
-                    ],
-                    "y_title": "Percentage",
-                },
-            ]
+            # Debug: Log DataFrame info for timeseries debugging
+            logger.info(f"DataFrame shape: {df.shape}")
+            logger.info(f"Timestamp range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+            if "local_timestamp" in df.columns:
+                logger.info(
+                    f"Local timestamp range: {df['local_timestamp'].min()} to {df['local_timestamp'].max()}"
+                )
 
-            for config in chart_configs:
-                fig = go.Figure()
-                has_data = False
-
-                for metric in config["metrics"]:
-                    field = metric["field"]
-                    if field in df.columns:
-                        values = df[field].fillna(0)
-                        if values.sum() > 0 or len(values) > 0:  # Only add if there's some data
-                            has_data = True
-                            fig.add_trace(
-                                go.Scatter(
-                                    x=df["local_timestamp"],
-                                    y=values,
-                                    mode="lines+markers",
-                                    name=metric["name"],
-                                    line={"color": f"var(--bs-{metric['color']})"},
-                                    marker={"size": 4},
-                                )
-                            )
-
-                if has_data:
-                    fig.update_layout(
-                        title=config["title"],
-                        xaxis_title=get_chart_axis_label(safe_timezone),
-                        yaxis_title=config["y_title"],
-                        margin={"l": 40, "r": 20, "t": 40, "b": 30},
-                        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02},
-                        template="plotly_white",
-                        height=300,
+            # Debug specific fields for chart debugging
+            for field in [
+                "executions_running",
+                "executions_ready",
+                "executions_finished",
+                "executions_failed",
+            ]:
+                if field in df.columns:
+                    values = df[field]
+                    logger.info(
+                        f"{field}: min={values.min()}, max={values.max()}, std={values.std():.2f}"
                     )
-                    charts.append(dcc.Graph(figure=fig))
-                else:
-                    # Add placeholder if no data
-                    charts.append(
-                        html.Div(
-                            f"No data available for {config['title']}",
-                            className="text-center text-muted p-3 border rounded",
+                    logger.info(f"{field} first 10 values: {values.head(10).tolist()}")
+                    logger.info(f"{field} last 10 values: {values.tail(10).tolist()}")
+                    unique_count = len(values.unique())
+                    logger.info(
+                        f"{field} has {unique_count} unique values out of {len(values)} total"
+                    )
+
+            # Debug time axis - this might be the issue!
+            logger.info("Time debugging:")
+            logger.info(f"local_timestamp dtype: {df['local_timestamp'].dtype}")
+            logger.info(f"First 5 timestamps: {df['local_timestamp'].head().tolist()}")
+            logger.info(f"Last 5 timestamps: {df['local_timestamp'].tail().tolist()}")
+            logger.info(
+                f"Timestamp uniqueness: {len(df['local_timestamp'].unique())} unique out of {len(df)} total"
+            )
+
+            # Check if timestamps are sorted
+            is_sorted = df["local_timestamp"].is_monotonic_increasing
+            logger.info(f"Timestamps are sorted: {is_sorted}")
+            if not is_sorted:
+                logger.warning("Timestamps are NOT sorted - this could cause chart display issues!")
+                df = df.sort_values("local_timestamp").reset_index(drop=True)
+                logger.info("Sorted DataFrame by local_timestamp")
+
+            # Chart 1: Total Executions Over Time (if available)
+            if "executions_count" in df.columns:
+                values = df["executions_count"].fillna(0)
+                # Show total executions even if it doesn't change much - it shows system activity
+                if values.max() > 0:  # Only show if there's actual data
+                    fig1 = go.Figure()
+                    fig1.add_trace(
+                        go.Scatter(
+                            x=df["local_timestamp"],
+                            y=values,
+                            mode="lines+markers",
+                            name="Total Executions",
+                            line={"color": "#007bff", "width": 3},
+                            marker={"size": 4},
+                            hovertemplate="<b>Total Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
                         )
                     )
 
+                    fig1.update_layout(
+                        title={
+                            "text": "Total Executions Over Time",
+                            "x": 0.5,
+                            "xanchor": "center",
+                        },
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis_title="Total Executions",
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        height=400,
+                        hovermode="x unified",
+                        showlegend=False,
+                    )
+                    charts.append(
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    figure=fig1,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                )
+                            ],
+                            className="mb-4",
+                        )
+                    )
+
+            # Chart 2: Scripts and Users Over Time
+            system_metrics_available = any(
+                col in df.columns for col in ["scripts_count", "users_count"]
+            )
+            if system_metrics_available:
+                fig2 = go.Figure()
+
+                if "scripts_count" in df.columns:
+                    scripts_values = df["scripts_count"].fillna(0)
+                    if scripts_values.max() > 0:
+                        fig2.add_trace(
+                            go.Scatter(
+                                x=df["local_timestamp"],
+                                y=scripts_values,
+                                mode="lines+markers",
+                                name="Scripts",
+                                line={"color": "#28a745", "width": 2},
+                                marker={"size": 4},
+                                yaxis="y",
+                                hovertemplate="<b>Scripts</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                            )
+                        )
+
+                if "users_count" in df.columns:
+                    users_values = df["users_count"].fillna(0)
+                    if users_values.max() > 0:
+                        fig2.add_trace(
+                            go.Scatter(
+                                x=df["local_timestamp"],
+                                y=users_values,
+                                mode="lines+markers",
+                                name="Users",
+                                line={"color": "#dc3545", "width": 2},
+                                marker={"size": 4},
+                                yaxis="y2",
+                                hovertemplate="<b>Users</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                            )
+                        )
+
+                # Only show chart if we added any traces
+                if fig2.data:
+                    fig2.update_layout(
+                        title={
+                            "text": "System Growth Over Time",
+                            "x": 0.5,
+                            "xanchor": "center",
+                        },
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis={"title": "Scripts Count", "side": "left", "color": "#28a745"},
+                        yaxis2={
+                            "title": "Users Count",
+                            "side": "right",
+                            "overlaying": "y",
+                            "color": "#dc3545",
+                        },
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        height=400,
+                        hovermode="x unified",
+                        legend={
+                            "orientation": "h",
+                            "yanchor": "bottom",
+                            "y": 1.02,
+                            "xanchor": "center",
+                            "x": 0.5,
+                        },
+                    )
+                    charts.append(
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    figure=fig2,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                )
+                            ],
+                            className="mb-4",
+                        )
+                    )
+
+            # Chart 3: Active Execution Status (Running, Ready, Pending)
+            active_status_metrics = [
+                {"field": "executions_running", "name": "Running", "color": "#007bff"},
+                {"field": "executions_ready", "name": "Ready", "color": "#17a2b8"},
+                {
+                    "field": "executions_pending",
+                    "name": "Pending",
+                    "color": "#ffc107",
+                },  # Preparing for API update
+            ]
+
+            fig3 = go.Figure()
+            has_active_data = False
+
+            for metric in active_status_metrics:
+                field = metric["field"]
+                if field in df.columns:
+                    values = df[field].fillna(0)
+                    # Show all active status lines to provide context, even if low values
+                    has_active_data = True
+                    logger.info(
+                        f"Adding {field} to active chart: min={values.min()}, max={values.max()}, unique_values={len(values.unique())}"
+                    )
+
+                    # Debug: Log the actual data being sent to Plotly
+                    x_data = df["local_timestamp"]
+                    y_data = values
+                    logger.info(
+                        f"X-axis data type: {type(x_data.iloc[0])}, sample: {x_data.iloc[0]}"
+                    )
+                    logger.info(
+                        f"Y-axis data type: {type(y_data.iloc[0])}, sample: {y_data.iloc[0]}"
+                    )
+                    logger.info(
+                        f"Data points being plotted: {len(x_data)} x-values, {len(y_data)} y-values"
+                    )
+
+                    fig3.add_trace(
+                        go.Scatter(
+                            x=x_data,
+                            y=y_data,
+                            mode="lines+markers",
+                            name=metric["name"],
+                            line={"color": metric["color"], "width": 3},  # Thicker lines
+                            marker={"size": 6},  # Larger markers
+                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                        )
+                    )
+
+            if has_active_data:
+                # Calculate y-axis range to make variations more visible
+                all_active_values = []
+                for metric in active_status_metrics:
+                    field = metric["field"]
+                    if field in df.columns:
+                        values = df[field].fillna(0)
+                        all_active_values.extend(values.tolist())
+
+                if all_active_values:
+                    min_val = min(all_active_values)
+                    max_val = max(all_active_values)
+                    # Add padding to make variations visible
+                    padding = max(1, (max_val - min_val) * 0.1)  # 10% padding or at least 1
+                    y_min = max(0, min_val - padding)
+                    y_max = max_val + padding
+                    logger.info(
+                        f"Active chart y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
+                    )
+                else:
+                    y_min, y_max = 0, 150
+
+                fig3.update_layout(
+                    title={
+                        "text": "Active Execution Status Over Time",
+                        "x": 0.5,
+                        "xanchor": "center",
+                    },
+                    xaxis_title=get_chart_axis_label(safe_timezone),
+                    yaxis_title="Number of Active Executions",
+                    yaxis={"range": [y_min, y_max]},  # Set explicit y-axis range
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.02,
+                        "xanchor": "center",
+                        "x": 0.5,
+                    },
+                    template="plotly_white",
+                    height=400,
+                    hovermode="x unified",
+                    showlegend=True,
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                figure=fig3,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            )
+                        ],
+                        className="mb-4",
+                    )
+                )
+                logger.info(
+                    f"Added active execution status chart to charts list. Total charts so far: {len(charts)}"
+                )
+
+            # Chart 3b: Completed Execution Status Rate (Show as bar chart for better visibility)
+            completed_status_metrics = [
+                {"field": "executions_finished", "name": "Finished", "color": "#28a745"},
+                {"field": "executions_failed", "name": "Failed", "color": "#dc3545"},
+                {"field": "executions_cancelled", "name": "Cancelled", "color": "#6c757d"},
+            ]
+
+            fig3b = go.Figure()
+            has_completed_data = False
+
+            # Calculate deltas to show the rate of change rather than cumulative totals
+            df_sorted = df.sort_values("timestamp").reset_index(drop=True)
+
+            for metric in completed_status_metrics:
+                field = metric["field"]
+                if field in df_sorted.columns:
+                    # Calculate the delta (difference) between consecutive points
+                    values = pd.to_numeric(df_sorted[field], errors="coerce").fillna(0)
+                    delta_values = values.diff().fillna(0).clip(lower=0)  # Remove negative values
+
+                    logger.info(
+                        f"Delta values for {field}: min={delta_values.min()}, max={delta_values.max()}, sum={delta_values.sum()}"
+                    )
+                    logger.info(
+                        f"Non-zero delta count for {field}: {(delta_values > 0).sum()} out of {len(delta_values)}"
+                    )
+
+                    # Show as bars instead of lines for better visibility of small values
+                    if len(delta_values) > 0 and not delta_values.isna().all():
+                        try:
+                            max_delta = delta_values.max()
+                            if max_delta > 0:
+                                has_completed_data = True
+
+                                # For sparse data (mostly zeros), use scatter plot instead of bars
+                                nonzero_data = df_sorted[delta_values > 0].copy()
+                                nonzero_deltas = delta_values[delta_values > 0]
+
+                                if len(nonzero_data) > 0:
+                                    if (
+                                        len(nonzero_data) < len(df_sorted) * 0.1
+                                    ):  # Less than 10% non-zero
+                                        # Use scatter plot for very sparse data
+                                        fig3b.add_trace(
+                                            go.Scatter(
+                                                x=nonzero_data["local_timestamp"],
+                                                y=nonzero_deltas,
+                                                mode="markers",
+                                                name=f"{metric['name']} (New)",
+                                                marker={"color": metric["color"], "size": 10},
+                                                hovertemplate=f"<b>New {metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                                            )
+                                        )
+                                    else:
+                                        # Use bar chart for denser data
+                                        fig3b.add_trace(
+                                            go.Bar(
+                                                x=df_sorted["local_timestamp"],
+                                                y=delta_values,
+                                                name=f"{metric['name']} (New)",
+                                                marker_color=metric["color"],
+                                                hovertemplate=f"<b>New {metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                                                width=300000,  # 5 minutes in milliseconds
+                                            )
+                                        )
+                                    logger.info(
+                                        f"Added {field} chart with max value {max_delta}, non-zero points: {len(nonzero_data)}"
+                                    )
+                        except Exception as e:
+                            logger.warning(f"Error processing {field}: {e}")
+                            continue
+
+            if has_completed_data:
+                fig3b.update_layout(
+                    title={
+                        "text": "Completed Executions Rate Over Time",
+                        "x": 0.5,
+                        "xanchor": "center",
+                    },
+                    xaxis_title=get_chart_axis_label(safe_timezone),
+                    yaxis_title="New Completions per Time Period",
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.02,
+                        "xanchor": "center",
+                        "x": 0.5,
+                    },
+                    template="plotly_white",
+                    height=400,
+                    hovermode="x unified",
+                    showlegend=True,
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                figure=fig3b,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            )
+                        ],
+                        className="mb-4",
+                    )
+                )
+                logger.info(
+                    f"Added completed execution rate chart to charts list. Total charts so far: {len(charts)}"
+                )
+            else:
+                # Show informative message about execution status
+                logger.info("No completed execution data found - showing info message")
+                charts.append(
+                    html.Div(
+                        [
+                            html.H5(
+                                "Completed Execution Tracking",
+                                className="text-center text-muted mb-3",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-info-circle fa-2x text-info mb-3"),
+                                    html.P(
+                                        "No completed executions detected during this period.",
+                                        className="text-muted mb-2",
+                                    ),
+                                    html.Small(
+                                        "This may indicate no new executions were completed or the tracking period is too short.",
+                                        className="text-muted",
+                                    ),
+                                ],
+                                className="text-center py-4",
+                            ),
+                        ],
+                        className="border rounded p-3 mb-4 bg-light",
+                    )
+                )
+
+            # Chart 4: Data Rate Analysis (if executions_count changes over time)
+            if "executions_count" in df.columns:
+                df_sorted = df.sort_values("timestamp").reset_index(drop=True)
+                df_sorted["execution_rate"] = df_sorted["executions_count"].diff().fillna(0)
+                df_sorted["execution_rate"] = df_sorted["execution_rate"].clip(
+                    lower=0
+                )  # Remove negative values
+
+                if df_sorted["execution_rate"].sum() > 0:
+                    fig4 = go.Figure()
+                    fig4.add_trace(
+                        go.Bar(
+                            x=df_sorted["local_timestamp"],
+                            y=df_sorted["execution_rate"],
+                            name="New Executions",
+                            marker_color="#6f42c1",
+                            hovertemplate="<b>New Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                        )
+                    )
+
+                    fig4.update_layout(
+                        title={
+                            "text": "Execution Activity Rate",
+                            "x": 0.5,
+                            "xanchor": "center",
+                        },
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis_title="New Executions per Period",
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        height=350,
+                        hovermode="x unified",
+                        showlegend=False,
+                    )
+                    charts.append(
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    figure=fig4,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                )
+                            ],
+                            className="mb-4",
+                        )
+                    )
+
+            # Chart 2: Active vs Inactive Executions
+            if "executions_active" in df.columns:
+                # Calculate inactive executions
+                df["executions_inactive"] = (
+                    df["executions_finished"] + df["executions_failed"] + df["executions_cancelled"]
+                )
+
+                fig2 = go.Figure()
+                fig2.add_trace(
+                    go.Scatter(
+                        x=df["local_timestamp"],
+                        y=df["executions_active"],
+                        mode="lines+markers",
+                        name="Active Executions",
+                        line={"color": "#fd7e14", "width": 3},
+                        fill="tonexty",
+                        hovertemplate="<b>Active</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                    )
+                )
+
+                fig2.update_layout(
+                    title={
+                        "text": "Active Executions Trend",
+                        "x": 0.5,
+                        "xanchor": "center",
+                    },
+                    xaxis_title=get_chart_axis_label(safe_timezone),
+                    yaxis_title="Number of Active Executions",
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    template="plotly_white",
+                    height=350,
+                    hovermode="x unified",
+                    showlegend=False,
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                figure=fig2,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            )
+                        ],
+                        className="mb-4",
+                    )
+                )
+
+            # Chart 5: Success Rate Over Time (3-hour windows based on completion deltas)
+            if all(field in df.columns for field in ["executions_finished", "executions_failed"]):
+                # Sort by timestamp for proper delta calculation
+                df_sorted = df.sort_values("timestamp").reset_index(drop=True)
+
+                # Calculate deltas (new completions in each time period)
+                df_sorted["finished_delta"] = df_sorted["executions_finished"].diff().fillna(0)
+                df_sorted["failed_delta"] = df_sorted["executions_failed"].diff().fillna(0)
+
+                # Remove negative deltas (data inconsistencies)
+                df_sorted["finished_delta"] = df_sorted["finished_delta"].clip(lower=0)
+                df_sorted["failed_delta"] = df_sorted["failed_delta"].clip(lower=0)
+
+                # Create 3-hour time windows
+                df_sorted["timestamp_3h"] = pd.to_datetime(df_sorted["timestamp"])
+                df_sorted["window_start"] = df_sorted["timestamp_3h"].dt.floor("3h")
+
+                # Group by 3-hour windows and sum the deltas
+                window_stats = (
+                    df_sorted.groupby("window_start")
+                    .agg({"finished_delta": "sum", "failed_delta": "sum"})
+                    .reset_index()
+                )
+
+                # Calculate total completions and success rate for each window
+                window_stats["total_completions"] = (
+                    window_stats["finished_delta"] + window_stats["failed_delta"]
+                )
+                window_stats = window_stats[
+                    window_stats["total_completions"] > 0
+                ]  # Only windows with completions
+
+                if not window_stats.empty:
+                    window_stats["success_rate"] = (
+                        window_stats["finished_delta"] / window_stats["total_completions"] * 100
+                    )
+
+                    # Convert to local timezone for display
+                    window_stats["local_window_start"] = (
+                        window_stats["window_start"]
+                        .dt.tz_localize("UTC")
+                        .dt.tz_convert(safe_timezone)
+                    )
+
+                    # Calculate dynamic y-axis range
+                    min_rate = window_stats["success_rate"].min()
+                    max_rate = window_stats["success_rate"].max()
+                    rate_range = max_rate - min_rate
+
+                    if rate_range < 1.0:  # Less than 1% variation
+                        padding = max(0.1, rate_range * 0.2)
+                        y_min = max(0, min_rate - padding)
+                        y_max = min(100, max_rate + padding)
+                    else:
+                        y_min, y_max = 0, 100
+
+                    logger.info(
+                        f"Success rate (3h windows): {len(window_stats)} windows, rate range {min_rate:.2f}%-{max_rate:.2f}%, y-axis: {y_min:.2f}-{y_max:.2f}"
+                    )
+
+                    fig5 = go.Figure()
+                    fig5.add_trace(
+                        go.Scatter(
+                            x=window_stats["local_window_start"],
+                            y=window_stats["success_rate"],
+                            mode="lines+markers",
+                            name="Success Rate",
+                            line={"color": "#20c997", "width": 3},
+                            marker={"size": 8},
+                            customdata=window_stats["total_completions"],
+                            hovertemplate="<b>Success Rate (3h window)</b><br>%{x}<br>Rate: %{y:.2f}%<br>Total Completions: %{customdata}<extra></extra>",
+                        )
+                    )
+
+                    fig5.update_layout(
+                        title={
+                            "text": "Execution Success Rate (3-Hour Windows)",
+                            "x": 0.5,
+                            "xanchor": "center",
+                        },
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis_title="Success Rate (%)",
+                        yaxis={"range": [y_min, y_max]},
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        height=350,
+                        hovermode="x unified",
+                        showlegend=False,
+                    )
+                    charts.append(
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    figure=fig5,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                )
+                            ],
+                            className="mb-4",
+                        )
+                    )
+                    logger.info(
+                        f"Added 3h-window success rate chart to charts list. Total charts so far: {len(charts)}"
+                    )
+
+            # Chart 6: Execution Throughput (1-hour windows) with improved visibility
+            if all(field in df.columns for field in ["executions_finished", "executions_failed"]):
+                # Sort by timestamp for proper delta calculation
+                df_sorted = df.sort_values("timestamp").reset_index(drop=True)
+
+                # Calculate deltas (new completions in each time period)
+                df_sorted["finished_delta"] = df_sorted["executions_finished"].diff().fillna(0)
+                df_sorted["failed_delta"] = df_sorted["executions_failed"].diff().fillna(0)
+
+                # Remove negative deltas (data inconsistencies)
+                df_sorted["finished_delta"] = df_sorted["finished_delta"].clip(lower=0)
+                df_sorted["failed_delta"] = df_sorted["failed_delta"].clip(lower=0)
+
+                # Calculate total throughput (finished + failed)
+                df_sorted["throughput"] = df_sorted["finished_delta"] + df_sorted["failed_delta"]
+
+                # Create 1-hour time windows
+                df_sorted["timestamp_1h"] = pd.to_datetime(df_sorted["timestamp"])
+                df_sorted["window_start"] = df_sorted["timestamp_1h"].dt.floor("1h")
+
+                # Group by 1-hour windows and sum the throughput
+                hourly_throughput = (
+                    df_sorted.groupby("window_start").agg({"throughput": "sum"}).reset_index()
+                )
+
+                # Only show windows with actual throughput
+                hourly_throughput = hourly_throughput[hourly_throughput["throughput"] > 0]
+
+                if not hourly_throughput.empty:
+                    # Convert to local timezone for display
+                    hourly_throughput["local_window_start"] = (
+                        hourly_throughput["window_start"]
+                        .dt.tz_localize("UTC")
+                        .dt.tz_convert(safe_timezone)
+                    )
+
+                    # Calculate y-axis range for better visibility
+                    max_throughput = hourly_throughput["throughput"].max()
+                    avg_throughput = hourly_throughput["throughput"].mean()
+                    y_max = max(max_throughput * 1.1, 1)  # At least 1, with 10% padding
+
+                    logger.info(
+                        f"Throughput (1h windows): {len(hourly_throughput)} windows, max={max_throughput}, avg={avg_throughput:.1f}, y_max={y_max}"
+                    )
+
+                    fig6 = go.Figure()
+                    fig6.add_trace(
+                        go.Bar(
+                            x=hourly_throughput["local_window_start"],
+                            y=hourly_throughput["throughput"],
+                            name="Executions Completed",
+                            marker_color="#6f42c1",
+                            hovertemplate="<b>Hourly Throughput</b><br>%{x}<br>Completions: %{y}<extra></extra>",
+                        )
+                    )
+
+                    fig6.update_layout(
+                        title={
+                            "text": "Execution Throughput (Hourly Windows)",
+                            "x": 0.5,
+                            "xanchor": "center",
+                        },
+                        xaxis_title=get_chart_axis_label(safe_timezone),
+                        yaxis_title="Executions Completed per Hour",
+                        yaxis={"range": [0, y_max]},  # Dynamic range based on data
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        height=350,
+                        hovermode="x unified",
+                        showlegend=False,
+                    )
+                    charts.append(
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    figure=fig6,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                )
+                            ],
+                            className="mb-4",
+                        )
+                    )
+                    logger.info(
+                        f"Added hourly throughput chart to charts list. Total charts so far: {len(charts)}"
+                    )
+
+            if not charts:
+                # If no charts were created, show a general message
+                time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
+                    time_tab, "selected period"
+                )
+
+                logger.info("No charts were created - showing fallback message")
+                return html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.I(
+                                    className="fas fa-exclamation-triangle fa-3x text-warning mb-3"
+                                ),
+                                html.H5(
+                                    "No System Status Data Available",
+                                    className="text-muted mb-3",
+                                ),
+                                html.P(
+                                    f"No status logs found for the last {time_period_name}.",
+                                    className="text-muted mb-2",
+                                ),
+                                html.Small(
+                                    "This could indicate that the system monitoring is not active or no status changes occurred during this period.",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-center py-5",
+                        ),
+                    ],
+                    className="border rounded p-4 bg-light",
+                )
+
+            logger.info(f"Returning {len(charts)} charts to display")
             return html.Div(charts)
 
         except requests.exceptions.RequestException as e:
