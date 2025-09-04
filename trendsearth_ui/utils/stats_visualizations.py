@@ -972,70 +972,133 @@ def create_system_overview(dashboard_stats_data, status_data=None):
 
         return html.Div(
             [
+                # Header section
                 html.Div(
                     [
+                        html.H5("System Overview", className="mb-3 text-center"),
+                    ],
+                    className="mb-3",
+                ),
+                # Main metrics section - organized in logical groups
+                html.Div(
+                    [
+                        # Total counts section
                         html.Div(
                             [
+                                html.H6("Total Resources", className="text-muted mb-3 text-center"),
                                 html.Div(
                                     [
-                                        html.Span("Total Users: ", className="fw-bold"),
-                                        html.Span(
-                                            f"{total_users:,}", className="text-primary fw-bold"
+                                        # Users card
+                                        html.Div(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H4(
+                                                            f"{total_users:,}",
+                                                            className="text-primary mb-0",
+                                                        ),
+                                                        html.Small("Users", className="text-muted"),
+                                                    ],
+                                                    className="text-center",
+                                                ),
+                                            ],
+                                            className="col-md-4 mb-3",
+                                        ),
+                                        # Scripts card
+                                        html.Div(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H4(
+                                                            f"{total_scripts:,}",
+                                                            className="text-info mb-0",
+                                                        ),
+                                                        html.Small(
+                                                            "Scripts", className="text-muted"
+                                                        ),
+                                                    ],
+                                                    className="text-center",
+                                                ),
+                                            ],
+                                            className="col-md-4 mb-3",
+                                        ),
+                                        # Executions card
+                                        html.Div(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H4(
+                                                            f"{total_executions:,}",
+                                                            className="text-success mb-0",
+                                                        ),
+                                                        html.Small(
+                                                            "Executions", className="text-muted"
+                                                        ),
+                                                    ],
+                                                    className="text-center",
+                                                ),
+                                            ],
+                                            className="col-md-4 mb-3",
                                         ),
                                     ],
-                                    className="mb-2",
-                                ),
-                                html.Div(
-                                    [
-                                        html.Span("Total Scripts: ", className="fw-bold"),
-                                        html.Span(
-                                            f"{total_scripts:,}", className="text-info fw-bold"
-                                        ),
-                                    ],
-                                    className="mb-2",
-                                ),
-                                html.Div(
-                                    [
-                                        html.Span("Total Executions: ", className="fw-bold"),
-                                        html.Span(
-                                            f"{total_executions:,}",
-                                            className="text-success fw-bold",
-                                        ),
-                                    ],
-                                    className="mb-2",
+                                    className="row",
                                 ),
                             ],
-                            className="col-md-6",
+                            className="mb-4",
                         ),
+                        # Recent activity section
                         html.Div(
                             [
-                                html.Div(
-                                    [
-                                        html.Span("Recent Users (24h): ", className="fw-bold"),
-                                        html.Span(
-                                            f"{recent_users:,}", className="text-warning fw-bold"
-                                        ),
-                                    ],
-                                    className="mb-2",
+                                html.H6(
+                                    "Recent Activity (24h)", className="text-muted mb-3 text-center"
                                 ),
                                 html.Div(
                                     [
-                                        html.Span("Recent Executions (24h): ", className="fw-bold"),
-                                        html.Span(
-                                            f"{recent_executions:,}",
-                                            className="text-secondary fw-bold",
+                                        # Recent users card
+                                        html.Div(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H4(
+                                                            f"{recent_users:,}",
+                                                            className="text-warning mb-0",
+                                                        ),
+                                                        html.Small(
+                                                            "New Users", className="text-muted"
+                                                        ),
+                                                    ],
+                                                    className="text-center",
+                                                ),
+                                            ],
+                                            className="col-md-6 mb-3",
+                                        ),
+                                        # Recent executions card
+                                        html.Div(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H4(
+                                                            f"{recent_executions:,}",
+                                                            className="text-secondary mb-0",
+                                                        ),
+                                                        html.Small(
+                                                            "New Executions", className="text-muted"
+                                                        ),
+                                                    ],
+                                                    className="text-center",
+                                                ),
+                                            ],
+                                            className="col-md-6 mb-3",
                                         ),
                                     ],
-                                    className="mb-2",
+                                    className="row justify-content-center",
                                 ),
                             ],
-                            className="col-md-6",
                         ),
                     ],
-                    className="row",
                 ),
             ],
-            className="p-3 bg-light rounded",
+            className="p-4 bg-light rounded border",
         )
 
     except Exception as e:
@@ -1228,10 +1291,15 @@ def create_deployment_information(api_environment="production"):
         try:
             # API health endpoint is at root level, not under /api/v1
             api_base_root = get_api_base(api_environment).replace("/api/v1", "")
-            resp = requests.get(f"{api_base_root}/api-health", timeout=5)
+            api_url = f"{api_base_root}/api-health"
+            logger.info(f"Fetching API deployment info from: {api_url}")
+            resp = requests.get(api_url, timeout=5)
+            logger.info(f"API health response status: {resp.status_code}")
             if resp.status_code == 200:
                 data = resp.json()
+                logger.info(f"API health response data: {data}")
                 deployment = data.get("deployment", {})
+                logger.info(f"API deployment section: {deployment}")
                 api_info = {
                     "environment": deployment.get("environment", "Unknown"),
                     "branch": deployment.get("branch", "Unknown"),
@@ -1239,18 +1307,26 @@ def create_deployment_information(api_environment="production"):
                     if deployment.get("commit_sha", "Unknown") != "Unknown"
                     else "Unknown",
                 }
+                logger.info(f"Processed API info: {api_info}")
+            else:
+                logger.warning(
+                    f"API health endpoint returned status {resp.status_code}: {resp.text}"
+                )
         except Exception as e:
             logger.warning(f"Could not fetch API deployment info: {e}")
 
         # Get API UI deployment information
         ui_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
         try:
-            resp = requests.get(
-                f"{get_api_base(api_environment).replace('/api/v1', '')}/api-ui-health", timeout=5
-            )
+            ui_url = f"{get_api_base(api_environment).replace('/api/v1', '')}/api-ui-health"
+            logger.info(f"Fetching UI deployment info from: {ui_url}")
+            resp = requests.get(ui_url, timeout=5)
+            logger.info(f"UI health response status: {resp.status_code}")
             if resp.status_code == 200:
                 data = resp.json()
+                logger.info(f"UI health response data: {data}")
                 deployment = data.get("deployment", {})
+                logger.info(f"UI deployment section: {deployment}")
                 ui_info = {
                     "environment": deployment.get("environment", "Unknown"),
                     "branch": deployment.get("branch", "Unknown"),
@@ -1258,8 +1334,26 @@ def create_deployment_information(api_environment="production"):
                     if deployment.get("commit_sha", "Unknown") != "Unknown"
                     else "Unknown",
                 }
+                logger.info(f"Processed UI info: {ui_info}")
+            else:
+                logger.warning(
+                    f"UI health endpoint returned status {resp.status_code}: {resp.text}"
+                )
         except Exception as e:
             logger.warning(f"Could not fetch API UI deployment info: {e}")
+
+        def format_value(val):
+            return val if val and val != "Unknown" else "-"
+
+        def commit_link(repo_url, sha):
+            if sha and sha != "Unknown":
+                return html.A(
+                    sha,
+                    href=f"{repo_url}/commit/{sha}",
+                    target="_blank",
+                    className="text-decoration-underline text-primary",
+                )
+            return "-"
 
         return html.Div(
             [
@@ -1275,15 +1369,21 @@ def create_deployment_information(api_environment="production"):
                                             [
                                                 html.H6("Trends.Earth API", className="card-title"),
                                                 html.P(
-                                                    f"Environment: {api_info['environment']}",
+                                                    f"Environment: {format_value(api_info['environment'])}",
                                                     className="mb-1",
                                                 ),
                                                 html.P(
-                                                    f"Branch: {api_info['branch']}",
+                                                    f"Branch: {format_value(api_info['branch'])}",
                                                     className="mb-1",
                                                 ),
                                                 html.P(
-                                                    f"Commit: {api_info['commit_sha']}",
+                                                    [
+                                                        "Commit: ",
+                                                        commit_link(
+                                                            "https://github.com/ConservationInternational/trends.earth-api",
+                                                            api_info["commit_sha"],
+                                                        ),
+                                                    ],
                                                     className="mb-0",
                                                 ),
                                             ],
@@ -1306,14 +1406,21 @@ def create_deployment_information(api_environment="production"):
                                                     "Trends.Earth API UI", className="card-title"
                                                 ),
                                                 html.P(
-                                                    f"Environment: {ui_info['environment']}",
+                                                    f"Environment: {format_value(ui_info['environment'])}",
                                                     className="mb-1",
                                                 ),
                                                 html.P(
-                                                    f"Branch: {ui_info['branch']}", className="mb-1"
+                                                    f"Branch: {format_value(ui_info['branch'])}",
+                                                    className="mb-1",
                                                 ),
                                                 html.P(
-                                                    f"Commit: {ui_info['commit_sha']}",
+                                                    [
+                                                        "Commit: ",
+                                                        commit_link(
+                                                            "https://github.com/ConservationInternational/trends.earth-api-ui",
+                                                            ui_info["commit_sha"],
+                                                        ),
+                                                    ],
                                                     className="mb-0",
                                                 ),
                                             ],
@@ -1368,8 +1475,8 @@ def create_docker_swarm_status_table(swarm_data):
             )
 
         # Handle error response structure
-        if swarm_data.get("error", False):
-            error_msg = swarm_data.get("message", "No swarm data available")
+        error_msg = swarm_data.get("error")
+        if error_msg:
             return html.Div(
                 [
                     html.P("Docker swarm status unavailable.", className="text-muted text-center"),
