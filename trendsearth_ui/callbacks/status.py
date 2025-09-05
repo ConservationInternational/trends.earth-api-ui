@@ -518,12 +518,16 @@ def register_callbacks(app):
                 status_data = resp.json().get("data", [])
                 if status_data:
                     # Fetch enhanced statistics for SUPERADMIN users with selected time period
-                    # Request all available sections to ensure we get comprehensive data
+                    # Request all available sections to ensure we get comprehensive data:
+                    # - summary: total counts and recent activity metrics
+                    # - trends: time series data for analysis
+                    # - geographic: location-based statistics
+                    # - tasks: job queue and processing metrics
                     dashboard_stats = fetch_dashboard_stats(
                         token,
                         api_environment,
                         api_period,
-                        include_sections=["summary", "trends", "geographic", "tasks"]
+                        include_sections=["summary", "trends", "geographic", "tasks"],
                     )
                     user_stats = fetch_user_stats(token, api_environment, api_period)
                     execution_stats = fetch_execution_stats(token, api_environment, api_period)
@@ -538,6 +542,22 @@ def register_callbacks(app):
 
                     if isinstance(dashboard_stats, dict):
                         logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
+                        # Log available sections to ensure we're utilizing all data
+                        data_section = dashboard_stats.get("data", {})
+                        if isinstance(data_section, dict):
+                            available_sections = list(data_section.keys())
+                            logger.info(f"Available dashboard sections: {available_sections}")
+
+                            # Log summary of each section to understand data completeness
+                            for section in available_sections:
+                                section_data = data_section.get(section, {})
+                                if isinstance(section_data, dict):
+                                    section_keys = list(section_data.keys())
+                                    logger.info(f"Dashboard {section} section keys: {section_keys}")
+                                else:
+                                    logger.info(
+                                        f"Dashboard {section} section type: {type(section_data)}"
+                                    )
                     if isinstance(user_stats, dict):
                         logger.info(f"User stats keys: {list(user_stats.keys())}")
                     if isinstance(execution_stats, dict):
@@ -553,7 +573,12 @@ def register_callbacks(app):
                         user_stats
                     ) + create_execution_statistics_chart(execution_stats)
 
-                    _stats_cache[cache_key] = (system_overview, summary_cards, user_map, additional_charts)
+                    _stats_cache[cache_key] = (
+                        system_overview,
+                        summary_cards,
+                        user_map,
+                        additional_charts,
+                    )
 
                     return (
                         system_overview,
