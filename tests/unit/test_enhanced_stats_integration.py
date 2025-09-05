@@ -21,7 +21,7 @@ class TestEnhancedStatsIntegration:
         content_str = str(content)
 
         # Should contain all three enhanced statistics components
-        assert "stats-summary-cards" in content_str
+        assert "system-overview-content" in content_str
         assert "stats-user-map" in content_str
         assert "stats-additional-charts" in content_str
 
@@ -36,7 +36,7 @@ class TestEnhancedStatsIntegration:
         content_str = str(content)
 
         # Should contain all three enhanced statistics components
-        assert "stats-summary-cards" in content_str
+        assert "system-overview-content" in content_str
         assert "stats-user-map" in content_str
         assert "stats-additional-charts" in content_str
 
@@ -50,7 +50,7 @@ class TestEnhancedStatsIntegration:
         assert "Administrator privileges required" in content_str
 
         # Should NOT contain enhanced statistics components
-        assert "stats-summary-cards" not in content_str
+        assert "system-overview-content" not in content_str
         assert "stats-user-map" not in content_str
         assert "stats-additional-charts" not in content_str
 
@@ -64,7 +64,7 @@ class TestEnhancedStatsIntegration:
         assert "System Status Trends" in content_str
 
         # Should have loading components for each section
-        assert "loading-stats-summary" in content_str
+        assert "loading-status-summary" in content_str
         assert "loading-stats-map" in content_str
         assert "loading-stats-charts" in content_str
 
@@ -120,7 +120,7 @@ class TestEnhancedStatsIntegration:
                             output_ids.append(arg.component_id)
 
                 if (
-                    "stats-summary-cards" in output_ids
+                    "system-overview-content" in output_ids
                     and "stats-user-map" in output_ids
                     and "stats-additional-charts" in output_ids
                 ):
@@ -139,7 +139,7 @@ class TestEnhancedStatsIntegration:
 
         # Should contain the components within the System Status Trends section
         assert "System Status Trends" in content_str
-        assert "stats-summary-cards" in content_str
+        assert "system-overview-content" in content_str
 
 
 class TestEnhancedStatsAccessControl:
@@ -151,7 +151,7 @@ class TestEnhancedStatsAccessControl:
         content_str = str(content)
 
         # Should NOT contain enhanced statistics components for ADMIN users
-        assert "stats-summary-cards" not in content_str
+        assert "system-overview-content" not in content_str
         assert "stats-user-map" not in content_str
         assert "stats-additional-charts" not in content_str
 
@@ -165,7 +165,7 @@ class TestEnhancedStatsAccessControl:
         content_str = str(content)
 
         # Should contain enhanced statistics components
-        assert "stats-summary-cards" in content_str
+        assert "system-overview-content" in content_str
         assert "stats-user-map" in content_str
         assert "stats-additional-charts" in content_str
 
@@ -178,7 +178,7 @@ class TestEnhancedStatsAccessControl:
         assert "Access denied" in content_str
 
         # Should NOT contain enhanced statistics components
-        assert "stats-summary-cards" not in content_str
+        assert "system-overview-content" not in content_str
         assert "stats-user-map" not in content_str
         assert "stats-additional-charts" not in content_str
 
