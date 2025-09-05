@@ -6,189 +6,227 @@ from dash import html
 import requests
 
 from trendsearth_ui.config import get_api_base
+from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
 
 logger = logging.getLogger(__name__)
 
 
+def _create_commit_link(commit_sha, repo_url):
+    """Create a GitHub commit link from a commit SHA and repository URL."""
+    if commit_sha != "unknown" and len(commit_sha) >= 7:
+        return html.A(
+            commit_sha[:7],
+            href=f"{repo_url}/commit/{commit_sha}",
+            target="_blank",
+            className="text-primary",
+        )
+    else:
+        return commit_sha
+
+
+def _fetch_health_status(url, headers=None, timeout=5):
+    """
+    Fetch health status from a given URL.
+
+    Returns:
+        tuple: (success: bool, data: dict, status_code: int, error_msg: str)
+    """
+    try:
+        resp = requests.get(url, headers=headers, timeout=timeout)
+        if resp.status_code == 200:
+            return True, resp.json(), resp.status_code, None
+        else:
+            return False, None, resp.status_code, f"HTTP {resp.status_code}"
+    except Exception as e:
+        logger.warning(f"Could not fetch health status from {url}: {e}")
+        return False, None, 0, "Connection Error"
+
+
+def _create_service_info(
+    service_name, deployment_prefix, success, data, status_code, error_msg, repo_url
+):
+    """
+    Create service information display based on health check results.
+
+    Args:
+        service_name: Display name for the service (e.g., "Trends.Earth API")
+        deployment_prefix: Prefix for deployment info (e.g., "API Deployment")
+        success: Whether the health check succeeded
+        data: Health check response data (if successful)
+        status_code: HTTP status code
+        error_msg: Error message (if failed)
+        repo_url: GitHub repository URL for commit links
+    """
+    if success and data:
+        deployment = data.get("deployment", {})
+        commit_sha = deployment.get("commit_sha", "unknown")
+        branch = deployment.get("branch", "unknown")
+        environment = deployment.get("environment", "unknown")
+
+        commit_link = _create_commit_link(commit_sha, repo_url)
+
+        # Create status line with service-specific information
+        status_parts = [f"Status: {data.get('status', 'unknown').upper()}"]
+        if "database" in data:
+            status_parts.append(f"DB: {data.get('database', 'unknown')}")
+
+        return html.Div(
+            [
+                html.P(
+                    [html.Strong(f"{service_name}: "), ", ".join(status_parts)],
+                    className="mb-1",
+                ),
+                html.P(
+                    [
+                        html.Strong(f"{deployment_prefix}: "),
+                        f"Branch: {branch}, Commit: ",
+                        commit_link,
+                        f", Env: {environment}",
+                    ],
+                    className="mb-1 small text-muted",
+                ),
+            ]
+        )
+    else:
+        # Extract service type (e.g., "API" from "Trends.Earth API")
+        service_type = service_name.split()[-1]  # Gets "API" or "UI"
+
+        # Format error message to match expected test format
+        if status_code > 0:
+            message = f"{service_type} Health: Error ({status_code})"
+        else:
+            message = f"{service_type} Health: {error_msg}"
+
+        return html.P(
+            message,
+            className="mb-1 text-warning" if status_code != 0 else "mb-1 text-danger",
+        )
+
+
 def fetch_deployment_info(api_environment, token=None):
-    """Fetch deployment information from the API's health endpoint."""
+    """Fetch deployment information from both API and UI health endpoints."""
     if not token:
         # Return basic environment info if no token available
         return html.Div(
             [
                 html.P(f"Environment: {api_environment.title()}", className="mb-1"),
                 html.P("API Status: Authentication required", className="mb-1 text-muted"),
-                html.P("Please log in to view health status", className="mb-1 text-muted"),
+                html.P("Please log in to view deployment status", className="mb-1 text-muted"),
             ]
         )
 
-    try:
-        # Use the documented /api/v1/stats/health endpoint
-        headers = {"Authorization": f"Bearer {token}"}
-        resp = requests.get(
-            f"{get_api_base(api_environment)}/stats/health",
-            headers=headers,
-            timeout=5,
-        )
+    # GitHub repository URLs for linking commits
+    API_REPO_URL = "https://github.com/ConservationInternational/trends.earth-API"
+    UI_REPO_URL = "https://github.com/ConservationInternational/trends.earth-api-ui"
 
-        if resp.status_code == 200:
-            return html.Div(
-                [
-                    html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                    html.P("Health Status: OK", className="mb-1 text-success"),
-                    html.P("Stats Service: Available", className="mb-1 text-success"),
-                ]
-            )
-        elif resp.status_code == 401:
-            return html.Div(
-                [
-                    html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                    html.P("Authentication failed", className="mb-1 text-warning"),
-                    html.P("Please check your login status", className="mb-1 text-muted"),
-                ]
-            )
-        elif resp.status_code == 403:
-            return html.Div(
-                [
-                    html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                    html.P("Access denied", className="mb-1 text-warning"),
-                    html.P("Admin privileges required", className="mb-1 text-muted"),
-                ]
-            )
-        else:
-            return html.Div(
-                [
-                    html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                    html.P(
-                        f"Health Status: Error ({resp.status_code})", className="mb-1 text-danger"
-                    ),
-                    html.P("Stats service unavailable", className="mb-1 text-muted"),
-                ]
-            )
+    # Fetch API health info (public endpoint, no auth required)
+    # API health endpoint is at the root level, not under /api/v1
+    api_url = f"{get_api_base(api_environment).removesuffix('/api/v1')}/api-health"
+    api_success, api_data, api_status, api_error = _fetch_health_status(api_url)
 
-    except requests.exceptions.RequestException as e:
-        logger.warning(f"Could not fetch deployment info: {e}")
-        return html.Div(
-            [
-                html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                html.P("API Status: Connection Error", className="mb-1 text-danger"),
-                html.P("Unable to reach stats service", className="mb-1 text-muted"),
-            ]
-        )
+    api_info = _create_service_info(
+        "Trends.Earth API",
+        "API Deployment",
+        api_success,
+        api_data,
+        api_status,
+        api_error,
+        API_REPO_URL,
+    )
+
+    # Fetch UI health info
+    # Check if the UI is deployed on the same domain as the API
+    ui_url = f"{get_api_base(api_environment).removesuffix('/api/v1')}/api-ui-health"
+
+    ui_success, ui_data, ui_status, ui_error = _fetch_health_status(ui_url)
+
+    ui_info = _create_service_info(
+        "Trends.Earth UI", "UI Deployment", ui_success, ui_data, ui_status, ui_error, UI_REPO_URL
+    )
+
+    # Combine the information
+    return html.Div(
+        [
+            html.P(f"Environment: {api_environment.title()}", className="mb-2 fw-bold"),
+            api_info or html.P("API status unavailable", className="mb-1 text-muted"),
+            ui_info or html.P("UI status unavailable", className="mb-1 text-muted"),
+        ]
+    )
 
 
 def fetch_swarm_info(api_environment, token=None):
     """Fetch Docker Swarm information from the API's swarm status endpoint."""
     if not token:
-        return html.Div(
+        # Return basic info if no token available
+        swarm_info = html.Div(
             [
-                html.P("Swarm information requires authentication", className="mb-1 text-muted"),
+                html.P("Authentication required", className="mb-1 text-muted"),
                 html.P("Please log in to view swarm status", className="mb-1 text-muted"),
             ]
-        ), " (Auth Required)"
+        )
+        return swarm_info, " (Auth Required)"
 
     try:
+        # Fetch raw swarm data from API
         headers = {"Authorization": f"Bearer {token}"}
+        swarm_url = f"{get_api_base(api_environment)}/status/swarm"
         resp = requests.get(
-            f"{get_api_base(api_environment)}/status/swarm",
+            swarm_url,
             headers=headers,
             timeout=5,
         )
 
         if resp.status_code == 200:
-            data = resp.json().get("data", {})
-
-            # Check if swarm is active
-            swarm_active = data.get("swarm_active", False)
-            error = data.get("error")
-            cache_info = data.get("cache_info", {})
+            swarm_response = resp.json()
+            swarm_data = swarm_response.get("data", {})
+            swarm_info = create_docker_swarm_status_table(swarm_data)
+            cache_info = swarm_data.get("cache_info", {})
             cached_at = cache_info.get("cached_at", "")
-
-            if not swarm_active or error:
-                # Handle non-swarm or error cases
-                error_msg = error or "Not in swarm mode"
-                return html.Div(
-                    [
-                        html.P(f"Swarm Status: {error_msg}", className="mb-1 text-warning"),
-                        html.P(f"Total Nodes: {data.get('total_nodes', 0)}", className="mb-1"),
-                        html.P(
-                            f"Cache Updated: {cached_at[:19] if cached_at else 'N/A'}",
-                            className="mb-1 text-muted",
-                        ),
-                    ]
-                ), " (Inactive)"
-
-            # Display swarm information
-            total_nodes = data.get("total_nodes", 0)
-            total_managers = data.get("total_managers", 0)
-            total_workers = data.get("total_workers", 0)
-            nodes = data.get("nodes", [])
-
-            info_lines = [
-                html.P("Swarm Active: Yes", className="mb-1 text-success"),
-                html.P(f"Total Nodes: {total_nodes}", className="mb-1"),
-                html.P(f"Managers: {total_managers}, Workers: {total_workers}", className="mb-1"),
-            ]
-
-            # Add node details if available
-            if nodes:
-                active_nodes = [n for n in nodes if n.get("state") == "ready"]
-                info_lines.append(
-                    html.P(f"Active Nodes: {len(active_nodes)}/{total_nodes}", className="mb-1")
-                )
-
-                # Show resource usage if available
-                total_cpu = sum(n.get("cpu_count", 0) for n in nodes)
-                total_memory = sum(n.get("memory_gb", 0) for n in nodes)
-                if total_cpu > 0 or total_memory > 0:
-                    info_lines.append(
-                        html.P(
-                            f"Total Resources: {total_cpu} CPUs, {total_memory:.1f}GB",
-                            className="mb-1",
-                        )
-                    )
-
-            if cached_at:
-                info_lines.append(
-                    html.P(f"Cache Updated: {cached_at[:19]}", className="mb-1 text-muted")
-                )
-
-            return html.Div(info_lines), " (Live)"
-
+            swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else " (Live)"
+            return swarm_info, swarm_cached_time
         elif resp.status_code == 401:
-            return html.Div(
+            # Handle authentication error
+            swarm_info = html.Div(
                 [
                     html.P("Authentication failed", className="mb-1 text-warning"),
                     html.P("Please check your login status", className="mb-1 text-muted"),
                 ]
-            ), " (Auth Error)"
+            )
+            return swarm_info, " (Auth Error)"
         elif resp.status_code == 403:
-            return html.Div(
+            # Handle permission error
+            swarm_info = html.Div(
                 [
                     html.P("Access denied", className="mb-1 text-warning"),
                     html.P(
-                        "Admin privileges required for swarm status", className="mb-1 text-muted"
+                        "Admin privileges required for swarm status",
+                        className="mb-1 text-muted",
                     ),
                 ]
-            ), " (Access Denied)"
+            )
+            return swarm_info, " (Access Denied)"
         else:
-            return html.Div(
+            # Handle other errors
+            swarm_info = html.Div(
                 [
                     html.P(
-                        f"Swarm Status: Error ({resp.status_code})", className="mb-1 text-danger"
+                        f"Swarm Status: Error ({resp.status_code})",
+                        className="mb-1 text-danger",
                     ),
                     html.P("Unable to retrieve swarm information", className="mb-1 text-muted"),
                 ]
-            ), " (Error)"
-
-    except requests.exceptions.RequestException as e:
-        logger.warning(f"Could not fetch swarm info: {e}")
-        return html.Div(
+            )
+            return swarm_info, " (Error)"
+    except Exception as e:
+        # Handle connection errors
+        logger.error(f"Error fetching swarm data: {e}")
+        swarm_info = html.Div(
             [
                 html.P("Swarm Status: Connection Error", className="mb-1 text-danger"),
                 html.P("Unable to reach swarm status endpoint", className="mb-1 text-muted"),
             ]
-        ), " (Connection Error)"
+        )
+        return swarm_info, " (Connection Error)"
 
 
 def get_fallback_summary():
