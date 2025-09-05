@@ -791,6 +791,22 @@ def status_tab_content(is_admin, role=None):
                                 [
                                     html.Div(
                                         [
+                                            # Dashboard summary cards
+                                            html.Div(
+                                                [
+                                                    html.H5("Dashboard Summary", className="mb-3"),
+                                                    dcc.Loading(
+                                                        id="loading-stats-summary",
+                                                        children=[
+                                                            html.Div(id="stats-summary-cards")
+                                                        ],
+                                                        type="default",
+                                                        color="#007bff",
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                            html.Hr(),
                                             # User geographic map
                                             html.Div(
                                                 [

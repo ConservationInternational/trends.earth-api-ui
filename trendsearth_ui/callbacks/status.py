@@ -16,14 +16,15 @@ from ..utils.stats_utils import (
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
-    create_deployment_information,
-    create_docker_swarm_status_table,
+    create_dashboard_summary_cards,
     create_execution_statistics_chart,
     create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
 from ..utils.status_helpers import (
+    fetch_deployment_info,
+    fetch_swarm_info,
     get_fallback_summary,
     is_status_endpoint_available,
 )
@@ -125,70 +126,11 @@ def register_callbacks(app):
                 )
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
-        # Fetch deployment info from api-health endpoint
-        deployment_info = create_deployment_information(api_environment)
+        # Fetch deployment info from status helpers
+        deployment_info = fetch_deployment_info(api_environment, token)
 
-        # Fetch Docker Swarm information
-        try:
-            # Fetch raw swarm data from API
-            headers = {"Authorization": f"Bearer {token}"} if token else {}
-            swarm_url = f"{get_api_base(api_environment)}/status/swarm"
-            resp = requests.get(
-                swarm_url,
-                headers=headers,
-                timeout=5,
-            )
-
-            if resp.status_code == 200:
-                swarm_response = resp.json()
-                swarm_data = swarm_response.get("data", {})
-                swarm_info = create_docker_swarm_status_table(swarm_data)
-                cache_info = swarm_data.get("cache_info", {})
-                cached_at = cache_info.get("cached_at", "")
-                swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else ""
-            elif resp.status_code == 401:
-                # Handle authentication error
-                swarm_info = html.Div(
-                    [
-                        html.P("Authentication failed", className="mb-1 text-warning"),
-                        html.P("Please check your login status", className="mb-1 text-muted"),
-                    ]
-                )
-                swarm_cached_time = " (Auth Error)"
-            elif resp.status_code == 403:
-                # Handle permission error
-                swarm_info = html.Div(
-                    [
-                        html.P("Access denied", className="mb-1 text-warning"),
-                        html.P(
-                            "Admin privileges required for swarm status",
-                            className="mb-1 text-muted",
-                        ),
-                    ]
-                )
-                swarm_cached_time = " (Access Denied)"
-            else:
-                # Handle other errors
-                swarm_info = html.Div(
-                    [
-                        html.P(
-                            f"Swarm Status: Error ({resp.status_code})",
-                            className="mb-1 text-danger",
-                        ),
-                        html.P("Unable to retrieve swarm information", className="mb-1 text-muted"),
-                    ]
-                )
-                swarm_cached_time = " (Error)"
-        except Exception as e:
-            # Handle connection errors
-            logger.error(f"Error fetching swarm data: {e}")
-            swarm_info = html.Div(
-                [
-                    html.P("Swarm Status: Connection Error", className="mb-1 text-danger"),
-                    html.P("Unable to reach swarm status endpoint", className="mb-1 text-muted"),
-                ]
-            )
-            swarm_cached_time = " (Connection Error)"
+        # Fetch Docker Swarm information using helper function
+        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
 
         # Create swarm title with cached timestamp
         swarm_title = html.H5(
@@ -372,6 +314,38 @@ def register_callbacks(app):
                                 ],
                                 className="row mb-4",
                             ),
+                            # Summary Totals Section
+                            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H6("Total Executions", className="mb-2"),
+                                            html.P(
+                                                str(
+                                                    latest_status.get(
+                                                        "executions_count",
+                                                        active_total + completed_total,
+                                                    )
+                                                ),
+                                                className="text-primary mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-6 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Users", className="mb-2"),
+                                            html.P(
+                                                str(latest_status.get("users_count", 0)),
+                                                className="text-info mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-6 text-center",
+                                    ),
+                                ],
+                                className="row mb-4",
+                            ),
                             # Last Updated Section
                             html.Div(
                                 [
@@ -419,6 +393,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output("system-overview-content", "children"),
+        Output("stats-summary-cards", "children"),
         Output("stats-user-map", "children"),
         Output("stats-additional-charts", "children"),
         [
@@ -448,11 +423,11 @@ def register_callbacks(app):
         """Update the status summary and enhanced statistics."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Check if user has required permissions for enhanced stats (SUPERADMIN only)
         if role != "SUPERADMIN":
@@ -467,7 +442,7 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return permission_msg, permission_msg, [permission_msg]
+            return permission_msg, permission_msg, permission_msg, [permission_msg]
 
         # Map UI time period to API period
         api_period_map = {"day": "last_day", "week": "last_week", "month": "last_month"}
@@ -494,6 +469,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
 
         headers = {"Authorization": f"Bearer {token}"}
@@ -515,7 +491,17 @@ def register_callbacks(app):
                 status_data = resp.json().get("data", [])
                 if status_data:
                     # Fetch enhanced statistics for SUPERADMIN users with selected time period
-                    dashboard_stats = fetch_dashboard_stats(token, api_environment, api_period)
+                    # Request all available sections to ensure we get comprehensive data:
+                    # - summary: total counts and recent activity metrics
+                    # - trends: time series data for analysis
+                    # - geographic: location-based statistics
+                    # - tasks: job queue and processing metrics
+                    dashboard_stats = fetch_dashboard_stats(
+                        token,
+                        api_environment,
+                        api_period,
+                        include_sections=["summary", "trends", "geographic", "tasks"],
+                    )
                     user_stats = fetch_user_stats(token, api_environment, api_period)
                     execution_stats = fetch_execution_stats(token, api_environment, api_period)
 
@@ -529,6 +515,22 @@ def register_callbacks(app):
 
                     if isinstance(dashboard_stats, dict):
                         logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
+                        # Log available sections to ensure we're utilizing all data
+                        data_section = dashboard_stats.get("data", {})
+                        if isinstance(data_section, dict):
+                            available_sections = list(data_section.keys())
+                            logger.info(f"Available dashboard sections: {available_sections}")
+
+                            # Log summary of each section to understand data completeness
+                            for section in available_sections:
+                                section_data = data_section.get(section, {})
+                                if isinstance(section_data, dict):
+                                    section_keys = list(section_data.keys())
+                                    logger.info(f"Dashboard {section} section keys: {section_keys}")
+                                else:
+                                    logger.info(
+                                        f"Dashboard {section} section type: {type(section_data)}"
+                                    )
                     if isinstance(user_stats, dict):
                         logger.info(f"User stats keys: {list(user_stats.keys())}")
                     if isinstance(execution_stats, dict):
@@ -538,20 +540,28 @@ def register_callbacks(app):
                     # Get the latest status for scripts count
                     latest_status = status_data[0] if status_data else {}
                     system_overview = create_system_overview(dashboard_stats, latest_status)
+                    summary_cards = create_dashboard_summary_cards(dashboard_stats)
                     user_map = create_user_geographic_map(user_stats)
                     additional_charts = create_user_statistics_chart(
                         user_stats
                     ) + create_execution_statistics_chart(execution_stats)
 
-                    _stats_cache[cache_key] = (system_overview, user_map, additional_charts)
+                    _stats_cache[cache_key] = (
+                        system_overview,
+                        summary_cards,
+                        user_map,
+                        additional_charts,
+                    )
 
                     return (
                         system_overview,
+                        summary_cards,
                         user_map,
                         additional_charts,
                     )
                 else:
                     return (
+                        no_update,
                         no_update,
                         no_update,
                         no_update,
@@ -561,9 +571,11 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                 )
         except requests.exceptions.RequestException:
             return (
+                no_update,
                 no_update,
                 no_update,
                 no_update,
