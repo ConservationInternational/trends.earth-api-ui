@@ -1318,8 +1318,18 @@ def create_deployment_information(api_environment="production"):
         # Get API UI deployment information
         ui_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
         try:
-            ui_url = f"{get_api_base(api_environment).replace('/api/v1', '')}/api-ui-health"
-            logger.info(f"Fetching UI deployment info from: {ui_url}")
+            # Get UI health from the current application, not from API server
+            from flask import request
+
+            # Construct the UI health URL using current request context
+            if request and hasattr(request, "host_url"):
+                # Use the current request's host URL
+                ui_url = f"{request.host_url.rstrip('/')}/api-ui-health"
+            else:
+                # Fallback: try localhost (for development or when no request context)
+                ui_url = "http://127.0.0.1:8050/api-ui-health"
+
+            logger.info(f"Fetching UI deployment info from current application: {ui_url}")
             resp = requests.get(ui_url, timeout=5)
             logger.info(f"UI health response status: {resp.status_code}")
             if resp.status_code == 200:
