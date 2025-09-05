@@ -37,11 +37,6 @@ def process_execution_data(executions, role, user_timezone):
     Returns:
         List of processed execution dictionaries ready for AG-Grid
     """
-    # Add duration_raw field for filtering while keeping formatted display
-    for exec_row in executions:
-        if "duration" in exec_row and exec_row["duration"] is not None:
-            exec_row["duration_raw"] = exec_row["duration"]
-
     tabledata = []
     for exec_row in executions:
         row = exec_row.copy()
