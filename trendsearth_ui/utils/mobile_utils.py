@@ -77,29 +77,6 @@ def get_mobile_column_config():
                     "minWidth": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
-                    "filter": "agNumberColumnFilter",
-                    "filterParams": {
-                        "buttons": ["clear", "apply"],
-                        "closeOnApply": True,
-                        "debounceMs": 500,
-                    },
-                    "valueGetter": {
-                        "function": "params.data.duration_raw && typeof params.data.duration_raw === 'string' ? parseFloat(params.data.duration_raw.replace(/[^0-9.-]/g, '')) : params.data.duration_raw"
-                    },
-                    "valueFormatter": {
-                        "function": """
-                        if (params.value == null || params.value === '') return '';
-                        const seconds = Math.floor(params.value);
-                        if (seconds < 60) return seconds + 's';
-                        const minutes = Math.floor(seconds / 60);
-                        const remainingSeconds = seconds % 60;
-                        if (seconds < 3600) return minutes + ':' + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
-                        const hours = Math.floor(seconds / 3600);
-                        const remainingMinutes = Math.floor((seconds % 3600) / 60);
-                        const finalSeconds = seconds % 60;
-                        return hours + ':' + (remainingMinutes < 10 ? '0' : '') + remainingMinutes + ':' + (finalSeconds < 10 ? '0' : '') + finalSeconds;
-                        """.strip()
-                    },
                 },
                 {
                     "headerName": "Status",

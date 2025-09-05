@@ -24,6 +24,8 @@ from ..utils.stats_visualizations import (
     create_user_statistics_chart,
 )
 from ..utils.status_helpers import (
+    fetch_deployment_info,  # noqa: F401 (used in tests)
+    fetch_swarm_info,  # noqa: F401 (used in tests)
     get_fallback_summary,
     is_status_endpoint_available,
 )
