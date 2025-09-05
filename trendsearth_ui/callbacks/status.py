@@ -17,14 +17,14 @@ from ..utils.stats_utils import (
 )
 from ..utils.stats_visualizations import (
     create_dashboard_summary_cards,
-    create_deployment_information,
-    create_docker_swarm_status_table,
     create_execution_statistics_chart,
     create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
 from ..utils.status_helpers import (
+    fetch_deployment_info,
+    fetch_swarm_info,
     get_fallback_summary,
     is_status_endpoint_available,
 )
@@ -126,70 +126,11 @@ def register_callbacks(app):
                 )
                 return cached_summary, cached_deployment, cached_swarm, swarm_title
 
-        # Fetch deployment info from api-health endpoint
-        deployment_info = create_deployment_information(api_environment)
+        # Fetch deployment info from status helpers
+        deployment_info = fetch_deployment_info(api_environment, token)
 
-        # Fetch Docker Swarm information
-        try:
-            # Fetch raw swarm data from API
-            headers = {"Authorization": f"Bearer {token}"} if token else {}
-            swarm_url = f"{get_api_base(api_environment)}/status/swarm"
-            resp = requests.get(
-                swarm_url,
-                headers=headers,
-                timeout=5,
-            )
-
-            if resp.status_code == 200:
-                swarm_response = resp.json()
-                swarm_data = swarm_response.get("data", {})
-                swarm_info = create_docker_swarm_status_table(swarm_data)
-                cache_info = swarm_data.get("cache_info", {})
-                cached_at = cache_info.get("cached_at", "")
-                swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else ""
-            elif resp.status_code == 401:
-                # Handle authentication error
-                swarm_info = html.Div(
-                    [
-                        html.P("Authentication failed", className="mb-1 text-warning"),
-                        html.P("Please check your login status", className="mb-1 text-muted"),
-                    ]
-                )
-                swarm_cached_time = " (Auth Error)"
-            elif resp.status_code == 403:
-                # Handle permission error
-                swarm_info = html.Div(
-                    [
-                        html.P("Access denied", className="mb-1 text-warning"),
-                        html.P(
-                            "Admin privileges required for swarm status",
-                            className="mb-1 text-muted",
-                        ),
-                    ]
-                )
-                swarm_cached_time = " (Access Denied)"
-            else:
-                # Handle other errors
-                swarm_info = html.Div(
-                    [
-                        html.P(
-                            f"Swarm Status: Error ({resp.status_code})",
-                            className="mb-1 text-danger",
-                        ),
-                        html.P("Unable to retrieve swarm information", className="mb-1 text-muted"),
-                    ]
-                )
-                swarm_cached_time = " (Error)"
-        except Exception as e:
-            # Handle connection errors
-            logger.error(f"Error fetching swarm data: {e}")
-            swarm_info = html.Div(
-                [
-                    html.P("Swarm Status: Connection Error", className="mb-1 text-danger"),
-                    html.P("Unable to reach swarm status endpoint", className="mb-1 text-muted"),
-                ]
-            )
-            swarm_cached_time = " (Connection Error)"
+        # Fetch Docker Swarm information using helper function
+        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
 
         # Create swarm title with cached timestamp
         swarm_title = html.H5(
@@ -369,6 +310,38 @@ def register_callbacks(app):
                                             ),
                                         ],
                                         className="col-12 text-center",
+                                    ),
+                                ],
+                                className="row mb-4",
+                            ),
+                            # Summary Totals Section
+                            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H6("Total Executions", className="mb-2"),
+                                            html.P(
+                                                str(
+                                                    latest_status.get(
+                                                        "executions_count",
+                                                        active_total + completed_total,
+                                                    )
+                                                ),
+                                                className="text-primary mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-6 text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6("Users", className="mb-2"),
+                                            html.P(
+                                                str(latest_status.get("users_count", 0)),
+                                                className="text-info mb-1",
+                                            ),
+                                        ],
+                                        className="col-md-6 text-center",
                                     ),
                                 ],
                                 className="row mb-4",
