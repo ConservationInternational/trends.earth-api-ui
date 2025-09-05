@@ -540,6 +540,210 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
+                    dbc.CardHeader(html.H4("Email Notifications")),
+                    dbc.CardBody(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Execution Completion Notifications"),
+                                            html.Div(
+                                                [
+                                                    dbc.Switch(
+                                                        id="profile-email-notifications-switch",
+                                                        value=user_data.get("email_notifications_enabled", True) if user_data else True,
+                                                        className="mb-2",
+                                                    ),
+                                                    html.Small(
+                                                        "Receive email notifications when your script executions finish, fail, or are cancelled.",
+                                                        className="text-muted",
+                                                    ),
+                                                ],
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Alert(
+                                                id="profile-email-notifications-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            dbc.Card(
+                [
+                    dbc.CardHeader(html.H4("Google Earth Engine Account")),
+                    dbc.CardBody(
+                        [
+                            # Current credentials status
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.H6("Current Credentials Status"),
+                                            html.Div(id="profile-gee-status-display"),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            html.Hr(),
+                            # GEE Account Setup Options
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.H6("Setup Your GEE Account"),
+                                            html.P(
+                                                "Choose one of the options below to configure your Google Earth Engine credentials:",
+                                                className="text-muted",
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            # OAuth Setup Section
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Card(
+                                                [
+                                                    dbc.CardBody(
+                                                        [
+                                                            html.H6("Option 1: Connect Your GEE Account (OAuth)", className="mb-3"),
+                                                            html.P(
+                                                                "Connect your personal Google Earth Engine account using OAuth authentication.",
+                                                                className="text-muted",
+                                                            ),
+                                                            dbc.Button(
+                                                                "Connect GEE Account",
+                                                                id="profile-gee-oauth-btn",
+                                                                color="primary",
+                                                                className="mb-2",
+                                                            ),
+                                                            dbc.Alert(
+                                                                id="profile-gee-oauth-alert",
+                                                                is_open=False,
+                                                                dismissable=True,
+                                                            ),
+                                                        ]
+                                                    )
+                                                ],
+                                                outline=True,
+                                                color="primary",
+                                            ),
+                                        ],
+                                        width=12,
+                                        className="mb-3",
+                                    ),
+                                ]
+                            ),
+                            # Service Account Upload Section
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Card(
+                                                [
+                                                    dbc.CardBody(
+                                                        [
+                                                            html.H6("Option 2: Upload Service Account Key", className="mb-3"),
+                                                            html.P(
+                                                                "Upload a Google Cloud service account JSON key with Earth Engine access.",
+                                                                className="text-muted",
+                                                            ),
+                                                            dcc.Upload(
+                                                                id="profile-gee-service-account-upload",
+                                                                children=dbc.Button(
+                                                                    [
+                                                                        html.I(className="fas fa-upload me-2"),
+                                                                        "Upload Service Account Key"
+                                                                    ],
+                                                                    color="secondary",
+                                                                    outline=True,
+                                                                ),
+                                                                accept=".json",
+                                                                max_size=1024*1024,  # 1MB max
+                                                            ),
+                                                            dbc.Alert(
+                                                                id="profile-gee-service-account-alert",
+                                                                is_open=False,
+                                                                dismissable=True,
+                                                            ),
+                                                        ]
+                                                    )
+                                                ],
+                                                outline=True,
+                                                color="secondary",
+                                            ),
+                                        ],
+                                        width=12,
+                                        className="mb-3",
+                                    ),
+                                ]
+                            ),
+                            # Credential Management Actions
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.H6("Manage Credentials"),
+                                            dbc.ButtonGroup(
+                                                [
+                                                    dbc.Button(
+                                                        "Test Credentials",
+                                                        id="profile-gee-test-btn",
+                                                        color="info",
+                                                        outline=True,
+                                                        disabled=True,
+                                                    ),
+                                                    dbc.Button(
+                                                        "Delete Credentials",
+                                                        id="profile-gee-delete-btn",
+                                                        color="danger",
+                                                        outline=True,
+                                                        disabled=True,
+                                                    ),
+                                                ],
+                                                className="mb-2",
+                                            ),
+                                            dbc.Alert(
+                                                id="profile-gee-management-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                            ),
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            dbc.Card(
+                [
                     dbc.CardHeader(html.H4("Change Password")),
                     dbc.CardBody(
                         [

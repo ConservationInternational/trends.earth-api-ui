@@ -166,8 +166,111 @@ def edit_user_modal():
                                         ],
                                         width=6,
                                     ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Email Notifications"),
+                                            html.Div(
+                                                [
+                                                    dbc.Switch(
+                                                        id="edit-user-email-notifications-switch",
+                                                        value=True,
+                                                        className="mb-1",
+                                                    ),
+                                                    html.Small(
+                                                        "Execution completion emails",
+                                                        className="text-muted",
+                                                    ),
+                                                ],
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
                                 ],
                                 className="mb-3",
+                            ),
+                            html.Hr(),
+                            html.H5("Google Earth Engine Credentials", className="mb-3"),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.Div(
+                                                [
+                                                    html.H6("Current Status"),
+                                                    html.Div(id="edit-user-gee-status-display", className="mb-3"),
+                                                ]
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.H6("Admin Actions"),
+                                            dbc.ButtonGroup(
+                                                [
+                                                    dbc.Button(
+                                                        "Test Credentials",
+                                                        id="edit-user-gee-test-btn",
+                                                        color="info",
+                                                        outline=True,
+                                                        size="sm",
+                                                        disabled=True,
+                                                    ),
+                                                    dbc.Button(
+                                                        "Delete Credentials",
+                                                        id="edit-user-gee-delete-btn",
+                                                        color="danger",
+                                                        outline=True,
+                                                        size="sm",
+                                                        disabled=True,
+                                                    ),
+                                                ],
+                                                className="mb-2",
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            html.H6("Upload Service Account"),
+                                            dcc.Upload(
+                                                id="edit-user-gee-service-account-upload",
+                                                children=dbc.Button(
+                                                    [
+                                                        html.I(className="fas fa-upload me-2"),
+                                                        "Upload for User"
+                                                    ],
+                                                    color="secondary",
+                                                    outline=True,
+                                                    size="sm",
+                                                ),
+                                                accept=".json",
+                                                max_size=1024*1024,  # 1MB max
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Alert(
+                                                id="edit-user-gee-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ]
                             ),
                             html.Hr(),
                             html.H5("Change Password", className="mb-3"),

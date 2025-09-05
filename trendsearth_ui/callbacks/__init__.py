@@ -32,6 +32,7 @@ def register_all_callbacks(app):
         "modals",
         "map",
         "profile",
+        "gee_credentials",  # Add GEE credentials callbacks
         "edit",
         "refresh",
     ]

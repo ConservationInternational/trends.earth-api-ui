@@ -150,5 +150,62 @@ def register_callbacks(app):
             print(f"💥 Network error during password change: {str(e)}")
             return f"Network error: {str(e)}", "danger", True, no_update, no_update, no_update
 
+    @app.callback(
+        [
+            Output("profile-email-notifications-alert", "children"),
+            Output("profile-email-notifications-alert", "color"),
+            Output("profile-email-notifications-alert", "is_open"),
+            Output("user-store", "data", allow_duplicate=True),
+        ],
+        [Input("profile-email-notifications-switch", "value")],
+        [
+            State("token-store", "data"),
+            State("user-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def update_email_notifications(enabled, token, user_data):
+        """Update user email notification preferences."""
+        if token is None or user_data is None:
+            return no_update, no_update, no_update, no_update
+
+        try:
+            from ..utils.helpers import make_authenticated_request
+
+            # Update email notifications setting
+            resp = make_authenticated_request(
+                "/user/me",
+                token,
+                method="PATCH",
+                json={"email_notifications_enabled": enabled},
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                # Update the user data in store
+                updated_data = resp.json().get("data", user_data)
+
+                status_text = "enabled" if enabled else "disabled"
+                return (
+                    [
+                        f"Email notifications {status_text} successfully!",
+                    ],
+                    "success",
+                    True,
+                    updated_data,
+                )
+            else:
+                error_msg = "Failed to update email notification settings."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_msg)
+                except Exception:
+                    pass
+                return error_msg, "danger", True, no_update
+
+        except Exception as e:
+            print(f"Error updating email notifications: {e}")
+            return f"Network error: {str(e)}", "danger", True, no_update
+
 
 # Legacy callback decorators for backward compatibility (these won't be executed)
