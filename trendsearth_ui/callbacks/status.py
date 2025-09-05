@@ -16,6 +16,7 @@ from ..utils.stats_utils import (
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
+    create_dashboard_summary_cards,
     create_deployment_information,
     create_docker_swarm_status_table,
     create_execution_statistics_chart,
@@ -419,6 +420,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output("system-overview-content", "children"),
+        Output("stats-summary-cards", "children"),
         Output("stats-user-map", "children"),
         Output("stats-additional-charts", "children"),
         [
@@ -448,11 +450,11 @@ def register_callbacks(app):
         """Update the status summary and enhanced statistics."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         # Check if user has required permissions for enhanced stats (SUPERADMIN only)
         if role != "SUPERADMIN":
@@ -467,7 +469,7 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return permission_msg, permission_msg, [permission_msg]
+            return permission_msg, permission_msg, permission_msg, [permission_msg]
 
         # Map UI time period to API period
         api_period_map = {"day": "last_day", "week": "last_week", "month": "last_month"}
@@ -494,6 +496,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
 
         headers = {"Authorization": f"Bearer {token}"}
@@ -515,7 +518,13 @@ def register_callbacks(app):
                 status_data = resp.json().get("data", [])
                 if status_data:
                     # Fetch enhanced statistics for SUPERADMIN users with selected time period
-                    dashboard_stats = fetch_dashboard_stats(token, api_environment, api_period)
+                    # Request all available sections to ensure we get comprehensive data
+                    dashboard_stats = fetch_dashboard_stats(
+                        token,
+                        api_environment,
+                        api_period,
+                        include_sections=["summary", "trends", "geographic", "tasks"]
+                    )
                     user_stats = fetch_user_stats(token, api_environment, api_period)
                     execution_stats = fetch_execution_stats(token, api_environment, api_period)
 
@@ -538,20 +547,23 @@ def register_callbacks(app):
                     # Get the latest status for scripts count
                     latest_status = status_data[0] if status_data else {}
                     system_overview = create_system_overview(dashboard_stats, latest_status)
+                    summary_cards = create_dashboard_summary_cards(dashboard_stats)
                     user_map = create_user_geographic_map(user_stats)
                     additional_charts = create_user_statistics_chart(
                         user_stats
                     ) + create_execution_statistics_chart(execution_stats)
 
-                    _stats_cache[cache_key] = (system_overview, user_map, additional_charts)
+                    _stats_cache[cache_key] = (system_overview, summary_cards, user_map, additional_charts)
 
                     return (
                         system_overview,
+                        summary_cards,
                         user_map,
                         additional_charts,
                     )
                 else:
                     return (
+                        no_update,
                         no_update,
                         no_update,
                         no_update,
@@ -561,9 +573,11 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                 )
         except requests.exceptions.RequestException:
             return (
+                no_update,
                 no_update,
                 no_update,
                 no_update,
