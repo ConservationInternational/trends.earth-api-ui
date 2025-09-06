@@ -1,11 +1,12 @@
 """Test enhancements to stats utils functions."""
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import patch, Mock
 
 from trendsearth_ui.utils.stats_utils import (
-    fetch_user_stats,
     fetch_execution_stats,
+    fetch_user_stats,
     get_optimal_grouping_for_period,
 )
 
@@ -70,6 +71,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
@@ -88,6 +90,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["country"] == "Kenya"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert result == {"data": {"geographic_distribution": {}}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
@@ -110,6 +113,7 @@ class TestEnhancedUserStats:
         assert params["group_by"] == "week"
         assert params["country"] == "Kenya"
         assert params["period"] == "last_month"
+        assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
     def test_fetch_user_stats_uses_enhanced_cache_key(self, mock_cache):
@@ -145,6 +149,7 @@ class TestEnhancedExecutionStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
@@ -167,6 +172,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "download"
         assert params["status"] == "FINISHED"
         assert params["period"] == "last_week"
+        assert result == {"data": {"task_performance": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
@@ -180,11 +186,11 @@ class TestEnhancedExecutionStats:
 
         result = fetch_execution_stats(
             "token",
-            "production", 
+            "production",
             "last_month",
             group_by="week",
             task_type="analysis",
-            status="FAILED"
+            status="FAILED",
         )
 
         # Check that the API was called with all parameters
@@ -195,6 +201,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "analysis"
         assert params["status"] == "FAILED"
         assert params["period"] == "last_month"
+        assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.get_cached_stats_data")
     def test_fetch_execution_stats_uses_enhanced_cache_key(self, mock_cache):
@@ -207,7 +214,7 @@ class TestEnhancedExecutionStats:
             "last_week",
             group_by="day",
             task_type="download",
-            status="FINISHED"
+            status="FINISHED",
         )
 
         # Check that cache was called with enhanced key
