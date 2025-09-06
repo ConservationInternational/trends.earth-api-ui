@@ -1,8 +1,9 @@
 """Integration test to verify the normalization fix in actual callback functions."""
 
+from unittest.mock import Mock, patch
+
 import pandas as pd
 import pytest
-from unittest.mock import Mock, patch
 
 from trendsearth_ui.utils.stats_visualizations import create_execution_statistics_chart
 
@@ -110,16 +111,16 @@ class TestIssue79IntegrationFix:
         }
 
         # Call the function
-        charts = create_execution_statistics_chart(mock_data)
+        create_execution_statistics_chart(mock_data)
 
         # Verify that the Figure was created
         if mock_figure.called:
             # Check that add_trace was called
             assert mock_fig_instance.add_trace.called
-            
+
             # Verify that the traces were added with the expected structure
             calls = mock_fig_instance.add_trace.call_args_list
-            
+
             # Should have been called for each status (finished, failed, cancelled)
             # and the y-values should be normalized (starting from 0)
             assert len(calls) >= 0  # At least some traces should be added if data is present
