@@ -13,6 +13,7 @@ from ..config import get_api_base
 from ..utils.stats_utils import (
     fetch_dashboard_stats,
     fetch_execution_stats,
+    fetch_scripts_count,
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
@@ -537,10 +538,15 @@ def register_callbacks(app):
                         logger.info(f"Execution stats keys: {list(execution_stats.keys())}")
 
                     # Format and cache the enhanced statistics with period-specific key
-                    # Get the latest status for scripts count
+                    # Get the latest status for scripts count and add scripts count
                     latest_status = status_data[0] if status_data else {}
+
+                    # Fetch scripts count and add to status data
+                    scripts_count = fetch_scripts_count(token, api_environment)
+                    latest_status["scripts_count"] = scripts_count
+
                     system_overview = create_system_overview(dashboard_stats, latest_status)
-                    summary_cards = create_dashboard_summary_cards(dashboard_stats)
+                    summary_cards = create_dashboard_summary_cards(dashboard_stats, scripts_count)
                     user_map = create_user_geographic_map(user_stats)
                     additional_charts = create_user_statistics_chart(
                         user_stats
@@ -1136,6 +1142,95 @@ def register_callbacks(app):
                         className="mb-4",
                     )
                 )
+
+            # Chart: Completed Execution Status Over Time (finished, failed, cancelled)
+            completed_status_metrics = [
+                {"field": "executions_finished", "name": "Finished", "color": "#28a745"},
+                {"field": "executions_failed", "name": "Failed", "color": "#dc3545"},
+                {"field": "executions_cancelled", "name": "Cancelled", "color": "#6c757d"},
+            ]
+
+            fig_completed_detailed = go.Figure()
+            has_completed_detailed_data = False
+
+            for metric in completed_status_metrics:
+                field = metric["field"]
+                if field in df.columns:
+                    values = df[field].fillna(0)
+                    has_completed_detailed_data = True
+                    logger.info(
+                        f"Adding {field} to completed chart: min={values.min()}, max={values.max()}, unique_values={len(values.unique())}"
+                    )
+
+                    fig_completed_detailed.add_trace(
+                        go.Scatter(
+                            x=df["local_timestamp"],
+                            y=values,
+                            mode="lines+markers",
+                            name=metric["name"],
+                            line={"color": metric["color"], "width": 3},
+                            marker={"size": 6},
+                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                        )
+                    )
+
+            if has_completed_detailed_data:
+                # Calculate y-axis range for completed executions
+                all_completed_values = []
+                for metric in completed_status_metrics:
+                    field = metric["field"]
+                    if field in df.columns:
+                        values = df[field].fillna(0)
+                        all_completed_values.extend(values.tolist())
+
+                if all_completed_values:
+                    min_val = min(all_completed_values)
+                    max_val = max(all_completed_values)
+                    padding = max(1, (max_val - min_val) * 0.1)
+                    y_min = max(0, min_val - padding)
+                    y_max = max_val + padding
+                    logger.info(
+                        f"Completed chart y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
+                    )
+                else:
+                    y_min, y_max = 0, 150
+
+                fig_completed_detailed.update_layout(
+                    title={
+                        "text": "Completed Execution Status Over Time",
+                        "x": 0.5,
+                        "xanchor": "center",
+                    },
+                    xaxis_title=get_chart_axis_label(safe_timezone),
+                    yaxis_title="Number of Completed Executions",
+                    yaxis={"range": [y_min, y_max]},
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.02,
+                        "xanchor": "center",
+                        "x": 0.5,
+                    },
+                    template="plotly_white",
+                    height=400,
+                    hovermode="x unified",
+                    showlegend=True,
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                figure=fig_completed_detailed,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            )
+                        ],
+                        className="mb-4",
+                    )
+                )
                 logger.info(
                     f"Added detailed active execution status chart to charts list. Total charts so far: {len(charts)}"
                 )
@@ -1376,58 +1471,7 @@ def register_callbacks(app):
                         )
                     )
 
-            # Chart 4: Data Rate Analysis (if executions_count changes over time)
-            if "executions_count" in df.columns:
-                df_sorted = df.sort_values("timestamp").reset_index(drop=True)
-                # Convert to numeric before calculating deltas
-                df_sorted["executions_count"] = pd.to_numeric(
-                    df_sorted["executions_count"], errors="coerce"
-                ).fillna(0)
-                df_sorted["execution_rate"] = df_sorted["executions_count"].diff().fillna(0)
-                df_sorted["execution_rate"] = df_sorted["execution_rate"].clip(
-                    lower=0
-                )  # Remove negative values
-
-                if df_sorted["execution_rate"].sum() > 0:
-                    fig4 = go.Figure()
-                    fig4.add_trace(
-                        go.Bar(
-                            x=df_sorted["local_timestamp"],
-                            y=df_sorted["execution_rate"],
-                            name="New Executions",
-                            marker_color="#6f42c1",
-                            hovertemplate="<b>New Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
-                        )
-                    )
-
-                    fig4.update_layout(
-                        title={
-                            "text": "Execution Activity Rate",
-                            "x": 0.5,
-                            "xanchor": "center",
-                        },
-                        xaxis_title=get_chart_axis_label(safe_timezone),
-                        yaxis_title="New Executions per Period",
-                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                        template="plotly_white",
-                        height=350,
-                        hovermode="x unified",
-                        showlegend=False,
-                    )
-                    charts.append(
-                        html.Div(
-                            [
-                                dcc.Graph(
-                                    figure=fig4,
-                                    config={
-                                        "displayModeBar": False,
-                                        "responsive": True,
-                                    },
-                                )
-                            ],
-                            className="mb-4",
-                        )
-                    )
+            # Chart removed: "Execution Activity Rate" was redundant with the new completed execution status chart
 
             if not charts:
                 # If no charts were created, show a general message
