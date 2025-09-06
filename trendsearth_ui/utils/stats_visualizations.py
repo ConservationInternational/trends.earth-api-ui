@@ -1112,15 +1112,16 @@ def create_system_overview(dashboard_stats_data, status_data=None):
         )
 
 
-def create_dashboard_summary_cards(dashboard_stats_data):
+def create_dashboard_summary_cards(dashboard_stats_data, scripts_count=None):
     """
     Create summary cards from dashboard statistics.
 
     Args:
         dashboard_stats_data: Dashboard statistics data from the API or error response structure
+        scripts_count: Total number of scripts (optional)
 
     Returns:
-        html.Div: Summary cards layout
+        html.Div: Dashboard summary cards layout
     """
     import logging
 
@@ -1182,76 +1183,114 @@ def create_dashboard_summary_cards(dashboard_stats_data):
         )  # API uses 'total_jobs' not 'total_executions'
         active_executions = summary.get("jobs_last_day", 0)  # Use recent jobs as proxy for active
         recent_users = summary.get("users_last_day", 0)  # API uses 'users_last_day'
+        total_scripts = scripts_count if scripts_count is not None else 0
 
         return html.Div(
             [
+                # First row: 3 main cards
                 html.Div(
                     [
                         html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.H6("Total Users", className="card-title"),
-                                        html.H4(str(total_users), className="text-primary"),
+                                        html.Div(
+                                            [
+                                                html.H6("Total Users", className="card-title"),
+                                                html.H4(str(total_users), className="text-primary"),
+                                            ],
+                                            className="card-body text-center",
+                                        )
                                     ],
-                                    className="card-body text-center",
-                                )
+                                    className="card",
+                                ),
                             ],
-                            className="card",
+                            className="col-md-4 mb-3",
+                        ),
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.H6("Total Scripts", className="card-title"),
+                                                html.H4(str(total_scripts), className="text-info"),
+                                            ],
+                                            className="card-body text-center",
+                                        )
+                                    ],
+                                    className="card",
+                                ),
+                            ],
+                            className="col-md-4 mb-3",
+                        ),
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.H6("Total Executions", className="card-title"),
+                                                html.H4(
+                                                    str(total_executions), className="text-success"
+                                                ),
+                                            ],
+                                            className="card-body text-center",
+                                        )
+                                    ],
+                                    className="card",
+                                ),
+                            ],
+                            className="col-md-4 mb-3",
                         ),
                     ],
-                    className="col-md-3 mb-3",
+                    className="row",
                 ),
+                # Second row: 2 activity cards (centered)
                 html.Div(
                     [
                         html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.H6("Total Executions", className="card-title"),
-                                        html.H4(str(total_executions), className="text-info"),
+                                        html.Div(
+                                            [
+                                                html.H6(
+                                                    "Active Executions", className="card-title"
+                                                ),
+                                                html.H4(
+                                                    str(active_executions), className="text-warning"
+                                                ),
+                                            ],
+                                            className="card-body text-center",
+                                        )
                                     ],
-                                    className="card-body text-center",
-                                )
+                                    className="card",
+                                ),
                             ],
-                            className="card",
+                            className="col-md-6 mb-3",
                         ),
-                    ],
-                    className="col-md-3 mb-3",
-                ),
-                html.Div(
-                    [
                         html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.H6("Active Executions", className="card-title"),
-                                        html.H4(str(active_executions), className="text-warning"),
+                                        html.Div(
+                                            [
+                                                html.H6("Recent Users", className="card-title"),
+                                                html.H4(
+                                                    str(recent_users), className="text-secondary"
+                                                ),
+                                            ],
+                                            className="card-body text-center",
+                                        )
                                     ],
-                                    className="card-body text-center",
-                                )
+                                    className="card",
+                                ),
                             ],
-                            className="card",
+                            className="col-md-6 mb-3",
                         ),
                     ],
-                    className="col-md-3 mb-3",
-                ),
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H6("Recent Users", className="card-title"),
-                                        html.H4(str(recent_users), className="text-success"),
-                                    ],
-                                    className="card-body text-center",
-                                )
-                            ],
-                            className="card",
-                        ),
-                    ],
-                    className="col-md-3 mb-3",
+                    className="row justify-content-center",
                 ),
             ],
             className="row",

@@ -156,6 +156,62 @@ def fetch_dashboard_stats(
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
+def fetch_scripts_count(token, api_environment="production"):
+    """
+    Fetch total scripts count from the API.
+
+    Args:
+        token: JWT authentication token
+        api_environment: API environment (production/staging)
+
+    Returns:
+        int: Total number of scripts or 0 if error
+    """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # Check cache first
+    cached_data = get_cached_stats_data("scripts_count")
+    if cached_data is not None:
+        logger.info("Scripts count: Returning cached data")
+        return cached_data
+
+    logger.info(f"Scripts count: Fetching data for environment={api_environment}")
+
+    if not token:
+        logger.warning("Scripts count: No token provided")
+        return 0
+
+    headers = {"Authorization": f"Bearer {token}"}
+    # Use pagination to get the total count without downloading all script data
+    params = {"page": 1, "per_page": 1}  # Minimal data transfer
+
+    try:
+        resp = requests.get(
+            f"{get_api_base(api_environment)}/script",
+            headers=headers,
+            params=params,
+            timeout=10,
+        )
+
+        logger.info(f"Scripts count: API response status: {resp.status_code}")
+
+        if resp.status_code == 200:
+            data = resp.json()
+            # Extract total count from paginated response
+            total_count = data.get("total", len(data.get("data", [])))
+            set_cached_stats_data("scripts_count", total_count, ttl=300)  # Cache for 5 minutes
+            logger.info(f"Scripts count: Successfully fetched {total_count} scripts")
+            return total_count
+        else:
+            logger.warning(f"Scripts count: Failed to fetch. Status: {resp.status_code}")
+            return 0
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Scripts count: Request failed: {e}")
+        return 0
+
+
 def fetch_user_stats(token, api_environment="production", period="last_week"):
     """
     Fetch user statistics from the API.

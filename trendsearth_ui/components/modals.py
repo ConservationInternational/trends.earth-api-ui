@@ -197,7 +197,10 @@ def edit_user_modal():
                                             html.Div(
                                                 [
                                                     html.H6("Current Status"),
-                                                    html.Div(id="edit-user-gee-status-display", className="mb-3"),
+                                                    html.Div(
+                                                        id="edit-user-gee-status-display",
+                                                        className="mb-3",
+                                                    ),
                                                 ]
                                             ),
                                         ],
@@ -243,14 +246,14 @@ def edit_user_modal():
                                                 children=dbc.Button(
                                                     [
                                                         html.I(className="fas fa-upload me-2"),
-                                                        "Upload for User"
+                                                        "Upload for User",
                                                     ],
                                                     color="secondary",
                                                     outline=True,
                                                     size="sm",
                                                 ),
                                                 accept=".json",
-                                                max_size=1024*1024,  # 1MB max
+                                                max_size=1024 * 1024,  # 1MB max
                                             ),
                                         ],
                                         width=6,

@@ -1,6 +1,7 @@
 """Helper functions for the status dashboard."""
 
 import logging
+import time
 
 from dash import html
 import requests
@@ -24,22 +25,65 @@ def _create_commit_link(commit_sha, repo_url):
         return commit_sha
 
 
-def _fetch_health_status(url, headers=None, timeout=5):
+def _fetch_health_status(url, headers=None, timeout=10):
     """
-    Fetch health status from a given URL.
+    Fetch health status from a given URL with retry logic.
 
     Returns:
         tuple: (success: bool, data: dict, status_code: int, error_msg: str)
     """
-    try:
-        resp = requests.get(url, headers=headers, timeout=timeout)
-        if resp.status_code == 200:
-            return True, resp.json(), resp.status_code, None
-        else:
-            return False, None, resp.status_code, f"HTTP {resp.status_code}"
-    except Exception as e:
-        logger.warning(f"Could not fetch health status from {url}: {e}")
-        return False, None, 0, "Connection Error"
+    max_retries = 2
+    retry_delay = 1  # seconds
+
+    for attempt in range(max_retries + 1):
+        try:
+            resp = requests.get(url, headers=headers, timeout=timeout)
+            if resp.status_code == 200:
+                return True, resp.json(), resp.status_code, None
+            else:
+                # Don't retry on client errors (4xx), only on server errors or network issues
+                if resp.status_code < 500:
+                    return False, None, resp.status_code, f"HTTP {resp.status_code}"
+                # For 5xx errors, log and potentially retry
+                if attempt < max_retries:
+                    logger.warning(
+                        f"Health check failed with {resp.status_code}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
+                    )
+                    time.sleep(retry_delay)
+                    continue
+                return False, None, resp.status_code, f"HTTP {resp.status_code}"
+        except requests.exceptions.Timeout:
+            if attempt < max_retries:
+                logger.warning(
+                    f"Health check timeout for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
+                )
+                time.sleep(retry_delay)
+                continue
+            logger.warning(f"Health check timed out for {url} after {max_retries + 1} attempts")
+            return False, None, 0, "Timeout"
+        except requests.exceptions.ConnectionError:
+            if attempt < max_retries:
+                logger.warning(
+                    f"Connection error for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
+                )
+                time.sleep(retry_delay)
+                continue
+            logger.warning(f"Connection failed for {url} after {max_retries + 1} attempts")
+            return False, None, 0, "Connection Error"
+        except Exception as e:
+            # For other exceptions, retry if it might be transient
+            if attempt < max_retries and (
+                "timeout" in str(e).lower() or "connection" in str(e).lower()
+            ):
+                logger.warning(
+                    f"Health check failed for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1}): {e}"
+                )
+                time.sleep(retry_delay)
+                continue
+            logger.warning(f"Could not fetch health status from {url}: {e}")
+            return False, None, 0, "Connection Error"
+
+    return False, None, 0, "Connection Error"
 
 
 def _create_service_info(

@@ -552,7 +552,11 @@ def profile_tab_content(user_data):
                                                 [
                                                     dbc.Switch(
                                                         id="profile-email-notifications-switch",
-                                                        value=user_data.get("email_notifications_enabled", True) if user_data else True,
+                                                        value=user_data.get(
+                                                            "email_notifications_enabled", True
+                                                        )
+                                                        if user_data
+                                                        else True,
                                                         className="mb-2",
                                                     ),
                                                     html.Small(
@@ -630,7 +634,10 @@ def profile_tab_content(user_data):
                                                 [
                                                     dbc.CardBody(
                                                         [
-                                                            html.H6("Option 1: Connect Your GEE Account (OAuth)", className="mb-3"),
+                                                            html.H6(
+                                                                "Option 1: Connect Your GEE Account (OAuth)",
+                                                                className="mb-3",
+                                                            ),
                                                             html.P(
                                                                 "Connect your personal Google Earth Engine account using OAuth authentication.",
                                                                 className="text-muted",
@@ -667,7 +674,10 @@ def profile_tab_content(user_data):
                                                 [
                                                     dbc.CardBody(
                                                         [
-                                                            html.H6("Option 2: Upload Service Account Key", className="mb-3"),
+                                                            html.H6(
+                                                                "Option 2: Upload Service Account Key",
+                                                                className="mb-3",
+                                                            ),
                                                             html.P(
                                                                 "Upload a Google Cloud service account JSON key with Earth Engine access.",
                                                                 className="text-muted",
@@ -676,14 +686,16 @@ def profile_tab_content(user_data):
                                                                 id="profile-gee-service-account-upload",
                                                                 children=dbc.Button(
                                                                     [
-                                                                        html.I(className="fas fa-upload me-2"),
-                                                                        "Upload Service Account Key"
+                                                                        html.I(
+                                                                            className="fas fa-upload me-2"
+                                                                        ),
+                                                                        "Upload Service Account Key",
                                                                     ],
                                                                     color="secondary",
                                                                     outline=True,
                                                                 ),
                                                                 accept=".json",
-                                                                max_size=1024*1024,  # 1MB max
+                                                                max_size=1024 * 1024,  # 1MB max
                                                             ),
                                                             dbc.Alert(
                                                                 id="profile-gee-service-account-alert",
