@@ -17,7 +17,6 @@ from ..utils.stats_utils import (
     fetch_user_stats,
 )
 from ..utils.stats_visualizations import (
-    create_dashboard_summary_cards,
     create_execution_statistics_chart,
     create_system_overview,
     create_user_geographic_map,
@@ -546,7 +545,7 @@ def register_callbacks(app):
                     latest_status["scripts_count"] = scripts_count
 
                     system_overview = create_system_overview(dashboard_stats, latest_status)
-                    summary_cards = create_dashboard_summary_cards(dashboard_stats, scripts_count)
+                    # Dashboard summary cards removed as they are duplicative with system overview
                     user_map = create_user_geographic_map(user_stats)
                     additional_charts = create_user_statistics_chart(
                         user_stats
@@ -554,14 +553,14 @@ def register_callbacks(app):
 
                     _stats_cache[cache_key] = (
                         system_overview,
-                        summary_cards,
+                        html.Div(),  # Empty div to replace removed dashboard summary cards
                         user_map,
                         additional_charts,
                     )
 
                     return (
                         system_overview,
-                        summary_cards,
+                        html.Div(),  # Empty div to replace removed dashboard summary cards
                         user_map,
                         additional_charts,
                     )
@@ -748,7 +747,7 @@ def register_callbacks(app):
                         y=df["executions_active"],
                         mode="lines+markers",
                         name="Active Executions",
-                        line={"color": "#fd7e14", "width": 3},
+                        line={"color": "#ff6f00", "width": 3},
                         fill="tonexty",
                         hovertemplate="<b>Active</b><br>%{x}<br>Count: %{y}<extra></extra>",
                     )
@@ -878,7 +877,7 @@ def register_callbacks(app):
                             y=window_stats["success_rate"],
                             mode="lines+markers",
                             name="Success Rate",
-                            line={"color": "#20c997", "width": 3},
+                            line={"color": "#00e676", "width": 3},
                             marker={"size": 8},
                             customdata=window_stats["total_completions"],
                             hovertemplate="<b>Success Rate (1h window)</b><br>%{x}<br>Rate: %{y:.2f}%<br>Total Completions: %{customdata}<extra></extra>",
@@ -989,7 +988,7 @@ def register_callbacks(app):
                             x=hourly_throughput["local_window_start"],
                             y=hourly_throughput["throughput"],
                             name="Executions Completed",
-                            marker_color="#6f42c1",
+                            marker_color="#3f51b5",
                             hovertemplate="<b>Hourly Throughput</b><br>%{x}<br>Completions: %{y}<extra></extra>",
                         )
                     )
@@ -1022,28 +1021,121 @@ def register_callbacks(app):
                         f"Added hourly throughput chart to charts list. Total charts so far: {len(charts)}"
                     )
 
-            # Secondary Charts: Supporting Metrics
+            # Primary Charts: Most Important Metrics First
 
-            # Add section header for detailed analytics
+            # Add section header for primary analytics
             charts.append(
                 html.Div(
                     [
                         html.Hr(className="my-4"),
-                        html.H6("Detailed Analytics", className="text-center mb-4 text-muted"),
+                        html.H6("System Status Trends", className="text-center mb-4 text-muted"),
                     ],
                     className="mb-3",
                 )
             )
 
-            # Detailed Chart 1: Active Execution Status (Running, Ready, Pending)
-            # Colors match the execution table row text colors for consistency
+            # Chart 1: Completed Execution Status Over Time (finished, failed, cancelled)
+            # Updated to use brighter colors for better visibility - This should be first per issue #4
+            completed_status_metrics = [
+                {"field": "executions_finished", "name": "Finished", "color": "#43a047"},
+                {"field": "executions_failed", "name": "Failed", "color": "#e53935"},
+                {"field": "executions_cancelled", "name": "Cancelled", "color": "#8e24aa"},
+            ]
+
+            fig_completed_detailed = go.Figure()
+            has_completed_detailed_data = False
+
+            for metric in completed_status_metrics:
+                field = metric["field"]
+                if field in df.columns:
+                    values = df[field].fillna(0)
+                    has_completed_detailed_data = True
+                    logger.info(
+                        f"Adding {field} to completed chart: min={values.min()}, max={values.max()}, unique_values={len(values.unique())}"
+                    )
+
+                    fig_completed_detailed.add_trace(
+                        go.Scatter(
+                            x=df["local_timestamp"],
+                            y=values,
+                            mode="lines+markers",
+                            name=metric["name"],
+                            line={"color": metric["color"], "width": 3},
+                            marker={"size": 6},
+                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                        )
+                    )
+
+            if has_completed_detailed_data:
+                # Calculate y-axis range for completed executions
+                all_completed_values = []
+                for metric in completed_status_metrics:
+                    field = metric["field"]
+                    if field in df.columns:
+                        values = df[field].fillna(0)
+                        all_completed_values.extend(values.tolist())
+
+                if all_completed_values:
+                    min_val = min(all_completed_values)
+                    max_val = max(all_completed_values)
+                    padding = max(1, (max_val - min_val) * 0.1)
+                    y_min = max(0, min_val - padding)
+                    y_max = max_val + padding
+                    logger.info(
+                        f"Completed chart y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
+                    )
+                else:
+                    y_min, y_max = 0, 150
+
+                fig_completed_detailed.update_layout(
+                    title={
+                        "text": "Completed Execution Status Over Time",
+                        "x": 0.5,
+                        "xanchor": "center",
+                    },
+                    xaxis_title=get_chart_axis_label(safe_timezone),
+                    yaxis_title="Number of Completed Executions",
+                    yaxis={"range": [y_min, y_max]},
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.02,
+                        "xanchor": "center",
+                        "x": 0.5,
+                    },
+                    template="plotly_white",
+                    height=400,
+                    hovermode="x unified",
+                    showlegend=True,
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                figure=fig_completed_detailed,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            )
+                        ],
+                        className="mb-4",
+                    )
+                )
+                logger.info(
+                    f"Added completed execution status chart as first chart. Total charts so far: {len(charts)}"
+                )
+
+            # Chart 2: Active Execution Status (Running, Ready, Pending)
+            # Updated to use brighter colors for better visibility
             active_status_metrics = [
-                {"field": "executions_running", "name": "Running", "color": "#084298"},
-                {"field": "executions_ready", "name": "Ready", "color": "#664D03"},
+                {"field": "executions_running", "name": "Running", "color": "#1e88e5"},
+                {"field": "executions_ready", "name": "Ready", "color": "#ffa726"},
                 {
                     "field": "executions_pending",
                     "name": "Pending",
-                    "color": "#495057",
+                    "color": "#8e24aa",
                 },  # Preparing for API update
             ]
 
@@ -1144,241 +1236,18 @@ def register_callbacks(app):
                     )
                 )
 
-            # Chart: Completed Execution Status Over Time (finished, failed, cancelled)
-            # Colors match the execution table row text colors for consistency
-            completed_status_metrics = [
-                {"field": "executions_finished", "name": "Finished", "color": "#0F5132"},
-                {"field": "executions_failed", "name": "Failed", "color": "#721C24"},
-                {"field": "executions_cancelled", "name": "Cancelled", "color": "#495057"},
-            ]
-
-            fig_completed_detailed = go.Figure()
-            has_completed_detailed_data = False
-
-            for metric in completed_status_metrics:
-                field = metric["field"]
-                if field in df.columns:
-                    values = df[field].fillna(0)
-                    has_completed_detailed_data = True
-                    logger.info(
-                        f"Adding {field} to completed chart: min={values.min()}, max={values.max()}, unique_values={len(values.unique())}"
-                    )
-
-                    fig_completed_detailed.add_trace(
-                        go.Scatter(
-                            x=df["local_timestamp"],
-                            y=values,
-                            mode="lines+markers",
-                            name=metric["name"],
-                            line={"color": metric["color"], "width": 3},
-                            marker={"size": 6},
-                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
-                        )
-                    )
-
-            if has_completed_detailed_data:
-                # Calculate y-axis range for completed executions
-                all_completed_values = []
-                for metric in completed_status_metrics:
-                    field = metric["field"]
-                    if field in df.columns:
-                        values = df[field].fillna(0)
-                        all_completed_values.extend(values.tolist())
-
-                if all_completed_values:
-                    min_val = min(all_completed_values)
-                    max_val = max(all_completed_values)
-                    padding = max(1, (max_val - min_val) * 0.1)
-                    y_min = max(0, min_val - padding)
-                    y_max = max_val + padding
-                    logger.info(
-                        f"Completed chart y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
-                    )
-                else:
-                    y_min, y_max = 0, 150
-
-                fig_completed_detailed.update_layout(
-                    title={
-                        "text": "Completed Execution Status Over Time",
-                        "x": 0.5,
-                        "xanchor": "center",
-                    },
-                    xaxis_title=get_chart_axis_label(safe_timezone),
-                    yaxis_title="Number of Completed Executions",
-                    yaxis={"range": [y_min, y_max]},
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                    legend={
-                        "orientation": "h",
-                        "yanchor": "bottom",
-                        "y": 1.02,
-                        "xanchor": "center",
-                        "x": 0.5,
-                    },
-                    template="plotly_white",
-                    height=400,
-                    hovermode="x unified",
-                    showlegend=True,
+            # Add section header for supporting metrics
+            charts.append(
+                html.Div(
+                    [
+                        html.Hr(className="my-4"),
+                        html.H6("Supporting Metrics", className="text-center mb-4 text-muted"),
+                    ],
+                    className="mb-3",
                 )
-                charts.append(
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                figure=fig_completed_detailed,
-                                config={
-                                    "displayModeBar": False,
-                                    "responsive": True,
-                                },
-                            )
-                        ],
-                        className="mb-4",
-                    )
-                )
-                logger.info(
-                    f"Added detailed active execution status chart to charts list. Total charts so far: {len(charts)}"
-                )
+            )
 
-            # Detailed Chart 2: Completed Execution Status Rate (Show as bar chart for better visibility)
-            completed_status_metrics = [
-                {"field": "executions_finished", "name": "Finished", "color": "#28a745"},
-                {"field": "executions_failed", "name": "Failed", "color": "#dc3545"},
-                {"field": "executions_cancelled", "name": "Cancelled", "color": "#6c757d"},
-            ]
-
-            fig_completed_detailed = go.Figure()
-            has_completed_detailed_data = False
-
-            # Calculate deltas to show the rate of change rather than cumulative totals
-            df_sorted = df.sort_values("timestamp").reset_index(drop=True)
-
-            for metric in completed_status_metrics:
-                field = metric["field"]
-                if field in df_sorted.columns:
-                    # Calculate the delta (difference) between consecutive points
-                    values = pd.to_numeric(df_sorted[field], errors="coerce").fillna(0)
-                    delta_values = values.diff().fillna(0).clip(lower=0)  # Remove negative values
-
-                    # Ensure delta_values is numeric
-                    delta_values = pd.to_numeric(delta_values, errors="coerce").fillna(0)
-
-                    logger.info(
-                        f"Delta values for {field}: min={delta_values.min()}, max={delta_values.max()}, sum={delta_values.sum()}"
-                    )
-                    logger.info(
-                        f"Non-zero delta count for {field}: {(delta_values > 0).sum()} out of {len(delta_values)}"
-                    )
-
-                    # Show as bars instead of lines for better visibility of small values
-                    if len(delta_values) > 0 and not delta_values.isna().all():
-                        try:
-                            max_delta = float(delta_values.max())
-                            if max_delta > 0:
-                                has_completed_detailed_data = True
-
-                                # For sparse data (mostly zeros), use scatter plot instead of bars
-                                nonzero_data = df_sorted[delta_values > 0].copy()
-                                nonzero_deltas = delta_values[delta_values > 0]
-
-                                if len(nonzero_data) > 0:
-                                    if (
-                                        len(nonzero_data) < len(df_sorted) * 0.1
-                                    ):  # Less than 10% non-zero
-                                        # Use scatter plot for very sparse data
-                                        fig_completed_detailed.add_trace(
-                                            go.Scatter(
-                                                x=nonzero_data["local_timestamp"],
-                                                y=nonzero_deltas,
-                                                mode="markers",
-                                                name=f"{metric['name']} (New)",
-                                                marker={"color": metric["color"], "size": 10},
-                                                hovertemplate=f"<b>New {metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
-                                            )
-                                        )
-                                    else:
-                                        # Use bar chart for denser data
-                                        fig_completed_detailed.add_trace(
-                                            go.Bar(
-                                                x=df_sorted["local_timestamp"],
-                                                y=delta_values,
-                                                name=f"{metric['name']} (New)",
-                                                marker_color=metric["color"],
-                                                hovertemplate=f"<b>New {metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
-                                                width=300000,  # 5 minutes in milliseconds
-                                            )
-                                        )
-                                    logger.info(
-                                        f"Added {field} chart with max value {max_delta}, non-zero points: {len(nonzero_data)}"
-                                    )
-                        except Exception as e:
-                            logger.warning(f"Error processing {field}: {e}")
-                            continue
-
-            if has_completed_detailed_data:
-                fig_completed_detailed.update_layout(
-                    title={
-                        "text": "Completed Executions Rate Over Time",
-                        "x": 0.5,
-                        "xanchor": "center",
-                    },
-                    xaxis_title=get_chart_axis_label(safe_timezone),
-                    yaxis_title="New Completions per Time Period",
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                    legend={
-                        "orientation": "h",
-                        "yanchor": "bottom",
-                        "y": 1.02,
-                        "xanchor": "center",
-                        "x": 0.5,
-                    },
-                    template="plotly_white",
-                    height=400,
-                    hovermode="x unified",
-                    showlegend=True,
-                )
-                charts.append(
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                figure=fig_completed_detailed,
-                                config={
-                                    "displayModeBar": False,
-                                    "responsive": True,
-                                },
-                            )
-                        ],
-                        className="mb-4",
-                    )
-                )
-                logger.info(
-                    f"Added detailed completed execution rate chart to charts list. Total charts so far: {len(charts)}"
-                )
-            else:
-                # Show informative message about execution status
-                logger.info("No completed execution data found - showing info message")
-                charts.append(
-                    html.Div(
-                        [
-                            html.H5(
-                                "Completed Execution Tracking",
-                                className="text-center text-muted mb-3",
-                            ),
-                            html.Div(
-                                [
-                                    html.I(className="fas fa-info-circle fa-2x text-info mb-3"),
-                                    html.P(
-                                        "No completed executions detected during this period.",
-                                        className="text-muted mb-2",
-                                    ),
-                                    html.Small(
-                                        "This may indicate no new executions were completed or the tracking period is too short.",
-                                        className="text-muted",
-                                    ),
-                                ],
-                                className="text-center py-4",
-                            ),
-                        ],
-                        className="border rounded p-3 mb-4 bg-light",
-                    )
-                )
+            # Chart removed: "Completed Executions Rate Over Time" was removed per issue #5 (duplicative)
 
             # Chart 1: Total Executions Over Time (if available)
             if "executions_count" in df.columns:
@@ -1392,7 +1261,7 @@ def register_callbacks(app):
                             y=values,
                             mode="lines+markers",
                             name="Total Executions",
-                            line={"color": "#007bff", "width": 3},
+                            line={"color": "#2196f3", "width": 3},
                             marker={"size": 4},
                             hovertemplate="<b>Total Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
                         )
@@ -1438,7 +1307,7 @@ def register_callbacks(app):
                             y=scripts_values,
                             mode="lines+markers",
                             name="Scripts",
-                            line={"color": "#28a745", "width": 2},
+                            line={"color": "#4caf50", "width": 2},
                             marker={"size": 4},
                             hovertemplate="<b>Scripts</b><br>%{x}<br>Count: %{y}<extra></extra>",
                         )

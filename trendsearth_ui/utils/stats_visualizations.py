@@ -242,7 +242,7 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                 locations=iso_countries,
                 z=iso_counts,
                 locationmode="ISO-3",
-                colorscale="Blues",
+                colorscale="Viridis",
                 text=country_labels,
                 hovertemplate="<b>%{text}</b><extra></extra>",
                 colorbar={
@@ -459,7 +459,7 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                             orientation="h",
                             hovertemplate="<b>%{y}</b><br>Avg Duration: %{x:.1f} minutes<br>Success Rate: %{customdata}%<extra></extra>",
                             customdata=success_rates,
-                            marker_color="lightcoral",
+                            marker_color="#ff7043",
                         )
                     ]
                 )
@@ -499,7 +499,7 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                         marker={
                             "size": [max(8, min(20, count / 2)) for count in execution_counts],
                             "color": success_rates,
-                            "colorscale": "RdYlGn",
+                            "colorscale": "Plasma",
                             "showscale": True,
                             "colorbar": {
                                 "title": {"text": "Success Rate (%)", "side": "right"},
@@ -762,7 +762,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
                             y=df["new_users"],
                             mode="lines+markers",
                             name="New Users",
-                            line={"color": "#28a745", "width": 2},
+                            line={"color": "#4caf50", "width": 2},
                             fill="tonexty" if len(df) > 1 else None,
                             hovertemplate="<b>New Users</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
                         )
@@ -776,7 +776,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
                             y=df["total_users"],
                             mode="lines+markers",
                             name="Total Users",
-                            line={"color": "#007bff", "width": 2},
+                            line={"color": "#2196f3", "width": 2},
                             yaxis="y2",
                             hovertemplate="<b>Total Users</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
                         )
