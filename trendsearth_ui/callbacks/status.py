@@ -1144,10 +1144,11 @@ def register_callbacks(app):
                 )
 
             # Chart: Completed Execution Status Over Time (finished, failed, cancelled)
+            # Colors match the execution table row text colors for consistency
             completed_status_metrics = [
-                {"field": "executions_finished", "name": "Finished", "color": "#28a745"},
-                {"field": "executions_failed", "name": "Failed", "color": "#dc3545"},
-                {"field": "executions_cancelled", "name": "Cancelled", "color": "#6c757d"},
+                {"field": "executions_finished", "name": "Finished", "color": "#0F5132"},
+                {"field": "executions_failed", "name": "Failed", "color": "#721C24"},
+                {"field": "executions_cancelled", "name": "Cancelled", "color": "#495057"},
             ]
 
             fig_completed_detailed = go.Figure()
