@@ -536,8 +536,8 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                     )
                 )
 
-        # 2. Time Series Trends (instead of trends)
-        # API has 'time_series' instead of 'trends'
+        # 2. Time Series Trends - enhanced to handle group_by data
+        # API returns 'time_series' data when group_by parameter is used
         trends_data = data.get("time_series", [])
         if trends_data:
             # Convert to DataFrame for easier handling
@@ -546,10 +546,20 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
             if not df.empty and "date" in df.columns:
                 fig_trend = go.Figure()
 
-                # Add traces for different execution statuses
-                for status in ["FINISHED", "FAILED", "CANCELLED"]:
-                    if status.lower() in df.columns:
-                        values = df[status.lower()]
+                # Enhanced color scheme for better visibility
+                status_colors = {
+                    "FINISHED": "#43a047",  # Green
+                    "FAILED": "#e53935",  # Red
+                    "CANCELLED": "#8e24aa",  # Purple
+                    "RUNNING": "#1e88e5",  # Blue
+                    "PENDING": "#ffa726",  # Orange
+                }
+
+                # Add traces for different execution statuses with enhanced styling
+                for status in ["FINISHED", "FAILED", "CANCELLED", "RUNNING", "PENDING"]:
+                    status_col = status.lower()
+                    if status_col in df.columns:
+                        values = df[status_col]
 
                         # Normalize to zero baseline by subtracting the initial value from each series
                         # This makes each line start from zero and show only changes from the starting point
@@ -565,18 +575,27 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                                 y=normalized_values,
                                 mode="lines+markers",
                                 name=status.title(),
-                                line={"width": 2},
+                                line={"color": status_colors.get(status, "#666666"), "width": 3},
+                                marker={"size": 6},
                                 hovertemplate=f"<b>{status.title()}</b><br>%{{x}}<br>Change from start: %{{y}}<extra></extra>",
                             )
                         )
 
                 fig_trend.update_layout(
-                    title=f"Execution Trends (Changes from Start){title_suffix}",
-                    xaxis_title="Date",
+                    title=f"Execution Status Trends (Changes from Start){title_suffix}",
+                    xaxis_title="Time Period",
                     yaxis_title="Change in Executions (from start of period)",
-                    height=300,
+                    height=400,
                     hovermode="x unified",
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    legend={
+                        "orientation": "h",
+                        "yanchor": "bottom",
+                        "y": 1.02,
+                        "xanchor": "center",
+                        "x": 0.5,
+                    },
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    template="plotly_white",
                 )
 
                 charts.append(
@@ -756,47 +775,68 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
 
         charts = []
 
-        # 1. User Registration Trends
-        # API uses 'registration_trends' instead of 'trends'
+        # 1. User Registration Trends - enhanced to handle group_by data
+        # Look for time series data first (when group_by parameter is used)
+        time_series_data = data.get("time_series", [])
         trends_data = data.get("registration_trends", [])
-        if trends_data:
-            df = pd.DataFrame(trends_data)
+
+        # Prefer time_series data if available (more detailed from group_by)
+        chart_data = time_series_data if time_series_data else trends_data
+        chart_title_prefix = (
+            "User Activity Time Series" if time_series_data else "User Registration Trends"
+        )
+
+        if chart_data:
+            df = pd.DataFrame(chart_data)
 
             if not df.empty and "date" in df.columns:
                 fig_users = go.Figure()
 
-                # Add user registration trend
-                if "new_users" in df.columns:
-                    fig_users.add_trace(
-                        go.Scatter(
-                            x=df["date"],
-                            y=df["new_users"],
-                            mode="lines+markers",
-                            name="New Users",
-                            line={"color": "#4caf50", "width": 2},
-                            fill="tonexty" if len(df) > 1 else None,
-                            hovertemplate="<b>New Users</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
-                        )
-                    )
+                # Enhanced styling and multiple metrics
+                user_metrics = [
+                    {
+                        "col": "new_users",
+                        "name": "New Users",
+                        "color": "#4caf50",
+                        "fill": "tonexty",
+                    },
+                    {
+                        "col": "active_users",
+                        "name": "Active Users",
+                        "color": "#2196f3",
+                        "fill": None,
+                    },
+                    {
+                        "col": "total_users",
+                        "name": "Total Users",
+                        "color": "#ff9800",
+                        "fill": None,
+                        "yaxis": "y2",
+                    },
+                ]
 
-                # Add cumulative users if available
-                if "total_users" in df.columns:
-                    fig_users.add_trace(
-                        go.Scatter(
-                            x=df["date"],
-                            y=df["total_users"],
-                            mode="lines+markers",
-                            name="Total Users",
-                            line={"color": "#2196f3", "width": 2},
-                            yaxis="y2",
-                            hovertemplate="<b>Total Users</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
+                # Add available user metrics
+                for metric in user_metrics:
+                    col_name = metric["col"]
+                    if col_name in df.columns:
+                        fig_users.add_trace(
+                            go.Scatter(
+                                x=df["date"],
+                                y=df[col_name],
+                                mode="lines+markers",
+                                name=metric["name"],
+                                line={"color": metric["color"], "width": 3},
+                                marker={"size": 6},
+                                fill=metric.get("fill"),
+                                yaxis=metric.get("yaxis", "y"),
+                                hovertemplate=f"<b>{metric['name']}</b><br>Date: %{{x}}<br>Count: %{{y}}<extra></extra>",
+                            )
                         )
-                    )
 
                 fig_users.update_layout(
-                    title=f"User Registration Trends{title_suffix}",
-                    xaxis_title="Date",
-                    yaxis_title="New Users",
+                    title=f"{chart_title_prefix}{title_suffix}",
+                    xaxis_title="Time Period",
+                    yaxis_title="User Count",
                     yaxis2={
                         "title": "Total Users",
                         "overlaying": "y",

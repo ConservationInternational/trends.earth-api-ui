@@ -15,6 +15,7 @@ from ..utils.stats_utils import (
     fetch_execution_stats,
     fetch_scripts_count,
     fetch_user_stats,
+    get_optimal_grouping_for_period,
 )
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
@@ -502,8 +503,17 @@ def register_callbacks(app):
                         api_period,
                         include_sections=["summary", "trends", "geographic", "tasks"],
                     )
-                    user_stats = fetch_user_stats(token, api_environment, api_period)
-                    execution_stats = fetch_execution_stats(token, api_environment, api_period)
+
+                    # Get time series data for better visualizations by using group_by parameter
+                    # Use optimal grouping based on the period for more meaningful data
+                    user_group_by, execution_group_by = get_optimal_grouping_for_period(api_period)
+
+                    user_stats = fetch_user_stats(
+                        token, api_environment, api_period, group_by=user_group_by
+                    )
+                    execution_stats = fetch_execution_stats(
+                        token, api_environment, api_period, group_by=execution_group_by
+                    )
 
                     # Debug logging to see what we actually get
                     import logging
