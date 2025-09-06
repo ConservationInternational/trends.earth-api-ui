@@ -604,12 +604,21 @@ def register_callbacks(app):
         time_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment, active_tab
     ):
         """Update the status charts for the selected time range."""
+        # Debug: Log the received time_tab parameter
+        logger.info(
+            f"🕒 update_status_charts called with time_tab='{time_tab}', active_tab='{active_tab}'"
+        )
+
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
+            logger.info("❌ update_status_charts: No token, returning no_update")
             return no_update
 
         # Only update when status tab is active to avoid unnecessary API calls
         if active_tab != "status":
+            logger.info(
+                f"❌ update_status_charts: Wrong tab '{active_tab}', expected 'status', returning no_update"
+            )
             return no_update
 
         headers = {"Authorization": f"Bearer {token}"}
@@ -626,9 +635,18 @@ def register_callbacks(app):
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
 
+        # Debug: Log the calculated time range
+        days_diff = (end_time - start_time).days
+        logger.info(
+            f"📅 Calculated time range: {days_diff} days (from {start_time.strftime('%Y-%m-%d %H:%M')} to {end_time.strftime('%Y-%m-%d %H:%M')})"
+        )
+
         # Format for API query
         start_iso = start_time.isoformat()
         end_iso = end_time.isoformat()
+
+        # Debug: Log API parameters
+        logger.info(f"🌐 API query params: start_date={start_iso}, end_date={end_iso}")
 
         try:
             resp = requests.get(
@@ -646,9 +664,36 @@ def register_callbacks(app):
             status_data = resp.json().get("data", [])
 
             if not status_data:
+                # Get time period name for user feedback
+                time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
+                    time_tab, "selected period"
+                )
+
+                logger.warning(
+                    f"❌ No status data received for time period '{time_tab}' ({time_period_name})"
+                )
+
                 return html.Div(
-                    "No status data available for the selected period.",
-                    className="text-center text-muted p-4",
+                    [
+                        html.Div(
+                            [
+                                html.I(
+                                    className="fas fa-exclamation-triangle fa-2x text-warning mb-3"
+                                ),
+                                html.H5("No Status Data Available", className="text-muted mb-3"),
+                                html.P(
+                                    f"No status logs found for the last {time_period_name}.",
+                                    className="text-muted mb-2",
+                                ),
+                                html.Small(
+                                    f"API request: {start_iso} to {end_iso}",
+                                    className="text-muted",
+                                ),
+                            ],
+                            className="text-center py-5",
+                        ),
+                    ],
+                    className="border rounded p-4 bg-light",
                 )
 
             # Convert to DataFrame for easier manipulation
@@ -665,10 +710,23 @@ def register_callbacks(app):
             df["local_timestamp"] = pd.to_datetime(local_timestamps)
 
             # Debug: Log what data we received
-            logger.info(f"Status data received: {len(status_data)} records")
+            logger.info(
+                f"📊 Status data received: {len(status_data)} records for time_tab='{time_tab}'"
+            )
             if status_data:
-                logger.info(f"Available columns: {list(df.columns)}")
-                logger.info(f"Sample data (first record): {status_data[0]}")
+                # Log time span of received data
+                timestamps = [
+                    record.get("timestamp") for record in status_data if record.get("timestamp")
+                ]
+                if timestamps:
+                    first_timestamp = min(timestamps)
+                    last_timestamp = max(timestamps)
+                    logger.info(f"📅 Data time span: {first_timestamp} to {last_timestamp}")
+                else:
+                    logger.warning("⚠️ No timestamps found in status data")
+
+                logger.info(f"🗂️ Available columns: {list(df.columns)}")
+                logger.info(f"📝 Sample data (first record): {status_data[0]}")
                 # Check specific fields we need
                 first_record = status_data[0]
                 execution_fields = [
@@ -1366,7 +1424,9 @@ def register_callbacks(app):
                     time_tab, "selected period"
                 )
 
-                logger.info("No charts were created - showing fallback message")
+                logger.warning(
+                    f"⚠️ No charts were created for time_tab='{time_tab}', showing fallback message"
+                )
                 return html.Div(
                     [
                         html.Div(
@@ -1383,7 +1443,7 @@ def register_callbacks(app):
                                     className="text-muted mb-2",
                                 ),
                                 html.Small(
-                                    "This could indicate that the system monitoring is not active or no status changes occurred during this period.",
+                                    f"Requested time period: {time_tab} | API query: {start_iso} to {end_iso}",
                                     className="text-muted",
                                 ),
                             ],
@@ -1393,7 +1453,7 @@ def register_callbacks(app):
                     className="border rounded p-4 bg-light",
                 )
 
-            logger.info(f"Returning {len(charts)} charts to display")
+            logger.info(f"✅ Returning {len(charts)} charts to display for time_tab='{time_tab}'")
             return html.Div(charts)
 
         except requests.exceptions.RequestException as e:
@@ -1418,14 +1478,25 @@ def register_callbacks(app):
     def switch_status_time_tabs(_day_clicks, _week_clicks, _month_clicks):
         """Update the visual style of the active status tab and store the active tab."""
         ctx = callback_context
+
+        # Debug: Log the callback trigger
+        logger.info(f"🔄 switch_status_time_tabs called, triggered: {ctx.triggered}")
+
         if not ctx.triggered:
+            logger.info("📅 switch_status_time_tabs: No trigger, returning default (day)")
             return "nav-link active", "nav-link", "nav-link", "day"
 
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        logger.info(f"🔘 switch_status_time_tabs: button_id='{button_id}'")
+
         if button_id == "status-tab-week":
+            logger.info("📅 switch_status_time_tabs: Setting week tab active, returning 'week'")
             return "nav-link", "nav-link active", "nav-link", "week"
         if button_id == "status-tab-month":
+            logger.info("📅 switch_status_time_tabs: Setting month tab active, returning 'month'")
             return "nav-link", "nav-link", "nav-link active", "month"
+
+        logger.info("📅 switch_status_time_tabs: Setting day tab active, returning 'day'")
         return "nav-link active", "nav-link", "nav-link", "day"
 
     @app.callback(
