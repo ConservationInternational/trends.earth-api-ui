@@ -549,20 +549,31 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                 # Add traces for different execution statuses
                 for status in ["FINISHED", "FAILED", "CANCELLED"]:
                     if status.lower() in df.columns:
+                        values = df[status.lower()]
+
+                        # Normalize to zero baseline by subtracting the initial value from each series
+                        # This makes each line start from zero and show only changes from the starting point
+                        if len(values) > 0:
+                            initial_value = values.iloc[0]
+                            normalized_values = values - initial_value
+                        else:
+                            normalized_values = values
+
                         fig_trend.add_trace(
                             go.Scatter(
                                 x=df["date"],
-                                y=df[status.lower()],
+                                y=normalized_values,
                                 mode="lines+markers",
                                 name=status.title(),
                                 line={"width": 2},
+                                hovertemplate=f"<b>{status.title()}</b><br>%{{x}}<br>Change from start: %{{y}}<extra></extra>",
                             )
                         )
 
                 fig_trend.update_layout(
-                    title=f"Execution Trends{title_suffix}",
+                    title=f"Execution Trends (Changes from Start){title_suffix}",
                     xaxis_title="Date",
-                    yaxis_title="Number of Executions",
+                    yaxis_title="Change in Executions (from start of period)",
                     height=300,
                     hovermode="x unified",
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},

@@ -1050,51 +1050,67 @@ def register_callbacks(app):
                 if field in df.columns:
                     values = df[field].fillna(0)
                     has_completed_detailed_data = True
+
+                    # Normalize to zero baseline by subtracting the initial value from each series
+                    # This makes each line start from zero and show only changes from the starting point
+                    if len(values) > 0:
+                        initial_value = values.iloc[0]
+                        normalized_values = values - initial_value
+                    else:
+                        normalized_values = values
+
                     logger.info(
-                        f"Adding {field} to completed chart: min={values.min()}, max={values.max()}, unique_values={len(values.unique())}"
+                        f"Adding {field} to completed chart (normalized): original min={values.min()}, max={values.max()}, normalized min={normalized_values.min()}, max={normalized_values.max()}, unique_values={len(values.unique())}"
                     )
 
                     fig_completed_detailed.add_trace(
                         go.Scatter(
                             x=df["local_timestamp"],
-                            y=values,
+                            y=normalized_values,
                             mode="lines+markers",
                             name=metric["name"],
                             line={"color": metric["color"], "width": 3},
                             marker={"size": 6},
-                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                            hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Change from start: %{{y}}<extra></extra>",
                         )
                     )
 
             if has_completed_detailed_data:
-                # Calculate y-axis range for completed executions
-                all_completed_values = []
+                # Calculate y-axis range for completed executions (normalized to start from 0)
+                all_completed_normalized_values = []
                 for metric in completed_status_metrics:
                     field = metric["field"]
                     if field in df.columns:
                         values = df[field].fillna(0)
-                        all_completed_values.extend(values.tolist())
+                        if len(values) > 0:
+                            initial_value = values.iloc[0]
+                            normalized_values = values - initial_value
+                        else:
+                            normalized_values = values
+                        all_completed_normalized_values.extend(normalized_values.tolist())
 
-                if all_completed_values:
-                    min_val = min(all_completed_values)
-                    max_val = max(all_completed_values)
-                    padding = max(1, (max_val - min_val) * 0.1)
-                    y_min = max(0, min_val - padding)
+                if all_completed_normalized_values:
+                    min_val = min(all_completed_normalized_values)
+                    max_val = max(all_completed_normalized_values)
+                    # For normalized data, we know it starts at 0, so include 0 in the range
+                    min_val = min(0, min_val)  # Ensure 0 is always visible
+                    padding = max(1, abs(max_val - min_val) * 0.1)
+                    y_min = min_val - padding
                     y_max = max_val + padding
                     logger.info(
-                        f"Completed chart y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
+                        f"Completed chart (normalized) y-axis range: {y_min} to {y_max} (data range: {min_val} to {max_val})"
                     )
                 else:
-                    y_min, y_max = 0, 150
+                    y_min, y_max = -10, 10  # Default range for normalized data
 
                 fig_completed_detailed.update_layout(
                     title={
-                        "text": "Completed Execution Status Over Time",
+                        "text": "Completed Execution Status Over Time (Changes from Start)",
                         "x": 0.5,
                         "xanchor": "center",
                     },
                     xaxis_title=get_chart_axis_label(safe_timezone),
-                    yaxis_title="Number of Completed Executions",
+                    yaxis_title="Change in Completed Executions (from start of period)",
                     yaxis={"range": [y_min, y_max]},
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                     legend={
