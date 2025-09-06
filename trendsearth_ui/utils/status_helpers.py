@@ -72,7 +72,9 @@ def _fetch_health_status(url, headers=None, timeout=10):
             return False, None, 0, "Connection Error"
         except Exception as e:
             # For other exceptions, retry if it might be transient
-            if attempt < max_retries and ("timeout" in str(e).lower() or "connection" in str(e).lower()):
+            if attempt < max_retries and (
+                "timeout" in str(e).lower() or "connection" in str(e).lower()
+            ):
                 logger.warning(
                     f"Health check failed for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1}): {e}"
                 )

@@ -1,7 +1,8 @@
 """Test new status page features."""
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from trendsearth_ui.utils.stats_utils import fetch_scripts_count
 from trendsearth_ui.utils.stats_visualizations import create_dashboard_summary_cards
@@ -14,6 +15,7 @@ class TestScriptsCountFunctionality:
     def setup_method(self):
         """Clear cache before each test."""
         from trendsearth_ui.utils.stats_utils import _stats_cache
+
         _stats_cache.clear()
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -90,16 +92,16 @@ class TestDashboardSummaryCardsWithScripts:
 
         # Verify it's an HTML div
         assert hasattr(result, "children")
-        
+
         # Convert to string to check content
         result_str = str(result)
-        
+
         # Should contain all the expected values
         assert "100" in result_str  # total users
-        assert "42" in result_str   # scripts count
+        assert "42" in result_str  # scripts count
         assert "500" in result_str  # total executions
-        assert "25" in result_str   # active executions
-        assert "5" in result_str    # recent users
+        assert "25" in result_str  # active executions
+        assert "5" in result_str  # recent users
 
     def test_create_dashboard_summary_cards_no_scripts_count(self):
         """Test dashboard summary cards without scripts count."""
@@ -116,9 +118,9 @@ class TestDashboardSummaryCardsWithScripts:
 
         result = create_dashboard_summary_cards(mock_dashboard_data, scripts_count=None)
         result_str = str(result)
-        
+
         # Should default to 0 for scripts
-        assert "0" in result_str   # scripts count should be 0
+        assert "0" in result_str  # scripts count should be 0
 
 
 class TestHealthEndpointRetryLogic:
@@ -129,6 +131,7 @@ class TestHealthEndpointRetryLogic:
     def test_fetch_health_status_retry_on_timeout(self, mock_get, mock_sleep):
         """Test that health status retries on timeout."""
         import requests
+
         # Mock timeout exception for first two calls, success on third
         mock_get.side_effect = [
             requests.exceptions.Timeout("timeout"),  # First call fails
@@ -151,6 +154,7 @@ class TestHealthEndpointRetryLogic:
     def test_fetch_health_status_give_up_after_retries(self, mock_get, mock_sleep):
         """Test that health status gives up after max retries."""
         import requests
+
         # Mock timeout exception for all calls
         mock_get.side_effect = requests.exceptions.Timeout("persistent timeout")
 
