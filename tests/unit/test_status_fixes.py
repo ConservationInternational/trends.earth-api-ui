@@ -14,6 +14,7 @@ class TestDeploymentInfoFixes:
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
     def test_fetch_deployment_info_with_both_endpoints_success(self, mock_get):
         """Test successful fetch from both API and UI health endpoints."""
+
         def mock_requests_side_effect(url, *args, **kwargs):
             """Mock different responses based on URL"""
             mock_response = Mock()
@@ -25,8 +26,8 @@ class TestDeploymentInfoFixes:
                     "deployment": {
                         "commit_sha": "abc123def456",
                         "branch": "main",
-                        "environment": "production"
-                    }
+                        "environment": "production",
+                    },
                 }
             elif "api-ui-health" in url:
                 mock_response.status_code = 200
@@ -35,13 +36,13 @@ class TestDeploymentInfoFixes:
                     "deployment": {
                         "commit_sha": "xyz789uvw012",
                         "branch": "master",
-                        "environment": "production"
-                    }
+                        "environment": "production",
+                    },
                 }
             else:
                 mock_response.status_code = 404
             return mock_response
-        
+
         mock_get.side_effect = mock_requests_side_effect
 
         result = fetch_deployment_info("production", "test_token")
@@ -63,6 +64,7 @@ class TestDeploymentInfoFixes:
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
     def test_fetch_deployment_info_with_api_error(self, mock_get):
         """Test handling when API endpoint returns an error."""
+
         def mock_requests_side_effect(url, *args, **kwargs):
             mock_response = Mock()
             if "api-health" in url:
@@ -74,11 +76,11 @@ class TestDeploymentInfoFixes:
                     "deployment": {
                         "commit_sha": "xyz789uvw012",
                         "branch": "master",
-                        "environment": "production"
-                    }
+                        "environment": "production",
+                    },
                 }
             return mock_response
-        
+
         mock_get.side_effect = mock_requests_side_effect
 
         result = fetch_deployment_info("production", "test_token")
