@@ -1036,13 +1036,14 @@ def register_callbacks(app):
             )
 
             # Detailed Chart 1: Active Execution Status (Running, Ready, Pending)
+            # Colors match the execution table row text colors for consistency
             active_status_metrics = [
-                {"field": "executions_running", "name": "Running", "color": "#007bff"},
-                {"field": "executions_ready", "name": "Ready", "color": "#17a2b8"},
+                {"field": "executions_running", "name": "Running", "color": "#084298"},
+                {"field": "executions_ready", "name": "Ready", "color": "#664D03"},
                 {
                     "field": "executions_pending",
                     "name": "Pending",
-                    "color": "#ffc107",
+                    "color": "#495057",
                 },  # Preparing for API update
             ]
 
