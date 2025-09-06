@@ -43,7 +43,9 @@ class TestIssue79IntegrationFix:
 
         # The function should have created the trends chart with normalized data
         # This test verifies the integration is working without breaking
-        assert trends_chart is not None or len(charts) > 0  # Either we found it or charts were created
+        assert (
+            trends_chart is not None or len(charts) > 0
+        )  # Either we found it or charts were created
 
     def test_normalization_with_pandas_in_context(self):
         """Test the normalization logic as it would be used in the actual code."""
@@ -81,7 +83,12 @@ class TestIssue79IntegrationFix:
                 normalized_data[field] = normalized_values.tolist()
 
         # Verify the normalization results
-        expected_finished = [0, 10, 5, 20]  # 1000 baseline: [1000-1000, 1010-1000, 1005-1000, 1020-1000]
+        expected_finished = [
+            0,
+            10,
+            5,
+            20,
+        ]  # 1000 baseline: [1000-1000, 1010-1000, 1005-1000, 1020-1000]
         expected_failed = [0, 5, 2, 8]  # 50 baseline: [50-50, 55-50, 52-50, 58-50]
         expected_cancelled = [0, 0, 2, 5]  # 20 baseline: [20-20, 20-20, 22-20, 25-20]
 
@@ -91,7 +98,9 @@ class TestIssue79IntegrationFix:
 
         # Verify all series start from 0
         for field_name, values in normalized_data.items():
-            assert values[0] == 0, f"Series {field_name} should start from 0, but starts from {values[0]}"
+            assert values[0] == 0, (
+                f"Series {field_name} should start from 0, but starts from {values[0]}"
+            )
 
     @patch("trendsearth_ui.utils.stats_visualizations.go.Figure")
     def test_stats_visualization_figure_creation(self, mock_figure):
