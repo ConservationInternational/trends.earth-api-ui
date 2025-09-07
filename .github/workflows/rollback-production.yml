@@ -14,9 +14,10 @@ on:
         type: string
 
 env:
-  REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-  IMAGE_NAME: trendsearth-ui
-  COMPOSE_FILE: docker-compose.prod.yml
+  AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: trendsearth-ui
+  CODEDEPLOY_APPLICATION: trendsearth-ui
+  CODEDEPLOY_DEPLOYMENT_GROUP: production
 
 jobs:
   rollback-production:
@@ -25,429 +26,203 @@ jobs:
     environment: production
     
     steps:
-    - name: Validate required secrets
+    - name: Validate inputs and configuration
       run: |
-        echo "🔍 Validating required secrets and environment variables..."
+        echo "🔍 Validating rollback configuration..."
+        echo "Reason: ${{ github.event.inputs.reason }}"
+        echo "Rollback to commit: ${{ github.event.inputs.rollback_to_commit || 'automatic rollback' }}"
         
-        # Check for required secrets
-        if [ -z "${{ secrets.DOCKER_REGISTRY }}" ]; then
-          echo "❌ Error: DOCKER_REGISTRY secret is not set"
-          echo "Please configure the DOCKER_REGISTRY secret in repository settings"
+        # Validate required secrets
+        if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+          echo "❌ Error: AWS credentials not configured"
           exit 1
         fi
         
-        if [ -z "${{ secrets.PROD_HOST }}" ]; then
-          echo "❌ Error: PROD_HOST secret is not set"
+        if [ -z "${{ secrets.CODEDEPLOY_S3_BUCKET }}" ]; then
+          echo "❌ Error: CODEDEPLOY_S3_BUCKET secret is not set"
           exit 1
         fi
         
-        if [ -z "${{ secrets.PROD_USERNAME }}" ]; then
-          echo "❌ Error: PROD_USERNAME secret is not set"
-          exit 1
-        fi
-        
-        if [ -z "${{ secrets.PROD_SSH_KEY }}" ]; then
-          echo "❌ Error: PROD_SSH_KEY secret is not set"
-          exit 1
-        fi
-        
-        # Validate registry format
-        REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
-        echo "✅ DOCKER_REGISTRY is set to: $REGISTRY"
-        
-        # Basic validation of registry format (should contain : for host:port)
-        if ! echo "$REGISTRY" | grep -q ":"; then
-          echo "❌ Error: DOCKER_REGISTRY appears to have invalid format: $REGISTRY"
-          echo "Expected format: hostname:port (e.g., registry.example.com:5000)"
-          exit 1
-        fi
-        
-        echo "✅ All required secrets are properly configured"
+        echo "✅ Configuration validated"
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Get runner IP and update security group
-      id: security-group
+    - name: Get current deployment status
+      id: current-deployment
       run: |
-        # Get the public IP of the GitHub Actions runner
-        RUNNER_IP=$(curl -s https://checkip.amazonaws.com)
-        echo "Runner IP: $RUNNER_IP"
-        echo "runner-ip=$RUNNER_IP" >> $GITHUB_OUTPUT
+        echo "📊 Getting current deployment status..."
         
-        # Add SSH access rule for the runner IP
-        echo "Adding SSH access for runner IP $RUNNER_IP to security group ${{ secrets.PROD_SECURITY_GROUP_ID }}"
-        aws ec2 authorize-security-group-ingress \
-          --group-id "${{ secrets.PROD_SECURITY_GROUP_ID }}" \
-          --protocol tcp \
-          --port 22 \
-          --cidr "${RUNNER_IP}/32" || true
+        # Get the most recent deployment
+        CURRENT_DEPLOYMENT=$(aws deploy list-deployments \
+          --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
+          --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+          --include-only-statuses Succeeded \
+          --max-items 1 \
+          --query 'deployments[0]' \
+          --output text)
         
-        echo "Security group rule added successfully"
+        if [ "$CURRENT_DEPLOYMENT" = "None" ]; then
+          echo "❌ No successful deployments found"
+          exit 1
+        fi
+        
+        echo "current-deployment=$CURRENT_DEPLOYMENT" >> $GITHUB_OUTPUT
+        echo "✅ Current deployment: $CURRENT_DEPLOYMENT"
 
-    - name: Set SSH port variable
-      id: ssh-port
+    - name: Determine rollback strategy
+      id: rollback-strategy
       run: |
-        # Trim whitespace and newlines from the port
-        PORT="${{ secrets.PROD_SSH_PORT || 22 }}"
-        PORT=$(echo "$PORT" | tr -d '[:space:]')
-        echo "port=$PORT" >> $GITHUB_OUTPUT
-
-    - name: Validate and prepare rollback target
-      id: rollback-target
-      run: |
-        ROLLBACK_TO_COMMIT="${{ github.event.inputs.rollback_to_commit }}"
-        
-        echo "Rollback to commit: $ROLLBACK_TO_COMMIT"
-        
-        # Determine the rollback method
-        if [ -n "$ROLLBACK_TO_COMMIT" ]; then
-          # Validate commit SHA format (should be at least 7 characters, alphanumeric)
-          if ! echo "$ROLLBACK_TO_COMMIT" | grep -qE '^[a-fA-F0-9]{7,}$'; then
-            echo "❌ Error: Invalid commit SHA format: $ROLLBACK_TO_COMMIT"
-            echo "Commit SHA should be at least 7 alphanumeric characters"
-            exit 1
-          fi
-          
-          echo "✅ Will rollback to commit SHA: $ROLLBACK_TO_COMMIT"
-          echo "rollback-method=commit" >> $GITHUB_OUTPUT
-          echo "commit-sha=$ROLLBACK_TO_COMMIT" >> $GITHUB_OUTPUT
-          
+        if [ -n "${{ github.event.inputs.rollback_to_commit }}" ]; then
+          echo "🎯 Specific commit rollback requested"
+          echo "strategy=commit" >> $GITHUB_OUTPUT
+          echo "target-commit=${{ github.event.inputs.rollback_to_commit }}" >> $GITHUB_OUTPUT
         else
-          echo "✅ Using automatic service rollback (no specific target specified)"
-          echo "rollback-method=automatic" >> $GITHUB_OUTPUT
+          echo "🔄 Automatic rollback requested"
+          echo "strategy=automatic" >> $GITHUB_OUTPUT
         fi
 
-    - name: Perform production rollback
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.PROD_HOST }}
-        username: ${{ secrets.PROD_USERNAME }}
-        key: ${{ secrets.PROD_SSH_KEY }}
-        port: ${{ steps.ssh-port.outputs.port }}
-        script: |
-          set -e
+    - name: Perform automatic rollback
+      if: steps.rollback-strategy.outputs.strategy == 'automatic'
+      run: |
+        echo "🔄 Performing automatic rollback using CodeDeploy..."
+        
+        # Stop the last deployment if it's still running
+        DEPLOYMENT_ID=${{ steps.current-deployment.outputs.current-deployment }}
+        
+        ROLLBACK_ID=$(aws deploy stop-deployment \
+          --deployment-id $DEPLOYMENT_ID \
+          --auto-rollback-enabled \
+          --query 'deploymentId' \
+          --output text || echo "")
+        
+        if [ -n "$ROLLBACK_ID" ]; then
+          echo "✅ Automatic rollback initiated: $ROLLBACK_ID"
           
-          echo "🔄 Starting production rollback..."
-          echo "Reason: ${{ github.event.inputs.reason }}"
-          echo "Requested by: ${{ github.actor }}"
-          echo "Rollback method: ${{ steps.rollback-target.outputs.rollback-method }}"
+          # Wait for rollback to complete
+          echo "⏳ Waiting for rollback to complete..."
+          aws deploy wait deployment-successful --deployment-id $ROLLBACK_ID
           
-          if [ "${{ steps.rollback-target.outputs.rollback-method }}" = "commit" ]; then
-            echo "Target commit SHA: ${{ steps.rollback-target.outputs.commit-sha }}"
-          fi
+          echo "✅ Automatic rollback completed successfully"
+        else
+          echo "⚠️ Could not initiate automatic rollback, will attempt service-level rollback"
           
-          # Navigate to application directory
-          cd ${{ secrets.PROD_APP_PATH || '/opt/trends-earth-ui' }}
-          
-          # Check current service status
-          echo "📊 Current service status before rollback:"
-          docker service ls --filter "name=trendsearth-ui-prod"
-          
-          ROLLBACK_METHOD="${{ steps.rollback-target.outputs.rollback-method }}"
-          
-          # Handle commit SHA rollback by rebuilding from the specified commit
-          if [ "$ROLLBACK_METHOD" = "commit" ]; then
-            COMMIT_SHA="${{ steps.rollback-target.outputs.commit-sha }}"
-            echo "🔄 Rolling back to commit SHA: $COMMIT_SHA"
-            
-            # Fetch latest changes and checkout the specific commit
-            echo "📥 Fetching latest changes from repository..."
-            git fetch origin
-            
-            echo "📋 Current branch and commit:"
-            echo "  Branch: $(git branch --show-current)"
-            echo "  Current commit: $(git rev-parse HEAD)"
-            
-            # Verify the commit exists
-            if git rev-parse --verify "$COMMIT_SHA" >/dev/null 2>&1; then
-              echo "✅ Commit $COMMIT_SHA found in repository"
-            else
-              echo "❌ Commit $COMMIT_SHA not found in repository"
-              echo "🔍 Recent commits:"
-              git log --oneline -10
-              exit 1
-            fi
-            
-            # Checkout the specific commit
-            echo "🔄 Checking out commit $COMMIT_SHA..."
-            git reset --hard "$COMMIT_SHA"
-            
-            echo "✅ Successfully checked out commit: $(git rev-parse HEAD)"
-            echo "📋 Commit details:"
-            git log --oneline -1
-            
-            # Configure insecure registry on server if needed
-            echo "📋 Configuring insecure registry on server..."
-            sudo mkdir -p /etc/docker
-            if [ ! -f /etc/docker/daemon.json ] || ! grep -q "insecure-registries" /etc/docker/daemon.json; then
-              echo '{"insecure-registries":["${{ env.REGISTRY }}"]}' | sudo tee /etc/docker/daemon.json > /dev/null
-              sudo systemctl restart docker
-              sleep 10
-            fi
-            
-            # Build new image from the rolled-back commit
-            echo "🔨 Building Docker image from commit $COMMIT_SHA..."
-            
-            REGISTRY="${{ env.REGISTRY }}"
-            IMAGE_NAME="${{ env.IMAGE_NAME }}"
-            SHORT_SHA="${COMMIT_SHA:0:7}"
-            ROLLBACK_TAG="rollback-$SHORT_SHA"
-            
-            BUILT_TAGS="$REGISTRY/$IMAGE_NAME:$ROLLBACK_TAG
-            $REGISTRY/$IMAGE_NAME:latest"
-            
-            # Build with the rollback tag
-            PRIMARY_TAG="$REGISTRY/$IMAGE_NAME:$ROLLBACK_TAG"
-            echo "Building with tag: $PRIMARY_TAG"
-            
-            # Build image with git information
-            docker build \
-              --build-arg GIT_BRANCH="master" \
-              --build-arg GIT_COMMIT="$COMMIT_SHA" \
-              --build-arg DEPLOYMENT_ENVIRONMENT="production" \
-              -t "$PRIMARY_TAG" .
-            
-            # Tag with latest as well
-            docker tag "$PRIMARY_TAG" "$REGISTRY/$IMAGE_NAME:latest"
-            
-            # Push the images to local registry
-            echo "🚀 Pushing rollback images to local registry..."
-            echo "$BUILT_TAGS" | while IFS= read -r tag; do
-              if [ -n "$tag" ]; then
-                echo "Pushing: $tag"
-                docker push "$tag"
-              fi
-            done
-            
-            # Set the image tag for service updates
-            FINAL_IMAGE_TAG="$ROLLBACK_TAG"
-            
-          fi
-          
-          # Perform rollback for the UI service
-          SERVICE_NAME="trendsearth-ui-prod_ui"
-          
-          echo "🔄 Rolling back service: $SERVICE_NAME"
-          
-          # Check if service exists
-          if ! docker service ls --format "{{.Name}}" | grep -q "^$SERVICE_NAME$"; then
-            echo "❌ Service $SERVICE_NAME not found!"
-            echo "Available services:"
-            docker service ls
-            exit 1
-          fi
-          
-          if [ "$ROLLBACK_METHOD" = "commit" ]; then
-            # Rollback to specific image (built from commit SHA)
-            FULL_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$FINAL_IMAGE_TAG"
-            echo "📦 Rolling back $SERVICE_NAME to image: $FULL_IMAGE"
-            
-            # Update service to use specific image
-            if docker service update --image "$FULL_IMAGE" "$SERVICE_NAME"; then
-              echo "✅ Successfully updated $SERVICE_NAME to image $FULL_IMAGE"
-            else
-              echo "❌ Failed to update $SERVICE_NAME to image $FULL_IMAGE"
-              exit 1
-            fi
-          else
-            # Use Docker Swarm's built-in rollback functionality
-            echo "⏪ Rolling back $SERVICE_NAME to previous version"
-            
-            # Check if service has update history for rollback
-            UPDATE_STATUS=$(docker service inspect "$SERVICE_NAME" --format='{{.UpdateStatus}}' 2>/dev/null || echo "null")
-            
-            if [ "$UPDATE_STATUS" = "null" ] || [ -z "$UPDATE_STATUS" ]; then
-              echo "⚠️ No update history found for $SERVICE_NAME, cannot perform automatic rollback"
-              echo "🔍 Current service details:"
-              docker service inspect "$SERVICE_NAME" --format='{{.Spec.TaskTemplate.ContainerSpec.Image}}'
-              exit 1
-            fi
-            
-            if docker service rollback "$SERVICE_NAME"; then
-              echo "✅ Successfully rolled back $SERVICE_NAME"
-            else
-              echo "❌ Failed to rollback $SERVICE_NAME"
-              exit 1
-            fi
-          fi
-          
-          # Wait for service to stabilize
-          echo "⏳ Waiting for $SERVICE_NAME to stabilize..."
-          sleep 10
-          
-          # Wait for service to be ready after rollback
-          echo "⏳ Waiting for service to be ready after rollback..."
-          
-          max_wait=120
-          wait_time=0
-          
-          while [ $wait_time -lt $max_wait ]; do
-            # Check if service has desired replicas running
-            service_status=$(docker service ls --filter "name=trendsearth-ui-prod" --format "{{.Name}}\t{{.Replicas}}")
-            pending_services=$(echo "$service_status" | grep -v "1/1" | wc -l)
-            
-            if [ $pending_services -eq 0 ]; then
-              echo "✅ Service is running after rollback"
-              break
-            fi
-            
-            echo "⏳ Waiting for service to be ready... ($wait_time/$max_wait seconds)"
-            echo "$service_status"
-            sleep 10
-            wait_time=$((wait_time + 10))
-          done
-          
-          if [ $wait_time -ge $max_wait ]; then
-            echo "⚠️ Service may not be fully ready after $max_wait seconds"
-          fi
-          
-          # Final service status
-          echo "📊 Final service status after rollback:"
-          docker service ls --filter "name=trendsearth-ui-prod"
-          
-          echo "🎉 Production rollback completed!"
+          # Alternative: Rollback at the service level using Docker Swarm
+          echo "🔄 Attempting Docker service rollback..."
+          # Note: This would require SSH access which we're removing
+          # For now, we'll just report the issue
+          echo "❌ Service-level rollback requires manual intervention"
+          exit 1
+        fi
 
-    - name: Verify rollback health
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.PROD_HOST }}
-        username: ${{ secrets.PROD_USERNAME }}
-        key: ${{ secrets.PROD_SSH_KEY }}
-        port: ${{ steps.ssh-port.outputs.port }}
-        script: |
-          set -e
-          
-          echo "🏥 Performing health check after rollback..."
-          
-          max_attempts=20
-          attempt=1
-          
-          while [ $attempt -le $max_attempts ]; do
-            echo "⏳ Health check attempt $attempt/$max_attempts..."
-            
-            # First check if port is listening
-            if ! nc -z 127.0.0.1 8000 2>/dev/null; then
-              echo "⚠️ Port 8000 is not listening yet"
-            else
-              echo "✅ Port 8000 is listening"
-            fi
-            
-            # Perform health check request
-            health_response=$(curl -f -s -w "HTTP_CODE:%{http_code}" http://127.0.0.1:8000/api-ui-health 2>&1)
-            curl_exit_code=$?
-            
-            if [ $curl_exit_code -eq 0 ]; then
-              echo "✅ Health check passed after rollback"
-              echo "Response: $health_response"
-              break
-            else
-              echo "⏳ Health check failed with exit code $curl_exit_code"
-              echo "Response: $health_response"
-            fi
-            
-            sleep 15
-            attempt=$((attempt + 1))
-          done
-          
-          if [ $attempt -gt $max_attempts ]; then
-            echo "❌ Health check failed after rollback - $max_attempts attempts"
-            echo "🔍 Debugging information:"
-            echo "  - All running containers:"
-            docker ps --filter "name=trendsearth-ui-prod"
-            echo "  - UI service details:"
-            docker service inspect trendsearth-ui-prod_ui --format="{{json .Spec.TaskTemplate.ContainerSpec}}" || echo "Service not found"
-            echo "  - Recent UI service logs:"
-            docker service logs --tail 50 trendsearth-ui-prod_ui || echo "No logs available"
-            exit 1
-          fi
-          
-          echo "🎉 Rollback health verification completed successfully!"
+    - name: Perform commit-specific rollback
+      if: steps.rollback-strategy.outputs.strategy == 'commit'
+      run: |
+        echo "🎯 Performing rollback to specific commit: ${{ steps.rollback-strategy.outputs.target-commit }}"
+        
+        # Checkout the specific commit
+        git fetch --depth=50  # Get enough history to find the commit
+        git checkout ${{ steps.rollback-strategy.outputs.target-commit }}
+        
+        # Check if ECR image exists for this commit
+        aws ecr describe-images \
+          --repository-name ${{ env.ECR_REPOSITORY }} \
+          --image-ids imageTag=${{ steps.rollback-strategy.outputs.target-commit }} \
+          --query 'imageDetails[0].imageTags' \
+          --output text || {
+          echo "❌ Error: ECR image not found for commit ${{ steps.rollback-strategy.outputs.target-commit }}"
+          echo "Available tags:"
+          aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageIds[].imageTag' --output table
+          exit 1
+        }
+        
+        # Create deployment bundle for the target commit
+        echo "📦 Creating rollback deployment bundle..."
+        mkdir -p deploy-bundle
+        cp appspec.yml deploy-bundle/
+        cp -r scripts/ deploy-bundle/
+        cp docker-compose.prod.yml deploy-bundle/
+        cp docker-compose.staging.yml deploy-bundle/
+        
+        # Create deployment info file
+        cat > deploy-bundle/deployment-info.json <<EOF
+        {
+          "deploymentId": "${{ steps.rollback-strategy.outputs.target-commit }}",
+          "branch": "rollback",
+          "image": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ steps.rollback-strategy.outputs.target-commit }}",
+          "registry": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com",
+          "environment": "production",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "rollback": true,
+          "reason": "${{ github.event.inputs.reason }}"
+        }
+        EOF
+        
+        cd deploy-bundle
+        zip -r ../rollback-bundle.zip .
+        cd ..
+        
+        # Upload bundle to S3
+        S3_BUCKET="${{ secrets.CODEDEPLOY_S3_BUCKET }}"
+        S3_KEY="deployments/trendsearth-ui/rollback/${{ steps.rollback-strategy.outputs.target-commit }}/rollback-bundle.zip"
+        
+        aws s3 cp rollback-bundle.zip "s3://$S3_BUCKET/$S3_KEY"
+        
+        # Create CodeDeploy deployment
+        ROLLBACK_DEPLOYMENT_ID=$(aws deploy create-deployment \
+          --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
+          --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+          --s3-location bucket=$S3_BUCKET,key=$S3_KEY,bundleType=zip \
+          --description "ROLLBACK to commit ${{ steps.rollback-strategy.outputs.target-commit }}: ${{ github.event.inputs.reason }}" \
+          --query 'deploymentId' \
+          --output text)
+        
+        echo "✅ Rollback deployment created: $ROLLBACK_DEPLOYMENT_ID"
+        
+        # Wait for rollback deployment to complete
+        echo "⏳ Waiting for rollback deployment to complete..."
+        aws deploy wait deployment-successful --deployment-id $ROLLBACK_DEPLOYMENT_ID
+        
+        echo "✅ Rollback to commit ${{ steps.rollback-strategy.outputs.target-commit }} completed successfully"
 
-    - name: Run basic integration tests after rollback
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.PROD_HOST }}
-        username: ${{ secrets.PROD_USERNAME }}
-        key: ${{ secrets.PROD_SSH_KEY }}
-        port: ${{ steps.ssh-port.outputs.port }}
-        script: |
-          set -e
-          
-          echo "🧪 Running basic integration tests after rollback..."
-          
-          # Test health endpoint
-          echo "⏳ Testing health endpoint..."
-          if curl -f -s http://127.0.0.1:8000/api-ui-health >/dev/null 2>&1; then
-            echo "✅ Health endpoint working"
-          else
-            echo "❌ Health endpoint failed"
-            exit 1
-          fi
-          
-          # Test basic application loading
-          echo "⏳ Testing basic application loading..."
-          if curl -f -s http://127.0.0.1:8000/ >/dev/null 2>&1; then
-            echo "✅ Application loading working"
-          else
-            echo "❌ Application loading failed"
-            exit 1
-          fi
-          
-          echo "✅ All basic integration tests passed after rollback"
+    - name: Verify rollback
+      run: |
+        echo "🔍 Verifying rollback was successful..."
+        
+        # Wait for services to stabilize
+        sleep 60
+        
+        # Basic verification - the actual health check is done by CodeDeploy validation hooks
+        echo "✅ Rollback verification will be handled by CodeDeploy validation hooks"
 
     - name: Notify Rollbar of rollback
-      if: success()
+      if: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       run: |
-        echo "🔔 Notifying Rollbar of rollback..."
+        COMMIT_SHA="${{ steps.rollback-strategy.outputs.target-commit || 'automatic-rollback' }}"
         
-        # Get rollback information
-        ENVIRONMENT="production"
-        REVISION="${{ github.sha }}"
-        LOCAL_USERNAME="${{ github.actor }}"
-        
-        # Build comment based on rollback method
-        ROLLBACK_METHOD="${{ steps.rollback-target.outputs.rollback-method }}"
-        if [ "$ROLLBACK_METHOD" = "commit" ]; then
-          COMMENT="ROLLBACK TO COMMIT: ${{ steps.rollback-target.outputs.commit-sha }} - Reason: ${{ github.event.inputs.reason }} - Triggered by: ${{ github.actor }}"
-        else
-          COMMENT="ROLLBACK (automatic): ${{ github.event.inputs.reason }} - Triggered by: ${{ github.actor }}"
-        fi
-        
-        # Send rollback notification to Rollbar (only if token is available)
-        if [ -n "${{ secrets.ROLLBAR_ACCESS_TOKEN }}" ]; then
-          curl -X POST 'https://api.rollbar.com/api/1/deploy/' \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "access_token": "${{ secrets.ROLLBAR_ACCESS_TOKEN }}",
-              "environment": "'"$ENVIRONMENT"'",
-              "revision": "'"$REVISION"'",
-              "local_username": "'"$LOCAL_USERNAME"'",
-              "comment": "'"$COMMENT"'"
-            }'
-          
-          echo "✅ Rollbar rollback notification sent successfully"
-        else
-          echo "⚠️ ROLLBAR_ACCESS_TOKEN not configured, skipping Rollbar notification"
-        fi
+        curl -X POST 'https://api.rollbar.com/api/1/deploy' \
+          -H 'X-Rollbar-Access-Token: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "environment": "production",
+            "revision": "'$COMMIT_SHA'",
+            "local_username": "github-actions-rollback",
+            "comment": "ROLLBACK: ${{ github.event.inputs.reason }}"
+          }'
 
-    - name: Cleanup security group access
-      if: always()
+    - name: Rollback summary
       run: |
-        # Remove the SSH access rule for the runner IP
-        RUNNER_IP="${{ steps.security-group.outputs.runner-ip }}"
-        if [ -n "$RUNNER_IP" ]; then
-          echo "Removing SSH access for runner IP $RUNNER_IP from security group ${{ secrets.PROD_SECURITY_GROUP_ID }}"
-          aws ec2 revoke-security-group-ingress \
-            --group-id "${{ secrets.PROD_SECURITY_GROUP_ID }}" \
-            --protocol tcp \
-            --port 22 \
-            --cidr "${RUNNER_IP}/32" || true
-          echo "Security group rule removed successfully"
-        else
-          echo "No runner IP found to remove from security group"
-        fi
+        echo "🔄 Production rollback completed!"
+        echo ""
+        echo "📋 Rollback Details:"
+        echo "  Strategy: ${{ steps.rollback-strategy.outputs.strategy }}"
+        echo "  Target Commit: ${{ steps.rollback-strategy.outputs.target-commit || 'automatic' }}"
+        echo "  Reason: ${{ github.event.inputs.reason }}"
+        echo "  Triggered by: ${{ github.actor }}"
+        echo "  Environment: production"
+        echo ""
+        echo "✅ Rollback completed successfully"

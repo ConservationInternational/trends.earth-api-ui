@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Application Start Script for CodeDeploy
+# Starts the new deployment using Docker Swarm
+
+set -e
+
+echo "🚀 Application Start: Starting new deployment"
+
+# Load environment variables
+source /opt/deploy-env
+
+echo "Environment: $ENVIRONMENT"
+echo "App Path: $APP_PATH"
+echo "Stack Name: $STACK_NAME"
+
+# Navigate to application directory
+cd "$APP_PATH"
+
+# Set compose file based on environment
+if [ "$ENVIRONMENT" = "staging" ]; then
+    COMPOSE_FILE="docker-compose.staging.yml"
+    IMAGE_TAG="${DEPLOYMENT_ID:-latest}"
+else
+    COMPOSE_FILE="docker-compose.prod.yml"
+    IMAGE_TAG="${DEPLOYMENT_ID:-latest}"
+fi
+
+echo "Compose File: $COMPOSE_FILE"
+echo "Image Tag: $IMAGE_TAG"
+
+# Update compose file with ECR registry
+export DOCKER_REGISTRY="$ECR_REGISTRY"
+export GIT_COMMIT_SHA="${DEPLOYMENT_ID:-unknown}"
+export GIT_BRANCH="${BRANCH_NAME:-master}"
+export DEPLOYMENT_ENVIRONMENT="$ENVIRONMENT"
+
+# Validate compose file syntax
+echo "🧪 Validating compose file syntax..."
+if docker compose -f "$COMPOSE_FILE" config >/dev/null 2>&1; then
+    echo "✅ Compose file is valid"
+else
+    echo "❌ Compose validation failed:"
+    docker compose -f "$COMPOSE_FILE" config 2>&1
+    exit 1
+fi
+
+# Pull the latest image from ECR
+echo "📥 Pulling latest image from ECR..."
+IMAGE_NAME="$ECR_REGISTRY/trendsearth-ui:$IMAGE_TAG"
+docker pull "$IMAGE_NAME"
+
+# Tag the image for the compose file
+docker tag "$IMAGE_NAME" "$ECR_REGISTRY/trendsearth-ui:latest"
+
+echo "📦 Deploying stack: $STACK_NAME"
+echo "🐳 Using image: $IMAGE_NAME"
+
+# Deploy the stack with retry logic
+attempts=0
+max_attempts=3
+
+while [ $attempts -lt $max_attempts ]; do
+    if docker stack deploy -c "$COMPOSE_FILE" --with-registry-auth "$STACK_NAME"; then
+        echo "✅ Stack deployed successfully"
+        break
+    else
+        attempts=$((attempts + 1))
+        if [ $attempts -lt $max_attempts ]; then
+            echo "⏳ Stack deploy failed, retrying in 10s (attempt $attempts/$max_attempts)..."
+            sleep 10
+        else
+            echo "❌ Stack deploy failed after $max_attempts attempts"
+            exit 1
+        fi
+    fi
+done
+
+# Wait for services to be ready
+echo "⏳ Waiting for services to be ready..."
+max_wait=180
+wait_time=0
+
+while [ $wait_time -lt $max_wait ]; do
+    # Check if all services have desired replicas running
+    pending_services=$(docker service ls --filter "name=$STACK_NAME" --format "table {{.Name}}\t{{.Replicas}}" | grep -v "1/1" | wc -l)
+    
+    # Only header line should remain if all services are 1/1
+    if [ $pending_services -eq 1 ]; then
+        echo "✅ All services are running"
+        break
+    fi
+    
+    echo "⏳ Waiting for services to be ready... ($wait_time/$max_wait seconds)"
+    docker service ls --filter "name=$STACK_NAME"
+    sleep 15
+    wait_time=$((wait_time + 15))
+done
+
+if [ $wait_time -ge $max_wait ]; then
+    echo "⚠️ Warning: Some services may not be fully ready after $max_wait seconds"
+    echo "📊 Current service status:"
+    docker service ls --filter "name=$STACK_NAME"
+fi
+
+# Show final status
+echo "📊 Final deployment status:"
+docker service ls --filter "name=$STACK_NAME"
+docker stack ps "$STACK_NAME"
+
+echo "✅ Application Start completed successfully"

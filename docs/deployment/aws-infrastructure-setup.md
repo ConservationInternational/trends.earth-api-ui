@@ -1,249 +1,335 @@
-# AWS Infrastructure Setup for Trends.Earth UI Deployment
+# AWS Infrastructure Setup for ECR + CodeDeploy Deployment
 
-This document provides instructions for setting up the AWS infrastructure required for EC2 Docker Swarm deployment.
+This document provides instructions for setting up the AWS infrastructure required for ECR + CodeDeploy deployment of the Trends.Earth API UI.
 
 ## Prerequisites
 
 - AWS CLI configured with appropriate permissions
 - Terraform (optional, for infrastructure as code)
-- Access to create EC2 instances, security groups, and manage IAM
+- Access to create ECR repositories, CodeDeploy applications, EC2 instances, S3 buckets, and manage IAM
 
 ## Required AWS Resources
 
-### 1. EC2 Instances
+### 1. Amazon ECR Repository
 
-You need two EC2 instances:
-- **Production**: For the production deployment
-- **Staging**: For the staging deployment
+Create an ECR repository to store Docker images:
 
-#### Recommended Instance Configuration
+```bash
+# Create ECR repository
+aws ecr create-repository \
+    --repository-name trendsearth-ui \
+    --region us-east-1
 
-**Instance Type**: t3.medium or larger
-**OS**: Ubuntu 22.04 LTS
-**Storage**: 20GB+ GP3 EBS volume
-**Network**: Public subnet with internet gateway access
-
-#### Security Groups
-
-Create security groups with the following rules:
-
-**Production Security Group** (`PROD_SECURITY_GROUP_ID`):
-```
-Inbound Rules:
-- SSH (22): Dynamic (managed by GitHub Actions)
-- HTTP (8000): 0.0.0.0/0 (or restricted to load balancer/CDN)
-- HTTPS (443): 0.0.0.0/0 (if using SSL termination)
-
-Outbound Rules:
-- All traffic: 0.0.0.0/0
-```
-
-**Staging Security Group** (`STAGING_SECURITY_GROUP_ID`):
-```
-Inbound Rules:
-- SSH (22): Dynamic (managed by GitHub Actions)  
-- HTTP (8001): Your IP/Office IP ranges
-- HTTPS (443): Your IP/Office IP ranges (if using SSL)
-
-Outbound Rules:
-- All traffic: 0.0.0.0/0
+# Set lifecycle policy to cleanup old images
+aws ecr put-lifecycle-policy \
+    --repository-name trendsearth-ui \
+    --lifecycle-policy-text '{
+        "rules": [
+            {
+                "rulePriority": 1,
+                "description": "Keep last 10 images",
+                "selection": {
+                    "tagStatus": "any",
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 10
+                },
+                "action": {
+                    "type": "expire"
+                }
+            }
+        ]
+    }'
 ```
 
-### 2. IAM User for GitHub Actions
+### 2. S3 Bucket for CodeDeploy Artifacts
 
-Create an IAM user with the following policy for security group management:
+Create an S3 bucket to store deployment bundles:
 
-```json
+```bash
+# Create S3 bucket for deployment artifacts
+aws s3 mb s3://your-codedeploy-artifacts-bucket
+
+# Set lifecycle policy to cleanup old artifacts
+aws s3api put-bucket-lifecycle-configuration \
+    --bucket your-codedeploy-artifacts-bucket \
+    --lifecycle-configuration '{
+        "Rules": [
+            {
+                "ID": "DeleteOldDeployments",
+                "Status": "Enabled",
+                "Filter": {"Prefix": "deployments/"},
+                "Expiration": {"Days": 30}
+            }
+        ]
+    }'
+```
+
+### 3. IAM Roles and Policies
+
+#### CodeDeploy Service Role
+
+```bash
+# Create trust policy for CodeDeploy
+cat > codedeploy-trust-policy.json <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "codedeploy.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+
+# Create CodeDeploy service role
+aws iam create-role \
+    --role-name CodeDeployServiceRole \
+    --assume-role-policy-document file://codedeploy-trust-policy.json
+
+# Attach the managed policy for CodeDeploy
+aws iam attach-role-policy \
+    --role-name CodeDeployServiceRole \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+```
+
+#### EC2 Instance Role for CodeDeploy Agent
+
+```bash
+# Create trust policy for EC2
+cat > ec2-trust-policy.json <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+
+# Create EC2 instance role
+aws iam create-role \
+    --role-name TrendsEarthUIInstanceRole \
+    --assume-role-policy-document file://ec2-trust-policy.json
+
+# Create policy for ECR and S3 access
+cat > ec2-deployment-policy.json <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
             "Action": [
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:RevokeSecurityGroupIngress",
-                "ec2:DescribeSecurityGroups"
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::your-codedeploy-artifacts-bucket",
+                "arn:aws:s3:::your-codedeploy-artifacts-bucket/*"
+            ]
         }
     ]
 }
+EOF
+
+# Attach policies to EC2 role
+aws iam put-role-policy \
+    --role-name TrendsEarthUIInstanceRole \
+    --policy-name ECRAndS3Access \
+    --policy-document file://ec2-deployment-policy.json
+
+aws iam attach-role-policy \
+    --role-name TrendsEarthUIInstanceRole \
+    --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+aws iam attach-role-policy \
+    --role-name TrendsEarthUIInstanceRole \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy
+
+# Create instance profile
+aws iam create-instance-profile \
+    --instance-profile-name TrendsEarthUIInstanceProfile
+
+aws iam add-role-to-instance-profile \
+    --instance-profile-name TrendsEarthUIInstanceProfile \
+    --role-name TrendsEarthUIInstanceRole
 ```
 
-Store the access key ID and secret access key as GitHub secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`).
+### 4. EC2 Instances
 
-## Server Setup
+#### Instance Configuration
 
-### 1. Initial Server Configuration
+**Instance Type**: t3.medium or larger  
+**OS**: Ubuntu 22.04 LTS  
+**Storage**: 20GB+ GP3 EBS volume  
+**Network**: Public subnet with internet gateway access  
+**IAM Instance Profile**: TrendsEarthUIInstanceProfile
 
-Connect to each EC2 instance and run:
+#### Security Groups
+
+Create security groups for the instances:
 
 ```bash
+# Production Security Group
+aws ec2 create-security-group \
+    --group-name trendsearth-ui-prod-sg \
+    --description "Security group for Trends.Earth UI Production"
+
+# Add rules for production
+aws ec2 authorize-security-group-ingress \
+    --group-id sg-xxxxxxxxx \
+    --protocol tcp \
+    --port 8000 \
+    --cidr 0.0.0.0/0
+
+# Staging Security Group  
+aws ec2 create-security-group \
+    --group-name trendsearth-ui-staging-sg \
+    --description "Security group for Trends.Earth UI Staging"
+
+# Add rules for staging (restrict to your IP ranges)
+aws ec2 authorize-security-group-ingress \
+    --group-id sg-yyyyyyyyy \
+    --protocol tcp \
+    --port 8001 \
+    --cidr YOUR_IP_RANGE/32
+```
+
+#### Instance User Data Script
+
+```bash
+#!/bin/bash
 # Update system
-sudo apt update && sudo apt upgrade -y
+apt-get update && apt-get upgrade -y
 
-# Install required packages
-sudo apt install -y curl git docker.io docker-compose netcat-openbsd
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+usermod -aG docker ubuntu
 
-# Start and enable Docker
-sudo systemctl start docker
-sudo systemctl enable docker
-
-# Add user to docker group
-sudo usermod -aG docker $USER
-
-# Install Docker Compose V2
-sudo apt install -y docker-compose-plugin
-
-# Logout and login again for group changes to take effect
-```
-
-### 2. Docker Swarm Initialization
-
-On each server, initialize Docker Swarm:
-
-```bash
-# Initialize swarm (single-node cluster)
+# Initialize Docker Swarm
 docker swarm init
 
-# Verify swarm status
-docker node ls
+# Install CodeDeploy agent
+apt-get install -y ruby wget
+cd /home/ubuntu
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x ./install
+./install auto
+
+# Install AWS CLI
+apt-get install -y awscli
+
+# Start CodeDeploy agent
+service codedeploy-agent start
 ```
 
-### 3. Application Directory Setup
-
-Create application directories:
-
-**Production**:
-```bash
-sudo mkdir -p /opt/trends-earth-ui
-sudo chown $USER:$USER /opt/trends-earth-ui
-cd /opt/trends-earth-ui
-git clone https://github.com/ConservationInternational/trends.earth-api-ui.git .
-```
-
-**Staging**:
-```bash
-sudo mkdir -p /opt/trends-earth-ui-staging  
-sudo chown $USER:$USER /opt/trends-earth-ui-staging
-cd /opt/trends-earth-ui-staging
-git clone https://github.com/ConservationInternational/trends.earth-api-ui.git .
-git checkout staging  # or develop
-```
-
-### 4. Docker Registry Setup
-
-If using a private registry on the same infrastructure, set up insecure registry configuration:
+### 5. CodeDeploy Application and Deployment Groups
 
 ```bash
-sudo mkdir -p /etc/docker
-echo '{"insecure-registries":["your-registry-host:5000"]}' | sudo tee /etc/docker/daemon.json
-sudo systemctl restart docker
+# Create CodeDeploy application
+aws deploy create-application \
+    --application-name trendsearth-ui \
+    --compute-platform Server
+
+# Create production deployment group
+aws deploy create-deployment-group \
+    --application-name trendsearth-ui \
+    --deployment-group-name production \
+    --service-role-arn arn:aws:iam::ACCOUNT_ID:role/CodeDeployServiceRole \
+    --ec2-tag-filters Key=Environment,Value=Production,Type=KEY_AND_VALUE \
+    --deployment-config-name CodeDeployDefault.AllAtOneTime \
+    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE
+
+# Create staging deployment group
+aws deploy create-deployment-group \
+    --application-name trendsearth-ui \
+    --deployment-group-name staging \
+    --service-role-arn arn:aws:iam::ACCOUNT_ID:role/CodeDeployServiceRole \
+    --ec2-tag-filters Key=Environment,Value=Staging,Type=KEY_AND_VALUE \
+    --deployment-config-name CodeDeployDefault.AllAtOneTime \
+    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE
 ```
 
-### 5. SSH Key Setup
+### 6. Instance Tags
 
-1. Generate SSH key pairs for GitHub Actions access
-2. Add public keys to `~/.ssh/authorized_keys` on each server
-3. Store private keys as GitHub secrets (`PROD_SSH_KEY`, `STAGING_SSH_KEY`)
-
-### 6. Firewall Configuration (Optional)
-
-If using UFW:
+Tag your EC2 instances so CodeDeploy can identify them:
 
 ```bash
-# Production
-sudo ufw allow 22
-sudo ufw allow 8000
-sudo ufw enable
+# Production instance
+aws ec2 create-tags \
+    --resources i-1234567890abcdef0 \
+    --tags Key=Environment,Value=Production Key=Application,Value=trendsearth-ui
 
-# Staging  
-sudo ufw allow 22
-sudo ufw allow 8001
-sudo ufw enable
+# Staging instance  
+aws ec2 create-tags \
+    --resources i-abcdef1234567890 \
+    --tags Key=Environment,Value=Staging Key=Application,Value=trendsearth-ui
 ```
 
-## Load Balancer / Reverse Proxy (Optional)
+## Required GitHub Secrets
 
-For production deployments, consider setting up:
+After setting up the infrastructure, configure these GitHub secrets:
 
-1. **Application Load Balancer (ALB)** - For SSL termination and domain routing
-2. **CloudFront** - For CDN and additional SSL termination
-3. **Nginx** - Local reverse proxy for advanced routing
+- `AWS_ACCESS_KEY_ID` - AWS access key with ECR, CodeDeploy, and S3 permissions
+- `AWS_SECRET_ACCESS_KEY` - Corresponding secret key  
+- `AWS_REGION` - AWS region (e.g., us-east-1)
+- `CODEDEPLOY_S3_BUCKET` - S3 bucket name for deployment artifacts
+- `ROLLBAR_ACCESS_TOKEN` - (Optional) Rollbar access token
 
-Example Nginx configuration:
+## Verification
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-    
-    location /api-ui-health {
-        proxy_pass http://localhost:8000/api-ui-health;
-        access_log off;
-    }
-}
+1. **ECR Repository**: Verify repository exists and has appropriate permissions
+2. **S3 Bucket**: Confirm bucket exists and is accessible
+3. **IAM Roles**: Verify roles have correct policies attached
+4. **EC2 Instances**: Check instances are running with correct tags and instance profiles
+5. **CodeDeploy**: Verify application and deployment groups are created
+6. **CodeDeploy Agent**: Confirm agent is running on all instances
+
+```bash
+# Check CodeDeploy agent status on instances
+ssh ubuntu@instance-ip 'sudo service codedeploy-agent status'
+
+# Verify ECR repository
+aws ecr describe-repositories --repository-names trendsearth-ui
+
+# Verify CodeDeploy application
+aws deploy get-application --application-name trendsearth-ui
 ```
 
-## Monitoring and Logging
+## Benefits of This Architecture
 
-Consider setting up:
-
-1. **CloudWatch Logs** - For centralized logging
-2. **CloudWatch Metrics** - For monitoring
-3. **AWS Systems Manager** - For patch management
-4. **Rollbar** - Application error tracking (configure `ROLLBAR_ACCESS_TOKEN`)
-
-## Backup Strategy
-
-1. **EBS Snapshots** - Regular automated snapshots
-2. **Application Data** - If using persistent volumes
-3. **Configuration Backup** - Docker compose files and environment configs
-
-## Security Best Practices
-
-1. **Regular Updates**: Keep OS and Docker updated
-2. **Limited Access**: Restrict SSH to known IPs when possible
-3. **Log Monitoring**: Monitor access logs and failed attempts  
-4. **Key Rotation**: Regular rotation of SSH keys and AWS credentials
-5. **Network Segmentation**: Use private subnets when possible
-
-## Terraform Example (Optional)
-
-For infrastructure as code, consider using Terraform. See `terraform/` directory for example configurations.
+1. **Enhanced Security** - No SSH keys or direct server access required
+2. **Managed Services** - Leverages AWS managed services for reliability
+3. **Audit Trail** - Complete deployment history and logging
+4. **Rollback Capabilities** - Built-in rollback support
+5. **Scalability** - Easy to add more instances to deployment groups
+6. **Monitoring** - Integrated with CloudWatch for monitoring and alerting
 
 ## Troubleshooting
 
-### Common Issues
+- **CodeDeploy Agent Issues**: Check `/var/log/aws/codedeploy-agent/` logs
+- **ECR Authentication**: Verify IAM permissions for ECR access
+- **S3 Access**: Confirm bucket policies and IAM permissions
+- **Docker Issues**: Check Docker daemon status and swarm mode
+- **Health Check Failures**: Review application logs and health endpoint responses
 
-1. **Docker daemon not running**: `sudo systemctl start docker`
-2. **Permission denied**: User not in docker group, logout/login required
-3. **Port conflicts**: Check for existing services on ports 8000/8001
-4. **Security group**: Verify GitHub Actions runner IP is allowed
-
-### Useful Commands
-
-```bash
-# Check Docker status
-sudo systemctl status docker
-
-# View Docker logs
-sudo journalctl -u docker
-
-# Check swarm status
-docker node ls
-
-# View running services
-docker service ls
-
-# Check service logs
-docker service logs trendsearth-ui-prod_ui
-```
+For more detailed troubleshooting, refer to the AWS CodeDeploy and ECR documentation.

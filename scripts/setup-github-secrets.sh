@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GitHub Secrets Setup Script for Trends.Earth UI Deployment
-# This script helps configure the required GitHub secrets for EC2 Docker Swarm deployment
+# This script helps configure the required GitHub secrets for ECR + CodeDeploy deployment
 
 set -e
 
@@ -103,34 +103,14 @@ read
 echo ""
 echo -e "${BLUE}📋 AWS Credentials${NC}"
 echo "=================="
-set_secret "AWS_ACCESS_KEY_ID" "AWS access key for security group management"
-set_secret "AWS_SECRET_ACCESS_KEY" "AWS secret key for security group management"
+set_secret "AWS_ACCESS_KEY_ID" "AWS access key for ECR, CodeDeploy, and S3 access"
+set_secret "AWS_SECRET_ACCESS_KEY" "AWS secret key for ECR, CodeDeploy, and S3 access"
 set_secret "AWS_REGION" "AWS region (e.g., us-east-1)" true
 
 echo ""
-echo -e "${BLUE}🏭 Production Environment${NC}"
-echo "=========================="
-set_secret "PROD_HOST" "Production server hostname or IP address"
-set_secret "PROD_USERNAME" "SSH username for production server"
-set_secret_from_file "PROD_SSH_KEY" "SSH private key for production server access" "Path to private key file (e.g., ~/.ssh/prod_key)"
-set_secret "PROD_SSH_PORT" "SSH port for production server (default: 22)" true
-set_secret "PROD_APP_PATH" "Application directory path (default: /opt/trends-earth-ui)" true
-set_secret "PROD_SECURITY_GROUP_ID" "AWS security group ID for production server"
-
-echo ""
-echo -e "${BLUE}🧪 Staging Environment${NC}"
-echo "======================="
-set_secret "STAGING_HOST" "Staging server hostname or IP address"
-set_secret "STAGING_USERNAME" "SSH username for staging server"
-set_secret_from_file "STAGING_SSH_KEY" "SSH private key for staging server access" "Path to private key file (e.g., ~/.ssh/staging_key)"
-set_secret "STAGING_SSH_PORT" "SSH port for staging server (default: 22)" true
-set_secret "STAGING_APP_PATH" "Application directory path (default: /opt/trends-earth-ui-staging)" true
-set_secret "STAGING_SECURITY_GROUP_ID" "AWS security group ID for staging server"
-
-echo ""
-echo -e "${BLUE}🐳 Docker Registry${NC}"
-echo "=================="
-set_secret "DOCKER_REGISTRY" "Docker registry hostname:port (e.g., registry.example.com:5000)"
+echo -e "${BLUE}🚀 CodeDeploy Configuration${NC}"
+echo "==========================="
+set_secret "CODEDEPLOY_S3_BUCKET" "S3 bucket for CodeDeploy deployment artifacts"
 
 echo ""
 echo -e "${BLUE}📊 Optional Services${NC}"

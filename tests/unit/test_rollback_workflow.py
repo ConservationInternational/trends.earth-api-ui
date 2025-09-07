@@ -51,18 +51,17 @@ def test_rollback_workflow_required_steps():
     with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
-    # Check required steps exist for EC2 Docker Swarm rollback
+    # Check required steps exist for ECR + CodeDeploy rollback
     required_steps = [
-        "Validate required secrets",
+        "Validate inputs and configuration",
         "Configure AWS credentials",
-        "Get runner IP and update security group",
-        "Set SSH port variable",
-        "Validate and prepare rollback target",
-        "Perform production rollback",
-        "Verify rollback health",
-        "Run basic integration tests after rollback",
+        "Get current deployment status",
+        "Determine rollback strategy",
+        "Perform automatic rollback",
+        "Perform commit-specific rollback",
+        "Verify rollback",
         "Notify Rollbar of rollback",
-        "Cleanup security group access",
+        "Rollback summary",
     ]
 
     for required_step in required_steps:
@@ -78,16 +77,12 @@ def test_rollback_workflow_secrets():
     with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
-    # Check that required secrets are referenced for EC2 Docker Swarm
+    # Check that required secrets are referenced for ECR + CodeDeploy
     required_secrets = [
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
         "AWS_REGION",
-        "DOCKER_REGISTRY",
-        "PROD_HOST",
-        "PROD_USERNAME",
-        "PROD_SSH_KEY",
-        "PROD_SECURITY_GROUP_ID",
+        "CODEDEPLOY_S3_BUCKET",
         "ROLLBAR_ACCESS_TOKEN",  # Optional but should be referenced
     ]
 
@@ -96,7 +91,7 @@ def test_rollback_workflow_secrets():
 
 
 def test_rollback_workflow_has_ec2_references():
-    """Test that the rollback workflow has EC2/Docker Swarm specific references."""
+    """Test that the rollback workflow has ECR + CodeDeploy specific references."""
     workflow_path = (
         Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback-production.yml"
     )
@@ -104,21 +99,21 @@ def test_rollback_workflow_has_ec2_references():
     with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
-    # These should appear in an EC2 Docker Swarm rollback workflow
-    ec2_terms = [
-        "ssh-action",
-        "docker service",
-        "appleboy/ssh-action",
-        ":8000",  # Correct port for production
-        "trendsearth-ui-prod",  # Stack name
+    # These should appear in an ECR + CodeDeploy rollback workflow
+    codedeploy_terms = [
+        "ECR_REPOSITORY",
+        "CODEDEPLOY_APPLICATION",
+        "CODEDEPLOY_DEPLOYMENT_GROUP",
+        "aws deploy",
+        "trendsearth-ui",  # Application name
     ]
 
-    for term in ec2_terms:
-        assert term in content, f"Missing EC2/Docker Swarm term that should be in workflow: {term}"
+    for term in codedeploy_terms:
+        assert term in content, f"Missing ECR/CodeDeploy term that should be in workflow: {term}"
 
 
 def test_rollback_workflow_health_check_url():
-    """Test that the rollback workflow uses the correct health check endpoint."""
+    """Test that the rollback workflow uses CodeDeploy validation hooks."""
     workflow_path = (
         Path(__file__).parent.parent.parent / ".github" / "workflows" / "rollback-production.yml"
     )
@@ -126,10 +121,10 @@ def test_rollback_workflow_health_check_url():
     with open(workflow_path, encoding="utf-8") as f:
         content = f.read()
 
-    # Should use correct health endpoint for EC2 deployment
-    assert "/api-ui-health" in content
-    assert ":8000" in content  # Production port
-    assert "127.0.0.1:8000" in content  # Direct localhost check
+    # Should reference CodeDeploy validation instead of direct health checks
+    assert "CodeDeploy validation hooks" in content or "validation hooks" in content
 
-    # Should use the direct URL pattern for EC2
-    assert "http://127.0.0.1:8000/api-ui-health" in content
+    # Should still reference the health endpoint in deployment scripts (via appspec.yml)
+    # but the workflow itself relies on CodeDeploy for validation
+    assert "rollback" in content.lower()
+    assert "production" in content.lower()

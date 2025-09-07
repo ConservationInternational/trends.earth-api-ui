@@ -1,38 +1,22 @@
-# EC2 Docker Swarm Deployment Setup
+# ECR + CodeDeploy Deployment Setup
 
-This document provides instructions for setting up the EC2 Docker Swarm deployment infrastructure and configuring the required GitHub secrets for the Trends.Earth API UI.
+This document provides instructions for setting up the ECR + AWS CodeDeploy deployment infrastructure and configuring the required GitHub secrets for the Trends.Earth API UI.
 
 ## Overview
 
-The deployment uses EC2 instances with Docker Swarm for both staging and production environments. GitHub Actions connect via SSH to build Docker images locally on the servers and deploy using Docker stack commands.
+The deployment uses Amazon ECR (Elastic Container Registry) for container storage and AWS CodeDeploy for deployment to EC2 instances running Docker Swarm. This approach provides enhanced security by eliminating direct SSH access and leverages AWS managed services for deployment automation.
 
 ## Required GitHub Secrets
 
 The following secrets must be configured in the GitHub repository settings for the deployment workflows to function:
 
 ### AWS Credentials
-- `AWS_ACCESS_KEY_ID` - AWS access key for security group management
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key for security group management  
+- `AWS_ACCESS_KEY_ID` - AWS access key for ECR, CodeDeploy, and S3 access
+- `AWS_SECRET_ACCESS_KEY` - AWS secret key for ECR, CodeDeploy, and S3 access  
 - `AWS_REGION` - AWS region (default: us-east-1)
 
-### Production Environment
-- `PROD_HOST` - Production server hostname/IP
-- `PROD_USERNAME` - SSH username for production server
-- `PROD_SSH_KEY` - SSH private key for production server access
-- `PROD_SSH_PORT` - SSH port (default: 22)
-- `PROD_APP_PATH` - Path to application directory (default: /opt/trends-earth-ui)
-- `PROD_SECURITY_GROUP_ID` - AWS security group ID for production server
-
-### Staging Environment  
-- `STAGING_HOST` - Staging server hostname/IP
-- `STAGING_USERNAME` - SSH username for staging server
-- `STAGING_SSH_KEY` - SSH private key for staging server access
-- `STAGING_SSH_PORT` - SSH port (default: 22)
-- `STAGING_APP_PATH` - Path to application directory (default: /opt/trends-earth-ui-staging)
-- `STAGING_SECURITY_GROUP_ID` - AWS security group ID for staging server
-
-### Docker Registry
-- `DOCKER_REGISTRY` - Docker registry hostname:port (e.g., registry.example.com:5000)
+### CodeDeploy Configuration
+- `CODEDEPLOY_S3_BUCKET` - S3 bucket for CodeDeploy deployment artifacts
 
 ### Optional
 - `ROLLBAR_ACCESS_TOKEN` - Rollbar token for deployment notifications
@@ -44,7 +28,7 @@ The following secrets must be configured in the GitHub repository settings for t
 - **Service**: `trendsearth-ui-prod_ui`
 - **Port**: 8000
 - **Health Endpoint**: `http://localhost:8000/api-ui-health`
-- **Docker Image**: `${DOCKER_REGISTRY}/trendsearth-ui:latest`
+- **Docker Image**: ECR registry with commit-specific tags
 
 ### Staging Environment
 - **Stack Name**: `trendsearth-ui-staging` 

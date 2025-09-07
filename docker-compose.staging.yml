@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   ui:
-    image: ${DOCKER_REGISTRY}/trendsearth-ui:staging
+    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/trendsearth-ui:staging
     ports:
       - "8001:8000"
     environment:
