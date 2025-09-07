@@ -1,7 +1,8 @@
 """Test status page optimization features."""
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 from trendsearth_ui.utils.status_data_manager import StatusDataManager
 
@@ -65,22 +66,28 @@ class TestStatusDataManager:
         # Mock successful response
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {"data": [{"timestamp": "2023-01-01", "executions_running": 5}]}
+        mock_response.json.return_value = {
+            "data": [{"timestamp": "2023-01-01", "executions_running": 5}]
+        }
         mock_get.return_value = mock_response
 
         # Mock the helper functions
-        with patch("trendsearth_ui.utils.status_data_manager.fetch_deployment_info") as mock_deployment, \
-             patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm, \
-             patch("trendsearth_ui.utils.status_data_manager.is_status_endpoint_available") as mock_available:
-            
+        with (
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
+            ) as mock_deployment,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.is_status_endpoint_available"
+            ) as mock_available,
+        ):
             mock_deployment.return_value = {"deployment": "info"}
             mock_swarm.return_value = ({"swarm": "info"}, " (cached)")
             mock_available.return_value = True
 
             # First call should fetch from API
             result1 = StatusDataManager.fetch_consolidated_status_data(
-                token="test_token", 
-                api_environment="test"
+                token="test_token", api_environment="test"
             )
 
             # Verify the result structure
@@ -92,13 +99,12 @@ class TestStatusDataManager:
 
             # Second call should use cache (no additional API call)
             result2 = StatusDataManager.fetch_consolidated_status_data(
-                token="test_token", 
-                api_environment="test"
+                token="test_token", api_environment="test"
             )
 
             # Should be the same result
             assert result1 == result2
-            
+
             # Should have only made one API call due to caching
             assert mock_get.call_count == 1
 
@@ -106,10 +112,7 @@ class TestStatusDataManager:
         """Test that stats data fetching checks for SUPERADMIN permissions."""
         # Test with non-SUPERADMIN role
         result = StatusDataManager.fetch_consolidated_stats_data(
-            token="test_token",
-            api_environment="test", 
-            time_period="day",
-            role="ADMIN"
+            token="test_token", api_environment="test", time_period="day", role="ADMIN"
         )
 
         assert result["error"] == "Insufficient permissions"
@@ -122,14 +125,14 @@ class TestStatusDataManager:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status.return_value = None
-        mock_response.json.return_value = {"data": [{"timestamp": "2023-01-01", "executions_active": 3}]}
+        mock_response.json.return_value = {
+            "data": [{"timestamp": "2023-01-01", "executions_active": 3}]
+        }
         mock_get.return_value = mock_response
 
         # First call should fetch from API
         result1 = StatusDataManager.fetch_time_series_status_data(
-            token="test_token",
-            api_environment="test",
-            time_period="day"
+            token="test_token", api_environment="test", time_period="day"
         )
 
         # Verify the result structure
@@ -139,14 +142,12 @@ class TestStatusDataManager:
 
         # Second call should use cache
         result2 = StatusDataManager.fetch_time_series_status_data(
-            token="test_token",
-            api_environment="test", 
-            time_period="day"
+            token="test_token", api_environment="test", time_period="day"
         )
 
         # Should be the same result
         assert result1 == result2
-        
+
         # Should have only made one API call due to caching
         assert mock_get.call_count == 1
 
@@ -167,10 +168,11 @@ class TestStatusCallbackOptimization:
             def decorator(func):
                 callback_functions[func.__name__] = func
                 return func
+
             return decorator
 
         mock_app.callback = capture_callback
-        
+
         # Register callbacks
         register_callbacks(mock_app)
 
@@ -179,18 +181,23 @@ class TestStatusCallbackOptimization:
         assert status_summary_func is not None
 
         # Mock the callback context to simulate manual refresh
-        with patch("trendsearth_ui.callbacks.status.callback_context") as mock_ctx, \
-             patch("trendsearth_ui.callbacks.status.get_cached_data") as mock_get_cache, \
-             patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment, \
-             patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm, \
-             patch("trendsearth_ui.callbacks.status.is_status_endpoint_available") as mock_available:
-
+        with (
+            patch("trendsearth_ui.callbacks.status.callback_context") as mock_ctx,
+            patch("trendsearth_ui.callbacks.status.get_cached_data") as mock_get_cache,
+            patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
+            patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
+            patch(
+                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data"
+            ) as mock_status_data,
+        ):
             # Set up mocks
             mock_ctx.triggered = [{"prop_id": "refresh-status-btn.n_clicks"}]
             mock_get_cache.return_value = None
             mock_deployment.return_value = {"deployment": "info"}
             mock_swarm.return_value = ({"swarm": "info"}, "")
-            mock_available.return_value = False  # Use fallback to avoid complex API mocking
+            mock_status_data.return_value = {
+                "status_endpoint_available": False
+            }  # Use fallback to avoid complex API mocking
 
             # Call the function with manual refresh
             status_summary_func(
@@ -200,7 +207,7 @@ class TestStatusCallbackOptimization:
                 active_tab="status",
                 user_timezone="UTC",
                 role="ADMIN",
-                api_environment="test"
+                api_environment="test",
             )
 
             # Verify that cache invalidation was called
@@ -209,13 +216,13 @@ class TestStatusCallbackOptimization:
     def test_optimization_integration_in_callbacks(self):
         """Test that StatusDataManager is properly imported and available in callbacks."""
         from trendsearth_ui.callbacks import status
-        
+
         # Verify StatusDataManager is available
-        assert hasattr(status, 'StatusDataManager')
+        assert hasattr(status, "StatusDataManager")
         assert status.StatusDataManager is not None
-        
+
         # Verify key methods are available
-        assert hasattr(status.StatusDataManager, 'fetch_consolidated_status_data')
-        assert hasattr(status.StatusDataManager, 'fetch_consolidated_stats_data')
-        assert hasattr(status.StatusDataManager, 'fetch_time_series_status_data')
-        assert hasattr(status.StatusDataManager, 'invalidate_cache')
+        assert hasattr(status.StatusDataManager, "fetch_consolidated_status_data")
+        assert hasattr(status.StatusDataManager, "fetch_consolidated_stats_data")
+        assert hasattr(status.StatusDataManager, "fetch_time_series_status_data")
+        assert hasattr(status.StatusDataManager, "invalidate_cache")

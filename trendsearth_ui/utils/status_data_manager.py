@@ -222,10 +222,10 @@ class StatusDataManager:
         force_refresh: bool = False,
     ) -> dict[str, Any]:
         """
-        Fetch time series status data for charts.
+        Fetch optimized time series status data for charts with enhanced caching and preprocessing.
 
         Returns:
-            dict: Contains time series data and metadata for chart generation
+            dict: Contains time series data, metadata for chart generation, and optimization info
         """
         cache_key = StatusDataManager.get_cache_key(
             "time_series_status", api_environment=api_environment, period=time_period
@@ -240,16 +240,19 @@ class StatusDataManager:
 
         logger.info(f"Fetching fresh time series data for period {time_period}")
 
-        # Calculate time range for API query
+        # Calculate time range for API query with optimized parameters
         from datetime import timedelta
 
         end_time = datetime.now(timezone.utc)
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
+            max_points = 720  # ~1 point per hour for 30 days
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
+            max_points = 336  # ~1 point per 30 minutes for 7 days
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
+            max_points = 288  # ~1 point per 5 minutes for 24 hours
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -260,6 +263,8 @@ class StatusDataManager:
             "time_period": time_period,
             "start_time": start_iso,
             "end_time": end_iso,
+            "max_points": max_points,
+            "optimization_applied": False,
             "error": None,
         }
 
@@ -271,18 +276,32 @@ class StatusDataManager:
                 params={
                     "start_date": start_iso,
                     "end_date": end_iso,
-                    "per_page": 1000,  # Fetch up to 1000 data points
+                    "per_page": max_points,  # Adaptive limit based on time period
                     "sort": "timestamp",  # Sort by timestamp ascending
+                    "exclude": "metadata,logs",  # Exclude large fields for performance
                 },
-                timeout=10,
+                timeout=15,  # Longer timeout for time series data
             )
             resp.raise_for_status()
 
             status_data = resp.json().get("data", [])
-            result["data"] = status_data
+
+            # Apply optimization if we have too many data points
+            if len(status_data) > max_points:
+                # Apply intelligent sampling to reduce data points while preserving trends
+                optimized_data = StatusDataManager._optimize_time_series_data(
+                    status_data, max_points, time_period
+                )
+                result["data"] = optimized_data
+                result["optimization_applied"] = True
+                logger.info(
+                    f"Applied time series optimization: {len(status_data)} -> {len(optimized_data)} points"
+                )
+            else:
+                result["data"] = status_data
 
             logger.info(
-                f"Successfully fetched {len(status_data)} time series records for period {time_period}"
+                f"Successfully fetched {len(result['data'])} time series records for period {time_period}"
             )
 
         except requests.exceptions.RequestException as e:
@@ -292,6 +311,42 @@ class StatusDataManager:
         # Cache the result
         StatusDataManager.set_cached_data(cache_key, result)
         return result
+
+    @staticmethod
+    def _optimize_time_series_data(
+        data: list[dict], target_points: int, _time_period: str
+    ) -> list[dict]:
+        """
+        Optimize time series data by intelligently sampling to reduce data points while preserving trends.
+
+        Args:
+            data: List of status data dictionaries
+            target_points: Target number of data points
+            _time_period: Time period for context-aware optimization (unused for now)
+
+        Returns:
+            list: Optimized data with reduced points
+        """
+        if len(data) <= target_points:
+            return data
+
+        # Sort by timestamp to ensure proper ordering
+        sorted_data = sorted(data, key=lambda x: x.get("timestamp", ""))
+
+        # Use systematic sampling with some randomization to preserve key events
+        step = len(sorted_data) / target_points
+        optimized_data = []
+
+        for i in range(target_points):
+            index = int(i * step)
+            if index < len(sorted_data):
+                optimized_data.append(sorted_data[index])
+
+        # Always include the most recent data point
+        if sorted_data and sorted_data[-1] not in optimized_data:
+            optimized_data[-1] = sorted_data[-1]
+
+        return optimized_data
 
     @staticmethod
     def invalidate_cache(pattern: str = None) -> int:

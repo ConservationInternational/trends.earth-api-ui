@@ -391,22 +391,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
@@ -477,22 +463,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
@@ -567,22 +539,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,

@@ -10,13 +10,6 @@ import plotly.graph_objects as go
 import requests
 
 from ..config import get_api_base
-from ..utils.stats_utils import (
-    fetch_dashboard_stats,
-    fetch_execution_stats,
-    fetch_scripts_count,
-    fetch_user_stats,
-    get_optimal_grouping_for_period,
-)
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
     create_system_overview,
@@ -27,8 +20,7 @@ from ..utils.status_data_manager import StatusDataManager
 from ..utils.status_helpers import (
     fetch_deployment_info,  # noqa: F401 (used in tests)
     fetch_swarm_info,
-    get_fallback_summary,
-    is_status_endpoint_available,
+    get_fallback_summary,  # Used by StatusDataManager
 )
 from ..utils.timezone_utils import (
     convert_utc_to_local,
@@ -100,7 +92,9 @@ def register_callbacks(app):
         if is_manual_refresh:
             try:
                 cleared_count = StatusDataManager.invalidate_cache("status")
-                logger.info(f"Manual refresh: invalidated {cleared_count} StatusDataManager cache entries")
+                logger.info(
+                    f"Manual refresh: invalidated {cleared_count} StatusDataManager cache entries"
+                )
             except Exception as e:
                 logger.warning(f"Failed to invalidate StatusDataManager cache: {e}")
 
@@ -147,252 +141,243 @@ def register_callbacks(app):
             f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
         )
 
-        # Quick check if status endpoint is available
-        if not is_status_endpoint_available(token, api_environment):
-            fallback_result = get_fallback_summary()
-            set_cached_data("summary", fallback_result)  # Shorter cache for fallback
-            set_cached_data("deployment", deployment_info)  # Cache deployment for 5 min
-            set_cached_data("swarm", swarm_info)  # Cache swarm for 5 min
-            return fallback_result, deployment_info, swarm_info, swarm_title
-
-        headers = {"Authorization": f"Bearer {token}"}
-
+        # Use StatusDataManager for consolidated status data fetching
         try:
-            # Get the latest status data from the status endpoint with optimized parameters
-            resp = requests.get(
-                f"{get_api_base(api_environment)}/status",
-                headers=headers,
-                params={
-                    "per_page": 1,
-                    "sort": "-timestamp",
-                    "exclude": "metadata,logs",  # Exclude large fields for performance
-                },
-                timeout=5,  # Reduced from 10 seconds
+            status_result = StatusDataManager.fetch_consolidated_status_data(
+                token, api_environment, force_refresh=is_manual_refresh
             )
 
-            if resp.status_code == 200:
-                status_data = resp.json().get("data", [])
-                if status_data:
-                    latest_status = status_data[0]
-                    timestamp = latest_status.get("timestamp", "")
+            # Check if status endpoint is available
+            if not status_result["status_endpoint_available"]:
+                fallback_result = get_fallback_summary()
+                set_cached_data("summary", fallback_result)
+                set_cached_data("deployment", deployment_info)
+                set_cached_data("swarm", swarm_info)
+                return fallback_result, deployment_info, swarm_info, swarm_title
 
-                    # Format the timestamp - show local time on top, UTC in parentheses
-                    try:
-                        if timestamp:
-                            dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                            utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+            # Check if we have valid status data
+            if status_result["summary"] == "SUCCESS" and status_result["latest_status"]:
+                latest_status = status_result["latest_status"]
+                timestamp = latest_status.get("timestamp", "")
 
-                            # Use Python to convert UTC to user's local time
-                            local_time_str, tz_abbrev = format_local_time(
-                                dt_utc, safe_timezone, include_seconds=True
-                            )
+                # Format the timestamp - show local time on top, UTC in parentheses
+                try:
+                    if timestamp:
+                        dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                        utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
 
-                            timestamp_display = html.Div(
-                                [
-                                    html.Div(
-                                        f"{local_time_str} {tz_abbrev}",
-                                        className="fw-bold text-primary",
-                                    ),
-                                    html.Div(f"({utc_time_str})", className="text-muted small"),
-                                ]
-                            )
-                        else:
-                            timestamp_display = "Not available"
-                    except (ValueError, TypeError):
-                        timestamp_display = "Invalid timestamp format"
+                        # Use Python to convert UTC to user's local time
+                        local_time_str, tz_abbrev = format_local_time(
+                            dt_utc, safe_timezone, include_seconds=True
+                        )
 
-                    # Extract status details for different sections
-                    executions_ready = latest_status.get("executions_ready", 0)
-                    executions_running = latest_status.get("executions_running", 0)
-                    executions_finished = latest_status.get("executions_finished", 0)
-                    executions_failed = latest_status.get("executions_failed", 0)
-                    executions_cancelled = latest_status.get("executions_cancelled", 0)
-                    executions_pending = latest_status.get("executions_pending", 0)
-                    active_total = executions_running + executions_ready + executions_pending
-                    completed_total = executions_finished + executions_failed + executions_cancelled
+                        timestamp_display = html.Div(
+                            [
+                                html.Div(
+                                    f"{local_time_str} {tz_abbrev}",
+                                    className="fw-bold text-primary",
+                                ),
+                                html.Div(f"({utc_time_str})", className="text-muted small"),
+                            ]
+                        )
+                    else:
+                        timestamp_display = "Not available"
+                except (ValueError, TypeError):
+                    timestamp_display = "Invalid timestamp format"
 
-                    # Create summary layout with expected section headers
-                    summary_layout = html.Div(
-                        [
-                            # Active Executions Section
-                            html.H5("Active Executions", className="text-center mb-3 text-muted"),
-                            # First row: Individual statuses
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Running", className="mb-2"),
-                                            html.P(
-                                                str(executions_running),
-                                                className="text-primary mb-1",
+                # Extract status details for different sections
+                executions_ready = latest_status.get("executions_ready", 0)
+                executions_running = latest_status.get("executions_running", 0)
+                executions_finished = latest_status.get("executions_finished", 0)
+                executions_failed = latest_status.get("executions_failed", 0)
+                executions_cancelled = latest_status.get("executions_cancelled", 0)
+                executions_pending = latest_status.get("executions_pending", 0)
+                active_total = executions_running + executions_ready + executions_pending
+                completed_total = executions_finished + executions_failed + executions_cancelled
+
+                # Create summary layout with expected section headers
+                summary_layout = html.Div(
+                    [
+                        # Active Executions Section
+                        html.H5("Active Executions", className="text-center mb-3 text-muted"),
+                        # First row: Individual statuses
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H6("Running", className="mb-2"),
+                                        html.P(
+                                            str(executions_running),
+                                            className="text-primary mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6("Ready", className="mb-2"),
+                                        html.P(
+                                            str(executions_ready),
+                                            className="text-info mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6("Pending", className="mb-2"),
+                                        html.P(
+                                            str(executions_pending),
+                                            className="text-warning mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                            ],
+                            className="row mb-3",
+                        ),
+                        # Second row: Active Total (prominent and centered)
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H5("Active Total", className="mb-2 text-muted"),
+                                        html.H3(
+                                            str(active_total),
+                                            className="text-success mb-1 fw-bold",
+                                        ),
+                                    ],
+                                    className="col-12 text-center",
+                                ),
+                            ],
+                            className="row mb-4",
+                        ),
+                        # Completed Executions Section
+                        html.H5("Completed Executions", className="text-center mb-3 text-muted"),
+                        # First row: Individual statuses
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H6("Finished", className="mb-2"),
+                                        html.P(
+                                            str(executions_finished),
+                                            className="text-success mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6("Failed", className="mb-2"),
+                                        html.P(
+                                            str(executions_failed),
+                                            className="text-danger mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6("Cancelled", className="mb-2"),
+                                        html.P(
+                                            str(executions_cancelled),
+                                            className="text-secondary mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-4 text-center",
+                                ),
+                            ],
+                            className="row mb-3",
+                        ),
+                        # Second row: Completed Total (prominent and centered)
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H5("Completed Total", className="mb-2 text-muted"),
+                                        html.H3(
+                                            str(completed_total),
+                                            className="text-info mb-1 fw-bold",
+                                        ),
+                                    ],
+                                    className="col-12 text-center",
+                                ),
+                            ],
+                            className="row mb-4",
+                        ),
+                        # Summary Totals Section
+                        html.H5("Summary Totals", className="text-center mb-3 text-muted"),
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H6("Total Executions", className="mb-2"),
+                                        html.P(
+                                            str(
+                                                latest_status.get(
+                                                    "executions_count",
+                                                    active_total + completed_total,
+                                                )
                                             ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Ready", className="mb-2"),
-                                            html.P(
-                                                str(executions_ready),
-                                                className="text-info mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Pending", className="mb-2"),
-                                            html.P(
-                                                str(executions_pending),
-                                                className="text-warning mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                ],
-                                className="row mb-3",
-                            ),
-                            # Second row: Active Total (prominent and centered)
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H5("Active Total", className="mb-2 text-muted"),
-                                            html.H3(
-                                                str(active_total),
-                                                className="text-success mb-1 fw-bold",
-                                            ),
-                                        ],
-                                        className="col-12 text-center",
-                                    ),
-                                ],
-                                className="row mb-4",
-                            ),
-                            # Completed Executions Section
-                            html.H5(
-                                "Completed Executions", className="text-center mb-3 text-muted"
-                            ),
-                            # First row: Individual statuses
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Finished", className="mb-2"),
-                                            html.P(
-                                                str(executions_finished),
-                                                className="text-success mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Failed", className="mb-2"),
-                                            html.P(
-                                                str(executions_failed),
-                                                className="text-danger mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Cancelled", className="mb-2"),
-                                            html.P(
-                                                str(executions_cancelled),
-                                                className="text-secondary mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-4 text-center",
-                                    ),
-                                ],
-                                className="row mb-3",
-                            ),
-                            # Second row: Completed Total (prominent and centered)
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H5("Completed Total", className="mb-2 text-muted"),
-                                            html.H3(
-                                                str(completed_total),
-                                                className="text-info mb-1 fw-bold",
-                                            ),
-                                        ],
-                                        className="col-12 text-center",
-                                    ),
-                                ],
-                                className="row mb-4",
-                            ),
-                            # Summary Totals Section
-                            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Total Executions", className="mb-2"),
-                                            html.P(
-                                                str(
-                                                    latest_status.get(
-                                                        "executions_count",
-                                                        active_total + completed_total,
-                                                    )
-                                                ),
-                                                className="text-primary mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-6 text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.H6("Users", className="mb-2"),
-                                            html.P(
-                                                str(latest_status.get("users_count", 0)),
-                                                className="text-info mb-1",
-                                            ),
-                                        ],
-                                        className="col-md-6 text-center",
-                                    ),
-                                ],
-                                className="row mb-4",
-                            ),
-                            # Last Updated Section
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H6("Last Updated", className="mb-2"),
-                                            timestamp_display,
-                                        ],
-                                        className="col-12 text-center",
-                                    ),
-                                ],
-                                className="row mb-4",
-                            ),
-                        ]
-                    )
-                    set_cached_data("summary", summary_layout)
-                    set_cached_data("deployment", deployment_info)
-                    set_cached_data("swarm", swarm_info)
-                    return summary_layout, deployment_info, swarm_info, swarm_title
-                else:
-                    no_data_result = html.Div(
-                        "No status data available.", className="text-center text-muted"
-                    )
-                    set_cached_data("summary", no_data_result)
-                    set_cached_data("deployment", deployment_info)
-                    set_cached_data("swarm", swarm_info)
-                    return no_data_result, deployment_info, swarm_info, swarm_title
+                                            className="text-primary mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-6 text-center",
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6("Users", className="mb-2"),
+                                        html.P(
+                                            str(latest_status.get("users_count", 0)),
+                                            className="text-info mb-1",
+                                        ),
+                                    ],
+                                    className="col-md-6 text-center",
+                                ),
+                            ],
+                            className="row mb-4",
+                        ),
+                        # Last Updated Section
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H6("Last Updated", className="mb-2"),
+                                        timestamp_display,
+                                    ],
+                                    className="col-12 text-center",
+                                ),
+                            ],
+                            className="row mb-4",
+                        ),
+                    ]
+                )
+                set_cached_data("summary", summary_layout)
+                set_cached_data("deployment", deployment_info)
+                set_cached_data("swarm", swarm_info)
+                return summary_layout, deployment_info, swarm_info, swarm_title
+            elif status_result["summary"] == "NO_DATA":
+                no_data_result = html.Div(
+                    "No status data available.", className="text-center text-muted"
+                )
+                set_cached_data("summary", no_data_result)
+                set_cached_data("deployment", deployment_info)
+                set_cached_data("swarm", swarm_info)
+                return no_data_result, deployment_info, swarm_info, swarm_title
             else:
+                # Handle API errors or request errors
+                error_message = status_result.get("error", "Unknown error occurred")
                 error_result = html.Div(
-                    f"Error fetching status: {resp.status_code}",
+                    f"Error fetching status: {error_message}",
                     className="text-center text-danger",
                 )
                 set_cached_data("summary", error_result)
                 set_cached_data("deployment", deployment_info)
                 set_cached_data("swarm", swarm_info)
                 return error_result, deployment_info, swarm_info, swarm_title
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
+            logger.error(f"Unexpected error in update_status_summary: {e}")
             error_result = html.Div(
                 f"Error fetching status: {e}", className="text-center text-danger"
             )
@@ -471,7 +456,9 @@ def register_callbacks(app):
         if is_manual_refresh:
             try:
                 cleared_count = StatusDataManager.invalidate_cache("stats")
-                logger.info(f"Manual refresh: invalidated {cleared_count} StatusDataManager stats cache entries")
+                logger.info(
+                    f"Manual refresh: invalidated {cleared_count} StatusDataManager stats cache entries"
+                )
             except Exception as e:
                 logger.warning(f"Failed to invalidate StatusDataManager stats cache: {e}")
 
@@ -481,120 +468,105 @@ def register_callbacks(app):
             if cached_statistics is not None:
                 return cached_statistics
 
-        # Quick check if status endpoint is available
-        if not is_status_endpoint_available(token, api_environment):
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
-
-        headers = {"Authorization": f"Bearer {token}"}
-
+        # Use StatusDataManager for consolidated data fetching
         try:
-            # Get the latest status data from the status endpoint with optimized parameters
-            resp = requests.get(
-                f"{get_api_base(api_environment)}/status",
-                headers=headers,
-                params={
-                    "per_page": 1,
-                    "sort": "-timestamp",
-                    "exclude": "metadata,logs",  # Exclude large fields for performance
-                },
-                timeout=5,  # Reduced from 10 seconds
+            # Get consolidated status data first for latest_status
+            status_result = StatusDataManager.fetch_consolidated_status_data(
+                token, api_environment, force_refresh=is_manual_refresh
             )
 
-            if resp.status_code == 200:
-                status_data = resp.json().get("data", [])
-                if status_data:
-                    # Fetch enhanced statistics for SUPERADMIN users with selected time period
-                    # Request all available sections to ensure we get comprehensive data:
-                    # - summary: total counts and recent activity metrics
-                    # - trends: time series data for analysis
-                    # - geographic: location-based statistics
-                    # - tasks: job queue and processing metrics
-                    dashboard_stats = fetch_dashboard_stats(
-                        token,
-                        api_environment,
-                        api_period,
-                        include_sections=["summary", "trends", "geographic", "tasks"],
-                    )
+            # Check if status endpoint is available
+            if not status_result["status_endpoint_available"]:
+                return (
+                    no_update,
+                    no_update,
+                    no_update,
+                    no_update,
+                )
 
-                    # Get time series data for better visualizations by using group_by parameter
-                    # Use optimal grouping based on the period for more meaningful data
-                    user_group_by, execution_group_by = get_optimal_grouping_for_period(api_period)
+            # Get consolidated stats data
+            stats_result = StatusDataManager.fetch_consolidated_stats_data(
+                token, api_environment, time_period, role, force_refresh=is_manual_refresh
+            )
 
-                    user_stats = fetch_user_stats(
-                        token, api_environment, api_period, group_by=user_group_by
-                    )
-                    execution_stats = fetch_execution_stats(
-                        token, api_environment, api_period, group_by=execution_group_by
-                    )
+            # Check if user has required permissions
+            if stats_result.get("requires_superadmin"):
+                permission_msg = html.Div(
+                    [
+                        html.P("Enhanced Statistics", className="text-muted text-center"),
+                        html.Small(
+                            "SUPERADMIN privileges required to access detailed analytics.",
+                            className="text-muted text-center d-block",
+                        ),
+                    ],
+                    className="p-4",
+                )
+                return permission_msg, permission_msg, permission_msg, [permission_msg]
 
-                    # Debug logging to see what we actually get
-                    logger.info(f"Dashboard stats type: {type(dashboard_stats)}")
-                    logger.info(f"User stats type: {type(user_stats)}")
-                    logger.info(f"Execution stats type: {type(execution_stats)}")
+            # Check if we have valid status and stats data
+            if (
+                status_result["summary"] == "SUCCESS"
+                and status_result["latest_status"]
+                and not stats_result.get("error")
+            ):
+                latest_status = status_result["latest_status"]
+                dashboard_stats = stats_result["dashboard_stats"]
+                user_stats = stats_result["user_stats"]
+                execution_stats = stats_result["execution_stats"]
+                scripts_count = stats_result["scripts_count"]
 
-                    if isinstance(dashboard_stats, dict):
-                        logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
-                        # Log available sections to ensure we're utilizing all data
-                        data_section = dashboard_stats.get("data", {})
-                        if isinstance(data_section, dict):
-                            available_sections = list(data_section.keys())
-                            logger.info(f"Available dashboard sections: {available_sections}")
+                # Debug logging to see what we actually get
+                logger.info(f"Dashboard stats type: {type(dashboard_stats)}")
+                logger.info(f"User stats type: {type(user_stats)}")
+                logger.info(f"Execution stats type: {type(execution_stats)}")
 
-                            # Log summary of each section to understand data completeness
-                            for section in available_sections:
-                                section_data = data_section.get(section, {})
-                                if isinstance(section_data, dict):
-                                    section_keys = list(section_data.keys())
-                                    logger.info(f"Dashboard {section} section keys: {section_keys}")
-                                else:
-                                    logger.info(
-                                        f"Dashboard {section} section type: {type(section_data)}"
-                                    )
-                    if isinstance(user_stats, dict):
-                        logger.info(f"User stats keys: {list(user_stats.keys())}")
-                    if isinstance(execution_stats, dict):
-                        logger.info(f"Execution stats keys: {list(execution_stats.keys())}")
+                if isinstance(dashboard_stats, dict):
+                    logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
+                    # Log available sections to ensure we're utilizing all data
+                    data_section = dashboard_stats.get("data", {})
+                    if isinstance(data_section, dict):
+                        available_sections = list(data_section.keys())
+                        logger.info(f"Available dashboard sections: {available_sections}")
 
-                    # Format and cache the enhanced statistics with period-specific key
-                    # Get the latest status for scripts count and add scripts count
-                    latest_status = status_data[0] if status_data else {}
+                        # Log summary of each section to understand data completeness
+                        for section in available_sections:
+                            section_data = data_section.get(section, {})
+                            if isinstance(section_data, dict):
+                                section_keys = list(section_data.keys())
+                                logger.info(f"Dashboard {section} section keys: {section_keys}")
+                            else:
+                                logger.info(
+                                    f"Dashboard {section} section type: {type(section_data)}"
+                                )
+                if isinstance(user_stats, dict):
+                    logger.info(f"User stats keys: {list(user_stats.keys())}")
+                if isinstance(execution_stats, dict):
+                    logger.info(f"Execution stats keys: {list(execution_stats.keys())}")
 
-                    # Fetch scripts count and add to status data
-                    scripts_count = fetch_scripts_count(token, api_environment)
-                    latest_status["scripts_count"] = scripts_count
+                # Format and cache the enhanced statistics with period-specific key
+                # Add scripts count to latest status
+                latest_status["scripts_count"] = scripts_count
 
-                    system_overview = create_system_overview(dashboard_stats, latest_status)
-                    # Dashboard summary cards removed as they are duplicative with system overview
-                    user_map = create_user_geographic_map(user_stats)
-                    additional_charts = create_user_statistics_chart(
-                        user_stats
-                    ) + create_execution_statistics_chart(execution_stats)
+                system_overview = create_system_overview(dashboard_stats, latest_status)
+                # Dashboard summary cards removed as they are duplicative with system overview
+                user_map = create_user_geographic_map(user_stats)
+                additional_charts = create_user_statistics_chart(
+                    user_stats
+                ) + create_execution_statistics_chart(execution_stats)
 
-                    _stats_cache[cache_key] = (
-                        system_overview,
-                        html.Div(),  # Empty div to replace removed dashboard summary cards
-                        user_map,
-                        additional_charts,
-                    )
+                _stats_cache[cache_key] = (
+                    system_overview,
+                    html.Div(),  # Empty div to replace removed dashboard summary cards
+                    user_map,
+                    additional_charts,
+                )
 
-                    return (
-                        system_overview,
-                        html.Div(),  # Empty div to replace removed dashboard summary cards
-                        user_map,
-                        additional_charts,
-                    )
-                else:
-                    return (
-                        no_update,
-                        no_update,
-                        no_update,
-                        no_update,
-                    )
+                return (
+                    system_overview,
+                    html.Div(),  # Empty div to replace removed dashboard summary cards
+                    user_map,
+                    additional_charts,
+                )
             else:
                 return (
                     no_update,
@@ -602,7 +574,8 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                 )
-        except requests.exceptions.RequestException:
+        except Exception as e:
+            logger.error(f"Unexpected error in update_status_and_statistics: {e}")
             return (
                 no_update,
                 no_update,
@@ -645,8 +618,6 @@ def register_callbacks(app):
             )
             return no_update
 
-        headers = {"Authorization": f"Bearer {token}"}
-
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
 
@@ -669,23 +640,25 @@ def register_callbacks(app):
         start_iso = start_time.isoformat()
         end_iso = end_time.isoformat()
 
-        # Debug: Log API parameters
-        logger.info(f"🌐 API query params: start_date={start_iso}, end_date={end_iso}")
-
+        # Use StatusDataManager for optimized time series data fetching
         try:
-            resp = requests.get(
-                f"{get_api_base(api_environment)}/status",
-                headers=headers,
-                params={
-                    "start_date": start_iso,
-                    "end_date": end_iso,
-                    "per_page": 1000,  # Fetch up to 1000 data points
-                    "sort": "timestamp",  # Sort by timestamp ascending
-                },
-                timeout=10,
+            # Check if manual refresh was triggered
+            ctx = callback_context
+            is_manual_refresh = ctx.triggered and any(
+                "refresh-status-btn" in t["prop_id"] for t in ctx.triggered
             )
-            resp.raise_for_status()
-            status_data = resp.json().get("data", [])
+
+            time_series_result = StatusDataManager.fetch_time_series_status_data(
+                token, api_environment, time_tab, force_refresh=is_manual_refresh
+            )
+
+            if time_series_result.get("error"):
+                return html.Div(
+                    f"Error fetching chart data: {time_series_result['error']}",
+                    className="text-center text-danger p-4",
+                )
+
+            status_data = time_series_result.get("data", [])
 
             if not status_data:
                 # Get time period name for user feedback
@@ -710,7 +683,7 @@ def register_callbacks(app):
                                     className="text-muted mb-2",
                                 ),
                                 html.Small(
-                                    f"API request: {start_iso} to {end_iso}",
+                                    f"Requested time period: {time_tab}",
                                     className="text-muted",
                                 ),
                             ],
@@ -1480,7 +1453,8 @@ def register_callbacks(app):
             logger.info(f"✅ Returning {len(charts)} charts to display for time_tab='{time_tab}'")
             return html.Div(charts)
 
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
+            logger.error(f"Unexpected error in update_status_charts: {e}")
             return html.Div(
                 f"Error fetching chart data: {e}",
                 className="text-center text-danger p-4",
