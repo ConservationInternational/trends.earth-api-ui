@@ -35,18 +35,32 @@ The following secrets must be configured in the GitHub repository settings for t
 - **Service**: `trendsearth-ui-staging_ui`
 - **Port**: 8001 (external), 8000 (internal)
 - **Health Endpoint**: `http://localhost:8001/api-ui-health`
-- **Docker Image**: `${DOCKER_REGISTRY}/trendsearth-ui:staging`
+- **Docker Image**: ECR registry with branch-specific tags
+
+## ECR Integration
+
+The Docker Compose files use ECR images through environment variable substitution:
+
+- **Image Format**: `${DOCKER_REGISTRY}/trendsearth-ui:latest`
+- **ECR Authentication**: Handled by CodeDeploy scripts in `scripts/deployment/before_install.sh`
+- **Registry Resolution**: `DOCKER_REGISTRY` environment variable is set to ECR registry URL during deployment
+- **Fallback Registry**: Falls back to `127.0.0.1:5000` for local development
+
+### How ECR Access Works
+1. **Authentication**: `before_install.sh` runs `aws ecr get-login-password` to authenticate Docker with ECR
+2. **Registry Configuration**: `application_start.sh` sets `DOCKER_REGISTRY` to ECR URL format: `{account-id}.dkr.ecr.{region}.amazonaws.com`
+3. **Image Resolution**: Docker Compose resolves `${DOCKER_REGISTRY}/trendsearth-ui:latest` to the ECR image
+4. **Registry Auth**: Docker Swarm uses `--with-registry-auth` to pass ECR credentials to all nodes
 
 ## Deployment Workflow
 
-1. **Security Group Update**: GitHub Actions runner IP is temporarily added to security group
-2. **Build**: Docker image is built on the target server with git metadata
-3. **Push**: Image is pushed to local Docker registry
-4. **Deploy**: Docker stack deploy with rolling update
-5. **Health Check**: Verification of service health and functionality
-6. **Integration Tests**: Basic smoke tests
-7. **Notifications**: Rollbar deployment notification
-8. **Cleanup**: Remove runner IP from security group
+1. **Build & Push**: Docker image is built in GitHub Actions and pushed to Amazon ECR
+2. **CodeDeploy Bundle**: Deployment artifacts (appspec.yml, scripts, compose files) are packaged and uploaded to S3
+3. **CodeDeploy Deployment**: AWS CodeDeploy orchestrates deployment to EC2 instances
+4. **ECR Authentication**: EC2 instances authenticate with ECR using IAM roles
+5. **Docker Swarm Update**: New image is pulled from ECR and deployed via Docker Swarm rolling update
+6. **Health Check**: Verification of service health via `/api-ui-health` endpoint
+7. **Notifications**: Rollbar deployment notification via CodeDeploy hooks
 
 ## Rollback Process
 
