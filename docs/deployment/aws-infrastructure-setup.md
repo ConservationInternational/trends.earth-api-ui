@@ -2,11 +2,72 @@
 
 This document provides instructions for setting up the AWS infrastructure required for ECR + CodeDeploy deployment of the Trends.Earth API UI.
 
+## Quick Start with Automated Scripts
+
+🚀 **Recommended**: Use the automated setup scripts for a guided, validated setup experience.
+
+### Interactive Setup (Recommended)
+```bash
+# Run the main setup script with guided prompts
+./scripts/setup-aws-infrastructure.sh
+```
+
+### Quick Setup with Defaults
+```bash
+# Set up all components with default values
+./scripts/setup-aws-infrastructure.sh --quick
+```
+
+### Check Existing Infrastructure
+```bash
+# Verify what infrastructure already exists
+./scripts/setup-aws-infrastructure.sh --check
+```
+
+### Individual Component Setup
+You can also set up individual components:
+
+```bash
+# ECR repository only
+./scripts/aws-setup/setup-ecr.sh
+
+# S3 bucket for CodeDeploy artifacts
+./scripts/aws-setup/setup-s3.sh
+
+# IAM roles and policies
+./scripts/aws-setup/setup-iam.sh
+
+# CodeDeploy application and deployment groups
+./scripts/aws-setup/setup-codedeploy.sh
+
+# EC2 instance setup guide
+./scripts/aws-setup/setup-ec2.sh
+```
+
 ## Prerequisites
 
 - AWS CLI configured with appropriate permissions
 - Terraform (optional, for infrastructure as code)
 - Access to create ECR repositories, CodeDeploy applications, EC2 instances, S3 buckets, and manage IAM
+
+## Script Features
+
+The automated setup scripts provide:
+
+- ✅ **Input validation** - Validates AWS regions, bucket names, repository names
+- ✅ **Error handling** - Graceful error handling with clear error messages
+- ✅ **Idempotent operations** - Safe to run multiple times
+- ✅ **Resource checking** - Detects existing resources and offers to update them
+- ✅ **Configuration prompts** - Interactive prompts with sensible defaults
+- ✅ **Progress tracking** - Clear progress indicators and success/failure feedback
+- ✅ **Comprehensive output** - Detailed information about created resources
+- ✅ **Next steps guidance** - Clear instructions for post-setup tasks
+
+## Manual Setup Instructions
+
+If you prefer to set up the infrastructure manually or need to understand the individual steps, the following sections provide detailed AWS CLI commands for each component.
+
+> **Note**: The automated scripts above handle all these steps with proper validation and error handling. Manual setup is provided for reference and customization purposes.
 
 ## Required AWS Resources
 
@@ -285,34 +346,64 @@ aws ec2 create-tags \
     --tags Key=Environment,Value=Staging Key=Application,Value=trendsearth-ui
 ```
 
-## Required GitHub Secrets
+## Setup Process Overview
 
-After setting up the infrastructure, configure these GitHub secrets:
+The automated setup scripts handle the following components in order:
 
-- `AWS_ACCESS_KEY_ID` - AWS access key with ECR, CodeDeploy, and S3 permissions
-- `AWS_SECRET_ACCESS_KEY` - Corresponding secret key  
-- `AWS_REGION` - AWS region (e.g., us-east-1)
-- `CODEDEPLOY_S3_BUCKET` - S3 bucket name for deployment artifacts
-- `ROLLBAR_ACCESS_TOKEN` - (Optional) Rollbar access token
+1. **ECR Repository** (`setup-ecr.sh`)
+   - Creates the `trendsearth-ui` repository
+   - Sets up lifecycle policies for image cleanup
+   - Configures appropriate permissions
 
-## Verification
+2. **S3 Bucket** (`setup-s3.sh`)
+   - Creates bucket for CodeDeploy deployment artifacts
+   - Enables versioning and blocks public access
+   - Sets up lifecycle policies for artifact cleanup
 
-1. **ECR Repository**: Verify repository exists and has appropriate permissions
-2. **S3 Bucket**: Confirm bucket exists and is accessible
-3. **IAM Roles**: Verify roles have correct policies attached
-4. **EC2 Instances**: Check instances are running with correct tags and instance profiles
-5. **CodeDeploy**: Verify application and deployment groups are created
-6. **CodeDeploy Agent**: Confirm agent is running on all instances
+3. **IAM Roles** (`setup-iam.sh`)
+   - Creates CodeDeploy service role with required policies
+   - Creates EC2 instance role with ECR, S3, and logging permissions
+   - Sets up instance profile for EC2 instances
+
+4. **CodeDeploy Application** (`setup-codedeploy.sh`)
+   - Creates CodeDeploy application
+   - Sets up production and staging deployment groups
+   - Configures auto-rollback policies
+
+5. **EC2 Setup Guide** (`setup-ec2.sh`)
+   - Provides guidance for EC2 instance creation
+   - Generates user data scripts for instance initialization
+   - Shows commands for security group creation and instance tagging
+
+## GitHub Secrets Configuration
+
+After setting up the AWS infrastructure, configure GitHub secrets:
 
 ```bash
-# Check CodeDeploy agent status on instances
-ssh ubuntu@instance-ip 'sudo service codedeploy-agent status'
+# Set up GitHub secrets for deployment
+./scripts/setup-github-secrets.sh
+```
 
-# Verify ECR repository
+This script will prompt for and configure:
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `CODEDEPLOY_S3_BUCKET`
+- `ROLLBAR_ACCESS_TOKEN` (optional)
+
+## Verification Commands
+
+After setup, verify your infrastructure:
+
+```bash
+# Check all components
+./scripts/setup-aws-infrastructure.sh --check
+
+# Verify specific resources
 aws ecr describe-repositories --repository-names trendsearth-ui
-
-# Verify CodeDeploy application
+aws s3api head-bucket --bucket your-bucket-name
 aws deploy get-application --application-name trendsearth-ui
+aws iam get-role --role-name TrendsEarthUICodeDeployRole
 ```
 
 ## Benefits of This Architecture
@@ -325,6 +416,27 @@ aws deploy get-application --application-name trendsearth-ui
 6. **Monitoring** - Integrated with CloudWatch for monitoring and alerting
 
 ## Troubleshooting
+
+### Common Issues
+
+**Script Permissions**
+```bash
+# If scripts are not executable
+chmod +x scripts/setup-aws-infrastructure.sh scripts/aws-setup/*.sh
+```
+
+**AWS CLI Configuration**
+```bash
+# Verify AWS CLI is configured
+aws sts get-caller-identity
+aws configure list
+```
+
+**Resource Already Exists**
+- Scripts will detect existing resources and offer to update them
+- Use `--check` flag to see what already exists before running setup
+
+### Detailed Troubleshooting
 
 - **CodeDeploy Agent Issues**: Check `/var/log/aws/codedeploy-agent/` logs
 - **ECR Authentication**: Verify IAM permissions for ECR access
