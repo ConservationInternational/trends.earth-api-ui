@@ -57,7 +57,6 @@ class StatusDataManager:
     def fetch_consolidated_status_data(
         token: str,
         api_environment: str,
-        user_timezone: str = None,
         force_refresh: bool = False,
     ) -> dict[str, Any]:
         """
