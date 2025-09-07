@@ -84,7 +84,7 @@ def register_callbacks(app):
 
         # Check cache first (unless it's a manual refresh)
         ctx = callback_context
-        is_manual_refresh = (
+        is_manual_refresh = bool(
             ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
         )
 

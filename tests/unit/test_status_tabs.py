@@ -343,6 +343,16 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_execution_status_grouping(self, mock_ctx):
         """Test that execution status structure is present in callback response."""
+        # Clear StatusDataManager cache to ensure test isolation
+        from trendsearth_ui.utils.status_data_manager import StatusDataManager
+
+        StatusDataManager.invalidate_cache()
+
+        # Clear callback-level cache to ensure test isolation
+        from trendsearth_ui.callbacks.status import _status_cache
+
+        _status_cache.clear()
+
         # Mock the callback context
         mock_ctx.triggered = []
 
@@ -429,6 +439,16 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_summary_totals_section(self, mock_ctx):
         """Test that summary totals are properly grouped with a header."""
+        # Clear StatusDataManager cache to ensure test isolation
+        from trendsearth_ui.utils.status_data_manager import StatusDataManager
+
+        StatusDataManager.invalidate_cache()
+
+        # Clear callback-level cache to ensure test isolation
+        from trendsearth_ui.callbacks.status import _status_cache
+
+        _status_cache.clear()
+
         # Mock the callback context
         mock_ctx.triggered = []
 
@@ -519,6 +539,16 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):
         """Test that both section headers are present and properly styled."""
+        # Clear StatusDataManager cache to ensure test isolation
+        from trendsearth_ui.utils.status_data_manager import StatusDataManager
+
+        StatusDataManager.invalidate_cache()
+
+        # Clear callback-level cache to ensure test isolation
+        from trendsearth_ui.callbacks.status import _status_cache
+
+        _status_cache.clear()
+
         # Mock the callback context
         mock_ctx.triggered = []
 
