@@ -343,16 +343,6 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_execution_status_grouping(self, mock_ctx):
         """Test that execution status structure is present in callback response."""
-        # Clear StatusDataManager cache to ensure test isolation
-        from trendsearth_ui.utils.status_data_manager import StatusDataManager
-
-        StatusDataManager.invalidate_cache()
-
-        # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
-
-        _status_cache.clear()
-
         # Mock the callback context
         mock_ctx.triggered = []
 
@@ -401,22 +391,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
@@ -439,16 +415,6 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_summary_totals_section(self, mock_ctx):
         """Test that summary totals are properly grouped with a header."""
-        # Clear StatusDataManager cache to ensure test isolation
-        from trendsearth_ui.utils.status_data_manager import StatusDataManager
-
-        StatusDataManager.invalidate_cache()
-
-        # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
-
-        _status_cache.clear()
-
         # Mock the callback context
         mock_ctx.triggered = []
 
@@ -497,22 +463,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
@@ -539,16 +491,6 @@ class TestStatusTabsErrorHandling:
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):
         """Test that both section headers are present and properly styled."""
-        # Clear StatusDataManager cache to ensure test isolation
-        from trendsearth_ui.utils.status_data_manager import StatusDataManager
-
-        StatusDataManager.invalidate_cache()
-
-        # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
-
-        _status_cache.clear()
-
         # Mock the callback context
         mock_ctx.triggered = []
 
@@ -597,22 +539,8 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
-                    return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
-                        },
-                    },
+                    "trendsearth_ui.callbacks.status.is_status_endpoint_available",
+                    return_value=True,
                 ),
                 patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
                 patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,

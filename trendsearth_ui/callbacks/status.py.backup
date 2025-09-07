@@ -10,17 +10,25 @@ import plotly.graph_objects as go
 import requests
 
 from ..config import get_api_base
+from ..utils.stats_utils import (
+    fetch_dashboard_stats,
+    fetch_execution_stats,
+    fetch_scripts_count,
+    fetch_user_stats,
+    get_optimal_grouping_for_period,
+)
+from ..utils.status_data_manager import StatusDataManager
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
     create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
-from ..utils.status_data_manager import StatusDataManager
 from ..utils.status_helpers import (
     fetch_deployment_info,  # noqa: F401 (used in tests)
     fetch_swarm_info,
-    get_fallback_summary,  # Used by StatusDataManager
+    get_fallback_summary,
+    is_status_endpoint_available,
 )
 from ..utils.timezone_utils import (
     convert_utc_to_local,
@@ -70,7 +78,7 @@ def register_callbacks(app):
     def update_status_summary(
         _n_intervals, _refresh_clicks, token, active_tab, user_timezone, role, api_environment
     ):
-        """Update the status summary from the status endpoint with caching."""
+        """Update the status summary using consolidated data fetching."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
             return no_update, no_update, no_update, no_update
@@ -82,309 +90,254 @@ def register_callbacks(app):
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
 
-        # Check cache first (unless it's a manual refresh)
+        # Check if this is a manual refresh
         ctx = callback_context
-        is_manual_refresh = bool(
+        is_manual_refresh = (
             ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
         )
 
-        # If this is a manual refresh, invalidate the StatusDataManager cache too for coordination
-        if is_manual_refresh:
-            try:
-                cleared_count = StatusDataManager.invalidate_cache("status")
-                logger.info(
-                    f"Manual refresh: invalidated {cleared_count} StatusDataManager cache entries"
-                )
-            except Exception as e:
-                logger.warning(f"Failed to invalidate StatusDataManager cache: {e}")
+        # Use the consolidated data manager to fetch all status data
+        status_data = StatusDataManager.fetch_consolidated_status_data(
+            token=token,
+            api_environment=api_environment,
+            user_timezone=user_timezone,
+            force_refresh=is_manual_refresh,
+        )
 
-        if not is_manual_refresh:
-            cached_summary = get_cached_data("summary")
-            cached_deployment = get_cached_data("deployment")
-            cached_swarm = get_cached_data("swarm")
-            if (
-                cached_summary is not None
-                and cached_deployment is not None
-                and cached_swarm is not None
-            ):
-                # Even for cached data, get the fresh timestamp from swarm endpoint
-                try:
-                    headers = {"Authorization": f"Bearer {token}"} if token else {}
-                    resp = requests.get(
-                        f"{get_api_base(api_environment)}/status/swarm",
-                        headers=headers,
-                        timeout=5,
-                    )
-                    if resp.status_code == 200:
-                        swarm_data = resp.json().get("data", {})
-                        cache_info = swarm_data.get("cache_info", {})
-                        cached_at = cache_info.get("cached_at", "")
-                        swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else ""
-                    else:
-                        swarm_cached_time = ""
-                except Exception:
-                    swarm_cached_time = ""
-
-                swarm_title = html.H5(
-                    f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
-                )
-                return cached_summary, cached_deployment, cached_swarm, swarm_title
-
-        # Fetch deployment info from status helpers
-        deployment_info = fetch_deployment_info(api_environment, token)
-
-        # Fetch Docker Swarm information using helper function
-        swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token)
-
-        # Create swarm title with cached timestamp
+        # Extract swarm title with timestamp
+        swarm_info = status_data.get("swarm")
+        swarm_cached_time = ""
+        if swarm_info and isinstance(swarm_info, tuple) and len(swarm_info) == 2:
+            swarm_info, swarm_cached_time = swarm_info
+            
         swarm_title = html.H5(
             f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
         )
 
-        # Use StatusDataManager for consolidated status data fetching
-        try:
-            status_result = StatusDataManager.fetch_consolidated_status_data(
-                token, api_environment, force_refresh=is_manual_refresh
+        # Handle different status data scenarios
+        if status_data.get("error"):
+            error_result = html.Div(
+                f"Error fetching status: {status_data['error']}", 
+                className="text-center text-danger"
             )
+            return error_result, status_data.get("deployment"), swarm_info, swarm_title
 
-            # Check if status endpoint is available
-            if not status_result["status_endpoint_available"]:
-                fallback_result = get_fallback_summary()
-                set_cached_data("summary", fallback_result)
-                set_cached_data("deployment", deployment_info)
-                set_cached_data("swarm", swarm_info)
-                return fallback_result, deployment_info, swarm_info, swarm_title
+        if not status_data.get("status_endpoint_available"):
+            # Use fallback summary
+            return status_data.get("summary"), status_data.get("deployment"), swarm_info, swarm_title
 
-            # Check if we have valid status data
-            if status_result["summary"] == "SUCCESS" and status_result["latest_status"]:
-                latest_status = status_result["latest_status"]
-                timestamp = latest_status.get("timestamp", "")
+        if status_data.get("summary") == "NO_DATA":
+            no_data_result = html.Div(
+                "No status data available.", className="text-center text-muted"
+            )
+            return no_data_result, status_data.get("deployment"), swarm_info, swarm_title
 
-                # Format the timestamp - show local time on top, UTC in parentheses
-                try:
-                    if timestamp:
-                        dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                        utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+        # Generate summary layout from latest status data
+        latest_status = status_data.get("latest_status")
+        if not latest_status:
+            no_data_result = html.Div(
+                "No status data available.", className="text-center text-muted"
+            )
+            return no_data_result, status_data.get("deployment"), swarm_info, swarm_title
 
-                        # Use Python to convert UTC to user's local time
-                        local_time_str, tz_abbrev = format_local_time(
-                            dt_utc, safe_timezone, include_seconds=True
-                        )
+        # Format timestamp
+        timestamp = latest_status.get("timestamp", "")
+        try:
+            if timestamp:
+                dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
 
-                        timestamp_display = html.Div(
-                            [
-                                html.Div(
-                                    f"{local_time_str} {tz_abbrev}",
-                                    className="fw-bold text-primary",
-                                ),
-                                html.Div(f"({utc_time_str})", className="text-muted small"),
-                            ]
-                        )
-                    else:
-                        timestamp_display = "Not available"
-                except (ValueError, TypeError):
-                    timestamp_display = "Invalid timestamp format"
+                # Use Python to convert UTC to user's local time
+                local_time_str, tz_abbrev = format_local_time(
+                    dt_utc, safe_timezone, include_seconds=True
+                )
 
-                # Extract status details for different sections
-                executions_ready = latest_status.get("executions_ready", 0)
-                executions_running = latest_status.get("executions_running", 0)
-                executions_finished = latest_status.get("executions_finished", 0)
-                executions_failed = latest_status.get("executions_failed", 0)
-                executions_cancelled = latest_status.get("executions_cancelled", 0)
-                executions_pending = latest_status.get("executions_pending", 0)
-                active_total = executions_running + executions_ready + executions_pending
-                completed_total = executions_finished + executions_failed + executions_cancelled
-
-                # Create summary layout with expected section headers
-                summary_layout = html.Div(
+                timestamp_display = html.Div(
                     [
-                        # Active Executions Section
-                        html.H5("Active Executions", className="text-center mb-3 text-muted"),
-                        # First row: Individual statuses
                         html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H6("Running", className="mb-2"),
-                                        html.P(
-                                            str(executions_running),
-                                            className="text-primary mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H6("Ready", className="mb-2"),
-                                        html.P(
-                                            str(executions_ready),
-                                            className="text-info mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H6("Pending", className="mb-2"),
-                                        html.P(
-                                            str(executions_pending),
-                                            className="text-warning mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                            ],
-                            className="row mb-3",
+                            f"{local_time_str} {tz_abbrev}",
+                            className="fw-bold text-primary",
                         ),
-                        # Second row: Active Total (prominent and centered)
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H5("Active Total", className="mb-2 text-muted"),
-                                        html.H3(
-                                            str(active_total),
-                                            className="text-success mb-1 fw-bold",
-                                        ),
-                                    ],
-                                    className="col-12 text-center",
-                                ),
-                            ],
-                            className="row mb-4",
-                        ),
-                        # Completed Executions Section
-                        html.H5("Completed Executions", className="text-center mb-3 text-muted"),
-                        # First row: Individual statuses
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H6("Finished", className="mb-2"),
-                                        html.P(
-                                            str(executions_finished),
-                                            className="text-success mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H6("Failed", className="mb-2"),
-                                        html.P(
-                                            str(executions_failed),
-                                            className="text-danger mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H6("Cancelled", className="mb-2"),
-                                        html.P(
-                                            str(executions_cancelled),
-                                            className="text-secondary mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-4 text-center",
-                                ),
-                            ],
-                            className="row mb-3",
-                        ),
-                        # Second row: Completed Total (prominent and centered)
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H5("Completed Total", className="mb-2 text-muted"),
-                                        html.H3(
-                                            str(completed_total),
-                                            className="text-info mb-1 fw-bold",
-                                        ),
-                                    ],
-                                    className="col-12 text-center",
-                                ),
-                            ],
-                            className="row mb-4",
-                        ),
-                        # Summary Totals Section
-                        html.H5("Summary Totals", className="text-center mb-3 text-muted"),
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H6("Total Executions", className="mb-2"),
-                                        html.P(
-                                            str(
-                                                latest_status.get(
-                                                    "executions_count",
-                                                    active_total + completed_total,
-                                                )
-                                            ),
-                                            className="text-primary mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-6 text-center",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H6("Users", className="mb-2"),
-                                        html.P(
-                                            str(latest_status.get("users_count", 0)),
-                                            className="text-info mb-1",
-                                        ),
-                                    ],
-                                    className="col-md-6 text-center",
-                                ),
-                            ],
-                            className="row mb-4",
-                        ),
-                        # Last Updated Section
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H6("Last Updated", className="mb-2"),
-                                        timestamp_display,
-                                    ],
-                                    className="col-12 text-center",
-                                ),
-                            ],
-                            className="row mb-4",
-                        ),
+                        html.Div(f"({utc_time_str})", className="text-muted small"),
                     ]
                 )
-                set_cached_data("summary", summary_layout)
-                set_cached_data("deployment", deployment_info)
-                set_cached_data("swarm", swarm_info)
-                return summary_layout, deployment_info, swarm_info, swarm_title
-            elif status_result["summary"] == "NO_DATA":
-                no_data_result = html.Div(
-                    "No status data available.", className="text-center text-muted"
-                )
-                set_cached_data("summary", no_data_result)
-                set_cached_data("deployment", deployment_info)
-                set_cached_data("swarm", swarm_info)
-                return no_data_result, deployment_info, swarm_info, swarm_title
             else:
-                # Handle API errors or request errors
-                error_message = status_result.get("error", "Unknown error occurred")
-                error_result = html.Div(
-                    f"Error fetching status: {error_message}",
-                    className="text-center text-danger",
-                )
-                set_cached_data("summary", error_result)
-                set_cached_data("deployment", deployment_info)
-                set_cached_data("swarm", swarm_info)
-                return error_result, deployment_info, swarm_info, swarm_title
-        except Exception as e:
-            logger.error(f"Unexpected error in update_status_summary: {e}")
-            error_result = html.Div(
-                f"Error fetching status: {e}", className="text-center text-danger"
-            )
-            set_cached_data("summary", error_result)
-            set_cached_data("deployment", deployment_info)
-            set_cached_data("swarm", swarm_info)
-            return error_result, deployment_info, swarm_info, swarm_title
+                timestamp_display = "Not available"
+        except (ValueError, TypeError):
+            timestamp_display = "Invalid timestamp format"
+
+        # Extract status details for different sections
+        executions_ready = latest_status.get("executions_ready", 0)
+        executions_running = latest_status.get("executions_running", 0)
+        executions_finished = latest_status.get("executions_finished", 0)
+        executions_failed = latest_status.get("executions_failed", 0)
+        executions_cancelled = latest_status.get("executions_cancelled", 0)
+        executions_pending = latest_status.get("executions_pending", 0)
+        active_total = executions_running + executions_ready + executions_pending
+        completed_total = executions_finished + executions_failed + executions_cancelled
+
+        # Create summary layout with expected section headers
+        summary_layout = html.Div(
+            [
+                # Active Executions Section
+                html.H5("Active Executions", className="text-center mb-3 text-muted"),
+                # First row: Individual statuses
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H6("Running", className="mb-2"),
+                                html.P(
+                                    str(executions_running),
+                                    className="text-primary mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                        html.Div(
+                            [
+                                html.H6("Ready", className="mb-2"),
+                                html.P(
+                                    str(executions_ready),
+                                    className="text-info mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                        html.Div(
+                            [
+                                html.H6("Pending", className="mb-2"),
+                                html.P(
+                                    str(executions_pending),
+                                    className="text-warning mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                    ],
+                    className="row mb-3",
+                ),
+                # Second row: Active Total (prominent and centered)
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H5("Active Total", className="mb-2 text-muted"),
+                                html.H3(
+                                    str(active_total),
+                                    className="text-success mb-1 fw-bold",
+                                ),
+                            ],
+                            className="col-12 text-center",
+                        ),
+                    ],
+                    className="row mb-4",
+                ),
+                # Completed Executions Section
+                html.H5(
+                    "Completed Executions", className="text-center mb-3 text-muted"
+                ),
+                # First row: Individual statuses
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H6("Finished", className="mb-2"),
+                                html.P(
+                                    str(executions_finished),
+                                    className="text-success mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                        html.Div(
+                            [
+                                html.H6("Failed", className="mb-2"),
+                                html.P(
+                                    str(executions_failed),
+                                    className="text-danger mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                        html.Div(
+                            [
+                                html.H6("Cancelled", className="mb-2"),
+                                html.P(
+                                    str(executions_cancelled),
+                                    className="text-secondary mb-1",
+                                ),
+                            ],
+                            className="col-md-4 text-center",
+                        ),
+                    ],
+                    className="row mb-3",
+                ),
+                # Second row: Completed Total (prominent and centered)
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H5("Completed Total", className="mb-2 text-muted"),
+                                html.H3(
+                                    str(completed_total),
+                                    className="text-info mb-1 fw-bold",
+                                ),
+                            ],
+                            className="col-12 text-center",
+                        ),
+                    ],
+                    className="row mb-4",
+                ),
+                # Summary Totals Section
+                html.H5("Summary Totals", className="text-center mb-3 text-muted"),
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H6("Total Executions", className="mb-2"),
+                                html.P(
+                                    str(
+                                        latest_status.get(
+                                            "executions_count",
+                                            active_total + completed_total,
+                                        )
+                                    ),
+                                    className="text-primary mb-1",
+                                ),
+                            ],
+                            className="col-md-6 text-center",
+                        ),
+                        html.Div(
+                            [
+                                html.H6("Users", className="mb-2"),
+                                html.P(
+                                    str(latest_status.get("users_count", 0)),
+                                    className="text-info mb-1",
+                                ),
+                            ],
+                            className="col-md-6 text-center",
+                        ),
+                    ],
+                    className="row mb-4",
+                ),
+                # Last Updated Section
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H6("Last Updated", className="mb-2"),
+                                timestamp_display,
+                            ],
+                            className="col-12 text-center",
+                        ),
+                    ],
+                    className="row mb-4",
+                ),
+            ]
+        )
+
+        return summary_layout, status_data.get("deployment"), swarm_info, swarm_title
 
     @app.callback(
         Output("system-overview-content", "children"),
@@ -415,7 +368,7 @@ def register_callbacks(app):
         role,
         api_environment,
     ):
-        """Update the status summary and enhanced statistics."""
+        """Update the status summary and enhanced statistics using consolidated data fetching."""
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
             return no_update, no_update, no_update, no_update
@@ -439,10 +392,6 @@ def register_callbacks(app):
             )
             return permission_msg, permission_msg, permission_msg, [permission_msg]
 
-        # Map UI time period to API period
-        api_period_map = {"day": "last_day", "week": "last_week", "month": "last_month"}
-        api_period = api_period_map.get(time_period, "last_day")
-
         # Check cache first (unless it's a manual refresh or time period changed)
         ctx = callback_context
         is_manual_refresh = (
@@ -452,136 +401,74 @@ def register_callbacks(app):
             ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "status-time-tabs-store"
         )
 
-        # Coordinate cache invalidation across different cache systems
-        if is_manual_refresh:
-            try:
-                cleared_count = StatusDataManager.invalidate_cache("stats")
-                logger.info(
-                    f"Manual refresh: invalidated {cleared_count} StatusDataManager stats cache entries"
-                )
-            except Exception as e:
-                logger.warning(f"Failed to invalidate StatusDataManager stats cache: {e}")
+        # Use the consolidated stats data manager to fetch all stats
+        stats_data = StatusDataManager.fetch_consolidated_stats_data(
+            token=token,
+            api_environment=api_environment,
+            time_period=time_period or "day",
+            role=role,
+            force_refresh=is_manual_refresh or is_time_period_change,
+        )
 
-        cache_key = f"stats_summary_{api_period}"
-        if not is_manual_refresh and not is_time_period_change:
-            cached_statistics = _stats_cache.get(cache_key)
-            if cached_statistics is not None:
-                return cached_statistics
+        # Handle permission errors
+        if stats_data.get("requires_superadmin"):
+            permission_msg = html.Div(
+                [
+                    html.P("Enhanced Statistics", className="text-muted text-center"),
+                    html.Small(
+                        "SUPERADMIN privileges required to access detailed analytics.",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
+            return permission_msg, permission_msg, permission_msg, [permission_msg]
 
-        # Use StatusDataManager for consolidated data fetching
+        # Handle API errors
+        if stats_data.get("error"):
+            error_msg = html.Div(
+                f"Error fetching statistics: {stats_data['error']}", 
+                className="text-center text-danger p-4"
+            )
+            return error_msg, error_msg, error_msg, [error_msg]
+
+        # Also fetch basic status data for system overview
+        basic_status_data = StatusDataManager.fetch_consolidated_status_data(
+            token=token,
+            api_environment=api_environment,
+            force_refresh=is_manual_refresh,
+        )
+
+        # Get latest status data for scripts count
+        latest_status = basic_status_data.get("latest_status", {})
+        if latest_status and stats_data.get("scripts_count"):
+            latest_status["scripts_count"] = stats_data["scripts_count"]
+
+        # Format and create the enhanced statistics visualizations
         try:
-            # Get consolidated status data first for latest_status
-            status_result = StatusDataManager.fetch_consolidated_status_data(
-                token, api_environment, force_refresh=is_manual_refresh
+            system_overview = create_system_overview(
+                stats_data.get("dashboard_stats"), 
+                latest_status
             )
+            user_map = create_user_geographic_map(stats_data.get("user_stats"))
+            additional_charts = create_user_statistics_chart(
+                stats_data.get("user_stats")
+            ) + create_execution_statistics_chart(stats_data.get("execution_stats"))
 
-            # Check if status endpoint is available
-            if not status_result["status_endpoint_available"]:
-                return (
-                    no_update,
-                    no_update,
-                    no_update,
-                    no_update,
-                )
-
-            # Get consolidated stats data
-            stats_result = StatusDataManager.fetch_consolidated_stats_data(
-                token, api_environment, time_period, role, force_refresh=is_manual_refresh
-            )
-
-            # Check if user has required permissions
-            if stats_result.get("requires_superadmin"):
-                permission_msg = html.Div(
-                    [
-                        html.P("Enhanced Statistics", className="text-muted text-center"),
-                        html.Small(
-                            "SUPERADMIN privileges required to access detailed analytics.",
-                            className="text-muted text-center d-block",
-                        ),
-                    ],
-                    className="p-4",
-                )
-                return permission_msg, permission_msg, permission_msg, [permission_msg]
-
-            # Check if we have valid status and stats data
-            if (
-                status_result["summary"] == "SUCCESS"
-                and status_result["latest_status"]
-                and not stats_result.get("error")
-            ):
-                latest_status = status_result["latest_status"]
-                dashboard_stats = stats_result["dashboard_stats"]
-                user_stats = stats_result["user_stats"]
-                execution_stats = stats_result["execution_stats"]
-                scripts_count = stats_result["scripts_count"]
-
-                # Debug logging to see what we actually get
-                logger.info(f"Dashboard stats type: {type(dashboard_stats)}")
-                logger.info(f"User stats type: {type(user_stats)}")
-                logger.info(f"Execution stats type: {type(execution_stats)}")
-
-                if isinstance(dashboard_stats, dict):
-                    logger.info(f"Dashboard stats keys: {list(dashboard_stats.keys())}")
-                    # Log available sections to ensure we're utilizing all data
-                    data_section = dashboard_stats.get("data", {})
-                    if isinstance(data_section, dict):
-                        available_sections = list(data_section.keys())
-                        logger.info(f"Available dashboard sections: {available_sections}")
-
-                        # Log summary of each section to understand data completeness
-                        for section in available_sections:
-                            section_data = data_section.get(section, {})
-                            if isinstance(section_data, dict):
-                                section_keys = list(section_data.keys())
-                                logger.info(f"Dashboard {section} section keys: {section_keys}")
-                            else:
-                                logger.info(
-                                    f"Dashboard {section} section type: {type(section_data)}"
-                                )
-                if isinstance(user_stats, dict):
-                    logger.info(f"User stats keys: {list(user_stats.keys())}")
-                if isinstance(execution_stats, dict):
-                    logger.info(f"Execution stats keys: {list(execution_stats.keys())}")
-
-                # Format and cache the enhanced statistics with period-specific key
-                # Add scripts count to latest status
-                latest_status["scripts_count"] = scripts_count
-
-                system_overview = create_system_overview(dashboard_stats, latest_status)
-                # Dashboard summary cards removed as they are duplicative with system overview
-                user_map = create_user_geographic_map(user_stats)
-                additional_charts = create_user_statistics_chart(
-                    user_stats
-                ) + create_execution_statistics_chart(execution_stats)
-
-                _stats_cache[cache_key] = (
-                    system_overview,
-                    html.Div(),  # Empty div to replace removed dashboard summary cards
-                    user_map,
-                    additional_charts,
-                )
-
-                return (
-                    system_overview,
-                    html.Div(),  # Empty div to replace removed dashboard summary cards
-                    user_map,
-                    additional_charts,
-                )
-            else:
-                return (
-                    no_update,
-                    no_update,
-                    no_update,
-                    no_update,
-                )
-        except Exception as e:
-            logger.error(f"Unexpected error in update_status_and_statistics: {e}")
             return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
+                system_overview,
+                html.Div(),  # Empty div to replace removed dashboard summary cards
+                user_map,
+                additional_charts,
             )
+
+        except Exception as e:
+            logger.error(f"Error creating statistics visualizations: {e}")
+            error_msg = html.Div(
+                f"Error creating visualizations: {e}", 
+                className="text-center text-danger p-4"
+            )
+            return error_msg, error_msg, error_msg, [error_msg]
 
     @app.callback(
         Output("status-charts", "children"),
@@ -600,7 +487,7 @@ def register_callbacks(app):
     def update_status_charts(
         time_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment, active_tab
     ):
-        """Update the status charts for the selected time range."""
+        """Update the status charts for the selected time range using optimized data fetching."""
         # Debug: Log the received time_tab parameter
         logger.info(
             f"🕒 update_status_charts called with time_tab='{time_tab}', active_tab='{active_tab}'"
@@ -618,49 +505,377 @@ def register_callbacks(app):
             )
             return no_update
 
+        # Check if this is a manual refresh
+        ctx = callback_context
+        is_manual_refresh = (
+            ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
+        )
+
+        # Use the consolidated data manager to fetch time series data
+        time_series_data = StatusDataManager.fetch_time_series_status_data(
+            token=token,
+            api_environment=api_environment,
+            time_period=time_tab or "day",
+            force_refresh=is_manual_refresh,
+        )
+
+        # Handle errors in data fetching
+        if time_series_data.get("error"):
+            logger.error(f"Error fetching time series data: {time_series_data['error']}")
+            return html.Div(
+                f"Error fetching chart data: {time_series_data['error']}",
+                className="text-center text-danger p-4",
+            )
+
+        status_data = time_series_data.get("data", [])
+        time_period = time_series_data.get("time_period", "day")
+
+        if not status_data:
+            # Get time period name for user feedback
+            time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
+                time_period, "selected period"
+            )
+
+            logger.warning(
+                f"❌ No status data received for time period '{time_period}' ({time_period_name})"
+            )
+
+            return html.Div(
+                [
+                    html.Div(
+                        [
+                            html.I(
+                                className="fas fa-exclamation-triangle fa-2x text-warning mb-3"
+                            ),
+                            html.H5("No Status Data Available", className="text-muted mb-3"),
+                            html.P(
+                                f"No status logs found for the last {time_period_name}.",
+                                className="text-muted mb-2",
+                            ),
+                            html.Small(
+                                f"API request: {time_series_data.get('start_time')} to {time_series_data.get('end_time')}",
+                                className="text-muted",
+                            ),
+                        ],
+                        className="text-center py-5",
+                    ),
+                ],
+                className="border rounded p-4 bg-light",
+            )
+
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
 
-        # Define time ranges for API query
-        end_time = datetime.now(timezone.utc)
-        if time_tab == "month":
-            start_time = end_time - timedelta(days=30)
-        elif time_tab == "week":
-            start_time = end_time - timedelta(days=7)
-        else:  # Default to day
-            start_time = end_time - timedelta(days=1)
+        # The rest of the chart generation logic remains largely the same
+        # but now uses the pre-fetched and cached data
+        return _generate_status_charts(status_data, safe_timezone, time_period)
 
-        # Debug: Log the calculated time range
-        days_diff = (end_time - start_time).days
+
+def _generate_status_charts(status_data, safe_timezone, time_period):
+    """Generate status charts from pre-fetched data."""
+    # Convert to DataFrame for easier manipulation
+    df = pd.DataFrame(status_data)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+    # Convert UTC timestamps to user's local timezone for plotting
+    local_timestamps = []
+    for timestamp in df["timestamp"]:
+        local_dt, tz_abbrev = convert_utc_to_local(timestamp, safe_timezone)
+        local_timestamps.append(local_dt)  # Only append the datetime object, not the tuple
+
+    df["local_timestamp"] = pd.to_datetime(local_timestamps)
+
+    # Debug: Log what data we received
+    logger.info(
+        f"📊 Status data received: {len(status_data)} records for time_period='{time_period}'"
+    )
+
+    # Create charts
+    charts = []
+
+    # Debug: Log DataFrame info for timeseries debugging
+    logger.info(f"DataFrame shape: {df.shape}")
+    logger.info(f"Timestamp range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+    if "local_timestamp" in df.columns:
         logger.info(
-            f"📅 Calculated time range: {days_diff} days (from {start_time.strftime('%Y-%m-%d %H:%M')} to {end_time.strftime('%Y-%m-%d %H:%M')})"
+            f"Local timestamp range: {df['local_timestamp'].min()} to {df['local_timestamp'].max()}"
         )
 
-        # Format for API query
-        start_iso = start_time.isoformat()
-        end_iso = end_time.isoformat()
+    # Priority charts with improved performance focus
 
-        # Use StatusDataManager for optimized time series data fetching
-        try:
-            # Check if manual refresh was triggered
-            ctx = callback_context
-            is_manual_refresh = ctx.triggered and any(
-                "refresh-status-btn" in t["prop_id"] for t in ctx.triggered
+    # Chart 1: Active Executions Trend (simple and fast)
+    if "executions_active" in df.columns:
+        charts.append(
+            html.Div(
+                [
+                    html.H5(
+                        "Active Executions Trend", className="text-center mb-3 text-primary"
+                    ),
+                ],
+                className="mb-2",
             )
+        )
 
-            time_series_result = StatusDataManager.fetch_time_series_status_data(
-                token, api_environment, time_tab, force_refresh=is_manual_refresh
+        fig_active = go.Figure()
+        fig_active.add_trace(
+            go.Scatter(
+                x=df["local_timestamp"],
+                y=df["executions_active"],
+                mode="lines+markers",
+                name="Active Executions",
+                line={"color": "#ff6f00", "width": 3},
+                hovertemplate="<b>Active</b><br>%{x}<br>Count: %{y}<extra></extra>",
             )
+        )
 
-            if time_series_result.get("error"):
-                return html.Div(
-                    f"Error fetching chart data: {time_series_result['error']}",
-                    className="text-center text-danger p-4",
+        fig_active.update_layout(
+            xaxis_title=get_chart_axis_label(safe_timezone),
+            yaxis_title="Number of Active Executions",
+            margin={"l": 40, "r": 40, "t": 20, "b": 40},
+            template="plotly_white",
+            height=350,
+            hovermode="x unified",
+            showlegend=False,
+        )
+        charts.append(
+            html.Div(
+                [
+                    dcc.Graph(
+                        figure=fig_active,
+                        config={
+                            "displayModeBar": False,
+                            "responsive": True,
+                        },
+                    )
+                ],
+                className="mb-4",
+            )
+        )
+
+    # Chart 2: Completed Execution Status Over Time (normalized)
+    completed_status_metrics = [
+        {"field": "executions_finished", "name": "Finished", "color": "#43a047"},
+        {"field": "executions_failed", "name": "Failed", "color": "#e53935"},
+        {"field": "executions_cancelled", "name": "Cancelled", "color": "#8e24aa"},
+    ]
+
+    fig_completed = go.Figure()
+    has_completed_data = False
+
+    for metric in completed_status_metrics:
+        field = metric["field"]
+        if field in df.columns:
+            values = df[field].fillna(0)
+            has_completed_data = True
+
+            # Normalize to show changes from start
+            if len(values) > 0:
+                initial_value = values.iloc[0]
+                normalized_values = values - initial_value
+            else:
+                normalized_values = values
+
+            fig_completed.add_trace(
+                go.Scatter(
+                    x=df["local_timestamp"],
+                    y=normalized_values,
+                    mode="lines+markers",
+                    name=metric["name"],
+                    line={"color": metric["color"], "width": 3},
+                    marker={"size": 6},
+                    hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Change: %{{y}}<extra></extra>",
                 )
+            )
 
-            status_data = time_series_result.get("data", [])
+    if has_completed_data:
+        fig_completed.update_layout(
+            title={
+                "text": "Completed Execution Status (Changes from Start)",
+                "x": 0.5,
+                "xanchor": "center",
+            },
+            xaxis_title=get_chart_axis_label(safe_timezone),
+            yaxis_title="Change in Executions",
+            margin={"l": 40, "r": 40, "t": 60, "b": 40},
+            legend={
+                "orientation": "h",
+                "yanchor": "bottom",
+                "y": 1.02,
+                "xanchor": "center",
+                "x": 0.5,
+            },
+            template="plotly_white",
+            height=400,
+            hovermode="x unified",
+            showlegend=True,
+        )
+        charts.append(
+            html.Div(
+                [
+                    dcc.Graph(
+                        figure=fig_completed,
+                        config={
+                            "displayModeBar": False,
+                            "responsive": True,
+                        },
+                    )
+                ],
+                className="mb-4",
+            )
+        )
 
-            if not status_data:
+    # Chart 3: Active Execution Details (Running, Ready, Pending)
+    active_status_metrics = [
+        {"field": "executions_running", "name": "Running", "color": "#1e88e5"},
+        {"field": "executions_ready", "name": "Ready", "color": "#ffa726"},
+        {"field": "executions_pending", "name": "Pending", "color": "#8e24aa"},
+    ]
+
+    fig_active_details = go.Figure()
+    has_active_data = False
+
+    for metric in active_status_metrics:
+        field = metric["field"]
+        if field in df.columns:
+            values = df[field].fillna(0)
+            has_active_data = True
+
+            fig_active_details.add_trace(
+                go.Scatter(
+                    x=df["local_timestamp"],
+                    y=values,
+                    mode="lines+markers",
+                    name=metric["name"],
+                    line={"color": metric["color"], "width": 3},
+                    marker={"size": 6},
+                    hovertemplate=f"<b>{metric['name']}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                )
+            )
+
+    if has_active_data:
+        fig_active_details.update_layout(
+            title={
+                "text": "Active Execution Status Over Time",
+                "x": 0.5,
+                "xanchor": "center",
+            },
+            xaxis_title=get_chart_axis_label(safe_timezone),
+            yaxis_title="Number of Executions",
+            margin={"l": 40, "r": 40, "t": 60, "b": 40},
+            legend={
+                "orientation": "h",
+                "yanchor": "bottom",
+                "y": 1.02,
+                "xanchor": "center",
+                "x": 0.5,
+            },
+            template="plotly_white",
+            height=400,
+            hovermode="x unified",
+            showlegend=True,
+        )
+        charts.append(
+            html.Div(
+                [
+                    dcc.Graph(
+                        figure=fig_active_details,
+                        config={
+                            "displayModeBar": False,
+                            "responsive": True,
+                        },
+                    )
+                ],
+                className="mb-4",
+            )
+        )
+
+    # Supporting charts section
+    charts.append(
+        html.Div(
+            [
+                html.Hr(className="my-4"),
+                html.H6("Supporting Metrics", className="text-center mb-4 text-muted"),
+            ],
+            className="mb-3",
+        )
+    )
+
+    # Chart 4: Total Executions Over Time
+    if "executions_count" in df.columns:
+        values = df["executions_count"].fillna(0)
+        if values.max() > 0:
+            fig_total = go.Figure()
+            fig_total.add_trace(
+                go.Scatter(
+                    x=df["local_timestamp"],
+                    y=values,
+                    mode="lines+markers",
+                    name="Total Executions",
+                    line={"color": "#2196f3", "width": 3},
+                    marker={"size": 4},
+                    hovertemplate="<b>Total Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                )
+            )
+
+            fig_total.update_layout(
+                title={
+                    "text": "Total Executions Over Time",
+                    "x": 0.5,
+                    "xanchor": "center",
+                },
+                xaxis_title=get_chart_axis_label(safe_timezone),
+                yaxis_title="Total Executions",
+                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                template="plotly_white",
+                height=400,
+                hovermode="x unified",
+                showlegend=False,
+            )
+            charts.append(
+                html.Div(
+                    [
+                        dcc.Graph(
+                            figure=fig_total,
+                            config={
+                                "displayModeBar": False,
+                                "responsive": True,
+                            },
+                        )
+                    ],
+                    className="mb-4",
+                )
+            )
+
+    if not charts:
+        # If no charts were created, show a message
+        time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
+            time_period, "selected period"
+        )
+
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.I(
+                            className="fas fa-exclamation-triangle fa-3x text-warning mb-3"
+                        ),
+                        html.H5(
+                            "No System Status Data Available",
+                            className="text-muted mb-3",
+                        ),
+                        html.P(
+                            f"No status logs found for the last {time_period_name}.",
+                            className="text-muted mb-2",
+                        ),
+                    ],
+                    className="text-center py-5",
+                ),
+            ],
+            className="border rounded p-4 bg-light",
+        )
+
+    logger.info(f"✅ Generated {len(charts)} charts for time_period='{time_period}'")
+    return html.Div(charts)
                 # Get time period name for user feedback
                 time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
                     time_tab, "selected period"
@@ -683,7 +898,7 @@ def register_callbacks(app):
                                     className="text-muted mb-2",
                                 ),
                                 html.Small(
-                                    f"Requested time period: {time_tab}",
+                                    f"API request: {start_iso} to {end_iso}",
                                     className="text-muted",
                                 ),
                             ],
@@ -1453,8 +1668,7 @@ def register_callbacks(app):
             logger.info(f"✅ Returning {len(charts)} charts to display for time_tab='{time_tab}'")
             return html.Div(charts)
 
-        except Exception as e:
-            logger.error(f"Unexpected error in update_status_charts: {e}")
+        except requests.exceptions.RequestException as e:
             return html.Div(
                 f"Error fetching chart data: {e}",
                 className="text-center text-danger p-4",
