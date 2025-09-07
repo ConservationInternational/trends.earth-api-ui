@@ -800,7 +800,7 @@ def register_callbacks(app):
                     go.Scatter(
                         x=df["local_timestamp"],
                         y=df["executions_active"],
-                        mode="lines+markers",
+                        mode="lines",
                         name="Active Executions",
                         line={"color": "#ff6f00", "width": 3},
                         fill="tonexty",
@@ -930,7 +930,7 @@ def register_callbacks(app):
                         go.Scatter(
                             x=window_stats["local_window_start"],
                             y=window_stats["success_rate"],
-                            mode="lines+markers",
+                            mode="lines",
                             name="Success Rate",
                             line={"color": "#00e676", "width": 3},
                             marker={"size": 8},
@@ -1122,7 +1122,7 @@ def register_callbacks(app):
                         go.Scatter(
                             x=df["local_timestamp"],
                             y=normalized_values,
-                            mode="lines+markers",
+                            mode="lines",
                             name=metric["name"],
                             line={"color": metric["color"], "width": 3},
                             marker={"size": 6},
@@ -1240,7 +1240,7 @@ def register_callbacks(app):
                         go.Scatter(
                             x=x_data,
                             y=y_data,
-                            mode="lines+markers",
+                            mode="lines",
                             name=metric["name"],
                             line={"color": metric["color"], "width": 3},  # Thicker lines
                             marker={"size": 6},  # Larger markers
@@ -1330,7 +1330,7 @@ def register_callbacks(app):
                         go.Scatter(
                             x=df["local_timestamp"],
                             y=values,
-                            mode="lines+markers",
+                            mode="lines",
                             name="Total Executions",
                             line={"color": "#2196f3", "width": 3},
                             marker={"size": 4},
@@ -1376,7 +1376,7 @@ def register_callbacks(app):
                         go.Scatter(
                             x=df["local_timestamp"],
                             y=scripts_values,
-                            mode="lines+markers",
+                            mode="lines",
                             name="Scripts",
                             line={"color": "#4caf50", "width": 2},
                             marker={"size": 4},
