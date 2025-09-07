@@ -72,6 +72,25 @@ def map_period_to_api_period(ui_period):
     return mapping.get(ui_period, "last_week")
 
 
+def get_optimal_grouping_for_period(period):
+    """
+    Get optimal group_by parameter for the given time period.
+
+    Args:
+        period: Time period (last_day, last_week, last_month, last_year, all)
+
+    Returns:
+        tuple: (user_group_by, execution_group_by) optimal for the period
+    """
+    mapping = {
+        "last_day": ("hour", "hour"),
+        "last_week": ("day", "day"),
+        "last_month": ("week", "week"),
+        "last_year": ("month", "month"),
+    }
+    return mapping.get(period, ("month", "month"))
+
+
 def fetch_dashboard_stats(
     token, api_environment="production", period="last_week", include_sections=None
 ):
@@ -212,7 +231,9 @@ def fetch_scripts_count(token, api_environment="production"):
         return 0
 
 
-def fetch_user_stats(token, api_environment="production", period="last_week"):
+def fetch_user_stats(
+    token, api_environment="production", period="last_week", group_by=None, country=None
+):
     """
     Fetch user statistics from the API.
 
@@ -220,6 +241,8 @@ def fetch_user_stats(token, api_environment="production", period="last_week"):
         token: JWT authentication token
         api_environment: API environment (production/staging)
         period: Time period (last_day, last_week, last_month, last_year, all)
+        group_by: Grouping interval (day, week, month) for time series data
+        country: Filter by specific country
 
     Returns:
         dict: User statistics data or None if error
@@ -228,19 +251,32 @@ def fetch_user_stats(token, api_environment="production", period="last_week"):
 
     logger = logging.getLogger(__name__)
 
+    # Create cache key that includes all parameters for proper caching
+    cache_key_suffix = f"{period}_{group_by or 'none'}_{country or 'none'}"
+
     # Check cache first
-    cached_data = get_cached_stats_data("users", period)
+    cached_data = get_cached_stats_data("users", cache_key_suffix)
     if cached_data is not None:
-        logger.info(f"User stats: Returning cached data for period {period}")
+        logger.info(
+            f"User stats: Returning cached data for period {period}, group_by {group_by}, country {country}"
+        )
         return cached_data
 
-    logger.info(f"User stats: Fetching data for period={period}, environment={api_environment}")
+    logger.info(
+        f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}"
+    )
     if not token:
         logger.warning("User stats: No token provided")
         return {"error": "Authentication token not provided"}
 
     headers = {"Authorization": f"Bearer {token}"}
     params = {"period": period}
+
+    # Add optional parameters if provided
+    if group_by:
+        params["group_by"] = group_by
+    if country:
+        params["country"] = country
 
     try:
         resp = requests.get(
@@ -254,8 +290,10 @@ def fetch_user_stats(token, api_environment="production", period="last_week"):
 
         if resp.status_code == 200:
             data = resp.json()
-            set_cached_stats_data("users", data, period)
-            logger.info(f"User stats: Successfully fetched and cached data for {period}")
+            set_cached_stats_data("users", data, cache_key_suffix)
+            logger.info(
+                f"User stats: Successfully fetched and cached data for {period}, group_by {group_by}, country {country}"
+            )
             return data
         elif resp.status_code == 401:
             logger.warning("User stats: Unauthorized access (401). Check token.")
@@ -281,7 +319,14 @@ def fetch_user_stats(token, api_environment="production", period="last_week"):
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
-def fetch_execution_stats(token, api_environment="production", period="last_week"):
+def fetch_execution_stats(
+    token,
+    api_environment="production",
+    period="last_week",
+    group_by=None,
+    task_type=None,
+    status=None,
+):
     """
     Fetch execution statistics from the API.
 
@@ -289,6 +334,9 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
         token: JWT authentication token
         api_environment: API environment (production/staging)
         period: Time period (last_day, last_week, last_month, last_year, all)
+        group_by: Grouping interval (hour, day, week, month) for time series data
+        task_type: Filter by specific task type
+        status: Filter by execution status (PENDING, RUNNING, FINISHED, FAILED, CANCELLED)
 
     Returns:
         dict: Execution statistics data or None if error
@@ -297,14 +345,19 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
 
     logger = logging.getLogger(__name__)
 
+    # Create cache key that includes all parameters for proper caching
+    cache_key_suffix = f"{period}_{group_by or 'none'}_{task_type or 'none'}_{status or 'none'}"
+
     # Check cache first
-    cached_data = get_cached_stats_data("executions", period)
+    cached_data = get_cached_stats_data("executions", cache_key_suffix)
     if cached_data is not None:
-        logger.info(f"Execution stats: Returning cached data for period {period}")
+        logger.info(
+            f"Execution stats: Returning cached data for period {period}, group_by {group_by}, task_type {task_type}, status {status}"
+        )
         return cached_data
 
     logger.info(
-        f"Execution stats: Fetching data for period={period}, environment={api_environment}"
+        f"Execution stats: Fetching data for period={period}, group_by={group_by}, task_type={task_type}, status={status}, environment={api_environment}"
     )
     if not token:
         logger.warning("Execution stats: No token provided")
@@ -312,6 +365,14 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
 
     headers = {"Authorization": f"Bearer {token}"}
     params = {"period": period}
+
+    # Add optional parameters if provided
+    if group_by:
+        params["group_by"] = group_by
+    if task_type:
+        params["task_type"] = task_type
+    if status:
+        params["status"] = status
 
     try:
         resp = requests.get(
@@ -325,8 +386,10 @@ def fetch_execution_stats(token, api_environment="production", period="last_week
 
         if resp.status_code == 200:
             data = resp.json()
-            set_cached_stats_data("executions", data, period)
-            logger.info(f"Execution stats: Successfully fetched and cached data for {period}")
+            set_cached_stats_data("executions", data, cache_key_suffix)
+            logger.info(
+                f"Execution stats: Successfully fetched and cached data for {period}, group_by {group_by}, task_type {task_type}, status {status}"
+            )
             return data
         elif resp.status_code == 401:
             logger.warning("Execution stats: Unauthorized access (401). Check token.")
