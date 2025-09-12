@@ -1768,3 +1768,222 @@ def register_callbacks(app):
             ]
 
         return updated_users, updated_options, current_users_display
+
+    # Enhanced JSON Viewer clientside callbacks
+
+    # Copy to clipboard functionality
+    app.clientside_callback(
+        """
+        function(n_clicks) {
+            if (!n_clicks || !window.dash_clientside.callback_context.triggered.length) {
+                return window.dash_clientside.no_update;
+            }
+
+            const triggered = window.dash_clientside.callback_context.triggered[0];
+            const button_id = triggered.prop_id.split('.')[0];
+
+            try {
+                const id_obj = JSON.parse(button_id);
+                const value = id_obj.value;
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(value).then(function() {
+                        showCopyNotification('Value copied to clipboard!');
+                    }).catch(function(err) {
+                        console.error('Failed to copy:', err);
+                        fallbackCopyTextToClipboard(value);
+                    });
+                } else {
+                    fallbackCopyTextToClipboard(value);
+                }
+            } catch (e) {
+                console.error('Error copying value:', e);
+            }
+
+            return window.dash_clientside.no_update;
+
+            function showCopyNotification(message) {
+                let notification = document.getElementById('copy-notification');
+                if (!notification) {
+                    notification = document.createElement('div');
+                    notification.id = 'copy-notification';
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background-color: #198754;
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 6px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        z-index: 9999;
+                        font-size: 14px;
+                        opacity: 0;
+                        transform: translateY(-10px);
+                        transition: all 0.3s ease;
+                    `;
+                    document.body.appendChild(notification);
+                }
+
+                notification.textContent = message;
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(-10px)';
+                }, 2000);
+            }
+
+            function fallbackCopyTextToClipboard(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showCopyNotification('Value copied to clipboard!');
+                    } else {
+                        showCopyNotification('Copy failed - please select and copy manually');
+                    }
+                } catch (err) {
+                    showCopyNotification('Copy failed - please select and copy manually');
+                }
+
+                document.body.removeChild(textArea);
+            }
+        }
+        """,
+        Output({"type": "copy-btn", "index": ALL, "value": ALL}, "color", allow_duplicate=True),
+        Input({"type": "copy-btn", "index": ALL, "value": ALL}, "n_clicks"),
+        prevent_initial_call=True,
+    )
+
+    # Expand all functionality
+    app.clientside_callback(
+        """
+        function(n_clicks) {
+            if (!n_clicks) {
+                return window.dash_clientside.no_update;
+            }
+
+            // Find the JSON container
+            const expandBtn = window.dash_clientside.callback_context.triggered[0];
+            const btnId = expandBtn.prop_id.split('.')[0];
+            const parentId = btnId.replace('-expand-all', '');
+            const container = document.getElementById(parentId + '-json-container');
+
+            if (container) {
+                const details = container.querySelectorAll('details');
+                details.forEach(detail => {
+                    detail.open = true;
+                });
+            }
+
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("root-expand-trigger", "children", allow_duplicate=True),
+        Input("root-expand-all", "n_clicks"),
+        prevent_initial_call=True,
+    )
+
+    # Collapse all functionality
+    app.clientside_callback(
+        """
+        function(n_clicks) {
+            if (!n_clicks) {
+                return window.dash_clientside.no_update;
+            }
+
+            // Find the JSON container
+            const collapseBtn = window.dash_clientside.callback_context.triggered[0];
+            const btnId = collapseBtn.prop_id.split('.')[0];
+            const parentId = btnId.replace('-collapse-all', '');
+            const container = document.getElementById(parentId + '-json-container');
+
+            if (container) {
+                const details = container.querySelectorAll('details');
+                details.forEach(detail => {
+                    detail.open = false;
+                });
+            }
+
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("root-collapse-trigger", "children", allow_duplicate=True),
+        Input("root-collapse-all", "n_clicks"),
+        prevent_initial_call=True,
+    )
+
+    # Search functionality
+    app.clientside_callback(
+        """
+        function(search_value) {
+            if (typeof search_value === 'undefined') {
+                return ['', {'display': 'none'}];
+            }
+
+            const container = document.getElementById('root-json-container');
+            if (!container) {
+                return ['Container not found', {'display': 'block'}];
+            }
+
+            // Clear previous highlights
+            const highlighted = container.querySelectorAll('.json-search-highlight');
+            highlighted.forEach(el => {
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize();
+            });
+
+            if (!search_value || search_value.trim() === '') {
+                return ['', {'display': 'none'}];
+            }
+
+            const term = search_value.toLowerCase().trim();
+            let matchCount = 0;
+
+            // Search in keys and values
+            const searchElements = container.querySelectorAll('.json-key, .json-value, .json-index');
+            searchElements.forEach(element => {
+                const text = element.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    // Highlight the match
+                    const originalText = element.textContent;
+                    const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+                    const highlightedHTML = originalText.replace(regex, '<span class="json-search-highlight">$1</span>');
+
+                    if (highlightedHTML !== originalText) {
+                        element.innerHTML = highlightedHTML;
+                        matchCount++;
+
+                        // Expand parent details elements
+                        let parent = element.closest('details');
+                        while (parent) {
+                            parent.open = true;
+                            parent = parent.parentElement.closest('details');
+                        }
+                    }
+                }
+            });
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+            }
+
+            const message = matchCount > 0 ? `${matchCount} matches found` : 'No matches found';
+            return [message, {'display': 'block'}];
+        }
+        """,
+        [Output("root-search-status", "children"), Output("root-search-status", "style")],
+        Input("root-json-search", "value"),
+        prevent_initial_call=True,
+    )
