@@ -157,7 +157,7 @@ def _render_object(data: dict[str, Any], level: int, parent_id: str) -> html.Div
                 _render_type_badge("object", len(data)),
             ],
             className="json-node json-object-empty",
-            style={"marginLeft": f"{level * 20}px"},
+            style={"marginLeft": f"{level * 12}px"},
         )
 
     items = []
@@ -179,12 +179,12 @@ def _render_object(data: dict[str, Any], level: int, parent_id: str) -> html.Div
                         html.Summary(
                             summary_content,
                             className="json-summary",
-                            style={"cursor": "pointer"},
+                            style={"cursor": "pointer", "marginLeft": f"{level * 12}px"},
                         ),
                         html.Div(
                             _render_json_node(v, level + 1, node_id),
                             className="json-details-content",
-                            style={"marginLeft": "20px", "marginTop": "5px"},
+                            style={"marginTop": "3px"},
                         ),
                     ],
                     open=(level < 2),
@@ -199,7 +199,6 @@ def _render_object(data: dict[str, Any], level: int, parent_id: str) -> html.Div
     return html.Div(
         items,
         className="json-object",
-        style={"marginLeft": f"{level * 20}px" if level > 0 else "0px"},
     )
 
 
@@ -212,7 +211,7 @@ def _render_array(data: list[Any], level: int, parent_id: str) -> html.Div:
                 _render_type_badge("array", len(data)),
             ],
             className="json-node json-array-empty",
-            style={"marginLeft": f"{level * 20}px"},
+            style={"marginLeft": f"{level * 12}px"},
         )
 
     items = []
@@ -234,12 +233,12 @@ def _render_array(data: list[Any], level: int, parent_id: str) -> html.Div:
                         html.Summary(
                             summary_content,
                             className="json-summary",
-                            style={"cursor": "pointer"},
+                            style={"cursor": "pointer", "marginLeft": f"{level * 12}px"},
                         ),
                         html.Div(
                             _render_json_node(v, level + 1, node_id),
                             className="json-details-content",
-                            style={"marginLeft": "20px", "marginTop": "5px"},
+                            style={"marginTop": "3px"},
                         ),
                     ],
                     open=(level < 2),
@@ -254,7 +253,6 @@ def _render_array(data: list[Any], level: int, parent_id: str) -> html.Div:
     return html.Div(
         items,
         className="json-array",
-        style={"marginLeft": f"{level * 20}px" if level > 0 else "0px"},
     )
 
 
@@ -282,7 +280,7 @@ def _render_simple_property(key: str, value: Any, level: int, node_id: str) -> h
             ),
         ],
         className="json-property",
-        style={"marginLeft": f"{(level + 1) * 20}px", "marginBottom": "2px"},
+        style={"marginLeft": f"{level * 12}px", "marginBottom": "2px"},
     )
 
 
@@ -310,7 +308,7 @@ def _render_simple_array_item(index: int, value: Any, level: int, node_id: str) 
             ),
         ],
         className="json-array-item",
-        style={"marginLeft": f"{(level + 1) * 20}px", "marginBottom": "2px"},
+        style={"marginLeft": f"{level * 12}px", "marginBottom": "2px"},
     )
 
 
@@ -336,7 +334,7 @@ def _render_primitive_value(value: Any, level: int, node_id: str) -> html.Div:
             ),
         ],
         className="json-primitive",
-        style={"marginLeft": f"{level * 20}px"},
+        style={"marginLeft": f"{level * 12}px"},
     )
 
 

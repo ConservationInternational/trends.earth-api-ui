@@ -288,10 +288,10 @@
 }
 
 .json-details-content {
-    margin-left: 20px;
-    margin-top: 8px;
+    margin-left: 12px;
+    margin-top: 3px;
     border-left: 1px solid #e9ecef;
-    padding-left: 12px;
+    padding-left: 8px;
 }
 
 /* JSON Value Styling */
@@ -433,8 +433,8 @@
     }
     
     .json-details-content {
-        margin-left: 16px;
-        padding-left: 8px;
+        margin-left: 8px;
+        padding-left: 6px;
     }
 }
 
