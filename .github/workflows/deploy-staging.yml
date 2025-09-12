@@ -1,0 +1,172 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging, develop]
+  pull_request:
+    branches: [staging]
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even if no changes detected'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: trendsearth-ui
+  CODEDEPLOY_APPLICATION: trendsearth-ui
+  CODEDEPLOY_DEPLOYMENT_GROUP: staging
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    concurrency:
+      group: staging-deployment
+      cancel-in-progress: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push image to ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+        BRANCH_NAME: ${{ github.ref_name }}
+      run: |
+        # Build Docker image
+        echo "🔨 Building Docker image for staging..."
+        docker build \
+          --build-arg GIT_BRANCH="${{ github.ref_name }}" \
+          --build-arg GIT_COMMIT="${{ github.sha }}" \
+          --build-arg DEPLOYMENT_ENVIRONMENT="staging" \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:staging \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME .
+        
+        # Push images to ECR
+        echo "🚀 Pushing images to ECR..."
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME
+        
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "registry=$ECR_REGISTRY" >> $GITHUB_OUTPUT
+
+    - name: Create deployment bundle
+      run: |
+        # Create deployment bundle for CodeDeploy
+        echo "📦 Creating deployment bundle..."
+        
+        # Create a clean directory for deployment
+        mkdir -p deploy-bundle
+        
+        # Copy deployment files
+        cp appspec.yml deploy-bundle/
+        cp -r scripts/ deploy-bundle/
+        cp docker-compose.prod.yml deploy-bundle/
+        cp docker-compose.staging.yml deploy-bundle/
+        
+        # Create deployment info file
+        cat > deploy-bundle/deployment-info.json <<EOF
+        {
+          "deploymentId": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "image": "${{ steps.build-image.outputs.image }}",
+          "registry": "${{ steps.build-image.outputs.registry }}",
+          "environment": "staging",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        }
+        EOF
+        
+        # Create deployment bundle
+        cd deploy-bundle
+        zip -r ../deployment-bundle.zip .
+        cd ..
+        
+        echo "✅ Deployment bundle created"
+
+    - name: Upload bundle to S3
+      run: |
+        # Upload deployment bundle to S3
+        S3_BUCKET="${{ secrets.CODEDEPLOY_S3_BUCKET }}"
+        S3_KEY="deployments/trendsearth-ui/staging/${{ github.sha }}/deployment-bundle.zip"
+        
+        aws s3 cp deployment-bundle.zip "s3://$S3_BUCKET/$S3_KEY"
+        
+        echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+        echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
+
+    - name: Create CodeDeploy deployment
+      id: deploy
+      run: |
+        # Create CodeDeploy deployment
+        echo "🚀 Creating CodeDeploy deployment..."
+        
+        DEPLOYMENT_ID=$(aws deploy create-deployment \
+          --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
+          --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+          --s3-location bucket=${{ env.S3_BUCKET }},key=${{ env.S3_KEY }},bundleType=zip \
+          --description "Staging deployment of commit ${{ github.sha }} from branch ${{ github.ref_name }}" \
+          --query 'deploymentId' \
+          --output text)
+        
+        echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+        echo "✅ Deployment created: $DEPLOYMENT_ID"
+
+    - name: Wait for deployment to complete
+      env:
+        DEPLOYMENT_ID: ${{ steps.deploy.outputs.deployment-id }}
+      run: |
+        echo "⏳ Waiting for deployment to complete..."
+        echo "Deployment ID: $DEPLOYMENT_ID"
+        
+        # Wait for deployment to complete
+        aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_ID
+        
+        # Get deployment status
+        STATUS=$(aws deploy get-deployment \
+          --deployment-id $DEPLOYMENT_ID \
+          --query 'deploymentInfo.status' \
+          --output text)
+        
+        echo "✅ Deployment completed with status: $STATUS"
+
+    - name: Verify deployment
+      run: |
+        echo "🔍 Verifying staging deployment..."
+        
+        # Wait a bit for services to be fully ready
+        sleep 30
+        
+        # Check health endpoint (this will be done by the validate script on the server)
+        echo "✅ Deployment verification will be handled by CodeDeploy validation hooks"
+
+    - name: Deployment summary
+      run: |
+        echo "🎉 Staging deployment completed successfully!"
+        echo ""
+        echo "📋 Deployment Details:"
+        echo "  Commit: ${{ github.sha }}"
+        echo "  Branch: ${{ github.ref_name }}"
+        echo "  Image: ${{ steps.build-image.outputs.image }}"
+        echo "  CodeDeploy ID: ${{ steps.deploy.outputs.deployment-id }}"
+        echo "  Environment: staging"
