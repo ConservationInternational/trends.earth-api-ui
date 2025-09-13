@@ -219,18 +219,18 @@ class TestStatusPageOptimizations:
             assert "metadata,logs,extra_data" in params["exclude"]
 
     def test_adaptive_max_points_based_on_time_period(self):
-        """Test that max points are adapted based on time period to optimize data transfer."""
+        """Test that max points provide sufficient coverage for each time period."""
         with patch("requests.get") as mock_get:
             mock_response = MagicMock()
             mock_response.status_code = 200
             mock_response.json.return_value = {"data": []}
             mock_get.return_value = mock_response
 
-            # Test different time periods
+            # Test different time periods with sufficient data points for full coverage
             test_cases = [
-                ("day", 144),  # Reduced from 288
-                ("week", 168),  # Reduced from 336
-                ("month", 360),  # Reduced from 720
+                ("day", 288),  # ~1 point per 5 minutes for 24 hours (ensures detailed coverage)
+                ("week", 336),  # ~2 points per hour for 7 days (ensures smooth visualization)
+                ("month", 720),  # ~1 point per hour for 30 days (ensures full coverage)
             ]
 
             for time_period, expected_max_points in test_cases:
@@ -257,15 +257,15 @@ class TestStatusPageOptimizations:
             for i in range(500)  # 500 data points
         ]
 
-        # Test different time periods and sampling strategies
-        optimized_day = StatusDataManager._optimize_time_series_data(large_dataset, 144, "day")
-        optimized_week = StatusDataManager._optimize_time_series_data(large_dataset, 168, "week")
-        optimized_month = StatusDataManager._optimize_time_series_data(large_dataset, 360, "month")
+        # Test different time periods and sampling strategies with sufficient coverage
+        optimized_day = StatusDataManager._optimize_time_series_data(large_dataset, 288, "day")
+        optimized_week = StatusDataManager._optimize_time_series_data(large_dataset, 336, "week")
+        optimized_month = StatusDataManager._optimize_time_series_data(large_dataset, 720, "month")
 
-        # Verify all optimizations reduce data points appropriately
-        assert len(optimized_day) <= 144
-        assert len(optimized_week) <= 168
-        assert len(optimized_month) <= 360
+        # Verify all optimizations reduce data points appropriately when needed
+        assert len(optimized_day) <= 288
+        assert len(optimized_week) <= 336
+        assert len(optimized_month) <= 720
 
         # Verify all optimizations preserve chronological order
         for optimized in [optimized_day, optimized_week, optimized_month]:

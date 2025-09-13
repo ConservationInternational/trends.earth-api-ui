@@ -30,30 +30,37 @@ This document describes the optimizations implemented to improve the status page
 - Faster network transfer and JSON parsing
 - More efficient memory usage
 
-### 3. Intelligent Time Series Data Sampling
+### 3. Intelligent Time Series Data with Full Period Coverage
 
-**Problem**: Time series charts were requesting too many data points, causing slow load times.
+**Problem**: Time series charts needed sufficient data points to properly visualize trends across different time periods while maintaining performance.
 
-**Solution**: Implemented adaptive data point limits and intelligent sampling:
-- Day view: 144 points (reduced from 288)
-- Week view: 168 points (reduced from 336) 
-- Month view: 360 points (reduced from 720)
-- Enhanced sampling algorithms to preserve data trends
+**Solution**: Implemented comprehensive data point limits with smart sampling:
+- Day view: 288 points (~1 point per 5 minutes for detailed coverage)
+- Week view: 336 points (~2 points per hour for smooth visualization) 
+- Month view: 720 points (~1 point per hour for full coverage)
+- Smart sampling only applied when data significantly exceeds targets (50% threshold)
+- Enhanced sampling algorithms to preserve data trends and key points
 
 **Benefits**:
-- Reduces data transfer volume by ~50%
-- Maintains chart visual quality
-- Faster chart rendering
+- Ensures full period coverage for all time ranges
+- Maintains chart visual quality and trend accuracy
+- Smart sampling only when truly necessary
+- Optimized data transfer while preserving important details
 
 ### 4. Role-Based Data Fetching Optimization
 
 **Problem**: All users were triggering stats API calls, even when they couldn't access the data.
 
-**Solution**: Only fetch enhanced statistics for SUPERADMIN users.
+**Solution**: Only fetch enhanced statistics for SUPERADMIN users, but ensure all available statistics sections are included:
+- Fetch all available dashboard stats sections (not limited to specific sections)
+- Include comprehensive user statistics with optimal grouping
+- Include execution statistics with appropriate time-based grouping
+- Include scripts count and all other available metrics
 
 **Benefits**:
-- Eliminates unnecessary API calls for non-admin users
-- Reduces server load
+- Eliminates unnecessary API calls for non-admin users  
+- Provides complete statistical coverage for administrators
+- Reduces server load while ensuring data completeness
 - Faster page loads for regular users
 
 ### 5. Performance Monitoring and Metadata
