@@ -25,7 +25,7 @@ def simulate_old_approach():
         ("GET /api/v1/stats/dashboard", "Dashboard stats", 200),
         ("GET /api/v1/stats/users", "User statistics", 150),
         ("GET /api/v1/stats/executions", "Execution statistics", 180),
-        ("GET /api/v1/status (time series)", "Chart data (720 points)", 300),
+        ("GET /api/v1/status (time series)", "Chart data (full coverage: 720 pts)", 300),
     ]
     
     for endpoint, description, latency_ms in calls:
@@ -56,8 +56,8 @@ def simulate_new_approach():
     # Simulate optimized consolidated calls
     calls = [
         ("GET /api/v1/status", "Status + deployment + swarm (consolidated)", 150),
-        ("GET /api/v1/stats/dashboard", "All stats (consolidated, SUPERADMIN only)", 250),
-        ("GET /api/v1/status (time series)", "Chart data (168 points, optimized)", 120),
+        ("GET /api/v1/stats/dashboard", "All comprehensive stats (all sections)", 250),
+        ("GET /api/v1/status (time series)", "Chart data (sufficient coverage, smart sampling)", 120),
     ]
     
     for endpoint, description, latency_ms in calls:
@@ -77,8 +77,9 @@ def simulate_new_approach():
     print(f"   • Total API calls: {len(api_calls)}")
     print(f"   • Total time: {total_time:.2f} seconds")
     print(f"   • Average per call: {total_time/len(api_calls):.2f} seconds")
-    print(f"   • Data points reduced: 720 → 168 (77% reduction)")
-    print(f"   • Excludes: metadata, logs, extra_data")
+    print(f"   • Data points: Full period coverage with smart sampling")
+    print(f"   • Stats sections: All available sections included")
+    print(f"   • Excludes: metadata, logs, extra_data for performance")
     
     return len(api_calls), total_time
 
@@ -103,12 +104,13 @@ def demonstrate_optimizations():
     print("=" * 30)
     print(f"📉 API Calls Reduced: {old_calls} → {new_calls} ({call_reduction:.1f}% reduction)")
     print(f"⚡ Load Time Improved: {old_time:.2f}s → {new_time:.2f}s ({time_improvement:.1f}% faster)")
-    print(f"📊 Data Transfer: ~50% reduction in time series data")
+    print(f"📊 Data Transfer: Smart sampling with full period coverage")
     print(f"💾 Caching: 60-80% cache hit rate for subsequent loads")
     
     print(f"\n✨ KEY OPTIMIZATIONS APPLIED:")
     print(f"   🔗 Consolidated API calls")
-    print(f"   📉 Intelligent data sampling")
+    print(f"   📊 Full period coverage with smart sampling")
+    print(f"   📈 All available statistics sections")
     print(f"   🎯 Role-based data fetching")
     print(f"   ⚡ Enhanced caching strategy")
     print(f"   📦 Optimized query parameters")

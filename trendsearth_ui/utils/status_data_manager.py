@@ -185,13 +185,13 @@ class StatusDataManager:
             # Get optimal grouping for time series data
             user_group_by, execution_group_by = get_optimal_grouping_for_period(api_period)
 
-            # Fetch all stats data in parallel-ready manner
+            # Fetch all stats data with comprehensive sections
             # (Note: These calls have their own caching, so we benefit from both levels)
             result["dashboard_stats"] = fetch_dashboard_stats(
                 token,
                 api_environment,
                 api_period,
-                include_sections=["summary", "trends", "geographic", "tasks"],
+                include_sections=None,  # Fetch all available sections for comprehensive stats
             )
 
             result["user_stats"] = fetch_user_stats(
@@ -222,7 +222,7 @@ class StatusDataManager:
         force_refresh: bool = False,
     ) -> dict[str, Any]:
         """
-        Fetch optimized time series status data for charts with enhanced caching and preprocessing.
+        Fetch time series status data for charts with enhanced caching and sufficient data points for full period coverage.
 
         Returns:
             dict: Contains time series data, metadata for chart generation, and optimization info
@@ -240,19 +240,19 @@ class StatusDataManager:
 
         logger.info(f"Fetching fresh time series data for period {time_period}")
 
-        # Calculate time range for API query with optimized parameters
+        # Calculate time range for API query with sufficient data points for full period coverage
         from datetime import timedelta
 
         end_time = datetime.now(timezone.utc)
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
-            max_points = 360  # ~2 points per hour for 30 days (reduced from 720)
+            max_points = 720  # ~1 point per hour for 30 days (ensures full coverage)
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
-            max_points = 168  # ~1 point per hour for 7 days (reduced from 336)
+            max_points = 336  # ~2 points per hour for 7 days (ensures smooth visualization)
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
-            max_points = 144  # ~1 point per 10 minutes for 24 hours (reduced from 288)
+            max_points = 288  # ~1 point per 5 minutes for 24 hours (ensures detailed coverage)
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -286,8 +286,10 @@ class StatusDataManager:
 
             status_data = resp.json().get("data", [])
 
-            # Apply optimization if we have too many data points
-            if len(status_data) > max_points:
+            # Apply smart sampling only if we have significantly more data than the target
+            # This ensures we don't unnecessarily reduce data quality
+            sampling_threshold = max_points * 1.5  # Only sample if 50% more than target
+            if len(status_data) > sampling_threshold:
                 # Apply intelligent sampling to reduce data points while preserving trends
                 optimized_data = StatusDataManager._optimize_time_series_data(
                     status_data, max_points, time_period
@@ -295,10 +297,13 @@ class StatusDataManager:
                 result["data"] = optimized_data
                 result["optimization_applied"] = True
                 logger.info(
-                    f"Applied time series optimization: {len(status_data)} -> {len(optimized_data)} points"
+                    f"Applied selective time series optimization: {len(status_data)} -> {len(optimized_data)} points"
                 )
             else:
                 result["data"] = status_data
+                logger.info(
+                    f"No optimization needed: {len(status_data)} points within acceptable range"
+                )
 
             logger.info(
                 f"Successfully fetched {len(result['data'])} time series records for period {time_period}"
