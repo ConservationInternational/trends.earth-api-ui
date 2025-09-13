@@ -113,6 +113,10 @@ def register_callbacks(app):
                     resp = requests.get(
                         f"{get_api_base(api_environment)}/status/swarm",
                         headers=headers,
+                        params={
+                            "per_page": 1,  # Optimization: limit response size
+                            "exclude": "metadata,logs",  # Optimization: exclude unnecessary fields
+                        },
                         timeout=5,
                     )
                     if resp.status_code == 200:
