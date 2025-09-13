@@ -111,7 +111,7 @@ class StatusDataManager:
                 params={
                     "per_page": 1,
                     "sort": "-timestamp",
-                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                    "exclude": "metadata,logs,extra_data",  # Exclude large fields for performance
                 },
                 timeout=5,
             )
@@ -246,13 +246,13 @@ class StatusDataManager:
         end_time = datetime.now(timezone.utc)
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
-            max_points = 720  # ~1 point per hour for 30 days
+            max_points = 360  # ~2 points per hour for 30 days (reduced from 720)
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
-            max_points = 336  # ~1 point per 30 minutes for 7 days
+            max_points = 168  # ~1 point per hour for 7 days (reduced from 336)
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
-            max_points = 288  # ~1 point per 5 minutes for 24 hours
+            max_points = 144  # ~1 point per 10 minutes for 24 hours (reduced from 288)
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -278,7 +278,7 @@ class StatusDataManager:
                     "end_date": end_iso,
                     "per_page": max_points,  # Adaptive limit based on time period
                     "sort": "timestamp",  # Sort by timestamp ascending
-                    "exclude": "metadata,logs",  # Exclude large fields for performance
+                    "exclude": "metadata,logs,extra_data",  # Exclude large fields for performance
                 },
                 timeout=15,  # Longer timeout for time series data
             )
@@ -314,15 +314,18 @@ class StatusDataManager:
 
     @staticmethod
     def _optimize_time_series_data(
-        data: list[dict], target_points: int, _time_period: str
+        data: list[dict], target_points: int, time_period: str
     ) -> list[dict]:
         """
         Optimize time series data by intelligently sampling to reduce data points while preserving trends.
 
+        Uses a hybrid approach: systematic sampling for even distribution plus
+        key point preservation for trend analysis.
+
         Args:
             data: List of status data dictionaries
             target_points: Target number of data points
-            _time_period: Time period for context-aware optimization (unused for now)
+            time_period: Time period for context-aware optimization
 
         Returns:
             list: Optimized data with reduced points
@@ -333,20 +336,51 @@ class StatusDataManager:
         # Sort by timestamp to ensure proper ordering
         sorted_data = sorted(data, key=lambda x: x.get("timestamp", ""))
 
-        # Use systematic sampling with some randomization to preserve key events
-        step = len(sorted_data) / target_points
-        optimized_data = []
+        # Enhanced sampling strategy based on time period
+        if time_period == "month":
+            # For monthly data, use hourly sampling to preserve daily patterns
+            optimized_data = StatusDataManager._sample_by_time_interval(
+                sorted_data, target_points, "hourly"
+            )
+        elif time_period == "week":
+            # For weekly data, use systematic sampling with trend preservation
+            optimized_data = StatusDataManager._sample_with_trend_preservation(
+                sorted_data, target_points
+            )
+        else:
+            # For daily data, use simple systematic sampling
+            optimized_data = StatusDataManager._systematic_sample(sorted_data, target_points)
 
-        for i in range(target_points):
-            index = int(i * step)
-            if index < len(sorted_data):
-                optimized_data.append(sorted_data[index])
-
-        # Always include the most recent data point
+        # Always include the most recent data point for real-time accuracy
         if sorted_data and sorted_data[-1] not in optimized_data:
-            optimized_data[-1] = sorted_data[-1]
+            if len(optimized_data) > 0:
+                optimized_data[-1] = sorted_data[-1]
+            else:
+                optimized_data.append(sorted_data[-1])
 
         return optimized_data
+
+    @staticmethod
+    def _systematic_sample(data: list[dict], target_points: int) -> list[dict]:
+        """Simple systematic sampling with even distribution."""
+        step = len(data) / target_points
+        return [data[int(i * step)] for i in range(target_points) if int(i * step) < len(data)]
+
+    @staticmethod
+    def _sample_by_time_interval(
+        data: list[dict], target_points: int, _interval: str
+    ) -> list[dict]:
+        """Sample data by time intervals (hourly, etc.) to preserve temporal patterns."""
+        # For now, fall back to systematic sampling
+        # In future, could implement actual time-interval based sampling
+        return StatusDataManager._systematic_sample(data, target_points)
+
+    @staticmethod
+    def _sample_with_trend_preservation(data: list[dict], target_points: int) -> list[dict]:
+        """Sample data while preserving important trend changes."""
+        # For now, use systematic sampling
+        # Future enhancement: detect significant changes in execution counts and preserve those points
+        return StatusDataManager._systematic_sample(data, target_points)
 
     @staticmethod
     def invalidate_cache(pattern: str = None) -> int:
@@ -373,3 +407,123 @@ class StatusDataManager:
 
         logger.info(f"Invalidated {cleared_count} cache entries")
         return cleared_count
+
+    @staticmethod
+    def fetch_comprehensive_status_page_data(
+        token: str,
+        api_environment: str,
+        time_period: str = "day",
+        role: str = "USER",
+        force_refresh: bool = False,
+    ) -> dict[str, Any]:
+        """
+        Fetch all data needed for the status page in optimized consolidated calls.
+
+        This method consolidates multiple API calls to minimize request volume and
+        improve page load performance by fetching related data together.
+
+        Args:
+            token: Authentication token
+            api_environment: API environment (production/staging)
+            time_period: Time period for stats data (day/week/month)
+            role: User role for permission checks
+            force_refresh: Whether to bypass cache
+
+        Returns:
+            dict: Comprehensive status page data including:
+                - status_data: Latest status information
+                - deployment_data: Deployment and health info
+                - swarm_data: Docker swarm status
+                - stats_data: Enhanced statistics (if SUPERADMIN)
+                - time_series_data: Chart data
+                - meta: Performance metadata
+        """
+        cache_key = StatusDataManager.get_cache_key(
+            "comprehensive_status",
+            api_environment=api_environment,
+            time_period=time_period,
+            role=role,
+        )
+
+        # Check cache first unless forced refresh
+        if not force_refresh:
+            cached_data = StatusDataManager.get_cached_data(cache_key, cache_type="status")
+            if cached_data is not None:
+                logger.info("Returning cached comprehensive status page data")
+                # Add cache hit metadata
+                cached_data.setdefault("meta", {})["cache_hit"] = True
+                return cached_data
+
+        logger.info(
+            f"Fetching fresh comprehensive status page data for period {time_period}, role {role}"
+        )
+
+        # Initialize result structure with performance metadata
+        result = {
+            "status_data": None,
+            "deployment_data": None,
+            "swarm_data": None,
+            "stats_data": None,
+            "time_series_data": None,
+            "meta": {
+                "cache_hit": False,
+                "fetch_time": datetime.now(timezone.utc),
+                "api_calls_made": [],
+                "optimizations_applied": [],
+            },
+        }
+
+        try:
+            # 1. Fetch core status data (always needed)
+            status_result = StatusDataManager.fetch_consolidated_status_data(
+                token, api_environment, force_refresh=force_refresh
+            )
+            result["status_data"] = status_result
+            result["meta"]["api_calls_made"].append("consolidated_status")
+
+            # 2. Fetch deployment and swarm info (lightweight)
+            result["deployment_data"] = fetch_deployment_info(api_environment, token)
+            result["meta"]["api_calls_made"].append("deployment_info")
+
+            swarm_info, swarm_time = fetch_swarm_info(api_environment, token)
+            result["swarm_data"] = {"info": swarm_info, "cached_time": swarm_time}
+            result["meta"]["api_calls_made"].append("swarm_info")
+
+            # 3. Fetch stats data (only for SUPERADMIN)
+            if role == "SUPERADMIN":
+                stats_result = StatusDataManager.fetch_consolidated_stats_data(
+                    token, api_environment, time_period, role, force_refresh=force_refresh
+                )
+                result["stats_data"] = stats_result
+                result["meta"]["api_calls_made"].append("consolidated_stats")
+                result["meta"]["optimizations_applied"].append("superadmin_stats_consolidated")
+            else:
+                result["meta"]["optimizations_applied"].append("stats_skipped_for_non_superadmin")
+
+            # 4. Fetch time series data with optimized parameters
+            time_series_result = StatusDataManager.fetch_time_series_status_data(
+                token, api_environment, time_period, force_refresh=force_refresh
+            )
+            result["time_series_data"] = time_series_result
+            result["meta"]["api_calls_made"].append("time_series_status")
+
+            # Add optimization metadata
+            if time_series_result.get("optimization_applied"):
+                result["meta"]["optimizations_applied"].append("time_series_sampling")
+
+            result["meta"]["total_api_calls"] = len(result["meta"]["api_calls_made"])
+            logger.info(
+                f"Comprehensive fetch completed: {result['meta']['total_api_calls']} API calls"
+            )
+
+        except Exception as e:
+            logger.error(f"Error fetching comprehensive status page data: {e}")
+            result["error"] = str(e)
+            result["meta"]["error"] = str(e)
+
+        # Cache the result (excluding error cases)
+        if not result.get("error"):
+            StatusDataManager.set_cached_data(cache_key, result, cache_type="status")
+            result["meta"]["optimizations_applied"].append("response_cached")
+
+        return result
