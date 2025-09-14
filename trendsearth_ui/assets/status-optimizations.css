@@ -1,0 +1,160 @@
+/* Status Page Performance Optimizations */
+
+/* Skeleton Loading Animations for Better Perceived Performance */
+.skeleton-text, .skeleton-stat {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    height: 1em;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.5em;
+    width: 60%;
+}
+
+.skeleton-subtitle {
+    height: 1.2em;
+    width: 40%;
+}
+
+.skeleton-stat {
+    height: 2em;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Chart Container Optimizations */
+.status-charts-container {
+    /* Use containment for better performance */
+    contain: layout style paint;
+}
+
+/* Lazy Loading Optimization */
+.lazy-load-placeholder {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
+.lazy-load-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.lazy-load-content.loaded {
+    opacity: 1;
+}
+
+/* Performance-optimized loading states */
+.loading-optimized {
+    /* Prevent layout shift during loading */
+    min-height: 200px;
+    position: relative;
+}
+
+.loading-optimized .dash-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Chart performance optimizations */
+.chart-container {
+    /* Use GPU acceleration for smoother rendering */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Reduce repaints for frequently updating elements */
+.status-countdown {
+    will-change: auto;
+    transform: translateZ(0);
+}
+
+/* Enhanced focus states without performance impact */
+.nav-link:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Optimize table rendering */
+.ag-theme-alpine .ag-row {
+    /* Improve row rendering performance */
+    contain: layout style;
+}
+
+/* Progressive enhancement for chart loading */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-text, .skeleton-stat {
+        animation: none;
+        background: #e0e0e0;
+    }
+    
+    .lazy-load-content {
+        transition: none;
+    }
+}
+
+/* Status summary grid optimizations */
+.status-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive chart containers */
+.chart-responsive {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 50%; /* 2:1 aspect ratio */
+}
+
+.chart-responsive > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Memory-efficient loading placeholders */
+.placeholder-efficient {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.placeholder-efficient::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.5rem;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
