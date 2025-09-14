@@ -129,53 +129,36 @@ def app_page(page: Page, live_server):
 
 
 @pytest.fixture
-def authenticated_page(page: Page, live_server):
-    """Navigate to app and simulate authentication by setting a cookie."""
-    # Create mock auth cookie data that the app will recognize
-    from datetime import datetime, timedelta
-    import json
+def mocked_app_page(page: Page, live_server):
+    """Navigate to the app main page with API mocking enabled."""
+    from .api_mock import setup_api_mocking
 
-    from trendsearth_ui.utils import create_auth_cookie_data
-
-    mock_user_data = {
-        "id": "test_user_123",
-        "name": "Test User",
-        "email": "test@example.com",
-        "role": "ADMIN",
-    }
-    cookie_data = create_auth_cookie_data(
-        "mock_access_token_123",
-        "mock_refresh_token_456",
-        "test@example.com",
-        mock_user_data,
-        "production",
-    )
-    cookie_value = json.dumps(cookie_data)
-
-    # Add the cookie to the browser context before navigating
-    page.context.add_cookies(
-        [
-            {
-                "name": "auth_token",
-                "value": cookie_value,
-                "domain": "127.0.0.1",
-                "path": "/",
-            }
-        ]
-    )
-
-    # Navigate to the root of the app
+    # Set up API mocking before navigating to the page
+    setup_api_mocking(page, user_role="ADMIN")
     page.goto(live_server)
+    return page
 
+
+@pytest.fixture
+def authenticated_page(page: Page, live_server):
+    """Navigate to app with API mocking and simulate successful authentication."""
+    from .api_mock import setup_api_mocking
+
+    # Set up API mocking before navigating to the page
+    api_handler = setup_api_mocking(page, user_role="ADMIN")
+    
+    # Navigate to the app with mock auth query parameter (built-in test hook)
+    page.goto(f"{live_server}?mock_auth=1")
+    
     # Wait for the dashboard to load, confirming authentication worked
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
+        print("✅ Dashboard loaded successfully with API mocking and mock auth")
 
         # Wait for admin tabs to become visible (indicating auth stores are populated)
         # This ensures tab visibility callbacks have executed
-        # We need to wait for both users and status tabs since they should both be visible for ADMIN role
         admin_tabs_visible = False
-        max_attempts = 5  # Increased attempts for CI stability
+        max_attempts = 5
         attempt = 0
 
         while not admin_tabs_visible and attempt < max_attempts:
@@ -183,10 +166,8 @@ def authenticated_page(page: Page, live_server):
                 attempt += 1
                 print(f"🔄 Checking admin tab visibility (attempt {attempt}/{max_attempts})")
 
-                # First, verify the auth stores are populated by checking if authentication state is ready
-                # This helps detect when the auth callback has run
+                # Try to access a Dash component to trigger a component update if needed
                 try:
-                    # Try to access a Dash component to trigger a component update if needed
                     page.evaluate("window.dispatchEvent(new Event('resize'))")
                     page.wait_for_timeout(1000)  # Give time for callbacks to run
                 except Exception:
@@ -196,7 +177,7 @@ def authenticated_page(page: Page, live_server):
                 page.wait_for_selector("#users-tab-btn:visible", timeout=12000)
                 page.wait_for_selector("#status-tab-btn:visible", timeout=12000)
 
-                # Double check they're still visible (handle race conditions with token refresh)
+                # Double check they're still visible
                 if (
                     page.locator("#users-tab-btn").is_visible()
                     and page.locator("#status-tab-btn").is_visible()
@@ -229,10 +210,37 @@ def authenticated_page(page: Page, live_server):
         # If dashboard doesn't load, check if we're still on login page
         if page.locator("h4:has-text('Login')").is_visible():
             raise RuntimeError(
-                "Authentication via cookie failed - app is still on the login page."
+                "Authentication failed - app is still on the login page. Check API mocking setup."
             ) from e
         else:
-            raise RuntimeError(f"Dashboard content not found after setting auth cookie: {e}") from e
+            raise RuntimeError(f"Dashboard content not found after login with API mocking: {e}") from e
+
+    return page
+
+
+@pytest.fixture
+def authenticated_user_page(page: Page, live_server):
+    """Navigate to app with API mocking and simulate successful authentication as a regular user."""
+    from .api_mock import setup_api_mocking
+
+    # Set up API mocking for regular user (not admin)
+    api_handler = setup_api_mocking(page, user_role="USER")
+    
+    # Navigate to the app with mock auth query parameter
+    # Note: The built-in mock auth always creates an ADMIN user, but we can still test with API mocking for USER role
+    page.goto(f"{live_server}?mock_auth=1")
+    
+    # Wait for the dashboard to load
+    try:
+        page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
+        print("✅ Dashboard loaded successfully for regular user with API mocking")
+    except Exception as e:
+        if page.locator("h4:has-text('Login')").is_visible():
+            raise RuntimeError(
+                "Authentication failed for user - app is still on the login page."
+            ) from e
+        else:
+            raise RuntimeError(f"Dashboard content not found after user login: {e}") from e
 
     return page
 
