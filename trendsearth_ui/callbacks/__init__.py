@@ -18,6 +18,9 @@ def register_all_callbacks(app):
     # Register optimized status callbacks for better performance
     status_optimized.register_optimized_callbacks(app)
 
+    # Register status callbacks for backward compatibility
+    status.register_callbacks(app)
+
     # Use importlib to dynamically import other modules to avoid circular imports
     callback_modules = [
         "timezone",  # Add timezone first for early detection
