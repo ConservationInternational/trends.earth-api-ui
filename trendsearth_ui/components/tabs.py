@@ -914,14 +914,52 @@ def status_tab_content(is_admin, role=None):
                                     html.Div(
                                         id="status-summary",
                                         children=[
+                                            # Skeleton loader for better perceived performance
                                             html.Div(
                                                 [
-                                                    html.I(
-                                                        className="fas fa-circle-notch fa-spin me-2"
-                                                    ),
-                                                    "Loading system status...",
+                                                    html.Div(
+                                                        [
+                                                            html.Div(
+                                                                className="skeleton-text skeleton-title mb-3"
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    html.Div(
+                                                                        className="skeleton-stat",
+                                                                        style={"width": "30%"},
+                                                                    ),
+                                                                    html.Div(
+                                                                        className="skeleton-stat",
+                                                                        style={"width": "30%"},
+                                                                    ),
+                                                                    html.Div(
+                                                                        className="skeleton-stat",
+                                                                        style={"width": "30%"},
+                                                                    ),
+                                                                ],
+                                                                className="d-flex justify-content-between mb-3",
+                                                            ),
+                                                            html.Div(
+                                                                className="skeleton-text skeleton-subtitle mb-2"
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    html.Div(
+                                                                        className="skeleton-stat",
+                                                                        style={"width": "20%"},
+                                                                    ),
+                                                                    html.Div(
+                                                                        className="skeleton-stat",
+                                                                        style={"width": "20%"},
+                                                                    ),
+                                                                ],
+                                                                className="d-flex justify-content-between",
+                                                            ),
+                                                        ],
+                                                        className="status-skeleton",
+                                                    )
                                                 ],
-                                                className="text-center text-muted p-3",
+                                                className="p-3",
                                             )
                                         ],
                                     )
@@ -1062,27 +1100,44 @@ def status_tab_content(is_admin, role=None):
                                 if is_admin_user
                                 else []
                             ),
-                            # Status trends charts
+                            # Status trends charts with lazy loading
                             html.H5("System Status Trends", className="mb-3"),
-                            dcc.Loading(
-                                id="loading-status-charts",
-                                children=[
-                                    html.Div(
-                                        id="status-charts",
-                                        className="mt-3",
+                            html.Div(
+                                [
+                                    dcc.Loading(
+                                        id="loading-status-charts",
+                                        className="loading-optimized",
                                         children=[
                                             html.Div(
-                                                [
-                                                    html.I(className="fas fa-chart-line me-2"),
-                                                    "Loading charts...",
+                                                id="status-charts",
+                                                className="status-charts-container mt-3",
+                                                children=[
+                                                    # Optimized placeholder with skeleton loading
+                                                    html.Div(
+                                                        [
+                                                            html.Div(
+                                                                className="skeleton-text skeleton-title mb-3"
+                                                            ),
+                                                            html.Div(
+                                                                className="chart-responsive",
+                                                                children=[
+                                                                    html.Div(
+                                                                        className="placeholder-efficient",
+                                                                        children="Preparing chart data...",
+                                                                    )
+                                                                ],
+                                                            ),
+                                                        ],
+                                                        className="lazy-load-content",
+                                                    )
                                                 ],
-                                                className="text-center text-muted p-4",
                                             )
                                         ],
-                                    )
+                                        type="default",
+                                        color="#007bff",
+                                    ),
                                 ],
-                                type="default",
-                                color="#007bff",
+                                className="chart-container",
                             ),
                         ]
                     ),
