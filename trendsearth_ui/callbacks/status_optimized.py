@@ -215,10 +215,10 @@ def register_optimized_callbacks(app):
         time_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment, active_tab
     ):
         """
-        Update status charts with optimized data fetching.
+        Update status charts with optimized data fetching and progressive loading.
 
         This callback uses pre-fetched time series data when possible
-        to reduce redundant API calls.
+        to reduce redundant API calls and implements progressive loading.
         """
         # Guard: Skip if not logged in
         if not token:
@@ -242,7 +242,43 @@ def register_optimized_callbacks(app):
         )
 
         try:
-            # Try to get time series data from comprehensive cache
+            # Progressive loading: Show immediate feedback
+            if (
+                not is_manual_refresh
+                and ctx.triggered
+                and "status-time-tabs-store" in str(ctx.triggered)
+            ):
+                # For time period changes, show a quick transition placeholder
+                time_period_name = {"day": "24 Hours", "week": "7 Days", "month": "30 Days"}.get(
+                    time_tab, "Selected Period"
+                )
+
+                # Return a temporary loading state with the new time period
+                return html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Div(className="skeleton-text skeleton-title mb-3"),
+                                html.Div(
+                                    f"Loading {time_period_name} data...",
+                                    className="text-muted text-center p-4",
+                                ),
+                                html.Div(
+                                    className="chart-responsive",
+                                    children=[
+                                        html.Div(
+                                            className="placeholder-efficient",
+                                            children="Fetching chart data...",
+                                        )
+                                    ],
+                                ),
+                            ],
+                            className="lazy-load-content",
+                        )
+                    ]
+                )
+
+            # Try to get time series data from comprehensive cache first
             comprehensive_cache_key = StatusDataManager.get_cache_key(
                 "comprehensive_status",
                 api_environment=api_environment,
@@ -253,14 +289,16 @@ def register_optimized_callbacks(app):
             cached_comprehensive = StatusDataManager.get_cached_data(comprehensive_cache_key)
             if cached_comprehensive and not is_manual_refresh:
                 time_series_data = cached_comprehensive.get("time_series_data", {}).get("data", [])
-                logger.info("Using time series data from comprehensive cache")
+                logger.info(
+                    "Using time series data from comprehensive cache for optimized rendering"
+                )
             else:
                 # Fetch time series data separately if not in comprehensive cache
                 time_series_result = StatusDataManager.fetch_time_series_status_data(
                     token, api_environment, time_tab, force_refresh=is_manual_refresh
                 )
                 time_series_data = time_series_result.get("data", [])
-                logger.info("Fetched fresh time series data for charts")
+                logger.info("Fetched fresh time series data for optimized charts")
 
             if not time_series_data:
                 time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
@@ -270,13 +308,15 @@ def register_optimized_callbacks(app):
                     [
                         html.Div(
                             [
-                                html.I(
-                                    className="fas fa-exclamation-triangle fa-2x text-warning mb-3"
-                                ),
-                                html.H5("No Status Data Available", className="text-muted mb-3"),
+                                html.I(className="fas fa-info-circle fa-2x text-info mb-3"),
+                                html.H5("No Chart Data Available", className="text-muted mb-3"),
                                 html.P(
                                     f"No status logs found for the last {time_period_name}.",
                                     className="text-muted mb-2",
+                                ),
+                                html.Small(
+                                    "Charts will appear when status data becomes available.",
+                                    className="text-muted",
                                 ),
                             ],
                             className="text-center py-5",
@@ -285,16 +325,39 @@ def register_optimized_callbacks(app):
                     className="border rounded p-4 bg-light",
                 )
 
-            # Build charts using existing chart generation logic
-            charts = _build_status_charts(time_series_data, safe_timezone, time_tab)
-            return html.Div(charts)
+            # Build charts using optimized chart generation
+            charts = _build_optimized_status_charts(time_series_data, safe_timezone, time_tab)
+
+            # Wrap charts in lazy-load container for performance
+            return html.Div(
+                [
+                    html.Div(
+                        charts,
+                        className="lazy-load-content loaded",
+                    )
+                ],
+                className="chart-container",
+            )
 
         except Exception as e:
             logger.error(f"Error in optimized status charts update: {e}")
             return html.Div(
-                f"Error fetching chart data: {e}",
-                className="text-center text-danger p-4",
+                [
+                    html.Div(
+                        [
+                            html.I(className="fas fa-exclamation-triangle fa-2x text-warning mb-3"),
+                            html.H5("Chart Loading Error", className="text-danger mb-3"),
+                            html.P(f"Unable to load chart data: {str(e)}", className="text-muted"),
+                            html.Small("Please try refreshing the page.", className="text-muted"),
+                        ],
+                        className="text-center py-4",
+                    )
+                ],
+                className="border rounded p-4 bg-light",
             )
+
+    # Register additional status callbacks
+    _register_additional_status_callbacks(app)
 
 
 def _build_status_summary(status_data, safe_timezone):
@@ -536,3 +599,256 @@ def _build_status_charts(time_series_data, safe_timezone, _time_tab):
         charts.append(html.Div([dcc.Graph(figure=fig_active)], className="mb-4"))
 
     return charts
+
+
+def _build_optimized_status_charts(time_series_data, safe_timezone, time_tab):
+    """Build optimized status charts with better performance and reduced complexity."""
+    from dash import dcc, html
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    if not time_series_data:
+        return []
+
+    # Convert to DataFrame efficiently
+    df = pd.DataFrame(time_series_data)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+    # Convert to local timezone efficiently
+    local_timestamps = []
+    for timestamp in df["timestamp"]:
+        local_dt, tz_abbrev = convert_utc_to_local(timestamp, safe_timezone)
+        local_timestamps.append(local_dt)
+
+    df["local_timestamp"] = pd.to_datetime(local_timestamps)
+
+    charts = []
+
+    # Create configuration for optimized rendering
+    chart_config = {
+        "displayModeBar": False,
+        "responsive": True,
+        "staticPlot": False,
+        # Optimize for performance
+        "scrollZoom": False,
+        "doubleClick": False,
+        "showTips": False,
+        "displaylogo": False,
+    }
+
+    # Chart 1: Active Executions (Primary metric)
+    if "executions_active" in df.columns:
+        active_values = df["executions_active"].fillna(0)
+        if active_values.max() > 0 or len(active_values) > 1:  # Only show if meaningful data
+            fig_active = go.Figure()
+            fig_active.add_trace(
+                go.Scatter(
+                    x=df["local_timestamp"],
+                    y=active_values,
+                    mode="lines+markers",
+                    name="Active Executions",
+                    line={"color": "#ff6f00", "width": 2},
+                    marker={"size": 4, "color": "#ff6f00"},
+                    hovertemplate="<b>Active Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
+                )
+            )
+
+            fig_active.update_layout(
+                title={
+                    "text": "Active Executions Over Time",
+                    "x": 0.5,
+                    "xanchor": "center",
+                    "font": {"size": 16},
+                },
+                xaxis_title=get_chart_axis_label(safe_timezone),
+                yaxis_title="Number of Active Executions",
+                template="plotly_white",
+                height=300,  # Reduced height for better performance
+                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                hovermode="x unified",
+                showlegend=False,
+            )
+
+            charts.append(
+                html.Div(
+                    [
+                        dcc.Graph(
+                            figure=fig_active,
+                            config=chart_config,
+                            className="chart-responsive",
+                        )
+                    ],
+                    className="mb-4",
+                )
+            )
+
+    # Chart 2: Execution Status Breakdown (if data available)
+    status_fields = [
+        "executions_running",
+        "executions_ready",
+        "executions_finished",
+        "executions_failed",
+    ]
+    available_fields = [field for field in status_fields if field in df.columns]
+
+    if len(available_fields) >= 2:  # Only show if we have multiple status types
+        fig_status = go.Figure()
+
+        colors = {
+            "executions_running": "#1e88e5",
+            "executions_ready": "#ffa726",
+            "executions_finished": "#43a047",
+            "executions_failed": "#e53935",
+        }
+
+        names = {
+            "executions_running": "Running",
+            "executions_ready": "Ready",
+            "executions_finished": "Finished",
+            "executions_failed": "Failed",
+        }
+
+        for field in available_fields:
+            values = df[field].fillna(0)
+            if values.max() > 0:  # Only add traces with actual data
+                fig_status.add_trace(
+                    go.Scatter(
+                        x=df["local_timestamp"],
+                        y=values,
+                        mode="lines",
+                        name=names.get(field, field),
+                        line={"color": colors.get(field, "#666"), "width": 2},
+                        hovertemplate=f"<b>{names.get(field, field)}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
+                    )
+                )
+
+        if len(fig_status.data) > 0:  # Only show if we have data
+            fig_status.update_layout(
+                title={
+                    "text": "Execution Status Breakdown",
+                    "x": 0.5,
+                    "xanchor": "center",
+                    "font": {"size": 16},
+                },
+                xaxis_title=get_chart_axis_label(safe_timezone),
+                yaxis_title="Number of Executions",
+                template="plotly_white",
+                height=300,
+                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                hovermode="x unified",
+                legend={
+                    "orientation": "h",
+                    "yanchor": "bottom",
+                    "y": 1.02,
+                    "xanchor": "center",
+                    "x": 0.5,
+                },
+            )
+
+            charts.append(
+                html.Div(
+                    [
+                        dcc.Graph(
+                            figure=fig_status,
+                            config=chart_config,
+                            className="chart-responsive",
+                        )
+                    ],
+                    className="mb-4",
+                )
+            )
+
+    # Show helpful message if no charts were generated
+    if not charts:
+        time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
+            time_tab, "selected period"
+        )
+
+        charts.append(
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            html.I(className="fas fa-chart-line fa-3x text-muted mb-3"),
+                            html.H5("Chart Data Not Available", className="text-muted mb-3"),
+                            html.P(
+                                f"No meaningful chart data found for the last {time_period_name}.",
+                                className="text-muted mb-2",
+                            ),
+                            html.Small(
+                                "Charts will appear when execution activity is detected.",
+                                className="text-muted",
+                            ),
+                        ],
+                        className="text-center py-5",
+                    ),
+                ],
+                className="border rounded p-4 bg-light mb-4",
+            )
+        )
+
+    return charts
+
+
+def _register_additional_status_callbacks(app):
+    """Register additional status callbacks for optimized version."""
+    from dash import Input, Output, State, callback_context
+
+    @app.callback(
+        [
+            Output("status-tab-day", "className"),
+            Output("status-tab-week", "className"),
+            Output("status-tab-month", "className"),
+            Output("status-time-tabs-store", "data"),
+        ],
+        [
+            Input("status-tab-day", "n_clicks"),
+            Input("status-tab-week", "n_clicks"),
+            Input("status-tab-month", "n_clicks"),
+        ],
+    )
+    def switch_status_time_tabs_optimized(_day_clicks, _week_clicks, _month_clicks):
+        """Update the visual style of the active status tab and store the active tab."""
+        ctx = callback_context
+
+        if not ctx.triggered:
+            return "nav-link active", "nav-link", "nav-link", "day"
+
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+        if button_id == "status-tab-week":
+            return "nav-link", "nav-link active", "nav-link", "week"
+        if button_id == "status-tab-month":
+            return "nav-link", "nav-link", "nav-link active", "month"
+
+        return "nav-link active", "nav-link", "nav-link", "day"
+
+    @app.callback(
+        Output("status-countdown", "children"),
+        [
+            Input("status-countdown-interval", "n_intervals"),
+            Input("refresh-status-btn", "n_clicks"),
+        ],
+        [
+            State("active-tab-store", "data"),
+        ],
+    )
+    def update_status_countdown_optimized(n_intervals, _refresh_clicks, active_tab):
+        """Update the countdown timer display with minimal processing."""
+        ctx = callback_context
+
+        # If refresh button was clicked, reset to 60s
+        if ctx.triggered and any("refresh-status-btn" in t["prop_id"] for t in ctx.triggered):
+            return "60s"
+
+        # If not on status tab, return 60s
+        if active_tab != "status":
+            return "60s"
+
+        # Normal countdown progression
+        if n_intervals is None:
+            return "60s"
+
+        # Calculate remaining seconds (60 second intervals)
+        seconds_remaining = 60 - (n_intervals % 60)
+        return f"{seconds_remaining}s"
