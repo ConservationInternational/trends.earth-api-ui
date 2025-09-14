@@ -145,26 +145,26 @@ def authenticated_page(page: Page, live_server):
     from .api_mock import setup_api_mocking
 
     # Set up API mocking before navigating to the page
-    api_handler = setup_api_mocking(page, user_role="ADMIN")
-    
+    setup_api_mocking(page, user_role="ADMIN")
+
     # Navigate to the app first
     page.goto(live_server)
-    
+
     # Wait for the app to load
     page.wait_for_selector("input[type='email']", timeout=10000)
-    
+
     # Try using the mock_auth query parameter approach
     try:
         page.goto(f"{live_server}?mock_auth=1")
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=5000)
         print("✅ Mock auth parameter worked")
-    except:
+    except Exception:
         print("⚠️  Mock auth parameter didn't work, trying direct token injection")
-        
+
         # Navigate back to normal page
         page.goto(live_server)
         page.wait_for_selector("input[type='email']", timeout=10000)
-        
+
         # Inject authentication data directly into Dash stores using JavaScript
         # This simulates what would happen after a successful login
         page.evaluate("""
@@ -177,7 +177,7 @@ def authenticated_page(page: Page, live_server):
                         const stores = document.querySelectorAll('[data-dash-is-loading="true"]');
                         console.log('Found stores:', stores.length);
                     }
-                    
+
                     // Trigger a page refresh to see if we can get to dashboard
                     window.location.href = window.location.href.split('?')[0] + '?mock_auth=1';
                 } catch (error) {
@@ -185,10 +185,10 @@ def authenticated_page(page: Page, live_server):
                 }
             }, 2000);
         """)
-        
+
         # Wait for the redirect/refresh
         page.wait_for_timeout(3000)
-    
+
     # Wait for the dashboard to load, confirming authentication worked
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
@@ -211,7 +211,9 @@ def authenticated_page(page: Page, live_server):
             print("⚠️  Proceeding with login page for basic API mocking tests")
             # Don't raise error, let tests that just need API mocking work
         else:
-            raise RuntimeError(f"Dashboard content not found after login with API mocking: {e}") from e
+            raise RuntimeError(
+                f"Dashboard content not found after login with API mocking: {e}"
+            ) from e
 
     return page
 
@@ -222,12 +224,12 @@ def authenticated_user_page(page: Page, live_server):
     from .api_mock import setup_api_mocking
 
     # Set up API mocking for regular user (not admin)
-    api_handler = setup_api_mocking(page, user_role="USER")
-    
+    setup_api_mocking(page, user_role="USER")
+
     # Navigate to the app with mock auth query parameter
     # Note: The built-in mock auth always creates an ADMIN user, but we can still test with API mocking for USER role
     page.goto(f"{live_server}?mock_auth=1")
-    
+
     # Wait for the dashboard to load
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)

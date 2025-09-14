@@ -60,23 +60,23 @@ class TestMockDataUsageExamples:
         """Example of how to use mock data for API route interception."""
         # With the new API mocking system, routes are automatically set up
         # The mocked_app_page fixture handles all the API endpoint mocking
-        
+
         # Navigate to page - API calls will be intercepted and return mock data
         # This is already done by the mocked_app_page fixture
-        
+
         # The page should now load with mock data
         # This is just an example - actual test would verify specific UI elements
         assert mocked_app_page.locator("body").is_visible()
-        
+
         # You can also login to see the dashboard with mock data
         if mocked_app_page.locator("h4:has-text('Login')").is_visible():
             mocked_app_page.fill("input[type='email']", "test@example.com")
             mocked_app_page.fill("input[type='password']", "testpassword123")
             mocked_app_page.click("#login-btn")
-            
+
             # Wait for dashboard to load with mock data
             mocked_app_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
-            
+
             # Verify dashboard loaded with mock API responses
             assert mocked_app_page.locator("[data-testid='dashboard-content']").is_visible()
 

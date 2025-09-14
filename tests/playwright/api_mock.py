@@ -5,20 +5,20 @@ Provides comprehensive mocking of the Trends.Earth API endpoints.
 
 from datetime import datetime, timedelta
 import json
-from typing import Dict, Any
-from urllib.parse import urlparse, parse_qs
+from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import Route
 
 from .conftest import (
     generate_mock_executions_data,
     generate_mock_scripts_data,
-    generate_mock_users_data,
     generate_mock_status_data,
+    generate_mock_users_data,
 )
 
 
-def create_mock_auth_response(email: str = "test@example.com") -> Dict[str, Any]:
+def create_mock_auth_response(email: str = "test@example.com") -> dict[str, Any]:
     """Create a mock authentication response."""
     return {
         "access_token": "mock_access_token_123456789",
@@ -36,7 +36,7 @@ def create_mock_auth_response(email: str = "test@example.com") -> Dict[str, Any]
     }
 
 
-def create_mock_user_me_response(role: str = "ADMIN") -> Dict[str, Any]:
+def create_mock_user_me_response(role: str = "ADMIN") -> dict[str, Any]:
     """Create a mock /user/me response."""
     return {
         "data": {
@@ -52,7 +52,7 @@ def create_mock_user_me_response(role: str = "ADMIN") -> Dict[str, Any]:
     }
 
 
-def create_mock_refresh_response() -> Dict[str, Any]:
+def create_mock_refresh_response() -> dict[str, Any]:
     """Create a mock token refresh response."""
     return {
         "access_token": "mock_refreshed_access_token_123456789",
@@ -61,7 +61,7 @@ def create_mock_refresh_response() -> Dict[str, Any]:
     }
 
 
-def create_mock_logout_response() -> Dict[str, Any]:
+def create_mock_logout_response() -> dict[str, Any]:
     """Create a mock logout response."""
     return {
         "message": "Successfully logged out",
@@ -81,7 +81,7 @@ class APIRouteHandler:
         print(f"🔐 AUTH LOGIN called: {route.request.url}")
         print(f"🔐 Request method: {route.request.method}")
         print(f"🔐 Request headers: {dict(route.request.headers)}")
-        
+
         try:
             request_body = route.request.post_data_json
             print(f"🔐 Request body: {request_body}")
@@ -103,10 +103,9 @@ class APIRouteHandler:
         except Exception as e:
             print(f"Error in auth login handler: {e}")
             import traceback
+
             print(f"Traceback: {traceback.format_exc()}")
-            route.fulfill(
-                json={"error": "Authentication failed", "message": str(e)}, status=500
-            )
+            route.fulfill(json={"error": "Authentication failed", "message": str(e)}, status=500)
 
     def handle_auth_refresh(self, route: Route):
         """Handle /auth/refresh endpoint."""
@@ -124,9 +123,7 @@ class APIRouteHandler:
                 )
         except Exception as e:
             print(f"Error in auth refresh handler: {e}")
-            route.fulfill(
-                json={"error": "Token refresh failed", "message": str(e)}, status=500
-            )
+            route.fulfill(json={"error": "Token refresh failed", "message": str(e)}, status=500)
 
     def handle_auth_logout(self, route: Route):
         """Handle /auth/logout endpoint."""
@@ -143,14 +140,14 @@ class APIRouteHandler:
         print(f"👤 USER ME called: {route.request.url}")
         print(f"👤 Request method: {route.request.method}")
         print(f"👤 Request headers: {dict(route.request.headers)}")
-        
+
         try:
             # Check authorization header
             auth_header = route.request.headers.get("authorization", "")
             print(f"👤 Auth header: {auth_header}")
-            
+
             if not auth_header.startswith("Bearer mock_"):
-                print(f"❌ Invalid auth header for user/me")
+                print("❌ Invalid auth header for user/me")
                 route.fulfill(
                     json={"error": "Unauthorized", "message": "Invalid or missing token"},
                     status=401,
@@ -162,7 +159,7 @@ class APIRouteHandler:
                 print(f"✅ User ME response: {response}")
                 route.fulfill(json=response, status=200)
             else:
-                print(f"❌ User not authenticated")
+                print("❌ User not authenticated")
                 route.fulfill(
                     json={"error": "Unauthorized", "message": "Authentication required"},
                     status=401,
@@ -170,6 +167,7 @@ class APIRouteHandler:
         except Exception as e:
             print(f"Error in user me handler: {e}")
             import traceback
+
             print(f"Traceback: {traceback.format_exc()}")
             route.fulfill(json={"error": "User info failed", "message": str(e)}, status=500)
 
@@ -205,9 +203,7 @@ class APIRouteHandler:
 
         except Exception as e:
             print(f"Error in executions handler: {e}")
-            route.fulfill(
-                json={"error": "Executions fetch failed", "message": str(e)}, status=500
-            )
+            route.fulfill(json={"error": "Executions fetch failed", "message": str(e)}, status=500)
 
     def handle_scripts(self, route: Route):
         """Handle /api/v1/scripts endpoint."""
@@ -340,7 +336,7 @@ class APIRouteHandler:
 def setup_api_mocking(page, user_role: str = "ADMIN"):
     """
     Set up comprehensive API mocking for Playwright tests.
-    
+
     Args:
         page: Playwright page object
         user_role: Role for the mock user (ADMIN, USER, etc.)
