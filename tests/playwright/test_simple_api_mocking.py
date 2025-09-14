@@ -9,7 +9,7 @@ from .conftest import skip_if_no_browsers
 
 
 @pytest.mark.playwright
-@skip_if_no_browsers 
+@skip_if_no_browsers
 class TestSimpleAPIMocking:
     """Test simple API mocking works."""
 
@@ -38,14 +38,14 @@ class TestSimpleAPIMocking:
         from .api_mock import setup_api_mocking
 
         # Set up API mocking
-        api_handler = setup_api_mocking(page, user_role="ADMIN")
+        setup_api_mocking(page, user_role="ADMIN")
 
         # Navigate to the page first
         page.goto(live_server)
 
         # Test if we can trigger API calls by evaluating JavaScript
         # This tests the API mocking without needing full authentication flow
-        
+
         # Try to fetch from a mocked endpoint using JavaScript
         result = page.evaluate("""
             fetch('/api/v1/status', {

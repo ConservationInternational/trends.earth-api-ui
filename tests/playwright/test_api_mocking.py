@@ -26,27 +26,29 @@ class TestAPIMocking:
         # Submit login form
         print("🔄 Clicking login button...")
         mocked_app_page.click("#login-btn")
-        
+
         # Wait for any response - might be success or error
         mocked_app_page.wait_for_timeout(3000)
-        
+
         # Check what happened
         is_still_login = mocked_app_page.locator("h4:has-text('Login')").is_visible()
         is_dashboard = mocked_app_page.locator("[data-testid='dashboard-content']").is_visible()
-        
-        print(f"📊 After login click - Still on login: {is_still_login}, On dashboard: {is_dashboard}")
-        
+
+        print(
+            f"📊 After login click - Still on login: {is_still_login}, On dashboard: {is_dashboard}"
+        )
+
         # Check for any error or success messages
         alerts = mocked_app_page.locator(".alert")
         if alerts.count() > 0:
             for i in range(alerts.count()):
                 alert_text = alerts.nth(i).text_content()
-                print(f"📄 Alert message {i+1}: {alert_text}")
+                print(f"📄 Alert message {i + 1}: {alert_text}")
 
         # The main goal is that API mocking doesn't break the form submission
         # If we reach here without errors, the test passes
         print("✅ Login form submission completed without errors")
-        
+
         # For a complete test, we would want to see the dashboard, but for now
         # we're validating that the API mocking infrastructure works
         assert True
@@ -81,7 +83,7 @@ class TestAPIMocking:
         from .api_mock import setup_api_mocking
 
         # Set up API mocking
-        api_handler = setup_api_mocking(page, user_role="ADMIN")
+        setup_api_mocking(page, user_role="ADMIN")
 
         # Navigate to the page
         page.goto(live_server)
@@ -124,10 +126,11 @@ class TestAPIMocking:
         from .api_mock import setup_api_mocking
 
         # Set up API mocking with debugging
-        api_handler = setup_api_mocking(page, user_role="ADMIN")
+        setup_api_mocking(page, user_role="ADMIN")
 
         # Add a general request listener to see all network requests
         request_log = []
+
         def log_request(request):
             request_log.append(f"{request.method} {request.url}")
             print(f"🌐 Network request: {request.method} {request.url}")
@@ -147,16 +150,16 @@ class TestAPIMocking:
         # Submit login form
         print("🔄 Clicking login button...")
         page.click("#login-btn")
-        
+
         # Wait to capture any network requests
         page.wait_for_timeout(5000)
-        
+
         print(f"📊 Captured {len(request_log)} network requests")
         for req in request_log[-10:]:  # Show last 10 requests
             print(f"  {req}")
-        
+
         # Check if any auth-related requests were made
-        auth_requests = [req for req in request_log if '/auth' in req or 'api.trends.earth' in req]
+        auth_requests = [req for req in request_log if "/auth" in req or "api.trends.earth" in req]
         print(f"🔐 Auth-related requests: {len(auth_requests)}")
         for req in auth_requests:
             print(f"  {req}")
