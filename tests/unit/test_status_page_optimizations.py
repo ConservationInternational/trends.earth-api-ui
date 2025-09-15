@@ -411,7 +411,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_optimized_callbacks_registered_successfully(self):
         """Test that optimized callbacks can be registered without errors."""
-        from trendsearth_ui.callbacks.status_optimized import register_optimized_callbacks
+        from trendsearth_ui.callbacks.status import register_optimized_callbacks
 
         # Mock app
         mock_app = MagicMock()
@@ -424,7 +424,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_status_summary_building_with_complete_data(self):
         """Test status summary building with complete status data."""
-        from trendsearth_ui.callbacks.status_optimized import _build_status_summary
+        from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Mock status data
         status_data = {
@@ -452,7 +452,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_status_summary_handles_missing_data_gracefully(self):
         """Test that status summary handles missing or invalid data gracefully."""
-        from trendsearth_ui.callbacks.status_optimized import _build_status_summary
+        from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Test with None data
         result1 = _build_status_summary(None, "UTC")
@@ -469,7 +469,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_stats_components_building_for_superadmin(self):
         """Test stats components building for SUPERADMIN users."""
-        from trendsearth_ui.callbacks.status_optimized import _build_stats_components
+        from trendsearth_ui.callbacks.status import _build_stats_components
 
         # Mock data
         stats_data = {

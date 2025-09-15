@@ -856,3 +856,7 @@ def _register_additional_status_callbacks(app):
         # Calculate remaining seconds (60 second intervals)
         seconds_remaining = 60 - (n_intervals % 60)
         return f"{seconds_remaining}s"
+
+
+# Alias for backward compatibility with tests
+register_optimized_callbacks = register_callbacks
