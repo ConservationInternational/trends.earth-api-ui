@@ -4,7 +4,7 @@ import importlib
 
 from ..utils.custom_filters import register_filter_callbacks
 from ..utils.mobile_utils import register_mobile_callbacks
-from . import status, status_optimized
+from . import status
 
 
 def register_all_callbacks(app):
@@ -15,10 +15,7 @@ def register_all_callbacks(app):
     # Register custom filter callbacks
     register_filter_callbacks(app)
 
-    # Register optimized status callbacks for better performance
-    status_optimized.register_optimized_callbacks(app)
-
-    # Register status callbacks for backward compatibility
+    # Register status callbacks
     status.register_callbacks(app)
 
     # Use importlib to dynamically import other modules to avoid circular imports

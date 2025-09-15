@@ -35,8 +35,8 @@ def register_callbacks(app):
             try:
                 from . import status
 
-                if hasattr(status, "_status_cache"):
-                    status._status_cache.clear()
+                if hasattr(status, "_request_cache"):
+                    status._request_cache.clear()
             except ImportError:
                 pass  # Status module may not be available
 
