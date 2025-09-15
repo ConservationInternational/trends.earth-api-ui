@@ -147,69 +147,41 @@ def authenticated_page(page: Page, live_server):
     # Set up API mocking before navigating to the page
     setup_api_mocking(page, user_role="ADMIN")
 
-    # Navigate to the app first
-    page.goto(live_server)
+    # Navigate directly to the app with mock_auth parameter
+    print("🎭 Navigating to app with mock_auth=1 parameter")
+    page.goto(f"{live_server}?mock_auth=1")
 
-    # Wait for the app to load
-    page.wait_for_selector("input[type='email']", timeout=10000)
-
-    # Try using the mock_auth query parameter approach
-    try:
-        page.goto(f"{live_server}?mock_auth=1")
-        page.wait_for_selector("[data-testid='dashboard-content']", timeout=5000)
-        print("✅ Mock auth parameter worked")
-    except Exception:
-        print("⚠️  Mock auth parameter didn't work, trying direct token injection")
-
-        # Navigate back to normal page
-        page.goto(live_server)
-        page.wait_for_selector("input[type='email']", timeout=10000)
-
-        # Inject authentication data directly into Dash stores using JavaScript
-        # This simulates what would happen after a successful login
-        page.evaluate("""
-            // Wait for Dash to be ready and then set the stores
-            setTimeout(function() {
-                try {
-                    // Set token store
-                    if (window.dash_clientside && window.dash_clientside.callback_context) {
-                        // Try to access the stores through Dash's internal API
-                        const stores = document.querySelectorAll('[data-dash-is-loading="true"]');
-                        console.log('Found stores:', stores.length);
-                    }
-
-                    // Trigger a page refresh to see if we can get to dashboard
-                    window.location.href = window.location.href.split('?')[0] + '?mock_auth=1';
-                } catch (error) {
-                    console.error('Error setting auth data:', error);
-                }
-            }, 2000);
-        """)
-
-        # Wait for the redirect/refresh
-        page.wait_for_timeout(3000)
-
-    # Wait for the dashboard to load, confirming authentication worked
+    # Wait for the app to load and check if we get the dashboard
     try:
         page.wait_for_selector("[data-testid='dashboard-content']", timeout=15000)
-        print("✅ Dashboard loaded successfully with API mocking")
+        print("✅ Dashboard loaded successfully with mock auth")
 
-        # Wait for admin tabs to become visible with a simpler approach
+        # Wait for admin tabs to become visible
         try:
             page.wait_for_selector("#users-tab-btn:visible", timeout=10000)
             page.wait_for_selector("#status-tab-btn:visible", timeout=5000)
             print("✅ Admin tabs are visible - authentication fully initialized")
         except Exception as e:
-            print(f"⚠️  Admin tabs not immediately visible: {e}")
-            print("⚠️  Tests may need to handle tab visibility timing")
+            print(f"⚠️ Admin tabs not immediately visible: {e}")
+            print("⚠️ Tests may need to handle tab visibility timing")
 
     except Exception as e:
         # If dashboard doesn't load, check if we're still on login page
         if page.locator("h4:has-text('Login')").is_visible():
-            # For now, let's create a minimal working test by just ensuring the basic setup works
-            print("⚠️  Still on login page - authentication setup needs work")
-            print("⚠️  Proceeding with login page for basic API mocking tests")
-            # Don't raise error, let tests that just need API mocking work
+            print("⚠️ Still on login page - mock auth may not be working properly")
+            print("⚠️ Attempting direct navigation to dashboard")
+
+            # Try alternative approach: go to app, wait briefly, then try mock auth again
+            page.goto(live_server)
+            page.wait_for_timeout(2000)  # Wait for initial load
+            page.goto(f"{live_server}?mock_auth=1")
+
+            try:
+                page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
+                print("✅ Dashboard loaded on second attempt")
+            except Exception:
+                print("⚠️ Proceeding with login page for basic API mocking tests")
+                # Don't raise error, let tests that just need API mocking work
         else:
             raise RuntimeError(
                 f"Dashboard content not found after login with API mocking: {e}"

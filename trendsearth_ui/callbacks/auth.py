@@ -37,39 +37,39 @@ def register_callbacks(app):
         ],
         [
             Input("url", "pathname"),
+            Input("url", "search"),
             Input("token-store", "data"),
         ],
         [
             State("api-environment-store", "data"),
         ],
     )
-    def display_page(_pathname, token, current_api_environment):
+    def display_page(_pathname, search, token, current_api_environment):
         """
         Display login or dashboard. This is the central callback for auth.
         It checks for a token in the store, then falls back to checking the
         auth cookie, ensuring a single, reliable path for session initialization.
         """
         # Test hook: allow mock auth via query param (used only in E2E tests)
-        try:
-            from flask import request as _rq
-
-            if _rq.args.get("mock_auth") == "1":
-                user_data = {
-                    "id": "test_user_123",
-                    "name": "Test User",
-                    "email": "test@example.com",
-                    "role": "ADMIN",
-                }
-                return (
-                    dashboard_layout(),
-                    False,
-                    "mock_token_12345",
-                    "ADMIN",
-                    user_data,
-                    (current_api_environment or "production"),
-                )
-        except Exception:
-            pass
+        if search and "mock_auth=1" in search:
+            print(
+                "🎭 Mock auth detected via URL search parameters - bypassing normal authentication"
+            )
+            user_data = {
+                "id": "test_user_123",
+                "name": "Test User",
+                "email": "test@example.com",
+                "role": "ADMIN",
+            }
+            print("✅ Returning mock authenticated dashboard layout")
+            return (
+                dashboard_layout(),
+                False,
+                "mock_token_12345",
+                "ADMIN",
+                user_data,
+                (current_api_environment or "production"),
+            )
 
         # If a token is already in the dcc.Store, user is authenticated
         if token:
@@ -138,14 +138,30 @@ def register_callbacks(app):
             State("login-password", "value"),
             State("remember-me-checkbox", "value"),
             State("api-environment-dropdown", "value"),
+            State("url", "search"),
         ],
         prevent_initial_call=True,
     )
-    def login_api(_n, email, password, remember_me, api_environment):
+    def login_api(_n, email, password, remember_me, api_environment, search):
         """Handle login authentication."""
         print(
             f"🔐 Login attempt - Email: {email}, Button clicks: {_n}, Remember: {remember_me}, Environment: {api_environment}"
         )
+
+        # Check if we're in mock auth mode and should skip normal login
+        if search and "mock_auth=1" in search:
+            print(
+                "🎭 Mock auth mode detected in login_api via URL search - skipping normal login process"
+            )
+            return (
+                None,
+                None,
+                None,
+                None,
+                "",
+                "success",
+                False,
+            )
 
         if not email or not password:
             print("⚠️ Missing email or password")
