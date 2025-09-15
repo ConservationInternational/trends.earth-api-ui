@@ -106,6 +106,10 @@ def register_callbacks(app):
             ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
         )
 
+        # If manual refresh, invalidate status cache
+        if is_manual_refresh:
+            StatusDataManager.invalidate_cache("status")
+
         # Set default time period if not provided
         if not time_period:
             time_period = "day"

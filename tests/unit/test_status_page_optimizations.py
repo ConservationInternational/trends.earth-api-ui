@@ -473,7 +473,7 @@ class TestOptimizedStatusCallbacks:
 
         # Mock data
         stats_data = {
-            "dashboard_stats": {"summary": {"total_executions": 100}},
+            "dashboard_stats": {"data": {"summary": {"total_executions": 100}}},
             "user_stats": {"geographic_distribution": []},
             "execution_stats": {"time_series": []},
             "scripts_count": 50,
@@ -482,17 +482,13 @@ class TestOptimizedStatusCallbacks:
         status_data = {"latest_status": {"executions_count": 100}}
 
         with (
+            patch("trendsearth_ui.callbacks.status.create_system_overview") as mock_overview,
+            patch("trendsearth_ui.callbacks.status.create_user_geographic_map") as mock_map,
             patch(
-                "trendsearth_ui.callbacks.status_optimized.create_system_overview"
-            ) as mock_overview,
-            patch(
-                "trendsearth_ui.callbacks.status_optimized.create_user_geographic_map"
-            ) as mock_map,
-            patch(
-                "trendsearth_ui.callbacks.status_optimized.create_user_statistics_chart"
+                "trendsearth_ui.callbacks.status.create_user_statistics_chart"
             ) as mock_user_chart,
             patch(
-                "trendsearth_ui.callbacks.status_optimized.create_execution_statistics_chart"
+                "trendsearth_ui.callbacks.status.create_execution_statistics_chart"
             ) as mock_exec_chart,
         ):
             mock_overview.return_value = "overview"

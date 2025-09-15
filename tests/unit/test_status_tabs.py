@@ -130,7 +130,7 @@ class TestStatusTabCallbacks:
 
         assert tab_switching_callback is not None, "Tab switching callback should be registered"
 
-    @patch("trendsearth_ui.callbacks.status.callback_context")
+    @patch("dash.callback_context")
     def test_tab_switching_logic(self, mock_ctx):
         """Test the tab switching logic."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -151,7 +151,7 @@ class TestStatusTabCallbacks:
         register_callbacks(mock_app)
 
         # Get the tab switching function
-        tab_switch_func = callback_functions.get("switch_status_time_tabs")
+        tab_switch_func = callback_functions.get("switch_status_time_tabs_optimized")
         assert tab_switch_func is not None, "Tab switching function should exist"
 
         # Test day tab click
@@ -172,7 +172,7 @@ class TestStatusTabCallbacks:
         expected = ("nav-link", "nav-link", "nav-link active", "month")
         assert result == expected
 
-    @patch("trendsearth_ui.callbacks.status.callback_context")
+    @patch("dash.callback_context")
     def test_countdown_reset_on_refresh(self, mock_ctx):
         """Test that countdown resets when refresh button is clicked."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -192,7 +192,7 @@ class TestStatusTabCallbacks:
         register_callbacks(mock_app)
 
         # Get the countdown function
-        countdown_func = callback_functions.get("update_status_countdown")
+        countdown_func = callback_functions.get("update_status_countdown_optimized")
         assert countdown_func is not None, "Countdown function should exist"
 
         # Test refresh button click (should reset to 60s)
@@ -290,7 +290,7 @@ class TestStatusTabsErrorHandling:
         content = status_tab_content(is_admin="invalid")
         assert content is not None
 
-    @patch("trendsearth_ui.callbacks.status.callback_context")
+    @patch("dash.callback_context")
     def test_tab_switching_with_no_trigger(self, mock_ctx):
         """Test tab switching when no trigger is provided."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -308,7 +308,7 @@ class TestStatusTabsErrorHandling:
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        tab_switch_func = callback_functions.get("switch_status_time_tabs")
+        tab_switch_func = callback_functions.get("switch_status_time_tabs_optimized")
 
         # Test with no trigger
         mock_ctx.triggered = []
@@ -316,7 +316,7 @@ class TestStatusTabsErrorHandling:
         expected = ("nav-link active", "nav-link", "nav-link", "day")
         assert result == expected
 
-    @patch("trendsearth_ui.callbacks.status.callback_context")
+    @patch("dash.callback_context")
     def test_countdown_with_non_status_tab(self, mock_ctx):
         """Test countdown when not on status tab."""
         from trendsearth_ui.callbacks.status import register_callbacks
@@ -334,7 +334,7 @@ class TestStatusTabsErrorHandling:
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        countdown_func = callback_functions.get("update_status_countdown")
+        countdown_func = callback_functions.get("update_status_countdown_optimized")
 
         # Test when not on status tab
         result = countdown_func(30, 0, "executions")
@@ -349,9 +349,9 @@ class TestStatusTabsErrorHandling:
         StatusDataManager.invalidate_cache()
 
         # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
+        from trendsearth_ui.callbacks.status import _request_cache
 
-        _status_cache.clear()
+        _request_cache.clear()
 
         # Mock the callback context
         mock_ctx.triggered = []
@@ -374,11 +374,11 @@ class TestStatusTabsErrorHandling:
         register_callbacks(mock_app)
 
         # Get the summary function
-        summary_func = callback_functions.get("update_status_summary")
+        summary_func = callback_functions.get("update_comprehensive_status_data")
         assert summary_func is not None, "Summary function should exist"
 
         # Mock a successful response with test data
-        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
@@ -401,31 +401,41 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
+                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
                     return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
+                        "status_data": {
+                            "summary": "SUCCESS",
+                            "latest_status": {
+                                "executions_ready": 5,
+                                "executions_running": 3,
+                                "executions_finished": 100,
+                                "executions_failed": 2,
+                                "executions_cancelled": 1,
+                                "executions_pending": 0,
+                                "executions_count": 111,
+                                "users_count": 25,
+                                "timestamp": "2023-01-01T12:00:00Z",
+                            },
+                        },
+                        "meta": {
+                            "total_api_calls": 1,
+                            "cache_hit": False,
+                            "optimizations_applied": [],
                         },
                     },
                 ),
-                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
-                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
+                patch(
+                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
+                ) as mock_deployment,
+                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+                result = summary_func(
+                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
+                )
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
@@ -445,9 +455,9 @@ class TestStatusTabsErrorHandling:
         StatusDataManager.invalidate_cache()
 
         # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
+        from trendsearth_ui.callbacks.status import _request_cache
 
-        _status_cache.clear()
+        _request_cache.clear()
 
         # Mock the callback context
         mock_ctx.triggered = []
@@ -470,11 +480,11 @@ class TestStatusTabsErrorHandling:
         register_callbacks(mock_app)
 
         # Get the summary function
-        summary_func = callback_functions.get("update_status_summary")
+        summary_func = callback_functions.get("update_comprehensive_status_data")
         assert summary_func is not None, "Summary function should exist"
 
         # Mock a successful response with test data
-        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
@@ -497,31 +507,41 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
+                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
                     return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
+                        "status_data": {
+                            "summary": "SUCCESS",
+                            "latest_status": {
+                                "executions_ready": 5,
+                                "executions_running": 3,
+                                "executions_finished": 100,
+                                "executions_failed": 2,
+                                "executions_cancelled": 1,
+                                "executions_pending": 0,
+                                "executions_count": 111,
+                                "users_count": 25,
+                                "timestamp": "2023-01-01T12:00:00Z",
+                            },
+                        },
+                        "meta": {
+                            "total_api_calls": 1,
+                            "cache_hit": False,
+                            "optimizations_applied": [],
                         },
                     },
                 ),
-                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
-                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
+                patch(
+                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
+                ) as mock_deployment,
+                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+                result = summary_func(
+                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
+                )
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
@@ -545,9 +565,9 @@ class TestStatusTabsErrorHandling:
         StatusDataManager.invalidate_cache()
 
         # Clear callback-level cache to ensure test isolation
-        from trendsearth_ui.callbacks.status import _status_cache
+        from trendsearth_ui.callbacks.status import _request_cache
 
-        _status_cache.clear()
+        _request_cache.clear()
 
         # Mock the callback context
         mock_ctx.triggered = []
@@ -570,11 +590,11 @@ class TestStatusTabsErrorHandling:
         register_callbacks(mock_app)
 
         # Get the summary function
-        summary_func = callback_functions.get("update_status_summary")
+        summary_func = callback_functions.get("update_comprehensive_status_data")
         assert summary_func is not None, "Summary function should exist"
 
         # Mock a successful response with test data
-        with patch("trendsearth_ui.callbacks.status.requests.get") as mock_get:
+        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
@@ -597,31 +617,41 @@ class TestStatusTabsErrorHandling:
             # Mock the availability check and helper functions
             with (
                 patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data",
+                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
                     return_value={
-                        "status_endpoint_available": True,
-                        "summary": "SUCCESS",
-                        "latest_status": {
-                            "executions_ready": 5,
-                            "executions_running": 3,
-                            "executions_finished": 100,
-                            "executions_failed": 2,
-                            "executions_cancelled": 1,
-                            "executions_pending": 0,
-                            "executions_count": 111,
-                            "users_count": 25,
-                            "timestamp": "2023-01-01T12:00:00Z",
+                        "status_data": {
+                            "summary": "SUCCESS",
+                            "latest_status": {
+                                "executions_ready": 5,
+                                "executions_running": 3,
+                                "executions_finished": 100,
+                                "executions_failed": 2,
+                                "executions_cancelled": 1,
+                                "executions_pending": 0,
+                                "executions_count": 111,
+                                "users_count": 25,
+                                "timestamp": "2023-01-01T12:00:00Z",
+                            },
+                        },
+                        "meta": {
+                            "total_api_calls": 1,
+                            "cache_hit": False,
+                            "optimizations_applied": [],
                         },
                     },
                 ),
-                patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
-                patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
+                patch(
+                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
+                ) as mock_deployment,
+                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+                result = summary_func(
+                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
+                )
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (

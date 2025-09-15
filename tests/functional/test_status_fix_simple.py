@@ -34,9 +34,9 @@ def test_status_callbacks_has_required_callbacks():
     """Test that status callbacks file has the required callback functions."""
     status_file = "trendsearth_ui/callbacks/status.py"
     required_callbacks = [
-        "update_status_summary",
-        "update_status_charts",
-        "update_status_countdown",
+        "update_comprehensive_status_data",
+        "update_status_charts_optimized",
+        "update_status_countdown_optimized",
     ]
 
     try:
@@ -97,9 +97,9 @@ def test_status_callbacks_has_performance_optimizations():
 
         optimizations = [
             'active_tab != "status"',  # Tab-based conditional updates
-            "timeout=",  # Timeout parameters
-            "per_page",  # Pagination limits
-            "exclude",  # Field exclusions
+            "fetch_comprehensive_status_page_data",  # Comprehensive data fetching
+            "force_refresh",  # Manual refresh capability
+            "is_manual_refresh",  # Manual refresh detection
         ]
 
         missing = []
