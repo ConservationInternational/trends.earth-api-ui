@@ -168,8 +168,9 @@ def fetch_dashboard_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -177,7 +178,7 @@ def fetch_dashboard_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"Dashboard stats: Request failed: {e}")
+        log_error(logger, f"Dashboard stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -233,7 +234,7 @@ def fetch_scripts_count(token, api_environment="production"):
             logger.warning(f"Scripts count: Failed to fetch. Status: {resp.status_code}")
             return 0
     except requests.exceptions.RequestException as e:
-        logger.error(f"Scripts count: Request failed: {e}")
+        log_error(logger, f"Scripts count: Request failed: {e}")
         return 0
 
 
@@ -310,47 +311,17 @@ def fetch_user_stats(
                 "status_code": 403,
             }
         else:
-            # Comprehensive error context for Rollbar reporting
-            error_context = {
-                "api_environment": api_environment,
-                "status_code": resp.status_code,
-                "response_body": resp.text,
-                "request_params": params,
-                "api_endpoint": f"{get_api_base(api_environment)}/stats/users",
-                "period": period,
-                "group_by": group_by,
-                "country": country,
-            }
-
-            error_message = (
-                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
-
-            # Use enhanced logging that reports to Rollbar with full context
-            log_error(logger, error_message, extra_data=error_context)
-
             return {
                 "error": True,
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        # Comprehensive error context for Rollbar reporting
-        error_context = {
-            "api_environment": api_environment,
-            "exception_type": type(e).__name__,
-            "request_params": params if "params" in locals() else None,
-            "api_endpoint": f"{get_api_base(api_environment)}/stats/users",
-            "period": period,
-            "group_by": group_by,
-            "country": country,
-        }
-
-        error_message = f"User stats: Request failed: {e}"
-
-        # Use enhanced logging that reports to Rollbar with full context
-        log_error(logger, error_message, extra_data=error_context)
-
+        log_error(logger, f"User stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -435,45 +406,15 @@ def fetch_execution_stats(
                 "status_code": 403,
             }
         else:
-            # Comprehensive error context for Rollbar reporting
-            error_context = {
-                "api_environment": api_environment,
-                "status_code": resp.status_code,
-                "response_body": resp.text,
-                "request_params": params,
-                "api_endpoint": f"{get_api_base(api_environment)}/stats/executions",
-                "period": period,
-                "group_by": group_by,
-                "task_type": task_type,
-                "status": status,
-            }
-
-            error_message = f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
-
-            # Use enhanced logging that reports to Rollbar with full context
-            log_error(logger, error_message, extra_data=error_context)
-
+            log_error(
+                logger,
+                f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
+            )
             return {
                 "error": True,
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        # Comprehensive error context for Rollbar reporting
-        error_context = {
-            "api_environment": api_environment,
-            "exception_type": type(e).__name__,
-            "request_params": params if "params" in locals() else None,
-            "api_endpoint": f"{get_api_base(api_environment)}/stats/executions",
-            "period": period,
-            "group_by": group_by,
-            "task_type": task_type,
-            "status": status,
-        }
-
-        error_message = f"Execution stats: Request failed: {e}"
-
-        # Use enhanced logging that reports to Rollbar with full context
-        log_error(logger, error_message, extra_data=error_context)
-
+        log_error(logger, f"Execution stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

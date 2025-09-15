@@ -32,7 +32,7 @@ def test_setup_logging_with_rollbar():
     """Test logging setup with Rollbar token."""
     with (
         patch("rollbar.init") as mock_rollbar_init,
-        patch("trendsearth_ui.utils.logging_config.RollbarHandler") as mock_rollbar_handler,
+        patch("trendsearth_ui.utils.logging_config.EnhancedRollbarHandler") as mock_rollbar_handler,
     ):
         mock_handler = MagicMock()
         # Configure the mock handler to have a proper level attribute
@@ -72,7 +72,7 @@ def test_get_logger():
 
 
 def test_log_functions():
-    """Test log wrapper functions."""
+    """Test log wrapper functions with enhanced context."""
     with (
         patch("rollbar._initialized", True),
         patch("rollbar.report_exc_info") as mock_exc_info,
@@ -85,15 +85,39 @@ def test_log_functions():
         logger.exception.assert_called_with("Test exception", exc_info=True)
         mock_exc_info.assert_called_once()
 
-        # Test log_error
+        # Verify that enhanced context was included
+        call_args = mock_exc_info.call_args[1]  # Get keyword arguments
+        extra_data = call_args["extra_data"]
+        assert "function_name" in extra_data
+        assert "filename" in extra_data
+        assert "line_number" in extra_data
+        assert "environment" in extra_data
+        assert extra_data["message"] == "Test exception"
+
+        # Test log_error with additional context
         log_error(logger, "Test error", {"key": "value"})
         logger.error.assert_called_with("Test error")
-        mock_message.assert_called_with("Test error", level="error", extra_data={"key": "value"})
 
-        # Test log_warning
+        # Verify enhanced context includes both automatic and provided data
+        call_args = mock_message.call_args[1]  # Get keyword arguments
+        extra_data = call_args["extra_data"]
+        assert extra_data["key"] == "value"  # User-provided data
+        assert "function_name" in extra_data  # Automatic context
+        assert "filename" in extra_data
+        assert "line_number" in extra_data
+        assert "environment" in extra_data
+        assert extra_data["message"] == "Test error"
+
+        # Test log_warning with no additional context
         log_warning(logger, "Test warning")
         logger.warning.assert_called_with("Test warning")
-        mock_message.assert_called_with("Test warning", level="warning", extra_data={})
+
+        # Verify enhanced context is still added even with no user data
+        call_args = mock_message.call_args[1]  # Get keyword arguments
+        extra_data = call_args["extra_data"]
+        assert "function_name" in extra_data
+        assert "environment" in extra_data
+        assert extra_data["message"] == "Test warning"
 
 
 def test_environment_variables():
