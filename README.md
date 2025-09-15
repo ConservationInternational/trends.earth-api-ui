@@ -5,20 +5,34 @@
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Deploy Status](https://img.shields.io/badge/deployment-ECS-orange.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy.yml)
+[![Deploy Status](https://img.shields.io/badge/deployment-EC2_Docker_Swarm-blue.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy-production.yml)
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
 ## 🚀 Deployment
 
-This application supports automatic deployment to Amazon ECS using GitHub Actions. 
+This application supports automatic deployment to EC2 instances using Docker Swarm and GitHub Actions.
 
 ### Available Deployment Workflows:
-- **ECS Deployment** (`deploy.yml`) - Production deployment with ECS, Docker, health checks, and Rollbar integration
-- **Rollback** (`rollback.yml`) - Manual rollback to previous ECS deployments
+- **Production Deployment** (`deploy-production.yml`) - Production deployment to EC2 with Docker Swarm, health checks, and Rollbar integration
+- **Staging Deployment** (`deploy-staging.yml`) - Staging deployment to EC2 for testing and validation  
+- **Production Rollback** (`rollback-production.yml`) - Manual rollback to previous deployments or specific commits
+
+### Deployment Architecture:
+- **Platform**: EC2 instances with Docker Swarm
+- **SSH Deployment**: Secure deployment via SSH using GitHub Actions
+- **Health Monitoring**: Automated health checks and integration testing
+- **Security**: Dynamic security group management for GitHub Actions runners
+- **Registry**: Local Docker registry with build-on-server approach
 
 ### Error Tracking
 The application includes integrated Rollbar error tracking for production monitoring and debugging.
+
+### Setup Instructions
+For detailed deployment setup instructions, see:
+- [Deployment README](docs/deployment/README.md) - Overview and GitHub secrets configuration
+- [AWS Infrastructure Setup](docs/deployment/aws-infrastructure-setup.md) - EC2 and AWS resource setup
+- [Setup Script](scripts/setup-github-secrets.sh) - Automated GitHub secrets configuration
 
 ## Features
 

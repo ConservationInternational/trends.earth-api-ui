@@ -1,0 +1,31 @@
+version: 0.0
+os: linux
+
+hooks:
+  BeforeInstall:
+    - location: scripts/deployment/before_install.sh
+      timeout: 300
+      runas: root
+  
+  ApplicationStart:
+    - location: scripts/deployment/application_start.sh
+      timeout: 600
+      runas: root
+  
+  ApplicationStop:
+    - location: scripts/deployment/application_stop.sh
+      timeout: 300
+      runas: root
+  
+  ValidateService:
+    - location: scripts/deployment/validate_service.sh
+      timeout: 300
+      runas: root
+
+files:
+  - source: docker-compose.prod.yml
+    destination: /opt/trends-earth-ui/
+  - source: docker-compose.staging.yml
+    destination: /opt/trends-earth-ui-staging/
+  - source: scripts/deployment/
+    destination: /opt/trends-earth-ui/scripts/deployment/
