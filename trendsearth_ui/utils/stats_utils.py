@@ -5,6 +5,7 @@ import time
 import requests
 
 from ..config import get_api_base
+from .logging_config import get_logger, log_error
 
 # Cache for stats data with TTL
 _stats_cache = {
@@ -81,9 +82,14 @@ def get_optimal_grouping_for_period(period):
 
     Returns:
         tuple: (user_group_by, execution_group_by) optimal for the period
+
+    Note:
+        User stats API accepts: day, week, month
+        Execution stats API accepts: hour, day, week, month
+        We use compatible values to prevent API errors.
     """
     mapping = {
-        "last_day": ("hour", "hour"),
+        "last_day": ("day", "hour"),  # Fixed: user stats API doesn't accept "hour"
         "last_week": ("day", "day"),
         "last_month": ("week", "week"),
         "last_year": ("month", "month"),
@@ -162,8 +168,9 @@ def fetch_dashboard_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -171,7 +178,7 @@ def fetch_dashboard_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"Dashboard stats: Request failed: {e}")
+        log_error(logger, f"Dashboard stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -227,7 +234,7 @@ def fetch_scripts_count(token, api_environment="production"):
             logger.warning(f"Scripts count: Failed to fetch. Status: {resp.status_code}")
             return 0
     except requests.exceptions.RequestException as e:
-        logger.error(f"Scripts count: Request failed: {e}")
+        log_error(logger, f"Scripts count: Request failed: {e}")
         return 0
 
 
@@ -247,9 +254,7 @@ def fetch_user_stats(
     Returns:
         dict: User statistics data or None if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
+    logger = get_logger()
 
     # Create cache key that includes all parameters for proper caching
     cache_key_suffix = f"{period}_{group_by or 'none'}_{country or 'none'}"
@@ -306,8 +311,9 @@ def fetch_user_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -315,7 +321,7 @@ def fetch_user_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"User stats: Request failed: {e}")
+        log_error(logger, f"User stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -341,9 +347,7 @@ def fetch_execution_stats(
     Returns:
         dict: Execution statistics data or None if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
+    logger = get_logger()
 
     # Create cache key that includes all parameters for proper caching
     cache_key_suffix = f"{period}_{group_by or 'none'}_{task_type or 'none'}_{status or 'none'}"
@@ -402,8 +406,9 @@ def fetch_execution_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -411,5 +416,5 @@ def fetch_execution_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"Execution stats: Request failed: {e}")
+        log_error(logger, f"Execution stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

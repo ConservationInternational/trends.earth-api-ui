@@ -15,10 +15,11 @@ class TestGetOptimalGroupingForPeriod:
     """Test the optimal grouping function for different time periods."""
 
     def test_last_day_returns_hour_grouping(self):
-        """Test that last_day period returns hour grouping."""
+        """Test that last_day period returns appropriate grouping (fixed for API compatibility)."""
         user_group, exec_group = get_optimal_grouping_for_period("last_day")
-        assert user_group == "hour"
-        assert exec_group == "hour"
+        # Fixed: user stats API doesn't accept "hour", only "day", "week", "month"
+        assert user_group == "day"  # Changed from "hour" to prevent API error
+        assert exec_group == "hour"  # Execution stats API still accepts "hour"
 
     def test_last_week_returns_day_grouping(self):
         """Test that last_week period returns day grouping."""
