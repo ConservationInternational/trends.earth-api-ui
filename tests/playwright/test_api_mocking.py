@@ -178,6 +178,15 @@ class TestAPIMocking:
             # Click logout
             logout_button.click()
 
+            # In mock authentication mode, we need to navigate to a clean URL without mock_auth
+            # to see the actual login page, since mock_auth=1 automatically authenticates
+            current_url = authenticated_page.url
+            if "mock_auth=1" in current_url:
+                # Navigate to base URL without mock_auth to see login page
+                base_url = current_url.split("?")[0]
+                authenticated_page.goto(base_url)
+                authenticated_page.wait_for_timeout(2000)  # Allow page to load
+
             # Should redirect to login page
             authenticated_page.wait_for_selector("h4:has-text('Login')", timeout=10000)
             expect(authenticated_page.locator("h4")).to_contain_text("Login")
