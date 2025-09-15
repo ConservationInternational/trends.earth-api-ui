@@ -1,9 +1,9 @@
 """Tests for rollbar error reporting fixes."""
 
-import requests
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
 
 from trendsearth_ui.utils.stats_utils import (
     fetch_execution_stats,
@@ -18,7 +18,7 @@ class TestOptimalGroupingFix:
     def test_last_day_returns_valid_user_group_by(self):
         """Test that last_day period returns valid group_by for user stats API."""
         user_group_by, execution_group_by = get_optimal_grouping_for_period("last_day")
-        
+
         # User stats API only accepts: day, week, month (not hour)
         assert user_group_by == "day"
         assert execution_group_by == "hour"  # Execution stats API accepts hour
@@ -27,9 +27,9 @@ class TestOptimalGroupingFix:
         """Test that all periods return valid group_by values."""
         valid_user_values = {"day", "week", "month"}
         valid_execution_values = {"hour", "day", "week", "month"}
-        
+
         test_periods = ["last_day", "last_week", "last_month", "last_year"]
-        
+
         for period in test_periods:
             user_group_by, execution_group_by = get_optimal_grouping_for_period(period)
             assert user_group_by in valid_user_values, f"Invalid user group_by '{user_group_by}' for period '{period}'"
@@ -38,14 +38,14 @@ class TestOptimalGroupingFix:
     def test_unknown_period_returns_default_valid_values(self):
         """Test that unknown periods return valid default values."""
         user_group_by, execution_group_by = get_optimal_grouping_for_period("unknown_period")
-        
+
         assert user_group_by == "month"
         assert execution_group_by == "month"
 
     def test_function_documentation_updated(self):
         """Test that function documentation reflects the API constraints."""
         import inspect
-        
+
         doc = inspect.getdoc(get_optimal_grouping_for_period)
         assert "User stats API accepts: day, week, month" in doc
         assert "Execution stats API accepts: hour, day, week, month" in doc
@@ -79,7 +79,7 @@ class TestEnhancedRollbarErrorReporting:
 
         # Verify enhanced Rollbar reporting was called
         mock_log_error.assert_called_once()
-        
+
         # Get the call arguments
         call_args = mock_log_error.call_args
         error_message = call_args[0][1]  # Second argument is the message
@@ -92,7 +92,7 @@ class TestEnhancedRollbarErrorReporting:
         # Verify comprehensive error context
         expected_keys = {
             "api_environment",
-            "status_code", 
+            "status_code",
             "response_body",
             "request_params",
             "api_endpoint",
@@ -101,7 +101,7 @@ class TestEnhancedRollbarErrorReporting:
             "country"
         }
         assert all(key in extra_data for key in expected_keys)
-        
+
         # Verify specific values
         assert extra_data["api_environment"] == "staging"
         assert extra_data["status_code"] == 400
@@ -129,7 +129,7 @@ class TestEnhancedRollbarErrorReporting:
 
         # Verify enhanced Rollbar reporting was called
         mock_log_error.assert_called_once()
-        
+
         # Get the call arguments
         call_args = mock_log_error.call_args
         error_message = call_args[0][1]  # Second argument is the message
@@ -150,7 +150,7 @@ class TestEnhancedRollbarErrorReporting:
             "country"
         }
         assert all(key in extra_data for key in expected_keys)
-        
+
         # Verify specific values
         assert extra_data["api_environment"] == "production"
         assert extra_data["exception_type"] == "ConnectionError"
@@ -182,7 +182,7 @@ class TestEnhancedRollbarErrorReporting:
 
         # Verify enhanced Rollbar reporting was called
         mock_log_error.assert_called_once()
-        
+
         # Get the call arguments
         call_args = mock_log_error.call_args
         error_message = call_args[0][1]  # Second argument is the message
@@ -195,7 +195,7 @@ class TestEnhancedRollbarErrorReporting:
         # Verify comprehensive error context
         expected_keys = {
             "api_environment",
-            "status_code", 
+            "status_code",
             "response_body",
             "request_params",
             "api_endpoint",
@@ -205,7 +205,7 @@ class TestEnhancedRollbarErrorReporting:
             "status"
         }
         assert all(key in extra_data for key in expected_keys)
-        
+
         # Verify specific values
         assert extra_data["api_environment"] == "staging"
         assert extra_data["status_code"] == 500
@@ -246,30 +246,30 @@ class TestIntegrationWithStatusDataManager:
     def test_status_data_manager_uses_corrected_group_by(self, mock_fetch_user_stats, mock_fetch_dashboard_stats, mock_fetch_execution_stats, mock_fetch_scripts_count):
         """Test that StatusDataManager gets corrected group_by values."""
         from trendsearth_ui.utils.status_data_manager import StatusDataManager
-        
+
         # Mock all the function calls
         mock_fetch_user_stats.return_value = {"data": {"users": 50}}
         mock_fetch_dashboard_stats.return_value = {"data": {"dashboard": "data"}}
         mock_fetch_execution_stats.return_value = {"data": {"executions": "data"}}
         mock_fetch_scripts_count.return_value = 10
-        
+
         # This should use the corrected group_by values and not cause API errors
-        result = StatusDataManager.fetch_consolidated_stats_data(
+        StatusDataManager.fetch_consolidated_stats_data(
             token="test_token",
-            api_environment="production", 
+            api_environment="production",
             time_period="day",  # Maps to last_day API period
             role="SUPERADMIN"
         )
-        
+
         # Verify the call was made with corrected group_by
         mock_fetch_user_stats.assert_called_once()
         call_args = mock_fetch_user_stats.call_args
-        
+
         # Check positional and keyword arguments
         # The function is called with: token, api_environment, period, group_by=user_group_by
         positional_args = call_args[0]
         keyword_args = call_args[1]
-        
+
         # Should be called with group_by="day" (not "hour")
         assert keyword_args["group_by"] == "day"
         assert positional_args[1] == "production"  # api_environment
@@ -279,12 +279,12 @@ class TestIntegrationWithStatusDataManager:
         """Test that the fix prevents the original invalid group_by error."""
         # The original error was caused by passing "hour" for user stats
         # Our fix should prevent this
-        
+
         user_group_by, execution_group_by = get_optimal_grouping_for_period("last_day")
-        
+
         # Should NOT be "hour" for user stats (this was the bug)
         assert user_group_by != "hour"
         assert user_group_by == "day"  # Should be a valid value
-        
+
         # Execution stats can still use "hour"
         assert execution_group_by == "hour"
