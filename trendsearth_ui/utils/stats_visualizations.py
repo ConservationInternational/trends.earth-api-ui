@@ -540,8 +540,20 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
         # API returns 'time_series' data when group_by parameter is used
         trends_data = data.get("time_series", [])
         if trends_data:
+            # Transform nested API data structure into flat DataFrame
+            # API returns: {"timestamp": "...", "by_status": {"FINISHED": 8, "FAILED": 2}}
+            # We need: {"date": "...", "finished": 8, "failed": 2}
+            flattened_data = []
+            for entry in trends_data:
+                row = {"date": entry.get("timestamp")}
+                by_status = entry.get("by_status", {})
+                # Flatten status counts into separate columns with lowercase names
+                for status_key, count in by_status.items():
+                    row[status_key.lower()] = count
+                flattened_data.append(row)
+
             # Convert to DataFrame for easier handling
-            df = pd.DataFrame(trends_data)
+            df = pd.DataFrame(flattened_data)
 
             if not df.empty and "date" in df.columns:
                 fig_trend = go.Figure()
@@ -559,32 +571,27 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                 for status in ["FINISHED", "FAILED", "CANCELLED", "RUNNING", "PENDING"]:
                     status_col = status.lower()
                     if status_col in df.columns:
-                        values = df[status_col]
+                        # Fill missing values with 0 to handle sparse data
+                        values = df[status_col].fillna(0)
 
-                        # Normalize to zero baseline by subtracting the initial value from each series
-                        # This makes each line start from zero and show only changes from the starting point
-                        if len(values) > 0:
-                            initial_value = values.iloc[0]
-                            normalized_values = values - initial_value
-                        else:
-                            normalized_values = values
-
+                        # Plot raw API data directly without normalization
+                        # The API returns instantaneous counts (snapshots) at each time point
                         fig_trend.add_trace(
                             go.Scatter(
                                 x=df["date"],
-                                y=normalized_values,
+                                y=values,
                                 mode="lines+markers",
                                 name=status.title(),
                                 line={"color": status_colors.get(status, "#666666"), "width": 3},
                                 marker={"size": 6},
-                                hovertemplate=f"<b>{status.title()}</b><br>%{{x}}<br>Change from start: %{{y}}<extra></extra>",
+                                hovertemplate=f"<b>{status.title()}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
                             )
                         )
 
                 fig_trend.update_layout(
-                    title=f"Execution Status Trends (Changes from Start){title_suffix}",
+                    title=f"Execution Status Trends{title_suffix}",
                     xaxis_title="Time Period",
-                    yaxis_title="Change in Executions (from start of period)",
+                    yaxis_title="Number of Executions",
                     height=400,
                     hovermode="x unified",
                     legend={

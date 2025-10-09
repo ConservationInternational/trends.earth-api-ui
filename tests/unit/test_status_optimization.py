@@ -179,8 +179,8 @@ class TestStatusCallbackOptimization:
         # Register callbacks
         register_callbacks(mock_app)
 
-        # Get the status summary callback
-        status_summary_func = callback_functions.get("update_comprehensive_status_data")
+        # Get the time-independent status callback (renamed from update_comprehensive_status_data)
+        status_summary_func = callback_functions.get("update_time_independent_status_data")
         assert status_summary_func is not None
 
         # Mock the callback context to simulate manual refresh
@@ -204,11 +204,10 @@ class TestStatusCallbackOptimization:
                 "meta": {"cache_hit": False},
             }
 
-            # Call the function with manual refresh
+            # Call the function with manual refresh (time-independent callback doesn't need time_period)
             status_summary_func(
                 _n_intervals=1,
                 _refresh_clicks=1,
-                time_period="day",
                 token="test_token",
                 active_tab="status",
                 user_timezone="UTC",

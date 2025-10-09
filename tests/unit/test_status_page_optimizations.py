@@ -196,7 +196,11 @@ class TestStatusPageOptimizations:
             assert "stats_skipped_for_non_superadmin" in result["meta"]["optimizations_applied"]
 
     def test_optimized_exclude_parameters_are_used(self):
-        """Test that API calls use optimized exclude parameters to reduce payload size."""
+        """Test that API parameters are correctly used (exclude parameter removed).
+
+        Note: The 'exclude' parameter was removed as it's not supported by the API.
+        This test now verifies that only supported parameters are sent.
+        """
         with patch("requests.get") as mock_get:
             mock_response = MagicMock()
             mock_response.status_code = 200
@@ -211,12 +215,15 @@ class TestStatusPageOptimizations:
                 force_refresh=True,
             )
 
-            # Verify exclude parameters were included
+            # Verify only supported parameters are used (no 'exclude')
             call_args = mock_get.call_args
             assert call_args is not None
             params = call_args[1]["params"]
-            assert "exclude" in params
-            assert "metadata,logs,extra_data" in params["exclude"]
+            # Verify exclude is NOT in params (it's unsupported by the API)
+            assert "exclude" not in params
+            # Verify supported parameters ARE present
+            assert "sort" in params
+            assert params["sort"] == "-timestamp"  # Descending order
 
     def test_adaptive_max_points_based_on_time_period(self):
         """Test that max points provide sufficient coverage for each time period."""

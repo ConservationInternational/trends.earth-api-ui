@@ -10,13 +10,10 @@ from trendsearth_ui.utils.status_helpers import _fetch_health_status
 
 
 class TestScriptsCountFunctionality:
-    """Test scripts count fetching functionality."""
+    """Test scripts count fetching functionality.
 
-    def setup_method(self):
-        """Clear cache before each test."""
-        from trendsearth_ui.utils.stats_utils import _stats_cache
-
-        _stats_cache.clear()
+    Note: Cache management removed - now handled by StatusDataManager.
+    """
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     def test_fetch_scripts_count_success(self, mock_get):

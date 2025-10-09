@@ -195,13 +195,16 @@ class TestStatusTabContent:
         assert "status-countdown-interval" in content_str
 
     def test_status_tab_charts_section(self):
-        """Test that status tab contains charts section."""
+        """Test that status tab contains expected sections but not the removed status-charts section."""
         content = status_tab_content(is_admin=True)
         content_str = str(content)
 
-        # Should contain charts container and loading components
-        assert "status-charts" in content_str
-        assert "loading-status-charts" in content_str
+        # Should NOT contain the removed status-charts section
+        assert "status-charts" not in content_str
+        assert "loading-status-charts" not in content_str
+
+        # Should contain time-based analytics section
+        assert "status-time-tabs" in content_str
 
     def test_status_tab_manual_time_tabs(self):
         """Test that status tab contains manual time period tabs."""

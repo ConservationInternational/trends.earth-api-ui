@@ -37,14 +37,10 @@ def register_callbacks(app):
             Output("swarm-info-summary", "children"),
             Output("swarm-status-title", "children"),
             Output("system-overview-content", "children"),
-            Output("stats-summary-cards", "children"),
-            Output("stats-user-map", "children"),
-            Output("stats-additional-charts", "children"),
         ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
             Input("refresh-status-btn", "n_clicks"),
-            Input("status-time-tabs-store", "data"),
         ],
         [
             State("token-store", "data"),
@@ -55,10 +51,9 @@ def register_callbacks(app):
         ],
         prevent_initial_call=False,
     )
-    def update_comprehensive_status_data(
+    def update_time_independent_status_data(
         _n_intervals,
         _refresh_clicks,
-        time_period,
         token,
         active_tab,
         user_timezone,
@@ -66,36 +61,18 @@ def register_callbacks(app):
         api_environment,
     ):
         """
-        Update all status components in a single optimized callback.
+        Update time-independent status components (not affected by time period selection).
 
-        This consolidates multiple separate callbacks to minimize API calls
-        and improve page load performance.
+        This includes: status summary, deployment info, swarm info, and system overview.
+        These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
         """
         # Guard: Skip if not logged in
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return (no_update, no_update, no_update, no_update, no_update)
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return (no_update, no_update, no_update, no_update, no_update)
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -110,16 +87,12 @@ def register_callbacks(app):
         if is_manual_refresh:
             StatusDataManager.invalidate_cache("status")
 
-        # Set default time period if not provided
-        if not time_period:
-            time_period = "day"
-
         try:
-            # Use comprehensive data fetching to minimize API calls
+            # Fetch time-independent data (use default "day" period for any stats needed)
             comprehensive_data = StatusDataManager.fetch_comprehensive_status_page_data(
                 token=token,
                 api_environment=api_environment,
-                time_period=time_period,
+                time_period="day",  # Default period, not used for time-independent data
                 role=role,
                 force_refresh=is_manual_refresh,
             )
@@ -127,10 +100,9 @@ def register_callbacks(app):
             # Log performance metrics
             meta = comprehensive_data.get("meta", {})
             logger.info(
-                f"Status page data fetch completed: "
+                f"Time-independent status data fetch completed: "
                 f"{meta.get('total_api_calls', 0)} API calls, "
-                f"cache_hit={meta.get('cache_hit', False)}, "
-                f"optimizations={len(meta.get('optimizations_applied', []))}"
+                f"cache_hit={meta.get('cache_hit', False)}"
             )
 
             # Extract data components
@@ -152,14 +124,14 @@ def register_callbacks(app):
                 f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
             )
 
-            # 4. Stats components (only for SUPERADMIN)
+            # 4. System overview (only for SUPERADMIN)
             if role == "SUPERADMIN" and not stats_data.get("error"):
-                system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
-                    stats_data, status_data
+                system_overview, _stats_cards, _user_map, _additional_charts = (
+                    _build_stats_components(stats_data, status_data)
                 )
             else:
                 # Permission message for non-SUPERADMIN
-                permission_msg = html.Div(
+                system_overview = html.Div(
                     [
                         html.P("Enhanced Statistics", className="text-muted text-center"),
                         html.Small(
@@ -169,10 +141,6 @@ def register_callbacks(app):
                     ],
                     className="p-4",
                 )
-                system_overview = permission_msg
-                stats_cards = html.Div()  # Empty div
-                user_map = permission_msg
-                additional_charts = [permission_msg]
 
             return (
                 status_summary,
@@ -180,13 +148,10 @@ def register_callbacks(app):
                 swarm_info,
                 swarm_title,
                 system_overview,
-                stats_cards,
-                user_map,
-                additional_charts,
             )
 
         except Exception as e:
-            logger.error(f"Error in comprehensive status update: {e}")
+            logger.error(f"Error in time-independent status update: {e}")
             error_msg = html.Div(
                 f"Error loading status data: {e}", className="text-center text-danger"
             )
@@ -196,13 +161,14 @@ def register_callbacks(app):
                 error_msg,
                 html.H5("Error"),
                 error_msg,
-                error_msg,
-                error_msg,
-                [error_msg],
             )
 
     @app.callback(
-        Output("status-charts", "children"),
+        [
+            Output("stats-summary-cards", "children"),
+            Output("stats-user-map", "children"),
+            Output("stats-additional-charts", "children"),
+        ],
         [
             Input("status-time-tabs-store", "data"),
             Input("status-auto-refresh-interval", "n_intervals"),
@@ -210,155 +176,109 @@ def register_callbacks(app):
         ],
         [
             State("token-store", "data"),
-            State("user-timezone-store", "data"),
-            State("api-environment-store", "data"),
             State("active-tab-store", "data"),
+            State("role-store", "data"),
+            State("api-environment-store", "data"),
         ],
+        prevent_initial_call=False,
     )
-    def update_status_charts_optimized(
-        time_tab, _n_intervals, _refresh_clicks, token, user_timezone, api_environment, active_tab
+    def update_time_dependent_stats(
+        time_period,
+        _n_intervals,
+        _refresh_clicks,
+        token,
+        active_tab,
+        role,
+        api_environment,
     ):
         """
-        Update status charts with optimized data fetching and progressive loading.
+        Update time-dependent statistics components (affected by time period selection).
 
-        This callback uses pre-fetched time series data when possible
-        to reduce redundant API calls and implements progressive loading.
+        This includes: user map, additional charts, etc.
+        These elements are refreshed when the time period changes, auto-refresh, or manual refresh.
         """
-        # Guard: Skip if not logged in
-        if not token:
-            return no_update
+        # Guard: Skip if not logged in or not SUPERADMIN
+        if not token or role != "SUPERADMIN":
+            permission_msg = html.Div(
+                [
+                    html.P("Enhanced Statistics", className="text-muted text-center"),
+                    html.Small(
+                        "SUPERADMIN privileges required to access detailed analytics.",
+                        className="text-muted text-center d-block",
+                    ),
+                ],
+                className="p-4",
+            )
+            return (html.Div(), permission_msg, [permission_msg])
 
         # Only update when status tab is active
         if active_tab != "status":
-            return no_update
-
-        # Set default time period
-        if not time_tab:
-            time_tab = "day"
-
-        # Get safe timezone
-        safe_timezone = get_safe_timezone(user_timezone)
+            return (no_update, no_update, no_update)
 
         # Check if this is a manual refresh
         ctx = callback_context
-        is_manual_refresh = ctx.triggered and any(
-            "refresh-status-btn" in t["prop_id"] for t in ctx.triggered
+        is_manual_refresh = bool(
+            ctx.triggered and ctx.triggered[0]["prop_id"].split(".")[0] == "refresh-status-btn"
         )
 
+        # If manual refresh, invalidate status cache
+        if is_manual_refresh:
+            StatusDataManager.invalidate_cache("status")
+
+        # Set default time period if not provided
+        if not time_period:
+            time_period = "day"
+
         try:
-            # Progressive loading: Show immediate feedback
-            if (
-                not is_manual_refresh
-                and ctx.triggered
-                and "status-time-tabs-store" in str(ctx.triggered)
-            ):
-                # For time period changes, show a quick transition placeholder
-                time_period_name = {"day": "24 Hours", "week": "7 Days", "month": "30 Days"}.get(
-                    time_tab, "Selected Period"
-                )
-
-                # Return a temporary loading state with the new time period
-                return html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.Div(className="skeleton-text skeleton-title mb-3"),
-                                html.Div(
-                                    f"Loading {time_period_name} data...",
-                                    className="text-muted text-center p-4",
-                                ),
-                                html.Div(
-                                    className="chart-responsive",
-                                    children=[
-                                        html.Div(
-                                            className="placeholder-efficient",
-                                            children="Fetching chart data...",
-                                        )
-                                    ],
-                                ),
-                            ],
-                            className="lazy-load-content",
-                        )
-                    ]
-                )
-
-            # Try to get time series data from comprehensive cache first
-            comprehensive_cache_key = StatusDataManager.get_cache_key(
-                "comprehensive_status",
+            # Fetch time-dependent stats data
+            comprehensive_data = StatusDataManager.fetch_comprehensive_status_page_data(
+                token=token,
                 api_environment=api_environment,
-                time_period=time_tab,
-                role="USER",  # Charts don't require SUPERADMIN
+                time_period=time_period,
+                role=role,
+                force_refresh=is_manual_refresh,
             )
 
-            cached_comprehensive = StatusDataManager.get_cached_data(comprehensive_cache_key)
-            if cached_comprehensive and not is_manual_refresh:
-                time_series_data = cached_comprehensive.get("time_series_data", {}).get("data", [])
-                logger.info(
-                    "Using time series data from comprehensive cache for optimized rendering"
+            # Log performance metrics
+            meta = comprehensive_data.get("meta", {})
+            logger.info(
+                f"Time-dependent stats fetch completed for {time_period}: "
+                f"{meta.get('total_api_calls', 0)} API calls, "
+                f"cache_hit={meta.get('cache_hit', False)}"
+            )
+
+            # Extract data components
+            status_data = comprehensive_data.get("status_data", {})
+            stats_data = comprehensive_data.get("stats_data", {})
+
+            # Build time-dependent stats components
+            if not stats_data.get("error"):
+                _system_overview, stats_cards, user_map, additional_charts = (
+                    _build_stats_components(stats_data, status_data)
                 )
             else:
-                # Fetch time series data separately if not in comprehensive cache
-                time_series_result = StatusDataManager.fetch_time_series_status_data(
-                    token, api_environment, time_tab, force_refresh=is_manual_refresh
-                )
-                time_series_data = time_series_result.get("data", [])
-                logger.info("Fetched fresh time series data for optimized charts")
-
-            if not time_series_data:
-                time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
-                    time_tab, "selected period"
-                )
-                return html.Div(
+                error_msg = html.Div(
                     [
-                        html.Div(
-                            [
-                                html.I(className="fas fa-info-circle fa-2x text-info mb-3"),
-                                html.H5("No Chart Data Available", className="text-muted mb-3"),
-                                html.P(
-                                    f"No status logs found for the last {time_period_name}.",
-                                    className="text-muted mb-2",
-                                ),
-                                html.Small(
-                                    "Charts will appear when status data becomes available.",
-                                    className="text-muted",
-                                ),
-                            ],
-                            className="text-center py-5",
+                        html.P("Statistics unavailable.", className="text-muted text-center"),
+                        html.Small(
+                            f"Error: {stats_data.get('message', 'Unknown error')}",
+                            className="text-muted text-center d-block",
                         ),
                     ],
-                    className="border rounded p-4 bg-light",
+                    className="p-4",
                 )
+                stats_cards = html.Div()
+                user_map = error_msg
+                additional_charts = [error_msg]
 
-            # Build charts using optimized chart generation
-            charts = _build_optimized_status_charts(time_series_data, safe_timezone, time_tab)
-
-            # Wrap charts in lazy-load container for performance
-            return html.Div(
-                [
-                    html.Div(
-                        charts,
-                        className="lazy-load-content loaded",
-                    )
-                ],
-                className="chart-container",
-            )
+            return (stats_cards, user_map, additional_charts)
 
         except Exception as e:
-            logger.error(f"Error in optimized status charts update: {e}")
-            return html.Div(
-                [
-                    html.Div(
-                        [
-                            html.I(className="fas fa-exclamation-triangle fa-2x text-warning mb-3"),
-                            html.H5("Chart Loading Error", className="text-danger mb-3"),
-                            html.P(f"Unable to load chart data: {str(e)}", className="text-muted"),
-                            html.Small("Please try refreshing the page.", className="text-muted"),
-                        ],
-                        className="text-center py-4",
-                    )
-                ],
-                className="border rounded p-4 bg-light",
+            logger.error(f"Error in time-dependent stats update: {e}")
+            error_msg = html.Div(
+                f"Error loading statistics: {e}", className="text-center text-danger"
             )
+            return (html.Div(), error_msg, [error_msg])
 
     # Register additional status callbacks
     _register_additional_status_callbacks(app)
@@ -383,6 +303,11 @@ def _build_status_summary(status_data, safe_timezone):
 
     active_total = executions_running + executions_ready + executions_pending
     completed_total = executions_finished + executions_failed + executions_cancelled
+    total_executions = latest_status.get("executions_count", active_total + completed_total)
+
+    # Extract user and script counts
+    users_count = latest_status.get("users_count", 0)
+    scripts_count = latest_status.get("scripts_count", 0)
 
     # Format timestamp
     timestamp = latest_status.get("timestamp", "")
@@ -397,7 +322,7 @@ def _build_status_summary(status_data, safe_timezone):
                 [
                     html.Div(
                         f"{local_time_str} {tz_abbrev}",
-                        className="fw-bold text-primary",
+                        className="fw-bold",
                     ),
                     html.Div(f"({utc_time_str})", className="text-muted small"),
                 ]
@@ -407,131 +332,170 @@ def _build_status_summary(status_data, safe_timezone):
     except (ValueError, TypeError):
         timestamp_display = "Invalid timestamp format"
 
-    # Build the summary layout
+    # Build the summary layout organized by category
     return html.Div(
         [
-            # Active Executions Section
-            html.H5("Active Executions", className="text-center mb-3 text-muted"),
+            # === EXECUTIONS SECTION ===
             html.Div(
                 [
+                    html.H5("Executions", className="mb-3 border-bottom pb-2"),
+                    # Active executions
                     html.Div(
                         [
-                            html.H6("Running", className="mb-2"),
-                            html.P(str(executions_running), className="text-primary mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                    html.Div(
-                        [
-                            html.H6("Ready", className="mb-2"),
-                            html.P(str(executions_ready), className="text-info mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                    html.Div(
-                        [
-                            html.H6("Pending", className="mb-2"),
-                            html.P(str(executions_pending), className="text-warning mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                ],
-                className="row mb-3",
-            ),
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.H5("Active Total", className="mb-2 text-muted"),
-                            html.H3(str(active_total), className="text-success mb-1 fw-bold"),
-                        ],
-                        className="col-12 text-center",
-                    ),
-                ],
-                className="row mb-4",
-            ),
-            # Completed Executions Section
-            html.H5("Completed Executions", className="text-center mb-3 text-muted"),
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.H6("Finished", className="mb-2"),
-                            html.P(str(executions_finished), className="text-success mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                    html.Div(
-                        [
-                            html.H6("Failed", className="mb-2"),
-                            html.P(str(executions_failed), className="text-danger mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                    html.Div(
-                        [
-                            html.H6("Cancelled", className="mb-2"),
-                            html.P(str(executions_cancelled), className="text-secondary mb-1"),
-                        ],
-                        className="col-md-4 text-center",
-                    ),
-                ],
-                className="row mb-3",
-            ),
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.H5("Completed Total", className="mb-2 text-muted"),
-                            html.H3(str(completed_total), className="text-info mb-1 fw-bold"),
-                        ],
-                        className="col-12 text-center",
-                    ),
-                ],
-                className="row mb-4",
-            ),
-            # Summary Totals Section
-            html.H5("Summary Totals", className="text-center mb-3 text-muted"),
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.H6("Total Executions", className="mb-2"),
-                            html.P(
-                                str(
-                                    latest_status.get(
-                                        "executions_count", active_total + completed_total
-                                    )
-                                ),
-                                className="text-primary mb-1",
+                            html.H6("Active", className="text-muted mb-2"),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div("Running", className="text-muted small mb-1"),
+                                            html.Div(str(executions_running), className="h5 mb-0"),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div("Ready", className="text-muted small mb-1"),
+                                            html.Div(str(executions_ready), className="h5 mb-0"),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div("Pending", className="text-muted small mb-1"),
+                                            html.Div(str(executions_pending), className="h5 mb-0"),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div("Total", className="text-muted small mb-1"),
+                                            html.Div(
+                                                str(active_total),
+                                                className="h4 mb-0 fw-bold text-success",
+                                            ),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                ],
+                                className="row mb-3",
                             ),
                         ],
-                        className="col-md-6 text-center",
+                        className="mb-3",
                     ),
+                    # Completed executions
                     html.Div(
                         [
-                            html.H6("Users", className="mb-2"),
-                            html.P(
-                                str(latest_status.get("users_count", 0)), className="text-info mb-1"
+                            html.H6("Completed", className="text-muted mb-2"),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div("Finished", className="text-muted small mb-1"),
+                                            html.Div(str(executions_finished), className="h5 mb-0"),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div("Failed", className="text-muted small mb-1"),
+                                            html.Div(
+                                                str(executions_failed),
+                                                className="h5 mb-0 text-danger",
+                                            ),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                "Cancelled", className="text-muted small mb-1"
+                                            ),
+                                            html.Div(
+                                                str(executions_cancelled), className="h5 mb-0"
+                                            ),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Div("Total", className="text-muted small mb-1"),
+                                            html.Div(
+                                                str(completed_total), className="h4 mb-0 fw-bold"
+                                            ),
+                                        ],
+                                        className="col text-center",
+                                    ),
+                                ],
+                                className="row mb-3",
                             ),
                         ],
-                        className="col-md-6 text-center",
+                        className="mb-3",
+                    ),
+                    # Total executions
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.Div("Total Executions", className="text-muted small mb-1"),
+                                    html.Div(str(total_executions), className="h3 mb-0 fw-bold"),
+                                ],
+                                className="text-center",
+                            ),
+                        ],
+                        className="mb-4 p-3 bg-light rounded",
                     ),
                 ],
-                className="row mb-4",
+                className="mb-4",
             ),
-            # Last Updated Section
+            # === USERS SECTION ===
+            html.Div(
+                [
+                    html.H5("Users", className="mb-3 border-bottom pb-2"),
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.Div("Total Users", className="text-muted small mb-1"),
+                                    html.Div(str(users_count), className="h3 mb-0 fw-bold"),
+                                ],
+                                className="text-center",
+                            ),
+                        ],
+                        className="mb-4 p-3 bg-light rounded",
+                    ),
+                ],
+                className="mb-4",
+            ),
+            # === SCRIPTS SECTION ===
+            html.Div(
+                [
+                    html.H5("Scripts", className="mb-3 border-bottom pb-2"),
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.Div("Total Scripts", className="text-muted small mb-1"),
+                                    html.Div(str(scripts_count), className="h3 mb-0 fw-bold"),
+                                ],
+                                className="text-center",
+                            ),
+                        ],
+                        className="mb-4 p-3 bg-light rounded",
+                    ),
+                ],
+                className="mb-4",
+            ),
+            # === LAST UPDATED ===
             html.Div(
                 [
                     html.Div(
                         [
-                            html.H6("Last Updated", className="mb-2"),
-                            timestamp_display,
+                            html.Div("Last Updated", className="text-muted small mb-1 text-center"),
+                            html.Div(timestamp_display, className="text-center"),
                         ],
-                        className="col-12 text-center",
                     ),
                 ],
-                className="row mb-4",
+                className="border-top pt-3",
             ),
         ]
     )
@@ -601,195 +565,6 @@ def _build_status_charts(time_series_data, safe_timezone, _time_tab):
             height=350,
         )
         charts.append(html.Div([dcc.Graph(figure=fig_active)], className="mb-4"))
-
-    return charts
-
-
-def _build_optimized_status_charts(time_series_data, safe_timezone, time_tab):
-    """Build optimized status charts with better performance and reduced complexity."""
-    from dash import dcc, html
-    import pandas as pd
-    import plotly.graph_objects as go
-
-    if not time_series_data:
-        return []
-
-    # Convert to DataFrame efficiently
-    df = pd.DataFrame(time_series_data)
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
-
-    # Convert to local timezone efficiently
-    local_timestamps = []
-    for timestamp in df["timestamp"]:
-        local_dt, tz_abbrev = convert_utc_to_local(timestamp, safe_timezone)
-        local_timestamps.append(local_dt)
-
-    df["local_timestamp"] = pd.to_datetime(local_timestamps)
-
-    charts = []
-
-    # Create configuration for optimized rendering
-    chart_config = {
-        "displayModeBar": False,
-        "responsive": True,
-        "staticPlot": False,
-        # Optimize for performance
-        "scrollZoom": False,
-        "doubleClick": False,
-        "showTips": False,
-        "displaylogo": False,
-    }
-
-    # Chart 1: Active Executions (Primary metric)
-    if "executions_active" in df.columns:
-        active_values = df["executions_active"].fillna(0)
-        if active_values.max() > 0 or len(active_values) > 1:  # Only show if meaningful data
-            fig_active = go.Figure()
-            fig_active.add_trace(
-                go.Scatter(
-                    x=df["local_timestamp"],
-                    y=active_values,
-                    mode="lines+markers",
-                    name="Active Executions",
-                    line={"color": "#ff6f00", "width": 2},
-                    marker={"size": 4, "color": "#ff6f00"},
-                    hovertemplate="<b>Active Executions</b><br>%{x}<br>Count: %{y}<extra></extra>",
-                )
-            )
-
-            fig_active.update_layout(
-                title={
-                    "text": "Active Executions Over Time",
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "font": {"size": 16},
-                },
-                xaxis_title=get_chart_axis_label(safe_timezone),
-                yaxis_title="Number of Active Executions",
-                template="plotly_white",
-                height=300,  # Reduced height for better performance
-                margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                hovermode="x unified",
-                showlegend=False,
-            )
-
-            charts.append(
-                html.Div(
-                    [
-                        dcc.Graph(
-                            figure=fig_active,
-                            config=chart_config,
-                            className="chart-responsive",
-                        )
-                    ],
-                    className="mb-4",
-                )
-            )
-
-    # Chart 2: Execution Status Breakdown (if data available)
-    status_fields = [
-        "executions_running",
-        "executions_ready",
-        "executions_finished",
-        "executions_failed",
-    ]
-    available_fields = [field for field in status_fields if field in df.columns]
-
-    if len(available_fields) >= 2:  # Only show if we have multiple status types
-        fig_status = go.Figure()
-
-        colors = {
-            "executions_running": "#1e88e5",
-            "executions_ready": "#ffa726",
-            "executions_finished": "#43a047",
-            "executions_failed": "#e53935",
-        }
-
-        names = {
-            "executions_running": "Running",
-            "executions_ready": "Ready",
-            "executions_finished": "Finished",
-            "executions_failed": "Failed",
-        }
-
-        for field in available_fields:
-            values = df[field].fillna(0)
-            if values.max() > 0:  # Only add traces with actual data
-                fig_status.add_trace(
-                    go.Scatter(
-                        x=df["local_timestamp"],
-                        y=values,
-                        mode="lines",
-                        name=names.get(field, field),
-                        line={"color": colors.get(field, "#666"), "width": 2},
-                        hovertemplate=f"<b>{names.get(field, field)}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>",
-                    )
-                )
-
-        if len(fig_status.data) > 0:  # Only show if we have data
-            fig_status.update_layout(
-                title={
-                    "text": "Execution Status Breakdown",
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "font": {"size": 16},
-                },
-                xaxis_title=get_chart_axis_label(safe_timezone),
-                yaxis_title="Number of Executions",
-                template="plotly_white",
-                height=300,
-                margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                hovermode="x unified",
-                legend={
-                    "orientation": "h",
-                    "yanchor": "bottom",
-                    "y": 1.02,
-                    "xanchor": "center",
-                    "x": 0.5,
-                },
-            )
-
-            charts.append(
-                html.Div(
-                    [
-                        dcc.Graph(
-                            figure=fig_status,
-                            config=chart_config,
-                            className="chart-responsive",
-                        )
-                    ],
-                    className="mb-4",
-                )
-            )
-
-    # Show helpful message if no charts were generated
-    if not charts:
-        time_period_name = {"day": "24 hours", "week": "7 days", "month": "30 days"}.get(
-            time_tab, "selected period"
-        )
-
-        charts.append(
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.I(className="fas fa-chart-line fa-3x text-muted mb-3"),
-                            html.H5("Chart Data Not Available", className="text-muted mb-3"),
-                            html.P(
-                                f"No meaningful chart data found for the last {time_period_name}.",
-                                className="text-muted mb-2",
-                            ),
-                            html.Small(
-                                "Charts will appear when execution activity is detected.",
-                                className="text-muted",
-                            ),
-                        ],
-                        className="text-center py-5",
-                    ),
-                ],
-                className="border rounded p-4 bg-light mb-4",
-            )
-        )
 
     return charts
 

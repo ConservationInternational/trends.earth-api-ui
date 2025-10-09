@@ -62,13 +62,16 @@ class TestStatusTabStructure:
         assert "nav-link active" in content_str
 
     def test_status_tab_charts_container(self):
-        """Test that status tab contains charts container."""
+        """Test that status tab does not contain the removed status-charts section."""
         content = status_tab_content(is_admin=True)
         content_str = str(content)
 
-        # Should contain charts container
-        assert "status-charts" in content_str
-        assert "loading-status-charts" in content_str
+        # Should NOT contain the removed status-charts section
+        assert "status-charts" not in content_str
+        assert "loading-status-charts" not in content_str
+
+        # Should still contain time-based analytics
+        assert "status-time-tabs" in content_str
 
     def test_status_tab_refresh_components(self):
         """Test that status tab contains refresh components."""
@@ -373,8 +376,8 @@ class TestStatusTabsErrorHandling:
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        # Get the summary function
-        summary_func = callback_functions.get("update_comprehensive_status_data")
+        # Get the summary function (renamed from update_comprehensive_status_data)
+        summary_func = callback_functions.get("update_time_independent_status_data")
         assert summary_func is not None, "Summary function should exist"
 
         # Mock a successful response with test data
@@ -433,9 +436,8 @@ class TestStatusTabsErrorHandling:
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(
-                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
-                )
+                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
@@ -443,8 +445,9 @@ class TestStatusTabsErrorHandling:
                 )
                 result_str = str(summary_result)
 
-                # Should contain execution status section content (without main header)
-                assert "Active Executions" in result_str
+                # Should contain execution status section content (labels have been simplified)
+                assert "H6(children='Active'" in result_str
+                assert "H6(children='Completed'" in result_str
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_summary_totals_section(self, mock_ctx):
@@ -479,11 +482,11 @@ class TestStatusTabsErrorHandling:
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        # Get the summary function
-        summary_func = callback_functions.get("update_comprehensive_status_data")
-        assert summary_func is not None, "Summary function should exist"
-
-        # Mock a successful response with test data
+        # Get the summary function (renamed from update_comprehensive_status_data)
+        summary_func = callback_functions.get("update_time_independent_status_data")
+        assert summary_func is not None, (
+            "Summary function should exist"
+        )  # Mock a successful response with test data
         with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
@@ -539,9 +542,8 @@ class TestStatusTabsErrorHandling:
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(
-                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
-                )
+                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
@@ -549,9 +551,9 @@ class TestStatusTabsErrorHandling:
                 )
                 result_str = str(summary_result)
 
-                # Should contain total sections with new labels
-                assert "Active Total" in result_str
-                assert "Completed Total" in result_str
+                # Should contain total sections (labels have been simplified to just "Total")
+                assert "Div(children='Total'" in result_str
+                assert "Total Executions" in result_str
 
                 # Should contain last updated section
                 assert "Last Updated" in result_str
@@ -589,8 +591,8 @@ class TestStatusTabsErrorHandling:
         mock_app.callback = capture_callback
         register_callbacks(mock_app)
 
-        # Get the summary function
-        summary_func = callback_functions.get("update_comprehensive_status_data")
+        # Get the summary function (renamed from update_comprehensive_status_data)
+        summary_func = callback_functions.get("update_time_independent_status_data")
         assert summary_func is not None, "Summary function should exist"
 
         # Mock a successful response with test data
@@ -649,9 +651,8 @@ class TestStatusTabsErrorHandling:
                 mock_deployment.return_value = "mock deployment info"
                 mock_swarm.return_value = ("mock swarm info", " (Live)")
 
-                result = summary_func(
-                    0, 0, "day", "test_token", "status", "UTC", "ADMIN", "production"
-                )
+                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
@@ -659,14 +660,15 @@ class TestStatusTabsErrorHandling:
                 )
                 result_str = str(summary_result)
 
-                # Should contain section headers (Updated: main "Execution Status" header removed)
-                assert "Active Executions" in result_str
-                assert "Completed Executions" in result_str
-                assert "Active Total" in result_str
-                assert "Completed Total" in result_str
+                # Should contain section headers (labels have been simplified)
+                assert "H6(children='Active'" in result_str
+                assert "H6(children='Completed'" in result_str
+                assert "Div(children='Total'" in result_str
+                assert "Total Executions" in result_str
 
                 # Should contain proper styling classes for headers
-                assert "text-center mb-3 text-muted" in result_str
+                assert "text-muted mb-2" in result_str  # Active/Completed headers use this
+                assert "mb-3 border-bottom pb-2" in result_str  # Main section headers use this
 
 
 if __name__ == "__main__":

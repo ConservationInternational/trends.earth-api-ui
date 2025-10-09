@@ -110,8 +110,7 @@ class StatusDataManager:
                 headers=headers,
                 params={
                     "per_page": 1,
-                    "sort": "-timestamp",
-                    "exclude": "metadata,logs,extra_data",  # Exclude large fields for performance
+                    "sort": "-timestamp",  # Descending order (newest first)
                 },
                 timeout=5,
             )
@@ -277,8 +276,7 @@ class StatusDataManager:
                     "start_date": start_iso,
                     "end_date": end_iso,
                     "per_page": max_points,  # Adaptive limit based on time period
-                    "sort": "timestamp",  # Sort by timestamp ascending
-                    "exclude": "metadata,logs,extra_data",  # Exclude large fields for performance
+                    "sort": "-timestamp",  # Descending order (newest first) for time series data
                 },
                 timeout=15,  # Longer timeout for time series data
             )

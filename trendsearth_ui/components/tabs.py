@@ -882,13 +882,13 @@ def status_tab_content(is_admin, role=None):
                 ],
                 className="justify-content-between",
             ),
-            # Status summary card
+            # Time-independent status information (not affected by time period tabs)
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("System Status Summary")),
+                    dbc.CardHeader(html.H4("Current System Status")),
                     dbc.CardBody(
                         [
-                            # System Overview section (SUPERADMIN only) - moved to top
+                            # System Overview section (SUPERADMIN only)
                             *(
                                 [
                                     html.Div(
@@ -908,6 +908,8 @@ def status_tab_content(is_admin, role=None):
                                 if is_admin_user
                                 else []
                             ),
+                            # Current status summary
+                            html.H5("Status Summary", className="mb-3"),
                             dcc.Loading(
                                 id="loading-status-summary",
                                 children=[
@@ -988,12 +990,13 @@ def status_tab_content(is_admin, role=None):
                 ],
                 className="mb-4",
             ),
-            # Status charts
+            # Time-dependent charts and statistics (affected by time period selection)
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("System Status Trends")),
+                    dbc.CardHeader(html.H4("Time-Based Analytics")),
                     dbc.CardBody(
                         [
+                            # Time period selector tabs
                             html.Div(
                                 [
                                     html.Ul(
@@ -1040,7 +1043,7 @@ def status_tab_content(is_admin, role=None):
                                 ],
                                 className="mb-3",
                             ),
-                            # Enhanced statistics sections (SUPERADMIN only)
+                            # Enhanced statistics sections (SUPERADMIN only) - time-dependent
                             *(
                                 [
                                     html.Div(
@@ -1099,45 +1102,6 @@ def status_tab_content(is_admin, role=None):
                                 ]
                                 if is_admin_user
                                 else []
-                            ),
-                            # Status trends charts with lazy loading
-                            html.H5("System Status Trends", className="mb-3"),
-                            html.Div(
-                                [
-                                    dcc.Loading(
-                                        id="loading-status-charts",
-                                        className="loading-optimized",
-                                        children=[
-                                            html.Div(
-                                                id="status-charts",
-                                                className="status-charts-container mt-3",
-                                                children=[
-                                                    # Optimized placeholder with skeleton loading
-                                                    html.Div(
-                                                        [
-                                                            html.Div(
-                                                                className="skeleton-text skeleton-title mb-3"
-                                                            ),
-                                                            html.Div(
-                                                                className="chart-responsive",
-                                                                children=[
-                                                                    html.Div(
-                                                                        className="placeholder-efficient",
-                                                                        children="Preparing chart data...",
-                                                                    )
-                                                                ],
-                                                            ),
-                                                        ],
-                                                        className="lazy-load-content",
-                                                    )
-                                                ],
-                                            )
-                                        ],
-                                        type="default",
-                                        color="#007bff",
-                                    ),
-                                ],
-                                className="chart-container",
                             ),
                         ]
                     ),
