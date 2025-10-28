@@ -909,7 +909,7 @@ def status_tab_content(is_admin, role=None):
                                 else []
                             ),
                             # Current status summary
-                            html.H5("Status Summary", className="mb-3"),
+                            html.H5("System Status Summary", className="mb-3"),
                             dcc.Loading(
                                 id="loading-status-summary",
                                 children=[
@@ -993,7 +993,7 @@ def status_tab_content(is_admin, role=None):
             # Time-dependent charts and statistics (affected by time period selection)
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Time-Based Analytics")),
+                    dbc.CardHeader(html.H4("System Status Trends")),
                     dbc.CardBody(
                         [
                             # Time period selector tabs
@@ -1064,6 +1064,22 @@ def status_tab_content(is_admin, role=None):
                                                 className="mb-4",
                                             ),
                                             html.Hr(),
+                                            # Additional statistics charts
+                                            html.Div(
+                                                [
+                                                    html.H5("Detailed Analytics", className="mb-3"),
+                                                    dcc.Loading(
+                                                        id="loading-stats-charts",
+                                                        children=[
+                                                            html.Div(id="stats-additional-charts")
+                                                        ],
+                                                        type="default",
+                                                        color="#007bff",
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                            html.Hr(),
                                             # User geographic map
                                             html.Div(
                                                 [
@@ -1074,22 +1090,6 @@ def status_tab_content(is_admin, role=None):
                                                     dcc.Loading(
                                                         id="loading-stats-map",
                                                         children=[html.Div(id="stats-user-map")],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
-                                                ],
-                                                className="mb-4",
-                                            ),
-                                            html.Hr(),
-                                            # Additional statistics charts
-                                            html.Div(
-                                                [
-                                                    html.H5("Detailed Analytics", className="mb-3"),
-                                                    dcc.Loading(
-                                                        id="loading-stats-charts",
-                                                        children=[
-                                                            html.Div(id="stats-additional-charts")
-                                                        ],
                                                         type="default",
                                                         color="#007bff",
                                                     ),

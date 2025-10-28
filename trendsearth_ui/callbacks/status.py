@@ -36,7 +36,6 @@ def register_callbacks(app):
             Output("deployment-info-summary", "children"),
             Output("swarm-info-summary", "children"),
             Output("swarm-status-title", "children"),
-            Output("system-overview-content", "children"),
         ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
@@ -68,11 +67,11 @@ def register_callbacks(app):
         """
         # Guard: Skip if not logged in
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return (no_update, no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update)
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update)
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -109,8 +108,6 @@ def register_callbacks(app):
             status_data = comprehensive_data.get("status_data", {})
             deployment_data = comprehensive_data.get("deployment_data")
             swarm_data = comprehensive_data.get("swarm_data", {})
-            stats_data = comprehensive_data.get("stats_data", {})
-
             # 1. Build status summary
             status_summary = _build_status_summary(status_data, safe_timezone)
 
@@ -123,31 +120,11 @@ def register_callbacks(app):
             swarm_title = html.H5(
                 f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
             )
-
-            # 4. System overview (only for SUPERADMIN)
-            if role == "SUPERADMIN" and not stats_data.get("error"):
-                system_overview, _stats_cards, _user_map, _additional_charts = (
-                    _build_stats_components(stats_data, status_data)
-                )
-            else:
-                # Permission message for non-SUPERADMIN
-                system_overview = html.Div(
-                    [
-                        html.P("Enhanced Statistics", className="text-muted text-center"),
-                        html.Small(
-                            "SUPERADMIN privileges required to access detailed analytics.",
-                            className="text-muted text-center d-block",
-                        ),
-                    ],
-                    className="p-4",
-                )
-
             return (
                 status_summary,
                 deployment_info,
                 swarm_info,
                 swarm_title,
-                system_overview,
             )
 
         except Exception as e:
@@ -160,11 +137,11 @@ def register_callbacks(app):
                 error_msg,
                 error_msg,
                 html.H5("Error"),
-                error_msg,
             )
 
     @app.callback(
         [
+            Output("system-overview-content", "children"),
             Output("stats-summary-cards", "children"),
             Output("stats-user-map", "children"),
             Output("stats-additional-charts", "children"),
@@ -209,11 +186,11 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return (html.Div(), permission_msg, [permission_msg])
+            return (permission_msg, html.Div(), permission_msg, [permission_msg])
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update)
 
         # Check if this is a manual refresh
         ctx = callback_context
@@ -253,8 +230,8 @@ def register_callbacks(app):
 
             # Build time-dependent stats components
             if not stats_data.get("error"):
-                _system_overview, stats_cards, user_map, additional_charts = (
-                    _build_stats_components(stats_data, status_data)
+                system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
+                    stats_data, status_data, comprehensive_data.get("time_series_data")
                 )
             else:
                 error_msg = html.Div(
@@ -267,18 +244,19 @@ def register_callbacks(app):
                     ],
                     className="p-4",
                 )
+                system_overview = error_msg
                 stats_cards = html.Div()
                 user_map = error_msg
                 additional_charts = [error_msg]
 
-            return (stats_cards, user_map, additional_charts)
+            return (system_overview, stats_cards, user_map, additional_charts)
 
         except Exception as e:
             logger.error(f"Error in time-dependent stats update: {e}")
             error_msg = html.Div(
                 f"Error loading statistics: {e}", className="text-center text-danger"
             )
-            return (html.Div(), error_msg, [error_msg])
+            return (html.Div(), html.Div(), error_msg, [error_msg])
 
     # Register additional status callbacks
     _register_additional_status_callbacks(app)
@@ -501,7 +479,7 @@ def _build_status_summary(status_data, safe_timezone):
     )
 
 
-def _build_stats_components(stats_data, status_data):
+def _build_stats_components(stats_data, status_data, time_series_data):
     """Build the enhanced statistics components."""
     dashboard_stats = stats_data.get("dashboard_stats")
     user_stats = stats_data.get("user_stats")
@@ -516,9 +494,13 @@ def _build_stats_components(stats_data, status_data):
     system_overview = create_system_overview(dashboard_stats, latest_status)
     stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
     user_map = create_user_geographic_map(user_stats)
-    additional_charts = create_user_statistics_chart(
-        user_stats
-    ) + create_execution_statistics_chart(execution_stats)
+    status_time_series = (
+        time_series_data.get("data") if isinstance(time_series_data, dict) else time_series_data
+    )
+
+    additional_charts = create_execution_statistics_chart(
+        execution_stats, status_time_series
+    ) + create_user_statistics_chart(user_stats)
 
     return system_overview, stats_cards, user_map, additional_charts
 

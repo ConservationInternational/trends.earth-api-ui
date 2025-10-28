@@ -2,6 +2,9 @@
 
 from dash import Input, Output, State, no_update
 
+from ..utils.helpers import make_authenticated_request
+from ._table_helpers import RowResolutionError, resolve_row_data
+
 
 def register_callbacks(app):
     """Register edit modal callbacks."""
@@ -33,50 +36,12 @@ def register_callbacks(app):
             return False, None, "", "", "", "", "USER", "", ""
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "", "", "USER", "", ""
-
-        # Try to get row data from cell click event first
-        row_data = cell_clicked.get("data")
-        user_id = None
-
-        if row_data:
-            user_id = row_data.get("id")
-            user = row_data
-
-        # If we don't have row data or user_id, fall back to pagination approach
-        if not user_id:
-            row_index = cell_clicked.get("rowIndex")
-            if row_index is None:
-                print("❌ No row index found in cell click event")
-                return False, None, "", "", "", "", "USER", "", ""
-
-            # Calculate which page this row is on
-            page_size = 50  # This should match your cacheBlockSize
-            page = (row_index // page_size) + 1
-            row_in_page = row_index % page_size
-
-            params = {"page": page, "per_page": page_size}
-
-            # Apply the same sort and filter that the table is currently using
-            if table_state:
-                if table_state.get("sort_sql"):
-                    params["sort"] = table_state["sort_sql"]
-                if table_state.get("filter_sql"):
-                    params["filter"] = table_state["filter_sql"]
-
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/user", token, params=params)
-            if resp.status_code != 200:
-                print(f"❌ Failed to fetch user data: {resp.text}")
-                return False, None, "", "", "", "", "USER", "", ""
-
-            result = resp.json()
-            users = result.get("data", [])
-            if row_in_page >= len(users):
-                print(f"❌ Row index {row_in_page} out of range for page {page}")
-                return False, None, "", "", "", "", "USER", "", ""
-
-            user = users[row_in_page]
+        try:
+            user = resolve_row_data(cell_clicked, token, table_state, "/user")
+        except RowResolutionError as exc:
+            print(f"❌ {exc}")
+            return False, None, "", "", "", "", "USER", "", ""
+        else:
             print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
 
         return (
@@ -114,50 +79,18 @@ def register_callbacks(app):
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "DRAFT"
 
-        # Try to get row data from cell click event first
-        row_data = cell_clicked.get("data")
-        script_id = None
-
-        if row_data:
-            script_id = row_data.get("id")
-            script = row_data
-
-        # If we don't have row data or script_id, fall back to pagination approach
-        if not script_id:
-            row_index = cell_clicked.get("rowIndex")
-            if row_index is None:
-                print("❌ No row index found in cell click event")
-                return False, None, "", "", "DRAFT"
-
-            # Calculate which page this row is on
-            page_size = 50  # This should match your cacheBlockSize
-            page = (row_index // page_size) + 1
-            row_in_page = row_index % page_size
-
-            params = {"page": page, "per_page": page_size, "include": "user_name"}
-
-            # Apply the same sort and filter that the table is currently using
-            if table_state:
-                if table_state.get("sort_sql"):
-                    params["sort"] = table_state["sort_sql"]
-                if table_state.get("filter_sql"):
-                    params["filter"] = table_state["filter_sql"]
-
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/script", token, params=params)
-            if resp.status_code != 200:
-                print(f"❌ Failed to fetch script data: {resp.text}")
-                return False, None, "", "", "DRAFT"
-
-            result = resp.json()
-            scripts = result.get("data", [])
-
-            if row_in_page >= len(scripts):
-                print(f"❌ Row index {row_in_page} out of range for page {page}")
-                return False, None, "", "", "DRAFT"
-
-            script = scripts[row_in_page]
+        try:
+            script = resolve_row_data(
+                cell_clicked,
+                token,
+                table_state,
+                "/script",
+                include="user_name",
+            )
+        except RowResolutionError as exc:
+            print(f"❌ {exc}")
+            return False, None, "", "", "DRAFT"
+        else:
             print(f"✅ Found script data: {script.get('id')} - {script.get('name')}")
 
         return (
@@ -226,8 +159,6 @@ def register_callbacks(app):
             "country": country,
             "role": role,
         }
-        from ..utils.helpers import make_authenticated_request
-
         resp = make_authenticated_request(
             f"/user/{user_id}",
             token,
@@ -276,8 +207,6 @@ def register_callbacks(app):
             "description": description,
             "status": status,
         }
-        from ..utils.helpers import make_authenticated_request
-
         resp = make_authenticated_request(
             f"/script/{script_id}",
             token,
@@ -354,8 +283,6 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             resp = make_authenticated_request(
                 f"/user/{user_id}", token, method="DELETE", timeout=10
             )
@@ -431,8 +358,6 @@ def register_callbacks(app):
             return False, no_update, no_update
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             resp = make_authenticated_request(
                 f"/script/{script_id}", token, method="DELETE", timeout=10
             )
@@ -504,8 +429,6 @@ def register_callbacks(app):
             print(
                 f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}"
             )
-
-            from ..utils.helpers import make_authenticated_request
 
             resp = make_authenticated_request(
                 f"/user/{user_id}/change-password",

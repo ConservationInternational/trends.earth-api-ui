@@ -1,10 +1,98 @@
 """Executions table callbacks."""
 
+from collections.abc import Mapping
+from typing import Any
+
 from dash import Input, Output, State, html, no_update
 import requests  # noqa: F401
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date
+from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+
+EXECUTION_ENDPOINT = "/execution"
+EXECUTION_BASE_INCLUDE = "script_name,user_id,duration"
+ADMIN_INCLUDE_SUFFIX = ",user_name,user_email"
+
+
+def _build_base_params(role: str | None, *, include_paging: bool = False) -> dict[str, Any]:
+    """Generate base params for execution API requests."""
+    include_fields = EXECUTION_BASE_INCLUDE
+    if role in ["ADMIN", "SUPERADMIN"]:
+        include_fields += ADMIN_INCLUDE_SUFFIX
+
+    params: dict[str, Any] = {
+        "exclude": "params,results",
+        "include": include_fields,
+    }
+    if include_paging:
+        params.update({"page": 1, "per_page": DEFAULT_PAGE_SIZE})
+    return params
+
+
+def _build_status_filter_override(
+    status_filter_selected: list[str] | None,
+) -> dict[str, Any] | None:
+    """Translate UI status filter selection into an AG-Grid filter override."""
+    if status_filter_selected:
+        return {
+            "status": {"filterType": "set", "values": status_filter_selected},
+        }
+    return None
+
+
+def _make_date_filter_handler(gte_key: str, lte_key: str):
+    """Create a handler that converts AG-Grid date filters into API params."""
+
+    def handler(config: Mapping[str, Any]) -> tuple[str | None, dict[str, Any]]:
+        if not isinstance(config, Mapping):
+            return None, {}
+
+        raw_type = config.get("type")
+        if isinstance(raw_type, str):
+            filter_type = raw_type.strip()
+        elif raw_type:
+            filter_type = str(raw_type)
+        else:
+            filter_type = "equals"
+        date_from = config.get("dateFrom")
+        date_to = config.get("dateTo")
+
+        params: dict[str, Any] = {}
+
+        def set_param(key: str, value: Any) -> None:
+            if value:
+                params[key] = value
+
+        if filter_type == "equals":
+            if date_from:
+                set_param(gte_key, date_from)
+                set_param(lte_key, date_from)
+        elif filter_type in ("greaterThan", "greaterThanOrEqual"):
+            if date_from:
+                set_param(gte_key, date_from)
+        elif filter_type in ("lessThan", "lessThanOrEqual"):
+            if date_from:
+                set_param(lte_key, date_from)
+        elif filter_type == "inRange":
+            if date_from:
+                set_param(gte_key, date_from)
+            if date_to:
+                set_param(lte_key, date_to)
+        else:
+            if date_from:
+                set_param(gte_key, date_from)
+                set_param(lte_key, date_from)
+
+        return None, params
+
+    return handler
+
+
+DATE_FILTER_HANDLERS = {
+    "start_date": _make_date_filter_handler("start_date_gte", "start_date_lte"),
+    "end_date": _make_date_filter_handler("end_date_gte", "end_date_lte"),
+}
 
 
 def format_duration(duration_seconds):
@@ -87,121 +175,15 @@ def register_callbacks(app):
                 # Return empty data but let ag-grid know there might be data
                 return {"rowData": [], "rowCount": None}, {}, 0
 
-            start_row = request.get("startRow", 0)
-            end_row = request.get("endRow", 10000)
-            page_size = end_row - start_row
-            page = (start_row // page_size) + 1
+            filter_overrides = _build_status_filter_override(status_filter_selected)
+            params, table_state = build_aggrid_request_params(
+                request,
+                base_params=_build_base_params(role),
+                filter_model_overrides=filter_overrides,
+                custom_filter_handlers=DATE_FILTER_HANDLERS,
+            )
 
-            sort_model = request.get("sortModel", [])
-            filter_model = request.get("filterModel", {})
-
-            # Add custom filter to filter_model if active
-            if status_filter_selected:
-                filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
-
-            params = {
-                "page": page,
-                "per_page": page_size,
-                "exclude": "params,results",
-                "include": "script_name,user_id,duration",
-            }
-
-            # Add admin-only fields if user is admin or superadmin
-            if role in ["ADMIN", "SUPERADMIN"]:
-                params["include"] += ",user_name,user_email"
-
-            # Build SQL-style sort string
-            sort_sql = []
-            for sort in sort_model:
-                col = sort.get("colId")
-                direction = sort.get("sort", "asc")
-                if direction == "desc":
-                    sort_sql.append(f"{col} desc")
-                else:
-                    sort_sql.append(f"{col} asc")
-            if sort_sql:
-                params["sort"] = ",".join(sort_sql)
-
-            # Build SQL-style filter string for general filters
-            filter_sql = []
-            for field, config in filter_model.items():
-                if config.get("filterType") == "set":
-                    # Set filters (checkboxes) - handle multiple selected values
-                    values = config.get("values", [])
-                    if values:
-                        # Create OR condition for multiple selected values
-                        value_conditions = [f"{field}='{val}'" for val in values]
-                        if value_conditions:
-                            filter_sql.append(f"({' OR '.join(value_conditions)})")
-                elif config.get("filterType") == "text":
-                    # General text filters (user_name, user_email, user_id, etc.)
-                    filter_type = config.get("type", "contains")
-                    val = config.get("filter", "").strip()
-                    if val:
-                        if filter_type == "contains":
-                            filter_sql.append(f"{field} like '%{val}%'")
-                        elif filter_type == "equals":
-                            filter_sql.append(f"{field}='{val}'")
-                        elif filter_type == "notEquals":
-                            filter_sql.append(f"{field}!='{val}'")
-                        elif filter_type == "startsWith":
-                            filter_sql.append(f"{field} like '{val}%'")
-                        elif filter_type == "endsWith":
-                            filter_sql.append(f"{field} like '%{val}'")
-                elif config.get("filterType") == "number":
-                    # Number filters (for duration column)
-                    filter_type = config.get("type", "equals")
-                    val = config.get("filter")
-                    if val is not None:
-                        if filter_type == "equals":
-                            filter_sql.append(f"{field}={val}")
-                        elif filter_type == "notEqual":
-                            filter_sql.append(f"{field}!={val}")
-                        elif filter_type == "greaterThan":
-                            filter_sql.append(f"{field}>{val}")
-                        elif filter_type == "greaterThanOrEqual":
-                            filter_sql.append(f"{field}>={val}")
-                        elif filter_type == "lessThan":
-                            filter_sql.append(f"{field}<{val}")
-                        elif filter_type == "lessThanOrEqual":
-                            filter_sql.append(f"{field}<={val}")
-                elif field in ["start_date", "end_date"] and config.get("filterType") == "date":
-                    # Date filters - convert to API format
-                    date_from = config.get("dateFrom")
-                    date_to = config.get("dateTo")
-                    filter_type = config.get("type", "equals")
-
-                    if field == "start_date" and date_from:
-                        if filter_type in ["greaterThan", "greaterThanOrEqual"]:
-                            params["start_date_gte"] = date_from
-                        elif filter_type in ["lessThan", "lessThanOrEqual"]:
-                            params["start_date_lte"] = date_from
-                    elif field == "end_date" and date_from:
-                        if filter_type in ["greaterThan", "greaterThanOrEqual"]:
-                            params["end_date_gte"] = date_from
-                        elif filter_type in ["lessThan", "lessThanOrEqual"]:
-                            params["end_date_lte"] = date_from
-
-                    # Handle date range filters
-                    if filter_type == "inRange":
-                        if field == "start_date":
-                            if date_from:
-                                params["start_date_gte"] = date_from
-                            if date_to:
-                                params["start_date_lte"] = date_to
-                        elif field == "end_date":
-                            if date_from:
-                                params["end_date_gte"] = date_from
-                            if date_to:
-                                params["end_date_lte"] = date_to
-
-            # Add general filters to params
-            if filter_sql:
-                params["filter"] = ",".join(filter_sql)
-
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/execution", token, params=params)
+            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
 
             if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, {}, 0
@@ -212,14 +194,6 @@ def register_callbacks(app):
 
             # Process execution data consistently
             tabledata = process_execution_data(executions, role, user_timezone)
-
-            # Store the current table state for use in modal callbacks
-            table_state = {
-                "sort_model": sort_model,
-                "filter_model": filter_model,
-                "sort_sql": ",".join(sort_sql) if sort_sql else None,
-                "filter_sql": ",".join(filter_sql) if filter_sql else None,
-            }
 
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
@@ -251,60 +225,42 @@ def register_callbacks(app):
         if not n_clicks or not token:
             return {"rowData": [], "rowCount": 0}, {}, 0, 0
 
-        # For infinite row model, we need to trigger a refresh by clearing the cache
-        # This is done by returning a fresh response for the first page
-        params = {
-            "page": 1,
-            "per_page": DEFAULT_PAGE_SIZE,
-            "exclude": "params,results",
-            "include": "script_name,user_id,duration",
-        }
+        try:
+            filter_overrides = _build_status_filter_override(status_filter_selected)
+            params = build_refresh_request_params(
+                base_params=_build_base_params(role, include_paging=True),
+                table_state=table_state,
+                additional_filters=filter_overrides,
+                custom_filter_handlers=DATE_FILTER_HANDLERS,
+            )
 
-        # Add admin-only fields if user is admin or superadmin
-        if role in ["ADMIN", "SUPERADMIN"]:
-            params["include"] += ",user_name,user_email"
+            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
 
-        # Preserve existing sort and filter settings if available
-        if table_state:
-            if table_state.get("sort_sql"):
-                params["sort"] = table_state["sort_sql"]
-            if table_state.get("filter_sql"):
-                params["filter"] = table_state["filter_sql"]
+            if resp.status_code != 200:
+                return {"rowData": [], "rowCount": 0}, table_state or {}, 0, 0
 
-        # Add custom filter from the status filter if active (similar to main callback)
-        if status_filter_selected and table_state:
-            # Add custom filter to existing table state filter logic
-            filter_model = table_state.get("filter_model", {})
-            filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
-            # Rebuild filter SQL from the updated filter model (simplified approach)
-            filter_sql = []
-            for field, config in filter_model.items():
-                if config.get("filterType") == "set":
-                    values = config.get("values", [])
-                    if values:
-                        value_conditions = [f"{field}='{val}'" for val in values]
-                        if value_conditions:
-                            filter_sql.append(f"({' OR '.join(value_conditions)})")
-            if filter_sql:
-                params["filter"] = ",".join(filter_sql)
+            result = resp.json()
+            executions = result.get("data", [])
+            total_rows = result.get("total", 0)
 
-        from ..utils.helpers import make_authenticated_request
+            # Process execution data consistently
+            tabledata = process_execution_data(executions, role, user_timezone)
 
-        resp = make_authenticated_request("/execution", token, params=params)
+            # Reset countdown timer to 0 when manually refreshed
+            # Return data with preserved table state
+            return (
+                {
+                    "rowData": tabledata,
+                    "rowCount": total_rows,
+                },
+                table_state or {},
+                0,
+                total_rows,
+            )
 
-        if resp.status_code != 200:
-            return {"rowData": [], "rowCount": 0}, {}, 0, 0
-
-        result = resp.json()
-        executions = result.get("data", [])
-        total_rows = result.get("total", 0)
-
-        # Process execution data consistently
-        tabledata = process_execution_data(executions, role, user_timezone)
-
-        # Reset countdown timer to 0 when manually refreshed
-        # Return data with preserved table state
-        return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, 0, total_rows
+        except Exception as exc:  # pragma: no cover - defensive guard
+            print(f"Error in refresh_executions_table: {exc}")
+            return {"rowData": [], "rowCount": 0}, table_state or {}, 0, 0
 
     @app.callback(
         [
@@ -336,44 +292,15 @@ def register_callbacks(app):
             return {"rowData": [], "rowCount": 0}, {}, 0
 
         try:
-            params = {
-                "page": 1,
-                "per_page": DEFAULT_PAGE_SIZE,
-                "exclude": "params,results",
-                "include": "script_name,user_id,duration",
-            }
+            filter_overrides = _build_status_filter_override(status_filter_selected)
+            params = build_refresh_request_params(
+                base_params=_build_base_params(role, include_paging=True),
+                table_state=table_state,
+                additional_filters=filter_overrides,
+                custom_filter_handlers=DATE_FILTER_HANDLERS,
+            )
 
-            # Add admin-only fields if user is admin or superadmin
-            if role in ["ADMIN", "SUPERADMIN"]:
-                params["include"] += ",user_name,user_email"
-
-            # Preserve existing sort and filter settings if available
-            if table_state:
-                if table_state.get("sort_sql"):
-                    params["sort"] = table_state["sort_sql"]
-                if table_state.get("filter_sql"):
-                    params["filter"] = table_state["filter_sql"]
-
-            # Add custom filter from the status filter if active (similar to main callback)
-            if status_filter_selected and table_state:
-                # Add custom filter to existing table state filter logic
-                filter_model = table_state.get("filter_model", {})
-                filter_model["status"] = {"filterType": "set", "values": status_filter_selected}
-                # Rebuild filter SQL from the updated filter model (simplified approach)
-                filter_sql = []
-                for field, config in filter_model.items():
-                    if config.get("filterType") == "set":
-                        values = config.get("values", [])
-                        if values:
-                            value_conditions = [f"{field}='{val}'" for val in values]
-                            if value_conditions:
-                                filter_sql.append(f"({' OR '.join(value_conditions)})")
-                if filter_sql:
-                    params["filter"] = ",".join(filter_sql)
-
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/execution", token, params=params)
+            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
 
             if resp.status_code != 200:
                 return {"rowData": [], "rowCount": 0}, table_state or {}, 0
@@ -506,7 +433,7 @@ def register_callbacks(app):
 
                     # Make API request exactly like logs callback
                     response = make_authenticated_request(
-                        "/execution",
+                        EXECUTION_ENDPOINT,
                         token,
                         method="GET",
                         params=params,
@@ -791,7 +718,7 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            refresh_resp = make_authenticated_request("/execution", token, params=params)
+            refresh_resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
             table_response = {"rowData": [], "rowCount": 0}
 
             if refresh_resp.status_code == 200:
