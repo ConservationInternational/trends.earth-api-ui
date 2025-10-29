@@ -298,13 +298,16 @@ class StatusDataManager:
         end_time = datetime.now(timezone.utc)
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
-            max_points = 720  # ~1 point per hour for 30 days (ensures full coverage)
+            target_points = 720  # Hourly resolution for 30 days
+            request_limit = 10000  # Ensure we retrieve the full month even with frequent updates
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
-            max_points = 336  # ~2 points per hour for 7 days (ensures smooth visualization)
+            target_points = 1344  # ~8 points per hour for 7 days (covers 15-min updates)
+            request_limit = 4096
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
-            max_points = 288  # ~1 point per 5 minutes for 24 hours (ensures detailed coverage)
+            target_points = 288  # ~1 point per 5 minutes for 24 hours
+            request_limit = 1024
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -315,7 +318,8 @@ class StatusDataManager:
             "time_period": time_period,
             "start_time": start_iso,
             "end_time": end_iso,
-            "max_points": max_points,
+            "target_points": target_points,
+            "request_limit": request_limit,
             "optimization_applied": False,
             "error": None,
         }
@@ -328,7 +332,7 @@ class StatusDataManager:
                 params={
                     "start_date": start_iso,
                     "end_date": end_iso,
-                    "per_page": max_points,  # Adaptive limit based on time period
+                    "per_page": request_limit,  # Fetch sufficient points for the selected range
                     "sort": "-timestamp",  # Descending order (newest first) for time series data
                 },
                 timeout=15,  # Longer timeout for time series data
@@ -339,11 +343,11 @@ class StatusDataManager:
 
             # Apply smart sampling only if we have significantly more data than the target
             # This ensures we don't unnecessarily reduce data quality
-            sampling_threshold = max_points * 1.5  # Only sample if 50% more than target
+            sampling_threshold = target_points * 1.5  # Only sample if 50% more than target
             if len(status_data) > sampling_threshold:
                 # Apply intelligent sampling to reduce data points while preserving trends
                 optimized_data = StatusDataManager._optimize_time_series_data(
-                    status_data, max_points, time_period
+                    status_data, target_points, time_period
                 )
                 result["data"] = optimized_data
                 result["optimization_applied"] = True
