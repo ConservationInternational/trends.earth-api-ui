@@ -699,7 +699,7 @@ def create_execution_statistics_chart(
         if execution_charts:
             charts.extend(execution_charts)
 
-        # 3. Task Performance - handle actual data structure
+        # 3. Execution Performance - handle actual data structure
         # API returns a list of task objects, not a dict with by_status
         task_performance_data = data.get("task_performance", [])
         logger.info(f"Task performance data: {task_performance_data}")
@@ -743,7 +743,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6(f"Task Performance{suffix_label}"),
+                            html.H6(f"Execution performance{suffix_label}"),
                             dcc.Graph(
                                 figure=fig_tasks,
                                 config={"displayModeBar": False, "responsive": True},
