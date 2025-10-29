@@ -889,7 +889,6 @@ def status_tab_content(is_admin, role=None):
                     ),
                     dbc.CardBody(
                         [
-                            html.H5("System Status Summary", className="mb-3"),
                             dcc.Loading(
                                 id="loading-status-summary",
                                 children=[
@@ -1028,57 +1027,35 @@ def status_tab_content(is_admin, role=None):
                                 [
                                     html.Div(
                                         [
-                                            # Dashboard summary cards
-                                            html.Div(
-                                                [
-                                                    html.H5("Dashboard Summary", className="mb-3"),
-                                                    dcc.Loading(
-                                                        id="loading-stats-summary",
-                                                        children=[
-                                                            html.Div(id="stats-summary-cards")
-                                                        ],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
+                                            # Stats summary and charts share a single loader to simplify layout
+                                            dcc.Loading(
+                                                id="loading-stats-charts",
+                                                children=[
+                                                    html.Div(id="stats-summary-cards"),
+                                                    html.Div(id="stats-additional-charts"),
                                                 ],
-                                                className="mb-4",
+                                                type="default",
+                                                color="#007bff",
                                             ),
-                                            html.Hr(),
-                                            # Additional statistics charts
-                                            html.Div(
-                                                [
-                                                    html.H5("Detailed Analytics", className="mb-3"),
-                                                    dcc.Loading(
-                                                        id="loading-stats-charts",
-                                                        children=[
-                                                            html.Div(id="stats-additional-charts")
-                                                        ],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
-                                                ],
-                                                className="mb-4",
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.H6(
+                                                "Countries with new user registrations",
+                                                className="mb-3",
                                             ),
-                                            html.Hr(),
-                                            # User geographic map
-                                            html.Div(
-                                                [
-                                                    html.H5(
-                                                        "User Geographic Distribution",
-                                                        className="mb-3",
-                                                    ),
-                                                    dcc.Loading(
-                                                        id="loading-stats-map",
-                                                        children=[html.Div(id="stats-user-map")],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
-                                                ],
-                                                className="mb-4",
+                                            dcc.Loading(
+                                                id="loading-stats-map",
+                                                children=[html.Div(id="stats-user-map")],
+                                                type="default",
+                                                color="#007bff",
                                             ),
-                                            html.Hr(),
-                                        ]
-                                    )
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                    html.Hr(),
                                 ]
                                 if is_admin_user
                                 else []

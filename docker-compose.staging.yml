@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  ui:
+    # ECR image resolved via DOCKER_REGISTRY environment variable
+    # Set by CodeDeploy scripts to: {account-id}.dkr.ecr.{region}.amazonaws.com
+    # Falls back to local registry (127.0.0.1:5000) for development
+    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/trendsearth-ui:staging
+    ports:
+      - "8001:8000"
+    environment:
+      - PORT=8000
+      - ENV=staging
+      - DEPLOYMENT_ENVIRONMENT=staging
+      - GIT_BRANCH=${GIT_BRANCH:-staging}
+      - GIT_COMMIT=${GIT_COMMIT_SHA:-unknown}
+      - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api-ui-health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        monitor: 60s
+        max_failure_ratio: 0.3
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: pause
+        monitor: 60s
+        max_failure_ratio: 0.3
+    networks:
+      - trendsearth-ui-staging-network
+
+networks:
+  trendsearth-ui-staging-network:
+    driver: overlay
+    attachable: true

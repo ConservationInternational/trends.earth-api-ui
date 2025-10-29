@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 from trendsearth_ui.utils.stats_utils import (
     fetch_execution_stats,
     fetch_user_stats,
@@ -14,24 +15,23 @@ from trendsearth_ui.utils.stats_utils import (
 class TestGetOptimalGroupingForPeriod:
     """Test the optimal grouping function for different time periods."""
 
-    def test_last_day_returns_hour_grouping(self):
-        """Test that last_day period returns appropriate grouping (fixed for API compatibility)."""
+    def test_last_day_returns_quarter_hour_grouping(self):
+        """Test that last_day period returns quarter-hour user grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_day")
-        # Fixed: user stats API doesn't accept "hour", only "day", "week", "month"
-        assert user_group == "day"  # Changed from "hour" to prevent API error
-        assert exec_group == "hour"  # Execution stats API still accepts "hour"
+        assert user_group == "quarter_hour"
+        assert exec_group == "hour"
 
-    def test_last_week_returns_day_grouping(self):
-        """Test that last_week period returns day grouping."""
+    def test_last_week_returns_hour_grouping(self):
+        """Test that last_week period returns hour grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_week")
+        assert user_group == "hour"
+        assert exec_group == "hour"
+
+    def test_last_month_returns_day_grouping(self):
+        """Test that last_month period returns day grouping."""
+        user_group, exec_group = get_optimal_grouping_for_period("last_month")
         assert user_group == "day"
         assert exec_group == "day"
-
-    def test_last_month_returns_week_grouping(self):
-        """Test that last_month period returns week grouping."""
-        user_group, exec_group = get_optimal_grouping_for_period("last_month")
-        assert user_group == "week"
-        assert exec_group == "week"
 
     def test_last_year_returns_month_grouping(self):
         """Test that last_year period returns month grouping."""
@@ -73,6 +73,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -90,6 +91,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["country"] == "Kenya"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"geographic_distribution": {}}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -111,6 +113,7 @@ class TestEnhancedUserStats:
         assert params["group_by"] == "week"
         assert params["country"] == "Kenya"
         assert params["period"] == "last_month"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     def test_fetch_user_stats_uses_enhanced_cache_key(self):
@@ -144,6 +147,7 @@ class TestEnhancedExecutionStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -165,6 +169,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "download"
         assert params["status"] == "FINISHED"
         assert params["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"task_performance": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -192,6 +197,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "analysis"
         assert params["status"] == "FAILED"
         assert params["period"] == "last_month"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     def test_fetch_execution_stats_uses_enhanced_cache_key(self):

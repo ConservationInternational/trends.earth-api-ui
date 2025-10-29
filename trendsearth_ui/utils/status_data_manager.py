@@ -8,6 +8,7 @@ from cachetools import TTLCache
 import requests
 
 from ..config import get_api_base
+from .http_client import apply_default_headers
 from .stats_utils import (
     fetch_dashboard_stats,
     fetch_execution_stats,
@@ -26,7 +27,9 @@ from .timezone_utils import get_safe_timezone
 logger = logging.getLogger(__name__)
 
 # Centralized cache for all status-related data
-_status_data_cache = TTLCache(maxsize=50, ttl=60)  # 1-minute TTL for status data
+_status_data_cache = TTLCache(
+    maxsize=50, ttl=55
+)  # Slightly under 1 minute to align with UI refresh cadence
 _stats_data_cache = TTLCache(maxsize=50, ttl=300)  # 5-minute TTL for stats data
 
 
@@ -112,9 +115,7 @@ class StatusDataManager:
         try:
             # Fetch deployment and swarm info (these are fast and can be done in parallel)
             result["deployment"] = fetch_deployment_info(api_environment, token)
-            swarm_info, swarm_cached_time = fetch_swarm_info(
-                api_environment, token, safe_timezone
-            )
+            swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token, safe_timezone)
             result["swarm"] = {
                 "info": swarm_info,
                 "cached_time": swarm_cached_time,
@@ -131,7 +132,7 @@ class StatusDataManager:
                 return result
 
             # Fetch latest status data with optimized parameters
-            headers = {"Authorization": f"Bearer {token}"}
+            headers = apply_default_headers({"Authorization": f"Bearer {token}"})
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
@@ -235,9 +236,7 @@ class StatusDataManager:
                     include_sections=["summary"],
                 )
 
-            summary_all_time = _extract_summary_from_stats(
-                result["dashboard_stats_all_time"]
-            )
+            summary_all_time = _extract_summary_from_stats(result["dashboard_stats_all_time"])
 
             result["total_executions_all_time"] = summary_all_time.get("total_executions")
             result["total_users_all_time"] = summary_all_time.get("total_users")
@@ -299,15 +298,14 @@ class StatusDataManager:
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
             target_points = 720  # Hourly resolution for 30 days
-            request_limit = 10000  # Ensure we retrieve the full month even with frequent updates
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
-            target_points = 1344  # ~8 points per hour for 7 days (covers 15-min updates)
-            request_limit = 4096
+            target_points = 336  # ~2 points per hour for 7 days
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
             target_points = 288  # ~1 point per 5 minutes for 24 hours
-            request_limit = 1024
+
+        request_limit = target_points
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -325,7 +323,7 @@ class StatusDataManager:
         }
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
+            headers = apply_default_headers({"Authorization": f"Bearer {token}"})
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,

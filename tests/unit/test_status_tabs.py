@@ -2,6 +2,7 @@
 Unit tests for the new status tab functionality including manual tab switching.
 """
 
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, Mock, patch
 
 from dash import dcc, html
@@ -312,6 +313,7 @@ class TestStatusTabsErrorHandling:
         register_callbacks(mock_app)
 
         tab_switch_func = callback_functions.get("switch_status_time_tabs_optimized")
+        assert tab_switch_func is not None, "Tab switching function should exist"
 
         # Test with no trigger
         mock_ctx.triggered = []
@@ -338,6 +340,7 @@ class TestStatusTabsErrorHandling:
         register_callbacks(mock_app)
 
         countdown_func = callback_functions.get("update_status_countdown_optimized")
+        assert countdown_func is not None, "Countdown function should exist"
 
         # Test when not on status tab
         result = countdown_func(30, 0, "executions")
@@ -424,6 +427,7 @@ class TestStatusTabsErrorHandling:
                             "total_api_calls": 1,
                             "cache_hit": False,
                             "optimizations_applied": [],
+                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
                         },
                     },
                 ),
@@ -441,7 +445,7 @@ class TestStatusTabsErrorHandling:
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
-                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
+                    result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
                 )
                 result_str = str(summary_result)
 
@@ -530,6 +534,7 @@ class TestStatusTabsErrorHandling:
                             "total_api_calls": 1,
                             "cache_hit": False,
                             "optimizations_applied": [],
+                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
                         },
                     },
                 ),
@@ -544,19 +549,19 @@ class TestStatusTabsErrorHandling:
 
                 # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
-                # We want to check the first output (summary)
-                summary_result = (
-                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
-                )
+                assert isinstance(result, (tuple, list))
+                status_title = result[0]
+                summary_result = result[1]
                 result_str = str(summary_result)
 
                 # Should contain total sections (labels have been simplified to just "Total")
                 assert "Div(children='Total'" in result_str
                 assert "Total Executions" in result_str
 
-                # Should contain last updated section
-                assert "Last Updated" in result_str
+                # Current status title should include the timestamp information
+                assert status_title.startswith("Current System Status")
+                assert status_title != "Current System Status"
+                assert "2023-01-01 12:30:00 UTC" in status_title
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):
@@ -656,7 +661,7 @@ class TestStatusTabsErrorHandling:
                 # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
                 # We want to check the first output (summary)
                 summary_result = (
-                    result[0] if isinstance(result, (tuple, list)) and len(result) > 0 else result
+                    result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
                 )
                 result_str = str(summary_result)
 

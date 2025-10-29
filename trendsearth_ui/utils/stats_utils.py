@@ -6,6 +6,7 @@ NOTE: Caching is handled by StatusDataManager. These functions are pure API fetc
 import requests
 
 from ..config import get_api_base
+from .http_client import apply_default_headers
 from .logging_config import get_logger, log_error
 
 
@@ -31,14 +32,14 @@ def get_optimal_grouping_for_period(period):
         tuple: (user_group_by, execution_group_by) optimal for the period
 
     Note:
-        User stats API accepts: day, week, month
+        User stats API accepts: quarter_hour, hour, day, week, month
         Execution stats API accepts: hour, day, week, month
         We use compatible values to prevent API errors.
     """
     mapping = {
-        "last_day": ("day", "hour"),  # Fixed: user stats API doesn't accept "hour"
-        "last_week": ("day", "hour"),
-        "last_month": ("week", "day"),
+        "last_day": ("quarter_hour", "hour"),
+        "last_week": ("hour", "hour"),
+        "last_month": ("day", "day"),
         "last_year": ("month", "month"),
     }
     return mapping.get(period, ("month", "month"))
@@ -75,7 +76,7 @@ def fetch_dashboard_stats(
         logger.warning("Dashboard stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     if include_sections:
@@ -143,7 +144,7 @@ def fetch_scripts_count(token, api_environment="production"):
         logger.warning("Scripts count: No token provided")
         return 0
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     # Use pagination to get the total count without downloading all script data
     params = {"page": 1, "per_page": 1}  # Minimal data transfer
 
@@ -196,7 +197,7 @@ def fetch_user_stats(
         logger.warning("User stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     # Add optional parameters if provided
@@ -277,7 +278,7 @@ def fetch_execution_stats(
         logger.warning("Execution stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     # Add optional parameters if provided

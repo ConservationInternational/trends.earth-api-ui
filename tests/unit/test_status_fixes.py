@@ -162,8 +162,6 @@ class TestSwarmInfoFixes:
         result, status = fetch_swarm_info("production", "test_token")
 
         result_str = str(result)
-        # Check for Docker Swarm table title
-        assert "Docker Swarm Nodes" in result_str
         # Check for table headers
         assert "Hostname" in result_str
         assert "Role" in result_str

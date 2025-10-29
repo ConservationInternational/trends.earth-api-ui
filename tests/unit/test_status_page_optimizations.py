@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
+from dash import html
 import pytest
 
 from trendsearth_ui.utils.status_data_manager import StatusDataManager
@@ -452,27 +453,28 @@ class TestOptimizedStatusCallbacks:
         # Mock timezone
         safe_timezone = "UTC"
 
-        result = _build_status_summary(status_data, safe_timezone)
+        summary_component, last_updated = _build_status_summary(status_data, safe_timezone)
 
         # Should return a valid Dash component
-        assert hasattr(result, "_namespace")  # Basic check for Dash component
+        assert hasattr(summary_component, "_namespace")  # Basic check for Dash component
+        assert last_updated is not None
 
     def test_status_summary_handles_missing_data_gracefully(self):
         """Test that status summary handles missing or invalid data gracefully."""
         from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Test with None data
-        result1 = _build_status_summary(None, "UTC")
-        assert result1 is not None
+        summary1, _ = _build_status_summary(None, "UTC")
+        assert summary1 is not None
 
         # Test with empty data
-        result2 = _build_status_summary({}, "UTC")
-        assert result2 is not None
+        summary2, _ = _build_status_summary({}, "UTC")
+        assert summary2 is not None
 
         # Test with error status
         status_data = {"summary": "ERROR", "error": "API Error"}
-        result3 = _build_status_summary(status_data, "UTC")
-        assert result3 is not None
+        summary3, _ = _build_status_summary(status_data, "UTC")
+        assert summary3 is not None
 
     def test_stats_components_building_for_superadmin(self):
         """Test stats components building for SUPERADMIN users."""
@@ -489,7 +491,6 @@ class TestOptimizedStatusCallbacks:
         status_data = {"latest_status": {"executions_count": 100}}
 
         with (
-            patch("trendsearth_ui.callbacks.status.create_system_overview") as mock_overview,
             patch("trendsearth_ui.callbacks.status.create_user_geographic_map") as mock_map,
             patch(
                 "trendsearth_ui.callbacks.status.create_user_statistics_chart"
@@ -498,23 +499,20 @@ class TestOptimizedStatusCallbacks:
                 "trendsearth_ui.callbacks.status.create_execution_statistics_chart"
             ) as mock_exec_chart,
         ):
-            mock_overview.return_value = "overview"
             mock_map.return_value = "map"
             mock_user_chart.return_value = ["user_chart"]
             mock_exec_chart.return_value = ["exec_chart"]
 
             time_series_data = []
-            system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
+            stats_cards, user_map, additional_charts = _build_stats_components(
                 stats_data, status_data, time_series_data, "UTC"
             )
 
             # Verify components were created
-            assert system_overview == "overview"
+            assert isinstance(stats_cards, html.Div)
             assert user_map == "map"
             assert len(additional_charts) == 2  # user + exec charts
 
             # Verify scripts count was added
-            mock_overview.assert_called_once()
-            call_args = mock_overview.call_args[0]
-            latest_status = call_args[1]
+            latest_status = status_data["latest_status"]
             assert latest_status["scripts_count"] == 50
