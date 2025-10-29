@@ -112,9 +112,7 @@ class StatusDataManager:
         try:
             # Fetch deployment and swarm info (these are fast and can be done in parallel)
             result["deployment"] = fetch_deployment_info(api_environment, token)
-            swarm_info, swarm_cached_time = fetch_swarm_info(
-                api_environment, token, safe_timezone
-            )
+            swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token, safe_timezone)
             result["swarm"] = {
                 "info": swarm_info,
                 "cached_time": swarm_cached_time,
@@ -235,9 +233,7 @@ class StatusDataManager:
                     include_sections=["summary"],
                 )
 
-            summary_all_time = _extract_summary_from_stats(
-                result["dashboard_stats_all_time"]
-            )
+            summary_all_time = _extract_summary_from_stats(result["dashboard_stats_all_time"])
 
             result["total_executions_all_time"] = summary_all_time.get("total_executions")
             result["total_users_all_time"] = summary_all_time.get("total_users")

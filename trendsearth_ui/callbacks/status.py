@@ -112,10 +112,10 @@ def register_callbacks(app):
         api_environment,
     ):
         """
-        Update time-independent status components (not affected by time period selection).
+            Update time-independent status components (not affected by time period selection).
 
-    This includes: status summary, deployment info, and swarm info.
-        These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
+        This includes: status summary, deployment info, and swarm info.
+            These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
         """
         # Guard: Skip if not logged in
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
