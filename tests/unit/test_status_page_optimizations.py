@@ -503,8 +503,9 @@ class TestOptimizedStatusCallbacks:
             mock_user_chart.return_value = ["user_chart"]
             mock_exec_chart.return_value = ["exec_chart"]
 
+            time_series_data = []
             system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
-                stats_data, status_data
+                stats_data, status_data, time_series_data, "UTC"
             )
 
             # Verify components were created

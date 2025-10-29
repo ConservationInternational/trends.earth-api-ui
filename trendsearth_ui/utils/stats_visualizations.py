@@ -302,6 +302,7 @@ def create_execution_statistics_chart(
     execution_stats_data,
     status_time_series_data=None,
     title_suffix="",
+    user_timezone="UTC",
 ):
     """
     Create execution statistics charts showing trends and distribution.
@@ -310,11 +311,14 @@ def create_execution_statistics_chart(
     execution_stats_data: Execution statistics data from the API or error response structure
     status_time_series_data: Optional status time series data providing instantaneous counts
         title_suffix: Additional text for the chart title
+        user_timezone: User's timezone (IANA timezone name)
 
     Returns:
         list: List of chart components
     """
     import logging
+
+    from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
 
     logger = logging.getLogger(__name__)
 
@@ -438,8 +442,39 @@ def create_execution_statistics_chart(
             df = pd.DataFrame(flattened_data)
 
             if not df.empty and "date" in df.columns:
+                # Log original data for debugging
+                logger.info(f"Original data points before processing: {len(df)}")
+                if len(df) > 0:
+                    logger.info(
+                        f"Date range before conversion: {df['date'].min()} to {df['date'].max()}"
+                    )
+
                 df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+                # Log after datetime conversion
+                before_dropna = len(df)
                 df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
+                after_dropna = len(df)
+
+                if before_dropna != after_dropna:
+                    logger.warning(
+                        f"Dropped {before_dropna - after_dropna} rows with invalid dates"
+                    )
+
+                if len(df) > 0:
+                    logger.info(
+                        f"Date range after datetime conversion: {df['date'].min()} to {df['date'].max()}"
+                    )
+
+                # Convert timestamps to local timezone
+                df["date"] = convert_timestamp_series_to_local(df["date"], user_timezone)
+
+                # Log after timezone conversion
+                if len(df) > 0:
+                    logger.info(
+                        f"Date range after timezone conversion to {user_timezone}: {df['date'].min()} to {df['date'].max()}"
+                    )
+                    logger.info(f"Final data points: {len(df)}")
 
                 status_columns = [col for col in df.columns if col != "date"]
                 completed_columns = [
@@ -470,15 +505,15 @@ def create_execution_statistics_chart(
                                 line={"color": _color_for(column), "width": 3},
                                 line_shape="hv",
                                 hovertemplate=(
-                                    f"<b>{_display_name(column)}</b><br>%{{x}}"
-                                    "<br>Cumulative Count: %{{y}}<extra></extra>"
+                                    "<b>" + _display_name(column) + "</b><br>%{x}"
+                                    "<br>Cumulative Count: %{y}<extra></extra>"
                                 ),
                             )
                         )
 
                     fig_completed.update_layout(
                         title=f"Execution Outcomes (Cumulative){title_suffix}",
-                        xaxis_title="Time Period",
+                        xaxis_title=get_chart_axis_label(user_timezone),
                         yaxis_title="Cumulative Executions",
                         height=360,
                         hovermode="x unified",
@@ -491,6 +526,11 @@ def create_execution_statistics_chart(
                         },
                         margin={"l": 40, "r": 40, "t": 60, "b": 40},
                         template="plotly_white",
+                        xaxis={
+                            "showgrid": True,
+                            "type": "date",
+                        },  # Ensure proper date axis handling
+                        yaxis={"showgrid": True},
                     )
 
                     execution_charts.append(
@@ -532,12 +572,45 @@ def create_execution_statistics_chart(
             status_df = pd.DataFrame(status_series)
 
             if not status_df.empty and "timestamp" in status_df.columns:
+                # Log original data for debugging
+                logger.info(f"Status time series original data points: {len(status_df)}")
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range before conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+
                 status_df["timestamp"] = pd.to_datetime(status_df["timestamp"], errors="coerce")
+
+                # Log after datetime conversion
+                before_dropna = len(status_df)
                 status_df = (
                     status_df.dropna(subset=["timestamp"])
                     .sort_values("timestamp")
                     .reset_index(drop=True)
                 )
+                after_dropna = len(status_df)
+
+                if before_dropna != after_dropna:
+                    logger.warning(
+                        f"Status time series: Dropped {before_dropna - after_dropna} rows with invalid timestamps"
+                    )
+
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range after datetime conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+
+                # Convert timestamps to local timezone
+                status_df["timestamp"] = convert_timestamp_series_to_local(
+                    status_df["timestamp"], user_timezone
+                )
+
+                # Log after timezone conversion
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range after timezone conversion to {user_timezone}: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+                    logger.info(f"Status final data points: {len(status_df)}")
 
                 in_process_columns = [
                     column
@@ -566,14 +639,16 @@ def create_execution_statistics_chart(
                                 },
                                 line_shape="hv",
                                 hovertemplate=(
-                                    f"<b>{status_name}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>"
+                                    "<b>"
+                                    + status_name
+                                    + "</b><br>%{x}<br>Count: %{y}<extra></extra>"
                                 ),
                             )
                         )
 
                     fig_in_process.update_layout(
                         title=f"Execution States In Progress{title_suffix}",
-                        xaxis_title="Time Period",
+                        xaxis_title=get_chart_axis_label(user_timezone),
                         yaxis_title="Number of Executions",
                         height=360,
                         hovermode="x unified",
@@ -586,6 +661,11 @@ def create_execution_statistics_chart(
                         },
                         margin={"l": 40, "r": 40, "t": 60, "b": 40},
                         template="plotly_white",
+                        xaxis={
+                            "showgrid": True,
+                            "type": "date",
+                        },  # Ensure proper date axis handling
+                        yaxis={"showgrid": True},
                     )
 
                     execution_charts.append(
@@ -859,17 +939,20 @@ def create_execution_statistics_chart(
         ]
 
 
-def create_user_statistics_chart(user_stats_data, title_suffix=""):
+def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone="UTC"):
     """
     Create user statistics charts showing registration trends.
 
     Args:
         user_stats_data: User statistics data from the API or error response structure
         title_suffix: Additional text for the chart title
+        user_timezone: User's timezone (IANA timezone name)
 
     Returns:
         list: List of chart components
     """
+    from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
+
     try:
         # Handle error response structure
         if not user_stats_data:
@@ -953,6 +1036,10 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
             df = pd.DataFrame(chart_data)
 
             if not df.empty and "date" in df.columns:
+                # Convert date column to pandas datetime and then to local timezone
+                df["date"] = pd.to_datetime(df["date"], errors="coerce")
+                df = df.dropna(subset=["date"])
+                df["date"] = convert_timestamp_series_to_local(df["date"], user_timezone)
                 fig_users = go.Figure()
 
                 # Enhanced styling and multiple metrics
@@ -992,13 +1079,15 @@ def create_user_statistics_chart(user_stats_data, title_suffix=""):
                                 marker={"size": 6},
                                 fill=metric.get("fill"),
                                 yaxis=metric.get("yaxis", "y"),
-                                hovertemplate=f"<b>{metric['name']}</b><br>Date: %{{x}}<br>Count: %{{y}}<extra></extra>",
+                                hovertemplate="<b>"
+                                + metric["name"]
+                                + "</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
                             )
                         )
 
                 fig_users.update_layout(
                     title=f"{chart_title_prefix}{title_suffix}",
-                    xaxis_title="Time Period",
+                    xaxis_title=get_chart_axis_label(user_timezone),
                     yaxis_title="User Count",
                     yaxis2={
                         "title": "Total Users",
