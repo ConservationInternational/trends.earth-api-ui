@@ -21,12 +21,30 @@ from .status_helpers import (
     get_fallback_summary,
     is_status_endpoint_available,
 )
+from .timezone_utils import get_safe_timezone
 
 logger = logging.getLogger(__name__)
 
 # Centralized cache for all status-related data
 _status_data_cache = TTLCache(maxsize=50, ttl=60)  # 1-minute TTL for status data
 _stats_data_cache = TTLCache(maxsize=50, ttl=300)  # 5-minute TTL for stats data
+
+
+def _extract_summary_from_stats(stats_payload: Any) -> dict[str, Any]:
+    """Safely extract the summary dictionary from a dashboard stats payload."""
+
+    if not stats_payload or getattr(stats_payload, "get", None) is None:
+        return {}
+
+    if stats_payload.get("error"):
+        return {}
+
+    data_section = stats_payload.get("data", {})
+    if not isinstance(data_section, dict):
+        return {}
+
+    summary = data_section.get("summary", {})
+    return summary if isinstance(summary, dict) else {}
 
 
 class StatusDataManager:
@@ -58,6 +76,7 @@ class StatusDataManager:
         token: str,
         api_environment: str,
         force_refresh: bool = False,
+        user_timezone: Optional[str] = None,
     ) -> dict[str, Any]:
         """
         Fetch all status-related data in one consolidated call.
@@ -65,8 +84,10 @@ class StatusDataManager:
         Returns:
             dict: Contains summary, deployment, swarm, and basic stats data
         """
+        safe_timezone = get_safe_timezone(user_timezone)
+
         cache_key = StatusDataManager.get_cache_key(
-            "consolidated_status", api_environment=api_environment
+            "consolidated_status", api_environment=api_environment, timezone=safe_timezone
         )
 
         # Check cache first unless forced refresh
@@ -91,7 +112,13 @@ class StatusDataManager:
         try:
             # Fetch deployment and swarm info (these are fast and can be done in parallel)
             result["deployment"] = fetch_deployment_info(api_environment, token)
-            result["swarm"], swarm_cached_time = fetch_swarm_info(api_environment, token)
+            swarm_info, swarm_cached_time = fetch_swarm_info(
+                api_environment, token, safe_timezone
+            )
+            result["swarm"] = {
+                "info": swarm_info,
+                "cached_time": swarm_cached_time,
+            }
 
             # Check if status endpoint is available
             result["status_endpoint_available"] = is_status_endpoint_available(
@@ -173,11 +200,15 @@ class StatusDataManager:
         # Initialize result structure
         result = {
             "dashboard_stats": None,
+            "dashboard_stats_all_time": None,
             "user_stats": None,
             "execution_stats": None,
             "scripts_count": 0,
             "api_period": api_period,
             "error": None,
+            "total_executions_all_time": None,
+            "total_users_all_time": None,
+            "total_scripts_all_time": None,
         }
 
         try:
@@ -186,12 +217,32 @@ class StatusDataManager:
 
             # Fetch all stats data with comprehensive sections
             # (Note: These calls have their own caching, so we benefit from both levels)
-            result["dashboard_stats"] = fetch_dashboard_stats(
+            period_stats = fetch_dashboard_stats(
                 token,
                 api_environment,
                 api_period,
                 include_sections=None,  # Fetch all available sections for comprehensive stats
             )
+            result["dashboard_stats"] = period_stats
+
+            if api_period == "all":
+                result["dashboard_stats_all_time"] = period_stats
+            else:
+                result["dashboard_stats_all_time"] = fetch_dashboard_stats(
+                    token,
+                    api_environment,
+                    "all",
+                    include_sections=["summary"],
+                )
+
+            summary_all_time = _extract_summary_from_stats(
+                result["dashboard_stats_all_time"]
+            )
+
+            result["total_executions_all_time"] = summary_all_time.get("total_executions")
+            result["total_users_all_time"] = summary_all_time.get("total_users")
+            # Prefer scripts count from summary if available; will fall back to scripts API below
+            result["total_scripts_all_time"] = summary_all_time.get("total_scripts")
 
             result["user_stats"] = fetch_user_stats(
                 token, api_environment, api_period, group_by=user_group_by
@@ -202,6 +253,8 @@ class StatusDataManager:
             )
 
             result["scripts_count"] = fetch_scripts_count(token, api_environment)
+            if result["total_scripts_all_time"] is None:
+                result["total_scripts_all_time"] = result["scripts_count"]
 
             logger.info(f"Successfully fetched consolidated stats data for period {api_period}")
 
@@ -386,7 +439,7 @@ class StatusDataManager:
         return StatusDataManager._systematic_sample(data, target_points)
 
     @staticmethod
-    def invalidate_cache(pattern: str = None) -> int:
+    def invalidate_cache(pattern: Optional[str] = None) -> int:
         """
         Invalidate cached data.
 
@@ -418,6 +471,7 @@ class StatusDataManager:
         time_period: str = "day",
         role: str = "USER",
         force_refresh: bool = False,
+        user_timezone: str = "UTC",
     ) -> dict[str, Any]:
         """
         Fetch all data needed for the status page in optimized consolidated calls.
@@ -441,11 +495,14 @@ class StatusDataManager:
                 - time_series_data: Chart data
                 - meta: Performance metadata
         """
+        safe_timezone = get_safe_timezone(user_timezone)
+
         cache_key = StatusDataManager.get_cache_key(
             "comprehensive_status",
             api_environment=api_environment,
             time_period=time_period,
             role=role,
+            timezone=safe_timezone,
         )
 
         # Check cache first unless forced refresh
@@ -479,18 +536,41 @@ class StatusDataManager:
         try:
             # 1. Fetch core status data (always needed)
             status_result = StatusDataManager.fetch_consolidated_status_data(
-                token, api_environment, force_refresh=force_refresh
+                token,
+                api_environment,
+                force_refresh=force_refresh,
+                user_timezone=safe_timezone,
             )
             result["status_data"] = status_result
             result["meta"]["api_calls_made"].append("consolidated_status")
 
-            # 2. Fetch deployment and swarm info (lightweight)
-            result["deployment_data"] = fetch_deployment_info(api_environment, token)
-            result["meta"]["api_calls_made"].append("deployment_info")
+            # 2. Reuse deployment and swarm info gathered with consolidated status fetch
+            deployment_from_status = status_result.get("deployment")
+            if deployment_from_status is not None:
+                result["deployment_data"] = deployment_from_status
+                result["meta"]["optimizations_applied"].append("deployment_reused")
+            else:
+                result["deployment_data"] = fetch_deployment_info(api_environment, token)
+                result["meta"]["api_calls_made"].append("deployment_info")
 
-            swarm_info, swarm_time = fetch_swarm_info(api_environment, token)
-            result["swarm_data"] = {"info": swarm_info, "cached_time": swarm_time}
-            result["meta"]["api_calls_made"].append("swarm_info")
+            swarm_from_status = status_result.get("swarm") or {}
+            swarm_info = swarm_from_status.get("info")
+            swarm_time = swarm_from_status.get("cached_time")
+
+            if swarm_info is not None:
+                result["swarm_data"] = {"info": swarm_info, "cached_time": swarm_time or ""}
+                result["meta"]["optimizations_applied"].append("swarm_reused")
+            else:
+                fetched_swarm_info, fetched_swarm_time = fetch_swarm_info(
+                    api_environment,
+                    token,
+                    user_timezone=safe_timezone,
+                )
+                result["swarm_data"] = {
+                    "info": fetched_swarm_info,
+                    "cached_time": fetched_swarm_time,
+                }
+                result["meta"]["api_calls_made"].append("swarm_info")
 
             # 3. Fetch stats data (only for SUPERADMIN)
             if role == "SUPERADMIN":
@@ -500,6 +580,31 @@ class StatusDataManager:
                 result["stats_data"] = stats_result
                 result["meta"]["api_calls_made"].append("consolidated_stats")
                 result["meta"]["optimizations_applied"].append("superadmin_stats_consolidated")
+
+                if stats_result and not stats_result.get("error"):
+                    summary_all_time = _extract_summary_from_stats(
+                        stats_result.get("dashboard_stats_all_time")
+                        or stats_result.get("dashboard_stats")
+                    )
+
+                    latest_status = result.get("status_data", {}).get("latest_status")
+                    if latest_status is not None:
+                        if summary_all_time:
+                            total_users = summary_all_time.get("total_users")
+                            if total_users is not None:
+                                latest_status["users_count"] = total_users
+
+                            total_executions = summary_all_time.get("total_executions")
+                            if total_executions is not None:
+                                latest_status["executions_count"] = total_executions
+
+                            total_scripts = summary_all_time.get("total_scripts")
+                            if total_scripts is not None:
+                                latest_status["scripts_count"] = total_scripts
+
+                        if stats_result.get("scripts_count") is not None:
+                            latest_status["scripts_count"] = stats_result["scripts_count"]
+
             else:
                 result["meta"]["optimizations_applied"].append("stats_skipped_for_non_superadmin")
 

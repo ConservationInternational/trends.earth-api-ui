@@ -8,7 +8,6 @@ from dash import Input, Output, State, callback_context, dcc, html, no_update
 
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
-    create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
@@ -27,11 +26,64 @@ logger = logging.getLogger(__name__)
 _request_cache = TTLCache(maxsize=20, ttl=30)  # 30-second TTL for request-level sharing
 
 
+def _build_request_cache_key(
+    token: str,
+    api_environment: str,
+    time_period: str,
+    role: str,
+    safe_timezone: str,
+) -> tuple:
+    """Create a request-level cache key for comprehensive status data."""
+
+    return (
+        token or "",
+        api_environment or "",
+        time_period or "",
+        role or "",
+        safe_timezone or "",
+    )
+
+
+def _fetch_comprehensive_data_with_cache(
+    *,
+    token: str,
+    api_environment: str,
+    time_period: str,
+    role: str,
+    safe_timezone: str,
+    force_refresh: bool,
+):
+    """Fetch comprehensive status data with an additional request-level cache layer."""
+
+    cache_key = _build_request_cache_key(token, api_environment, time_period, role, safe_timezone)
+
+    if not force_refresh:
+        cached_result = _request_cache.get(cache_key)
+        if cached_result is not None:
+            cached_result.setdefault("meta", {})["request_cache_hit"] = True
+            return cached_result
+
+    comprehensive_data = StatusDataManager.fetch_comprehensive_status_page_data(
+        token=token,
+        api_environment=api_environment,
+        time_period=time_period,
+        role=role,
+        force_refresh=force_refresh,
+        user_timezone=safe_timezone,
+    )
+
+    if not comprehensive_data.get("error"):
+        _request_cache[cache_key] = comprehensive_data
+
+    return comprehensive_data
+
+
 def register_callbacks(app):
     """Register optimized status dashboard callbacks with reduced API calls."""
 
     @app.callback(
         [
+            Output("current-system-status-title", "children"),
             Output("status-summary", "children"),
             Output("deployment-info-summary", "children"),
             Output("swarm-info-summary", "children"),
@@ -62,16 +114,16 @@ def register_callbacks(app):
         """
         Update time-independent status components (not affected by time period selection).
 
-        This includes: status summary, deployment info, swarm info, and system overview.
+    This includes: status summary, deployment info, and swarm info.
         These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
         """
         # Guard: Skip if not logged in
         if not token or role not in ["ADMIN", "SUPERADMIN"]:
-            return (no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update, no_update)
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update, no_update)
 
         # Get safe timezone
         safe_timezone = get_safe_timezone(user_timezone)
@@ -85,14 +137,17 @@ def register_callbacks(app):
         # If manual refresh, invalidate status cache
         if is_manual_refresh:
             StatusDataManager.invalidate_cache("status")
+            _request_cache.clear()
+            _request_cache.clear()
 
         try:
             # Fetch time-independent data (use default "day" period for any stats needed)
-            comprehensive_data = StatusDataManager.fetch_comprehensive_status_page_data(
+            comprehensive_data = _fetch_comprehensive_data_with_cache(
                 token=token,
                 api_environment=api_environment,
                 time_period="day",  # Default period, not used for time-independent data
                 role=role,
+                safe_timezone=safe_timezone,
                 force_refresh=is_manual_refresh,
             )
 
@@ -109,7 +164,13 @@ def register_callbacks(app):
             deployment_data = comprehensive_data.get("deployment_data")
             swarm_data = comprehensive_data.get("swarm_data", {})
             # 1. Build status summary
-            status_summary = _build_status_summary(status_data, safe_timezone)
+            status_summary, last_updated_label = _build_status_summary(status_data, safe_timezone)
+
+            current_status_title = (
+                f"Current System Status ({last_updated_label})"
+                if last_updated_label
+                else "Current System Status"
+            )
 
             # 2. Deployment info is already formatted
             deployment_info = deployment_data
@@ -121,6 +182,7 @@ def register_callbacks(app):
                 f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
             )
             return (
+                current_status_title,
                 status_summary,
                 deployment_info,
                 swarm_info,
@@ -133,6 +195,7 @@ def register_callbacks(app):
                 f"Error loading status data: {e}", className="text-center text-danger"
             )
             return (
+                "Current System Status",
                 error_msg,
                 error_msg,
                 error_msg,
@@ -141,7 +204,6 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("system-overview-content", "children"),
             Output("stats-summary-cards", "children"),
             Output("stats-user-map", "children"),
             Output("stats-additional-charts", "children"),
@@ -188,11 +250,11 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return (permission_msg, html.Div(), permission_msg, [permission_msg])
+            return (permission_msg, permission_msg, [permission_msg])
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update)
 
         # Check if this is a manual refresh
         ctx = callback_context
@@ -203,6 +265,9 @@ def register_callbacks(app):
         # If manual refresh, invalidate status cache
         if is_manual_refresh:
             StatusDataManager.invalidate_cache("status")
+            _request_cache.clear()
+
+        safe_timezone = get_safe_timezone(user_timezone)
 
         # Set default time period if not provided
         if not time_period:
@@ -210,14 +275,14 @@ def register_callbacks(app):
 
         try:
             # Fetch time-dependent stats data
-            comprehensive_data = StatusDataManager.fetch_comprehensive_status_page_data(
+            comprehensive_data = _fetch_comprehensive_data_with_cache(
                 token=token,
                 api_environment=api_environment,
                 time_period=time_period,
                 role=role,
+                safe_timezone=safe_timezone,
                 force_refresh=is_manual_refresh,
             )
-
             # Log performance metrics
             meta = comprehensive_data.get("meta", {})
             logger.info(
@@ -232,7 +297,7 @@ def register_callbacks(app):
 
             # Build time-dependent stats components
             if not stats_data.get("error"):
-                system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
+                stats_cards, user_map, additional_charts = _build_stats_components(
                     stats_data,
                     status_data,
                     comprehensive_data.get("time_series_data"),
@@ -249,32 +314,67 @@ def register_callbacks(app):
                     ],
                     className="p-4",
                 )
-                system_overview = error_msg
                 stats_cards = html.Div()
                 user_map = error_msg
                 additional_charts = [error_msg]
 
-            return (system_overview, stats_cards, user_map, additional_charts)
+            return (stats_cards, user_map, additional_charts)
 
         except Exception as e:
             logger.error(f"Error in time-dependent stats update: {e}")
             error_msg = html.Div(
                 f"Error loading statistics: {e}", className="text-center text-danger"
             )
-            return (html.Div(), html.Div(), error_msg, [error_msg])
+            return (html.Div(), error_msg, [error_msg])
 
     # Register additional status callbacks
     _register_additional_status_callbacks(app)
 
 
+def _format_count(value):
+    """Format numeric values with thousands separators."""
+
+    try:
+        return f"{int(value):,}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _summary_card_column(label, value):
+    """Build a column containing a summary card."""
+
+    return html.Div(
+        html.Div(
+            [
+                html.Div(label, className="text-muted small mb-1"),
+                html.Div(_format_count(value), className="h3 mb-0 fw-bold"),
+            ],
+            className="p-3 bg-light rounded text-center h-100",
+        ),
+        className="col-md-4 col-sm-12",
+    )
+
+
+def _metric_column(label, value, *, value_class="h5 mb-0", container_class="col text-center"):
+    """Build a metric column with consistent styling."""
+
+    return html.Div(
+        [
+            html.Div(label, className="text-muted small mb-1"),
+            html.Div(_format_count(value), className=value_class),
+        ],
+        className=container_class,
+    )
+
+
 def _build_status_summary(status_data, safe_timezone):
     """Build the status summary component from status data."""
     if not status_data or status_data.get("summary") != "SUCCESS":
-        return get_fallback_summary()
+        return get_fallback_summary(), None
 
     latest_status = status_data.get("latest_status", {})
     if not latest_status:
-        return html.Div("No status data available.", className="text-center text-muted")
+        return html.Div("No status data available.", className="text-center text-muted"), None
 
     # Extract execution counts
     executions_ready = latest_status.get("executions_ready", 0)
@@ -292,72 +392,52 @@ def _build_status_summary(status_data, safe_timezone):
     users_count = latest_status.get("users_count", 0)
     scripts_count = latest_status.get("scripts_count", 0)
 
-    # Format timestamp
+    # Format timestamp (local time only)
     timestamp = latest_status.get("timestamp", "")
+    last_updated_label = None
     try:
         if timestamp:
             dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-            utc_time_str = dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC")
             local_time_str, tz_abbrev = format_local_time(
                 dt_utc, safe_timezone, include_seconds=True
             )
-            timestamp_display = html.Div(
-                [
-                    html.Div(
-                        f"{local_time_str} {tz_abbrev}",
-                        className="fw-bold",
-                    ),
-                    html.Div(f"({utc_time_str})", className="text-muted small"),
-                ]
-            )
-        else:
-            timestamp_display = "Not available"
+            last_updated_label = f"{local_time_str} {tz_abbrev}".strip()
     except (ValueError, TypeError):
-        timestamp_display = "Invalid timestamp format"
+        last_updated_label = None
 
     # Build the summary layout organized by category
-    return html.Div(
+    summary_component = html.Div(
         [
-            # === EXECUTIONS SECTION ===
+            # === SUMMARY SECTION ===
+            html.Div(
+                [
+                    html.H5("Summary - all time", className="mb-3 border-bottom pb-2"),
+                    html.Div(
+                        [
+                            _summary_card_column("Total Executions", total_executions),
+                            _summary_card_column("Total Users", users_count),
+                            _summary_card_column("Total Scripts", scripts_count),
+                        ],
+                        className="row g-3",
+                    ),
+                ],
+                className="mb-4",
+            ),
             html.Div(
                 [
                     html.H5("Executions", className="mb-3 border-bottom pb-2"),
-                    # Active executions
                     html.Div(
                         [
                             html.H6("Active", className="text-muted mb-2"),
                             html.Div(
                                 [
-                                    html.Div(
-                                        [
-                                            html.Div("Running", className="text-muted small mb-1"),
-                                            html.Div(str(executions_running), className="h5 mb-0"),
-                                        ],
-                                        className="col text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.Div("Ready", className="text-muted small mb-1"),
-                                            html.Div(str(executions_ready), className="h5 mb-0"),
-                                        ],
-                                        className="col text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.Div("Pending", className="text-muted small mb-1"),
-                                            html.Div(str(executions_pending), className="h5 mb-0"),
-                                        ],
-                                        className="col text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.Div("Total", className="text-muted small mb-1"),
-                                            html.Div(
-                                                str(active_total),
-                                                className="h4 mb-0 fw-bold text-success",
-                                            ),
-                                        ],
-                                        className="col text-center",
+                                    _metric_column("Running", executions_running),
+                                    _metric_column("Ready", executions_ready),
+                                    _metric_column("Pending", executions_pending),
+                                    _metric_column(
+                                        "Total",
+                                        active_total,
+                                        value_class="h4 mb-0 fw-bold text-success",
                                     ),
                                 ],
                                 className="row mb-3",
@@ -365,48 +445,22 @@ def _build_status_summary(status_data, safe_timezone):
                         ],
                         className="mb-3",
                     ),
-                    # Completed executions
                     html.Div(
                         [
                             html.H6("Completed", className="text-muted mb-2"),
                             html.Div(
                                 [
-                                    html.Div(
-                                        [
-                                            html.Div("Finished", className="text-muted small mb-1"),
-                                            html.Div(str(executions_finished), className="h5 mb-0"),
-                                        ],
-                                        className="col text-center",
+                                    _metric_column("Finished", executions_finished),
+                                    _metric_column(
+                                        "Failed",
+                                        executions_failed,
+                                        value_class="h5 mb-0 text-danger",
                                     ),
-                                    html.Div(
-                                        [
-                                            html.Div("Failed", className="text-muted small mb-1"),
-                                            html.Div(
-                                                str(executions_failed),
-                                                className="h5 mb-0 text-danger",
-                                            ),
-                                        ],
-                                        className="col text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.Div(
-                                                "Cancelled", className="text-muted small mb-1"
-                                            ),
-                                            html.Div(
-                                                str(executions_cancelled), className="h5 mb-0"
-                                            ),
-                                        ],
-                                        className="col text-center",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.Div("Total", className="text-muted small mb-1"),
-                                            html.Div(
-                                                str(completed_total), className="h4 mb-0 fw-bold"
-                                            ),
-                                        ],
-                                        className="col text-center",
+                                    _metric_column("Cancelled", executions_cancelled),
+                                    _metric_column(
+                                        "Total",
+                                        completed_total,
+                                        value_class="h4 mb-0 fw-bold",
                                     ),
                                 ],
                                 className="row mb-3",
@@ -414,79 +468,17 @@ def _build_status_summary(status_data, safe_timezone):
                         ],
                         className="mb-3",
                     ),
-                    # Total executions
-                    html.Div(
-                        [
-                            html.Div(
-                                [
-                                    html.Div("Total Executions", className="text-muted small mb-1"),
-                                    html.Div(str(total_executions), className="h3 mb-0 fw-bold"),
-                                ],
-                                className="text-center",
-                            ),
-                        ],
-                        className="mb-4 p-3 bg-light rounded",
-                    ),
                 ],
                 className="mb-4",
-            ),
-            # === USERS SECTION ===
-            html.Div(
-                [
-                    html.H5("Users", className="mb-3 border-bottom pb-2"),
-                    html.Div(
-                        [
-                            html.Div(
-                                [
-                                    html.Div("Total Users", className="text-muted small mb-1"),
-                                    html.Div(str(users_count), className="h3 mb-0 fw-bold"),
-                                ],
-                                className="text-center",
-                            ),
-                        ],
-                        className="mb-4 p-3 bg-light rounded",
-                    ),
-                ],
-                className="mb-4",
-            ),
-            # === SCRIPTS SECTION ===
-            html.Div(
-                [
-                    html.H5("Scripts", className="mb-3 border-bottom pb-2"),
-                    html.Div(
-                        [
-                            html.Div(
-                                [
-                                    html.Div("Total Scripts", className="text-muted small mb-1"),
-                                    html.Div(str(scripts_count), className="h3 mb-0 fw-bold"),
-                                ],
-                                className="text-center",
-                            ),
-                        ],
-                        className="mb-4 p-3 bg-light rounded",
-                    ),
-                ],
-                className="mb-4",
-            ),
-            # === LAST UPDATED ===
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.Div("Last Updated", className="text-muted small mb-1 text-center"),
-                            html.Div(timestamp_display, className="text-center"),
-                        ],
-                    ),
-                ],
-                className="border-top pt-3",
             ),
         ]
     )
 
+    return summary_component, last_updated_label
+
 
 def _build_stats_components(stats_data, status_data, time_series_data, user_timezone="UTC"):
     """Build the enhanced statistics components."""
-    dashboard_stats = stats_data.get("dashboard_stats")
     user_stats = stats_data.get("user_stats")
     execution_stats = stats_data.get("execution_stats")
     scripts_count = stats_data.get("scripts_count", 0)
@@ -496,7 +488,6 @@ def _build_stats_components(stats_data, status_data, time_series_data, user_time
     latest_status["scripts_count"] = scripts_count
 
     # Build components
-    system_overview = create_system_overview(dashboard_stats, latest_status)
     stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
     user_map = create_user_geographic_map(user_stats)
     status_time_series = (
@@ -507,7 +498,7 @@ def _build_stats_components(stats_data, status_data, time_series_data, user_time
         execution_stats, status_time_series, title_suffix="", user_timezone=user_timezone
     ) + create_user_statistics_chart(user_stats, title_suffix="", user_timezone=user_timezone)
 
-    return system_overview, stats_cards, user_map, additional_charts
+    return stats_cards, user_map, additional_charts
 
 
 def _build_status_charts(time_series_data, safe_timezone, _time_tab):
