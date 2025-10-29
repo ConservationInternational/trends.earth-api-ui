@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Default values
-DEFAULT_REPOSITORY_NAME="trendsearth-ui"
+DEFAULT_REPOSITORY_NAME="trendsearth-api-ui"
 DEFAULT_REGION="$(get_aws_region)"
 
 main() {

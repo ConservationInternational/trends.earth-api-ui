@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Default values
-DEFAULT_BUCKET_PREFIX="trendsearth-ui-codedeploy-artifacts"
+DEFAULT_BUCKET_PREFIX="trendsearth-api-ui-codedeploy-artifacts"
 DEFAULT_REGION="$(get_aws_region)"
 DEFAULT_LIFECYCLE_DAYS=30
 
@@ -22,17 +22,9 @@ main() {
     local bucket_name
     local region
     local lifecycle_days
-    local account_id
     
-    # Get AWS account ID for unique bucket naming
-    account_id=$(get_aws_account_id)
-    if [ -z "$account_id" ]; then
-        log_error "Failed to get AWS account ID"
-        exit 1
-    fi
-    
-    # Generate default bucket name with account ID
-    local default_bucket="${DEFAULT_BUCKET_PREFIX}-${account_id}"
+    # Default bucket name without account-specific suffix
+    local default_bucket="$DEFAULT_BUCKET_PREFIX"
     
     # Get configuration
     log_step "Getting configuration..."

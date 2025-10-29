@@ -14,6 +14,27 @@ echo "Environment: $ENVIRONMENT"
 echo "App Path: $APP_PATH"
 echo "Stack Name: $STACK_NAME"
 
+# Short-circuit if this node is not the active swarm manager. CodeDeploy may target
+# multiple nodes for redundancy, but only the current leader should run stack updates.
+echo "🔍 Checking swarm manager status..."
+if ! docker info >/dev/null 2>&1; then
+    echo "⚠️ Docker daemon unreachable. Skipping deployment on this node."
+    exit 0
+fi
+
+manager_status=$(docker node ls --format '{{.Self}} {{.ManagerStatus}}' 2>/dev/null | awk '$1=="true" {print $2}')
+if [ -z "$manager_status" ]; then
+    echo "ℹ️ This node is not part of the swarm or manager status unknown. Skipping."
+    exit 0
+fi
+
+if [ "$manager_status" != "Leader" ]; then
+    echo "ℹ️ Node is a swarm manager but not the leader ($manager_status). Skipping deployment."
+    exit 0
+fi
+
+echo "✅ Node is the active swarm leader. Continuing deployment."
+
 # Navigate to application directory
 cd "$APP_PATH"
 

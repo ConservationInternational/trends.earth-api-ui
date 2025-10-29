@@ -8,9 +8,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Default values
-DEFAULT_INSTANCE_PROFILE="TrendsEarthUIInstanceProfile"
+DEFAULT_INSTANCE_PROFILE="TrendsEarthAPIUIInstanceProfile"
 DEFAULT_KEY_NAME=""
 DEFAULT_SECURITY_GROUP=""
+DEFAULT_S3_BUCKET="trendsearth-api-ui-codedeploy-artifacts"
+DEFAULT_APP_TAG_VALUE="trendsearth-api-ui"
+PRODUCTION_TAG_KEY="CodeDeployGroupProduction"
+STAGING_TAG_KEY="CodeDeployGroupStaging"
 
 main() {
     echo -e "${BLUE}💻 EC2 Instance Setup Guide for Trends.Earth UI${NC}"
@@ -34,8 +38,17 @@ main() {
     # Get configuration
     log_step "Getting configuration..."
     prompt_with_default "Enter IAM instance profile name" "$DEFAULT_INSTANCE_PROFILE" instance_profile
-    prompt_with_default "Enter EC2 key pair name (for SSH access)" "$DEFAULT_KEY_NAME" key_name
     
+    echo ""
+    if confirm "Configure existing Docker Swarm instance(s) for CodeDeploy (skip new instance guidance)?"; then
+        configure_existing_swarm "$instance_profile"
+        echo ""
+        log_success "Existing Docker Swarm configuration steps completed"
+        return
+    fi
+
+    prompt_with_default "Enter EC2 key pair name (for SSH access)" "$DEFAULT_KEY_NAME" key_name
+
     echo ""
     log_info "This script will help you:"
     log_info "1. Create security groups for production and staging"
@@ -76,8 +89,8 @@ main() {
 create_security_groups() {
     log_step "Creating security groups..."
     
-    local prod_sg_name="trendsearth-ui-prod-sg"
-    local staging_sg_name="trendsearth-ui-staging-sg"
+    local prod_sg_name="trendsearth-api-ui-prod-sg"
+    local staging_sg_name="trendsearth-api-ui-staging-sg"
     
     # Production security group
     log_info "Creating production security group..."
@@ -162,6 +175,371 @@ create_security_groups() {
     log_info "  Staging: $staging_sg_name ($staging_sg_id) - Port 8001 restricted"
 }
 
+configure_existing_swarm() {
+    local instance_profile="$1"
+
+    log_step "Configuring existing Docker Swarm instance(s) for CodeDeploy"
+
+    echo -n -e "${YELLOW}Enter EC2 instance IDs of swarm managers to configure (comma-separated): ${NC}"
+    local instance_ids_raw
+    read instance_ids_raw
+
+    if [ -z "$instance_ids_raw" ]; then
+        log_error "At least one instance ID is required"
+        exit 1
+    fi
+
+    echo -n -e "${YELLOW}Enter CIDR allowed to access staging on port 8001 [0.0.0.0/0]: ${NC}"
+    local staging_cidr
+    read staging_cidr
+    staging_cidr=${staging_cidr:-0.0.0.0/0}
+
+    local s3_bucket
+    prompt_with_default "Enter S3 bucket name for deployment artifacts" "$DEFAULT_S3_BUCKET" s3_bucket
+
+    local account_id region
+    account_id=$(get_aws_account_id)
+    region=$(get_aws_region)
+
+    for raw_id in ${instance_ids_raw//,/ }; do
+        local instance_id
+        instance_id=$(echo "$raw_id" | xargs)
+        if [ -z "$instance_id" ]; then
+            continue
+        fi
+
+        if ! aws ec2 describe-instances --instance-ids "$instance_id" \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text &>/dev/null; then
+            log_error "Instance '$instance_id' not found or not accessible"
+            exit 1
+        fi
+
+        log_info "Configuring instance: $instance_id"
+
+        aws ec2 describe-instances --instance-ids "$instance_id" \
+            --query 'Reservations[0].Instances[0].{Name:Tags[?Key==`Name`].Value|[0],PublicIp:PublicIpAddress,PrivateIp:PrivateIpAddress}' \
+            --output table
+
+        local sg_table
+        sg_table=$(aws ec2 describe-instances --instance-ids "$instance_id" \
+            --query 'Reservations[0].Instances[0].SecurityGroups[*].[GroupId,GroupName]' --output table)
+
+        echo "$sg_table"
+
+        local default_sg
+        default_sg=$(aws ec2 describe-instances --instance-ids "$instance_id" \
+            --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' --output text)
+
+        echo -n -e "${YELLOW}Enter security group ID to update for application ports [$default_sg]: ${NC}"
+        local selected_sg
+        read selected_sg
+        selected_sg=${selected_sg:-$default_sg}
+
+        if [ -z "$selected_sg" ]; then
+            log_error "Security group ID is required to continue"
+            exit 1
+        fi
+
+        ensure_security_group_rule "$selected_sg" 8000 "0.0.0.0/0"
+        ensure_security_group_rule "$selected_sg" 8001 "$staging_cidr"
+
+        associate_instance_profile "$instance_id" "$instance_profile" "$account_id" "$region" "$s3_bucket"
+        ensure_instance_tags "$instance_id"
+    done
+
+    if confirm "Generate helper script to install/refresh CodeDeploy agent on the instance(s)?"; then
+        generate_codedeploy_agent_script "$region"
+    fi
+
+    echo ""
+    log_info "Existing environment checklist:"
+    log_info "  - Copy /tmp/trendsearth-codedeploy-bootstrap.sh to each instance (if generated)"
+    log_info "  - Execute with: sudo ./trendsearth-codedeploy-bootstrap.sh"
+    log_info "  - Verify CodeDeploy agent is active: sudo systemctl status codedeploy-agent"
+    log_info "  - Ensure Docker Swarm services are healthy: docker service ls"
+}
+
+ensure_security_group_rule() {
+    local sg_id="$1"
+    local port="$2"
+    local cidr="$3"
+
+    cidr=${cidr:-0.0.0.0/0}
+
+    local tmp_file
+    tmp_file=$(mktemp)
+
+    if aws ec2 authorize-security-group-ingress \
+        --group-id "$sg_id" \
+        --protocol tcp \
+        --port "$port" \
+        --cidr "$cidr" \
+        &> "$tmp_file"; then
+        log_success "Security group $sg_id: opened port $port for $cidr"
+    else
+        if grep -q "InvalidPermission.Duplicate" "$tmp_file"; then
+            log_info "Security group $sg_id already allows port $port for $cidr"
+        else
+            log_warning "Failed to update security group $sg_id for port $port"
+            cat "$tmp_file"
+        fi
+    fi
+
+    rm -f "$tmp_file"
+}
+
+associate_instance_profile() {
+    local instance_id="$1"
+    local desired_profile="$2"
+    local account_id="$3"
+    local region="$4"
+    local s3_bucket="$5"
+
+    local desired_arn="arn:aws:iam::$account_id:instance-profile/$desired_profile"
+    local current_profile_arn
+    current_profile_arn=$(aws ec2 describe-iam-instance-profile-associations \
+        --filters Name=instance-id,Values="$instance_id" \
+        --query 'IamInstanceProfileAssociations[0].IamInstanceProfile.Arn' \
+        --output text 2>/dev/null)
+
+    local effective_profile
+
+    if [ -z "$current_profile_arn" ] || [ "$current_profile_arn" = "None" ]; then
+        effective_profile="$desired_profile"
+        if aws ec2 associate-iam-instance-profile \
+            --instance-id "$instance_id" \
+            --iam-instance-profile Name="$desired_profile" >/dev/null; then
+            log_success "Associated instance profile $desired_profile with $instance_id"
+            sleep 2
+        else
+            log_warning "Failed to associate instance profile $desired_profile with $instance_id"
+            return
+        fi
+    else
+        effective_profile="${current_profile_arn##*/}"
+        if [ "$current_profile_arn" = "$desired_arn" ]; then
+            log_success "Instance $instance_id already uses instance profile $desired_profile"
+        else
+            log_info "Instance $instance_id already uses instance profile $effective_profile"
+            log_info "Keeping existing profile and ensuring required permissions."
+        fi
+    fi
+
+    ensure_profile_role_permissions "$effective_profile" "$account_id" "$region" "$s3_bucket"
+}
+
+ensure_profile_role_permissions() {
+    local profile_name="$1"
+    local account_id="$2"
+    local region="$3"
+    local s3_bucket="$4"
+
+    if [ -z "$profile_name" ] || [ "$profile_name" = "None" ]; then
+        log_warning "No instance profile available to update permissions"
+        return
+    fi
+
+    if [ -z "$s3_bucket" ]; then
+        log_warning "S3 bucket not provided; skipping permission update for profile $profile_name"
+        return
+    fi
+
+    local attempts=0
+    local max_attempts=5
+    local role_names=""
+
+    while [ $attempts -lt $max_attempts ]; do
+        role_names=$(aws iam get-instance-profile \
+            --instance-profile-name "$profile_name" \
+            --query 'InstanceProfile.Roles[*].RoleName' \
+            --output text 2>/dev/null)
+        if [ -n "$role_names" ] && [ "$role_names" != "None" ]; then
+            break
+        fi
+        attempts=$((attempts + 1))
+        sleep 2
+    done
+
+    if [ -z "$role_names" ] || [ "$role_names" = "None" ]; then
+        log_warning "Could not determine roles for instance profile $profile_name"
+        return
+    fi
+
+    for role_name in $role_names; do
+        ensure_role_permissions "$role_name" "$account_id" "$region" "$s3_bucket"
+    done
+}
+
+ensure_role_permissions() {
+    local role_name="$1"
+    local account_id="$2"
+    local region="$3"
+    local s3_bucket="$4"
+
+    local policy_file
+    policy_file=$(mktemp)
+
+    cat > "$policy_file" <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::$s3_bucket",
+                "arn:aws:s3:::$s3_bucket/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": "arn:aws:logs:$region:$account_id:*"
+        }
+    ]
+}
+EOF
+
+    if aws iam put-role-policy \
+        --role-name "$role_name" \
+        --policy-name "TrendsEarthAPIUIDeploymentPolicy" \
+        --policy-document "file://$policy_file" >/dev/null; then
+        log_success "Updated inline deployment policy on role $role_name"
+    else
+        log_warning "Failed to update inline deployment policy on role $role_name"
+    fi
+
+    rm -f "$policy_file"
+
+    local managed_policies=(
+        "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
+    )
+
+    local policy_arn
+    for policy_arn in "${managed_policies[@]}"; do
+        local already_attached
+        already_attached=$(aws iam list-attached-role-policies \
+            --role-name "$role_name" \
+            --query "AttachedPolicies[?PolicyArn=='$policy_arn'].PolicyArn" \
+            --output text 2>/dev/null)
+
+        if [ "$already_attached" = "$policy_arn" ]; then
+            log_info "Role $role_name already has managed policy $(basename "$policy_arn")"
+        else
+            if aws iam attach-role-policy --role-name "$role_name" --policy-arn "$policy_arn" >/dev/null; then
+                log_success "Attached managed policy $(basename "$policy_arn") to role $role_name"
+            else
+                log_warning "Failed to attach managed policy $(basename "$policy_arn") to role $role_name"
+            fi
+        fi
+    done
+}
+
+ensure_instance_tags() {
+    local instance_id="$1"
+
+    if aws ec2 create-tags --resources "$instance_id" --tags \
+        Key=Application,Value="$DEFAULT_APP_TAG_VALUE" \
+        Key=$PRODUCTION_TAG_KEY,Value=true \
+        Key=$STAGING_TAG_KEY,Value=true \
+        >/dev/null; then
+        log_success "Applied CodeDeploy tags to $instance_id"
+    else
+        log_warning "Failed to apply CodeDeploy tags to $instance_id"
+    fi
+}
+
+generate_codedeploy_agent_script() {
+    local region="$1"
+    local script_path="/tmp/trendsearth-codedeploy-bootstrap.sh"
+
+    cat > "$script_path" <<'EOF'
+#!/bin/bash
+set -euo pipefail
+
+LOG_FILE=/var/log/trendsearth-codedeploy-bootstrap.log
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+REGION="%%REGION%%"
+
+log "Starting CodeDeploy agent setup for Trends.Earth API UI"
+
+log "Updating package index"
+apt-get update
+
+log "Installing dependencies"
+apt-get install -y ruby wget unzip
+
+log "Downloading latest CodeDeploy installer"
+cd /tmp
+wget -O codedeploy-install https://aws-codedeploy-%%REGION%%.s3.%%REGION%%.amazonaws.com/latest/install
+chmod +x codedeploy-install
+
+log "Installing / updating CodeDeploy agent"
+./codedeploy-install auto
+
+log "Enabling CodeDeploy agent service"
+systemctl enable codedeploy-agent
+systemctl start codedeploy-agent
+
+log "Ensuring application directory exists"
+mkdir -p /opt/trendsearth-api-ui
+chown ubuntu:ubuntu /opt/trendsearth-api-ui
+
+log "Configuring log rotation"
+cat > /etc/logrotate.d/trendsearth-api-ui <<'LOGROTATE'
+/var/log/trendsearth-*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 ubuntu ubuntu
+}
+LOGROTATE
+
+log "CodeDeploy agent setup finished"
+systemctl status codedeploy-agent --no-pager || true
+EOF
+
+    local effective_region
+    effective_region=${region:-us-east-1}
+    sed -i "s/%%REGION%%/${effective_region}/g" "$script_path"
+
+    chmod +x "$script_path"
+
+    local script_name
+    script_name=$(basename "$script_path")
+
+    log_success "Helper script generated: $script_path"
+    log_info "Copy to instance with: scp $script_path ubuntu@<instance>:/tmp/"
+    log_info "Then run: ssh ubuntu@<instance> 'sudo /tmp/$script_name'"
+}
+
 generate_user_data_script() {
     log_step "Generating user data script..."
     
@@ -228,12 +606,12 @@ systemctl start codedeploy-agent
 
 # Create application directory
 log "Creating application directory..."
-mkdir -p /opt/trendsearth-ui
-chown ubuntu:ubuntu /opt/trendsearth-ui
+mkdir -p /opt/trendsearth-api-ui
+chown ubuntu:ubuntu /opt/trendsearth-api-ui
 
 # Set up log rotation
 log "Setting up log rotation..."
-cat > /etc/logrotate.d/trendsearth-ui <<LOGROTATE
+cat > /etc/logrotate.d/trendsearth-api-ui <<LOGROTATE
 /var/log/trends-earth-*.log {
     daily
     rotate 30
@@ -286,7 +664,7 @@ show_instance_creation_commands() {
     echo "    --security-group-ids sg-PRODUCTION-SECURITY-GROUP-ID \\"
     echo "    --iam-instance-profile Name=$instance_profile \\"
     echo "    --user-data file:///tmp/ec2-user-data.sh \\"
-    echo "    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=TrendsEarth-UI-Production},{Key=Environment,Value=Production},{Key=Application,Value=trendsearth-ui}]' \\"
+    echo "    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=TrendsEarth-UI-Production},{Key=Application,Value=${DEFAULT_APP_TAG_VALUE}},{Key=${PRODUCTION_TAG_KEY},Value=true}]' \\"
     echo "    --block-device-mappings '[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":20,\"VolumeType\":\"gp3\"}}]'"
     
     echo ""
@@ -298,7 +676,7 @@ show_instance_creation_commands() {
     echo "    --security-group-ids sg-STAGING-SECURITY-GROUP-ID \\"
     echo "    --iam-instance-profile Name=$instance_profile \\"
     echo "    --user-data file:///tmp/ec2-user-data.sh \\"
-    echo "    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=TrendsEarth-UI-Staging},{Key=Environment,Value=Staging},{Key=Application,Value=trendsearth-ui}]' \\"
+    echo "    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=TrendsEarth-UI-Staging},{Key=Application,Value=${DEFAULT_APP_TAG_VALUE}},{Key=${STAGING_TAG_KEY},Value=true}]' \\"
     echo "    --block-device-mappings '[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"VolumeSize\":20,\"VolumeType\":\"gp3\"}}]'"
     
     echo ""
@@ -315,19 +693,21 @@ show_tagging_commands() {
     echo ""
     log_info "After instance creation, tag them for CodeDeploy discovery:"
     echo ""
-    log_info "For Production instance:"
-    echo "aws ec2 create-tags --resources i-PRODUCTION-INSTANCE-ID --tags \\"
-    echo "    Key=Environment,Value=Production \\"
-    echo "    Key=Application,Value=trendsearth-ui"
+    log_info "For Production deployments:"
+    echo "aws ec2 create-tags --resources i-INSTANCE-ID --tags \\"
+    echo "    Key=Application,Value=${DEFAULT_APP_TAG_VALUE} \\"
+    echo "    Key=${PRODUCTION_TAG_KEY},Value=true"
     echo ""
-    log_info "For Staging instance:"
-    echo "aws ec2 create-tags --resources i-STAGING-INSTANCE-ID --tags \\"
-    echo "    Key=Environment,Value=Staging \\"
-    echo "    Key=Application,Value=trendsearth-ui"
+    log_info "For Staging deployments:"
+    echo "aws ec2 create-tags --resources i-INSTANCE-ID --tags \\"
+    echo "    Key=Application,Value=${DEFAULT_APP_TAG_VALUE} \\"
+    echo "    Key=${STAGING_TAG_KEY},Value=true"
+    echo ""
+    log_info "Single instance scenario: add both ${PRODUCTION_TAG_KEY}=true and ${STAGING_TAG_KEY}=true to the same instance."
     
     echo ""
-    log_info "To find your instance IDs:"
-    echo "aws ec2 describe-instances --filters \"Name=tag:Name,Values=TrendsEarth-UI-Production\" --query 'Reservations[*].Instances[*].InstanceId' --output text"
+    log_info "To find tagged instances:"
+    echo "aws ec2 describe-instances --filters \"Name=tag:${PRODUCTION_TAG_KEY},Values=true\" --query 'Reservations[*].Instances[*].InstanceId' --output text"
 }
 
 show_verification_commands() {

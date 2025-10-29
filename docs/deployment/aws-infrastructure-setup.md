@@ -8,19 +8,16 @@ This document provides instructions for setting up the AWS infrastructure requir
 
 ### Interactive Setup (Recommended)
 ```bash
-# Run the main setup script with guided prompts
 ./scripts/setup-aws-infrastructure.sh
 ```
 
 ### Quick Setup with Defaults
 ```bash
-# Set up all components with default values
 ./scripts/setup-aws-infrastructure.sh --quick
 ```
 
 ### Check Existing Infrastructure
 ```bash
-# Verify what infrastructure already exists
 ./scripts/setup-aws-infrastructure.sh --check
 ```
 
@@ -54,7 +51,6 @@ You can also set up individual components:
 
 The automated setup scripts provide:
 
-- ✅ **Input validation** - Validates AWS regions, bucket names, repository names
 - ✅ **Error handling** - Graceful error handling with clear error messages
 - ✅ **Idempotent operations** - Safe to run multiple times
 - ✅ **Resource checking** - Detects existing resources and offers to update them
@@ -78,12 +74,12 @@ Create an ECR repository to store Docker images:
 ```bash
 # Create ECR repository
 aws ecr create-repository \
-    --repository-name trendsearth-ui \
+    --repository-name trendsearth-api-ui \
     --region us-east-1
 
 # Set lifecycle policy to cleanup old images
 aws ecr put-lifecycle-policy \
-    --repository-name trendsearth-ui \
+    --repository-name trendsearth-api-ui \
     --lifecycle-policy-text '{
         "rules": [
             {
@@ -178,7 +174,7 @@ EOF
 
 # Create EC2 instance role
 aws iam create-role \
-    --role-name TrendsEarthUIInstanceRole \
+    --role-name TrendsEarthAPIUIInstanceRole \
     --assume-role-policy-document file://ec2-trust-policy.json
 
 # Create policy for ECR and S3 access
@@ -213,25 +209,25 @@ EOF
 
 # Attach policies to EC2 role
 aws iam put-role-policy \
-    --role-name TrendsEarthUIInstanceRole \
+    --role-name TrendsEarthAPIUIInstanceRole \
     --policy-name ECRAndS3Access \
     --policy-document file://ec2-deployment-policy.json
 
 aws iam attach-role-policy \
-    --role-name TrendsEarthUIInstanceRole \
+    --role-name TrendsEarthAPIUIInstanceRole \
     --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 
 aws iam attach-role-policy \
-    --role-name TrendsEarthUIInstanceRole \
+    --role-name TrendsEarthAPIUIInstanceRole \
     --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy
 
 # Create instance profile
 aws iam create-instance-profile \
-    --instance-profile-name TrendsEarthUIInstanceProfile
+    --instance-profile-name TrendsEarthAPIUIInstanceProfile
 
 aws iam add-role-to-instance-profile \
-    --instance-profile-name TrendsEarthUIInstanceProfile \
-    --role-name TrendsEarthUIInstanceRole
+    --instance-profile-name TrendsEarthAPIUIInstanceProfile \
+    --role-name TrendsEarthAPIUIInstanceRole
 ```
 
 ### 4. EC2 Instances
@@ -242,7 +238,7 @@ aws iam add-role-to-instance-profile \
 **OS**: Ubuntu 22.04 LTS  
 **Storage**: 20GB+ GP3 EBS volume  
 **Network**: Public subnet with internet gateway access  
-**IAM Instance Profile**: TrendsEarthUIInstanceProfile
+**IAM Instance Profile**: TrendsEarthAPIUIInstanceProfile
 
 #### Security Groups
 
@@ -251,7 +247,7 @@ Create security groups for the instances:
 ```bash
 # Production Security Group
 aws ec2 create-security-group \
-    --group-name trendsearth-ui-prod-sg \
+    --group-name trendsearth-api-ui-prod-sg \
     --description "Security group for Trends.Earth UI Production"
 
 # Add rules for production
@@ -263,7 +259,7 @@ aws ec2 authorize-security-group-ingress \
 
 # Staging Security Group  
 aws ec2 create-security-group \
-    --group-name trendsearth-ui-staging-sg \
+    --group-name trendsearth-api-ui-staging-sg \
     --description "Security group for Trends.Earth UI Staging"
 
 # Add rules for staging (restrict to your IP ranges)
@@ -308,26 +304,26 @@ service codedeploy-agent start
 ```bash
 # Create CodeDeploy application
 aws deploy create-application \
-    --application-name trendsearth-ui \
+    --application-name trendsearth-api-ui \
     --compute-platform Server
 
 # Create production deployment group
 aws deploy create-deployment-group \
-    --application-name trendsearth-ui \
+    --application-name trendsearth-api-ui \
     --deployment-group-name production \
     --service-role-arn arn:aws:iam::ACCOUNT_ID:role/CodeDeployServiceRole \
-    --ec2-tag-filters Key=Environment,Value=Production,Type=KEY_AND_VALUE \
-    --deployment-config-name CodeDeployDefault.AllAtOneTime \
-    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE
+    --ec2-tag-set "ec2TagSetList=[[{Key=Application,Value=trendsearth-api-ui,Type=KEY_AND_VALUE},{Key=CodeDeployGroupProduction,Value=true,Type=KEY_AND_VALUE}]]" \
+    --deployment-config-name CodeDeployDefault.AllAtOnce \
+    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM
 
 # Create staging deployment group
 aws deploy create-deployment-group \
-    --application-name trendsearth-ui \
+    --application-name trendsearth-api-ui \
     --deployment-group-name staging \
     --service-role-arn arn:aws:iam::ACCOUNT_ID:role/CodeDeployServiceRole \
-    --ec2-tag-filters Key=Environment,Value=Staging,Type=KEY_AND_VALUE \
-    --deployment-config-name CodeDeployDefault.AllAtOneTime \
-    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE
+    --ec2-tag-set "ec2TagSetList=[[{Key=Application,Value=trendsearth-api-ui,Type=KEY_AND_VALUE},{Key=CodeDeployGroupStaging,Value=true,Type=KEY_AND_VALUE}]]" \
+    --deployment-config-name CodeDeployDefault.AllAtOnce \
+    --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM
 ```
 
 ### 6. Instance Tags
@@ -335,15 +331,20 @@ aws deploy create-deployment-group \
 Tag your EC2 instances so CodeDeploy can identify them:
 
 ```bash
-# Production instance
+# Production deployment tag
 aws ec2 create-tags \
     --resources i-1234567890abcdef0 \
-    --tags Key=Environment,Value=Production Key=Application,Value=trendsearth-ui
+    --tags Key=Application,Value=trendsearth-api-ui Key=CodeDeployGroupProduction,Value=true
 
-# Staging instance  
+# Staging deployment tag  
 aws ec2 create-tags \
     --resources i-abcdef1234567890 \
-    --tags Key=Environment,Value=Staging Key=Application,Value=trendsearth-ui
+    --tags Key=Application,Value=trendsearth-api-ui Key=CodeDeployGroupStaging,Value=true
+
+# Single instance hosting both deployment groups
+aws ec2 create-tags \
+    --resources i-abcdef1234567890 \
+    --tags Key=CodeDeployGroupProduction,Value=true Key=CodeDeployGroupStaging,Value=true
 ```
 
 ## Setup Process Overview
@@ -351,7 +352,7 @@ aws ec2 create-tags \
 The automated setup scripts handle the following components in order:
 
 1. **ECR Repository** (`setup-ecr.sh`)
-   - Creates the `trendsearth-ui` repository
+    - Creates the `trendsearth-api-ui` repository
    - Sets up lifecycle policies for image cleanup
    - Configures appropriate permissions
 
@@ -400,10 +401,10 @@ After setup, verify your infrastructure:
 ./scripts/setup-aws-infrastructure.sh --check
 
 # Verify specific resources
-aws ecr describe-repositories --repository-names trendsearth-ui
+aws ecr describe-repositories --repository-names trendsearth-api-ui
 aws s3api head-bucket --bucket your-bucket-name
-aws deploy get-application --application-name trendsearth-ui
-aws iam get-role --role-name TrendsEarthUICodeDeployRole
+aws deploy get-application --application-name trendsearth-api-ui
+aws iam get-role --role-name TrendsEarthAPIUICodeDeployRole
 ```
 
 ## Benefits of This Architecture

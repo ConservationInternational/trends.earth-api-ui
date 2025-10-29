@@ -65,8 +65,8 @@ validate_bucket_name() {
 
 validate_repository_name() {
     local repo="$1"
-    # ECR repository name validation
-    if [[ ! "$repo" =~ ^[a-z0-9]+(?:[._-][a-z0-9]+)*$ ]] || [ ${#repo} -lt 2 ] || [ ${#repo} -gt 256 ]; then
+    # ECR repository name validation (uses basic grouping for bash compatibility)
+    if [[ ! "$repo" =~ ^[a-z0-9]+([._-][a-z0-9]+)*$ ]] || [ ${#repo} -lt 2 ] || [ ${#repo} -gt 256 ]; then
         log_error "Invalid ECR repository name: $repo"
         log_info "Repository names must be 2-256 characters, lowercase letters, numbers, dots, underscores, and hyphens only"
         return 1

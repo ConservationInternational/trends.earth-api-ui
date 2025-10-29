@@ -7,9 +7,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Default values
-DEFAULT_CODEDEPLOY_ROLE="TrendsEarthUICodeDeployRole"
-DEFAULT_EC2_ROLE="TrendsEarthUIInstanceRole"
-DEFAULT_INSTANCE_PROFILE="TrendsEarthUIInstanceProfile"
+DEFAULT_CODEDEPLOY_ROLE="TrendsEarthAPIUICodeDeployRole"
+DEFAULT_EC2_ROLE="TrendsEarthAPIUIInstanceRole"
+DEFAULT_INSTANCE_PROFILE="TrendsEarthAPIUIInstanceProfile"
+DEFAULT_S3_BUCKET="trendsearth-api-ui-codedeploy-artifacts"
 
 main() {
     echo -e "${BLUE}🔑 IAM Roles Setup for Trends.Earth UI Deployment${NC}"
@@ -40,7 +41,7 @@ main() {
     prompt_with_default "Enter CodeDeploy service role name" "$DEFAULT_CODEDEPLOY_ROLE" codedeploy_role
     prompt_with_default "Enter EC2 instance role name" "$DEFAULT_EC2_ROLE" ec2_role
     prompt_with_default "Enter EC2 instance profile name" "$DEFAULT_INSTANCE_PROFILE" instance_profile
-    prompt_with_default "Enter S3 bucket name for deployment artifacts" "" s3_bucket
+    prompt_with_default "Enter S3 bucket name for deployment artifacts" "$DEFAULT_S3_BUCKET" s3_bucket
     
     # Validate inputs
     validate_required "$codedeploy_role" "CodeDeploy role name" || exit 1
@@ -238,7 +239,7 @@ EOF
     # Attach custom deployment policy
     if aws iam put-role-policy \
         --role-name "$role_name" \
-        --policy-name "TrendsEarthUIDeploymentPolicy" \
+        --policy-name "TrendsEarthAPIUIDeploymentPolicy" \
         --policy-document "file://$deployment_policy" \
         --output text > /dev/null; then
         log_success "Custom deployment policy attached"

@@ -131,7 +131,7 @@ setup_infrastructure() {
         log_step "Setting up ECR repository..."
         if "$SCRIPT_DIR/aws-setup/setup-ecr.sh"; then
             log_success "ECR setup completed"
-            ecr_repo_name="trendsearth-ui"  # Default name
+            ecr_repo_name="trendsearth-api-ui"  # Default name
         else
             log_error "ECR setup failed"
             exit 1
@@ -144,7 +144,7 @@ setup_infrastructure() {
         log_step "Setting up S3 bucket..."
         if "$SCRIPT_DIR/aws-setup/setup-s3.sh"; then
             log_success "S3 setup completed"
-            s3_bucket_name="trendsearth-ui-codedeploy-artifacts-$(get_aws_account_id)"
+            s3_bucket_name="trendsearth-api-ui-codedeploy-artifacts"
         else
             log_error "S3 setup failed"
             exit 1
@@ -207,28 +207,28 @@ show_setup_summary() {
     echo ""
     
     # Check and display created resources
-    if check_ecr_repository "trendsearth-ui"; then
+    if check_ecr_repository "trendsearth-api-ui"; then
         local ecr_uri
-        ecr_uri=$(aws ecr describe-repositories --repository-names trendsearth-ui --query 'repositories[0].repositoryUri' --output text 2>/dev/null)
+        ecr_uri=$(aws ecr describe-repositories --repository-names trendsearth-api-ui --query 'repositories[0].repositoryUri' --output text 2>/dev/null)
         log_success "ECR Repository: $ecr_uri"
     fi
     
-    local default_bucket="trendsearth-ui-codedeploy-artifacts-$account_id"
+    local default_bucket="trendsearth-api-ui-codedeploy-artifacts"
     if check_s3_bucket "$default_bucket"; then
         log_success "S3 Bucket: $default_bucket"
     fi
     
-    if check_iam_role "TrendsEarthUICodeDeployRole"; then
-        log_success "CodeDeploy Role: arn:aws:iam::$account_id:role/TrendsEarthUICodeDeployRole"
+    if check_iam_role "TrendsEarthAPIUICodeDeployRole"; then
+        log_success "CodeDeploy Role: arn:aws:iam::$account_id:role/TrendsEarthAPIUICodeDeployRole"
     fi
     
-    if check_iam_role "TrendsEarthUIInstanceRole"; then
-        log_success "EC2 Instance Role: arn:aws:iam::$account_id:role/TrendsEarthUIInstanceRole"
-        log_success "Instance Profile: arn:aws:iam::$account_id:instance-profile/TrendsEarthUIInstanceProfile"
+    if check_iam_role "TrendsEarthAPIUIInstanceRole"; then
+        log_success "EC2 Instance Role: arn:aws:iam::$account_id:role/TrendsEarthAPIUIInstanceRole"
+        log_success "Instance Profile: arn:aws:iam::$account_id:instance-profile/TrendsEarthAPIUIInstanceProfile"
     fi
     
-    if check_codedeploy_application "trendsearth-ui"; then
-        log_success "CodeDeploy Application: trendsearth-ui"
+    if check_codedeploy_application "trendsearth-api-ui"; then
+        log_success "CodeDeploy Application: trendsearth-api-ui"
         log_info "  Deployment Groups: production, staging"
     fi
     
@@ -240,7 +240,7 @@ show_setup_summary() {
     log_info "   Run: $SCRIPT_DIR/setup-github-secrets.sh"
     echo ""
     log_info "2. EC2 Instance Setup:"
-    log_info "   - Launch EC2 instances with the TrendsEarthUIInstanceProfile"
+    log_info "   - Launch EC2 instances with the TrendsEarthAPIUIInstanceProfile"
     log_info "   - Use the user data script from the EC2 setup guide"
     log_info "   - Tag instances with Environment=Production or Environment=Staging"
     echo ""
@@ -263,7 +263,7 @@ show_setup_summary() {
     echo -e "${GREEN}🔗 Useful Commands:${NC}"
     echo ""
     log_info "List CodeDeploy deployments:"
-    echo "  aws deploy list-deployments --application-name trendsearth-ui"
+    echo "  aws deploy list-deployments --application-name trendsearth-api-ui"
     echo ""
     log_info "Check instance health:"
     echo "  aws deploy list-deployment-targets --deployment-id <deployment-id>"
@@ -304,14 +304,14 @@ check_existing_infrastructure() {
     echo ""
     
     # Check ECR
-    if check_ecr_repository "trendsearth-ui"; then
-        log_success "ECR repository 'trendsearth-ui' exists"
+    if check_ecr_repository "trendsearth-api-ui"; then
+        log_success "ECR repository 'trendsearth-api-ui' exists"
     else
-        log_warning "ECR repository 'trendsearth-ui' not found"
+        log_warning "ECR repository 'trendsearth-api-ui' not found"
     fi
     
     # Check S3
-    local bucket="trendsearth-ui-codedeploy-artifacts-$account_id"
+    local bucket="trendsearth-api-ui-codedeploy-artifacts"
     if check_s3_bucket "$bucket"; then
         log_success "S3 bucket '$bucket' exists"
     else
@@ -319,36 +319,36 @@ check_existing_infrastructure() {
     fi
     
     # Check IAM roles
-    if check_iam_role "TrendsEarthUICodeDeployRole"; then
-        log_success "CodeDeploy role 'TrendsEarthUICodeDeployRole' exists"
+    if check_iam_role "TrendsEarthAPIUICodeDeployRole"; then
+        log_success "CodeDeploy role 'TrendsEarthAPIUICodeDeployRole' exists"
     else
-        log_warning "CodeDeploy role 'TrendsEarthUICodeDeployRole' not found"
+        log_warning "CodeDeploy role 'TrendsEarthAPIUICodeDeployRole' not found"
     fi
     
-    if check_iam_role "TrendsEarthUIInstanceRole"; then
-        log_success "EC2 role 'TrendsEarthUIInstanceRole' exists"
+    if check_iam_role "TrendsEarthAPIUIInstanceRole"; then
+        log_success "EC2 role 'TrendsEarthAPIUIInstanceRole' exists"
     else
-        log_warning "EC2 role 'TrendsEarthUIInstanceRole' not found"
+        log_warning "EC2 role 'TrendsEarthAPIUIInstanceRole' not found"
     fi
     
     # Check CodeDeploy
-    if check_codedeploy_application "trendsearth-ui"; then
-        log_success "CodeDeploy application 'trendsearth-ui' exists"
+    if check_codedeploy_application "trendsearth-api-ui"; then
+        log_success "CodeDeploy application 'trendsearth-api-ui' exists"
         
         # Check deployment groups
-        if aws deploy get-deployment-group --application-name trendsearth-ui --deployment-group-name production &>/dev/null; then
+        if aws deploy get-deployment-group --application-name trendsearth-api-ui --deployment-group-name production &>/dev/null; then
             log_success "Production deployment group exists"
         else
             log_warning "Production deployment group not found"
         fi
         
-        if aws deploy get-deployment-group --application-name trendsearth-ui --deployment-group-name staging &>/dev/null; then
+        if aws deploy get-deployment-group --application-name trendsearth-api-ui --deployment-group-name staging &>/dev/null; then
             log_success "Staging deployment group exists"
         else
             log_warning "Staging deployment group not found"
         fi
     else
-        log_warning "CodeDeploy application 'trendsearth-ui' not found"
+        log_warning "CodeDeploy application 'trendsearth-api-ui' not found"
     fi
     
     echo ""

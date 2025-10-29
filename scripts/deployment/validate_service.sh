@@ -13,6 +13,27 @@ source /opt/deploy-env
 echo "Environment: $ENVIRONMENT"
 echo "Stack Name: $STACK_NAME"
 
+# Only the active swarm leader should perform validation checks. CodeDeploy may
+# target multiple instances, so exit early when this node is not responsible.
+echo "🔍 Checking swarm manager status..."
+if ! docker info >/dev/null 2>&1; then
+    echo "⚠️ Docker daemon unreachable. Skipping validation on this node."
+    exit 0
+fi
+
+manager_status=$(docker node ls --format '{{.Self}} {{.ManagerStatus}}' 2>/dev/null | awk '$1=="true" {print $2}')
+if [ -z "$manager_status" ]; then
+    echo "ℹ️ This node is not part of the swarm or manager status unknown. Skipping."
+    exit 0
+fi
+
+if [ "$manager_status" != "Leader" ]; then
+    echo "ℹ️ Node is a swarm manager but not the leader ($manager_status). Skipping validation."
+    exit 0
+fi
+
+echo "✅ Node is the active swarm leader. Continuing validation."
+
 # Set health check URL based on environment
 if [ "$ENVIRONMENT" = "staging" ]; then
     HEALTH_URL="http://localhost:8001/api-ui-health"

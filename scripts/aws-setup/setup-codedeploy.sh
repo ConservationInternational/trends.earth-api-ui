@@ -7,8 +7,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Default values
-DEFAULT_APPLICATION_NAME="trendsearth-ui"
-DEFAULT_CODEDEPLOY_ROLE="TrendsEarthUICodeDeployRole"
+DEFAULT_APPLICATION_NAME="trendsearth-api-ui"
+DEFAULT_CODEDEPLOY_ROLE="TrendsEarthAPIUICodeDeployRole"
+APPLICATION_TAG_KEY="Application"
+APPLICATION_TAG_VALUE="trendsearth-api-ui"
+PRODUCTION_TAG_KEY="CodeDeployGroupProduction"
+STAGING_TAG_KEY="CodeDeployGroupStaging"
+INSTANCE_TAG_VALUE="true"
 
 main() {
     echo -e "${BLUE}🚀 CodeDeploy Application Setup for Trends.Earth UI${NC}"
@@ -73,13 +78,13 @@ main() {
     log_info "  Service Role: $role_arn"
     echo ""
     log_info "Next steps:"
-    log_info "1. Tag your EC2 instances with appropriate Environment tags"
+    log_info "1. Tag your EC2 instances with CodeDeploy group tags"
     log_info "2. Ensure CodeDeploy agent is installed and running on instances"
     log_info "3. Test deployment using GitHub Actions workflows"
     echo ""
     log_info "Instance tagging examples:"
-    log_info "  Production: Environment=Production"
-    log_info "  Staging: Environment=Staging"
+    log_info "  Production: ${PRODUCTION_TAG_KEY}=${INSTANCE_TAG_VALUE}"
+    log_info "  Staging: ${STAGING_TAG_KEY}=${INSTANCE_TAG_VALUE}"
 }
 
 setup_codedeploy_application() {
@@ -116,17 +121,17 @@ setup_deployment_groups() {
     log_step "Setting up deployment groups..."
     
     # Production deployment group
-    setup_deployment_group "$app_name" "production" "$role_arn" "Production"
+    setup_deployment_group "$app_name" "production" "$role_arn" "$PRODUCTION_TAG_KEY"
     
     # Staging deployment group
-    setup_deployment_group "$app_name" "staging" "$role_arn" "Staging"
+    setup_deployment_group "$app_name" "staging" "$role_arn" "$STAGING_TAG_KEY"
 }
 
 setup_deployment_group() {
     local app_name="$1"
     local group_name="$2"
     local role_arn="$3"
-    local environment="$4"
+    local tag_key="$4"
     
     log_step "Creating $group_name deployment group..."
     
@@ -152,15 +157,16 @@ setup_deployment_group() {
     fi
     
     # Create deployment group
-    local create_cmd="aws deploy create-deployment-group \
-        --application-name '$app_name' \
-        --deployment-group-name '$group_name' \
-        --service-role-arn '$role_arn' \
-        --ec2-tag-filters Key=Environment,Value=$environment,Type=KEY_AND_VALUE \
-        --deployment-config-name CodeDeployDefault.AllAtOneTime \
-        --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM,DEPLOYMENT_STOP_ON_INSTANCE_FAILURE"
-    
-    if eval "$create_cmd" --output text > /dev/null; then
+    local tag_set="ec2TagSetList=[[{Key=${APPLICATION_TAG_KEY},Value=${APPLICATION_TAG_VALUE},Type=KEY_AND_VALUE},{Key=${tag_key},Value=${INSTANCE_TAG_VALUE},Type=KEY_AND_VALUE}]]"
+
+    if aws deploy create-deployment-group \
+        --application-name "$app_name" \
+        --deployment-group-name "$group_name" \
+        --service-role-arn "$role_arn" \
+        --ec2-tag-set "$tag_set" \
+        --deployment-config-name CodeDeployDefault.AllAtOnce \
+        --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM \
+        --output text > /dev/null; then
         log_success "$group_name deployment group created"
     else
         log_error "Failed to create $group_name deployment group"
@@ -176,8 +182,8 @@ setup_deployment_group() {
         --output text 2>/dev/null || echo "0")
     
     log_info "$group_name deployment group configured"
-    log_info "  Target instances: Tagged with Environment=$environment"
-    log_info "  Deployment config: CodeDeployDefault.AllAtOneTime"
+    log_info "  Target instances: Tagged with ${APPLICATION_TAG_KEY}=${APPLICATION_TAG_VALUE} AND $tag_key=$INSTANCE_TAG_VALUE"
+    log_info "  Deployment config: CodeDeployDefault.AllAtOnce"
     log_info "  Auto rollback: Enabled on failure"
     echo ""
 }
@@ -187,15 +193,20 @@ show_tagging_instructions() {
     echo ""
     log_info "EC2 Instance Tagging Instructions:"
     echo ""
-    log_info "To make instances discoverable by CodeDeploy, tag them as follows:"
+    log_info "To make instances discoverable by CodeDeploy, apply these tags:"
     echo ""
-    log_info "For Production instances:"
-    echo "  aws ec2 create-tags --resources i-1234567890abcdef0 --tags Key=Environment,Value=Production"
+    log_info "Mandatory application tag:"
+    echo "  aws ec2 create-tags --resources i-INSTANCE-ID --tags Key=${APPLICATION_TAG_KEY},Value=${APPLICATION_TAG_VALUE}"
     echo ""
-    log_info "For Staging instances:"
-    echo "  aws ec2 create-tags --resources i-abcdef1234567890 --tags Key=Environment,Value=Staging"
+    log_info "Production deployment group tag:"
+    echo "  aws ec2 create-tags --resources i-INSTANCE-ID --tags Key=${PRODUCTION_TAG_KEY},Value=${INSTANCE_TAG_VALUE}"
     echo ""
-    log_info "Replace the instance IDs with your actual EC2 instance IDs."
+    log_info "Staging deployment group tag:"
+    echo "  aws ec2 create-tags --resources i-INSTANCE-ID --tags Key=${STAGING_TAG_KEY},Value=${INSTANCE_TAG_VALUE}"
+    echo ""
+    log_info "Apply both deployment group tags to the same instance if production and staging share the host."
+    echo ""
+    log_info "Replace the placeholder instance ID with your actual EC2 instance ID."
     echo ""
     log_warning "Important: Instances must have the CodeDeploy agent installed and running!"
     echo ""
