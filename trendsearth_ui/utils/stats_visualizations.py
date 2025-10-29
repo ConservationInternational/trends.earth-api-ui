@@ -1180,7 +1180,7 @@ def create_user_statistics_chart(
                     go.Scatter(
                         x=registration_plot_df["timestamp"],
                         y=registration_plot_df["cumulative_users"],
-                        mode="lines+markers",
+                        mode="lines",
                         name="Cumulative New Users",
                         line={"color": "#4caf50", "width": 3},
                         marker={"size": 5},

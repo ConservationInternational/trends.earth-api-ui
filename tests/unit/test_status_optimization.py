@@ -96,7 +96,8 @@ class TestStatusDataManager:
             # Verify the result structure
             assert result1["summary"] == "SUCCESS"
             assert result1["deployment"] == {"deployment": "info"}
-            assert result1["swarm"] == {"swarm": "info"}
+            assert result1["swarm"]["info"] == {"swarm": "info"}
+            assert result1["swarm"]["cached_time"] == " (cached)"
             assert result1["status_endpoint_available"] is True
             assert result1["latest_status"]["executions_running"] == 5
 
@@ -120,6 +121,82 @@ class TestStatusDataManager:
 
         assert result["error"] == "Insufficient permissions"
         assert result["requires_superadmin"] is True
+
+    @patch("trendsearth_ui.utils.status_data_manager.fetch_scripts_count", return_value=0)
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_execution_stats", return_value={"data": {}}
+    )
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_user_stats",
+        return_value={"data": {"registration_trends": []}},
+    )
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_dashboard_stats",
+        return_value={"data": {"summary": {}}},
+    )
+    def test_consolidated_stats_uses_quarter_hour_for_last_day(
+        self,
+        mock_dashboard,
+        mock_user_stats,
+        mock_execution_stats,
+        _mock_scripts_count,
+    ):
+        """Ensure consolidated stats request quarter-hour user buckets for last-day period."""
+
+        StatusDataManager.invalidate_cache()
+
+        result = StatusDataManager.fetch_consolidated_stats_data(
+            token="test_token",
+            api_environment="production",
+            time_period="day",
+            role="SUPERADMIN",
+            force_refresh=True,
+        )
+
+        mock_dashboard.assert_called()
+        mock_user_stats.assert_called_once()
+        args, kwargs = mock_user_stats.call_args
+        assert args[2] == "last_day"
+        assert kwargs["group_by"] == "quarter_hour"
+        assert result["user_stats"] == {"data": {"registration_trends": []}}
+
+    @patch("trendsearth_ui.utils.status_data_manager.fetch_scripts_count", return_value=0)
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_execution_stats", return_value={"data": {}}
+    )
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_user_stats",
+        return_value={"data": {"registration_trends": []}},
+    )
+    @patch(
+        "trendsearth_ui.utils.status_data_manager.fetch_dashboard_stats",
+        return_value={"data": {"summary": {}}},
+    )
+    def test_consolidated_stats_uses_hour_for_last_week(
+        self,
+        mock_dashboard,
+        mock_user_stats,
+        mock_execution_stats,
+        _mock_scripts_count,
+    ):
+        """Ensure consolidated stats request hourly user buckets for last-week period."""
+
+        StatusDataManager.invalidate_cache()
+
+        result = StatusDataManager.fetch_consolidated_stats_data(
+            token="test_token",
+            api_environment="production",
+            time_period="week",
+            role="SUPERADMIN",
+            force_refresh=True,
+        )
+
+        mock_dashboard.assert_called()
+        mock_user_stats.assert_called_once()
+        args, kwargs = mock_user_stats.call_args
+        assert args[2] == "last_week"
+        assert kwargs["group_by"] == "hour"
+        assert result["user_stats"] == {"data": {"registration_trends": []}}
 
     @patch("trendsearth_ui.utils.status_data_manager.requests.get")
     def test_time_series_data_fetching_with_caching(self, mock_get):

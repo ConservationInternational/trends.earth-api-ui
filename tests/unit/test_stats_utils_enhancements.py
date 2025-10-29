@@ -14,24 +14,23 @@ from trendsearth_ui.utils.stats_utils import (
 class TestGetOptimalGroupingForPeriod:
     """Test the optimal grouping function for different time periods."""
 
-    def test_last_day_returns_hour_grouping(self):
-        """Test that last_day period returns appropriate grouping (fixed for API compatibility)."""
+    def test_last_day_returns_quarter_hour_grouping(self):
+        """Test that last_day period returns quarter-hour user grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_day")
-        # Fixed: user stats API doesn't accept "hour", only "day", "week", "month"
-        assert user_group == "day"  # Changed from "hour" to prevent API error
-        assert exec_group == "hour"  # Execution stats API still accepts "hour"
+        assert user_group == "quarter_hour"
+        assert exec_group == "hour"
 
-    def test_last_week_returns_day_grouping(self):
-        """Test that last_week period returns day grouping."""
+    def test_last_week_returns_hour_grouping(self):
+        """Test that last_week period returns hour grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_week")
+        assert user_group == "hour"
+        assert exec_group == "hour"
+
+    def test_last_month_returns_day_grouping(self):
+        """Test that last_month period returns day grouping."""
+        user_group, exec_group = get_optimal_grouping_for_period("last_month")
         assert user_group == "day"
         assert exec_group == "day"
-
-    def test_last_month_returns_week_grouping(self):
-        """Test that last_month period returns week grouping."""
-        user_group, exec_group = get_optimal_grouping_for_period("last_month")
-        assert user_group == "week"
-        assert exec_group == "week"
 
     def test_last_year_returns_month_grouping(self):
         """Test that last_year period returns month grouping."""

@@ -31,14 +31,14 @@ def get_optimal_grouping_for_period(period):
         tuple: (user_group_by, execution_group_by) optimal for the period
 
     Note:
-        User stats API accepts: day, week, month
+        User stats API accepts: quarter_hour, hour, day, week, month
         Execution stats API accepts: hour, day, week, month
         We use compatible values to prevent API errors.
     """
     mapping = {
-        "last_day": ("day", "hour"),  # Fixed: user stats API doesn't accept "hour"
-        "last_week": ("day", "hour"),
-        "last_month": ("week", "day"),
+        "last_day": ("quarter_hour", "hour"),
+        "last_week": ("hour", "hour"),
+        "last_month": ("day", "day"),
         "last_year": ("month", "month"),
     }
     return mapping.get(period, ("month", "month"))
