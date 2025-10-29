@@ -156,6 +156,7 @@ def register_callbacks(app):
             State("active-tab-store", "data"),
             State("role-store", "data"),
             State("api-environment-store", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=False,
     )
@@ -167,6 +168,7 @@ def register_callbacks(app):
         active_tab,
         role,
         api_environment,
+        user_timezone,
     ):
         """
         Update time-dependent statistics components (affected by time period selection).
@@ -231,7 +233,10 @@ def register_callbacks(app):
             # Build time-dependent stats components
             if not stats_data.get("error"):
                 system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
-                    stats_data, status_data, comprehensive_data.get("time_series_data")
+                    stats_data,
+                    status_data,
+                    comprehensive_data.get("time_series_data"),
+                    user_timezone,
                 )
             else:
                 error_msg = html.Div(
@@ -479,7 +484,7 @@ def _build_status_summary(status_data, safe_timezone):
     )
 
 
-def _build_stats_components(stats_data, status_data, time_series_data):
+def _build_stats_components(stats_data, status_data, time_series_data, user_timezone="UTC"):
     """Build the enhanced statistics components."""
     dashboard_stats = stats_data.get("dashboard_stats")
     user_stats = stats_data.get("user_stats")
@@ -499,8 +504,8 @@ def _build_stats_components(stats_data, status_data, time_series_data):
     )
 
     additional_charts = create_execution_statistics_chart(
-        execution_stats, status_time_series
-    ) + create_user_statistics_chart(user_stats)
+        execution_stats, status_time_series, title_suffix="", user_timezone=user_timezone
+    ) + create_user_statistics_chart(user_stats, title_suffix="", user_timezone=user_timezone)
 
     return system_overview, stats_cards, user_map, additional_charts
 

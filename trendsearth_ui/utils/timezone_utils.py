@@ -95,6 +95,58 @@ def get_chart_axis_label(user_timezone: str, base_label: str = "Time") -> str:
     return f"{base_label} ({tz_abbrev})"
 
 
+def convert_timestamp_series_to_local(timestamps_series, user_timezone: str):
+    """Convert a pandas Series of timestamps from UTC to local timezone.
+
+    Args:
+        timestamps_series: pandas Series containing UTC timestamps
+        user_timezone: IANA timezone name
+
+    Returns:
+        pandas Series with converted local timestamps
+    """
+    import logging
+
+    import pandas as pd
+
+    logger = logging.getLogger(__name__)
+    local_timestamps = []
+    safe_timezone = get_safe_timezone(user_timezone)
+    failed_conversions = 0
+
+    logger.info(f"Converting {len(timestamps_series)} timestamps to {safe_timezone}")
+
+    for i, timestamp in enumerate(timestamps_series):
+        if pd.isna(timestamp):
+            local_timestamps.append(timestamp)
+        else:
+            try:
+                # Ensure we have a datetime object
+                if isinstance(timestamp, str):
+                    dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                elif hasattr(timestamp, "to_pydatetime"):
+                    dt_utc = timestamp.to_pydatetime()
+                else:
+                    dt_utc = timestamp
+
+                local_dt, _ = convert_utc_to_local(dt_utc, safe_timezone)
+                local_timestamps.append(local_dt)
+            except (ValueError, TypeError) as e:
+                # If conversion fails, keep original timestamp
+                failed_conversions += 1
+                logger.warning(f"Failed to convert timestamp at index {i}: {timestamp}, error: {e}")
+                local_timestamps.append(timestamp)
+
+    if failed_conversions > 0:
+        logger.warning(
+            f"Failed to convert {failed_conversions} out of {len(timestamps_series)} timestamps"
+        )
+
+    result = pd.Series(local_timestamps, index=timestamps_series.index)
+    logger.info(f"Timezone conversion complete. Result length: {len(result)}")
+    return result
+
+
 def is_valid_timezone(timezone_name: str) -> bool:
     """Check if timezone name is valid.
 
