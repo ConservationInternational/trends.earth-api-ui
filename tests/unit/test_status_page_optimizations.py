@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
+from dash import html
 import pytest
 
 from trendsearth_ui.utils.status_data_manager import StatusDataManager
@@ -490,7 +491,6 @@ class TestOptimizedStatusCallbacks:
         status_data = {"latest_status": {"executions_count": 100}}
 
         with (
-            patch("trendsearth_ui.callbacks.status.create_system_overview") as mock_overview,
             patch("trendsearth_ui.callbacks.status.create_user_geographic_map") as mock_map,
             patch(
                 "trendsearth_ui.callbacks.status.create_user_statistics_chart"
@@ -499,23 +499,20 @@ class TestOptimizedStatusCallbacks:
                 "trendsearth_ui.callbacks.status.create_execution_statistics_chart"
             ) as mock_exec_chart,
         ):
-            mock_overview.return_value = "overview"
             mock_map.return_value = "map"
             mock_user_chart.return_value = ["user_chart"]
             mock_exec_chart.return_value = ["exec_chart"]
 
             time_series_data = []
-            system_overview, stats_cards, user_map, additional_charts = _build_stats_components(
+            stats_cards, user_map, additional_charts = _build_stats_components(
                 stats_data, status_data, time_series_data, "UTC"
             )
 
             # Verify components were created
-            assert system_overview == "overview"
+            assert isinstance(stats_cards, html.Div)
             assert user_map == "map"
             assert len(additional_charts) == 2  # user + exec charts
 
             # Verify scripts count was added
-            mock_overview.assert_called_once()
-            call_args = mock_overview.call_args[0]
-            latest_status = call_args[1]
+            latest_status = status_data["latest_status"]
             assert latest_status["scripts_count"] == 50

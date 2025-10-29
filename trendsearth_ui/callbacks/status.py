@@ -1,6 +1,6 @@
 """Optimized status dashboard callbacks with reduced API calls and enhanced caching."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from cachetools import TTLCache
@@ -8,7 +8,6 @@ from dash import Input, Output, State, callback_context, dcc, html, no_update
 
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
-    create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
@@ -25,6 +24,37 @@ logger = logging.getLogger(__name__)
 
 # Request-level cache for sharing data between callbacks
 _request_cache = TTLCache(maxsize=20, ttl=30)  # 30-second TTL for request-level sharing
+
+
+def _format_display_time(value, safe_timezone, *, include_seconds=True):
+    """Format a datetime or ISO timestamp for display in the user's timezone."""
+
+    if not value:
+        return None
+
+    try:
+        if isinstance(value, str):
+            # Handle potential Z suffix
+            value = value.replace("Z", "+00:00")
+            dt_utc = datetime.fromisoformat(value)
+        elif isinstance(value, datetime):
+            dt_utc = value
+        else:
+            return None
+
+        if dt_utc.tzinfo is None:
+            dt_utc = dt_utc.replace(tzinfo=timezone.utc)
+        else:
+            dt_utc = dt_utc.astimezone(timezone.utc)
+
+        local_time_str, tz_abbrev = format_local_time(
+            dt_utc,
+            safe_timezone,
+            include_seconds=include_seconds,
+        )
+        return f"{local_time_str} {tz_abbrev}".strip()
+    except (ValueError, TypeError):
+        return None
 
 
 def _build_request_cache_key(
@@ -167,9 +197,13 @@ def register_callbacks(app):
             # 1. Build status summary
             status_summary, last_updated_label = _build_status_summary(status_data, safe_timezone)
 
+            # Prefer the actual fetch time for display so the header reflects refreshes
+            fetch_time = meta.get("fetch_time") if isinstance(meta, dict) else None
+            header_label = _format_display_time(fetch_time, safe_timezone) or last_updated_label
+
             current_status_title = (
-                f"Current System Status ({last_updated_label})"
-                if last_updated_label
+                f"Current System Status ({header_label})"
+                if header_label
                 else "Current System Status"
             )
 
@@ -205,7 +239,6 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("system-overview-content", "children"),
             Output("stats-summary-cards", "children"),
             Output("stats-user-map", "children"),
             Output("stats-additional-charts", "children"),
@@ -252,11 +285,11 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return (permission_msg, permission_msg, permission_msg, [permission_msg])
+            return (permission_msg, permission_msg, [permission_msg])
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update, no_update)
+            return (no_update, no_update, no_update)
 
         # Check if this is a manual refresh
         ctx = callback_context
@@ -300,7 +333,6 @@ def register_callbacks(app):
             # Build time-dependent stats components
             if not stats_data.get("error"):
                 (
-                    system_overview,
                     stats_cards,
                     user_map,
                     additional_charts,
@@ -322,19 +354,18 @@ def register_callbacks(app):
                     ],
                     className="p-4",
                 )
-                system_overview = error_msg
                 stats_cards = html.Div()
                 user_map = error_msg
                 additional_charts = [error_msg]
 
-            return (system_overview, stats_cards, user_map, additional_charts)
+            return (stats_cards, user_map, additional_charts)
 
         except Exception as e:
             logger.error(f"Error in time-dependent stats update: {e}")
             error_msg = html.Div(
                 f"Error loading statistics: {e}", className="text-center text-danger"
             )
-            return (html.Div(), html.Div(), error_msg, [error_msg])
+            return (html.Div(), error_msg, [error_msg])
 
     # Register additional status callbacks
     _register_additional_status_callbacks(app)
@@ -402,17 +433,8 @@ def _build_status_summary(status_data, safe_timezone):
     scripts_count = latest_status.get("scripts_count", 0)
 
     # Format timestamp (local time only)
-    timestamp = latest_status.get("timestamp", "")
-    last_updated_label = None
-    try:
-        if timestamp:
-            dt_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-            local_time_str, tz_abbrev = format_local_time(
-                dt_utc, safe_timezone, include_seconds=True
-            )
-            last_updated_label = f"{local_time_str} {tz_abbrev}".strip()
-    except (ValueError, TypeError):
-        last_updated_label = None
+    timestamp = latest_status.get("timestamp")
+    last_updated_label = _format_display_time(timestamp, safe_timezone, include_seconds=True)
 
     # Build the summary layout organized by category
     summary_component = html.Div(
@@ -496,7 +518,7 @@ def _build_stats_components(
     """Build the enhanced statistics components."""
 
     if not stats_data or stats_data.get("error"):
-        error_message = html.Div(
+        error_component = html.Div(
             [
                 html.P("Statistics unavailable.", className="text-muted text-center"),
                 html.Small(
@@ -508,7 +530,7 @@ def _build_stats_components(
             ],
             className="p-4",
         )
-        return error_message, html.Div(), error_message, [error_message]
+        return html.Div(), error_component, [error_component]
 
     user_stats = stats_data.get("user_stats")
     execution_stats = stats_data.get("execution_stats")
@@ -517,12 +539,6 @@ def _build_stats_components(
     # Add scripts count to latest status so downstream visualizations stay in sync
     latest_status = status_data.get("latest_status", {})
     latest_status["scripts_count"] = scripts_count
-
-    dashboard_stats = stats_data.get("dashboard_stats") or stats_data.get(
-        "dashboard_stats_all_time"
-    )
-
-    system_overview = create_system_overview(dashboard_stats, latest_status)
 
     stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
     user_map = create_user_geographic_map(user_stats)
@@ -543,7 +559,7 @@ def _build_stats_components(
         ui_period=ui_period,
     )
 
-    return system_overview, stats_cards, user_map, additional_charts
+    return stats_cards, user_map, additional_charts
 
 
 def _build_status_charts(time_series_data, safe_timezone, _time_tab):

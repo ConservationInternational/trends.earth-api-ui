@@ -2,6 +2,7 @@
 Unit tests for the new status tab functionality including manual tab switching.
 """
 
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, Mock, patch
 
 from dash import dcc, html
@@ -426,6 +427,7 @@ class TestStatusTabsErrorHandling:
                             "total_api_calls": 1,
                             "cache_hit": False,
                             "optimizations_applied": [],
+                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
                         },
                     },
                 ),
@@ -532,6 +534,7 @@ class TestStatusTabsErrorHandling:
                             "total_api_calls": 1,
                             "cache_hit": False,
                             "optimizations_applied": [],
+                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
                         },
                     },
                 ),
@@ -558,6 +561,7 @@ class TestStatusTabsErrorHandling:
                 # Current status title should include the timestamp information
                 assert status_title.startswith("Current System Status")
                 assert status_title != "Current System Status"
+                assert "2023-01-01 12:30:00 UTC" in status_title
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):

@@ -1027,18 +1027,6 @@ def status_tab_content(is_admin, role=None):
                                 [
                                     html.Div(
                                         [
-                                            html.H5("System Overview", className="mb-3"),
-                                            dcc.Loading(
-                                                id="loading-system-overview",
-                                                children=[html.Div(id="system-overview-content")],
-                                                type="default",
-                                                color="#007bff",
-                                            ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Div(
-                                        [
                                             # Stats summary and charts share a single loader to simplify layout
                                             dcc.Loading(
                                                 id="loading-stats-charts",

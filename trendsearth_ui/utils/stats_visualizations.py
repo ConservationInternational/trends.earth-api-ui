@@ -959,7 +959,7 @@ def create_user_statistics_chart(
 
     suffix_label = f" ({title_suffix})" if title_suffix else ""
     target_freq = {
-        "day": "15T",
+        "day": "15min",
         "week": "1H",
         "month": "1D",
     }.get(ui_period or "")
