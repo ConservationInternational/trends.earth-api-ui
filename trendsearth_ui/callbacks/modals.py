@@ -3,7 +3,8 @@
 from dash import ALL, Input, Output, State, html, no_update
 import dash_bootstrap_components as dbc
 
-from ..utils import parse_date, render_json_tree
+from ..utils import make_authenticated_request, parse_date, render_json_tree
+from ._table_helpers import RowResolutionError, resolve_row_data
 
 
 def register_callbacks(app):
@@ -60,89 +61,30 @@ def register_callbacks(app):
                 no_update,
             )
 
-        row_data = cell.get("data")
-        script_id = None
-        script_name_from_row = None
-        if row_data:
-            script_id = row_data.get("id")
-            script_name_from_row = row_data.get("name")
+        row_data = cell.get("data") if cell else None
+        try:
+            script = (
+                row_data
+                if isinstance(row_data, dict) and row_data.get("id") is not None
+                else resolve_row_data(cell, token, table_state, "/script")
+            )
+        except RowResolutionError as exc:
+            return (
+                True,
+                None,
+                "Error",
+                f"Error fetching script data: {exc}",
+                "unrestricted",
+                [],
+                [],
+                [],
+                [],
+                {"display": "none"},
+                {"display": "none"},
+            )
 
-        if not script_id:
-            row_index = cell.get("rowIndex")
-            if row_index is None:
-                return (
-                    True,
-                    None,
-                    "Error",
-                    "Could not get row index.",
-                    "unrestricted",
-                    [],
-                    [],
-                    [],
-                    [],
-                    {"display": "none"},
-                    {"display": "none"},
-                )
-            try:
-                from ..utils.helpers import make_authenticated_request
-
-                page_size = 50
-                page = (row_index // page_size) + 1
-                row_in_page = row_index % page_size
-                params = {"page": page, "per_page": page_size}
-                if table_state:
-                    if table_state.get("sort_sql"):
-                        params["sort"] = table_state["sort_sql"]
-                    if table_state.get("filter_sql"):
-                        params["filter"] = table_state["filter_sql"]
-                resp = make_authenticated_request("/script", token, params=params)
-                if resp.status_code != 200:
-                    return (
-                        True,
-                        None,
-                        "Error",
-                        f"Failed to fetch script data: {resp.status_code} - {resp.text}",
-                        "unrestricted",
-                        [],
-                        [],
-                        [],
-                        [],
-                        {"display": "none"},
-                        {"display": "none"},
-                    )
-                result = resp.json()
-                scripts = result.get("data", [])
-                if row_in_page >= len(scripts):
-                    return (
-                        True,
-                        None,
-                        "Error",
-                        f"Row index {row_in_page} out of range for page {page} (found {len(scripts)} scripts)",
-                        "unrestricted",
-                        [],
-                        [],
-                        [],
-                        [],
-                        {"display": "none"},
-                        {"display": "none"},
-                    )
-                script = scripts[row_in_page]
-                script_id = script.get("id")
-                script_name_from_row = script.get("name")
-            except Exception as e:
-                return (
-                    True,
-                    None,
-                    "Error",
-                    f"Error fetching script data: {str(e)}",
-                    "unrestricted",
-                    [],
-                    [],
-                    [],
-                    [],
-                    {"display": "none"},
-                    {"display": "none"},
-                )
+        script_id = script.get("id") if isinstance(script, dict) else None
+        script_name_from_row = script.get("name") if isinstance(script, dict) else None
 
         if not script_id:
             return (
@@ -160,8 +102,6 @@ def register_callbacks(app):
             )
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Get script data including access control information
             resp = make_authenticated_request(f"/script/{script_id}/access", token)
             if resp.status_code == 200:
@@ -258,8 +198,6 @@ def register_callbacks(app):
             if users:
                 try:
                     # Fetch user details using the same approach as user search
-                    from ..utils.helpers import make_authenticated_request
-
                     # Get all users by querying with user IDs
                     all_user_data = {}
                     for user_id in users:
@@ -404,113 +342,31 @@ def register_callbacks(app):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         # Try to get row data from cell click event first
-        row_data = cell.get("data")
-        execution_id = None
-
-        if row_data:
-            execution_id = row_data.get("id")
-            # Add debug logging to understand when row_data is available
-            print(f"DEBUG: Got execution_id {execution_id} from row_data for column {col}")
+        row_data = cell.get("data") if cell else None
+        execution = row_data if isinstance(row_data, dict) else None
+        execution_id = execution.get("id") if execution else None
 
         # If we don't have execution_id from row data, fall back to pagination approach
         if not execution_id:
-            print(
-                f"DEBUG: No execution_id from row_data, falling back to pagination for column {col}"
-            )
-            row_index = cell.get("rowIndex")
-            if row_index is None:
-                print(f"DEBUG: No row_index available in cell click event: {cell}")
-                return (
-                    True,
-                    "Could not get row index from cell click event.",
-                    None,
-                    "Error",
-                    {"display": "none"},
-                    True,
-                    None,
-                )
-
-            # Additional safety check for unreasonable row index values
-            if row_index < 0 or row_index > 100000:  # Reasonable upper limit
-                print(f"DEBUG: Unreasonable row_index value: {row_index}")
-                return (
-                    True,
-                    f"Invalid row index: {row_index}. Please refresh the page and try again.",
-                    None,
-                    "Error",
-                    {"display": "none"},
-                    True,
-                    None,
-                )
-
+            print(f"DEBUG: No execution_id from row_data, resolving via helper for column {col}")
             try:
-                from ..utils.helpers import make_authenticated_request
-
-                # Calculate which page this row is on
-                page_size = 50  # This should match DEFAULT_PAGE_SIZE
-                page = (row_index // page_size) + 1
-                row_in_page = row_index % page_size
-
-                # Use exclude=params,results for pagination since we'll fetch them separately
-                params = {
-                    "page": page,
-                    "per_page": page_size,
-                    "exclude": "params,results",
-                    "include": "script_name,user_name,user_email,user_id,duration",
-                }
-
-                # Apply the same sort and filter that the table is currently using
-                if table_state:
-                    if table_state.get("sort_sql"):
-                        params["sort"] = table_state["sort_sql"]
-                    if table_state.get("filter_sql"):
-                        params["filter"] = table_state["filter_sql"]
-
-                print(
-                    f"DEBUG: Fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                execution = resolve_row_data(
+                    cell,
+                    token,
+                    table_state,
+                    "/execution",
+                    include="script_name,user_name,user_email,user_id,duration",
+                    exclude="params,results",
                 )
-                resp = make_authenticated_request("/execution", token, params=params)
-                if resp.status_code != 200:
-                    return (
-                        True,
-                        f"Failed to fetch execution data: {resp.status_code} - {resp.text}",
-                        None,
-                        "Error",
-                        {"display": "none"},
-                        True,
-                        None,
+                execution_id = execution.get("id") if execution else None
+                if execution_id:
+                    print(
+                        f"DEBUG: Resolved execution_id {execution_id} with helper for column {col}"
                     )
-
-                result = resp.json()
-                executions = result.get("data", [])
-
-                if row_in_page >= len(executions):
-                    return (
-                        True,
-                        f"Row index {row_in_page} out of range for page {page} (found {len(executions)} executions)",
-                        None,
-                        "Error",
-                        {"display": "none"},
-                        True,
-                        None,
-                    )
-
-                execution_data = executions[row_in_page]
-                execution_id = execution_data.get("id")
-
-                # Add verification logging
-                print(
-                    f"DEBUG: Found execution_id {execution_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}"
-                )
-                print(
-                    f"DEBUG: Execution data: script_name={execution_data.get('script_name')}, status={execution_data.get('status')}"
-                )
-
-            except Exception as e:
-                print(f"DEBUG: Exception in pagination fallback: {str(e)}")
+            except RowResolutionError as exc:
                 return (
                     True,
-                    f"Error fetching execution data: {str(e)}",
+                    f"Error fetching execution data: {exc}",
                     None,
                     "Error",
                     {"display": "none"},
@@ -534,8 +390,6 @@ def register_callbacks(app):
 
         # Verify the execution exists before fetching logs to prevent wrong execution issues
         try:
-            from ..utils.helpers import make_authenticated_request
-
             verification_resp = make_authenticated_request(
                 f"/execution/{execution_id}", token, params={"include": "id,script_name,status"}
             )
@@ -567,8 +421,6 @@ def register_callbacks(app):
             # Continue anyway, as verification failure shouldn't block the logs
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             if col == "params":
                 # Always fetch params from the individual execution endpoint
                 resp = make_authenticated_request(
@@ -670,8 +522,6 @@ def register_callbacks(app):
                 )
 
             elif col == "logs":
-                from ..utils.helpers import make_authenticated_request
-
                 # Get execution status from row data for auto-refresh control
                 execution_status = None
                 if row_data:
@@ -776,8 +626,6 @@ def register_callbacks(app):
                 )
 
             elif col == "docker_logs":
-                from ..utils.helpers import make_authenticated_request
-
                 # Get execution status from row data for auto-refresh control
                 execution_status = None
                 if row_data:
@@ -961,8 +809,6 @@ def register_callbacks(app):
             return html.P("No execution context available")
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Use different endpoints based on log type
             if log_type == "docker":
                 resp = make_authenticated_request(f"/execution/{execution_id}/docker-logs", token)
@@ -1121,104 +967,28 @@ def register_callbacks(app):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         # Try to get row data from cell click event first
-        row_data = cell.get("data")
-        script_id = None
-
-        if row_data:
-            script_id = row_data.get("id")
-            # Add debug logging to understand when row_data is available
-            print(f"DEBUG: Got script_id {script_id} from row_data for logs")
+        row_data = cell.get("data") if cell else None
+        script = row_data if isinstance(row_data, dict) else None
+        script_id = script.get("id") if script else None
 
         # If we don't have row data or script_id, fall back to pagination approach
         if not script_id:
-            print("DEBUG: No script_id from row_data, falling back to pagination for script logs")
-            row_index = cell.get("rowIndex")
-            if row_index is None:
-                print(f"DEBUG: No row_index available in script logs cell click event: {cell}")
-                return (
-                    True,
-                    "Could not get row index.",
-                    None,
-                    "Error",
-                    {"display": "none"},
-                    True,
-                    None,
-                )
-
-            # Additional safety check for unreasonable row index values
-            if row_index < 0 or row_index > 100000:  # Reasonable upper limit
-                print(f"DEBUG: Unreasonable row_index value in scripts: {row_index}")
-                return (
-                    True,
-                    f"Invalid row index: {row_index}. Please refresh the page and try again.",
-                    None,
-                    "Error",
-                    {"display": "none"},
-                    True,
-                    None,
-                )
-
+            print("DEBUG: No script_id from row_data, resolving via helper for script logs")
             try:
-                from ..utils.helpers import make_authenticated_request
-
-                # Calculate which page this row is on
-                page_size = 50  # This should match DEFAULT_PAGE_SIZE
-                page = (row_index // page_size) + 1
-                row_in_page = row_index % page_size
-
-                params = {"page": page, "per_page": page_size, "include": "user_name"}
-
-                # Apply the same sort and filter that the table is currently using
-                if table_state:
-                    if table_state.get("sort_sql"):
-                        params["sort"] = table_state["sort_sql"]
-                    if table_state.get("filter_sql"):
-                        params["filter"] = table_state["filter_sql"]
-
-                print(
-                    f"DEBUG: Script logs fallback pagination request for row_index {row_index}, page {page}, row_in_page {row_in_page}"
+                script = resolve_row_data(
+                    cell,
+                    token,
+                    table_state,
+                    "/script",
+                    include="user_name",
                 )
-                resp = make_authenticated_request("/script", token, params=params)
-                if resp.status_code != 200:
-                    return (
-                        True,
-                        f"Failed to fetch script data: {resp.status_code} - {resp.text}",
-                        None,
-                        "Error",
-                        {"display": "none"},
-                        True,
-                        None,
-                    )
-
-                result = resp.json()
-                scripts = result.get("data", [])
-                if row_in_page >= len(scripts):
-                    return (
-                        True,
-                        f"Row index {row_in_page} out of range for page {page} (found {len(scripts)} scripts)",
-                        None,
-                        "Error",
-                        {"display": "none"},
-                        True,
-                        None,
-                    )
-
-                script = scripts[row_in_page]
-                script_id = script.get("id")
-
-                # Add verification logging
-                print(
-                    f"DEBUG: Found script_id {script_id} at row_index {row_index}, page {page}, row_in_page {row_in_page}"
-                )
-                print(
-                    f"DEBUG: Script data: name={script.get('name')}, user_name={script.get('user_name')}"
-                )
-
-            except Exception as e:
-                print(f"DEBUG: Exception in script pagination fallback: {str(e)}")
+                script_id = script.get("id") if script else None
+                if script_id:
+                    print(f"DEBUG: Resolved script_id {script_id} via helper for script logs")
+            except RowResolutionError as exc:
                 return (
                     True,
-                    f"Error fetching script data: {str(e)}",
+                    f"Error fetching script data: {exc}",
                     None,
                     "Error",
                     {"display": "none"},
@@ -1233,8 +1003,6 @@ def register_callbacks(app):
         print(f"DEBUG: Proceeding to fetch script logs for script_id {script_id}")
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Get the logs for this script with automatic token refresh
             print(f"DEBUG: Fetching logs for script {script_id}")
             resp = make_authenticated_request(f"/script/{script_id}/log", token)
@@ -1332,8 +1100,6 @@ def register_callbacks(app):
             return [], {"display": "none"}
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Search by name (filter like)
             name_results = []
             try:
@@ -1478,8 +1244,6 @@ def register_callbacks(app):
                 return no_update, True, "Error: No script data available", "danger", no_update
 
             try:
-                from ..utils.helpers import make_authenticated_request
-
                 script_id = script_data["script_id"]
 
                 # Use the correct endpoints and data format based on the API structure
@@ -1621,8 +1385,6 @@ def register_callbacks(app):
             )
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             script_id = script_data["script_id"]
 
             # Make the API request to delete access control restrictions using correct endpoint

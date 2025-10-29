@@ -196,7 +196,11 @@ class TestStatusPageOptimizations:
             assert "stats_skipped_for_non_superadmin" in result["meta"]["optimizations_applied"]
 
     def test_optimized_exclude_parameters_are_used(self):
-        """Test that API calls use optimized exclude parameters to reduce payload size."""
+        """Test that API parameters are correctly used (exclude parameter removed).
+
+        Note: The 'exclude' parameter was removed as it's not supported by the API.
+        This test now verifies that only supported parameters are sent.
+        """
         with patch("requests.get") as mock_get:
             mock_response = MagicMock()
             mock_response.status_code = 200
@@ -211,12 +215,15 @@ class TestStatusPageOptimizations:
                 force_refresh=True,
             )
 
-            # Verify exclude parameters were included
+            # Verify only supported parameters are used (no 'exclude')
             call_args = mock_get.call_args
             assert call_args is not None
             params = call_args[1]["params"]
-            assert "exclude" in params
-            assert "metadata,logs,extra_data" in params["exclude"]
+            # Verify exclude is NOT in params (it's unsupported by the API)
+            assert "exclude" not in params
+            # Verify supported parameters ARE present
+            assert "sort" in params
+            assert params["sort"] == "-timestamp"  # Descending order
 
     def test_adaptive_max_points_based_on_time_period(self):
         """Test that max points provide sufficient coverage for each time period."""
@@ -411,7 +418,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_optimized_callbacks_registered_successfully(self):
         """Test that optimized callbacks can be registered without errors."""
-        from trendsearth_ui.callbacks.status_optimized import register_optimized_callbacks
+        from trendsearth_ui.callbacks.status import register_optimized_callbacks
 
         # Mock app
         mock_app = MagicMock()
@@ -424,7 +431,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_status_summary_building_with_complete_data(self):
         """Test status summary building with complete status data."""
-        from trendsearth_ui.callbacks.status_optimized import _build_status_summary
+        from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Mock status data
         status_data = {
@@ -452,7 +459,7 @@ class TestOptimizedStatusCallbacks:
 
     def test_status_summary_handles_missing_data_gracefully(self):
         """Test that status summary handles missing or invalid data gracefully."""
-        from trendsearth_ui.callbacks.status_optimized import _build_status_summary
+        from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Test with None data
         result1 = _build_status_summary(None, "UTC")
@@ -469,11 +476,11 @@ class TestOptimizedStatusCallbacks:
 
     def test_stats_components_building_for_superadmin(self):
         """Test stats components building for SUPERADMIN users."""
-        from trendsearth_ui.callbacks.status_optimized import _build_stats_components
+        from trendsearth_ui.callbacks.status import _build_stats_components
 
         # Mock data
         stats_data = {
-            "dashboard_stats": {"summary": {"total_executions": 100}},
+            "dashboard_stats": {"data": {"summary": {"total_executions": 100}}},
             "user_stats": {"geographic_distribution": []},
             "execution_stats": {"time_series": []},
             "scripts_count": 50,
@@ -482,17 +489,13 @@ class TestOptimizedStatusCallbacks:
         status_data = {"latest_status": {"executions_count": 100}}
 
         with (
+            patch("trendsearth_ui.callbacks.status.create_system_overview") as mock_overview,
+            patch("trendsearth_ui.callbacks.status.create_user_geographic_map") as mock_map,
             patch(
-                "trendsearth_ui.callbacks.status_optimized.create_system_overview"
-            ) as mock_overview,
-            patch(
-                "trendsearth_ui.callbacks.status_optimized.create_user_geographic_map"
-            ) as mock_map,
-            patch(
-                "trendsearth_ui.callbacks.status_optimized.create_user_statistics_chart"
+                "trendsearth_ui.callbacks.status.create_user_statistics_chart"
             ) as mock_user_chart,
             patch(
-                "trendsearth_ui.callbacks.status_optimized.create_execution_statistics_chart"
+                "trendsearth_ui.callbacks.status.create_execution_statistics_chart"
             ) as mock_exec_chart,
         ):
             mock_overview.return_value = "overview"

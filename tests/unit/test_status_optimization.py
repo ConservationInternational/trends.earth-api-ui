@@ -179,30 +179,32 @@ class TestStatusCallbackOptimization:
         # Register callbacks
         register_callbacks(mock_app)
 
-        # Get the status summary callback
-        status_summary_func = callback_functions.get("update_status_summary")
+        # Get the time-independent status callback (renamed from update_comprehensive_status_data)
+        status_summary_func = callback_functions.get("update_time_independent_status_data")
         assert status_summary_func is not None
 
         # Mock the callback context to simulate manual refresh
         with (
             patch("trendsearth_ui.callbacks.status.callback_context") as mock_ctx,
-            patch("trendsearth_ui.callbacks.status.get_cached_data") as mock_get_cache,
-            patch("trendsearth_ui.callbacks.status.fetch_deployment_info") as mock_deployment,
-            patch("trendsearth_ui.callbacks.status.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_helpers.fetch_deployment_info") as mock_deployment,
+            patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
             patch(
-                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_consolidated_status_data"
+                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data"
             ) as mock_status_data,
         ):
             # Set up mocks
             mock_ctx.triggered = [{"prop_id": "refresh-status-btn.n_clicks"}]
-            mock_get_cache.return_value = None
             mock_deployment.return_value = {"deployment": "info"}
             mock_swarm.return_value = ({"swarm": "info"}, "")
             mock_status_data.return_value = {
-                "status_endpoint_available": False
-            }  # Use fallback to avoid complex API mocking
+                "status_data": {"summary": "SUCCESS"},
+                "deployment_data": {"deployment": "info"},
+                "swarm_data": {"info": {"swarm": "info"}, "cached_time": ""},
+                "stats_data": {},
+                "meta": {"cache_hit": False},
+            }
 
-            # Call the function with manual refresh
+            # Call the function with manual refresh (time-independent callback doesn't need time_period)
             status_summary_func(
                 _n_intervals=1,
                 _refresh_clicks=1,

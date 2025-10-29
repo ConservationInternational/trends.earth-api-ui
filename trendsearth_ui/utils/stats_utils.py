@@ -1,64 +1,12 @@
-"""Utility functions for fetching and processing stats data from the API."""
+"""Utility functions for fetching and processing stats data from the API.
 
-import time
+NOTE: Caching is handled by StatusDataManager. These functions are pure API fetch utilities.
+"""
 
 import requests
 
 from ..config import get_api_base
-
-# Cache for stats data with TTL
-_stats_cache = {
-    "dashboard": {"data": None, "timestamp": 0, "ttl": 300},  # 5 minutes
-    "users": {"data": {}, "timestamp": 0, "ttl": 300},  # 5 minutes
-    "executions": {"data": {}, "timestamp": 0, "ttl": 300},  # 5 minutes
-}
-
-
-def get_cached_stats_data(cache_key, period=None, ttl=None):
-    """Get cached stats data if still valid."""
-    cache_entry = _stats_cache.get(cache_key, {})
-    if ttl is None:
-        ttl = cache_entry.get("ttl", 300)
-
-    current_time = time.time()
-
-    # For data that varies by period, use period as sub-key
-    if period:
-        cache_data = cache_entry.get("data", {})
-        if (
-            isinstance(cache_data, dict)
-            and period in cache_data
-            and current_time - cache_entry.get("timestamp", 0) < ttl
-        ):
-            return cache_data[period]
-    else:
-        # For non-period specific data
-        if (
-            cache_entry.get("data") is not None
-            and current_time - cache_entry.get("timestamp", 0) < ttl
-        ):
-            return cache_entry["data"]
-
-    return None
-
-
-def set_cached_stats_data(cache_key, data, period=None, ttl=None):
-    """Set cached stats data with timestamp."""
-    if cache_key not in _stats_cache:
-        _stats_cache[cache_key] = {"data": {}, "timestamp": 0, "ttl": 300}
-
-    if period:
-        # For period-specific data, store under period sub-key
-        if not isinstance(_stats_cache[cache_key]["data"], dict):
-            _stats_cache[cache_key]["data"] = {}
-        _stats_cache[cache_key]["data"][period] = data
-    else:
-        # For non-period specific data
-        _stats_cache[cache_key]["data"] = data
-
-    _stats_cache[cache_key]["timestamp"] = time.time()
-    if ttl is not None:
-        _stats_cache[cache_key]["ttl"] = ttl
+from .logging_config import get_logger, log_error
 
 
 def check_stats_access(role):
@@ -81,9 +29,14 @@ def get_optimal_grouping_for_period(period):
 
     Returns:
         tuple: (user_group_by, execution_group_by) optimal for the period
+
+    Note:
+        User stats API accepts: day, week, month
+        Execution stats API accepts: hour, day, week, month
+        We use compatible values to prevent API errors.
     """
     mapping = {
-        "last_day": ("hour", "hour"),
+        "last_day": ("day", "hour"),  # Fixed: user stats API doesn't accept "hour"
         "last_week": ("day", "day"),
         "last_month": ("week", "week"),
         "last_year": ("month", "month"),
@@ -109,12 +62,6 @@ def fetch_dashboard_stats(
     import logging
 
     logger = logging.getLogger(__name__)
-
-    # Check cache first
-    cached_data = get_cached_stats_data("dashboard", period)
-    if cached_data is not None:
-        logger.info(f"Dashboard stats: Returning cached data for period {period}")
-        return cached_data
 
     # Enhanced logging for debugging
     logger.info(
@@ -148,8 +95,7 @@ def fetch_dashboard_stats(
 
         if resp.status_code == 200:
             data = resp.json()
-            set_cached_stats_data("dashboard", data, period)
-            logger.info(f"Dashboard stats: Successfully fetched and cached data for {period}")
+            logger.info(f"Dashboard stats: Successfully fetched data for {period}")
             return data
         elif resp.status_code == 401:
             logger.warning("Dashboard stats: Unauthorized access (401). Check token.")
@@ -162,8 +108,9 @@ def fetch_dashboard_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"Dashboard stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -171,7 +118,7 @@ def fetch_dashboard_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"Dashboard stats: Request failed: {e}")
+        log_error(logger, f"Dashboard stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -189,12 +136,6 @@ def fetch_scripts_count(token, api_environment="production"):
     import logging
 
     logger = logging.getLogger(__name__)
-
-    # Check cache first
-    cached_data = get_cached_stats_data("scripts_count")
-    if cached_data is not None:
-        logger.info("Scripts count: Returning cached data")
-        return cached_data
 
     logger.info(f"Scripts count: Fetching data for environment={api_environment}")
 
@@ -220,14 +161,13 @@ def fetch_scripts_count(token, api_environment="production"):
             data = resp.json()
             # Extract total count from paginated response
             total_count = data.get("total", len(data.get("data", [])))
-            set_cached_stats_data("scripts_count", total_count, ttl=300)  # Cache for 5 minutes
             logger.info(f"Scripts count: Successfully fetched {total_count} scripts")
             return total_count
         else:
             logger.warning(f"Scripts count: Failed to fetch. Status: {resp.status_code}")
             return 0
     except requests.exceptions.RequestException as e:
-        logger.error(f"Scripts count: Request failed: {e}")
+        log_error(logger, f"Scripts count: Request failed: {e}")
         return 0
 
 
@@ -247,20 +187,7 @@ def fetch_user_stats(
     Returns:
         dict: User statistics data or None if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
-
-    # Create cache key that includes all parameters for proper caching
-    cache_key_suffix = f"{period}_{group_by or 'none'}_{country or 'none'}"
-
-    # Check cache first
-    cached_data = get_cached_stats_data("users", cache_key_suffix)
-    if cached_data is not None:
-        logger.info(
-            f"User stats: Returning cached data for period {period}, group_by {group_by}, country {country}"
-        )
-        return cached_data
+    logger = get_logger()
 
     logger.info(
         f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}"
@@ -290,9 +217,8 @@ def fetch_user_stats(
 
         if resp.status_code == 200:
             data = resp.json()
-            set_cached_stats_data("users", data, cache_key_suffix)
             logger.info(
-                f"User stats: Successfully fetched and cached data for {period}, group_by {group_by}, country {country}"
+                f"User stats: Successfully fetched data for {period}, group_by {group_by}, country {country}"
             )
             return data
         elif resp.status_code == 401:
@@ -306,8 +232,9 @@ def fetch_user_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"User stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -315,7 +242,7 @@ def fetch_user_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"User stats: Request failed: {e}")
+        log_error(logger, f"User stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
 
@@ -341,20 +268,7 @@ def fetch_execution_stats(
     Returns:
         dict: Execution statistics data or None if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
-
-    # Create cache key that includes all parameters for proper caching
-    cache_key_suffix = f"{period}_{group_by or 'none'}_{task_type or 'none'}_{status or 'none'}"
-
-    # Check cache first
-    cached_data = get_cached_stats_data("executions", cache_key_suffix)
-    if cached_data is not None:
-        logger.info(
-            f"Execution stats: Returning cached data for period {period}, group_by {group_by}, task_type {task_type}, status {status}"
-        )
-        return cached_data
+    logger = get_logger()
 
     logger.info(
         f"Execution stats: Fetching data for period={period}, group_by={group_by}, task_type={task_type}, status={status}, environment={api_environment}"
@@ -386,9 +300,8 @@ def fetch_execution_stats(
 
         if resp.status_code == 200:
             data = resp.json()
-            set_cached_stats_data("executions", data, cache_key_suffix)
             logger.info(
-                f"Execution stats: Successfully fetched and cached data for {period}, group_by {group_by}, task_type {task_type}, status {status}"
+                f"Execution stats: Successfully fetched data for {period}, group_by {group_by}, task_type {task_type}, status {status}"
             )
             return data
         elif resp.status_code == 401:
@@ -402,8 +315,9 @@ def fetch_execution_stats(
                 "status_code": 403,
             }
         else:
-            logger.error(
-                f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}"
+            log_error(
+                logger,
+                f"Execution stats: Failed to fetch data. Status: {resp.status_code}, Body: {resp.text}",
             )
             return {
                 "error": True,
@@ -411,5 +325,5 @@ def fetch_execution_stats(
                 "status_code": resp.status_code,
             }
     except requests.exceptions.RequestException as e:
-        logger.error(f"Execution stats: Request failed: {e}")
+        log_error(logger, f"Execution stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

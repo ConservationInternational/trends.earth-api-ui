@@ -1,119 +1,157 @@
 """Visualization utilities for stats charts and maps."""
 
+import logging
+from typing import Any, Callable
+
 from dash import dcc, html
 import pandas as pd
 import plotly.graph_objects as go
 
 
+def _build_message_block(
+    message: str,
+    *,
+    detail: str | None = None,
+    message_class: str = "text-muted text-center",
+    detail_class: str = "text-muted text-center d-block",
+    container_class: str = "p-4",
+) -> html.Div:
+    """Build a reusable message block for empty/error states."""
+
+    children: list[Any] = [html.P(message, className=message_class)]
+    if detail:
+        children.append(html.Small(detail, className=detail_class))
+    return html.Div(children, className=container_class)
+
+
+def _resolve_error_detail(
+    payload: dict[str, Any],
+    *,
+    forbidden_detail: str,
+    unauthorized_detail: str,
+    default_message: str,
+) -> str:
+    """Generate detailed error message based on API response payload."""
+
+    status_code = payload.get("status_code")
+    message = payload.get("message", "No data available")
+
+    if status_code == 403:
+        return forbidden_detail
+    if status_code == 401:
+        return unauthorized_detail
+    return default_message.format(error_msg=message)
+
+
+def _extract_stats_data(
+    payload: Any,
+    *,
+    empty_response: html.Div,
+    unexpected_response: html.Div,
+    error_response_builder: Callable[[dict[str, Any]], html.Div],
+    logger: logging.Logger,
+    log_prefix: str,
+) -> tuple[dict[str, Any] | None, html.Div | None]:
+    """Normalize payload validation and data extraction for stats endpoints."""
+
+    logger.info(f"{log_prefix}: Received data type: {type(payload)}")
+
+    if not payload:
+        return None, empty_response
+
+    if isinstance(payload, list):
+        logger.warning(f"{log_prefix}: Unexpected list payload; cannot parse data.")
+        return None, unexpected_response
+
+    if not isinstance(payload, dict):
+        logger.warning(f"{log_prefix}: Unexpected payload type: {payload!r}")
+        return None, unexpected_response
+
+    if payload.get("error"):
+        logger.warning(
+            f"{log_prefix}: Error flag set with status {payload.get('status_code')} and message {payload.get('message')}"
+        )
+        return None, error_response_builder(payload)
+
+    data = payload.get("data", {})
+    logger.info(
+        f"{log_prefix}: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+    )
+
+    if not isinstance(data, dict):
+        logger.warning(f"{log_prefix}: Data section is not a dict: {data!r}")
+        return None, unexpected_response
+
+    return data, None
+
+
 def create_user_geographic_map(user_stats_data, title_suffix=""):
-    """
-    Create a geographic map showing countries from which recent users have joined.
+    """Render a choropleth map of user registrations by country."""
 
-    Args:
-        user_stats_data: User statistics data from the API or error response structure
-        title_suffix: Additional text for the chart title
-
-    Returns:
-        dcc.Graph: Plotly map figure or error message div
-    """
     import logging
 
     logger = logging.getLogger(__name__)
 
+    empty_response = _build_message_block(
+        "No geographic data available.", detail="No data provided."
+    )
+    unexpected_response = _build_message_block(
+        "No geographic data available.", detail="Received unexpected data format from API."
+    )
+
+    def _build_error_response(payload: dict[str, Any]) -> html.Div:
+        detail = _resolve_error_detail(
+            payload,
+            forbidden_detail="You need SUPERADMIN privileges to access geographic user data.",
+            unauthorized_detail="Authentication failed. Please log in again.",
+            default_message="Geographic user data unavailable: {error_msg}",
+        )
+        return _build_message_block("No geographic user data available.", detail=detail)
+
     try:
-        # Debug logging - show what we actually received
-        logger.info(f"User geographic map: Received data type: {type(user_stats_data)}")
-        if user_stats_data:
-            logger.info(
-                f"User geographic map: Data keys: {list(user_stats_data.keys()) if isinstance(user_stats_data, dict) else 'Not a dict'}"
-            )
-
-        # Handle error response structure
-        if not user_stats_data:
-            return html.Div(
-                [
-                    html.P("No geographic data available.", className="text-muted text-center"),
-                    html.Small("No data provided.", className="text-muted text-center d-block"),
-                ],
-                className="p-4",
-            )
-
-        # Check if data is a list (unexpected format) and handle gracefully
-        if isinstance(user_stats_data, list):
-            return html.Div(
-                [
-                    html.P("No geographic data available.", className="text-muted text-center"),
-                    html.Small(
-                        "Received unexpected data format from API.",
-                        className="text-muted text-center d-block",
-                    ),
-                ],
-                className="p-4",
-            )
-
-        # Handle error response structure (should be a dict)
-        if user_stats_data.get("error", False):
-            error_msg = user_stats_data.get("message", "No data available")
-            status_code = user_stats_data.get("status_code", "unknown")
-
-            if status_code == 403:
-                error_detail = "You need SUPERADMIN privileges to access geographic user data."
-            elif status_code == 401:
-                error_detail = "Authentication failed. Please log in again."
-            else:
-                error_detail = f"Geographic user data unavailable: {error_msg}"
-
-            return html.Div(
-                [
-                    html.P(
-                        "No geographic user data available.", className="text-muted text-center"
-                    ),
-                    html.Small(
-                        error_detail,
-                        className="text-muted text-center d-block",
-                    ),
-                ],
-                className="p-4",
-            )
-
-        # Extract geographic data from user stats
-        data = user_stats_data.get("data", {})
-        logger.info(
-            f"User geographic map: Data section keys: {list(data.keys()) if isinstance(data, dict) else 'No data section'}"
+        data, message = _extract_stats_data(
+            user_stats_data,
+            empty_response=empty_response,
+            unexpected_response=unexpected_response,
+            error_response_builder=_build_error_response,
+            logger=logger,
+            log_prefix="User geographic map",
         )
 
-        # API uses 'geographic_distribution' not 'geographic'
+        if message:
+            return message
+
+        if data is None:
+            # Defensive guard; should not occur but keeps the return contract explicit.
+            return _build_message_block(
+                "No geographic user data available.",
+                detail="User statistics response missing data section.",
+            )
+
         geographic_data = data.get("geographic_distribution", {})
         logger.info(
-            f"User geographic map: Geographic section keys: {list(geographic_data.keys()) if isinstance(geographic_data, dict) else 'No geographic section'}"
+            "User geographic map: Geographic section keys: %s",
+            list(geographic_data.keys())
+            if isinstance(geographic_data, dict)
+            else "No geographic section",
         )
 
         if not geographic_data:
-            return html.Div(
-                [
-                    html.P(
-                        "No geographic user data available.", className="text-muted text-center"
-                    ),
-                    html.Small(
-                        "User location data may not be configured, or you may need SUPERADMIN privileges to access this data.",
-                        className="text-muted text-center d-block",
-                    ),
-                ],
-                className="p-4",
+            return _build_message_block(
+                "No geographic user data available.",
+                detail=(
+                    "User location data may not be configured, or you may need SUPERADMIN "
+                    "privileges to access this data."
+                ),
             )
 
-        # Process geographic data - expect format like:
-        # {"top_countries": [{"country": "US", "count": 45}, {"country": "CA", "count": 12}, ...]}
-        # or {"countries": {"US": 45, "CA": 12, "GB": 8, ...}}
         countries_data = geographic_data.get("countries", {})
         top_countries_data = geographic_data.get("top_countries", [])
 
-        logger.info(f"Countries data: {countries_data}")
-        logger.info(f"Top countries data: {top_countries_data}")
+        logger.info("Countries data: %s", countries_data)
+        logger.info("Top countries data: %s", top_countries_data)
 
-        # Handle both possible formats
         if top_countries_data and isinstance(top_countries_data, list):
-            # Convert list format to dict format
             countries_data = {}
             for item in top_countries_data:
                 if isinstance(item, dict):
@@ -122,21 +160,17 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                     if country:
                         countries_data[country] = count
 
-        logger.info(f"Final countries data: {countries_data}")
+        logger.info("Final countries data: %s", countries_data)
 
         if not countries_data:
-            return html.Div(
-                [
-                    html.P("No country data available.", className="text-muted text-center"),
-                    html.Small(
-                        "User country information not available for this period. This may be due to insufficient privileges or no user data for the selected timeframe.",
-                        className="text-muted text-center d-block",
-                    ),
-                ],
-                className="p-4",
+            return _build_message_block(
+                "No country data available.",
+                detail=(
+                    "User country information not available for this period. This may be due to "
+                    "insufficient privileges or no user data for the selected timeframe."
+                ),
             )
 
-        # Country name to ISO-3 code mapping for common countries
         country_code_mapping = {
             "China": "CHN",
             "Mozambique": "MOZ",
@@ -206,10 +240,9 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
             "Madagascar": "MDG",
         }
 
-        # Convert country names to ISO-3 codes and filter valid ones
-        iso_countries = []
-        iso_counts = []
-        country_labels = []
+        iso_countries: list[str] = []
+        iso_counts: list[int] = []
+        country_labels: list[str] = []
 
         for country, count in countries_data.items():
             iso_code = country_code_mapping.get(country)
@@ -218,25 +251,19 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
                 iso_counts.append(count)
                 country_labels.append(f"{country}: {count} users")
             else:
-                logger.warning(f"No ISO-3 code mapping found for country: {country}")
+                logger.warning("No ISO-3 code mapping found for country: %s", country)
 
-        logger.info(f"Mapped to ISO codes: {dict(zip(iso_countries, iso_counts))}")
+        logger.info("Mapped to ISO codes: %s", dict(zip(iso_countries, iso_counts)))
 
         if not iso_countries:
-            return html.Div(
-                [
-                    html.P(
-                        "No mappable country data available.", className="text-muted text-center"
-                    ),
-                    html.Small(
-                        f"Countries found: {', '.join(countries_data.keys())}. These countries need ISO-3 code mapping.",
-                        className="text-muted text-center d-block",
-                    ),
-                ],
-                className="p-4",
+            return _build_message_block(
+                "No mappable country data available.",
+                detail=(
+                    "Countries found: "
+                    f"{', '.join(countries_data.keys())}. These countries need ISO-3 code mapping."
+                ),
             )
 
-        # Create the choropleth map
         fig = go.Figure(
             data=go.Choropleth(
                 locations=iso_countries,
@@ -262,22 +289,26 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
 
         return dcc.Graph(figure=fig, config={"displayModeBar": False, "responsive": True})
 
-    except Exception as e:
-        return html.Div(
-            [
-                html.P("Error creating geographic map.", className="text-danger text-center"),
-                html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
-            ],
-            className="p-4",
+    except Exception:  # pragma: no cover - safeguarding unexpected runtime failures
+        logger.exception("Error creating geographic user map")
+        return _build_message_block(
+            "Error creating geographic map.",
+            detail="An unexpected error occurred while rendering the map.",
+            message_class="text-danger text-center",
         )
 
 
-def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
+def create_execution_statistics_chart(
+    execution_stats_data,
+    status_time_series_data=None,
+    title_suffix="",
+):
     """
     Create execution statistics charts showing trends and distribution.
 
     Args:
-        execution_stats_data: Execution statistics data from the API or error response structure
+    execution_stats_data: Execution statistics data from the API or error response structure
+    status_time_series_data: Optional status time series data providing instantaneous counts
         title_suffix: Additional text for the chart title
 
     Returns:
@@ -377,9 +408,219 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                 )
             ]
 
-        charts = []
+        charts: list[Any] = []
 
-        # 1. Task Performance - handle actual data structure
+        execution_charts: list[html.Div] = []
+
+        status_colors = {
+            "FINISHED": "#43a047",
+            "FAILED": "#e53935",
+            "CANCELLED": "#8e24aa",
+            "RUNNING": "#1e88e5",
+            "PENDING": "#ffa726",
+            "READY": "#6d4c41",
+        }
+
+        # 1. Execution Outcomes (cumulative) from execution stats time series
+        trends_data = data.get("time_series", [])
+        if trends_data:
+            flattened_data = []
+            status_lookup: dict[str, str] = {}
+            for entry in trends_data:
+                row = {"date": entry.get("timestamp")}
+                by_status = entry.get("by_status", {})
+                for status_key, count in by_status.items():
+                    normalized_key = status_key.lower()
+                    row[normalized_key] = count
+                    status_lookup.setdefault(normalized_key, status_key)
+                flattened_data.append(row)
+
+            df = pd.DataFrame(flattened_data)
+
+            if not df.empty and "date" in df.columns:
+                df["date"] = pd.to_datetime(df["date"], errors="coerce")
+                df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
+
+                status_columns = [col for col in df.columns if col != "date"]
+                completed_columns = [
+                    col for col in status_columns if col in {"finished", "failed", "cancelled"}
+                ]
+
+                def _display_name(column: str) -> str:
+                    original = status_lookup.get(column, column)
+                    return original.replace("_", " ").title()
+
+                def _color_for(column: str) -> str:
+                    original = status_lookup.get(column, column).upper()
+                    return status_colors.get(original, "#666666")
+
+                def _coerce_series(column_name: str) -> pd.Series:
+                    return pd.to_numeric(df[column_name], errors="coerce").fillna(0)
+
+                if completed_columns:
+                    fig_completed = go.Figure()
+                    for column in completed_columns:
+                        cumulative_values = _coerce_series(column).cumsum()
+                        fig_completed.add_trace(
+                            go.Scatter(
+                                x=df["date"],
+                                y=cumulative_values,
+                                mode="lines",
+                                name=_display_name(column),
+                                line={"color": _color_for(column), "width": 3},
+                                line_shape="hv",
+                                hovertemplate=(
+                                    f"<b>{_display_name(column)}</b><br>%{{x}}"
+                                    "<br>Cumulative Count: %{{y}}<extra></extra>"
+                                ),
+                            )
+                        )
+
+                    fig_completed.update_layout(
+                        title=f"Execution Outcomes (Cumulative){title_suffix}",
+                        xaxis_title="Time Period",
+                        yaxis_title="Cumulative Executions",
+                        height=360,
+                        hovermode="x unified",
+                        legend={
+                            "orientation": "h",
+                            "yanchor": "bottom",
+                            "y": 1.02,
+                            "xanchor": "center",
+                            "x": 0.5,
+                        },
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                    )
+
+                    execution_charts.append(
+                        html.Div(
+                            [
+                                html.H6("Execution Outcomes (Cumulative)"),
+                                dcc.Graph(
+                                    figure=fig_completed,
+                                    config={"displayModeBar": False, "responsive": True},
+                                ),
+                            ],
+                            className="mb-3",
+                        )
+                    )
+                else:
+                    execution_charts.append(
+                        _build_message_block(
+                            "No cumulative execution data available.",
+                            detail=(
+                                "The execution statistics time series did not include finished, failed, or "
+                                "cancelled statuses."
+                            ),
+                        )
+                    )
+            else:
+                execution_charts.append(
+                    _build_message_block(
+                        "No execution trend data available.",
+                        detail="Execution timestamps could not be parsed from the API response.",
+                    )
+                )
+
+        # 2. Execution States In Progress from status time series data
+        status_series = status_time_series_data or []
+        if isinstance(status_series, dict):
+            status_series = status_series.get("data", [])
+
+        if status_series:
+            status_df = pd.DataFrame(status_series)
+
+            if not status_df.empty and "timestamp" in status_df.columns:
+                status_df["timestamp"] = pd.to_datetime(status_df["timestamp"], errors="coerce")
+                status_df = (
+                    status_df.dropna(subset=["timestamp"])
+                    .sort_values("timestamp")
+                    .reset_index(drop=True)
+                )
+
+                in_process_columns = [
+                    column
+                    for column in [
+                        "executions_ready",
+                        "executions_pending",
+                        "executions_running",
+                    ]
+                    if column in status_df.columns
+                ]
+
+                if in_process_columns:
+                    fig_in_process = go.Figure()
+                    for column in in_process_columns:
+                        values = pd.to_numeric(status_df[column], errors="coerce").fillna(0)
+                        status_name = column.replace("executions_", "").replace("_", " ").title()
+                        fig_in_process.add_trace(
+                            go.Scatter(
+                                x=status_df["timestamp"],
+                                y=values,
+                                mode="lines",
+                                name=status_name,
+                                line={
+                                    "color": status_colors.get(status_name.upper(), "#666666"),
+                                    "width": 3,
+                                },
+                                line_shape="hv",
+                                hovertemplate=(
+                                    f"<b>{status_name}</b><br>%{{x}}<br>Count: %{{y}}<extra></extra>"
+                                ),
+                            )
+                        )
+
+                    fig_in_process.update_layout(
+                        title=f"Execution States In Progress{title_suffix}",
+                        xaxis_title="Time Period",
+                        yaxis_title="Number of Executions",
+                        height=360,
+                        hovermode="x unified",
+                        legend={
+                            "orientation": "h",
+                            "yanchor": "bottom",
+                            "y": 1.02,
+                            "xanchor": "center",
+                            "x": 0.5,
+                        },
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                    )
+
+                    execution_charts.append(
+                        html.Div(
+                            [
+                                html.H6("Execution States In Progress"),
+                                dcc.Graph(
+                                    figure=fig_in_process,
+                                    config={"displayModeBar": False, "responsive": True},
+                                ),
+                            ],
+                            className="mb-3",
+                        )
+                    )
+                else:
+                    execution_charts.append(
+                        _build_message_block(
+                            "No in-progress execution data available.",
+                            detail=(
+                                "Status time series data did not include ready, pending, or running counts for this period."
+                            ),
+                        )
+                    )
+            else:
+                execution_charts.append(
+                    _build_message_block(
+                        "No in-progress execution data available.",
+                        detail="Status timestamps could not be parsed from the API response.",
+                    )
+                )
+
+        if execution_charts:
+            charts.extend(execution_charts)
+
+        # 3. Task Performance - handle actual data structure
         # API returns a list of task objects, not a dict with by_status
         task_performance_data = data.get("task_performance", [])
         logger.info(f"Task performance data: {task_performance_data}")
@@ -439,7 +680,6 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                 durations = []
                 for task in task_performance_data[:10]:  # Top 10 tasks
                     if isinstance(task, dict):
-                        # Convert duration from string to float, handling potential formats
                         duration_str = task.get("avg_duration_minutes", "0")
                         try:
                             if isinstance(duration_str, str):
@@ -450,7 +690,6 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                             duration = 0
                         durations.append(duration)
 
-                # Create horizontal bar chart for task duration
                 fig_duration = go.Figure(
                     data=[
                         go.Bar(
@@ -484,7 +723,6 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                     )
                 )
 
-                # Create a combined scatter plot for execution count vs duration
                 fig_combined = go.Figure()
 
                 fig_combined.add_trace(
@@ -536,82 +774,7 @@ def create_execution_statistics_chart(execution_stats_data, title_suffix=""):
                     )
                 )
 
-        # 2. Time Series Trends - enhanced to handle group_by data
-        # API returns 'time_series' data when group_by parameter is used
-        trends_data = data.get("time_series", [])
-        if trends_data:
-            # Convert to DataFrame for easier handling
-            df = pd.DataFrame(trends_data)
-
-            if not df.empty and "date" in df.columns:
-                fig_trend = go.Figure()
-
-                # Enhanced color scheme for better visibility
-                status_colors = {
-                    "FINISHED": "#43a047",  # Green
-                    "FAILED": "#e53935",  # Red
-                    "CANCELLED": "#8e24aa",  # Purple
-                    "RUNNING": "#1e88e5",  # Blue
-                    "PENDING": "#ffa726",  # Orange
-                }
-
-                # Add traces for different execution statuses with enhanced styling
-                for status in ["FINISHED", "FAILED", "CANCELLED", "RUNNING", "PENDING"]:
-                    status_col = status.lower()
-                    if status_col in df.columns:
-                        values = df[status_col]
-
-                        # Normalize to zero baseline by subtracting the initial value from each series
-                        # This makes each line start from zero and show only changes from the starting point
-                        if len(values) > 0:
-                            initial_value = values.iloc[0]
-                            normalized_values = values - initial_value
-                        else:
-                            normalized_values = values
-
-                        fig_trend.add_trace(
-                            go.Scatter(
-                                x=df["date"],
-                                y=normalized_values,
-                                mode="lines+markers",
-                                name=status.title(),
-                                line={"color": status_colors.get(status, "#666666"), "width": 3},
-                                marker={"size": 6},
-                                hovertemplate=f"<b>{status.title()}</b><br>%{{x}}<br>Change from start: %{{y}}<extra></extra>",
-                            )
-                        )
-
-                fig_trend.update_layout(
-                    title=f"Execution Status Trends (Changes from Start){title_suffix}",
-                    xaxis_title="Time Period",
-                    yaxis_title="Change in Executions (from start of period)",
-                    height=400,
-                    hovermode="x unified",
-                    legend={
-                        "orientation": "h",
-                        "yanchor": "bottom",
-                        "y": 1.02,
-                        "xanchor": "center",
-                        "x": 0.5,
-                    },
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                    template="plotly_white",
-                )
-
-                charts.append(
-                    html.Div(
-                        [
-                            html.H6("Execution Trends"),
-                            dcc.Graph(
-                                figure=fig_trend,
-                                config={"displayModeBar": False, "responsive": True},
-                            ),
-                        ],
-                        className="mb-3",
-                    )
-                )
-
-        # 3. Top Users (instead of task types)
+        # 4. Top Users (instead of task types)
         # API has 'top_users' instead of 'task_types'
         top_users_data = data.get("top_users", [])
         if top_users_data and isinstance(top_users_data, list):

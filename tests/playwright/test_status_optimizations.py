@@ -24,8 +24,8 @@ class TestStatusPageOptimizations:
         expect(status_tab).to_be_visible()
         status_tab.click()
 
-        # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        # Wait for status elements to load - use the actual IDs that exist
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
         # Find time period buttons - look for common text patterns
         time_period_selectors = [
@@ -89,7 +89,7 @@ class TestStatusPageOptimizations:
         status_tab.click()
 
         # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
         # Look for chart containers (Plotly charts)
         chart_selectors = [
@@ -133,7 +133,7 @@ class TestStatusPageOptimizations:
         status_tab.click()
 
         # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
         # Look for progressive loading indicators
         progressive_indicators = [
@@ -200,7 +200,7 @@ class TestStatusPageOptimizations:
         status_tab.click()
 
         # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
         # Wait for any charts or dynamic content to load
         authenticated_page.wait_for_timeout(3000)
@@ -232,7 +232,7 @@ class TestStatusPageOptimizations:
         status_tab.click()
 
         # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
         # Wait for all requests to complete
         authenticated_page.wait_for_timeout(5000)
@@ -257,13 +257,14 @@ class TestStatusPageOptimizations:
         status_tab.click()
 
         # Wait for status content to load
-        authenticated_page.wait_for_selector("[data-testid='status-content']", timeout=15000)
+        authenticated_page.wait_for_selector("#status-summary", timeout=15000)
 
-        # Look for error handling elements (checking for common error patterns)
+        # Look for error handling elements (checking for specific error patterns)
         # The page should handle errors gracefully
         page_content = authenticated_page.content()
-        assert "500" not in page_content, "Server error detected"
-        assert "404" not in page_content, "Not found error detected"
+        assert "500 Internal Server Error" not in page_content, "Server error detected"
+        assert "404 Not Found" not in page_content, "Not found error detected"
+        assert "Error:" not in page_content, "Error message detected"
 
         # Even if there are error messages, the page structure should be intact
-        expect(authenticated_page.locator("[data-testid='status-content']")).to_be_visible()
+        expect(authenticated_page.locator("#status-summary")).to_be_visible()
