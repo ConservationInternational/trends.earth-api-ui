@@ -27,8 +27,7 @@ class TestEnhancedStatsIntegration:
 
         # Should contain the section headers
         assert "System Overview" in content_str
-        assert "User Geographic Distribution" in content_str
-        assert "Detailed Analytics" in content_str
+        assert "Countries with new user registrations" in content_str
 
     def test_enhanced_stats_components_for_superadmin(self):
         """Test that enhanced statistics components are present for SUPERADMIN users."""
@@ -156,7 +155,6 @@ class TestEnhancedStatsAccessControl:
         assert "stats-additional-charts" not in content_str
 
         # But should still show basic status functionality
-        assert "System Status Summary" in content_str
         assert "System Status Trends" in content_str
 
     def test_superadmin_has_access_to_enhanced_stats(self):

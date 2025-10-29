@@ -889,7 +889,6 @@ def status_tab_content(is_admin, role=None):
                     ),
                     dbc.CardBody(
                         [
-                            html.H5("System Status Summary", className="mb-3"),
                             dcc.Loading(
                                 id="loading-status-summary",
                                 children=[
@@ -1028,30 +1027,14 @@ def status_tab_content(is_admin, role=None):
                                 [
                                     html.Div(
                                         [
-                                            # Dashboard summary cards
+                                            # Stats summary and charts share a single loader to simplify layout
                                             html.Div(
                                                 [
-                                                    html.H5("Dashboard Summary", className="mb-3"),
-                                                    dcc.Loading(
-                                                        id="loading-stats-summary",
-                                                        children=[
-                                                            html.Div(id="stats-summary-cards")
-                                                        ],
-                                                        type="default",
-                                                        color="#007bff",
-                                                    ),
-                                                ],
-                                                className="mb-4",
-                                            ),
-                                            html.Hr(),
-                                            # Additional statistics charts
-                                            html.Div(
-                                                [
-                                                    html.H5("Detailed Analytics", className="mb-3"),
                                                     dcc.Loading(
                                                         id="loading-stats-charts",
                                                         children=[
-                                                            html.Div(id="stats-additional-charts")
+                                                            html.Div(id="stats-summary-cards"),
+                                                            html.Div(id="stats-additional-charts"),
                                                         ],
                                                         type="default",
                                                         color="#007bff",
@@ -1064,7 +1047,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Div(
                                                 [
                                                     html.H5(
-                                                        "User Geographic Distribution",
+                                                        "Countries with new user registrations",
                                                         className="mb-3",
                                                     ),
                                                     dcc.Loading(

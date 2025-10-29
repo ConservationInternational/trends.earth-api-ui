@@ -411,7 +411,7 @@ def _build_status_summary(status_data, safe_timezone):
             # === SUMMARY SECTION ===
             html.Div(
                 [
-                    html.H5("Summary - all time", className="mb-3 border-bottom pb-2"),
+                    html.H5("Overview", className="mb-3 border-bottom pb-2"),
                     html.Div(
                         [
                             _summary_card_column("Total Executions", total_executions),

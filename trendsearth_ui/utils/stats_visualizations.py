@@ -85,7 +85,7 @@ def _extract_stats_data(
     return data, None
 
 
-def create_user_geographic_map(user_stats_data, title_suffix=""):
+def create_user_geographic_map(user_stats_data):
     """Render a choropleth map of user registrations by country."""
 
     import logging
@@ -281,7 +281,6 @@ def create_user_geographic_map(user_stats_data, title_suffix=""):
         )
 
         fig.update_layout(
-            title=f"User Registrations by Country{title_suffix}",
             geo={"showframe": False, "showcoastlines": True, "projection_type": "natural earth"},
             height=400,
             margin={"l": 0, "r": 0, "t": 40, "b": 0},
@@ -319,6 +318,8 @@ def create_execution_statistics_chart(
     import logging
 
     from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
+
+    suffix_label = f" ({title_suffix})" if title_suffix else ""
 
     logger = logging.getLogger(__name__)
 
@@ -425,7 +426,140 @@ def create_execution_statistics_chart(
             "READY": "#6d4c41",
         }
 
-        # 1. Execution Outcomes (cumulative) from execution stats time series
+        # 1. Running executions from status time series data
+        status_series = status_time_series_data or []
+        if isinstance(status_series, dict):
+            status_series = status_series.get("data", [])
+
+        if status_series:
+            status_df = pd.DataFrame(status_series)
+
+            if not status_df.empty and "timestamp" in status_df.columns:
+                # Log original data for debugging
+                logger.info(f"Status time series original data points: {len(status_df)}")
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range before conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+
+                status_df["timestamp"] = pd.to_datetime(status_df["timestamp"], errors="coerce")
+
+                # Log after datetime conversion
+                before_dropna = len(status_df)
+                status_df = (
+                    status_df.dropna(subset=["timestamp"])
+                    .sort_values("timestamp")
+                    .reset_index(drop=True)
+                )
+                after_dropna = len(status_df)
+
+                if before_dropna != after_dropna:
+                    logger.warning(
+                        f"Status time series: Dropped {before_dropna - after_dropna} rows with invalid timestamps"
+                    )
+
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range after datetime conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+
+                # Convert timestamps to local timezone
+                status_df["timestamp"] = convert_timestamp_series_to_local(
+                    status_df["timestamp"], user_timezone
+                )
+
+                # Log after timezone conversion
+                if len(status_df) > 0:
+                    logger.info(
+                        f"Status timestamp range after timezone conversion to {user_timezone}: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
+                    )
+                    logger.info(f"Status final data points: {len(status_df)}")
+
+                in_process_columns = [
+                    column
+                    for column in [
+                        "executions_ready",
+                        "executions_pending",
+                        "executions_running",
+                    ]
+                    if column in status_df.columns
+                ]
+
+                if in_process_columns:
+                    fig_in_process = go.Figure()
+                    for column in in_process_columns:
+                        values = pd.to_numeric(status_df[column], errors="coerce").fillna(0)
+                        status_name = column.replace("executions_", "").replace("_", " ").title()
+                        fig_in_process.add_trace(
+                            go.Scatter(
+                                x=status_df["timestamp"],
+                                y=values,
+                                mode="lines",
+                                name=status_name,
+                                line={
+                                    "color": status_colors.get(status_name.upper(), "#666666"),
+                                    "width": 3,
+                                },
+                                line_shape="hv",
+                                hovertemplate=(
+                                    "<b>"
+                                    + status_name
+                                    + "</b><br>%{x}<br>Count: %{y}<extra></extra>"
+                                ),
+                            )
+                        )
+
+                    fig_in_process.update_layout(
+                        xaxis_title=get_chart_axis_label(user_timezone),
+                        yaxis_title="Number of Executions",
+                        height=360,
+                        hovermode="x unified",
+                        legend={
+                            "orientation": "h",
+                            "yanchor": "bottom",
+                            "y": 1.02,
+                            "xanchor": "center",
+                            "x": 0.5,
+                        },
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        template="plotly_white",
+                        xaxis={
+                            "showgrid": True,
+                            "type": "date",
+                        },  # Ensure proper date axis handling
+                        yaxis={"showgrid": True},
+                    )
+
+                    execution_charts.append(
+                        html.Div(
+                            [
+                                html.H6(f"Running executions{suffix_label}"),
+                                dcc.Graph(
+                                    figure=fig_in_process,
+                                    config={"displayModeBar": False, "responsive": True},
+                                ),
+                            ],
+                            className="mb-3",
+                        )
+                    )
+                else:
+                    execution_charts.append(
+                        _build_message_block(
+                            "No in-progress execution data available.",
+                            detail=(
+                                "Status time series data did not include ready, pending, or running counts for this period."
+                            ),
+                        )
+                    )
+            else:
+                execution_charts.append(
+                    _build_message_block(
+                        "No in-progress execution data available.",
+                        detail="Status timestamps could not be parsed from the API response.",
+                    )
+                )
+
+        # 1. Completed executions (cumulative) from execution stats time series
         trends_data = data.get("time_series", [])
         if trends_data:
             flattened_data = []
@@ -512,7 +646,6 @@ def create_execution_statistics_chart(
                         )
 
                     fig_completed.update_layout(
-                        title=f"Execution Outcomes (Cumulative){title_suffix}",
                         xaxis_title=get_chart_axis_label(user_timezone),
                         yaxis_title="Cumulative Executions",
                         height=360,
@@ -536,7 +669,7 @@ def create_execution_statistics_chart(
                     execution_charts.append(
                         html.Div(
                             [
-                                html.H6("Execution Outcomes (Cumulative)"),
+                                html.H6(f"Completed executions (cumulative){suffix_label}"),
                                 dcc.Graph(
                                     figure=fig_completed,
                                     config={"displayModeBar": False, "responsive": True},
@@ -560,140 +693,6 @@ def create_execution_statistics_chart(
                     _build_message_block(
                         "No execution trend data available.",
                         detail="Execution timestamps could not be parsed from the API response.",
-                    )
-                )
-
-        # 2. Execution States In Progress from status time series data
-        status_series = status_time_series_data or []
-        if isinstance(status_series, dict):
-            status_series = status_series.get("data", [])
-
-        if status_series:
-            status_df = pd.DataFrame(status_series)
-
-            if not status_df.empty and "timestamp" in status_df.columns:
-                # Log original data for debugging
-                logger.info(f"Status time series original data points: {len(status_df)}")
-                if len(status_df) > 0:
-                    logger.info(
-                        f"Status timestamp range before conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
-                    )
-
-                status_df["timestamp"] = pd.to_datetime(status_df["timestamp"], errors="coerce")
-
-                # Log after datetime conversion
-                before_dropna = len(status_df)
-                status_df = (
-                    status_df.dropna(subset=["timestamp"])
-                    .sort_values("timestamp")
-                    .reset_index(drop=True)
-                )
-                after_dropna = len(status_df)
-
-                if before_dropna != after_dropna:
-                    logger.warning(
-                        f"Status time series: Dropped {before_dropna - after_dropna} rows with invalid timestamps"
-                    )
-
-                if len(status_df) > 0:
-                    logger.info(
-                        f"Status timestamp range after datetime conversion: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
-                    )
-
-                # Convert timestamps to local timezone
-                status_df["timestamp"] = convert_timestamp_series_to_local(
-                    status_df["timestamp"], user_timezone
-                )
-
-                # Log after timezone conversion
-                if len(status_df) > 0:
-                    logger.info(
-                        f"Status timestamp range after timezone conversion to {user_timezone}: {status_df['timestamp'].min()} to {status_df['timestamp'].max()}"
-                    )
-                    logger.info(f"Status final data points: {len(status_df)}")
-
-                in_process_columns = [
-                    column
-                    for column in [
-                        "executions_ready",
-                        "executions_pending",
-                        "executions_running",
-                    ]
-                    if column in status_df.columns
-                ]
-
-                if in_process_columns:
-                    fig_in_process = go.Figure()
-                    for column in in_process_columns:
-                        values = pd.to_numeric(status_df[column], errors="coerce").fillna(0)
-                        status_name = column.replace("executions_", "").replace("_", " ").title()
-                        fig_in_process.add_trace(
-                            go.Scatter(
-                                x=status_df["timestamp"],
-                                y=values,
-                                mode="lines",
-                                name=status_name,
-                                line={
-                                    "color": status_colors.get(status_name.upper(), "#666666"),
-                                    "width": 3,
-                                },
-                                line_shape="hv",
-                                hovertemplate=(
-                                    "<b>"
-                                    + status_name
-                                    + "</b><br>%{x}<br>Count: %{y}<extra></extra>"
-                                ),
-                            )
-                        )
-
-                    fig_in_process.update_layout(
-                        title=f"Execution States In Progress{title_suffix}",
-                        xaxis_title=get_chart_axis_label(user_timezone),
-                        yaxis_title="Number of Executions",
-                        height=360,
-                        hovermode="x unified",
-                        legend={
-                            "orientation": "h",
-                            "yanchor": "bottom",
-                            "y": 1.02,
-                            "xanchor": "center",
-                            "x": 0.5,
-                        },
-                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                        template="plotly_white",
-                        xaxis={
-                            "showgrid": True,
-                            "type": "date",
-                        },  # Ensure proper date axis handling
-                        yaxis={"showgrid": True},
-                    )
-
-                    execution_charts.append(
-                        html.Div(
-                            [
-                                html.H6("Execution States In Progress"),
-                                dcc.Graph(
-                                    figure=fig_in_process,
-                                    config={"displayModeBar": False, "responsive": True},
-                                ),
-                            ],
-                            className="mb-3",
-                        )
-                    )
-                else:
-                    execution_charts.append(
-                        _build_message_block(
-                            "No in-progress execution data available.",
-                            detail=(
-                                "Status time series data did not include ready, pending, or running counts for this period."
-                            ),
-                        )
-                    )
-            else:
-                execution_charts.append(
-                    _build_message_block(
-                        "No in-progress execution data available.",
-                        detail="Status timestamps could not be parsed from the API response.",
                     )
                 )
 
@@ -736,7 +735,6 @@ def create_execution_statistics_chart(
                 )
 
                 fig_tasks.update_layout(
-                    title="Task Performance by Execution Count",
                     xaxis_title="Number of Executions",
                     height=max(300, len(task_names) * 30),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
@@ -745,7 +743,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Task Performance"),
+                            html.H6(f"Task Performance{suffix_label}"),
                             dcc.Graph(
                                 figure=fig_tasks,
                                 config={"displayModeBar": False, "responsive": True},
@@ -784,7 +782,6 @@ def create_execution_statistics_chart(
                 )
 
                 fig_duration.update_layout(
-                    title="Average Task Duration",
                     xaxis_title="Average Duration (minutes)",
                     height=max(300, len(task_names) * 30),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
@@ -793,7 +790,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Task Duration Analysis"),
+                            html.H6(f"Execution duration{suffix_label}"),
                             dcc.Graph(
                                 figure=fig_duration,
                                 config={"displayModeBar": False, "responsive": True},
@@ -829,7 +826,6 @@ def create_execution_statistics_chart(
                 )
 
                 fig_combined.update_layout(
-                    title="Task Performance Overview: Duration vs Execution Count",
                     xaxis_title="Average Duration (minutes)",
                     yaxis_title="Total Executions",
                     height=400,
@@ -840,7 +836,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Task Performance Overview"),
+                            html.H6(f"Execution outcome vs duration{suffix_label}"),
                             html.P(
                                 "Bubble size indicates execution count, color indicates success rate.",
                                 className="text-muted small mb-2",
@@ -883,7 +879,6 @@ def create_execution_statistics_chart(
                 )
 
                 fig_users.update_layout(
-                    title=f"Top Users by Execution Count{title_suffix}",
                     xaxis_title="Number of Executions",
                     height=max(
                         300, len(user_names) * 30
@@ -894,7 +889,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6("Top Users by Activity"),
+                            html.H6(f"Top Users by Activity{suffix_label}"),
                             dcc.Graph(
                                 figure=fig_users,
                                 config={"displayModeBar": False, "responsive": True},
@@ -952,6 +947,8 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
         list: List of chart components
     """
     from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
+
+    suffix_label = f" ({title_suffix})" if title_suffix else ""
 
     try:
         # Handle error response structure
@@ -1021,7 +1018,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
 
         charts = []
 
-        # 1. User Registration Trends - enhanced to handle group_by data
+        # 1. New user registrations - enhanced to handle group_by data
         # Look for time series data first (when group_by parameter is used)
         time_series_data = data.get("time_series", [])
         trends_data = data.get("registration_trends", [])
@@ -1029,8 +1026,9 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
         # Prefer time_series data if available (more detailed from group_by)
         chart_data = time_series_data if time_series_data else trends_data
         chart_title_prefix = (
-            "User Activity Time Series" if time_series_data else "User Registration Trends"
+            "User Activity Time Series" if time_series_data else "New user registrations"
         )
+        chart_title = f"{chart_title_prefix}{suffix_label}"
 
         if chart_data:
             df = pd.DataFrame(chart_data)
@@ -1086,7 +1084,6 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
                         )
 
                 fig_users.update_layout(
-                    title=f"{chart_title_prefix}{title_suffix}",
                     xaxis_title=get_chart_axis_label(user_timezone),
                     yaxis_title="User Count",
                     yaxis2={
@@ -1103,7 +1100,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
                 charts.append(
                     html.Div(
                         [
-                            html.H6("User Registration Trends"),
+                            html.H6(chart_title),
                             dcc.Graph(
                                 figure=fig_users,
                                 config={"displayModeBar": False, "responsive": True},
@@ -1138,7 +1135,6 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
                     )
 
                     fig_countries.update_layout(
-                        title=f"Top Countries by User Count{title_suffix}",
                         xaxis_title="Country",
                         yaxis_title="Number of Users",
                         height=300,
@@ -1148,7 +1144,7 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
                     charts.append(
                         html.Div(
                             [
-                                html.H6("Top Countries"),
+                                html.H6(f"Top Countries{suffix_label}"),
                                 dcc.Graph(
                                     figure=fig_countries,
                                     config={"displayModeBar": False, "responsive": True},
@@ -1967,7 +1963,6 @@ def create_docker_swarm_status_table(swarm_data):
 
         return html.Div(
             [
-                html.H4("Docker Swarm Nodes", className="mb-3"),
                 summary_section,
                 html.Div(
                     [
@@ -1985,7 +1980,6 @@ def create_docker_swarm_status_table(swarm_data):
         logger.error(f"Error creating Docker swarm status table: {e}")
         return html.Div(
             [
-                html.H4("Docker Swarm Nodes", className="mb-3"),
                 html.P("Error creating swarm status table.", className="text-danger text-center"),
                 html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
             ],

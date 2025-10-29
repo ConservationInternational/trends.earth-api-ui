@@ -84,7 +84,6 @@ def main():
         print("2. Login with admin credentials")
         print("3. Navigate to the Status tab")
         print("4. You should now see:")
-        print("   - System status summary (instead of 'Loading...')")
         print("   - Interactive charts showing execution trends")
         print("   - Auto-refresh countdown working properly")
     else:
