@@ -1042,11 +1042,10 @@ def status_tab_content(is_admin, role=None):
                                                 ],
                                                 className="mb-4",
                                             ),
-                                            html.Hr(),
                                             # User geographic map
                                             html.Div(
                                                 [
-                                                    html.H5(
+                                                    html.H6(
                                                         "Countries with new user registrations",
                                                         className="mb-3",
                                                     ),
