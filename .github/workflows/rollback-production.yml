@@ -15,8 +15,8 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
-  ECR_REPOSITORY: trendsearth-ui
-  CODEDEPLOY_APPLICATION: trendsearth-ui
+  ECR_REPOSITORY: trendsearth-api-ui
+  CODEDEPLOY_APPLICATION: trendsearth-api-ui
   CODEDEPLOY_DEPLOYMENT_GROUP: production
 
 jobs:
@@ -170,7 +170,7 @@ jobs:
         cd ..
         
         # Upload bundle to S3
-        S3_KEY="deployments/trendsearth-ui/rollback/${{ steps.rollback-strategy.outputs.target-commit }}/rollback-bundle.zip"
+        S3_KEY="deployments/trendsearth-api-ui/rollback/${{ steps.rollback-strategy.outputs.target-commit }}/rollback-bundle.zip"
         
         aws s3 cp rollback-bundle.zip "s3://$CODEDEPLOY_S3_BUCKET/$S3_KEY"
         

@@ -13,8 +13,8 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
-  ECR_REPOSITORY: trendsearth-ui
-  CODEDEPLOY_APPLICATION: trendsearth-ui
+  ECR_REPOSITORY: trendsearth-api-ui
+  CODEDEPLOY_APPLICATION: trendsearth-api-ui
   CODEDEPLOY_DEPLOYMENT_GROUP: production
 
 jobs:
@@ -101,7 +101,7 @@ jobs:
 
     - name: Upload bundle to S3
       env:
-        S3_KEY: deployments/trendsearth-ui/production/${{ github.sha }}/deployment-bundle.zip
+        S3_KEY: deployments/trendsearth-api-ui/production/${{ github.sha }}/deployment-bundle.zip
       run: |
         # Upload deployment bundle to S3
         aws s3 cp deployment-bundle.zip "s3://$CODEDEPLOY_S3_BUCKET/$S3_KEY"
