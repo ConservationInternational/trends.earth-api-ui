@@ -37,8 +37,8 @@ def get_optimal_grouping_for_period(period):
     """
     mapping = {
         "last_day": ("day", "hour"),  # Fixed: user stats API doesn't accept "hour"
-        "last_week": ("day", "day"),
-        "last_month": ("week", "week"),
+        "last_week": ("day", "hour"),
+        "last_month": ("week", "day"),
         "last_year": ("month", "month"),
     }
     return mapping.get(period, ("month", "month"))
