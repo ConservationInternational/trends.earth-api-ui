@@ -47,30 +47,32 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Build and push image to ECR
+      id: build-and-push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:staging
+          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name }}
+        build-args: |
+          GIT_BRANCH=${{ github.ref_name }}
+          GIT_COMMIT=${{ github.sha }}
+          DEPLOYMENT_ENVIRONMENT=staging
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Export image metadata
       id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-        BRANCH_NAME: ${{ github.ref_name }}
       run: |
-        # Build Docker image
-        echo "🔨 Building Docker image for staging..."
-        docker build \
-          --build-arg GIT_BRANCH="${{ github.ref_name }}" \
-          --build-arg GIT_COMMIT="${{ github.sha }}" \
-          --build-arg DEPLOYMENT_ENVIRONMENT="staging" \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:staging \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME .
-        
-        # Push images to ECR
-        echo "🚀 Pushing images to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME
-        
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+        IMAGE="$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+        echo "image=$IMAGE" >> $GITHUB_OUTPUT
         echo "registry=$ECR_REGISTRY" >> $GITHUB_OUTPUT
 
     - name: Create deployment bundle
