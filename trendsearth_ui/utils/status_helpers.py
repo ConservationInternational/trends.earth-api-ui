@@ -1,5 +1,6 @@
 """Helper functions for the status dashboard."""
 
+from datetime import datetime
 import logging
 import time
 
@@ -8,6 +9,7 @@ import requests
 
 from trendsearth_ui.config import get_api_base
 from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
+from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +200,7 @@ def fetch_deployment_info(api_environment, token=None):
     )
 
 
-def fetch_swarm_info(api_environment, token=None):
+def fetch_swarm_info(api_environment, token=None, user_timezone=None):
     """Fetch Docker Swarm information from the API's swarm status endpoint."""
     if not token:
         # Return basic info if no token available
@@ -209,6 +211,8 @@ def fetch_swarm_info(api_environment, token=None):
             ]
         )
         return swarm_info, " (Auth Required)"
+
+    safe_timezone = get_safe_timezone(user_timezone)
 
     try:
         # Fetch raw swarm data from API
@@ -225,8 +229,17 @@ def fetch_swarm_info(api_environment, token=None):
             swarm_data = swarm_response.get("data", {})
             swarm_info = create_docker_swarm_status_table(swarm_data)
             cache_info = swarm_data.get("cache_info", {})
-            cached_at = cache_info.get("cached_at", "")
-            swarm_cached_time = f" (Updated: {cached_at[:19]})" if cached_at else " (Live)"
+            cached_at_raw = cache_info.get("cached_at")
+
+            swarm_cached_time = " (Live)"
+            if isinstance(cached_at_raw, str) and cached_at_raw:
+                try:
+                    cached_dt = datetime.fromisoformat(cached_at_raw.replace("Z", "+00:00"))
+                    formatted_time, tz_abbrev = format_local_time(cached_dt, safe_timezone)
+                    swarm_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
+                except (ValueError, TypeError):
+                    # Fallback to original string if parsing fails
+                    swarm_cached_time = f" (Updated: {cached_at_raw[:19]})"
             return swarm_info, swarm_cached_time
         elif resp.status_code == 401:
             # Handle authentication error

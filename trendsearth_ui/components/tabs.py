@@ -845,7 +845,6 @@ def status_tab_content(is_admin, role=None):
             ]
         )
 
-    # Check if user is a superadmin for enhanced statistics (API requires SUPERADMIN)
     is_admin_user = role == "SUPERADMIN"
 
     return html.Div(
@@ -885,30 +884,11 @@ def status_tab_content(is_admin, role=None):
             # Time-independent status information (not affected by time period tabs)
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Current System Status")),
+                    dbc.CardHeader(
+                        html.H4("Current System Status", id="current-system-status-title")
+                    ),
                     dbc.CardBody(
                         [
-                            # System Overview section (SUPERADMIN only)
-                            *(
-                                [
-                                    html.Div(
-                                        [
-                                            html.H5("System Overview", className="mb-3"),
-                                            dcc.Loading(
-                                                id="loading-system-overview",
-                                                children=[html.Div(id="system-overview-content")],
-                                                type="default",
-                                                color="#007bff",
-                                            ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Hr(),
-                                ]
-                                if is_admin_user
-                                else []
-                            ),
-                            # Current status summary
                             html.H5("System Status Summary", className="mb-3"),
                             dcc.Loading(
                                 id="loading-status-summary",
