@@ -17,6 +17,7 @@ from ..utils import (
     refresh_access_token,
     should_refresh_token,
 )
+from ..utils.http_client import apply_default_headers
 from ..utils.logging_config import get_logger, log_exception
 
 # Get the configured logger
@@ -182,7 +183,12 @@ def register_callbacks(app):
         print(f"🌐 Attempting to connect to: {auth_url}")
         try:
             auth_data = {"email": email, "password": password}
-            resp = requests.post(auth_url, json=auth_data, timeout=5)
+            resp = requests.post(
+                auth_url,
+                headers=apply_default_headers(),
+                json=auth_data,
+                timeout=5,
+            )
 
             if resp.status_code == 200:
                 print("✅ Login API response successful")
@@ -521,6 +527,7 @@ def register_callbacks(app):
             # Use the email as the user_id parameter in the endpoint
             resp = requests.post(
                 f"{api_base}/user/{email}/recover-password",
+                headers=apply_default_headers(),
                 timeout=10,
             )
 

@@ -1729,6 +1729,7 @@ def create_deployment_information(api_environment="production"):
     import requests
 
     from trendsearth_ui.config import get_api_base
+    from trendsearth_ui.utils.http_client import apply_default_headers
 
     logger = logging.getLogger(__name__)
 
@@ -1740,7 +1741,7 @@ def create_deployment_information(api_environment="production"):
             api_base_root = get_api_base(api_environment).replace("/api/v1", "")
             api_url = f"{api_base_root}/api-health"
             logger.info(f"Fetching API deployment info from: {api_url}")
-            resp = requests.get(api_url, timeout=5)
+            resp = requests.get(api_url, headers=apply_default_headers(), timeout=5)
             logger.info(f"API health response status: {resp.status_code}")
             if resp.status_code == 200:
                 data = resp.json()
@@ -1777,7 +1778,7 @@ def create_deployment_information(api_environment="production"):
                 ui_url = "http://127.0.0.1:8050/api-ui-health"
 
             logger.info(f"Fetching UI deployment info from current application: {ui_url}")
-            resp = requests.get(ui_url, timeout=5)
+            resp = requests.get(ui_url, headers=apply_default_headers(), timeout=5)
             logger.info(f"UI health response status: {resp.status_code}")
             if resp.status_code == 200:
                 data = resp.json()

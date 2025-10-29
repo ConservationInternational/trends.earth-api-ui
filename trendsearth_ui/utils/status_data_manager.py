@@ -22,6 +22,7 @@ from .status_helpers import (
     is_status_endpoint_available,
 )
 from .timezone_utils import get_safe_timezone
+from .http_client import apply_default_headers
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +130,7 @@ class StatusDataManager:
                 return result
 
             # Fetch latest status data with optimized parameters
-            headers = {"Authorization": f"Bearer {token}"}
+            headers = apply_default_headers({"Authorization": f"Bearer {token}"})
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
@@ -295,15 +296,14 @@ class StatusDataManager:
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
             target_points = 720  # Hourly resolution for 30 days
-            request_limit = 10000  # Ensure we retrieve the full month even with frequent updates
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
-            target_points = 1344  # ~8 points per hour for 7 days (covers 15-min updates)
-            request_limit = 4096
+            target_points = 336  # ~2 points per hour for 7 days
         else:  # Default to day
             start_time = end_time - timedelta(days=1)
             target_points = 288  # ~1 point per 5 minutes for 24 hours
-            request_limit = 1024
+
+        request_limit = target_points
 
         # Format for API query
         start_iso = start_time.isoformat()
@@ -321,7 +321,7 @@ class StatusDataManager:
         }
 
         try:
-            headers = {"Authorization": f"Bearer {token}"}
+            headers = apply_default_headers({"Authorization": f"Bearer {token}"})
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,

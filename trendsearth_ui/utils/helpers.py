@@ -7,6 +7,7 @@ from typing import Optional
 import requests
 
 from ..config import API_BASE, AUTH_URL
+from .http_client import apply_default_headers
 from .timezone_utils import format_local_time, get_safe_timezone
 
 
@@ -66,7 +67,7 @@ def get_user_info(token, api_base=None):
 
     # Use provided api_base or fallback to default
     base_url = api_base or API_BASE
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
 
     print(f"🔍 get_user_info: Using API base URL: {base_url}")
     print(f"🔍 get_user_info: Token length: {len(token)} characters")
@@ -177,7 +178,12 @@ def refresh_access_token(
 
     try:
         refresh_data = {"refresh_token": refresh_token}
-        resp = requests.post(f"{auth_url}/refresh", json=refresh_data, timeout=10)
+        resp = requests.post(
+            f"{auth_url}/refresh",
+            headers=apply_default_headers(),
+            json=refresh_data,
+            timeout=10,
+        )
 
         if resp.status_code == 200:
             data = resp.json()
@@ -221,7 +227,7 @@ def logout_user(access_token: str, refresh_token: str = None, api_environment: s
     auth_url = get_auth_url(api_environment)
 
     try:
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = apply_default_headers({"Authorization": f"Bearer {access_token}"})
 
         # Prepare request body with refresh token if provided
         logout_data = {}
@@ -266,7 +272,7 @@ def logout_all_devices(access_token: str) -> bool:
         return False
 
     try:
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = apply_default_headers({"Authorization": f"Bearer {access_token}"})
         resp = requests.post(f"{AUTH_URL}/logout-all", headers=headers, timeout=10)
 
         if resp.status_code == 200:
@@ -306,7 +312,7 @@ def make_authenticated_request(
     # If URL is relative (starts with /), prepend the current API base
     full_url = get_current_api_base() + url if url.startswith("/") else url
 
-    headers = kwargs.get("headers", {})
+    headers = apply_default_headers(kwargs.get("headers"))
     headers["Authorization"] = f"Bearer {token}"
     kwargs["headers"] = headers
 
@@ -371,6 +377,7 @@ def make_authenticated_request(
                     print(f"Error preparing updated cookie: {e}")
 
                 # Retry with new token
+                headers = apply_default_headers(kwargs.get("headers"))
                 headers["Authorization"] = f"Bearer {new_access_token}"
                 kwargs["headers"] = headers
                 resp = getattr(requests, method.lower())(full_url, **kwargs)

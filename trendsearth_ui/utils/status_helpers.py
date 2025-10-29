@@ -7,6 +7,7 @@ import time
 from dash import html
 import requests
 
+from .http_client import apply_default_headers
 from trendsearth_ui.config import get_api_base
 from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
 from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
@@ -37,9 +38,11 @@ def _fetch_health_status(url, headers=None, timeout=10):
     max_retries = 2
     retry_delay = 1  # seconds
 
+    merged_headers = apply_default_headers(headers)
+
     for attempt in range(max_retries + 1):
         try:
-            resp = requests.get(url, headers=headers, timeout=timeout)
+            resp = requests.get(url, headers=merged_headers, timeout=timeout)
             if resp.status_code == 200:
                 return True, resp.json(), resp.status_code, None
             else:
@@ -216,7 +219,7 @@ def fetch_swarm_info(api_environment, token=None, user_timezone=None):
 
     try:
         # Fetch raw swarm data from API
-        headers = {"Authorization": f"Bearer {token}"}
+        headers = apply_default_headers({"Authorization": f"Bearer {token}"})
         swarm_url = f"{get_api_base(api_environment)}/status/swarm"
         resp = requests.get(
             swarm_url,
@@ -236,7 +239,11 @@ def fetch_swarm_info(api_environment, token=None, user_timezone=None):
                 try:
                     cached_dt = datetime.fromisoformat(cached_at_raw.replace("Z", "+00:00"))
                     formatted_time, tz_abbrev = format_local_time(cached_dt, safe_timezone)
-                    swarm_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
+                    if tz_abbrev and tz_abbrev != "UTC":
+                        swarm_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
+                    else:
+                        iso_timestamp = cached_at_raw[:19] if "T" in cached_at_raw else formatted_time
+                        swarm_cached_time = f" (Updated: {iso_timestamp})"
                 except (ValueError, TypeError):
                     # Fallback to original string if parsing fails
                     swarm_cached_time = f" (Updated: {cached_at_raw[:19]})"
@@ -298,7 +305,7 @@ def get_fallback_summary():
 
 def is_status_endpoint_available(token, api_environment):
     """Check if the /status endpoint is available and returns data."""
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     try:
         resp = requests.get(
             f"{get_api_base(api_environment)}/status",

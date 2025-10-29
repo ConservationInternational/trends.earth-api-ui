@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 from trendsearth_ui.utils.stats_utils import (
     fetch_execution_stats,
     fetch_user_stats,
@@ -72,6 +73,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -89,6 +91,7 @@ class TestEnhancedUserStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["country"] == "Kenya"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"geographic_distribution": {}}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -110,6 +113,7 @@ class TestEnhancedUserStats:
         assert params["group_by"] == "week"
         assert params["country"] == "Kenya"
         assert params["period"] == "last_month"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     def test_fetch_user_stats_uses_enhanced_cache_key(self):
@@ -143,6 +147,7 @@ class TestEnhancedExecutionStats:
         call_args = mock_requests.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -164,6 +169,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "download"
         assert params["status"] == "FINISHED"
         assert params["period"] == "last_week"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"task_performance": []}}
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
@@ -191,6 +197,7 @@ class TestEnhancedExecutionStats:
         assert params["task_type"] == "analysis"
         assert params["status"] == "FAILED"
         assert params["period"] == "last_month"
+        assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
     def test_fetch_execution_stats_uses_enhanced_cache_key(self):

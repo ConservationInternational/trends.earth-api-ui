@@ -452,27 +452,28 @@ class TestOptimizedStatusCallbacks:
         # Mock timezone
         safe_timezone = "UTC"
 
-        result = _build_status_summary(status_data, safe_timezone)
+        summary_component, last_updated = _build_status_summary(status_data, safe_timezone)
 
         # Should return a valid Dash component
-        assert hasattr(result, "_namespace")  # Basic check for Dash component
+        assert hasattr(summary_component, "_namespace")  # Basic check for Dash component
+        assert last_updated is not None
 
     def test_status_summary_handles_missing_data_gracefully(self):
         """Test that status summary handles missing or invalid data gracefully."""
         from trendsearth_ui.callbacks.status import _build_status_summary
 
         # Test with None data
-        result1 = _build_status_summary(None, "UTC")
-        assert result1 is not None
+        summary1, _ = _build_status_summary(None, "UTC")
+        assert summary1 is not None
 
         # Test with empty data
-        result2 = _build_status_summary({}, "UTC")
-        assert result2 is not None
+        summary2, _ = _build_status_summary({}, "UTC")
+        assert summary2 is not None
 
         # Test with error status
         status_data = {"summary": "ERROR", "error": "API Error"}
-        result3 = _build_status_summary(status_data, "UTC")
-        assert result3 is not None
+        summary3, _ = _build_status_summary(status_data, "UTC")
+        assert summary3 is not None
 
     def test_stats_components_building_for_superadmin(self):
         """Test stats components building for SUPERADMIN users."""

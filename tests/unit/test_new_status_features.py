@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
+from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 from trendsearth_ui.utils.stats_utils import fetch_scripts_count
 from trendsearth_ui.utils.stats_visualizations import create_dashboard_summary_cards
 from trendsearth_ui.utils.status_helpers import _fetch_health_status
@@ -35,6 +36,8 @@ class TestScriptsCountFunctionality:
         # Verify the result
         assert result == 42
         mock_get.assert_called_once()
+        headers = mock_get.call_args[1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
 
     @patch("trendsearth_ui.utils.stats_utils.requests.get")
     def test_fetch_scripts_count_no_total(self, mock_get):
@@ -52,6 +55,9 @@ class TestScriptsCountFunctionality:
 
         # Should fallback to length of data array
         assert result == 2
+        mock_get.assert_called_once()
+        headers = mock_get.call_args[1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
 
     def test_fetch_scripts_count_no_token(self):
         """Test scripts count without token."""
@@ -67,6 +73,9 @@ class TestScriptsCountFunctionality:
 
         result = fetch_scripts_count("fake_token", "production")
         assert result == 0
+        mock_get.assert_called_once()
+        headers = mock_get.call_args[1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
 
 
 class TestDashboardSummaryCardsWithScripts:
@@ -145,6 +154,8 @@ class TestHealthEndpointRetryLogic:
         assert error is None
         assert mock_get.call_count == 3
         assert mock_sleep.call_count == 2  # Sleep between retries
+        headers = mock_get.call_args_list[0][1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
 
     @patch("trendsearth_ui.utils.status_helpers.time.sleep")
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
@@ -164,6 +175,8 @@ class TestHealthEndpointRetryLogic:
         assert error == "Timeout"
         assert mock_get.call_count == 3  # Initial + 2 retries
         assert mock_sleep.call_count == 2  # Sleep between retries
+        headers = mock_get.call_args_list[0][1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
     def test_fetch_health_status_no_retry_on_client_error(self, mock_get):
@@ -180,3 +193,5 @@ class TestHealthEndpointRetryLogic:
         assert status == 404
         assert error == "HTTP 404"
         assert mock_get.call_count == 1  # No retries
+        headers = mock_get.call_args[1]["headers"]
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING

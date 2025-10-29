@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from trendsearth_ui.config import API_BASE
+from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 from trendsearth_ui.utils.helpers import (
     get_user_info,
     parse_date,
@@ -44,6 +45,7 @@ class TestParseDateFunction:
         date_str = "2025-06-21T10:30:00Z"
         result = parse_date(date_str, "America/New_York")
         # UTC 10:30 should be 06:30 in EDT (UTC-4 in summer)
+        assert result is not None
         assert "06:30" in result
         assert "EDT" in result or "EST" in result
 
@@ -109,9 +111,13 @@ class TestGetUserInfoFunction:
         result = get_user_info(token)
 
         assert result == mock_user_data
-        mock_get.assert_called_once_with(
-            f"{API_BASE}/user/me", headers={"Authorization": f"Bearer {token}"}, timeout=10
-        )
+        mock_get.assert_called_once()
+        call_args = mock_get.call_args
+        assert call_args[0][0] == f"{API_BASE}/user/me"
+        headers = call_args[1]["headers"]
+        assert headers["Authorization"] == f"Bearer {token}"
+        assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
+        assert call_args[1]["timeout"] == 10
 
     @patch("trendsearth_ui.utils.helpers.requests.get")
     def test_get_user_info_failure(self, mock_get):

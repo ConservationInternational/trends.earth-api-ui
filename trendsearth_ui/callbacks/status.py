@@ -8,6 +8,7 @@ from dash import Input, Output, State, callback_context, dcc, html, no_update
 
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
+    create_system_overview,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
@@ -204,6 +205,7 @@ def register_callbacks(app):
 
     @app.callback(
         [
+            Output("system-overview-content", "children"),
             Output("stats-summary-cards", "children"),
             Output("stats-user-map", "children"),
             Output("stats-additional-charts", "children"),
@@ -250,11 +252,11 @@ def register_callbacks(app):
                 ],
                 className="p-4",
             )
-            return (permission_msg, permission_msg, [permission_msg])
+            return (permission_msg, permission_msg, permission_msg, [permission_msg])
 
         # Only update when status tab is active
         if active_tab != "status":
-            return (no_update, no_update, no_update)
+            return (no_update, no_update, no_update, no_update)
 
         # Check if this is a manual refresh
         ctx = callback_context
@@ -292,12 +294,17 @@ def register_callbacks(app):
             )
 
             # Extract data components
-            status_data = comprehensive_data.get("status_data", {})
-            stats_data = comprehensive_data.get("stats_data", {})
+            status_data = comprehensive_data.get("status_data") or {}
+            stats_data = comprehensive_data.get("stats_data") or {}
 
             # Build time-dependent stats components
             if not stats_data.get("error"):
-                stats_cards, user_map, additional_charts = _build_stats_components(
+                (
+                    system_overview,
+                    stats_cards,
+                    user_map,
+                    additional_charts,
+                ) = _build_stats_components(
                     stats_data,
                     status_data,
                     comprehensive_data.get("time_series_data"),
@@ -315,18 +322,19 @@ def register_callbacks(app):
                     ],
                     className="p-4",
                 )
+                system_overview = error_msg
                 stats_cards = html.Div()
                 user_map = error_msg
                 additional_charts = [error_msg]
 
-            return (stats_cards, user_map, additional_charts)
+            return (system_overview, stats_cards, user_map, additional_charts)
 
         except Exception as e:
             logger.error(f"Error in time-dependent stats update: {e}")
             error_msg = html.Div(
                 f"Error loading statistics: {e}", className="text-center text-danger"
             )
-            return (html.Div(), error_msg, [error_msg])
+            return (html.Div(), html.Div(), error_msg, [error_msg])
 
     # Register additional status callbacks
     _register_additional_status_callbacks(app)
@@ -486,15 +494,36 @@ def _build_stats_components(
     ui_period=None,
 ):
     """Build the enhanced statistics components."""
+
+    if not stats_data or stats_data.get("error"):
+        error_message = html.Div(
+            [
+                html.P("Statistics unavailable.", className="text-muted text-center"),
+                html.Small(
+                    f"Error: {stats_data.get('message', 'Unknown error')}"
+                    if stats_data
+                    else "No statistics available for the selected period.",
+                    className="text-muted text-center d-block",
+                ),
+            ],
+            className="p-4",
+        )
+        return error_message, html.Div(), error_message, [error_message]
+
     user_stats = stats_data.get("user_stats")
     execution_stats = stats_data.get("execution_stats")
     scripts_count = stats_data.get("scripts_count", 0)
 
-    # Add scripts count to latest status
+    # Add scripts count to latest status so downstream visualizations stay in sync
     latest_status = status_data.get("latest_status", {})
     latest_status["scripts_count"] = scripts_count
 
-    # Build components
+    dashboard_stats = stats_data.get("dashboard_stats") or stats_data.get(
+        "dashboard_stats_all_time"
+    )
+
+    system_overview = create_system_overview(dashboard_stats, latest_status)
+
     stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
     user_map = create_user_geographic_map(user_stats)
     status_time_series = (
@@ -514,7 +543,7 @@ def _build_stats_components(
         ui_period=ui_period,
     )
 
-    return stats_cards, user_map, additional_charts
+    return system_overview, stats_cards, user_map, additional_charts
 
 
 def _build_status_charts(time_series_data, safe_timezone, _time_tab):

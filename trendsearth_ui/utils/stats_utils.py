@@ -7,6 +7,7 @@ import requests
 
 from ..config import get_api_base
 from .logging_config import get_logger, log_error
+from .http_client import apply_default_headers
 
 
 def check_stats_access(role):
@@ -75,7 +76,7 @@ def fetch_dashboard_stats(
         logger.warning("Dashboard stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     if include_sections:
@@ -143,7 +144,7 @@ def fetch_scripts_count(token, api_environment="production"):
         logger.warning("Scripts count: No token provided")
         return 0
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     # Use pagination to get the total count without downloading all script data
     params = {"page": 1, "per_page": 1}  # Minimal data transfer
 
@@ -196,7 +197,7 @@ def fetch_user_stats(
         logger.warning("User stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     # Add optional parameters if provided
@@ -277,7 +278,7 @@ def fetch_execution_stats(
         logger.warning("Execution stats: No token provided")
         return {"error": "Authentication token not provided"}
 
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     params = {"period": period}
 
     # Add optional parameters if provided
