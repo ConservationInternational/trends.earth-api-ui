@@ -527,7 +527,6 @@ def register_callbacks(app):
             # Use the email as the user_id parameter in the endpoint
             resp = requests.post(
                 f"{api_base}/user/{email}/recover-password",
-                headers=apply_default_headers(),
                 timeout=10,
             )
 

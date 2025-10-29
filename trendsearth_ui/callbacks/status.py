@@ -26,6 +26,42 @@ logger = logging.getLogger(__name__)
 _request_cache = TTLCache(maxsize=20, ttl=30)  # 30-second TTL for request-level sharing
 
 
+def update_comprehensive_status_data(
+    *,
+    token: str | None,
+    api_environment: str | None,
+    time_period: str | None,
+    role: str | None,
+    user_timezone: str | None = "UTC",
+    force_refresh: bool = False,
+):
+    """Compatibility helper that mirrors the optimized comprehensive data fetch."""
+
+    safe_timezone = get_safe_timezone(user_timezone)
+    period = time_period or "day"
+
+    return _fetch_comprehensive_data_with_cache(
+        token=token or "",
+        api_environment=api_environment or "",
+        time_period=period,
+        role=role or "",
+        safe_timezone=safe_timezone,
+        force_refresh=force_refresh,
+    )
+
+
+def update_status_charts_optimized(
+    time_series_data,
+    user_timezone: str | None = "UTC",
+    time_period: str | None = None,
+):
+    """Compatibility helper that builds status charts using the optimized renderer."""
+
+    safe_timezone = get_safe_timezone(user_timezone)
+    period = time_period or "day"
+    return _build_status_charts(time_series_data, safe_timezone, period)
+
+
 def _format_display_time(value, safe_timezone, *, include_seconds=True):
     """Format a datetime or ISO timestamp for display in the user's timezone."""
 
