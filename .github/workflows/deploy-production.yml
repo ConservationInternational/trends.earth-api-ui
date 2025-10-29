@@ -22,6 +22,9 @@ jobs:
     name: Build and Deploy to Production
     runs-on: ubuntu-latest
     environment: production
+    env:
+      ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+      CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
     
     steps:
     - name: Checkout code
@@ -97,14 +100,13 @@ jobs:
         echo "✅ Deployment bundle created"
 
     - name: Upload bundle to S3
+      env:
+        S3_KEY: deployments/trendsearth-ui/production/${{ github.sha }}/deployment-bundle.zip
       run: |
         # Upload deployment bundle to S3
-        S3_BUCKET="${{ secrets.CODEDEPLOY_S3_BUCKET }}"
-        S3_KEY="deployments/trendsearth-ui/production/${{ github.sha }}/deployment-bundle.zip"
+        aws s3 cp deployment-bundle.zip "s3://$CODEDEPLOY_S3_BUCKET/$S3_KEY"
         
-        aws s3 cp deployment-bundle.zip "s3://$S3_BUCKET/$S3_KEY"
-        
-        echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+        echo "S3_BUCKET=$CODEDEPLOY_S3_BUCKET" >> $GITHUB_ENV
         echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
 
     - name: Create CodeDeploy deployment
@@ -116,7 +118,7 @@ jobs:
         DEPLOYMENT_ID=$(aws deploy create-deployment \
           --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
           --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
-          --s3-location bucket=${{ env.S3_BUCKET }},key=${{ env.S3_KEY }},bundleType=zip \
+          --s3-location bucket=$CODEDEPLOY_S3_BUCKET,key=$S3_KEY,bundleType=zip \
           --description "Production deployment of commit ${{ github.sha }}" \
           --query 'deploymentId' \
           --output text)
@@ -153,17 +155,21 @@ jobs:
         echo "✅ Deployment verification will be handled by CodeDeploy validation hooks"
 
     - name: Notify Rollbar of deployment
-      if: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+      if: ${{ env.ROLLBAR_ACCESS_TOKEN != '' }}
       run: |
-        curl -X POST 'https://api.rollbar.com/api/1/deploy' \
-          -H 'X-Rollbar-Access-Token: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}' \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "environment": "production",
-            "revision": "${{ github.sha }}",
-            "local_username": "github-actions",
-            "comment": "Production deployment via CodeDeploy"
-          }'
+        cat <<EOF > rollbar-payload.json
+        {
+          "environment": "production",
+          "revision": "$GITHUB_SHA",
+          "local_username": "github-actions",
+          "comment": "Production deployment via CodeDeploy"
+        }
+        EOF
+
+        curl -X POST https://api.rollbar.com/api/1/deploy \
+          -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d @rollbar-payload.json
 
     - name: Deployment summary
       run: |

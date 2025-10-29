@@ -29,6 +29,8 @@ jobs:
     concurrency:
       group: staging-deployment
       cancel-in-progress: false
+    env:
+      CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
     
     steps:
     - name: Checkout code
@@ -105,14 +107,13 @@ jobs:
         echo "✅ Deployment bundle created"
 
     - name: Upload bundle to S3
+      env:
+        S3_KEY: deployments/trendsearth-ui/staging/${{ github.sha }}/deployment-bundle.zip
       run: |
         # Upload deployment bundle to S3
-        S3_BUCKET="${{ secrets.CODEDEPLOY_S3_BUCKET }}"
-        S3_KEY="deployments/trendsearth-ui/staging/${{ github.sha }}/deployment-bundle.zip"
+        aws s3 cp deployment-bundle.zip "s3://$CODEDEPLOY_S3_BUCKET/$S3_KEY"
         
-        aws s3 cp deployment-bundle.zip "s3://$S3_BUCKET/$S3_KEY"
-        
-        echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+        echo "S3_BUCKET=$CODEDEPLOY_S3_BUCKET" >> $GITHUB_ENV
         echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
 
     - name: Create CodeDeploy deployment
@@ -124,7 +125,7 @@ jobs:
         DEPLOYMENT_ID=$(aws deploy create-deployment \
           --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
           --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
-          --s3-location bucket=${{ env.S3_BUCKET }},key=${{ env.S3_KEY }},bundleType=zip \
+          --s3-location bucket=$CODEDEPLOY_S3_BUCKET,key=$S3_KEY,bundleType=zip \
           --description "Staging deployment of commit ${{ github.sha }} from branch ${{ github.ref_name }}" \
           --query 'deploymentId' \
           --output text)

@@ -24,6 +24,9 @@ jobs:
     name: Rollback Production Service
     runs-on: ubuntu-latest
     environment: production
+    env:
+      ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+      CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
     
     steps:
     - name: Validate inputs and configuration
@@ -38,7 +41,7 @@ jobs:
           exit 1
         fi
         
-        if [ -z "${{ secrets.CODEDEPLOY_S3_BUCKET }}" ]; then
+        if [ -z "$CODEDEPLOY_S3_BUCKET" ]; then
           echo "❌ Error: CODEDEPLOY_S3_BUCKET secret is not set"
           exit 1
         fi
@@ -167,16 +170,15 @@ jobs:
         cd ..
         
         # Upload bundle to S3
-        S3_BUCKET="${{ secrets.CODEDEPLOY_S3_BUCKET }}"
         S3_KEY="deployments/trendsearth-ui/rollback/${{ steps.rollback-strategy.outputs.target-commit }}/rollback-bundle.zip"
         
-        aws s3 cp rollback-bundle.zip "s3://$S3_BUCKET/$S3_KEY"
+        aws s3 cp rollback-bundle.zip "s3://$CODEDEPLOY_S3_BUCKET/$S3_KEY"
         
         # Create CodeDeploy deployment
         ROLLBACK_DEPLOYMENT_ID=$(aws deploy create-deployment \
           --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
           --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
-          --s3-location bucket=$S3_BUCKET,key=$S3_KEY,bundleType=zip \
+          --s3-location bucket=$CODEDEPLOY_S3_BUCKET,key=$S3_KEY,bundleType=zip \
           --description "ROLLBACK to commit ${{ steps.rollback-strategy.outputs.target-commit }}: ${{ github.event.inputs.reason }}" \
           --query 'deploymentId' \
           --output text)
@@ -200,19 +202,23 @@ jobs:
         echo "✅ Rollback verification will be handled by CodeDeploy validation hooks"
 
     - name: Notify Rollbar of rollback
-      if: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+      if: ${{ env.ROLLBAR_ACCESS_TOKEN != '' }}
+      env:
+        COMMIT_SHA: ${{ steps.rollback-strategy.outputs.target-commit || 'automatic-rollback' }}
       run: |
-        COMMIT_SHA="${{ steps.rollback-strategy.outputs.target-commit || 'automatic-rollback' }}"
-        
-        curl -X POST 'https://api.rollbar.com/api/1/deploy' \
-          -H 'X-Rollbar-Access-Token: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}' \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "environment": "production",
-            "revision": "'$COMMIT_SHA'",
-            "local_username": "github-actions-rollback",
-            "comment": "ROLLBACK: ${{ github.event.inputs.reason }}"
-          }'
+        cat <<EOF > rollbar-payload.json
+        {
+          "environment": "production",
+          "revision": "$COMMIT_SHA",
+          "local_username": "github-actions-rollback",
+          "comment": "ROLLBACK: ${{ github.event.inputs.reason }}"
+        }
+        EOF
+
+        curl -X POST https://api.rollbar.com/api/1/deploy \
+          -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d @rollbar-payload.json
 
     - name: Rollback summary
       run: |
