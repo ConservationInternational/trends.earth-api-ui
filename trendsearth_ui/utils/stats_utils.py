@@ -6,8 +6,8 @@ NOTE: Caching is handled by StatusDataManager. These functions are pure API fetc
 import requests
 
 from ..config import get_api_base
-from .logging_config import get_logger, log_error
 from .http_client import apply_default_headers
+from .logging_config import get_logger, log_error
 
 
 def check_stats_access(role):

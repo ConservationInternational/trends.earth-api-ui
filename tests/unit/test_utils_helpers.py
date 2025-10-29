@@ -7,12 +7,12 @@ from unittest.mock import Mock, patch
 import pytest
 
 from trendsearth_ui.config import API_BASE
-from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 from trendsearth_ui.utils.helpers import (
     get_user_info,
     parse_date,
     safe_table_data,
 )
+from trendsearth_ui.utils.http_client import DEFAULT_ACCEPT_ENCODING
 
 
 class TestParseDateFunction:

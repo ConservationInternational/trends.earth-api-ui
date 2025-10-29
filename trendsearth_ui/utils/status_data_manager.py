@@ -8,6 +8,7 @@ from cachetools import TTLCache
 import requests
 
 from ..config import get_api_base
+from .http_client import apply_default_headers
 from .stats_utils import (
     fetch_dashboard_stats,
     fetch_execution_stats,
@@ -22,12 +23,13 @@ from .status_helpers import (
     is_status_endpoint_available,
 )
 from .timezone_utils import get_safe_timezone
-from .http_client import apply_default_headers
 
 logger = logging.getLogger(__name__)
 
 # Centralized cache for all status-related data
-_status_data_cache = TTLCache(maxsize=50, ttl=55)  # Slightly under 1 minute to align with UI refresh cadence
+_status_data_cache = TTLCache(
+    maxsize=50, ttl=55
+)  # Slightly under 1 minute to align with UI refresh cadence
 _stats_data_cache = TTLCache(maxsize=50, ttl=300)  # 5-minute TTL for stats data
 
 

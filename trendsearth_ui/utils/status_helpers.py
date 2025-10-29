@@ -7,10 +7,11 @@ import time
 from dash import html
 import requests
 
-from .http_client import apply_default_headers
 from trendsearth_ui.config import get_api_base
 from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
 from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
+
+from .http_client import apply_default_headers
 
 logger = logging.getLogger(__name__)
 
@@ -242,7 +243,9 @@ def fetch_swarm_info(api_environment, token=None, user_timezone=None):
                     if tz_abbrev and tz_abbrev != "UTC":
                         swarm_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
                     else:
-                        iso_timestamp = cached_at_raw[:19] if "T" in cached_at_raw else formatted_time
+                        iso_timestamp = (
+                            cached_at_raw[:19] if "T" in cached_at_raw else formatted_time
+                        )
                         swarm_cached_time = f" (Updated: {iso_timestamp})"
                 except (ValueError, TypeError):
                     # Fallback to original string if parsing fails
