@@ -302,6 +302,7 @@ def register_callbacks(app):
                     status_data,
                     comprehensive_data.get("time_series_data"),
                     user_timezone,
+                    time_period,
                 )
             else:
                 error_msg = html.Div(
@@ -477,7 +478,13 @@ def _build_status_summary(status_data, safe_timezone):
     return summary_component, last_updated_label
 
 
-def _build_stats_components(stats_data, status_data, time_series_data, user_timezone="UTC"):
+def _build_stats_components(
+    stats_data,
+    status_data,
+    time_series_data,
+    user_timezone="UTC",
+    ui_period=None,
+):
     """Build the enhanced statistics components."""
     user_stats = stats_data.get("user_stats")
     execution_stats = stats_data.get("execution_stats")
@@ -495,8 +502,17 @@ def _build_stats_components(stats_data, status_data, time_series_data, user_time
     )
 
     additional_charts = create_execution_statistics_chart(
-        execution_stats, status_time_series, title_suffix="", user_timezone=user_timezone
-    ) + create_user_statistics_chart(user_stats, title_suffix="", user_timezone=user_timezone)
+        execution_stats,
+        status_time_series,
+        title_suffix="",
+        user_timezone=user_timezone,
+    ) + create_user_statistics_chart(
+        user_stats,
+        title_suffix="",
+        user_timezone=user_timezone,
+        status_time_series=status_time_series,
+        ui_period=ui_period,
+    )
 
     return stats_cards, user_map, additional_charts
 

@@ -934,7 +934,14 @@ def create_execution_statistics_chart(
         ]
 
 
-def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone="UTC"):
+def create_user_statistics_chart(
+    user_stats_data,
+    title_suffix="",
+    user_timezone="UTC",
+    *,
+    status_time_series=None,
+    ui_period=None,
+):
     """
     Create user statistics charts showing registration trends.
 
@@ -942,6 +949,8 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
         user_stats_data: User statistics data from the API or error response structure
         title_suffix: Additional text for the chart title
         user_timezone: User's timezone (IANA timezone name)
+        status_time_series: Optional status endpoint time series data for enhanced resolution
+        ui_period: Selected UI period (day, week, month) used to determine target resolution
 
     Returns:
         list: List of chart components
@@ -949,6 +958,13 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
     from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
 
     suffix_label = f" ({title_suffix})" if title_suffix else ""
+    target_freq = {
+        "day": "15T",
+        "week": "1H",
+        "month": "1D",
+    }.get(ui_period or "")
+
+    logger = logging.getLogger(__name__)
 
     try:
         # Handle error response structure
@@ -1018,6 +1034,109 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
 
         charts = []
 
+        def _normalize_records(records):
+            if not records:
+                return None
+
+            df = pd.DataFrame(records)
+            if df.empty:
+                return None
+
+            time_col = None
+            for candidate in ("timestamp", "date", "datetime"):
+                if candidate in df.columns:
+                    time_col = candidate
+                    break
+
+            if time_col is None:
+                logger.info("Registration data missing timestamp column")
+                return None
+
+            df["timestamp"] = pd.to_datetime(df[time_col], errors="coerce")
+            df = df.dropna(subset=["timestamp"]).sort_values("timestamp")
+
+            if df.empty:
+                return None
+
+            if "new_users" not in df.columns:
+                if "total_users" in df.columns:
+                    df["new_users"] = (
+                        pd.to_numeric(df["total_users"], errors="coerce").ffill().diff()
+                    )
+                    df.loc[df["new_users"].isna(), "new_users"] = pd.to_numeric(
+                        df.loc[df["new_users"].isna(), "total_users"], errors="coerce"
+                    ).fillna(0)
+                elif "count" in df.columns:
+                    df["new_users"] = pd.to_numeric(df["count"], errors="coerce")
+                else:
+                    logger.info("Registration data missing new_users column")
+                    return None
+
+            df["new_users"] = (
+                pd.to_numeric(df["new_users"], errors="coerce").fillna(0).clip(lower=0)
+            )
+
+            return df[["timestamp", "new_users"]]
+
+        def _derive_from_status(status_records):
+            if not status_records:
+                return None
+
+            df_status = pd.DataFrame(status_records)
+            if df_status.empty or "timestamp" not in df_status.columns:
+                return None
+
+            user_col = next(
+                (
+                    col
+                    for col in [
+                        "users_count",
+                        "total_users",
+                        "user_count",
+                        "users",
+                    ]
+                    if col in df_status.columns
+                ),
+                None,
+            )
+
+            if user_col is None:
+                return None
+
+            df_status["timestamp"] = pd.to_datetime(df_status["timestamp"], errors="coerce")
+            df_status[user_col] = pd.to_numeric(df_status[user_col], errors="coerce")
+            df_status = df_status.dropna(subset=["timestamp", user_col]).sort_values("timestamp")
+
+            if df_status.empty:
+                return None
+
+            df_status["new_users"] = df_status[user_col].diff().fillna(0)
+            df_status["new_users"] = df_status["new_users"].clip(lower=0)
+
+            return df_status[["timestamp", "new_users"]]
+
+        def _choose_registration_df(primary_df, status_df):
+            if primary_df is None or primary_df.empty:
+                return status_df
+            if status_df is None or status_df.empty:
+                return primary_df
+
+            if target_freq is None:
+                return primary_df
+
+            primary_diff = primary_df["timestamp"].diff().dropna()
+            status_diff = status_df["timestamp"].diff().dropna()
+
+            primary_min = primary_diff.min() if not primary_diff.empty else None
+            status_min = status_diff.min() if not status_diff.empty else None
+
+            if status_min is None:
+                return primary_df
+            if primary_min is None:
+                return status_df
+
+            return status_df if status_min < primary_min else primary_df
+
         # 1. New user registrations - enhanced to handle group_by data
         # Look for time series data first (when group_by parameter is used)
         time_series_data = data.get("time_series", [])
@@ -1025,73 +1144,56 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
 
         # Prefer time_series data if available (more detailed from group_by)
         chart_data = time_series_data if time_series_data else trends_data
-        chart_title_prefix = (
-            "User Activity Time Series" if time_series_data else "New user registrations"
-        )
-        chart_title = f"{chart_title_prefix}{suffix_label}"
+        chart_title = f"New user registrations{suffix_label}"
 
-        if chart_data:
-            df = pd.DataFrame(chart_data)
+        registration_df = _normalize_records(chart_data)
+        status_df = _derive_from_status(status_time_series)
+        registration_df = _choose_registration_df(registration_df, status_df)
 
-            if not df.empty and "date" in df.columns:
-                # Convert date column to pandas datetime and then to local timezone
-                df["date"] = pd.to_datetime(df["date"], errors="coerce")
-                df = df.dropna(subset=["date"])
-                df["date"] = convert_timestamp_series_to_local(df["date"], user_timezone)
+        if registration_df is not None and not registration_df.empty:
+            registration_df = registration_df.sort_values("timestamp")
+            registration_df["timestamp"] = convert_timestamp_series_to_local(
+                registration_df["timestamp"], user_timezone
+            )
+
+            if target_freq:
+                freq_delta = pd.Timedelta(target_freq)
+                diffs = registration_df["timestamp"].diff().dropna()
+                min_diff = diffs.min() if not diffs.empty else None
+
+                series = registration_df.set_index("timestamp")["new_users"].copy()
+                if min_diff is not None and min_diff <= freq_delta:
+                    resampled = series.resample(target_freq).sum()
+                else:
+                    resampled = series.resample(target_freq).sum(min_count=1)
+                resampled = resampled.fillna(0)
+                registration_plot_df = resampled.reset_index()
+            else:
+                registration_plot_df = registration_df.copy()
+
+            if not registration_plot_df.empty:
+                registration_plot_df["cumulative_users"] = (
+                    registration_plot_df["new_users"].cumsum().fillna(0)
+                )
                 fig_users = go.Figure()
-
-                # Enhanced styling and multiple metrics
-                user_metrics = [
-                    {
-                        "col": "new_users",
-                        "name": "New Users",
-                        "color": "#4caf50",
-                        "fill": "tonexty",
-                    },
-                    {
-                        "col": "active_users",
-                        "name": "Active Users",
-                        "color": "#2196f3",
-                        "fill": None,
-                    },
-                    {
-                        "col": "total_users",
-                        "name": "Total Users",
-                        "color": "#ff9800",
-                        "fill": None,
-                        "yaxis": "y2",
-                    },
-                ]
-
-                # Add available user metrics
-                for metric in user_metrics:
-                    col_name = metric["col"]
-                    if col_name in df.columns:
-                        fig_users.add_trace(
-                            go.Scatter(
-                                x=df["date"],
-                                y=df[col_name],
-                                mode="lines+markers",
-                                name=metric["name"],
-                                line={"color": metric["color"], "width": 3},
-                                marker={"size": 6},
-                                fill=metric.get("fill"),
-                                yaxis=metric.get("yaxis", "y"),
-                                hovertemplate="<b>"
-                                + metric["name"]
-                                + "</b><br>Date: %{x}<br>Count: %{y}<extra></extra>",
-                            )
-                        )
+                fig_users.add_trace(
+                    go.Scatter(
+                        x=registration_plot_df["timestamp"],
+                        y=registration_plot_df["cumulative_users"],
+                        mode="lines+markers",
+                        name="Cumulative New Users",
+                        line={"color": "#4caf50", "width": 3},
+                        marker={"size": 5},
+                        line_shape="hv",
+                        hovertemplate=(
+                            "<b>Cumulative New Users</b><br>Time: %{x}<br>Total: %{y}<extra></extra>"
+                        ),
+                    )
+                )
 
                 fig_users.update_layout(
                     xaxis_title=get_chart_axis_label(user_timezone),
-                    yaxis_title="User Count",
-                    yaxis2={
-                        "title": "Total Users",
-                        "overlaying": "y",
-                        "side": "right",
-                        "showgrid": False,
-                    },
+                    yaxis_title="Cumulative New Users",
                     height=300,
                     hovermode="x unified",
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
@@ -1109,6 +1211,13 @@ def create_user_statistics_chart(user_stats_data, title_suffix="", user_timezone
                         className="mb-3",
                     )
                 )
+        else:
+            charts.append(
+                _build_message_block(
+                    "No new user registration data available.",
+                    detail="The API did not return registration trends for this period.",
+                )
+            )
 
         # 2. Top Countries by User Count
         # API uses 'geographic_distribution' instead of 'geographic'
