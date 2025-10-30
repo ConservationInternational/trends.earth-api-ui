@@ -41,9 +41,9 @@ services:
         monitor: 60s
         max_failure_ratio: 0.3
     networks:
-      - trendsearth-ui-network
+      - trendsearth-api-ui-network
 
 networks:
-  trendsearth-ui-network:
+  trendsearth-api-ui-network:
     driver: overlay
     attachable: true

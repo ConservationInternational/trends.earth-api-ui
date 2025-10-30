@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  trendsearth-ui:
+  trendsearth-api-ui:
     build: 
       context: .
       args:

@@ -32,7 +32,7 @@ playwright = "^1.40.0"
 pytest-playwright = "^0.4.0"
 
 [tool.poetry.scripts]
-trendsearth-ui = "trendsearth_ui.app:main"
+trendsearth-api-ui = "trendsearth_ui.app:main"
 
 [build-system]
 requires = ["poetry-core"]

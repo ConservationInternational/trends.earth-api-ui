@@ -11,11 +11,11 @@ echo "🔧 Before Install: Preparing environment for deployment"
 if [[ "${DEPLOYMENT_GROUP_NAME}" == *"staging"* ]]; then
     ENVIRONMENT="staging"
     APP_PATH="/opt/trends-earth-ui-staging"
-    STACK_NAME="trendsearth-ui-staging"
+    STACK_NAME="trendsearth-api-ui-staging"
 else
     ENVIRONMENT="production"
     APP_PATH="/opt/trends-earth-ui"
-    STACK_NAME="trendsearth-ui-prod"
+    STACK_NAME="trendsearth-api-ui-prod"
 fi
 
 echo "Environment: $ENVIRONMENT"

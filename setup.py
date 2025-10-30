@@ -9,7 +9,7 @@ with open("requirements.txt", encoding="utf-8") as fh:
     requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 setup(
-    name="trendsearth-ui",
+    name="trendsearth-api-ui",
     version="0.1.0",
     author="Alex Zvoleff",
     author_email="azvoleff@conservation.org",
@@ -40,7 +40,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "trendsearth-ui=trendsearth_ui.app:main",
+            "trendsearth-api-ui=trendsearth_ui.app:main",
         ],
     },
     include_package_data=True,

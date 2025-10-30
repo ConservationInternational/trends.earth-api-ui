@@ -89,16 +89,16 @@ poetry run python -m trendsearth_ui.app
 
 #### Using Poetry script
 ```bash
-poetry run trendsearth-ui
+poetry run trendsearth-api-ui
 ```
 
 #### Production mode (Docker with Gunicorn)
 ```bash
 # Build the Docker image
-docker build -t trendsearth-ui .
+docker build -t trendsearth-api-ui .
 
 # Run the container
-docker run -p 8000:8000 trendsearth-ui
+docker run -p 8000:8000 trendsearth-api-ui
 ```
 
 #### Production mode (Docker Compose)

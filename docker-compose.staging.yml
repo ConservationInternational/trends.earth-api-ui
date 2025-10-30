@@ -41,9 +41,9 @@ services:
         monitor: 60s
         max_failure_ratio: 0.3
     networks:
-      - trendsearth-ui-staging-network
+      - trendsearth-api-ui-staging-network
 
 networks:
-  trendsearth-ui-staging-network:
+  trendsearth-api-ui-staging-network:
     driver: overlay
     attachable: true

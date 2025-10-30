@@ -89,16 +89,16 @@ poetry run ruff format trendsearth_ui/ tests/
 poetry run python -m trendsearth_ui.app
 
 # Using Poetry script
-poetry run trendsearth-ui
+poetry run trendsearth-api-ui
 ```
 
 **Production mode with Docker**:
 ```bash
 # Build Docker image
-docker build -t trendsearth-ui .
+docker build -t trendsearth-api-ui .
 
 # Run container (accessible at http://localhost:8000)
-docker run -p 8000:8000 trendsearth-ui
+docker run -p 8000:8000 trendsearth-api-ui
 
 # Using Docker Compose (available as `docker compose`)
 docker compose up -d
