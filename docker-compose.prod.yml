@@ -23,6 +23,10 @@ services:
       start_period: 60s
     deploy:
       replicas: 2
+      resources:
+        reservations:
+          cpus: "0.25"
+          memory: 100M
       restart_policy:
         condition: on-failure
         delay: 5s
