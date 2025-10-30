@@ -12,11 +12,6 @@ hooks:
       timeout: 600
       runas: root
   
-  ApplicationStop:
-    - location: scripts/deployment/application_stop.sh
-      timeout: 300
-      runas: root
-  
   ValidateService:
     - location: scripts/deployment/validate_service.sh
       timeout: 300

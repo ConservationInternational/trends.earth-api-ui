@@ -49,16 +49,30 @@ else
     COMPOSE_IMAGE_TAG="latest"
 fi
 
-# Prefer the exact image tag provided by CI metadata; fall back to the
-# CodeDeploy deployment ID and ultimately to "latest" if needed.
-if [ -n "${IMAGE_TAG:-}" ]; then
-    RESOLVED_IMAGE_TAG="$IMAGE_TAG"
-elif [ -n "${DEPLOYMENT_IMAGE:-}" ]; then
+# Prefer the exact image URL provided by CI metadata; fall back to other
+# known tags that we publish (branch name, compose tag, latest) but avoid
+# relying on the CodeDeploy deployment ID because images are not pushed
+# with that tag.
+RESOLVED_IMAGE_TAG=""
+IMAGE_NAME=""
+
+if [ -n "${DEPLOYMENT_IMAGE:-}" ]; then
+    IMAGE_NAME="$DEPLOYMENT_IMAGE"
     RESOLVED_IMAGE_TAG="${DEPLOYMENT_IMAGE##*:}"
-elif [ -n "${DEPLOYMENT_ID:-}" ]; then
-    RESOLVED_IMAGE_TAG="$DEPLOYMENT_ID"
+elif [ -n "${IMAGE_TAG:-}" ]; then
+    RESOLVED_IMAGE_TAG="$IMAGE_TAG"
+    IMAGE_NAME="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$RESOLVED_IMAGE_TAG"
 else
+    FALLBACK_TAG="${BRANCH_NAME:-$COMPOSE_IMAGE_TAG}"
+    echo "ℹ️ No explicit image metadata provided; defaulting to tag: $FALLBACK_TAG"
+    RESOLVED_IMAGE_TAG="$FALLBACK_TAG"
+    IMAGE_NAME="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$RESOLVED_IMAGE_TAG"
+fi
+
+# Last-resort fallback if everything else is empty
+if [ -z "$RESOLVED_IMAGE_TAG" ]; then
     RESOLVED_IMAGE_TAG="latest"
+    IMAGE_NAME="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$RESOLVED_IMAGE_TAG"
 fi
 
 IMAGE_TAG="$RESOLVED_IMAGE_TAG"
@@ -85,12 +99,6 @@ fi
 
 # Pull the latest image from ECR
 echo "📥 Pulling latest image from ECR..."
-if [ -n "${DEPLOYMENT_IMAGE:-}" ]; then
-    IMAGE_NAME="$DEPLOYMENT_IMAGE"
-else
-    IMAGE_NAME="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$IMAGE_TAG"
-fi
-
 docker pull "$IMAGE_NAME"
 
 # Tag the image for the compose file

@@ -15,6 +15,26 @@ echo "Stack Name: $STACK_NAME"
 APP_IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-trendsearth-api-ui}"
 echo "Image Repository: $APP_IMAGE_REPOSITORY"
 
+# Only the active swarm leader should attempt to stop or remove the stack.
+echo "🔍 Checking swarm manager status..."
+if ! docker info >/dev/null 2>&1; then
+    echo "⚠️ Docker daemon unreachable. Skipping stop actions on this node."
+    exit 0
+fi
+
+manager_status=$(docker node ls --format '{{.Self}} {{.ManagerStatus}}' 2>/dev/null | awk '$1=="true" {print $2}')
+if [ -z "$manager_status" ]; then
+    echo "ℹ️ This node is not part of the swarm or manager status unknown. Skipping."
+    exit 0
+fi
+
+if [ "$manager_status" != "Leader" ]; then
+    echo "ℹ️ Node is a swarm manager but not the leader ($manager_status). Skipping ApplicationStop."
+    exit 0
+fi
+
+echo "✅ Node is the active swarm leader. Continuing stop sequence."
+
 # Check if stack exists and stop it gracefully
 if docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
     echo "📦 Stopping existing stack: $STACK_NAME"
