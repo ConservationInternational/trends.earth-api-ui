@@ -66,7 +66,7 @@ class TestDeploymentInfoFixes:
         result_str = str(result)
         assert "Environment: Production" in result_str
         assert "API Health: Error (500)" in result_str
-        
+
         assert "Trends.Earth UI" not in result_str
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
