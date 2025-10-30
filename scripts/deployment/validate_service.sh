@@ -52,17 +52,32 @@ if ! docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
     exit 1
 fi
 
-# Verify services are running
+# Verify services are running and capture their names
 echo "🔍 Checking service status..."
-service_count=$(docker service ls --filter "name=$STACK_NAME" --format "table {{.Name}}\t{{.Replicas}}" | grep -c "1/1" || echo "0")
+service_status_output=$(docker service ls --filter "name=$STACK_NAME" --format "{{.Name}} {{.Replicas}}")
 
-if [ "$service_count" -eq 0 ]; then
-    echo "❌ No services are running properly"
+if [ -z "$service_status_output" ]; then
+    echo "❌ No services found for stack: $STACK_NAME"
+    docker service ls --filter "name=$STACK_NAME"
+    exit 1
+fi
+
+PRIMARY_SERVICE=$(echo "$service_status_output" | head -n 1 | awk '{print $1}')
+
+unhealthy_services=$(echo "$service_status_output" | awk '{
+    split($2, counts, "/");
+    if (counts[1] != counts[2]) { print $0 }
+}')
+
+if [ -n "$unhealthy_services" ]; then
+    echo "❌ Some services are not running the desired replica count"
+    echo "$unhealthy_services"
     echo "📊 Current service status:"
     docker service ls --filter "name=$STACK_NAME"
     exit 1
 fi
 
+service_count=$(echo "$service_status_output" | wc -l | tr -d ' ')
 echo "✅ $service_count service(s) are running"
 
 # Wait for application to be ready
@@ -85,12 +100,12 @@ while [ $attempt -lt $max_attempts ]; do
             
             # Show service logs
             echo "📋 Service logs:"
-            docker service logs "$STACK_NAME"_ui --tail 50 || true
+            docker service logs "$PRIMARY_SERVICE" --tail 50 || true
             
             # Show service details
             echo "📊 Service details:"
             docker service ls --filter "name=$STACK_NAME"
-            docker service ps "$STACK_NAME"_ui || true
+            docker service ps "$PRIMARY_SERVICE" || true
             
             # Check if port is listening
             echo "🔗 Port check:"

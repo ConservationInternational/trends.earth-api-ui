@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  ui:
+  api-ui:
     # ECR image resolved via DOCKER_REGISTRY environment variable
     # Set by CodeDeploy scripts to: {account-id}.dkr.ecr.{region}.amazonaws.com
     # Falls back to local registry (127.0.0.1:5000) for development
