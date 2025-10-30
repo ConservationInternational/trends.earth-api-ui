@@ -318,23 +318,30 @@ def dashboard_layout():
                         [
                             dbc.Col(
                                 [
-                                    html.Img(
-                                        src=LOGO_SQUARE_URL,
-                                        height="40px",
-                                        className="me-2",
-                                    ),
-                                    dbc.NavbarBrand(
-                                        APP_TITLE,
-                                        className="fw-bold me-2",
-                                    ),
-                                    html.Span(
-                                        id="environment-indicator",
-                                        className="badge me-2",
-                                        style={
-                                            "fontSize": "12px",
-                                            "backgroundColor": "#6c757d",
-                                            "color": "white",
-                                        },
+                                    html.Div(
+                                        [
+                                            html.Img(
+                                                src=LOGO_SQUARE_URL,
+                                                height="40px",
+                                                className="me-2",
+                                            ),
+                                            dbc.NavbarBrand(
+                                                APP_TITLE,
+                                                className="fw-bold me-3",
+                                            ),
+                                            html.Div(
+                                                id="environment-indicator",
+                                                style={
+                                                    "fontSize": "12px",
+                                                    "color": "white",
+                                                    "display": "flex",
+                                                    "flexDirection": "column",
+                                                    "alignItems": "flex-start",
+                                                    "gap": "1px",
+                                                },
+                                            ),
+                                        ],
+                                        className="d-flex align-items-center",
                                     ),
                                 ],
                                 width="auto",

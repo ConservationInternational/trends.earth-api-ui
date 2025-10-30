@@ -1818,43 +1818,6 @@ def create_deployment_information(api_environment="production"):
         except Exception as e:
             logger.warning(f"Could not fetch API deployment info: {e}")
 
-        # Get API UI deployment information
-        ui_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
-        try:
-            # Get UI health from the current application, not from API server
-            from flask import request
-
-            # Construct the UI health URL using current request context
-            if request and hasattr(request, "host_url"):
-                # Use the current request's host URL
-                ui_url = f"{request.host_url.rstrip('/')}/api-ui-health"
-            else:
-                # Fallback: try localhost (for development or when no request context)
-                ui_url = "http://127.0.0.1:8050/api-ui-health"
-
-            logger.info(f"Fetching UI deployment info from current application: {ui_url}")
-            resp = requests.get(ui_url, headers=apply_default_headers(), timeout=5)
-            logger.info(f"UI health response status: {resp.status_code}")
-            if resp.status_code == 200:
-                data = resp.json()
-                logger.info(f"UI health response data: {data}")
-                deployment = data.get("deployment", {})
-                logger.info(f"UI deployment section: {deployment}")
-                ui_info = {
-                    "environment": deployment.get("environment", "Unknown"),
-                    "branch": deployment.get("branch", "Unknown"),
-                    "commit_sha": deployment.get("commit_sha", "Unknown")[:8]
-                    if deployment.get("commit_sha", "Unknown") != "Unknown"
-                    else "Unknown",
-                }
-                logger.info(f"Processed UI info: {ui_info}")
-            else:
-                logger.warning(
-                    f"UI health endpoint returned status {resp.status_code}: {resp.text}"
-                )
-        except Exception as e:
-            logger.warning(f"Could not fetch API UI deployment info: {e}")
-
         def format_value(val):
             return val if val and val != "Unknown" else "-"
 
@@ -1906,44 +1869,7 @@ def create_deployment_information(api_environment="production"):
                                     className="card",
                                 ),
                             ],
-                            className="col-md-6 mb-3",
-                        ),
-                        # API UI Information Card
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.Div(
-                                            [
-                                                html.H6(
-                                                    "Trends.Earth API UI", className="card-title"
-                                                ),
-                                                html.P(
-                                                    f"Environment: {format_value(ui_info['environment'])}",
-                                                    className="mb-1",
-                                                ),
-                                                html.P(
-                                                    f"Branch: {format_value(ui_info['branch'])}",
-                                                    className="mb-1",
-                                                ),
-                                                html.P(
-                                                    [
-                                                        "Commit: ",
-                                                        commit_link(
-                                                            "https://github.com/ConservationInternational/trends.earth-api-ui",
-                                                            ui_info["commit_sha"],
-                                                        ),
-                                                    ],
-                                                    className="mb-0",
-                                                ),
-                                            ],
-                                            className="card-body",
-                                        )
-                                    ],
-                                    className="card",
-                                ),
-                            ],
-                            className="col-md-6 mb-3",
+                            className="col-md-12 mb-3",
                         ),
                     ],
                     className="row",

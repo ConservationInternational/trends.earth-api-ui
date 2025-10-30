@@ -433,17 +433,44 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def update_environment_indicator(api_environment):
-        """Update the environment indicator in the header."""
+        """Update the environment indicator in the header to show both API and UI environments."""
         if not api_environment:
             return ""
 
-        # Return the appropriate environment label
-        if api_environment == "production":
-            return "Production"
-        elif api_environment == "staging":
-            return "Staging"
-        else:
-            return api_environment.title()
+        # Get UI environment info
+        from trendsearth_ui.utils.deployment_info import get_deployment_info
+
+        ui_deployment = get_deployment_info()
+        ui_environment = ui_deployment.get("environment", "unknown")
+
+        # Format environment names
+        api_env_display = api_environment.title() if api_environment else "Unknown"
+        ui_env_display = ui_environment.title() if ui_environment else "Unknown"
+
+        # Return badges showing both API and UI environments
+        return [
+            html.Span(
+                f"API: {api_env_display}",
+                className="badge",
+                style={
+                    "backgroundColor": "#6c757d" if api_environment != "production" else "#28a745",
+                    "color": "white",
+                    "fontSize": "11px",
+                    "padding": "2px 6px",
+                    "marginBottom": "1px",
+                },
+            ),
+            html.Span(
+                f"UI: {ui_env_display}",
+                className="badge",
+                style={
+                    "backgroundColor": "#6c757d" if ui_environment != "production" else "#28a745",
+                    "color": "white",
+                    "fontSize": "11px",
+                    "padding": "2px 6px",
+                },
+            ),
+        ]
 
     @app.callback(
         Output("forgot-password-modal", "is_open"),

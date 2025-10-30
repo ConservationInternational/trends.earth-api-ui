@@ -105,7 +105,7 @@ def test_rollback_workflow_has_ec2_references():
         "CODEDEPLOY_APPLICATION",
         "CODEDEPLOY_DEPLOYMENT_GROUP",
         "aws deploy",
-        "trendsearth-ui",  # Application name
+        "trendsearth-api-ui",  # Application name
     ]
 
     for term in codedeploy_terms:

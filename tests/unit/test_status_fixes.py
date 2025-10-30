@@ -12,8 +12,8 @@ class TestDeploymentInfoFixes:
     """Test deployment information fixes using actual API endpoints."""
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_both_endpoints_success(self, mock_get):
-        """Test successful fetch from both API and UI health endpoints."""
+    def test_fetch_deployment_info_with_api_endpoint_success(self, mock_get):
+        """Test successful fetch from API health endpoint."""
 
         def mock_requests_side_effect(url, *args, **kwargs):
             """Mock different responses based on URL"""
@@ -26,16 +26,6 @@ class TestDeploymentInfoFixes:
                     "deployment": {
                         "commit_sha": "abc123def456",
                         "branch": "main",
-                        "environment": "production",
-                    },
-                }
-            elif "api-ui-health" in url:
-                mock_response.status_code = 200
-                mock_response.json.return_value = {
-                    "status": "ok",
-                    "deployment": {
-                        "commit_sha": "xyz789uvw012",
-                        "branch": "master",
                         "environment": "production",
                     },
                 }
@@ -56,10 +46,8 @@ class TestDeploymentInfoFixes:
         assert "DB: healthy" in result_str
         assert "abc123d" in result_str  # Shortened commit SHA
         assert "main" in result_str
-        # Check UI info
-        assert "Trends.Earth UI" in result_str
-        assert "xyz789u" in result_str  # Shortened commit SHA
-        assert "master" in result_str
+        # UI info should NOT be present (removed as per requirement)
+        assert "Trends.Earth UI" not in result_str
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
     def test_fetch_deployment_info_with_api_error(self, mock_get):
@@ -69,16 +57,6 @@ class TestDeploymentInfoFixes:
             mock_response = Mock()
             if "api-health" in url:
                 mock_response.status_code = 500
-            elif "api-ui-health" in url:
-                mock_response.status_code = 200
-                mock_response.json.return_value = {
-                    "status": "ok",
-                    "deployment": {
-                        "commit_sha": "xyz789uvw012",
-                        "branch": "master",
-                        "environment": "production",
-                    },
-                }
             return mock_response
 
         mock_get.side_effect = mock_requests_side_effect
@@ -88,8 +66,8 @@ class TestDeploymentInfoFixes:
         result_str = str(result)
         assert "Environment: Production" in result_str
         assert "API Health: Error (500)" in result_str
-        assert "Trends.Earth UI" in result_str
-        assert "xyz789u" in result_str
+        
+        assert "Trends.Earth UI" not in result_str
 
     @patch("trendsearth_ui.utils.status_helpers.requests.get")
     def test_fetch_deployment_info_with_connection_error(self, mock_get):
@@ -101,7 +79,6 @@ class TestDeploymentInfoFixes:
         result_str = str(result)
         assert "Environment: Production" in result_str
         assert "API Health: Connection Error" in result_str
-        assert "UI Health: Connection Error" in result_str
 
     def test_fetch_deployment_info_no_token(self):
         """Test behavior when no token is provided."""

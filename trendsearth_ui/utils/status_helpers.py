@@ -167,7 +167,6 @@ def fetch_deployment_info(api_environment, token=None):
 
     # GitHub repository URLs for linking commits
     API_REPO_URL = "https://github.com/ConservationInternational/trends.earth-API"
-    UI_REPO_URL = "https://github.com/ConservationInternational/trends.earth-api-ui"
 
     # Fetch API health info (public endpoint, no auth required)
     # API health endpoint is at the root level, not under /api/v1
@@ -184,22 +183,14 @@ def fetch_deployment_info(api_environment, token=None):
         API_REPO_URL,
     )
 
-    # Fetch UI health info
-    # Check if the UI is deployed on the same domain as the API
-    ui_url = f"{get_api_base(api_environment).removesuffix('/api/v1')}/api-ui-health"
-
-    ui_success, ui_data, ui_status, ui_error = _fetch_health_status(ui_url)
-
-    ui_info = _create_service_info(
-        "Trends.Earth UI", "UI Deployment", ui_success, ui_data, ui_status, ui_error, UI_REPO_URL
-    )
+    # Note: UI health info removed as per requirement
+    # Only showing API deployment information
 
     # Combine the information
     return html.Div(
         [
             html.P(f"Environment: {api_environment.title()}", className="mb-2 fw-bold"),
             api_info or html.P("API status unavailable", className="mb-1 text-muted"),
-            ui_info or html.P("UI status unavailable", className="mb-1 text-muted"),
         ]
     )
 
