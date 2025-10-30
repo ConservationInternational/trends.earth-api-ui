@@ -14,7 +14,9 @@ ENV DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT}
 # to avoid exposing secrets in the Docker image layers
 
 # Install build tools and dependencies
-RUN apt-get update && apt-get install -y build-essential gcc && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends build-essential gcc curl \
+	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
