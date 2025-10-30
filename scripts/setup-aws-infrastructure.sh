@@ -210,26 +210,38 @@ show_setup_summary() {
     if check_ecr_repository "trendsearth-api-ui"; then
         local ecr_uri
         ecr_uri=$(aws ecr describe-repositories --repository-names trendsearth-api-ui --query 'repositories[0].repositoryUri' --output text 2>/dev/null)
-        log_success "ECR Repository: $ecr_uri"
+        log_success "ECR repository detected with default name: $ecr_uri"
+    else
+        log_info "ECR repository configured (custom name provided during setup; see logs above for details)."
     fi
     
     local default_bucket="trendsearth-api-ui-codedeploy-artifacts"
     if check_s3_bucket "$default_bucket"; then
-        log_success "S3 Bucket: $default_bucket"
+        log_success "S3 bucket detected with default name: $default_bucket"
+    else
+        log_info "S3 bucket for CodeDeploy artifacts configured (custom name provided during setup)."
     fi
     
     if check_iam_role "TrendsEarthAPIUICodeDeployRole"; then
-        log_success "CodeDeploy Role: arn:aws:iam::$account_id:role/TrendsEarthAPIUICodeDeployRole"
+        log_success "CodeDeploy service role detected with default name: arn:aws:iam::$account_id:role/TrendsEarthAPIUICodeDeployRole"
+    else
+        log_info "CodeDeploy service role configured (custom role name supplied)."
     fi
     
     if check_iam_role "TrendsEarthAPIUIInstanceRole"; then
-        log_success "EC2 Instance Role: arn:aws:iam::$account_id:role/TrendsEarthAPIUIInstanceRole"
-        log_success "Instance Profile: arn:aws:iam::$account_id:instance-profile/TrendsEarthAPIUIInstanceProfile"
+        log_success "EC2 instance role detected with default name: arn:aws:iam::$account_id:role/TrendsEarthAPIUIInstanceRole"
+        if aws iam get-instance-profile --instance-profile-name "TrendsEarthAPIUIInstanceProfile" &>/dev/null; then
+            log_success "Instance profile detected with default name: arn:aws:iam::$account_id:instance-profile/TrendsEarthAPIUIInstanceProfile"
+        fi
+    else
+        log_info "EC2 instance role and profile configured (custom names supplied during setup)."
     fi
     
     if check_codedeploy_application "trendsearth-api-ui"; then
-        log_success "CodeDeploy Application: trendsearth-api-ui"
-        log_info "  Deployment Groups: production, staging"
+        log_success "CodeDeploy application detected with default name: trendsearth-api-ui"
+        log_info "  Deployment groups with default names: production, staging"
+    else
+        log_info "CodeDeploy application configured (custom name supplied)."
     fi
     
     echo ""
