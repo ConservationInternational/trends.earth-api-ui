@@ -571,13 +571,14 @@ def _build_stats_components(
     user_stats = stats_data.get("user_stats")
     execution_stats = stats_data.get("execution_stats")
     scripts_count = stats_data.get("scripts_count", 0)
+    iso_resolver = stats_data.get("country_iso_resolver")
 
     # Add scripts count to latest status so downstream visualizations stay in sync
     latest_status = status_data.get("latest_status", {})
     latest_status["scripts_count"] = scripts_count
 
     stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
-    user_map = create_user_geographic_map(user_stats)
+    user_map = create_user_geographic_map(user_stats, iso_resolver=iso_resolver)
     status_time_series = (
         time_series_data.get("data") if isinstance(time_series_data, dict) else time_series_data
     )

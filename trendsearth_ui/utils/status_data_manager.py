@@ -8,6 +8,7 @@ from cachetools import TTLCache
 import requests
 
 from ..config import get_api_base
+from .boundaries_utils import clear_country_iso_cache, get_country_iso_resolver
 from .http_client import apply_default_headers
 from .stats_utils import (
     fetch_dashboard_stats,
@@ -255,6 +256,15 @@ class StatusDataManager:
             if result["total_scripts_all_time"] is None:
                 result["total_scripts_all_time"] = result["scripts_count"]
 
+            resolver = get_country_iso_resolver(token, api_environment)
+            if resolver is not None:
+                result["country_iso_resolver"] = resolver
+            else:
+                logger.warning(
+                    "Country ISO resolver unavailable for environment '%s'",
+                    api_environment,
+                )
+
             logger.info(f"Successfully fetched consolidated stats data for period {api_period}")
 
         except Exception as e:
@@ -462,6 +472,12 @@ class StatusDataManager:
                 for key in keys_to_remove:
                     del cache[key]
                 cleared_count += len(keys_to_remove)
+
+        # Only clear the expensive boundaries resolver when explicitly requested or when
+        # invalidating everything; manual status refreshes should continue reusing the
+        # cached hierarchy until the TTL expires.
+        if pattern is None or pattern == "boundaries":
+            cleared_count += clear_country_iso_cache()
 
         logger.info(f"Invalidated {cleared_count} cache entries")
         return cleared_count

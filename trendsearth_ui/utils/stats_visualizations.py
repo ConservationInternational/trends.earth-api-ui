@@ -1,11 +1,14 @@
 """Visualization utilities for stats charts and maps."""
 
 import logging
-from typing import Any, Callable
+import re
+from typing import Any, Callable, Optional
 
 from dash import dcc, html
 import pandas as pd
 import plotly.graph_objects as go
+
+from .boundaries_utils import COUNTRY_NAME_OVERRIDES, CountryIsoResolver
 
 
 def _build_message_block(
@@ -85,7 +88,82 @@ def _extract_stats_data(
     return data, None
 
 
-def create_user_geographic_map(user_stats_data):
+_FALLBACK_COUNTRY_CODE_MAP_LOWER = {
+    name.lower(): iso for name, iso in COUNTRY_NAME_OVERRIDES.items()
+}
+_FALLBACK_COUNTRY_CODE_VALUES = {iso.upper() for iso in COUNTRY_NAME_OVERRIDES.values()}
+_ISO_SPLIT_PATTERN = re.compile(r"[^A-Za-z]+")
+
+
+def _coerce_user_count(value: Any) -> int:
+    """Safely coerce counts to non-negative integers."""
+
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return 0
+    if numeric <= 0:
+        return 0
+    return int(numeric)
+
+
+def _extract_iso_candidate(country_name: str) -> str | None:
+    """Extract a likely ISO-3 token from a free-form country string."""
+
+    if not country_name:
+        return None
+    for token in _ISO_SPLIT_PATTERN.split(country_name):
+        candidate = token.strip()
+        if len(candidate) == 3 and candidate.isalpha():
+            return candidate.upper()
+    return None
+
+
+def _resolve_country_iso(
+    country_name: str,
+    iso_resolver: Optional[CountryIsoResolver],
+) -> tuple[str | None, str | None]:
+    """Resolve a country name to an ISO code and display label using available data."""
+
+    if not isinstance(country_name, str):
+        return None, None
+
+    candidate = country_name.strip()
+    if not candidate:
+        return None, None
+
+    iso_candidate = _extract_iso_candidate(candidate)
+    if iso_candidate:
+        if iso_resolver and iso_candidate in iso_resolver.iso_codes:
+            display = iso_resolver.display_name(iso_candidate)
+            return iso_candidate, display or candidate
+        if iso_candidate in _FALLBACK_COUNTRY_CODE_VALUES:
+            display = iso_resolver.display_name(iso_candidate) if iso_resolver else candidate
+            return iso_candidate, display or candidate
+
+    if iso_resolver:
+        resolved_iso = iso_resolver.resolve(candidate)
+        if resolved_iso:
+            display = iso_resolver.display_name(resolved_iso)
+            return resolved_iso, display or candidate
+
+    exact_iso = COUNTRY_NAME_OVERRIDES.get(candidate)
+    if exact_iso:
+        display = iso_resolver.display_name(exact_iso) if iso_resolver else candidate
+        return exact_iso, display or candidate
+
+    lowered_iso = _FALLBACK_COUNTRY_CODE_MAP_LOWER.get(candidate.lower())
+    if lowered_iso:
+        display = iso_resolver.display_name(lowered_iso) if iso_resolver else candidate
+        return lowered_iso, display or candidate
+
+    return None, None
+
+
+def create_user_geographic_map(
+    user_stats_data,
+    iso_resolver: Optional[CountryIsoResolver] = None,
+):
     """Render a choropleth map of user registrations by country."""
 
     import logging
@@ -171,98 +249,75 @@ def create_user_geographic_map(user_stats_data):
                 ),
             )
 
-        country_code_mapping = {
-            "China": "CHN",
-            "Mozambique": "MOZ",
-            "United States": "USA",
-            "United States of America": "USA",
-            "Canada": "CAN",
-            "United Kingdom": "GBR",
-            "Germany": "DEU",
-            "France": "FRA",
-            "Japan": "JPN",
-            "Brazil": "BRA",
-            "India": "IND",
-            "Australia": "AUS",
-            "South Africa": "ZAF",
-            "Mexico": "MEX",
-            "Russia": "RUS",
-            "Italy": "ITA",
-            "Spain": "ESP",
-            "Netherlands": "NLD",
-            "Sweden": "SWE",
-            "Norway": "NOR",
-            "Denmark": "DNK",
-            "Finland": "FIN",
-            "Kenya": "KEN",
-            "Nigeria": "NGA",
-            "Egypt": "EGY",
-            "Argentina": "ARG",
-            "Chile": "CHL",
-            "Peru": "PER",
-            "Colombia": "COL",
-            "Ecuador": "ECU",
-            "Bolivia": "BOL",
-            "Venezuela": "VEN",
-            "Thailand": "THA",
-            "Indonesia": "IDN",
-            "Philippines": "PHL",
-            "Malaysia": "MYS",
-            "Singapore": "SGP",
-            "Vietnam": "VNM",
-            "South Korea": "KOR",
-            "Turkey": "TUR",
-            "Poland": "POL",
-            "Czech Republic": "CZE",
-            "Hungary": "HUN",
-            "Romania": "ROU",
-            "Bulgaria": "BGR",
-            "Greece": "GRC",
-            "Portugal": "PRT",
-            "Belgium": "BEL",
-            "Austria": "AUT",
-            "Switzerland": "CHE",
-            "Ireland": "IRL",
-            "New Zealand": "NZL",
-            "Israel": "ISR",
-            "Morocco": "MAR",
-            "Algeria": "DZA",
-            "Tunisia": "TUN",
-            "Ghana": "GHA",
-            "Ethiopia": "ETH",
-            "Tanzania": "TZA",
-            "Uganda": "UGA",
-            "Rwanda": "RWA",
-            "Zambia": "ZMB",
-            "Zimbabwe": "ZWE",
-            "Botswana": "BWA",
-            "Namibia": "NAM",
-            "Madagascar": "MDG",
-        }
-
-        iso_countries: list[str] = []
-        iso_counts: list[int] = []
-        country_labels: list[str] = []
+        iso_counts_map: dict[str, int] = {}
+        iso_labels: dict[str, str] = {}
+        iso_aliases: dict[str, set[str]] = {}
+        unmatched_countries: list[str] = []
 
         for country, count in countries_data.items():
-            iso_code = country_code_mapping.get(country)
+            numeric_count = _coerce_user_count(count)
+            if numeric_count == 0:
+                continue
+
+            iso_code, display_name = _resolve_country_iso(country, iso_resolver)
             if iso_code:
-                iso_countries.append(iso_code)
-                iso_counts.append(count)
-                country_labels.append(f"{country}: {count} users")
+                iso_counts_map[iso_code] = iso_counts_map.get(iso_code, 0) + numeric_count
+                if display_name:
+                    iso_labels[iso_code] = display_name
+                iso_aliases.setdefault(iso_code, set()).add(str(country))
             else:
-                logger.warning("No ISO-3 code mapping found for country: %s", country)
+                unmatched_countries.append(str(country))
 
-        logger.info("Mapped to ISO codes: %s", dict(zip(iso_countries, iso_counts)))
+        if unmatched_countries:
+            logger.warning(
+                "No ISO-3 code mapping found for countries: %s",
+                ", ".join(sorted({name for name in unmatched_countries if name})),
+            )
 
-        if not iso_countries:
+        if not iso_counts_map:
+            if unmatched_countries:
+                missing_names = sorted({name for name in unmatched_countries if name})
+                missing_display = ", ".join(missing_names) if missing_names else "unknown countries"
+                detail = (
+                    "Countries without ISO-3 mapping: "
+                    f"{missing_display}. Update the boundary metadata or mapping overrides."
+                )
+            else:
+                detail = (
+                    "Countries found: "
+                    f"{', '.join(sorted(str(key) for key in countries_data))}. "
+                    "These countries need ISO-3 code mapping."
+                )
+
             return _build_message_block(
                 "No mappable country data available.",
-                detail=(
-                    "Countries found: "
-                    f"{', '.join(countries_data.keys())}. These countries need ISO-3 code mapping."
-                ),
+                detail=detail,
             )
+
+        sorted_iso_entries = sorted(
+            iso_counts_map.items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+
+        iso_countries = [iso for iso, _ in sorted_iso_entries]
+        iso_counts = [iso_counts_map[iso] for iso in iso_countries]
+        country_labels: list[str] = []
+        for iso in iso_countries:
+            display_name = iso_labels.get(iso)
+            if not display_name and iso_resolver:
+                display_name = iso_resolver.display_name(iso)
+            if not display_name:
+                display_name = iso
+            aliases = {
+                alias
+                for alias in iso_aliases.get(iso, set())
+                if alias and alias.lower() != display_name.lower()
+            }
+            alias_suffix = f" ({', '.join(sorted(aliases))})" if aliases else ""
+            country_labels.append(f"{display_name}{alias_suffix}: {iso_counts_map[iso]} users")
+
+        logger.info("Mapped to ISO codes: %s", iso_counts_map)
 
         fig = go.Figure(
             data=go.Choropleth(
