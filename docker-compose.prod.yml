@@ -5,7 +5,7 @@ services:
     # ECR image resolved via DOCKER_REGISTRY environment variable
     # Set by CodeDeploy scripts to: {account-id}.dkr.ecr.{region}.amazonaws.com
     # Falls back to local registry (127.0.0.1:5000) for development
-    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/trendsearth-ui:latest
+    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/trendsearth-api-ui:latest
     ports:
       - "8000:8000"
     environment:

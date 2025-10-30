@@ -12,6 +12,8 @@ source /opt/deploy-env
 
 echo "Environment: $ENVIRONMENT"
 echo "Stack Name: $STACK_NAME"
+APP_IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-trendsearth-api-ui}"
+echo "Image Repository: $APP_IMAGE_REPOSITORY"
 
 # Check if stack exists and stop it gracefully
 if docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
@@ -46,6 +48,6 @@ fi
 # Clean up old images to save space (keep last 3 versions)
 echo "🧹 Cleaning up old Docker images..."
 docker image prune -f
-docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedAt}}" | grep "trendsearth-ui" | tail -n +4 | awk '{print $3}' | xargs -r docker rmi || true
+docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}\t{{.CreatedAt}}" | grep "$APP_IMAGE_REPOSITORY" | tail -n +4 | awk '{print $3}' | xargs -r docker rmi || true
 
 echo "✅ Application Stop completed successfully"

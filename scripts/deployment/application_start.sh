@@ -13,6 +13,8 @@ source /opt/deploy-env
 echo "Environment: $ENVIRONMENT"
 echo "App Path: $APP_PATH"
 echo "Stack Name: $STACK_NAME"
+APP_IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-trendsearth-api-ui}"
+echo "Image Repository: $APP_IMAGE_REPOSITORY"
 
 # Short-circuit if this node is not the active swarm manager. CodeDeploy may target
 # multiple nodes for redundancy, but only the current leader should run stack updates.
@@ -41,18 +43,33 @@ cd "$APP_PATH"
 # Set compose file based on environment
 if [ "$ENVIRONMENT" = "staging" ]; then
     COMPOSE_FILE="docker-compose.staging.yml"
-    IMAGE_TAG="${DEPLOYMENT_ID:-latest}"
+    COMPOSE_IMAGE_TAG="staging"
 else
     COMPOSE_FILE="docker-compose.prod.yml"
-    IMAGE_TAG="${DEPLOYMENT_ID:-latest}"
+    COMPOSE_IMAGE_TAG="latest"
 fi
+
+# Prefer the exact image tag provided by CI metadata; fall back to the
+# CodeDeploy deployment ID and ultimately to "latest" if needed.
+if [ -n "${IMAGE_TAG:-}" ]; then
+    RESOLVED_IMAGE_TAG="$IMAGE_TAG"
+elif [ -n "${DEPLOYMENT_IMAGE:-}" ]; then
+    RESOLVED_IMAGE_TAG="${DEPLOYMENT_IMAGE##*:}"
+elif [ -n "${DEPLOYMENT_ID:-}" ]; then
+    RESOLVED_IMAGE_TAG="$DEPLOYMENT_ID"
+else
+    RESOLVED_IMAGE_TAG="latest"
+fi
+
+IMAGE_TAG="$RESOLVED_IMAGE_TAG"
 
 echo "Compose File: $COMPOSE_FILE"
 echo "Image Tag: $IMAGE_TAG"
+echo "Compose Image Tag: $COMPOSE_IMAGE_TAG"
 
 # Update compose file with ECR registry
 export DOCKER_REGISTRY="$ECR_REGISTRY"
-export GIT_COMMIT_SHA="${DEPLOYMENT_ID:-unknown}"
+export GIT_COMMIT_SHA="${GIT_COMMIT_SHA:-${DEPLOYMENT_ID:-unknown}}"
 export GIT_BRANCH="${BRANCH_NAME:-master}"
 export DEPLOYMENT_ENVIRONMENT="$ENVIRONMENT"
 
@@ -68,14 +85,24 @@ fi
 
 # Pull the latest image from ECR
 echo "📥 Pulling latest image from ECR..."
-IMAGE_NAME="$ECR_REGISTRY/trendsearth-ui:$IMAGE_TAG"
+if [ -n "${DEPLOYMENT_IMAGE:-}" ]; then
+    IMAGE_NAME="$DEPLOYMENT_IMAGE"
+else
+    IMAGE_NAME="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$IMAGE_TAG"
+fi
+
 docker pull "$IMAGE_NAME"
 
 # Tag the image for the compose file
-docker tag "$IMAGE_NAME" "$ECR_REGISTRY/trendsearth-ui:latest"
+COMPOSE_IMAGE_REFERENCE="$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:$COMPOSE_IMAGE_TAG"
+docker tag "$IMAGE_NAME" "$COMPOSE_IMAGE_REFERENCE"
+if [ "$COMPOSE_IMAGE_TAG" != "latest" ]; then
+    docker tag "$IMAGE_NAME" "$ECR_REGISTRY/$APP_IMAGE_REPOSITORY:latest"
+fi
 
 echo "📦 Deploying stack: $STACK_NAME"
 echo "🐳 Using image: $IMAGE_NAME"
+echo "🐳 Tagged for compose as: $COMPOSE_IMAGE_REFERENCE"
 
 # Deploy the stack with retry logic
 attempts=0
