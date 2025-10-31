@@ -132,8 +132,13 @@ def _resolve_country_iso(
     if not candidate:
         return None, None
 
-    iso_candidate = _extract_iso_candidate(candidate)
+    # Replace non-breaking spaces and collapse repeated whitespace so that variants using
+    # non-standard spacing (e.g. S.&nbsp;Sudan) resolve consistently.
+    normalized_candidate = " ".join(candidate.replace("\u00a0", " ").split())
+
+    iso_candidate = _extract_iso_candidate(normalized_candidate)
     if iso_candidate:
+        iso_candidate = iso_candidate.upper()
         if iso_resolver and iso_candidate in iso_resolver.iso_codes:
             display = iso_resolver.display_name(iso_candidate)
             return iso_candidate, display or candidate
@@ -142,20 +147,25 @@ def _resolve_country_iso(
             return iso_candidate, display or candidate
 
     if iso_resolver:
-        resolved_iso = iso_resolver.resolve(candidate)
+        resolved_iso = iso_resolver.resolve(normalized_candidate)
         if resolved_iso:
             display = iso_resolver.display_name(resolved_iso)
             return resolved_iso, display or candidate
 
-    exact_iso = COUNTRY_NAME_OVERRIDES.get(candidate)
+    exact_iso = COUNTRY_NAME_OVERRIDES.get(normalized_candidate)
     if exact_iso:
         display = iso_resolver.display_name(exact_iso) if iso_resolver else candidate
         return exact_iso, display or candidate
 
-    lowered_iso = _FALLBACK_COUNTRY_CODE_MAP_LOWER.get(candidate.lower())
+    lowered_iso = _FALLBACK_COUNTRY_CODE_MAP_LOWER.get(normalized_candidate.lower())
     if lowered_iso:
         display = iso_resolver.display_name(lowered_iso) if iso_resolver else candidate
         return lowered_iso, display or candidate
+
+    if iso_candidate and iso_resolver is None:
+        # Accept well-formed ISO-3 codes even when the resolver could not be
+        # loaded. Use the raw country label as a fallback display name.
+        return iso_candidate, candidate
 
     return None, None
 
@@ -224,19 +234,19 @@ def create_user_geographic_map(
             )
 
         countries_data = geographic_data.get("countries", {})
-        top_countries_data = geographic_data.get("top_countries", [])
 
         logger.info("Countries data: %s", countries_data)
-        logger.info("Top countries data: %s", top_countries_data)
 
-        if top_countries_data and isinstance(top_countries_data, list):
-            countries_data = {}
-            for item in top_countries_data:
+        if isinstance(countries_data, list):
+            # Some endpoints may return a list of country/count mappings instead of a dict
+            extracted = {}
+            for item in countries_data:
                 if isinstance(item, dict):
                     country = item.get("country", item.get("country_code", ""))
                     count = item.get("user_count", item.get("count", 0))
                     if country:
-                        countries_data[country] = count
+                        extracted[country] = count
+            countries_data = extracted
 
         logger.info("Final countries data: %s", countries_data)
 

@@ -125,6 +125,17 @@ COUNTRY_NAME_OVERRIDES: dict[str, str] = {
     "Bahamas": "BHS",
     "The Bahamas": "BHS",
     "Taiwan": "TWN",
+    "Democratic Republic of the Congo": "COD",
+    "Democratic Republic of Congo": "COD",
+    "Democratic Republic Congo": "COD",
+    "Dem. Rep. Congo": "COD",
+    "Congo Democratic Republic": "COD",
+    "Central African Republic": "CAF",
+    "Central African Rep.": "CAF",
+    "Central African Rep": "CAF",
+    "S. Sudan": "SSD",
+    "S Sudan": "SSD",
+    "South Sudan": "SSD",
 }
 
 COUNTRY_NAME_OVERRIDES.update(
