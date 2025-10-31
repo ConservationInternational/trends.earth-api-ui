@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 import json
+import os
 import re
 
 from dash import Input, Output, State, callback_context, html, no_update
@@ -22,6 +23,36 @@ from ..utils.logging_config import get_logger, log_exception
 
 # Get the configured logger
 logger = get_logger()
+
+_SECURE_COOKIE_ENVIRONMENTS = {"production", "staging"}
+
+
+def _should_use_secure_cookie() -> bool:
+    """Determine if cookies must be marked secure."""
+    env = os.environ.get("DEPLOYMENT_ENVIRONMENT", "").lower()
+    if env in _SECURE_COOKIE_ENVIRONMENTS:
+        return True
+
+    forwarded_proto = request.headers.get("X-Forwarded-Proto", "")
+    if "https" in forwarded_proto.lower():
+        return True
+
+    return request.is_secure
+
+
+def _set_auth_cookie(response, value: str, expires):
+    """Set auth cookie with consistent security flags."""
+    if not response:
+        return
+
+    response.set_cookie(
+        "auth_token",
+        value,
+        expires=expires,
+        httponly=True,
+        secure=_should_use_secure_cookie(),
+        samesite="Lax",
+    )
 
 
 def register_callbacks(app):
@@ -240,14 +271,7 @@ def register_callbacks(app):
                         ctx = callback_context
                         if hasattr(ctx, "response") and ctx.response:
                             expiration = datetime.now() + timedelta(days=30)
-                            ctx.response.set_cookie(
-                                "auth_token",
-                                cookie_value,
-                                expires=expiration,
-                                httponly=True,
-                                secure=False,  # Set to True in production with HTTPS
-                                samesite="Lax",
-                            )
+                            _set_auth_cookie(ctx.response, cookie_value, expiration)
                             print("🍪 Set HTTP authentication cookie with 30-day expiration")
 
                     return (
@@ -354,14 +378,7 @@ def register_callbacks(app):
             # Clear HTTP cookie
             ctx = callback_context
             if hasattr(ctx, "response") and ctx.response:
-                ctx.response.set_cookie(
-                    "auth_token",
-                    "",
-                    expires=0,  # Expire immediately
-                    httponly=True,
-                    secure=False,  # Set to True in production with HTTPS
-                    samesite="Lax",
-                )
+                _set_auth_cookie(ctx.response, "", 0)
                 print("🍪 Cleared HTTP authentication cookie")
 
             return (True, True, True, login_layout(), [])
@@ -732,14 +749,7 @@ def register_callbacks(app):
                             )
                             cookie_value = json.dumps(new_cookie_data)
                             expiration = datetime.now() + timedelta(days=30)
-                            ctx.response.set_cookie(
-                                "auth_token",
-                                cookie_value,
-                                expires=expiration,
-                                httponly=True,
-                                secure=False,
-                                samesite="Lax",
-                            )
+                            _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
                 print(f"Error updating cookie during auto-refresh: {e}")
 
@@ -831,14 +841,7 @@ def register_callbacks(app):
                         )
                         cookie_value = json.dumps(new_cookie_data)
                         expiration = datetime.now() + timedelta(days=30)
-                        ctx.response.set_cookie(
-                            "auth_token",
-                            cookie_value,
-                            expires=expiration,
-                            httponly=True,
-                            secure=False,
-                            samesite="Lax",
-                        )
+                        _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
                 print(f"Error updating cookie during proactive refresh: {e}")
 

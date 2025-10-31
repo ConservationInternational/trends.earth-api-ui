@@ -26,6 +26,21 @@ logger = setup_logging(rollbar_token)
 
 server = flask.Flask(__name__)
 
+_SECURE_ENVIRONMENTS = {"production", "staging"}
+
+
+def _should_enforce_hsts() -> bool:
+    """Return True when HSTS should be applied."""
+    env = os.environ.get("DEPLOYMENT_ENVIRONMENT", "").lower()
+    if env in _SECURE_ENVIRONMENTS:
+        return True
+
+    forwarded_proto = flask.request.headers.get("X-Forwarded-Proto", "")
+    if "https" in forwarded_proto.lower():
+        return True
+
+    return flask.request.is_secure
+
 # Configure assets directory
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 
@@ -142,6 +157,31 @@ app.layout = create_main_layout()
 
 
 # Add global error handlers
+@server.after_request
+def add_security_headers(response):
+    """Attach standard security headers to every response."""
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-XSS-Protection", "1; mode=block")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' data:;",
+    )
+
+    if _should_enforce_hsts():
+        response.headers.setdefault(
+            "Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload"
+        )
+
+    return response
+
+
 def _is_bot_request(user_agent: str) -> bool:
     """Check if the User-Agent indicates a bot, scanner, or automated tool."""
     if not user_agent:

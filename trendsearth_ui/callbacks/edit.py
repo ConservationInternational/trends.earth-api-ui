@@ -2,6 +2,8 @@
 
 from dash import Input, Output, State, no_update
 
+from ..config import get_api_base
+from ..utils import get_user_info
 from ..utils.helpers import make_authenticated_request
 from ._table_helpers import RowResolutionError, resolve_row_data
 
@@ -269,10 +271,13 @@ def register_callbacks(app):
             State("token-store", "data"),
             State("role-store", "data"),
             State("refresh-users-btn", "n_clicks"),
+            State("api-environment-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def confirm_delete_user(confirm_clicks, user_data, token, role, current_refresh_clicks):
+    def confirm_delete_user(
+        confirm_clicks, user_data, token, role, current_refresh_clicks, api_environment
+    ):
         """Confirm and execute user deletion."""
         if not confirm_clicks or role != "SUPERADMIN" or not user_data or not token:
             return no_update, no_update, no_update
@@ -280,6 +285,12 @@ def register_callbacks(app):
         user_id = user_data.get("id")
         if not user_id:
             print("❌ No user ID found for deletion")
+            return no_update, no_update, no_update
+
+        api_base = get_api_base(api_environment)
+        current_user = get_user_info(token, api_base)
+        if not current_user or current_user.get("role") != "SUPERADMIN":
+            print("❌ Unauthorized delete attempt blocked")
             return no_update, no_update, no_update
 
         try:
