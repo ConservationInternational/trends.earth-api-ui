@@ -157,6 +157,23 @@ app.layout = create_main_layout()
 
 
 # Add global error handlers
+_CSP_STYLE_SOURCES = [
+    "'self'",
+    "'unsafe-inline'",
+    "https://cdn.jsdelivr.net",
+    "https://fonts.googleapis.com",
+]
+
+_CSP_FONT_SOURCES = [
+    "'self'",
+    "data:",
+    "https://cdn.jsdelivr.net",
+    "https://fonts.gstatic.com",
+]
+
+_CSP_IMG_SOURCES = ["'self'", "data:", "https:"]
+
+
 @server.after_request
 def add_security_headers(response):
     """Attach standard security headers to every response."""
@@ -165,14 +182,18 @@ def add_security_headers(response):
     response.headers.setdefault("X-XSS-Protection", "1; mode=block")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
-    response.headers.setdefault(
-        "Content-Security-Policy",
+
+    csp_value = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-        "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data: https:; "
-        "font-src 'self' data:;",
+        f"style-src {' '.join(_CSP_STYLE_SOURCES)}; "
+        f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
+        f"font-src {' '.join(_CSP_FONT_SOURCES)}; "
+        "connect-src 'self' https://cdn.jsdelivr.net; "
+        "frame-ancestors 'none';"
     )
+
+    response.headers.setdefault("Content-Security-Policy", csp_value)
 
     if _should_enforce_hsts():
         response.headers.setdefault(
