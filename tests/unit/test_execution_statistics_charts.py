@@ -55,8 +55,10 @@ def test_year_period_uses_cumulative_task_charts(sample_execution_stats):
 
     titles = _extract_chart_titles(charts)
 
-    assert any("Cumulative finished tasks" in title for title in titles)
-    assert any("Cumulative failed tasks" in title for title in titles)
+    cumulative_titles = [title for title in titles if "Cumulative" in title]
+    assert any("Cumulative completed tasks" in title for title in cumulative_titles)
+    assert len(cumulative_titles) == 1
+    assert any("Weekly aggregation" in title for title in titles)
     assert all("Running executions" not in title for title in titles)
 
 
@@ -80,3 +82,20 @@ def test_month_period_retains_running_chart(sample_execution_stats):
 
     assert any(title == "Running executions" for title in titles)
     assert any("Completed executions (cumulative)" in title for title in titles)
+
+
+def test_all_period_uses_monthly_aggregation_label(sample_execution_stats):
+    """All-time cumulative charts should keep monthly aggregation label."""
+    charts = create_execution_statistics_chart(
+        sample_execution_stats,
+        status_time_series_data=None,
+        user_timezone="UTC",
+        ui_period="all",
+    )
+
+    titles = _extract_chart_titles(charts)
+
+    cumulative_titles = [title for title in titles if "Cumulative" in title]
+    assert any("Cumulative completed tasks" in title for title in cumulative_titles)
+    assert len(cumulative_titles) == 1
+    assert any("Monthly aggregation" in title for title in titles)

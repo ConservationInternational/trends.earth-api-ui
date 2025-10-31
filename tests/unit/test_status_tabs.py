@@ -160,20 +160,41 @@ class TestStatusTabCallbacks:
 
         # Test day tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-day.n_clicks"}]
-        result = tab_switch_func(1, 0, 0)
-        expected = ("nav-link active", "nav-link", "nav-link", "day")
+        result = tab_switch_func(1, 0, 0, 0, 0)
+        expected = (
+            "nav-link active",
+            "nav-link",
+            "nav-link",
+            "nav-link",
+            "nav-link",
+            "day",
+        )
         assert result == expected
 
         # Test week tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-week.n_clicks"}]
-        result = tab_switch_func(0, 1, 0)
-        expected = ("nav-link", "nav-link active", "nav-link", "week")
+        result = tab_switch_func(0, 1, 0, 0, 0)
+        expected = (
+            "nav-link",
+            "nav-link active",
+            "nav-link",
+            "nav-link",
+            "nav-link",
+            "week",
+        )
         assert result == expected
 
         # Test month tab click
         mock_ctx.triggered = [{"prop_id": "status-tab-month.n_clicks"}]
-        result = tab_switch_func(0, 0, 1)
-        expected = ("nav-link", "nav-link", "nav-link active", "month")
+        result = tab_switch_func(0, 0, 1, 0, 0)
+        expected = (
+            "nav-link",
+            "nav-link",
+            "nav-link active",
+            "nav-link",
+            "nav-link",
+            "month",
+        )
         assert result == expected
 
     @patch("dash.callback_context")
@@ -317,8 +338,15 @@ class TestStatusTabsErrorHandling:
 
         # Test with no trigger
         mock_ctx.triggered = []
-        result = tab_switch_func(0, 0, 0)
-        expected = ("nav-link active", "nav-link", "nav-link", "day")
+        result = tab_switch_func(0, 0, 0, 0, 0)
+        expected = (
+            "nav-link active",
+            "nav-link",
+            "nav-link",
+            "nav-link",
+            "nav-link",
+            "day",
+        )
         assert result == expected
 
     @patch("dash.callback_context")

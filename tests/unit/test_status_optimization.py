@@ -1,6 +1,6 @@
 """Test status page optimization features."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 import pytest
 
@@ -197,6 +197,102 @@ class TestStatusDataManager:
         assert args[2] == "last_week"
         assert kwargs["group_by"] == "hour"
         assert result["user_stats"] == {"data": {"registration_trends": []}}
+
+    def test_consolidated_stats_refetches_after_cached_error(self):
+        """Ensure cached execution errors are ignored and data is refetched."""
+
+        StatusDataManager.invalidate_cache()
+
+        with (
+            patch.object(
+                StatusDataManager,
+                "get_cached_data",
+                return_value={
+                    "execution_stats": {
+                        "error": True,
+                        "status_code": 400,
+                        "message": "Invalid group_by",
+                    }
+                },
+            ) as mock_get_cached,
+            patch.object(StatusDataManager, "set_cached_data") as mock_set_cached,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_dashboard_stats",
+                return_value={"data": {"summary": {}}},
+            ) as mock_dashboard,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_user_stats",
+                return_value={"data": {"registration_trends": []}},
+            ) as mock_user_stats,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_execution_stats",
+                return_value={"data": {"time_series": []}},
+            ) as mock_execution_stats,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_scripts_count",
+                return_value=0,
+            ) as mock_scripts_count,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.get_country_iso_resolver",
+                return_value=None,
+            ),
+        ):
+            result = StatusDataManager.fetch_consolidated_stats_data(
+                token="test_token",
+                api_environment="production",
+                time_period="day",
+                role="SUPERADMIN",
+            )
+
+        mock_get_cached.assert_called_once()
+        assert mock_dashboard.call_args_list == [
+            call("test_token", "production", "last_day", include_sections=None),
+            call("test_token", "production", "all", include_sections=["summary"]),
+        ]
+        mock_user_stats.assert_called_once()
+        mock_execution_stats.assert_called_once()
+        mock_scripts_count.assert_called_once()
+        mock_set_cached.assert_called_once()
+        assert result["execution_stats"] == {"data": {"time_series": []}}
+
+    def test_consolidated_stats_skips_caching_on_execution_error(self):
+        """Ensure we do not cache when execution stats return an error payload."""
+
+        StatusDataManager.invalidate_cache()
+
+        with (
+            patch.object(StatusDataManager, "set_cached_data") as mock_set_cached,
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_dashboard_stats",
+                return_value={"data": {"summary": {}}},
+            ),
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_user_stats",
+                return_value={"data": {"registration_trends": []}},
+            ),
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_execution_stats",
+                return_value={"error": True, "status_code": 400},
+            ),
+            patch(
+                "trendsearth_ui.utils.status_data_manager.fetch_scripts_count",
+                return_value=0,
+            ),
+            patch(
+                "trendsearth_ui.utils.status_data_manager.get_country_iso_resolver",
+                return_value=None,
+            ),
+        ):
+            result = StatusDataManager.fetch_consolidated_stats_data(
+                token="test_token",
+                api_environment="production",
+                time_period="day",
+                role="SUPERADMIN",
+                force_refresh=True,
+            )
+
+        mock_set_cached.assert_not_called()
+        assert result["execution_stats"] == {"error": True, "status_code": 400}
 
     @patch("trendsearth_ui.utils.status_data_manager.requests.get")
     def test_time_series_data_fetching_with_caching(self, mock_get):

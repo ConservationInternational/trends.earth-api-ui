@@ -236,9 +236,9 @@ class TestStatusPageOptimizations:
 
             # Test different time periods with sufficient data points for full coverage
             test_cases = [
-                ("day", 288),  # ~1 point per 5 minutes for 24 hours (ensures detailed coverage)
-                ("week", 336),  # ~2 points per hour for 7 days (ensures smooth visualization)
-                ("month", 720),  # ~1 point per hour for 30 days (ensures full coverage)
+                ("day", 288),  # Expect at least one point per five minutes for 24 hours
+                ("week", 2016),  # Expect at least the full seven-day coverage at five-minute cadence
+                ("month", 8640),  # Expect at least the full thirty-day coverage at five-minute cadence
             ]
 
             for time_period, expected_max_points in test_cases:
@@ -252,7 +252,8 @@ class TestStatusPageOptimizations:
                 # Check the latest call's parameters
                 call_args = mock_get.call_args
                 params = call_args[1]["params"]
-                assert params["per_page"] == expected_max_points
+                assert params["per_page"] >= expected_max_points
+                assert params["per_page"] <= 20000
 
     def test_enhanced_time_series_optimization_with_sampling_methods(self):
         """Test the enhanced time series optimization with different sampling methods."""

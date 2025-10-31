@@ -43,10 +43,10 @@ def get_optimal_grouping_for_period(period):
         We use compatible values to prevent API errors.
     """
     mapping = {
-        "last_day": ("quarter_hour", "hour"),
+        "last_day": ("quarter_hour", "quarter_hour"),
         "last_week": ("hour", "hour"),
-        "last_month": ("week", "week"),
-        "last_year": ("month", "month"),
+        "last_month": ("day", "day"),
+        "last_year": ("week", "week"),
         "all": ("month", "month"),
     }
     return mapping.get(period, ("month", "month"))

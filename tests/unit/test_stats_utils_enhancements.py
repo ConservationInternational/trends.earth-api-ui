@@ -19,7 +19,7 @@ class TestGetOptimalGroupingForPeriod:
         """Test that last_day period returns quarter-hour user grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_day")
         assert user_group == "quarter_hour"
-        assert exec_group == "hour"
+        assert exec_group == "quarter_hour"
 
     def test_last_week_returns_hour_grouping(self):
         """Test that last_week period returns hour grouping."""
@@ -27,17 +27,17 @@ class TestGetOptimalGroupingForPeriod:
         assert user_group == "hour"
         assert exec_group == "hour"
 
-    def test_last_month_returns_week_grouping(self):
+    def test_last_month_returns_day_grouping(self):
         """Test that last_month period returns week grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_month")
+        assert user_group == "day"
+        assert exec_group == "day"
+
+    def test_last_year_returns_week_execution_grouping(self):
+        """Test that last_year period returns weekly execution grouping."""
+        user_group, exec_group = get_optimal_grouping_for_period("last_year")
         assert user_group == "week"
         assert exec_group == "week"
-
-    def test_last_year_returns_month_grouping(self):
-        """Test that last_year period returns month grouping."""
-        user_group, exec_group = get_optimal_grouping_for_period("last_year")
-        assert user_group == "month"
-        assert exec_group == "month"
 
     def test_unknown_period_returns_default_month_grouping(self):
         """Test that unknown period returns default month grouping."""

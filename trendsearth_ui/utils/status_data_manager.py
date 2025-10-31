@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 import logging
+import math
 from typing import Any, Optional
 
 from cachetools import TTLCache
@@ -200,8 +201,17 @@ class StatusDataManager:
         if not force_refresh:
             cached_data = StatusDataManager.get_cached_data(cache_key, cache_type="stats")
             if cached_data is not None:
-                logger.info(f"Returning cached consolidated stats data for period {api_period}")
-                return cached_data
+                cached_execution_stats = cached_data.get("execution_stats")
+                if isinstance(cached_execution_stats, dict) and cached_execution_stats.get("error"):
+                    logger.warning(
+                        "Cached execution stats for period %s contained an error response; refetching fresh data.",
+                        api_period,
+                    )
+                else:
+                    logger.info(
+                        f"Returning cached consolidated stats data for period {api_period}"
+                    )
+                    return cached_data
 
         logger.info(f"Fetching fresh consolidated stats data for period {api_period}")
 
@@ -277,8 +287,15 @@ class StatusDataManager:
             logger.error(f"Error fetching consolidated stats data: {e}")
             result["error"] = str(e)
 
-        # Cache the result
-        StatusDataManager.set_cached_data(cache_key, result, cache_type="stats")
+        # Cache the result unless execution stats returned an error
+        execution_stats = result.get("execution_stats")
+        if isinstance(execution_stats, dict) and execution_stats.get("error"):
+            logger.warning(
+                "Skipping cache for consolidated stats period %s due to execution stats error response.",
+                api_period,
+            )
+        else:
+            StatusDataManager.set_cached_data(cache_key, result, cache_type="stats")
         return result
 
     @staticmethod
@@ -337,7 +354,17 @@ class StatusDataManager:
             start_time = end_time - timedelta(days=1)
             target_points = 288  # ~1 point per 5 minutes for 24 hours
 
-        request_limit = None if use_aggregation else target_points
+        request_limit: int | None = None
+        if not use_aggregation:
+            if start_time is not None:
+                duration_seconds = max((end_time - start_time).total_seconds(), 0)
+                base_interval_seconds = 300  # Approximate five-minute sampling cadence
+                estimated_points = math.ceil(duration_seconds / base_interval_seconds) + 1
+                estimated_points = max(estimated_points, target_points)
+                # Cap to avoid excessive payloads while ensuring full coverage for month-scale views
+                request_limit = min(estimated_points, 20000)
+            else:
+                request_limit = target_points
 
         start_iso = start_time.isoformat() if start_time else None
         end_iso = end_time.isoformat()
@@ -369,7 +396,8 @@ class StatusDataManager:
                 if start_iso:
                     params["start_date"] = start_iso
                 params["end_date"] = end_iso
-                params["per_page"] = request_limit
+                if request_limit is not None:
+                    params["per_page"] = request_limit
 
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
