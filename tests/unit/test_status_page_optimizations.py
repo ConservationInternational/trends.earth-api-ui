@@ -237,8 +237,14 @@ class TestStatusPageOptimizations:
             # Test different time periods with sufficient data points for full coverage
             test_cases = [
                 ("day", 288),  # Expect at least one point per five minutes for 24 hours
-                ("week", 2016),  # Expect at least the full seven-day coverage at five-minute cadence
-                ("month", 8640),  # Expect at least the full thirty-day coverage at five-minute cadence
+                (
+                    "week",
+                    2016,
+                ),  # Expect at least the full seven-day coverage at five-minute cadence
+                (
+                    "month",
+                    8640,
+                ),  # Expect at least the full thirty-day coverage at five-minute cadence
             ]
 
             for time_period, expected_max_points in test_cases:

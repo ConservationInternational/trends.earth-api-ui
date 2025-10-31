@@ -208,9 +208,7 @@ class StatusDataManager:
                         api_period,
                     )
                 else:
-                    logger.info(
-                        f"Returning cached consolidated stats data for period {api_period}"
-                    )
+                    logger.info(f"Returning cached consolidated stats data for period {api_period}")
                     return cached_data
 
         logger.info(f"Fetching fresh consolidated stats data for period {api_period}")
