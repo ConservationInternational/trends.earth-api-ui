@@ -173,6 +173,12 @@ _CSP_FONT_SOURCES = [
 
 _CSP_IMG_SOURCES = ["'self'", "data:", "https:"]
 
+_CSP_CONNECT_SOURCES = [
+    "'self'",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.plot.ly",
+]
+
 
 @server.after_request
 def add_security_headers(response):
@@ -189,7 +195,7 @@ def add_security_headers(response):
         f"style-src {' '.join(_CSP_STYLE_SOURCES)}; "
         f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
         f"font-src {' '.join(_CSP_FONT_SOURCES)}; "
-        "connect-src 'self' https://cdn.jsdelivr.net; "
+        f"connect-src {' '.join(_CSP_CONNECT_SOURCES)}; "
         "frame-ancestors 'none';"
     )
 
