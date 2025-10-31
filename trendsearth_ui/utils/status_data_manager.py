@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 
 # Centralized cache for all status-related data
 _status_data_cache = TTLCache(
-    maxsize=50, ttl=55
-)  # Slightly under 1 minute to align with UI refresh cadence
+    maxsize=50, ttl=270
+)  # 4.5-minute TTL to align with slower refresh cadence
 _stats_data_cache = TTLCache(maxsize=50, ttl=300)  # 5-minute TTL for stats data
 
 

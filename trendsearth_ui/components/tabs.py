@@ -869,7 +869,7 @@ def status_tab_content(is_admin, role=None):
                                     html.Span("Auto-refresh in: ", className="me-2"),
                                     html.Span(
                                         id="status-countdown",
-                                        children="60s",
+                                        children=f"{STATUS_REFRESH_INTERVAL // 1000}s",
                                         className="badge bg-secondary",
                                     ),
                                 ],

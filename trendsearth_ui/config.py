@@ -73,9 +73,7 @@ CACHE_BLOCK_SIZE = 50
 MAX_BLOCKS_IN_CACHE = 2
 EXECUTIONS_REFRESH_INTERVAL = 30 * 1000  # 30 seconds in milliseconds
 LOGS_REFRESH_INTERVAL = 10 * 1000  # 10 seconds in milliseconds
-STATUS_REFRESH_INTERVAL = (
-    60 * 1000
-)  # 45 seconds in milliseconds (reduced for better responsiveness)
+STATUS_REFRESH_INTERVAL = 5 * 60 * 1000  # 5 minutes in milliseconds for status auto-refresh
 
 # UI Constants
 LOGO_URL = "/assets/trends_earth_logo.png"

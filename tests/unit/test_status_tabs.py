@@ -10,6 +10,9 @@ import pytest
 
 from trendsearth_ui.callbacks.status import register_callbacks
 from trendsearth_ui.components.tabs import status_tab_content
+from trendsearth_ui.config import STATUS_REFRESH_INTERVAL
+
+REFRESH_INTERVAL_SECONDS = STATUS_REFRESH_INTERVAL // 1000
 
 
 class TestStatusTabStructure:
@@ -220,15 +223,15 @@ class TestStatusTabCallbacks:
         countdown_func = callback_functions.get("update_status_countdown_optimized")
         assert countdown_func is not None, "Countdown function should exist"
 
-        # Test refresh button click (should reset to 60s)
+        # Test refresh button click (should reset to full interval)
         mock_ctx.triggered = [{"prop_id": "refresh-status-btn.n_clicks"}]
         result = countdown_func(30, 1, "status")
-        assert result == "60s"
+        assert result == f"{REFRESH_INTERVAL_SECONDS}s"
 
         # Test normal countdown progression
         mock_ctx.triggered = [{"prop_id": "status-countdown-interval.n_intervals"}]
         result = countdown_func(15, 0, "status")
-        expected = f"{60 - (15 % 60)}s"
+        expected = f"{REFRESH_INTERVAL_SECONDS - (15 % REFRESH_INTERVAL_SECONDS)}s"
         assert result == expected
 
 
@@ -372,7 +375,7 @@ class TestStatusTabsErrorHandling:
 
         # Test when not on status tab
         result = countdown_func(30, 0, "executions")
-        assert result == "60s"
+        assert result == f"{REFRESH_INTERVAL_SECONDS}s"
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_execution_status_grouping(self, mock_ctx):

@@ -6,6 +6,8 @@ import logging
 from cachetools import TTLCache
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 
+from ..config import STATUS_REFRESH_INTERVAL
+
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
     create_user_geographic_map,
@@ -23,7 +25,9 @@ from ..utils.timezone_utils import (
 logger = logging.getLogger(__name__)
 
 # Request-level cache for sharing data between callbacks
-_request_cache = TTLCache(maxsize=20, ttl=30)  # 30-second TTL for request-level sharing
+_request_cache = TTLCache(maxsize=20, ttl=270)  # 4.5-minute TTL for request-level sharing
+
+_REFRESH_INTERVAL_SECONDS = max(STATUS_REFRESH_INTERVAL // 1000, 1)
 
 
 def update_comprehensive_status_data(
@@ -726,20 +730,22 @@ def _register_additional_status_callbacks(app):
         """Update the countdown timer display with minimal processing."""
         ctx = callback_context
 
-        # If refresh button was clicked, reset to 60s
+    # If refresh button was clicked, reset to the full interval
         if ctx.triggered and any("refresh-status-btn" in t["prop_id"] for t in ctx.triggered):
-            return "60s"
+            return f"{_REFRESH_INTERVAL_SECONDS}s"
 
-        # If not on status tab, return 60s
+    # If not on status tab, show the full interval countdown
         if active_tab != "status":
-            return "60s"
+            return f"{_REFRESH_INTERVAL_SECONDS}s"
 
-        # Normal countdown progression
+    # Normal countdown progression
         if n_intervals is None:
-            return "60s"
+            return f"{_REFRESH_INTERVAL_SECONDS}s"
 
-        # Calculate remaining seconds (60 second intervals)
-        seconds_remaining = 60 - (n_intervals % 60)
+    # Calculate remaining seconds based on the refresh cadence
+        seconds_remaining = _REFRESH_INTERVAL_SECONDS - (n_intervals % _REFRESH_INTERVAL_SECONDS)
+        if seconds_remaining == _REFRESH_INTERVAL_SECONDS:
+            return f"{_REFRESH_INTERVAL_SECONDS}s"
         return f"{seconds_remaining}s"
 
 
