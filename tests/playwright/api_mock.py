@@ -69,6 +69,40 @@ def create_mock_logout_response() -> dict[str, Any]:
     }
 
 
+def generate_mock_time_series_data(num_points: int = 24) -> list[dict[str, Any]]:
+    """
+    Generate mock time series status data for charts.
+
+    Args:
+        num_points: Number of time series data points to generate
+
+    Returns:
+        List of time series status records
+    """
+    import random
+
+    time_series = []
+    base_time = datetime.now() - timedelta(hours=num_points)
+
+    for i in range(num_points):
+        timestamp = base_time + timedelta(hours=i)
+        time_series.append(
+            {
+                "timestamp": timestamp.isoformat() + "Z",
+                "executions_active": random.randint(5, 25),
+                "executions_finished": random.randint(50, 150),
+                "executions_failed": random.randint(2, 15),
+                "executions_queued": random.randint(0, 10),
+                "executions_total": random.randint(100, 250),
+                "users_active": random.randint(10, 50),
+                "users_total": random.randint(80, 200),
+                "scripts_count": random.randint(15, 45),
+            }
+        )
+
+    return time_series
+
+
 class APIRouteHandler:
     """Handles API route mocking for Playwright tests."""
 
@@ -299,7 +333,21 @@ class APIRouteHandler:
                 )
                 return
 
-            mock_data = generate_mock_status_data()
+            # Parse URL to check for time series query parameters
+            parsed_url = urlparse(route.request.url)
+            query_params = parse_qs(parsed_url.query)
+
+            # Check if this is a time series request (has start_date or end_date parameters)
+            is_time_series = "start_date" in query_params or "end_date" in query_params
+
+            if is_time_series:
+                # Return time series data for charts
+                time_series_data = generate_mock_time_series_data(num_points=24)
+                mock_data = {"data": time_series_data}
+            else:
+                # Return single status snapshot
+                mock_data = generate_mock_status_data()
+
             route.fulfill(json=mock_data, status=200)
 
         except Exception as e:
