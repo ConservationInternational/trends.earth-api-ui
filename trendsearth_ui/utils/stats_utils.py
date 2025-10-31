@@ -17,7 +17,13 @@ def check_stats_access(role):
 
 def map_period_to_api_period(ui_period):
     """Map UI time period to API-compatible period string."""
-    mapping = {"day": "last_day", "week": "last_week", "month": "last_month"}
+    mapping = {
+        "day": "last_day",
+        "week": "last_week",
+        "month": "last_month",
+        "year": "last_year",
+        "all": "all",
+    }
     return mapping.get(ui_period, "last_week")
 
 
@@ -39,8 +45,9 @@ def get_optimal_grouping_for_period(period):
     mapping = {
         "last_day": ("quarter_hour", "hour"),
         "last_week": ("hour", "hour"),
-        "last_month": ("day", "day"),
+        "last_month": ("week", "week"),
         "last_year": ("month", "month"),
+        "all": ("month", "month"),
     }
     return mapping.get(period, ("month", "month"))
 

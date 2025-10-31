@@ -1013,6 +1013,28 @@ def status_tab_content(is_admin, role=None):
                                                 ],
                                                 className="nav-item",
                                             ),
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "Last Year",
+                                                        className="nav-link",
+                                                        id="status-tab-year",
+                                                        style={"cursor": "pointer"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
+                                            html.Li(
+                                                [
+                                                    html.A(
+                                                        "All Time",
+                                                        className="nav-link",
+                                                        id="status-tab-all",
+                                                        style={"cursor": "pointer"},
+                                                    )
+                                                ],
+                                                className="nav-item",
+                                            ),
                                         ],
                                         className="nav nav-tabs",
                                         id="status-time-tabs",

@@ -588,6 +588,7 @@ def _build_stats_components(
         status_time_series,
         title_suffix="",
         user_timezone=user_timezone,
+        ui_period=ui_period,
     ) + create_user_statistics_chart(
         user_stats,
         title_suffix="",
@@ -654,29 +655,62 @@ def _register_additional_status_callbacks(app):
             Output("status-tab-day", "className"),
             Output("status-tab-week", "className"),
             Output("status-tab-month", "className"),
+            Output("status-tab-year", "className"),
+            Output("status-tab-all", "className"),
             Output("status-time-tabs-store", "data"),
         ],
         [
             Input("status-tab-day", "n_clicks"),
             Input("status-tab-week", "n_clicks"),
             Input("status-tab-month", "n_clicks"),
+            Input("status-tab-year", "n_clicks"),
+            Input("status-tab-all", "n_clicks"),
         ],
     )
-    def switch_status_time_tabs_optimized(_day_clicks, _week_clicks, _month_clicks):
+    def switch_status_time_tabs_optimized(
+        _day_clicks, _week_clicks, _month_clicks, _year_clicks, _all_clicks
+    ):
         """Update the visual style of the active status tab and store the active tab."""
         ctx = callback_context
 
+        button_to_period = {
+            "status-tab-day": "day",
+            "status-tab-week": "week",
+            "status-tab-month": "month",
+            "status-tab-year": "year",
+            "status-tab-all": "all",
+        }
+
+        default_classes = dict.fromkeys(button_to_period, "nav-link")
+
         if not ctx.triggered:
-            return "nav-link active", "nav-link", "nav-link", "day"
+            default_classes["status-tab-day"] = "nav-link active"
+            return (
+                default_classes["status-tab-day"],
+                default_classes["status-tab-week"],
+                default_classes["status-tab-month"],
+                default_classes["status-tab-year"],
+                default_classes["status-tab-all"],
+                "day",
+            )
 
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        active_period = button_to_period.get(button_id, "day")
 
-        if button_id == "status-tab-week":
-            return "nav-link", "nav-link active", "nav-link", "week"
-        if button_id == "status-tab-month":
-            return "nav-link", "nav-link", "nav-link active", "month"
+        for key in default_classes:
+            default_classes[key] = "nav-link"
 
-        return "nav-link active", "nav-link", "nav-link", "day"
+        active_key = button_id if button_id in default_classes else "status-tab-day"
+        default_classes[active_key] = "nav-link active"
+
+        return (
+            default_classes["status-tab-day"],
+            default_classes["status-tab-week"],
+            default_classes["status-tab-month"],
+            default_classes["status-tab-year"],
+            default_classes["status-tab-all"],
+            active_period,
+        )
 
     @app.callback(
         Output("status-countdown", "children"),

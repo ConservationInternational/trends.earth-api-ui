@@ -357,6 +357,8 @@ def create_execution_statistics_chart(
     status_time_series_data=None,
     title_suffix="",
     user_timezone="UTC",
+    *,
+    ui_period: str | None = None,
 ):
     """
     Create execution statistics charts showing trends and distribution.
@@ -366,6 +368,7 @@ def create_execution_statistics_chart(
     status_time_series_data: Optional status time series data providing instantaneous counts
         title_suffix: Additional text for the chart title
         user_timezone: User's timezone (IANA timezone name)
+        ui_period: Selected UI period (day, week, month, year, all)
 
     Returns:
         list: List of chart components
@@ -377,6 +380,9 @@ def create_execution_statistics_chart(
     suffix_label = f" ({title_suffix})" if title_suffix else ""
 
     logger = logging.getLogger(__name__)
+    normalized_period = (ui_period or "").lower()
+    use_extended_cumulative = normalized_period in {"year", "all"}
+    aggregation_label = "Monthly" if normalized_period in {"year", "all"} else None
 
     try:
         # Debug logging - show what we actually received
@@ -486,7 +492,7 @@ def create_execution_statistics_chart(
         if isinstance(status_series, dict):
             status_series = status_series.get("data", [])
 
-        if status_series:
+        if status_series and not use_extended_cumulative:
             status_df = pd.DataFrame(status_series)
 
             if not status_df.empty and "timestamp" in status_df.columns:
@@ -613,6 +619,13 @@ def create_execution_statistics_chart(
                         detail="Status timestamps could not be parsed from the API response.",
                     )
                 )
+        elif not use_extended_cumulative:
+            execution_charts.append(
+                _build_message_block(
+                    "No in-progress execution data available.",
+                    detail="Status time series data was not provided for this period.",
+                )
+            )
 
         # 1. Completed executions (cumulative) from execution stats time series
         trends_data = data.get("time_series", [])
@@ -682,57 +695,148 @@ def create_execution_statistics_chart(
                     return pd.to_numeric(df[column_name], errors="coerce").fillna(0)
 
                 if completed_columns:
-                    fig_completed = go.Figure()
-                    for column in completed_columns:
-                        cumulative_values = _coerce_series(column).cumsum()
-                        fig_completed.add_trace(
-                            go.Scatter(
-                                x=df["date"],
-                                y=cumulative_values,
-                                mode="lines",
-                                name=_display_name(column),
-                                line={"color": _color_for(column), "width": 3},
-                                line_shape="hv",
-                                hovertemplate=(
-                                    "<b>" + _display_name(column) + "</b><br>%{x}"
-                                    "<br>Cumulative Count: %{y}<extra></extra>"
-                                ),
+                    cumulative_series = {
+                        column: _coerce_series(column).cumsum() for column in completed_columns
+                    }
+
+                    if use_extended_cumulative:
+                        agg_suffix = (
+                            f" ({aggregation_label} aggregation)" if aggregation_label else ""
+                        )
+
+                        def _make_cumulative_chart(
+                            column_name: str,
+                            title_prefix: str,
+                        ) -> html.Div:
+                            series = cumulative_series.get(column_name)
+                            if series is None:
+                                return _build_message_block(
+                                    f"No {title_prefix.lower()} data available.",
+                                    detail=(
+                                        "Execution statistics did not include the required status for "
+                                        "this period."
+                                    ),
+                                )
+
+                            figure = go.Figure(
+                                data=[
+                                    go.Scatter(
+                                        x=df["date"],
+                                        y=series,
+                                        mode="lines",
+                                        name=_display_name(column_name),
+                                        line={"color": _color_for(column_name), "width": 3},
+                                        line_shape="hv",
+                                        hovertemplate=(
+                                            "<b>"
+                                            + _display_name(column_name)
+                                            + "</b><br>%{x}<br>Cumulative Count: %{y}<extra></extra>"
+                                        ),
+                                    )
+                                ]
+                            )
+
+                            figure.update_layout(
+                                xaxis_title=get_chart_axis_label(user_timezone),
+                                yaxis_title="Cumulative Executions",
+                                height=360,
+                                hovermode="x unified",
+                                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                                template="plotly_white",
+                                xaxis={"showgrid": True, "type": "date"},
+                                yaxis={"showgrid": True},
+                                showlegend=False,
+                            )
+
+                            return html.Div(
+                                [
+                                    html.H6(
+                                        f"Cumulative {title_prefix.lower()} tasks{suffix_label}{agg_suffix}"
+                                    ),
+                                    dcc.Graph(
+                                        figure=figure,
+                                        config={"displayModeBar": False, "responsive": True},
+                                    ),
+                                ],
+                                className="mb-3",
+                            )
+
+                        if "finished" in cumulative_series:
+                            execution_charts.append(_make_cumulative_chart("finished", "Finished"))
+                        else:
+                            execution_charts.append(
+                                _build_message_block(
+                                    "No finished task data available.",
+                                    detail=(
+                                        "Execution statistics did not include finished status counts for this period."
+                                    ),
+                                )
+                            )
+
+                        if "failed" in cumulative_series:
+                            execution_charts.append(_make_cumulative_chart("failed", "Failed"))
+                        else:
+                            execution_charts.append(
+                                _build_message_block(
+                                    "No failed task data available.",
+                                    detail=(
+                                        "Execution statistics did not include failed status counts for this period."
+                                    ),
+                                )
+                            )
+                    else:
+                        fig_completed = go.Figure()
+                        for column in completed_columns:
+                            cumulative_values = cumulative_series[column]
+                            fig_completed.add_trace(
+                                go.Scatter(
+                                    x=df["date"],
+                                    y=cumulative_values,
+                                    mode="lines",
+                                    name=_display_name(column),
+                                    line={"color": _color_for(column), "width": 3},
+                                    line_shape="hv",
+                                    hovertemplate=(
+                                        "<b>"
+                                        + _display_name(column)
+                                        + "</b><br>%{x}<br>Cumulative Count: %{y}<extra></extra>"
+                                    ),
+                                )
+                            )
+
+                        fig_completed.update_layout(
+                            xaxis_title=get_chart_axis_label(user_timezone),
+                            yaxis_title="Cumulative Executions",
+                            height=360,
+                            hovermode="x unified",
+                            legend={
+                                "orientation": "h",
+                                "yanchor": "bottom",
+                                "y": 1.02,
+                                "xanchor": "center",
+                                "x": 0.5,
+                            },
+                            margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                            template="plotly_white",
+                            xaxis={
+                                "showgrid": True,
+                                "type": "date",
+                            },  # Ensure proper date axis handling
+                            yaxis={"showgrid": True},
+                        )
+
+                        execution_charts.append(
+                            html.Div(
+                                [
+                                    html.H6(f"Completed executions (cumulative){suffix_label}"),
+                                    dcc.Graph(
+                                        figure=fig_completed,
+                                        config={"displayModeBar": False, "responsive": True},
+                                    ),
+                                ],
+                                className="mb-3",
                             )
                         )
-
-                    fig_completed.update_layout(
-                        xaxis_title=get_chart_axis_label(user_timezone),
-                        yaxis_title="Cumulative Executions",
-                        height=360,
-                        hovermode="x unified",
-                        legend={
-                            "orientation": "h",
-                            "yanchor": "bottom",
-                            "y": 1.02,
-                            "xanchor": "center",
-                            "x": 0.5,
-                        },
-                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                        template="plotly_white",
-                        xaxis={
-                            "showgrid": True,
-                            "type": "date",
-                        },  # Ensure proper date axis handling
-                        yaxis={"showgrid": True},
-                    )
-
-                    execution_charts.append(
-                        html.Div(
-                            [
-                                html.H6(f"Completed executions (cumulative){suffix_label}"),
-                                dcc.Graph(
-                                    figure=fig_completed,
-                                    config={"displayModeBar": False, "responsive": True},
-                                ),
-                            ],
-                            className="mb-3",
-                        )
-                    )
                 else:
                     execution_charts.append(
                         _build_message_block(

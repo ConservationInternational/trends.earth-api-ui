@@ -27,11 +27,11 @@ class TestGetOptimalGroupingForPeriod:
         assert user_group == "hour"
         assert exec_group == "hour"
 
-    def test_last_month_returns_day_grouping(self):
-        """Test that last_month period returns day grouping."""
+    def test_last_month_returns_week_grouping(self):
+        """Test that last_month period returns week grouping."""
         user_group, exec_group = get_optimal_grouping_for_period("last_month")
-        assert user_group == "day"
-        assert exec_group == "day"
+        assert user_group == "week"
+        assert exec_group == "week"
 
     def test_last_year_returns_month_grouping(self):
         """Test that last_year period returns month grouping."""

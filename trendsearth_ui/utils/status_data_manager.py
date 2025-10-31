@@ -183,7 +183,13 @@ class StatusDataManager:
             return {"error": "Insufficient permissions", "requires_superadmin": True}
 
         # Map UI time period to API period
-        api_period_map = {"day": "last_day", "week": "last_week", "month": "last_month"}
+        api_period_map = {
+            "day": "last_day",
+            "week": "last_week",
+            "month": "last_month",
+            "year": "last_year",
+            "all": "all",
+        }
         api_period = api_period_map.get(time_period, "last_day")
 
         cache_key = StatusDataManager.get_cache_key(
@@ -301,24 +307,39 @@ class StatusDataManager:
 
         logger.info(f"Fetching fresh time series data for period {time_period}")
 
-        # Calculate time range for API query with sufficient data points for full period coverage
+        # Calculate time range or aggregation strategy for the selected period
         from datetime import timedelta
 
         end_time = datetime.now(timezone.utc)
+        use_aggregation = time_period in {"year", "all"}
+        period_param: str | None = None
+        group_by: str | None = None
+
         if time_period == "month":
             start_time = end_time - timedelta(days=30)
             target_points = 720  # Hourly resolution for 30 days
         elif time_period == "week":
             start_time = end_time - timedelta(days=7)
             target_points = 336  # ~2 points per hour for 7 days
-        else:  # Default to day
+        elif time_period == "year":
+            start_time = end_time - timedelta(days=365)
+            target_points = 12  # Monthly aggregation for year view
+            use_aggregation = True
+            period_param = "last_year"
+            group_by = "month"
+        elif time_period == "all":
+            start_time = None
+            target_points = 120  # Monthly aggregation; adjust as data grows
+            use_aggregation = True
+            period_param = "all"
+            group_by = "month"
+        else:  # Default to last day
             start_time = end_time - timedelta(days=1)
             target_points = 288  # ~1 point per 5 minutes for 24 hours
 
-        request_limit = target_points
+        request_limit = None if use_aggregation else target_points
 
-        # Format for API query
-        start_iso = start_time.isoformat()
+        start_iso = start_time.isoformat() if start_time else None
         end_iso = end_time.isoformat()
 
         result = {
@@ -334,43 +355,66 @@ class StatusDataManager:
 
         try:
             headers = apply_default_headers({"Authorization": f"Bearer {token}"})
+            params: dict[str, Any] = {
+                "sort": "timestamp" if use_aggregation else "-timestamp",
+            }
+
+            if use_aggregation:
+                if period_param:
+                    params["period"] = period_param
+                if group_by:
+                    params["group_by"] = group_by
+                params["aggregate"] = "true"
+            else:
+                if start_iso:
+                    params["start_date"] = start_iso
+                params["end_date"] = end_iso
+                params["per_page"] = request_limit
+
             resp = requests.get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
-                params={
-                    "start_date": start_iso,
-                    "end_date": end_iso,
-                    "per_page": request_limit,  # Fetch sufficient points for the selected range
-                    "sort": "-timestamp",  # Descending order (newest first) for time series data
-                },
+                params=params,
                 timeout=15,  # Longer timeout for time series data
             )
             resp.raise_for_status()
 
             status_data = resp.json().get("data", [])
 
-            # Apply smart sampling only if we have significantly more data than the target
-            # This ensures we don't unnecessarily reduce data quality
-            sampling_threshold = target_points * 1.5  # Only sample if 50% more than target
-            if len(status_data) > sampling_threshold:
-                # Apply intelligent sampling to reduce data points while preserving trends
-                optimized_data = StatusDataManager._optimize_time_series_data(
-                    status_data, target_points, time_period
-                )
-                result["data"] = optimized_data
-                result["optimization_applied"] = True
+            if use_aggregation:
+                result["data"] = status_data
+                result["optimization_applied"] = False
+                if status_data:
+                    result["start_time"] = status_data[0].get("timestamp")
+                    result["end_time"] = status_data[-1].get("timestamp")
+                    result["request_limit"] = len(status_data)
+                    result["target_points"] = len(status_data)
                 logger.info(
-                    f"Applied selective time series optimization: {len(status_data)} -> {len(optimized_data)} points"
+                    f"Successfully fetched {len(status_data)} aggregated status records for period {time_period}"
                 )
             else:
-                result["data"] = status_data
-                logger.info(
-                    f"No optimization needed: {len(status_data)} points within acceptable range"
-                )
+                # Apply smart sampling only if we have significantly more data than the target
+                # This ensures we don't unnecessarily reduce data quality
+                sampling_threshold = target_points * 1.5  # Only sample if 50% more than target
+                if len(status_data) > sampling_threshold:
+                    # Apply intelligent sampling to reduce data points while preserving trends
+                    optimized_data = StatusDataManager._optimize_time_series_data(
+                        status_data, target_points, time_period
+                    )
+                    result["data"] = optimized_data
+                    result["optimization_applied"] = True
+                    logger.info(
+                        f"Applied selective time series optimization: {len(status_data)} -> {len(optimized_data)} points"
+                    )
+                else:
+                    result["data"] = status_data
+                    logger.info(
+                        f"No optimization needed: {len(status_data)} points within acceptable range"
+                    )
 
-            logger.info(
-                f"Successfully fetched {len(result['data'])} time series records for period {time_period}"
-            )
+                logger.info(
+                    f"Successfully fetched {len(result['data'])} time series records for period {time_period}"
+                )
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Error fetching time series status data: {e}")
@@ -500,7 +544,7 @@ class StatusDataManager:
         Args:
             token: Authentication token
             api_environment: API environment (production/staging)
-            time_period: Time period for stats data (day/week/month)
+        time_period: Time period for stats data (day/week/month/year/all)
             role: User role for permission checks
             force_refresh: Whether to bypass cache
 
