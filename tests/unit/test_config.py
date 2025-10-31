@@ -46,7 +46,7 @@ class TestConfigurationConstants:
         """Test pagination and refresh settings."""
         assert isinstance(DEFAULT_PAGE_SIZE, int)
         assert DEFAULT_PAGE_SIZE > 0
-        assert DEFAULT_PAGE_SIZE <= 100  # Reasonable limit
+        assert DEFAULT_PAGE_SIZE <= 200  # Reasonable limit
 
     def test_refresh_intervals(self):
         """Test refresh interval settings."""
@@ -107,7 +107,7 @@ class TestConfigurationConsistency:
         """Test that page size is reasonable for web display."""
         # Page size should be reasonable for web tables
         assert DEFAULT_PAGE_SIZE >= 10  # Not too small
-        assert DEFAULT_PAGE_SIZE <= 100  # Not too large
+        assert DEFAULT_PAGE_SIZE <= 200  # Not too large
 
     def test_logo_dimensions_format(self):
         """Test that logo height is in valid CSS format."""

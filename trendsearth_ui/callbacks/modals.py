@@ -3,6 +3,7 @@
 from dash import ALL, Input, Output, State, html, no_update
 import dash_bootstrap_components as dbc
 
+from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date, render_json_tree
 from ._table_helpers import RowResolutionError, resolve_row_data
 
@@ -206,7 +207,7 @@ def register_callbacks(app):
                             user_resp = make_authenticated_request(
                                 "/user",
                                 token,
-                                params={"per_page": 100, "filter": f"id='{user_id}'"},
+                                params={"per_page": DEFAULT_PAGE_SIZE, "filter": f"id='{user_id}'"},
                             )
                             if user_resp.status_code == 200:
                                 user_data_resp = user_resp.json()
@@ -1106,7 +1107,10 @@ def register_callbacks(app):
                 name_resp = make_authenticated_request(
                     "/user",
                     token,
-                    params={"per_page": 100, "filter": f"name like '%{search_term}%'"},
+                    params={
+                        "per_page": DEFAULT_PAGE_SIZE,
+                        "filter": f"name like '%{search_term}%'",
+                    },
                 )
                 if name_resp.status_code == 200:
                     name_data = name_resp.json()
@@ -1120,7 +1124,10 @@ def register_callbacks(app):
                 email_resp = make_authenticated_request(
                     "/user",
                     token,
-                    params={"per_page": 100, "filter": f"email like '%{search_term}%'"},
+                    params={
+                        "per_page": DEFAULT_PAGE_SIZE,
+                        "filter": f"email like '%{search_term}%'",
+                    },
                 )
                 if email_resp.status_code == 200:
                     email_data = email_resp.json()

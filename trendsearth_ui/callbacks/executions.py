@@ -405,7 +405,7 @@ def register_callbacks(app):
             row_index = cell.get("rowIndex", 0)
 
             # Calculate which page this row is on (same logic as logs callback)
-            page_size = 50  # This should match DEFAULT_PAGE_SIZE
+            page_size = DEFAULT_PAGE_SIZE
             page = (row_index // page_size) + 1
             row_in_page = row_index % page_size
 

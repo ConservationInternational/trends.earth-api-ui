@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from ..config import DEFAULT_PAGE_SIZE
 from ..utils.helpers import make_authenticated_request
 
 
@@ -28,7 +29,7 @@ def resolve_row_data(
     include: str | None = None,
     exclude: str | None = None,
     extra_params: Mapping[str, Any] | None = None,
-    page_size: int = 50,
+    page_size: int = DEFAULT_PAGE_SIZE,
     id_field: str = "id",
 ) -> Mapping[str, Any]:
     """Return row data for a clicked AG Grid cell.
@@ -45,8 +46,7 @@ def resolve_row_data(
         include: Optional ``include`` query parameter to append.
         exclude: Optional ``exclude`` query parameter to append.
         extra_params: Additional query parameters to merge into the request.
-        page_size: Size of the pages requested from the API. Defaults to 50 which matches
-            the UI configuration.
+        page_size: Size of the pages requested from the API.
         id_field: Name of the identifier field expected in the row payload.
 
     Returns:

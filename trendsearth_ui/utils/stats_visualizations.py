@@ -146,12 +146,6 @@ def _resolve_country_iso(
             display = iso_resolver.display_name(iso_candidate) if iso_resolver else candidate
             return iso_candidate, display or candidate
 
-    if iso_resolver:
-        resolved_iso = iso_resolver.resolve(normalized_candidate)
-        if resolved_iso:
-            display = iso_resolver.display_name(resolved_iso)
-            return resolved_iso, display or candidate
-
     exact_iso = COUNTRY_NAME_OVERRIDES.get(normalized_candidate)
     if exact_iso:
         display = iso_resolver.display_name(exact_iso) if iso_resolver else candidate
@@ -161,6 +155,12 @@ def _resolve_country_iso(
     if lowered_iso:
         display = iso_resolver.display_name(lowered_iso) if iso_resolver else candidate
         return lowered_iso, display or candidate
+
+    if iso_resolver:
+        resolved_iso = iso_resolver.resolve(normalized_candidate)
+        if resolved_iso:
+            display = iso_resolver.display_name(resolved_iso)
+            return resolved_iso, display or candidate
 
     if iso_candidate and iso_resolver is None:
         # Accept well-formed ISO-3 codes even when the resolver could not be
@@ -235,7 +235,14 @@ def create_user_geographic_map(
 
         countries_data = geographic_data.get("countries", {})
 
-        logger.info("Countries data: %s", countries_data)
+        preview_items: list[tuple[Any, Any]] = []
+        if countries_data:
+            preview_items = list(countries_data.items())[:10]
+            logger.info(
+                "Countries data sample (%s entries): %s",
+                len(countries_data),
+                preview_items,
+            )
 
         if isinstance(countries_data, list):
             # Some endpoints may return a list of country/count mappings instead of a dict
@@ -247,8 +254,13 @@ def create_user_geographic_map(
                     if country:
                         extracted[country] = count
             countries_data = extracted
+            preview_items = list(countries_data.items())[:10] if countries_data else []
 
-        logger.info("Final countries data: %s", countries_data)
+        logger.info(
+            "Final countries sample (%s entries): %s",
+            len(countries_data),
+            preview_items,
+        )
 
         if not countries_data:
             return _build_message_block(
@@ -327,7 +339,11 @@ def create_user_geographic_map(
             alias_suffix = f" ({', '.join(sorted(aliases))})" if aliases else ""
             country_labels.append(f"{display_name}{alias_suffix}: {iso_counts_map[iso]} users")
 
-        logger.info("Mapped to ISO codes: %s", iso_counts_map)
+        logger.info(
+            "Mapped ISO sample (%s entries): %s",
+            len(iso_counts_map),
+            list(iso_counts_map.items())[:10],
+        )
 
         fig = go.Figure(
             data=go.Choropleth(
