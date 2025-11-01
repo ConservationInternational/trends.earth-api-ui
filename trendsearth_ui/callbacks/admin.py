@@ -686,7 +686,11 @@ def register_callbacks(app):
             resp = make_authenticated_request("/rate-limit/status", token, method="GET")
 
             if resp.status_code == 200:
-                data = resp.json()
+                payload = resp.json()
+                data = payload.get("data") if isinstance(payload, dict) else None
+
+                if not isinstance(data, dict):
+                    raise ValueError("Unexpected rate limit status payload structure")
 
                 # Extract status information
                 enabled_status = "Enabled" if data.get("enabled", False) else "Disabled"
