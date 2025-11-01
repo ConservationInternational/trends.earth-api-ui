@@ -68,9 +68,7 @@ APP_HOST = "127.0.0.1"
 APP_PORT = 8050
 
 # Pagination and refresh settings
-DEFAULT_PAGE_SIZE = 50
-CACHE_BLOCK_SIZE = 50
-MAX_BLOCKS_IN_CACHE = 2
+DEFAULT_PAGE_SIZE = 100
 EXECUTIONS_REFRESH_INTERVAL = 30 * 1000  # 30 seconds in milliseconds
 LOGS_REFRESH_INTERVAL = 10 * 1000  # 10 seconds in milliseconds
 STATUS_REFRESH_INTERVAL = 5 * 60 * 1000  # 5 minutes in milliseconds for status auto-refresh

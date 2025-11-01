@@ -41,6 +41,7 @@ def _should_enforce_hsts() -> bool:
 
     return flask.request.is_secure
 
+
 # Configure assets directory
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 

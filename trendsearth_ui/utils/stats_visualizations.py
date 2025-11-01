@@ -132,8 +132,13 @@ def _resolve_country_iso(
     if not candidate:
         return None, None
 
-    iso_candidate = _extract_iso_candidate(candidate)
+    # Replace non-breaking spaces and collapse repeated whitespace so that variants using
+    # non-standard spacing (e.g. S.&nbsp;Sudan) resolve consistently.
+    normalized_candidate = " ".join(candidate.replace("\u00a0", " ").split())
+
+    iso_candidate = _extract_iso_candidate(normalized_candidate)
     if iso_candidate:
+        iso_candidate = iso_candidate.upper()
         if iso_resolver and iso_candidate in iso_resolver.iso_codes:
             display = iso_resolver.display_name(iso_candidate)
             return iso_candidate, display or candidate
@@ -141,21 +146,26 @@ def _resolve_country_iso(
             display = iso_resolver.display_name(iso_candidate) if iso_resolver else candidate
             return iso_candidate, display or candidate
 
-    if iso_resolver:
-        resolved_iso = iso_resolver.resolve(candidate)
-        if resolved_iso:
-            display = iso_resolver.display_name(resolved_iso)
-            return resolved_iso, display or candidate
-
-    exact_iso = COUNTRY_NAME_OVERRIDES.get(candidate)
+    exact_iso = COUNTRY_NAME_OVERRIDES.get(normalized_candidate)
     if exact_iso:
         display = iso_resolver.display_name(exact_iso) if iso_resolver else candidate
         return exact_iso, display or candidate
 
-    lowered_iso = _FALLBACK_COUNTRY_CODE_MAP_LOWER.get(candidate.lower())
+    lowered_iso = _FALLBACK_COUNTRY_CODE_MAP_LOWER.get(normalized_candidate.lower())
     if lowered_iso:
         display = iso_resolver.display_name(lowered_iso) if iso_resolver else candidate
         return lowered_iso, display or candidate
+
+    if iso_resolver:
+        resolved_iso = iso_resolver.resolve(normalized_candidate)
+        if resolved_iso:
+            display = iso_resolver.display_name(resolved_iso)
+            return resolved_iso, display or candidate
+
+    if iso_candidate and iso_resolver is None:
+        # Accept well-formed ISO-3 codes even when the resolver could not be
+        # loaded. Use the raw country label as a fallback display name.
+        return iso_candidate, candidate
 
     return None, None
 
@@ -224,21 +234,33 @@ def create_user_geographic_map(
             )
 
         countries_data = geographic_data.get("countries", {})
-        top_countries_data = geographic_data.get("top_countries", [])
 
-        logger.info("Countries data: %s", countries_data)
-        logger.info("Top countries data: %s", top_countries_data)
+        preview_items: list[tuple[Any, Any]] = []
+        if countries_data:
+            preview_items = list(countries_data.items())[:10]
+            logger.info(
+                "Countries data sample (%s entries): %s",
+                len(countries_data),
+                preview_items,
+            )
 
-        if top_countries_data and isinstance(top_countries_data, list):
-            countries_data = {}
-            for item in top_countries_data:
+        if isinstance(countries_data, list):
+            # Some endpoints may return a list of country/count mappings instead of a dict
+            extracted = {}
+            for item in countries_data:
                 if isinstance(item, dict):
                     country = item.get("country", item.get("country_code", ""))
                     count = item.get("user_count", item.get("count", 0))
                     if country:
-                        countries_data[country] = count
+                        extracted[country] = count
+            countries_data = extracted
+            preview_items = list(countries_data.items())[:10] if countries_data else []
 
-        logger.info("Final countries data: %s", countries_data)
+        logger.info(
+            "Final countries sample (%s entries): %s",
+            len(countries_data),
+            preview_items,
+        )
 
         if not countries_data:
             return _build_message_block(
@@ -317,7 +339,11 @@ def create_user_geographic_map(
             alias_suffix = f" ({', '.join(sorted(aliases))})" if aliases else ""
             country_labels.append(f"{display_name}{alias_suffix}: {iso_counts_map[iso]} users")
 
-        logger.info("Mapped to ISO codes: %s", iso_counts_map)
+        logger.info(
+            "Mapped ISO sample (%s entries): %s",
+            len(iso_counts_map),
+            list(iso_counts_map.items())[:10],
+        )
 
         fig = go.Figure(
             data=go.Choropleth(

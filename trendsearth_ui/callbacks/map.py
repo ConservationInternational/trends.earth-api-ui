@@ -2,6 +2,8 @@
 
 from dash import MATCH, Input, Output, State, html, no_update
 
+from ..config import DEFAULT_PAGE_SIZE
+
 
 def register_callbacks(app):
     """Register map modal callbacks."""
@@ -40,7 +42,7 @@ def register_callbacks(app):
 
             try:
                 # Calculate which page this row is on
-                page_size = 50  # This should match DEFAULT_PAGE_SIZE
+                page_size = DEFAULT_PAGE_SIZE
                 page = (row_index // page_size) + 1
                 row_in_page = row_index % page_size
 
