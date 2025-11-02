@@ -2,6 +2,12 @@
 
 from dash import Input, Output, clientside_callback, dcc, html
 
+TRUNCATED_CELL_STYLE = {
+    "whiteSpace": "nowrap",
+    "overflow": "hidden",
+    "textOverflow": "ellipsis",
+}
+
 
 def create_mobile_detection_components():
     """Create components for mobile device detection."""
@@ -368,6 +374,8 @@ def get_mobile_column_config():
                     "flex": 1.8,
                     "minWidth": 220,
                     "filter": False,
+                    "tooltipField": "endpoint",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "Method",
@@ -382,6 +390,8 @@ def get_mobile_column_config():
                     "flex": 1.8,
                     "minWidth": 220,
                     "filter": False,
+                    "tooltipField": "user_email",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "Role",
@@ -403,6 +413,8 @@ def get_mobile_column_config():
                     "flex": 1.4,
                     "minWidth": 200,
                     "filter": False,
+                    "tooltipField": "limit_definition",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "Count",
@@ -433,6 +445,8 @@ def get_mobile_column_config():
                     "flex": 1,
                     "minWidth": 160,
                     "filter": False,
+                    "tooltipField": "user_id",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "Limiter Key",
@@ -440,6 +454,8 @@ def get_mobile_column_config():
                     "flex": 1.2,
                     "minWidth": 220,
                     "filter": False,
+                    "tooltipField": "limit_key",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "User Agent",
@@ -447,6 +463,8 @@ def get_mobile_column_config():
                     "flex": 2,
                     "minWidth": 260,
                     "filter": False,
+                    "tooltipField": "user_agent",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
                     "headerName": "Event ID",
@@ -454,8 +472,16 @@ def get_mobile_column_config():
                     "flex": 1.2,
                     "minWidth": 260,
                     "filter": False,
+                    "tooltipField": "id",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
                 },
             ],
+            "default_col_def_overrides": {
+                "wrapText": False,
+            },
+            "grid_options_overrides": {
+                "rowHeight": 44,
+            },
         },
     }
 

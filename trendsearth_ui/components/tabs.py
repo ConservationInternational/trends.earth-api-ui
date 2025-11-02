@@ -73,19 +73,29 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
     # Get base responsive grid options
     base_grid_options = get_responsive_grid_options(is_mobile=False)  # Default to desktop
 
+    # Allow individual table configurations to override default column behavior
+    default_col_def = {
+        "resizable": True,
+        "sortable": True,
+        "filter": True,
+        "minWidth": 50,
+        "suppressSizeToFit": True,  # Prevent auto-sizing that can hide scroll
+        "wrapText": True,
+        "autoHeight": False,
+    }
+
+    default_col_def.update(config.get("default_col_def_overrides", {}))
+
+    # Apply any grid option overrides before building the final config
+    grid_options_overrides = config.get("grid_options_overrides")
+    if grid_options_overrides:
+        base_grid_options.update(grid_options_overrides)
+
     # Base AG-Grid configuration
     base_config = {
         "id": table_id,
         "columnDefs": all_columns,
-        "defaultColDef": {
-            "resizable": True,
-            "sortable": True,
-            "filter": True,
-            "minWidth": 50,
-            "suppressSizeToFit": True,  # Prevent auto-sizing that can hide scroll
-            "wrapText": True,
-            "autoHeight": False,
-        },
+        "defaultColDef": default_col_def,
         "columnSize": "sizeToFit"
         if not all_columns or len(all_columns) <= 5
         else None,  # Use autoSize for many columns
