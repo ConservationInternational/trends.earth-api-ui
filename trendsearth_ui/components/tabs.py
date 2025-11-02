@@ -1442,6 +1442,60 @@ def admin_tab_content(role, is_admin):
                                         ],
                                         className="mb-4",
                                     ),
+                                    html.Div(
+                                        [
+                                            html.H5(
+                                                "Recent Rate Limit Breaches",
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Button(
+                                                                [
+                                                                    html.I(
+                                                                        className="fas fa-sync-alt me-2"
+                                                                    ),
+                                                                    "Refresh Breach History",
+                                                                ],
+                                                                id="refresh-rate-limit-events-btn",
+                                                                color="outline-secondary",
+                                                                className="mb-2",
+                                                            )
+                                                        ],
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            html.Div(
+                                                                [
+                                                                    html.Span(
+                                                                        id="rate-limit-events-total-count",
+                                                                        children="Total: 0",
+                                                                        className="text-muted fw-bold",
+                                                                    ),
+                                                                    html.Span(
+                                                                        " · Last 24 hours",
+                                                                        className="text-muted ms-2",
+                                                                    ),
+                                                                ],
+                                                                className="d-flex align-items-center justify-content-end",
+                                                            )
+                                                        ],
+                                                        width=True,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            create_responsive_table(
+                                                table_id="rate-limit-events-table",
+                                                table_type="rate_limit_events",
+                                                height="500px",
+                                            ),
+                                        ],
+                                        className="mb-4",
+                                    ),
                                     # Reset Rate Limits Section
                                     html.Hr(),
                                     html.H5("Reset Rate Limits", className="mb-3"),

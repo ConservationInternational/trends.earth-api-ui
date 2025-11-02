@@ -1,10 +1,79 @@
 """Admin functionality callbacks."""
 
 import base64
+from typing import Any
 
 from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 import requests
+
+from ..config import DEFAULT_PAGE_SIZE
+from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+from ..utils.helpers import make_authenticated_request, parse_date
+
+RATE_LIMIT_EVENTS_ENDPOINT = "/rate-limit/events"
+RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS = 24
+
+
+def _format_duration_label(value: Any) -> str:
+    """Convert a numeric duration in seconds to a human readable label."""
+
+    try:
+        seconds = int(float(value))
+    except (TypeError, ValueError):
+        return "-"
+
+    if seconds <= 0:
+        return "-"
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, secs = divmod(remainder, 60)
+
+    parts: list[str] = []
+    if hours:
+        parts.append(f"{hours}h")
+    if minutes:
+        parts.append(f"{minutes}m")
+    if secs and not hours:
+        parts.append(f"{secs}s")
+    if not parts:
+        parts.append(f"{secs}s")
+    return " ".join(parts)
+
+
+def _format_limit_count(value: Any) -> str:
+    """Format limit counts for display."""
+
+    if value in (None, ""):
+        return "-"
+    try:
+        numeric = int(float(value))
+    except (TypeError, ValueError):
+        return str(value)
+    return f"{numeric:,}"
+
+
+def _format_rate_limit_events(
+    events: list[dict[str, Any]] | None,
+    user_timezone: str | None,
+) -> list[dict[str, Any]]:
+    """Prepare rate limit event rows for the data grid."""
+
+    if not events:
+        return []
+
+    timezone = user_timezone or "UTC"
+    rows: list[dict[str, Any]] = []
+
+    for event in events:
+        event = dict(event)
+        event["occurred_at"] = parse_date(event.get("occurred_at"), timezone)
+        event["time_window_display"] = _format_duration_label(event.get("time_window_seconds"))
+        event["retry_after_display"] = _format_duration_label(event.get("retry_after_seconds"))
+        event["limit_count_display"] = _format_limit_count(event.get("limit_count"))
+        rows.append(event)
+
+    return rows
 
 
 def register_callbacks(app):
@@ -135,7 +204,6 @@ def register_callbacks(app):
                 )
 
             try:
-                # Create user via API
                 user_data = {
                     "name": name.strip(),
                     "email": email.strip().lower(),
@@ -145,8 +213,6 @@ def register_callbacks(app):
                     "role": role,
                     "is_active": True,
                 }
-
-                from ..utils.helpers import make_authenticated_request
 
                 response = make_authenticated_request(
                     "/user", token, method="POST", json=user_data, timeout=10
@@ -397,8 +463,6 @@ def register_callbacks(app):
                 # Create multipart form data
                 files = {"file": (filename, decoded_content)}
 
-                from ..utils.helpers import make_authenticated_request
-
                 response = make_authenticated_request(
                     "/script", token, method="POST", data=script_data, files=files, timeout=30
                 )
@@ -522,8 +586,6 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Get user count
             user_response = make_authenticated_request("/user?per_page=1", token, timeout=5)
             total_users = (
@@ -609,8 +671,6 @@ def register_callbacks(app):
             return no_update, no_update, no_update
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Make API call to reset rate limits
             resp = make_authenticated_request("/rate-limit/reset", token, method="POST", json={})
 
@@ -680,8 +740,6 @@ def register_callbacks(app):
             )
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # Fetch rate limiting status
             resp = make_authenticated_request("/rate-limit/status", token, method="GET")
 
@@ -901,3 +959,134 @@ def register_callbacks(app):
                 className="text-center text-danger p-3",
             )
             return "Error", "Error", "Error", error_div
+
+    @app.callback(
+        [
+            Output("rate-limit-events-table", "getRowsResponse"),
+            Output("rate-limit-events-table-state", "data"),
+            Output("rate-limit-events-total-count-store", "data"),
+        ],
+        Input("rate-limit-events-table", "getRowsRequest"),
+        [
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("user-timezone-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def load_rate_limit_events(request, token, role, user_timezone):
+        """Load rate limit breach history for the admin table."""
+
+        if not token or role != "SUPERADMIN":
+            return {"rowData": [], "rowCount": 0}, {}, 0
+
+        try:
+            params, table_state = build_aggrid_request_params(
+                request,
+                base_params={"since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS},
+                default_page_size=DEFAULT_PAGE_SIZE,
+                allowed_sort_columns=("occurred_at",),
+                allow_filters=False,
+            )
+
+            response = make_authenticated_request(
+                RATE_LIMIT_EVENTS_ENDPOINT,
+                token,
+                params=params,
+                timeout=10,
+            )
+
+            if response.status_code != 200:
+                return {"rowData": [], "rowCount": 0}, table_state, 0
+
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = {}
+
+            data = payload.get("data", {}) if isinstance(payload, dict) else {}
+            events = data.get("events", []) if isinstance(data, dict) else []
+            total = data.get("total", 0) if isinstance(data, dict) else 0
+
+            rows = _format_rate_limit_events(events, user_timezone)
+
+            return {"rowData": rows, "rowCount": total}, table_state, total
+
+        except Exception as exc:  # pragma: no cover - defensive guard
+            print(f"Error loading rate limit events: {exc}")
+            return {"rowData": [], "rowCount": 0}, {}, 0
+
+    @app.callback(
+        [
+            Output("rate-limit-events-table", "getRowsResponse", allow_duplicate=True),
+            Output("rate-limit-events-table-state", "data", allow_duplicate=True),
+            Output("rate-limit-events-total-count-store", "data", allow_duplicate=True),
+        ],
+        Input("refresh-rate-limit-events-btn", "n_clicks"),
+        [
+            State("rate-limit-events-table-state", "data"),
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("user-timezone-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def refresh_rate_limit_events(n_clicks, table_state, token, role, user_timezone):
+        """Manually refresh the rate limit events table."""
+
+        if not n_clicks or not token or role != "SUPERADMIN":
+            return {"rowData": [], "rowCount": 0}, table_state or {}, 0
+
+        try:
+            base_params = {
+                "page": 1,
+                "per_page": DEFAULT_PAGE_SIZE,
+                "since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS,
+            }
+
+            params = build_refresh_request_params(
+                base_params=base_params,
+                table_state=table_state,
+                allow_filters=False,
+            )
+
+            response = make_authenticated_request(
+                RATE_LIMIT_EVENTS_ENDPOINT,
+                token,
+                params=params,
+                timeout=10,
+            )
+
+            if response.status_code != 200:
+                return {"rowData": [], "rowCount": 0}, table_state or {}, 0
+
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = {}
+
+            data = payload.get("data", {}) if isinstance(payload, dict) else {}
+            events = data.get("events", []) if isinstance(data, dict) else []
+            total = data.get("total", 0) if isinstance(data, dict) else 0
+
+            rows = _format_rate_limit_events(events, user_timezone)
+
+            return {"rowData": rows, "rowCount": total}, table_state or {}, total
+
+        except Exception as exc:  # pragma: no cover - defensive guard
+            print(f"Error refreshing rate limit events: {exc}")
+            return {"rowData": [], "rowCount": 0}, table_state or {}, 0
+
+    @app.callback(
+        Output("rate-limit-events-total-count", "children"),
+        Input("rate-limit-events-total-count-store", "data"),
+        prevent_initial_call=False,
+    )
+    def update_rate_limit_events_total_display(total_count):
+        """Update the displayed total for the rate limit events table."""
+
+        try:
+            numeric = int(total_count)
+        except (TypeError, ValueError):
+            numeric = 0
+        return f"Total: {numeric:,}"
