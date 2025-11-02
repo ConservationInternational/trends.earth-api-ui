@@ -780,21 +780,31 @@ def register_callbacks(app):
                 print(f"🔍 DEBUG: Error Response Text: {resp.text[:500]}")
 
             if resp.status_code == 200:
-                data = resp.json()
+                payload = resp.json()
+                status_data = payload.get("data")
+                if not isinstance(status_data, dict):
+                    status_data = payload if isinstance(payload, dict) else {}
 
-                # Extract status information
-                enabled_status = "Enabled" if data.get("enabled", False) else "Disabled"
-                storage_type = data.get("storage_type", "Unknown")
-                total_active = data.get("total_active_limits", 0)
-                active_limits = data.get("active_limits", [])
+                # Extract status information from current API schema
+                enabled_flag = bool(status_data.get("enabled", False))
+                enabled_status = "Enabled" if enabled_flag else "Disabled"
+                storage_type = status_data.get("storage_type") or "Unknown"
+
+                active_limits = status_data.get("active_limits") or []
+                if not isinstance(active_limits, list):
+                    active_limits = []
+
+                total_active = status_data.get("total_active_limits")
+                if total_active is None:
+                    total_active = len(active_limits)
 
                 # Create table for active limits
                 if active_limits:
                     table_rows = []
                     for limit in active_limits:
                         # Get user info if available
-                        user_info = limit.get("user_info", {})
-                        identifier_display = limit.get("identifier", "Unknown")
+                        user_info = limit.get("user_info") or {}
+                        identifier_display = limit.get("identifier") or limit.get("key") or "Unknown"
 
                         # Format identifier with user info if available
                         if user_info:
@@ -807,17 +817,23 @@ def register_callbacks(app):
 
                         # Format time window
                         time_window = limit.get("time_window_seconds", 0)
+                        try:
+                            time_window = int(time_window)
+                        except (TypeError, ValueError):
+                            time_window = 0
                         if time_window >= 3600:
                             time_display = f"{time_window // 3600}h"
                         elif time_window >= 60:
                             time_display = f"{time_window // 60}m"
-                        else:
+                        elif time_window:
                             time_display = f"{time_window}s"
+                        else:
+                            time_display = "-"
 
                         table_rows.append(
                             html.Tr(
                                 [
-                                    html.Td(limit.get("type", "").title()),
+                                    html.Td((limit.get("type") or "").replace("_", " ").title()),
                                     html.Td(identifier_display),
                                     html.Td(
                                         f"{limit.get('current_count', 0)}/{limit.get('limit', 'N/A')}"
