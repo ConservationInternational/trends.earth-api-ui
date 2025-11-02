@@ -8,6 +8,7 @@ from .modals import (
     edit_user_modal,
     json_modal,
     map_modal,
+    reset_individual_rate_limit_modal,
     reset_rate_limits_modal,
 )
 from .tabs import (
@@ -30,6 +31,7 @@ __all__ = [
     "delete_user_modal",
     "delete_script_modal",
     "reset_rate_limits_modal",
+    "reset_individual_rate_limit_modal",
     "admin_tab_content",
     "executions_tab_content",
     "users_tab_content",

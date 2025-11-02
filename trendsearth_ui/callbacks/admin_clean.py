@@ -804,7 +804,9 @@ def register_callbacks(app):
                     for limit in active_limits:
                         # Get user info if available
                         user_info = limit.get("user_info") or {}
-                        identifier_display = limit.get("identifier") or limit.get("key") or "Unknown"
+                        identifier_display = (
+                            limit.get("identifier") or limit.get("key") or "Unknown"
+                        )
 
                         # Format identifier with user info if available
                         if user_info:

@@ -3,7 +3,7 @@
 import base64
 from typing import Any
 
-from dash import Input, Output, State, callback_context, html, no_update
+from dash import ALL, Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 import requests
 
@@ -759,7 +759,7 @@ def register_callbacks(app):
                 # Create table for active limits
                 if active_limits:
                     table_rows = []
-                    for limit in active_limits:
+                    for idx, limit in enumerate(active_limits):
                         # Get user info if available
                         user_info = limit.get("user_info", {})
                         identifier_display = limit.get("identifier", "Unknown")
@@ -782,6 +782,7 @@ def register_callbacks(app):
                         else:
                             time_display = f"{time_window}s"
 
+                        # Make rows clickable with hover effect
                         table_rows.append(
                             html.Tr(
                                 [
@@ -798,7 +799,17 @@ def register_callbacks(app):
                                             className="me-1",
                                         )
                                     ),
-                                ]
+                                    html.Td(
+                                        dbc.Button(
+                                            [html.I(className="fas fa-undo me-1"), "Reset"],
+                                            id={"type": "reset-rate-limit-btn", "index": idx},
+                                            color="warning",
+                                            size="sm",
+                                            outline=True,
+                                        )
+                                    ),
+                                ],
+                                style={"cursor": "default"},
                             )
                         )
 
@@ -813,6 +824,7 @@ def register_callbacks(app):
                                             html.Th("Usage"),
                                             html.Th("Window"),
                                             html.Th("Role"),
+                                            html.Th("Action"),
                                         ]
                                     )
                                 ]
@@ -976,11 +988,13 @@ def register_callbacks(app):
     )
     def load_rate_limit_events(request, token, role, user_timezone):
         """Load rate limit breach history for the admin table."""
-
-        if not token or role != "SUPERADMIN":
-            return {"rowData": [], "rowCount": 0}, {}, 0
-
         try:
+            if not token or role not in ("ADMIN", "SUPERADMIN"):
+                return {"rowData": [], "rowCount": 0}, {}, 0
+            if not request:
+                # Return empty data but let ag-grid know there might be data
+                return {"rowData": [], "rowCount": None}, {}, 0
+
             params, table_state = build_aggrid_request_params(
                 request,
                 base_params={"since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS},
@@ -1010,10 +1024,12 @@ def register_callbacks(app):
 
             rows = _format_rate_limit_events(events, user_timezone)
 
-            return {"rowData": rows, "rowCount": total}, table_state, total
+            # Return data in AG Grid infinite scroll format
+            response = {"rowData": rows, "rowCount": total}
 
-        except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error loading rate limit events: {exc}")
+            return response, table_state, total
+
+        except Exception:  # pragma: no cover - defensive guard
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
@@ -1034,7 +1050,7 @@ def register_callbacks(app):
     def refresh_rate_limit_events(n_clicks, table_state, token, role, user_timezone):
         """Manually refresh the rate limit events table."""
 
-        if not n_clicks or not token or role != "SUPERADMIN":
+        if not n_clicks or not token or role not in ("ADMIN", "SUPERADMIN"):
             return {"rowData": [], "rowCount": 0}, table_state or {}, 0
 
         try:
@@ -1090,3 +1106,200 @@ def register_callbacks(app):
         except (TypeError, ValueError):
             numeric = 0
         return f"Total: {numeric:,}"
+
+    @app.callback(
+        [
+            Output("reset-individual-rate-limit-modal", "is_open"),
+            Output("selected-rate-limit-data", "data"),
+            Output("individual-rate-limit-details", "children"),
+        ],
+        [
+            Input({"type": "reset-rate-limit-btn", "index": ALL}, "n_clicks"),
+            Input("cancel-reset-individual-rate-limit", "n_clicks"),
+        ],
+        [
+            State("rate-limit-status", "children"),
+            State("token-store", "data"),
+            State("role-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def open_reset_individual_rate_limit_modal(
+        _reset_clicks_list, _cancel_clicks, _status, token, role
+    ):
+        """Handle opening the individual rate limit reset modal."""
+        if not token or role != "SUPERADMIN":
+            return False, None, []
+
+        ctx = callback_context
+        if not ctx.triggered:
+            return False, None, []
+
+        button_id = ctx.triggered[0]["prop_id"]
+
+        # If cancel button was clicked, close modal
+        if "cancel-reset-individual-rate-limit" in button_id:
+            return False, None, []
+
+        # If a reset button was clicked, open modal with rate limit details
+        if "reset-rate-limit-btn" in button_id:
+            # Parse the button ID to get the index
+            try:
+                import json
+
+                button_data = json.loads(button_id.split(".")[0])
+                idx = button_data.get("index")
+
+                # Fetch current rate limit status to get the details
+                resp = make_authenticated_request("/rate-limit/status", token, method="GET")
+
+                if resp.status_code == 200:
+                    payload = resp.json()
+                    data = payload.get("data", {})
+                    active_limits = data.get("active_limits", [])
+
+                    if idx is not None and 0 <= idx < len(active_limits):
+                        limit = active_limits[idx]
+
+                        # Get user info if available
+                        user_info = limit.get("user_info", {})
+                        identifier_display = limit.get("identifier", "Unknown")
+                        limit_key = limit.get("key", "")
+
+                        # Format identifier with user info if available
+                        if user_info:
+                            user_name = user_info.get("name", "")
+                            user_email = user_info.get("email", "")
+                            if user_name and user_email:
+                                identifier_display = f"{user_name} ({user_email})"
+                            elif user_email:
+                                identifier_display = user_email
+
+                        # Format time window
+                        time_window = limit.get("time_window_seconds", 0)
+                        if time_window >= 3600:
+                            time_display = f"{time_window // 3600} hour(s)"
+                        elif time_window >= 60:
+                            time_display = f"{time_window // 60} minute(s)"
+                        else:
+                            time_display = f"{time_window} second(s)"
+
+                        # Create details display
+                        details = [
+                            html.Dl(
+                                [
+                                    html.Dt("Type:", className="fw-bold"),
+                                    html.Dd(limit.get("type", "").title()),
+                                    html.Dt("Identifier:", className="fw-bold"),
+                                    html.Dd(identifier_display),
+                                    html.Dt("Current Usage:", className="fw-bold"),
+                                    html.Dd(
+                                        f"{limit.get('current_count', 0)} requests in {time_display}"
+                                    ),
+                                ],
+                                className="mb-0",
+                            )
+                        ]
+
+                        return True, {"key": limit_key, "identifier": identifier_display}, details
+
+            except Exception as e:
+                print(f"Error opening reset modal: {e}")
+
+        return False, None, []
+
+    @app.callback(
+        [
+            Output("admin-reset-rate-limits-alert", "children", allow_duplicate=True),
+            Output("admin-reset-rate-limits-alert", "color", allow_duplicate=True),
+            Output("admin-reset-rate-limits-alert", "is_open", allow_duplicate=True),
+            Output("reset-individual-rate-limit-modal", "is_open", allow_duplicate=True),
+            Output("refresh-rate-limit-status-btn", "n_clicks"),
+        ],
+        [Input("confirm-reset-individual-rate-limit", "n_clicks")],
+        [
+            State("selected-rate-limit-data", "data"),
+            State("token-store", "data"),
+            State("role-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def reset_individual_rate_limit(confirm_clicks, rate_limit_data, token, role):
+        """Reset a specific rate limit via API call."""
+        if not confirm_clicks or not token or role != "SUPERADMIN" or not rate_limit_data:
+            return no_update, no_update, no_update, no_update, no_update
+
+        limit_key = rate_limit_data.get("key")
+        identifier_display = rate_limit_data.get("identifier", "")
+
+        if not limit_key:
+            return (
+                [
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    "Error: No rate limit selected.",
+                ],
+                "danger",
+                True,
+                False,
+                no_update,
+            )
+
+        try:
+            # Make API call to reset specific rate limit
+            resp = make_authenticated_request(
+                f"/rate-limit/reset/{limit_key}", token, method="POST", json={}
+            )
+
+            if resp.status_code == 200:
+                return (
+                    [
+                        html.I(className="fas fa-check-circle me-2"),
+                        f"Rate limit for {identifier_display} has been successfully reset.",
+                    ],
+                    "success",
+                    True,
+                    False,
+                    1,  # Trigger refresh
+                )
+            elif resp.status_code == 404:
+                return (
+                    [
+                        html.I(className="fas fa-info-circle me-2"),
+                        f"Rate limit for {identifier_display} not found. It may have already expired.",
+                    ],
+                    "info",
+                    True,
+                    False,
+                    1,  # Trigger refresh
+                )
+            else:
+                error_msg = f"Failed to reset rate limit. Status: {resp.status_code}"
+                try:
+                    error_data = resp.json()
+                    if "error" in error_data:
+                        error_msg += f" - {error_data['error']}"
+                    elif "detail" in error_data:
+                        error_msg += f" - {error_data['detail']}"
+                except (ValueError, KeyError):
+                    if resp.text:
+                        error_msg += f" - {resp.text[:200]}"
+
+                return (
+                    [html.I(className="fas fa-exclamation-triangle me-2"), error_msg],
+                    "danger",
+                    True,
+                    False,
+                    no_update,
+                )
+
+        except Exception as e:
+            return (
+                [
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    f"Error resetting rate limit: {str(e)}",
+                ],
+                "danger",
+                True,
+                False,
+                no_update,
+            )

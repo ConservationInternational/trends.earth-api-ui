@@ -21,6 +21,7 @@ from .modals import (
     edit_user_modal,
     json_modal,
     map_modal,
+    reset_individual_rate_limit_modal,
     reset_rate_limits_modal,
 )
 
@@ -71,6 +72,7 @@ def create_main_layout():
             dcc.Store(id="active-tab-store", data="executions"),
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
+            dcc.Store(id="selected-rate-limit-data"),  # Store data for selected rate limit to reset
             # Timezone detection components
             *timezone_components,
             # Mobile detection components
@@ -84,6 +86,7 @@ def create_main_layout():
             delete_user_modal(),
             delete_script_modal(),
             reset_rate_limits_modal(),
+            reset_individual_rate_limit_modal(),
         ],
         fluid=True,
     )

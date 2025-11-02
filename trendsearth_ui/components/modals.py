@@ -897,3 +897,73 @@ def reset_rate_limits_modal():
         id="reset-rate-limits-modal",
         is_open=False,
     )
+
+
+def reset_individual_rate_limit_modal():
+    """Create the individual rate limit reset confirmation modal."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("⚠️ Reset Individual Rate Limit")),
+            dbc.ModalBody(
+                [
+                    html.Div(
+                        [
+                            html.H5(
+                                "Reset this rate limit?",
+                                className="text-warning mb-3",
+                            ),
+                            # Rate limit details will be populated by callback
+                            html.Div(
+                                id="individual-rate-limit-details",
+                                className="mb-3",
+                            ),
+                            html.P(
+                                "This will:",
+                                className="mb-2",
+                            ),
+                            html.Ul(
+                                [
+                                    html.Li(
+                                        "Clear all rate limit counters for this specific identifier"
+                                    ),
+                                    html.Li(
+                                        "Allow this user/IP to start fresh with new request counters"
+                                    ),
+                                    html.Li("Not affect other active rate limits"),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Alert(
+                                [
+                                    html.I(className="fas fa-info-circle me-2"),
+                                    "This action only resets the rate limit for the selected user or IP address. The rate limiting system will continue to track new requests.",
+                                ],
+                                color="info",
+                                className="mb-3",
+                            ),
+                            html.P(
+                                "Are you sure you want to proceed?", className="fw-bold text-center"
+                            ),
+                        ]
+                    )
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Cancel",
+                        id="cancel-reset-individual-rate-limit",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        [html.I(className="fas fa-undo me-2"), "Reset This Limit"],
+                        id="confirm-reset-individual-rate-limit",
+                        color="warning",
+                    ),
+                ]
+            ),
+        ],
+        id="reset-individual-rate-limit-modal",
+        is_open=False,
+    )

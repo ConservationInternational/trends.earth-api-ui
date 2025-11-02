@@ -1320,7 +1320,7 @@ def admin_tab_content(role, is_admin):
                 if role == "SUPERADMIN"
                 else []
             ),
-            # Rate Limiting Reset Section (SUPERADMIN only)
+            # Rate Limiting Management Section (ADMIN and SUPERADMIN)
             *(
                 [
                     dbc.Card(
@@ -1534,7 +1534,7 @@ def admin_tab_content(role, is_admin):
                         className="mb-4",
                     ),
                 ]
-                if role == "SUPERADMIN"
+                if role in ("ADMIN", "SUPERADMIN")
                 else []
             ),
             # Upload New Script Section
