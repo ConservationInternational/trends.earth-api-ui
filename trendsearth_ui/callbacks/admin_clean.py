@@ -697,37 +697,6 @@ def register_callbacks(app):
                 True,
             )
 
-    @app.callback(
-        [
-            Output("rate-limit-status", "children"),
-            Output("rate-limit-storage", "children"),
-            Output("rate-limit-count", "children"),
-            Output("rate-limits-table-container", "children"),
-        ],
-        [
-            Input("refresh-rate-limit-status-btn", "n_clicks"),
-            Input("active-tab-store", "data"),
-        ],
-        [
-            State("token-store", "data"),
-            State("role-store", "data"),
-            State("api-environment-store", "data"),
-        ],
-        prevent_initial_call=False,
-    )
-    def fetch_rate_limit_status(_refresh_clicks, active_tab, token, role, _api_environment):
-        """Fetch and display rate limiting status."""
-        # Debug: Print callback trigger details
-        print("🔍 DEBUG: fetch_rate_limit_status callback triggered")
-        print(f"🔍 DEBUG: Active tab: {active_tab}")
-        print(f"🔍 DEBUG: User role: {role}")
-        print(f"🔍 DEBUG: Has token: {bool(token)}")
-        print(f"🔍 DEBUG: Token length: {len(token) if token else 0}")
-
-        # Only load when admin tab is active and user is SUPERADMIN
-        if active_tab != "admin" or not token or role != "SUPERADMIN":
-            print("🔍 DEBUG: Skipping rate limit fetch - conditions not met")
-            print(f"🔍 DEBUG: - active_tab == 'admin': {active_tab == 'admin'}")
             print(f"🔍 DEBUG: - has token: {bool(token)}")
             print(f"🔍 DEBUG: - role == 'SUPERADMIN': {role == 'SUPERADMIN'}")
             return (

@@ -3,12 +3,12 @@
 import base64
 from typing import Any
 
-from dash import ALL, Input, Output, State, callback_context, html, no_update
+from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 import requests
 
 from ..config import DEFAULT_PAGE_SIZE
-from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+from ..utils.aggrid import build_sort_clause, build_table_state
 from ..utils.helpers import make_authenticated_request, parse_date
 
 RATE_LIMIT_EVENTS_ENDPOINT = "/rate-limit/events"
@@ -74,6 +74,328 @@ def _format_rate_limit_events(
         rows.append(event)
 
     return rows
+
+
+def _normalise_rate_limit_type(value: Any) -> str:
+    """Convert a raw rate limit type into a readable label."""
+
+    if not value:
+        return "-"
+    text = str(value).strip()
+    if not text:
+        return "-"
+    return text.replace("_", " ").title()
+
+
+def _fetch_rate_limit_status_data(token: str | None) -> dict[str, Any] | None:
+    """Safely fetch rate limit status information from the API."""
+
+    if not token:
+        return None
+
+    try:
+        response = make_authenticated_request("/rate-limit/status", token, method="GET")
+    except Exception as exc:  # pragma: no cover - defensive guard
+        print(f"Error fetching rate limit status data: {exc}")
+        return None
+
+    if response.status_code != 200:
+        return None
+
+    try:
+        payload = response.json()
+    except ValueError:
+        return None
+
+    data = payload.get("data") if isinstance(payload, dict) else None
+    return data if isinstance(data, dict) else None
+
+
+def _format_active_limits_for_table(
+    active_limits: list[dict[str, Any]] | None,
+    user_timezone: str | None,
+) -> list[dict[str, Any]]:
+    """Transform active rate limits into rows compatible with the unified table."""
+
+    if not active_limits:
+        return []
+
+    timezone = user_timezone or "UTC"
+    rows: list[dict[str, Any]] = []
+
+    for idx, raw_limit in enumerate(active_limits):
+        limit = dict(raw_limit or {})
+
+        key = limit.get("key") or limit.get("identifier") or f"active-{idx}"
+        user_info = limit.get("user_info") or {}
+        user_name = (user_info.get("name") or "").strip()
+        user_email = (user_info.get("email") or "").strip()
+        identifier = (limit.get("identifier") or "").strip()
+
+        identifier_candidates = [
+            f"{user_name} ({user_email})" if user_name and user_email else None,
+            user_email or None,
+            user_name or None,
+            identifier or None,
+            key,
+        ]
+        identifier_display = next((value for value in identifier_candidates if value), "Unknown")
+
+        ip_address = limit.get("ip_address") or (
+            identifier if identifier and "@" not in identifier else "-"
+        )
+
+        occurred_at = parse_date(limit.get("occurred_at"), timezone) or "-"
+        expires_at = parse_date(limit.get("expires_at"), timezone) or "-"
+
+        current_display = _format_limit_count(limit.get("current_count"))
+        limit_cap_value = limit.get("limit") or limit.get("limit_count")
+        limit_cap_display = _format_limit_count(limit_cap_value)
+
+        if limit_cap_display not in ("-", "0") and current_display not in ("-", "0"):
+            usage_display = f"{current_display} / {limit_cap_display}"
+        elif limit_cap_display not in ("-", "0"):
+            usage_display = (
+                f"{current_display} / {limit_cap_display}"
+                if current_display != "-"
+                else limit_cap_display
+            )
+        else:
+            usage_display = current_display
+
+        time_window_display = _format_duration_label(limit.get("time_window_seconds"))
+        retry_after_display = _format_duration_label(limit.get("retry_after_seconds"))
+
+        limit_definition = limit.get("limit_definition")
+        if not limit_definition:
+            if limit_cap_display != "-" and time_window_display != "-":
+                limit_definition = f"{limit_cap_display} per {time_window_display}"
+            elif limit_cap_display != "-":
+                limit_definition = limit_cap_display
+            else:
+                limit_definition = "-"
+
+        rows.append(
+            {
+                "id": f"active:{key}",
+                "is_active": True,
+                "status_display": "Active",
+                "occurred_at": occurred_at,
+                "expires_at_display": expires_at,
+                "identifier_display": identifier_display,
+                "user_email": user_email or "-",
+                "user_role": user_info.get("role") or "-",
+                "ip_address": ip_address or "-",
+                "endpoint": limit.get("endpoint") or "-",
+                "method": limit.get("method") or "-",
+                "limit_definition": limit_definition or "-",
+                "limit_count_display": usage_display or "-",
+                "time_window_display": time_window_display or "-",
+                "retry_after_display": retry_after_display or "-",
+                "rate_limit_type": _normalise_rate_limit_type(
+                    limit.get("type") or limit.get("rate_limit_type")
+                ),
+                "limit_key": limit.get("key") or key,
+                "cancel_allowed": bool(limit.get("key")),
+            }
+        )
+
+    return rows
+
+
+def _format_historical_events_for_table(
+    events: list[dict[str, Any]] | None,
+    user_timezone: str | None,
+) -> list[dict[str, Any]]:
+    """Transform historical rate limit events for the unified table."""
+
+    formatted_events = _format_rate_limit_events(events, user_timezone)
+    rows: list[dict[str, Any]] = []
+
+    for idx, event in enumerate(formatted_events):
+        event_id = event.get("id") or event.get("limit_key") or event.get("occurred_at")
+        if not event_id:
+            event_id = f"event-{idx}"
+
+        identifier_candidates = [
+            event.get("identifier"),
+            event.get("user_email"),
+            event.get("ip_address"),
+            event.get("limit_key"),
+        ]
+        identifier_display = next((value for value in identifier_candidates if value), "-")
+
+        rows.append(
+            {
+                "id": f"event:{event_id}",
+                "is_active": False,
+                "status_display": "Historical",
+                "occurred_at": event.get("occurred_at") or "-",
+                "expires_at_display": "-",
+                "identifier_display": identifier_display,
+                "user_email": event.get("user_email") or "-",
+                "user_role": event.get("user_role") or "-",
+                "ip_address": event.get("ip_address") or "-",
+                "endpoint": event.get("endpoint") or "-",
+                "method": event.get("method") or "-",
+                "limit_definition": event.get("limit_definition") or "-",
+                "limit_count_display": event.get("limit_count_display") or "-",
+                "time_window_display": event.get("time_window_display") or "-",
+                "retry_after_display": event.get("retry_after_display") or "-",
+                "rate_limit_type": _normalise_rate_limit_type(event.get("rate_limit_type")),
+                "limit_key": event.get("limit_key") or event.get("id"),
+                "cancel_allowed": False,
+            }
+        )
+
+    return rows
+
+
+def _query_rate_limit_breaches(
+    request_data: dict[str, Any] | None,
+    token: str | None,
+    role: str | None,
+    user_timezone: str | None,
+    *,
+    stored_state: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any], int]:
+    """Fetch combined active and historical rate limit rows for the unified table."""
+
+    if not token or role not in ("ADMIN", "SUPERADMIN"):
+        return {"rowData": [], "rowCount": 0}, stored_state or {}, 0
+
+    stored_state = stored_state or {}
+    request_data = request_data or {}
+
+    try:
+        start_row = int(request_data.get("startRow") or 0)
+    except (TypeError, ValueError):
+        start_row = 0
+    start_row = max(start_row, 0)
+
+    try:
+        raw_end_row = request_data.get("endRow")
+        end_row = int(raw_end_row) if raw_end_row is not None else None
+    except (TypeError, ValueError):
+        end_row = None
+
+    default_block = stored_state.get("page_size") or DEFAULT_PAGE_SIZE
+    if end_row is None or end_row <= start_row:
+        end_row = start_row + max(default_block, DEFAULT_PAGE_SIZE)
+
+    page_size = max(end_row - start_row, 1)
+
+    sort_model = request_data.get("sortModel")
+    if sort_model is None:
+        sort_model = stored_state.get("sort_model") if stored_state else []
+    sort_model = list(sort_model or [])
+
+    sort_sql = build_sort_clause(sort_model, allowed_columns=("occurred_at",))
+    table_state = build_table_state(sort_model, {}, sort_sql, None)
+    table_state["page_size"] = page_size
+
+    status_data = _fetch_rate_limit_status_data(token)
+    active_limits = status_data.get("active_limits", []) if status_data else []
+    active_rows = _format_active_limits_for_table(active_limits, user_timezone)
+    active_count = len(active_rows)
+
+    hist_start_row = max(start_row - active_count, 0)
+    hist_needed = max(0, end_row - max(start_row, active_count))
+
+    hist_rows: list[dict[str, Any]] = []
+    hist_total = 0
+
+    fetch_historical = hist_needed > 0 or start_row == 0
+
+    if fetch_historical:
+        per_page = max(DEFAULT_PAGE_SIZE, hist_needed, 1)
+        initial_page = (hist_start_row // per_page) + 1 if hist_needed > 0 else 1
+        current_page = initial_page
+        offset = hist_start_row % per_page if hist_needed > 0 else 0
+        remaining_needed = hist_needed
+
+        while True:
+            params = {
+                "since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS,
+                "page": current_page,
+                "per_page": per_page,
+            }
+            if sort_sql:
+                params["sort"] = sort_sql
+
+            try:
+                response = make_authenticated_request(
+                    RATE_LIMIT_EVENTS_ENDPOINT,
+                    token,
+                    params=params,
+                    timeout=10,
+                )
+            except Exception as exc:  # pragma: no cover - defensive guard
+                print(f"Error fetching rate limit events: {exc}")
+                hist_rows = []
+                hist_total = 0
+                break
+
+            if response.status_code != 200:
+                print(f"Failed to fetch rate limit events: status {response.status_code}")
+                hist_rows = []
+                hist_total = 0
+                break
+
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = {}
+
+            data = payload.get("data", {}) if isinstance(payload, dict) else {}
+            events = data.get("events", []) if isinstance(data, dict) else []
+            if not hist_total:
+                try:
+                    hist_total = int(data.get("total", 0) or 0)
+                except (TypeError, ValueError):
+                    hist_total = 0
+
+            formatted_events = _format_historical_events_for_table(events, user_timezone)
+
+            if hist_needed > 0:
+                chunk = (
+                    formatted_events[offset:] if current_page == initial_page else formatted_events
+                )
+                if chunk:
+                    take = min(len(chunk), remaining_needed)
+                    hist_rows.extend(chunk[:take])
+                    remaining_needed -= take
+                else:
+                    remaining_needed = 0
+
+            if hist_needed == 0:
+                break
+
+            if remaining_needed <= 0:
+                break
+
+            if len(formatted_events) < per_page:
+                break
+
+            current_page += 1
+            offset = 0
+
+    total_row_count = active_count + hist_total
+    if not total_row_count:
+        total_row_count = active_count + len(hist_rows)
+
+    if total_row_count and start_row >= total_row_count:
+        return {"rowData": [], "rowCount": total_row_count}, table_state, total_row_count
+
+    rows: list[dict[str, Any]] = []
+
+    if active_count and start_row < active_count:
+        active_slice_end = min(active_count, end_row)
+        rows.extend(active_rows[start_row:active_slice_end])
+
+    rows.extend(hist_rows)
+
+    return {"rowData": rows, "rowCount": total_row_count}, table_state, total_row_count
 
 
 def register_callbacks(app):
@@ -656,25 +978,50 @@ def register_callbacks(app):
             Output("admin-reset-rate-limits-alert", "children"),
             Output("admin-reset-rate-limits-alert", "color"),
             Output("admin-reset-rate-limits-alert", "is_open"),
+            Output("rate-limit-breaches-table", "getRowsResponse", allow_duplicate=True),
+            Output("rate-limit-breaches-table-state", "data", allow_duplicate=True),
+            Output("rate-limit-breaches-total-count-store", "data", allow_duplicate=True),
+            Output("selected-rate-limit-data", "data", allow_duplicate=True),
         ],
         [Input("confirm-reset-rate-limits", "n_clicks")],
         [
             State("token-store", "data"),
             State("role-store", "data"),
             State("api-environment-store", "data"),
+            State("rate-limit-breaches-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def reset_rate_limits(confirm_clicks, token, role, _api_environment):
+    def reset_rate_limits(
+        confirm_clicks, token, role, _api_environment, table_state, user_timezone
+    ):
         """Reset all rate limits via API call."""
         if not confirm_clicks or not token or role != "SUPERADMIN":
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
         try:
             # Make API call to reset rate limits
             resp = make_authenticated_request("/rate-limit/reset", token, method="POST", json={})
 
+            refresh_request = {
+                "startRow": 0,
+                "endRow": (table_state or {}).get("page_size", DEFAULT_PAGE_SIZE),
+                "sortModel": (table_state or {}).get("sort_model"),
+            }
+
+            grid_response = no_update
+            new_table_state = no_update
+            new_total = no_update
+
             if resp.status_code == 200:
+                grid_response, new_table_state, new_total = _query_rate_limit_breaches(
+                    refresh_request,
+                    token,
+                    role,
+                    user_timezone,
+                    stored_state=table_state or {},
+                )
                 return (
                     [
                         html.I(className="fas fa-check-circle me-2"),
@@ -682,21 +1029,29 @@ def register_callbacks(app):
                     ],
                     "success",
                     True,
+                    grid_response,
+                    new_table_state,
+                    new_total,
+                    None,
                 )
-            else:
-                error_msg = f"Failed to reset rate limits. Status: {resp.status_code}"
-                try:
-                    error_data = resp.json()
-                    if "detail" in error_data:
-                        error_msg += f" - {error_data['detail']}"
-                except (ValueError, KeyError):
-                    error_msg += f" - {resp.text}"
 
-                return (
-                    [html.I(className="fas fa-exclamation-triangle me-2"), error_msg],
-                    "danger",
-                    True,
-                )
+            error_msg = f"Failed to reset rate limits. Status: {resp.status_code}"
+            try:
+                error_data = resp.json()
+                if "detail" in error_data:
+                    error_msg += f" - {error_data['detail']}"
+            except (ValueError, KeyError):
+                error_msg += f" - {resp.text}"
+
+            return (
+                [html.I(className="fas fa-exclamation-triangle me-2"), error_msg],
+                "danger",
+                True,
+                grid_response,
+                new_table_state,
+                new_total,
+                no_update,
+            )
 
         except Exception as e:
             return (
@@ -706,279 +1061,19 @@ def register_callbacks(app):
                 ],
                 "danger",
                 True,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
             )
 
     @app.callback(
         [
-            Output("rate-limit-status", "children"),
-            Output("rate-limit-storage", "children"),
-            Output("rate-limit-count", "children"),
-            Output("rate-limits-table-container", "children"),
+            Output("rate-limit-breaches-table", "getRowsResponse"),
+            Output("rate-limit-breaches-table-state", "data"),
+            Output("rate-limit-breaches-total-count-store", "data"),
         ],
-        [
-            Input("refresh-rate-limit-status-btn", "n_clicks"),
-            Input("active-tab-store", "data"),
-        ],
-        [
-            State("token-store", "data"),
-            State("role-store", "data"),
-            State("api-environment-store", "data"),
-        ],
-        prevent_initial_call=False,
-    )
-    def fetch_rate_limit_status(_refresh_clicks, active_tab, token, role, _api_environment):
-        """Fetch and display rate limiting status."""
-        # Only load when admin tab is active and user is SUPERADMIN
-        if active_tab != "admin" or not token or role != "SUPERADMIN":
-            return (
-                "N/A",
-                "N/A",
-                "0",
-                html.Div(
-                    "Rate limiting status not available.", className="text-muted text-center p-3"
-                ),
-            )
-
-        try:
-            # Fetch rate limiting status
-            resp = make_authenticated_request("/rate-limit/status", token, method="GET")
-
-            if resp.status_code == 200:
-                payload = resp.json()
-                data = payload.get("data") if isinstance(payload, dict) else None
-
-                if not isinstance(data, dict):
-                    raise ValueError("Unexpected rate limit status payload structure")
-
-                # Extract status information
-                enabled_status = "Enabled" if data.get("enabled", False) else "Disabled"
-                storage_type = data.get("storage_type", "Unknown")
-                total_active = data.get("total_active_limits", 0)
-                active_limits = data.get("active_limits", [])
-
-                # Create table for active limits
-                if active_limits:
-                    table_rows = []
-                    for idx, limit in enumerate(active_limits):
-                        # Get user info if available
-                        user_info = limit.get("user_info", {})
-                        identifier_display = limit.get("identifier", "Unknown")
-
-                        # Format identifier with user info if available
-                        if user_info:
-                            user_name = user_info.get("name", "")
-                            user_email = user_info.get("email", "")
-                            if user_name and user_email:
-                                identifier_display = f"{user_name} ({user_email})"
-                            elif user_email:
-                                identifier_display = user_email
-
-                        # Format time window
-                        time_window = limit.get("time_window_seconds", 0)
-                        if time_window >= 3600:
-                            time_display = f"{time_window // 3600}h"
-                        elif time_window >= 60:
-                            time_display = f"{time_window // 60}m"
-                        else:
-                            time_display = f"{time_window}s"
-
-                        # Make rows clickable with hover effect
-                        table_rows.append(
-                            html.Tr(
-                                [
-                                    html.Td(limit.get("type", "").title()),
-                                    html.Td(identifier_display),
-                                    html.Td(
-                                        f"{limit.get('current_count', 0)}/{limit.get('limit', 'N/A')}"
-                                    ),
-                                    html.Td(time_display),
-                                    html.Td(
-                                        dbc.Badge(
-                                            user_info.get("role", "N/A") if user_info else "N/A",
-                                            color="secondary" if not user_info else "primary",
-                                            className="me-1",
-                                        )
-                                    ),
-                                    html.Td(
-                                        dbc.Button(
-                                            [html.I(className="fas fa-undo me-1"), "Reset"],
-                                            id={"type": "reset-rate-limit-btn", "index": idx},
-                                            color="warning",
-                                            size="sm",
-                                            outline=True,
-                                        )
-                                    ),
-                                ],
-                                style={"cursor": "default"},
-                            )
-                        )
-
-                    table_content = dbc.Table(
-                        [
-                            html.Thead(
-                                [
-                                    html.Tr(
-                                        [
-                                            html.Th("Type"),
-                                            html.Th("User/IP"),
-                                            html.Th("Usage"),
-                                            html.Th("Window"),
-                                            html.Th("Role"),
-                                            html.Th("Action"),
-                                        ]
-                                    )
-                                ]
-                            ),
-                            html.Tbody(table_rows),
-                        ],
-                        striped=True,
-                        bordered=True,
-                        hover=True,
-                        responsive=True,
-                        size="sm",
-                    )
-                else:
-                    table_content = html.Div(
-                        [
-                            html.I(className="fas fa-check-circle me-2 text-success"),
-                            "No active rate limits found.",
-                        ],
-                        className="text-center text-muted p-4",
-                    )
-
-                return enabled_status, storage_type, str(total_active), table_content
-
-            elif resp.status_code == 404:
-                # Graceful fallback for missing endpoint
-                fallback_div = html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.I(className="fas fa-info-circle me-2 text-info"),
-                                html.Strong("Rate limiting status endpoint not available."),
-                            ],
-                            className="mb-2",
-                        ),
-                        html.Small(
-                            [
-                                "This feature requires API version with rate limiting management support. ",
-                                "The rate limiting system may still be active, but status monitoring is not available.",
-                            ],
-                            className="text-muted",
-                        ),
-                    ],
-                    className="text-center p-3",
-                )
-                return "Unknown", "Unknown", "N/A", fallback_div
-
-            elif resp.status_code == 403:
-                # Permission denied
-                permission_div = html.Div(
-                    [
-                        html.I(className="fas fa-lock me-2 text-warning"),
-                        "Access denied. SuperAdmin privileges required to view rate limiting status.",
-                    ],
-                    className="text-center text-warning p-3",
-                )
-                return "Access Denied", "Access Denied", "N/A", permission_div
-
-            else:
-                # Other HTTP errors
-                error_msg = f"Failed to fetch rate limit status. Status: {resp.status_code}"
-                try:
-                    error_data = resp.json()
-                    if "detail" in error_data:
-                        error_msg += f" - {error_data['detail']}"
-                except (ValueError, KeyError):
-                    if resp.text:
-                        error_msg += f" - {resp.text[:200]}"
-
-                error_div = html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
-                                html.Strong("Error fetching rate limit status"),
-                            ],
-                            className="mb-2",
-                        ),
-                        html.Small(error_msg, className="text-muted"),
-                        html.Br(),
-                        html.Small(
-                            [
-                                "Try refreshing or check if the API endpoint is available. ",
-                                "Request URL: /api/v1/rate-limit/status",
-                            ],
-                            className="text-muted mt-2",
-                        ),
-                    ],
-                    className="text-center text-danger p-3",
-                )
-                return "Error", "Error", "Error", error_div
-
-        except requests.exceptions.Timeout:
-            error_div = html.Div(
-                [
-                    html.Div(
-                        [
-                            html.I(className="fas fa-clock me-2 text-warning"),
-                            html.Strong("Request timeout"),
-                        ],
-                        className="mb-2",
-                    ),
-                    html.Small(
-                        "The rate limiting status request timed out. Please try again.",
-                        className="text-muted",
-                    ),
-                ],
-                className="text-center text-warning p-3",
-            )
-            return "Timeout", "Timeout", "Timeout", error_div
-
-        except requests.exceptions.ConnectionError:
-            error_div = html.Div(
-                [
-                    html.Div(
-                        [
-                            html.I(className="fas fa-wifi me-2 text-danger"),
-                            html.Strong("Connection error"),
-                        ],
-                        className="mb-2",
-                    ),
-                    html.Small(
-                        "Unable to connect to the API server. Check your network connection.",
-                        className="text-muted",
-                    ),
-                ],
-                className="text-center text-danger p-3",
-            )
-            return "Connection Error", "Connection Error", "Connection Error", error_div
-
-        except Exception as e:
-            error_div = html.Div(
-                [
-                    html.Div(
-                        [
-                            html.I(className="fas fa-exclamation-triangle me-2 text-danger"),
-                            html.Strong("Unexpected error"),
-                        ],
-                        className="mb-2",
-                    ),
-                    html.Small(f"Error: {str(e)}", className="text-muted"),
-                    html.Br(),
-                    html.Small("Please check logs for more details.", className="text-muted mt-2"),
-                ],
-                className="text-center text-danger p-3",
-            )
-            return "Error", "Error", "Error", error_div
-
-    @app.callback(
-        [
-            Output("rate-limit-events-table", "getRowsResponse"),
-            Output("rate-limit-events-table-state", "data"),
-            Output("rate-limit-events-total-count-store", "data"),
-        ],
-        Input("rate-limit-events-table", "getRowsRequest"),
+        Input("rate-limit-breaches-table", "getRowsRequest"),
         [
             State("token-store", "data"),
             State("role-store", "data"),
@@ -986,120 +1081,55 @@ def register_callbacks(app):
         ],
         prevent_initial_call=False,
     )
-    def load_rate_limit_events(request, token, role, user_timezone):
-        """Load rate limit breach history for the admin table."""
-        try:
-            if not token or role not in ("ADMIN", "SUPERADMIN"):
-                return {"rowData": [], "rowCount": 0}, {}, 0
-            if not request:
-                # Return empty data but let ag-grid know there might be data
-                return {"rowData": [], "rowCount": None}, {}, 0
+    def load_rate_limit_breaches(request, token, role, user_timezone):
+        """Load combined active and historical rate limit data for the unified grid."""
 
-            params, table_state = build_aggrid_request_params(
-                request,
-                base_params={"since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS},
-                default_page_size=DEFAULT_PAGE_SIZE,
-                allowed_sort_columns=("occurred_at",),
-                allow_filters=False,
-            )
-
-            response = make_authenticated_request(
-                RATE_LIMIT_EVENTS_ENDPOINT,
-                token,
-                params=params,
-                timeout=10,
-            )
-
-            if response.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, table_state, 0
-
-            try:
-                payload = response.json()
-            except ValueError:
-                payload = {}
-
-            data = payload.get("data", {}) if isinstance(payload, dict) else {}
-            events = data.get("events", []) if isinstance(data, dict) else []
-            total = data.get("total", 0) if isinstance(data, dict) else 0
-
-            rows = _format_rate_limit_events(events, user_timezone)
-
-            # Return data in AG Grid infinite scroll format
-            response = {"rowData": rows, "rowCount": total}
-
-            return response, table_state, total
-
-        except Exception:  # pragma: no cover - defensive guard
-            return {"rowData": [], "rowCount": 0}, {}, 0
+        return _query_rate_limit_breaches(request, token, role, user_timezone)
 
     @app.callback(
         [
-            Output("rate-limit-events-table", "getRowsResponse", allow_duplicate=True),
-            Output("rate-limit-events-table-state", "data", allow_duplicate=True),
-            Output("rate-limit-events-total-count-store", "data", allow_duplicate=True),
+            Output("rate-limit-breaches-table", "getRowsResponse", allow_duplicate=True),
+            Output("rate-limit-breaches-table-state", "data", allow_duplicate=True),
+            Output("rate-limit-breaches-total-count-store", "data", allow_duplicate=True),
         ],
-        Input("refresh-rate-limit-events-btn", "n_clicks"),
+        Input("refresh-rate-limit-breaches-btn", "n_clicks"),
         [
-            State("rate-limit-events-table-state", "data"),
+            State("rate-limit-breaches-table-state", "data"),
             State("token-store", "data"),
             State("role-store", "data"),
             State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def refresh_rate_limit_events(n_clicks, table_state, token, role, user_timezone):
-        """Manually refresh the rate limit events table."""
+    def refresh_rate_limit_breaches(n_clicks, table_state, token, role, user_timezone):
+        """Refresh the rate limit breaches grid while preserving sort state."""
 
-        if not n_clicks or not token or role not in ("ADMIN", "SUPERADMIN"):
-            return {"rowData": [], "rowCount": 0}, table_state or {}, 0
+        if not n_clicks:
+            return no_update, table_state or {}, no_update
 
-        try:
-            base_params = {
-                "page": 1,
-                "per_page": DEFAULT_PAGE_SIZE,
-                "since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS,
-            }
+        request = {
+            "startRow": 0,
+            "endRow": (table_state or {}).get("page_size", DEFAULT_PAGE_SIZE),
+            "sortModel": (table_state or {}).get("sort_model"),
+        }
 
-            params = build_refresh_request_params(
-                base_params=base_params,
-                table_state=table_state,
-                allow_filters=False,
-            )
+        response, new_state, total = _query_rate_limit_breaches(
+            request,
+            token,
+            role,
+            user_timezone,
+            stored_state=table_state or {},
+        )
 
-            response = make_authenticated_request(
-                RATE_LIMIT_EVENTS_ENDPOINT,
-                token,
-                params=params,
-                timeout=10,
-            )
-
-            if response.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, table_state or {}, 0
-
-            try:
-                payload = response.json()
-            except ValueError:
-                payload = {}
-
-            data = payload.get("data", {}) if isinstance(payload, dict) else {}
-            events = data.get("events", []) if isinstance(data, dict) else []
-            total = data.get("total", 0) if isinstance(data, dict) else 0
-
-            rows = _format_rate_limit_events(events, user_timezone)
-
-            return {"rowData": rows, "rowCount": total}, table_state or {}, total
-
-        except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error refreshing rate limit events: {exc}")
-            return {"rowData": [], "rowCount": 0}, table_state or {}, 0
+        return response, new_state, total
 
     @app.callback(
-        Output("rate-limit-events-total-count", "children"),
-        Input("rate-limit-events-total-count-store", "data"),
+        Output("rate-limit-breaches-total-count", "children"),
+        Input("rate-limit-breaches-total-count-store", "data"),
         prevent_initial_call=False,
     )
-    def update_rate_limit_events_total_display(total_count):
-        """Update the displayed total for the rate limit events table."""
+    def update_rate_limit_breaches_total_display(total_count):
+        """Display the combined total for active and historical rate limit entries."""
 
         try:
             numeric = int(total_count)
@@ -1109,104 +1139,89 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("reset-individual-rate-limit-modal", "is_open"),
             Output("selected-rate-limit-data", "data"),
+            Output("reset-selected-rate-limit-btn", "disabled"),
+        ],
+        Input("rate-limit-breaches-table", "selectedRows"),
+        State("role-store", "data"),
+        prevent_initial_call=False,
+    )
+    def update_selected_rate_limit(selected_rows, role):
+        """Persist selected row data and enable reset when appropriate."""
+
+        if role != "SUPERADMIN":
+            return None, True
+
+        if not selected_rows:
+            return None, True
+
+        row = selected_rows[0]
+        if not row or not row.get("cancel_allowed"):
+            return None, True
+
+        return row, False
+
+    @app.callback(
+        [
+            Output("reset-individual-rate-limit-modal", "is_open"),
             Output("individual-rate-limit-details", "children"),
         ],
         [
-            Input({"type": "reset-rate-limit-btn", "index": ALL}, "n_clicks"),
+            Input("reset-selected-rate-limit-btn", "n_clicks"),
             Input("cancel-reset-individual-rate-limit", "n_clicks"),
         ],
         [
-            State("rate-limit-status", "children"),
-            State("token-store", "data"),
+            State("selected-rate-limit-data", "data"),
             State("role-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def open_reset_individual_rate_limit_modal(
-        _reset_clicks_list, _cancel_clicks, _status, token, role
-    ):
-        """Handle opening the individual rate limit reset modal."""
-        if not token or role != "SUPERADMIN":
-            return False, None, []
+    def open_reset_individual_rate_limit_modal(reset_clicks, _cancel_clicks, selected_row, role):
+        """Open the confirmation modal for cancelling an active rate limit."""
 
         ctx = callback_context
         if not ctx.triggered:
-            return False, None, []
+            return no_update, no_update
 
-        button_id = ctx.triggered[0]["prop_id"]
+        trigger = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        # If cancel button was clicked, close modal
-        if "cancel-reset-individual-rate-limit" in button_id:
-            return False, None, []
+        if trigger == "cancel-reset-individual-rate-limit" or role != "SUPERADMIN":
+            return False, no_update
 
-        # If a reset button was clicked, open modal with rate limit details
-        if "reset-rate-limit-btn" in button_id:
-            # Parse the button ID to get the index
-            try:
-                import json
+        if trigger != "reset-selected-rate-limit-btn" or not reset_clicks:
+            return no_update, no_update
 
-                button_data = json.loads(button_id.split(".")[0])
-                idx = button_data.get("index")
+        if not selected_row or not selected_row.get("limit_key"):
+            details = [
+                dbc.Alert(
+                    [
+                        html.I(className="fas fa-info-circle me-2"),
+                        "Select an active rate limit row to cancel.",
+                    ],
+                    color="warning",
+                    className="mb-0",
+                )
+            ]
+            return True, details
 
-                # Fetch current rate limit status to get the details
-                resp = make_authenticated_request("/rate-limit/status", token, method="GET")
+        details = html.Dl(
+            [
+                html.Dt("Identifier:", className="fw-bold"),
+                html.Dd(selected_row.get("identifier_display", "-")),
+                html.Dt("Type:", className="fw-bold"),
+                html.Dd(selected_row.get("rate_limit_type", "-")),
+                html.Dt("Usage:", className="fw-bold"),
+                html.Dd(selected_row.get("limit_count_display", "-")),
+                html.Dt("Limit Rule:", className="fw-bold"),
+                html.Dd(selected_row.get("limit_definition", "-")),
+                html.Dt("First Seen:", className="fw-bold"),
+                html.Dd(selected_row.get("occurred_at", "-")),
+                html.Dt("Expires:", className="fw-bold"),
+                html.Dd(selected_row.get("expires_at_display", "-")),
+            ]
+        )
 
-                if resp.status_code == 200:
-                    payload = resp.json()
-                    data = payload.get("data", {})
-                    active_limits = data.get("active_limits", [])
-
-                    if idx is not None and 0 <= idx < len(active_limits):
-                        limit = active_limits[idx]
-
-                        # Get user info if available
-                        user_info = limit.get("user_info", {})
-                        identifier_display = limit.get("identifier", "Unknown")
-                        limit_key = limit.get("key", "")
-
-                        # Format identifier with user info if available
-                        if user_info:
-                            user_name = user_info.get("name", "")
-                            user_email = user_info.get("email", "")
-                            if user_name and user_email:
-                                identifier_display = f"{user_name} ({user_email})"
-                            elif user_email:
-                                identifier_display = user_email
-
-                        # Format time window
-                        time_window = limit.get("time_window_seconds", 0)
-                        if time_window >= 3600:
-                            time_display = f"{time_window // 3600} hour(s)"
-                        elif time_window >= 60:
-                            time_display = f"{time_window // 60} minute(s)"
-                        else:
-                            time_display = f"{time_window} second(s)"
-
-                        # Create details display
-                        details = [
-                            html.Dl(
-                                [
-                                    html.Dt("Type:", className="fw-bold"),
-                                    html.Dd(limit.get("type", "").title()),
-                                    html.Dt("Identifier:", className="fw-bold"),
-                                    html.Dd(identifier_display),
-                                    html.Dt("Current Usage:", className="fw-bold"),
-                                    html.Dd(
-                                        f"{limit.get('current_count', 0)} requests in {time_display}"
-                                    ),
-                                ],
-                                className="mb-0",
-                            )
-                        ]
-
-                        return True, {"key": limit_key, "identifier": identifier_display}, details
-
-            except Exception as e:
-                print(f"Error opening reset modal: {e}")
-
-        return False, None, []
+        return True, [details]
 
     @app.callback(
         [
@@ -1214,23 +1229,35 @@ def register_callbacks(app):
             Output("admin-reset-rate-limits-alert", "color", allow_duplicate=True),
             Output("admin-reset-rate-limits-alert", "is_open", allow_duplicate=True),
             Output("reset-individual-rate-limit-modal", "is_open", allow_duplicate=True),
-            Output("refresh-rate-limit-status-btn", "n_clicks"),
+            Output("rate-limit-breaches-table", "getRowsResponse", allow_duplicate=True),
+            Output("rate-limit-breaches-table-state", "data", allow_duplicate=True),
+            Output("rate-limit-breaches-total-count-store", "data", allow_duplicate=True),
+            Output("selected-rate-limit-data", "data", allow_duplicate=True),
         ],
         [Input("confirm-reset-individual-rate-limit", "n_clicks")],
         [
             State("selected-rate-limit-data", "data"),
             State("token-store", "data"),
             State("role-store", "data"),
+            State("rate-limit-breaches-table-state", "data"),
+            State("user-timezone-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def reset_individual_rate_limit(confirm_clicks, rate_limit_data, token, role):
+    def reset_individual_rate_limit(
+        confirm_clicks,
+        rate_limit_data,
+        token,
+        role,
+        table_state,
+        user_timezone,
+    ):
         """Reset a specific rate limit via API call."""
         if not confirm_clicks or not token or role != "SUPERADMIN" or not rate_limit_data:
-            return no_update, no_update, no_update, no_update, no_update
+            return (no_update,) * 8
 
-        limit_key = rate_limit_data.get("key")
-        identifier_display = rate_limit_data.get("identifier", "")
+        limit_key = rate_limit_data.get("limit_key")
+        identifier_display = rate_limit_data.get("identifier_display", "")
 
         if not limit_key:
             return (
@@ -1242,6 +1269,10 @@ def register_callbacks(app):
                 True,
                 False,
                 no_update,
+                no_update,
+                no_update,
+                no_update,
+                rate_limit_data,
             )
 
         try:
@@ -1249,6 +1280,25 @@ def register_callbacks(app):
             resp = make_authenticated_request(
                 f"/rate-limit/reset/{limit_key}", token, method="POST", json={}
             )
+
+            should_refresh_grid = resp.status_code in (200, 404)
+            grid_response = no_update
+            new_table_state = no_update
+            new_total = no_update
+
+            if should_refresh_grid:
+                request = {
+                    "startRow": 0,
+                    "endRow": (table_state or {}).get("page_size", DEFAULT_PAGE_SIZE),
+                    "sortModel": (table_state or {}).get("sort_model"),
+                }
+                grid_response, new_table_state, new_total = _query_rate_limit_breaches(
+                    request,
+                    token,
+                    role,
+                    user_timezone,
+                    stored_state=table_state or {},
+                )
 
             if resp.status_code == 200:
                 return (
@@ -1259,7 +1309,10 @@ def register_callbacks(app):
                     "success",
                     True,
                     False,
-                    1,  # Trigger refresh
+                    grid_response,
+                    new_table_state,
+                    new_total,
+                    None,
                 )
             elif resp.status_code == 404:
                 return (
@@ -1270,7 +1323,10 @@ def register_callbacks(app):
                     "info",
                     True,
                     False,
-                    1,  # Trigger refresh
+                    grid_response,
+                    new_table_state,
+                    new_total,
+                    None,
                 )
             else:
                 error_msg = f"Failed to reset rate limit. Status: {resp.status_code}"
@@ -1290,6 +1346,9 @@ def register_callbacks(app):
                     True,
                     False,
                     no_update,
+                    no_update,
+                    no_update,
+                    rate_limit_data,
                 )
 
         except Exception as e:
@@ -1302,4 +1361,7 @@ def register_callbacks(app):
                 True,
                 False,
                 no_update,
+                no_update,
+                no_update,
+                rate_limit_data,
             )

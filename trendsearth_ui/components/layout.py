@@ -59,16 +59,16 @@ def create_main_layout():
                 id="scripts-table-state"
             ),  # Store current sort/filter state for scripts table
             dcc.Store(
-                id="rate-limit-events-table-state"
-            ),  # Store current sort/filter state for rate limit events
+                id="rate-limit-breaches-table-state"
+            ),  # Store current sort/filter state for rate limit breaches
             dcc.Store(
                 id="executions-total-count-store", data=0
             ),  # Store total count for executions
             dcc.Store(id="users-total-count-store", data=0),  # Store total count for users
             dcc.Store(id="scripts-total-count-store", data=0),  # Store total count for scripts
             dcc.Store(
-                id="rate-limit-events-total-count-store", data=0
-            ),  # Store total count for rate limit events
+                id="rate-limit-breaches-total-count-store", data=0
+            ),  # Store total count for rate limit breaches
             dcc.Store(id="active-tab-store", data="executions"),
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted

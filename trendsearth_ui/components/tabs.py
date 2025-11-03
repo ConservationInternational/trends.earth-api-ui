@@ -1338,170 +1338,99 @@ def admin_tab_content(role, is_admin):
                                     # Rate Limiting Status Summary
                                     html.Div(
                                         [
-                                            html.H5("System Status", className="mb-3"),
-                                            dbc.Row(
-                                                [
-                                                    dbc.Col(
-                                                        [
-                                                            dbc.Card(
-                                                                [
-                                                                    dbc.CardBody(
-                                                                        [
-                                                                            html.H6(
-                                                                                "Rate Limiting",
-                                                                                className="card-title",
-                                                                            ),
-                                                                            html.H4(
-                                                                                id="rate-limit-status",
-                                                                                children="Loading...",
-                                                                                className="text-primary",
-                                                                            ),
-                                                                        ]
-                                                                    )
-                                                                ],
-                                                                className="text-center",
-                                                            )
-                                                        ],
-                                                        width=3,
-                                                    ),
-                                                    dbc.Col(
-                                                        [
-                                                            dbc.Card(
-                                                                [
-                                                                    dbc.CardBody(
-                                                                        [
-                                                                            html.H6(
-                                                                                "Storage Type",
-                                                                                className="card-title",
-                                                                            ),
-                                                                            html.H4(
-                                                                                id="rate-limit-storage",
-                                                                                children="Loading...",
-                                                                                className="text-info",
-                                                                            ),
-                                                                        ]
-                                                                    )
-                                                                ],
-                                                                className="text-center",
-                                                            )
-                                                        ],
-                                                        width=3,
-                                                    ),
-                                                    dbc.Col(
-                                                        [
-                                                            dbc.Card(
-                                                                [
-                                                                    dbc.CardBody(
-                                                                        [
-                                                                            html.H6(
-                                                                                "Active Limits",
-                                                                                className="card-title",
-                                                                            ),
-                                                                            html.H4(
-                                                                                id="rate-limit-count",
-                                                                                children="0",
-                                                                                className="text-warning",
-                                                                            ),
-                                                                        ]
-                                                                    )
-                                                                ],
-                                                                className="text-center",
-                                                            )
-                                                        ],
-                                                        width=3,
-                                                    ),
-                                                    dbc.Col(
-                                                        [
-                                                            dbc.Button(
-                                                                [
-                                                                    html.I(
-                                                                        className="fas fa-refresh me-2"
-                                                                    ),
-                                                                    "Refresh Status",
-                                                                ],
-                                                                id="refresh-rate-limit-status-btn",
-                                                                color="outline-primary",
-                                                                className="w-100",
-                                                            ),
-                                                        ],
-                                                        width=3,
-                                                    ),
-                                                ],
-                                                className="mb-4",
-                                            ),
-                                        ]
-                                    ),
-                                    # Active Rate Limits Table
-                                    html.Div(
-                                        [
-                                            html.H5("Active Rate Limits", className="mb-3"),
-                                            html.Div(
-                                                id="rate-limits-table-container",
-                                                children=[
-                                                    html.Div(
-                                                        [
-                                                            html.I(
-                                                                className="fas fa-spinner fa-spin me-2"
-                                                            ),
-                                                            "Loading active rate limits...",
-                                                        ],
-                                                        className="text-center text-muted p-4",
-                                                    )
-                                                ],
-                                            ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    html.Div(
-                                        [
                                             html.H5(
-                                                "Recent Rate Limit Breaches",
+                                                "Current & Historical Rate Limit Breaches",
                                                 className="mb-3",
                                             ),
                                             dbc.Row(
                                                 [
                                                     dbc.Col(
-                                                        [
-                                                            dbc.Button(
-                                                                [
-                                                                    html.I(
-                                                                        className="fas fa-sync-alt me-2"
-                                                                    ),
-                                                                    "Refresh Breach History",
-                                                                ],
-                                                                id="refresh-rate-limit-events-btn",
-                                                                color="outline-secondary",
-                                                                className="mb-2",
-                                                            )
-                                                        ],
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-sync-alt me-2"
+                                                                ),
+                                                                "Refresh Breaches",
+                                                            ],
+                                                            id="refresh-rate-limit-breaches-btn",
+                                                            color="outline-secondary",
+                                                            className="mb-2",
+                                                        ),
                                                         width="auto",
                                                     ),
                                                     dbc.Col(
-                                                        [
-                                                            html.Div(
-                                                                [
-                                                                    html.Span(
-                                                                        id="rate-limit-events-total-count",
-                                                                        children="Total: 0",
-                                                                        className="text-muted fw-bold",
-                                                                    ),
-                                                                    html.Span(
-                                                                        " · Last 24 hours",
-                                                                        className="text-muted ms-2",
-                                                                    ),
-                                                                ],
-                                                                className="d-flex align-items-center justify-content-end",
-                                                            )
-                                                        ],
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-undo me-2"
+                                                                ),
+                                                                "Cancel Selected Limit",
+                                                            ],
+                                                            id="reset-selected-rate-limit-btn",
+                                                            color="warning",
+                                                            outline=True,
+                                                            className="mb-2",
+                                                            disabled=role != "SUPERADMIN",
+                                                            style={
+                                                                "display": "inline-flex"
+                                                                if role == "SUPERADMIN"
+                                                                else "none"
+                                                            },
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        html.Div(
+                                                            [
+                                                                html.Span(
+                                                                    id="rate-limit-breaches-total-count",
+                                                                    children="Total: 0",
+                                                                    className="text-muted fw-bold",
+                                                                ),
+                                                                html.Span(
+                                                                    " · Active + last 24 hours",
+                                                                    className="text-muted ms-2",
+                                                                ),
+                                                            ],
+                                                            className="d-flex align-items-center justify-content-end",
+                                                        ),
                                                         width=True,
                                                     ),
                                                 ],
-                                                className="mb-3",
+                                                className="align-items-center mb-3 g-2",
                                             ),
                                             create_responsive_table(
-                                                table_id="rate-limit-events-table",
-                                                table_type="rate_limit_events",
-                                                height="500px",
+                                                table_id="rate-limit-breaches-table",
+                                                table_type="rate_limit_breaches",
+                                                height="520px",
+                                                style_data_conditional=[
+                                                    {
+                                                        "condition": "params.data && params.data.is_active",
+                                                        "style": {
+                                                            "backgroundColor": "#fff4e0",
+                                                        },
+                                                    },
+                                                    {
+                                                        "condition": "params.node && params.node.isSelected()",
+                                                        "style": {
+                                                            "boxShadow": "inset 0 0 0 2px #fd7e14",
+                                                        },
+                                                    },
+                                                ],
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.Span(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-circle text-warning me-2",
+                                                            ),
+                                                            "Highlighted rows are active and can be cancelled individually.",
+                                                        ],
+                                                        className="text-muted small",
+                                                    ),
+                                                ],
+                                                className="mt-2",
                                             ),
                                         ],
                                         className="mb-4",
