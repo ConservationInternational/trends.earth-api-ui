@@ -12,6 +12,7 @@ from ..utils.aggrid import build_sort_clause, build_table_state
 from ..utils.helpers import make_authenticated_request, parse_date
 
 RATE_LIMIT_EVENTS_ENDPOINT = "/rate-limit/events"
+MAX_RATE_LIMIT_EVENT_PAGE_SIZE = 500
 
 
 def _format_duration_label(value: Any) -> str:
@@ -279,10 +280,22 @@ def _query_rate_limit_breaches(
         end_row = None
 
     default_block = stored_state.get("page_size") or DEFAULT_PAGE_SIZE
+    if not isinstance(default_block, int) or default_block <= 0:
+        default_block = DEFAULT_PAGE_SIZE
+
     if end_row is None or end_row <= start_row:
         end_row = start_row + max(default_block, DEFAULT_PAGE_SIZE)
 
-    page_size = max(end_row - start_row, 1)
+    requested_block = max(end_row - start_row, 0)
+
+    if start_row == 0:
+        desired_block = max(default_block, DEFAULT_PAGE_SIZE)
+        desired_block = min(desired_block, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
+        if requested_block < desired_block:
+            end_row = start_row + desired_block
+            requested_block = desired_block
+
+    page_size = max(requested_block, 1)
 
     sort_model = request_data.get("sortModel")
     if sort_model is None:
@@ -307,7 +320,8 @@ def _query_rate_limit_breaches(
     fetch_historical = hist_needed > 0 or start_row == 0
 
     if fetch_historical:
-        per_page = max(DEFAULT_PAGE_SIZE, hist_needed, 1)
+        per_page = max(DEFAULT_PAGE_SIZE, hist_needed, page_size, 1)
+        per_page = min(per_page, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
         initial_page = (hist_start_row // per_page) + 1 if hist_needed > 0 else 1
         current_page = initial_page
         offset = hist_start_row % per_page if hist_needed > 0 else 0
