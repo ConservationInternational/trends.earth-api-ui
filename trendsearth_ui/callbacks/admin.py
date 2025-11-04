@@ -12,7 +12,6 @@ from ..utils.aggrid import build_sort_clause, build_table_state
 from ..utils.helpers import make_authenticated_request, parse_date
 
 RATE_LIMIT_EVENTS_ENDPOINT = "/rate-limit/events"
-RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS = 24
 
 
 def _format_duration_label(value: Any) -> str:
@@ -316,7 +315,6 @@ def _query_rate_limit_breaches(
 
         while True:
             params = {
-                "since_hours": RATE_LIMIT_EVENTS_DEFAULT_SINCE_HOURS,
                 "page": current_page,
                 "per_page": per_page,
             }

@@ -1388,7 +1388,7 @@ def admin_tab_content(role, is_admin):
                                                                     className="text-muted fw-bold",
                                                                 ),
                                                                 html.Span(
-                                                                    " · Active + last 24 hours",
+                                                                    " · Active and historical events",
                                                                     className="text-muted ms-2",
                                                                 ),
                                                             ],
