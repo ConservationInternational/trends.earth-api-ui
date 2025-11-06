@@ -371,6 +371,10 @@ def _query_rate_limit_breaches(
     else:
         requested_block = end_row - start_row
 
+    if start_row == 0 and requested_block < default_block:
+        requested_block = max(default_block, DEFAULT_PAGE_SIZE)
+        end_row = start_row + requested_block
+
     requested_block = max(requested_block, 1)
     page_size = max(requested_block, default_block, DEFAULT_PAGE_SIZE)
     page_size = min(page_size, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
@@ -431,6 +435,14 @@ def _query_rate_limit_breaches(
 
         data_section = payload.get("data") if isinstance(payload, dict) else payload
         events_page_raw, total_candidate = _extract_rate_limit_events(data_section)
+        print(
+            "[rate-limit-table] fetched",
+            len(events_page_raw),
+            "events (raw) with params",
+            params,
+            "total_candidate=",
+            total_candidate,
+        )
 
         if total_candidate is not None:
             total_row_count = (
@@ -511,13 +523,26 @@ def _query_rate_limit_breaches(
         is_first_page = False
 
     rows = _format_combined_rate_limit_rows(combined_events, user_timezone)
+    print(
+        "[rate-limit-table] combined_events=",
+        len(combined_events),
+        "formatted_rows=",
+        len(rows),
+        "start_row=",
+        start_row,
+    )
+
+    produced_rows = len(rows)
+    minimal_total = start_row + produced_rows
 
     if total_row_count is None:
-        base_count = start_row + len(rows)
         if remaining_needed <= 0 and last_raw_count == page_size:
-            total_row_count = base_count + page_size
+            total_row_count = minimal_total + page_size
         else:
-            total_row_count = base_count
+            total_row_count = minimal_total
+    else:
+        if total_row_count < minimal_total:
+            total_row_count = minimal_total
 
     if total_row_count and start_row >= total_row_count:
         return {"rowData": [], "rowCount": total_row_count}, table_state, total_row_count
