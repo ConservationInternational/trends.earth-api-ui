@@ -1139,6 +1139,151 @@ def admin_tab_content(role, is_admin):
                     )
                 ]
             ),
+            # Rate Limiting Management Section (ADMIN and SUPERADMIN)
+            *(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4(
+                                    [
+                                        html.I(className="fas fa-tachometer-alt me-2"),
+                                        "Rate Limiting Management",
+                                    ]
+                                )
+                            ),
+                            dbc.CardBody(
+                                [
+                                    # Rate Limiting Status Summary
+                                    html.Div(
+                                        [
+                                            html.H5(
+                                                "Current & Historical Rate Limit Breaches",
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-sync-alt me-2"
+                                                                ),
+                                                                "Refresh Breaches",
+                                                            ],
+                                                            id="refresh-rate-limit-breaches-btn",
+                                                            color="outline-secondary",
+                                                            className="mb-2",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-undo me-2"
+                                                                ),
+                                                                "Cancel Selected Limit",
+                                                            ],
+                                                            id="reset-selected-rate-limit-btn",
+                                                            color="warning",
+                                                            outline=True,
+                                                            className="mb-2",
+                                                            disabled=role != "SUPERADMIN",
+                                                            style={
+                                                                "display": "inline-flex"
+                                                                if role == "SUPERADMIN"
+                                                                else "none"
+                                                            },
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-refresh me-2"
+                                                                ),
+                                                                "Reset All Rate Limits",
+                                                            ],
+                                                            id="admin-reset-rate-limits-btn",
+                                                            color="warning",
+                                                            className="mb-2",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        html.Div(
+                                                            [
+                                                                html.Span(
+                                                                    id="rate-limit-breaches-total-count",
+                                                                    children="Total: 0",
+                                                                    className="text-muted fw-bold",
+                                                                ),
+                                                                html.Span(
+                                                                    " · Active and historical events",
+                                                                    className="text-muted ms-2",
+                                                                ),
+                                                            ],
+                                                            className="d-flex align-items-center justify-content-end",
+                                                        ),
+                                                        width=True,
+                                                    ),
+                                                ],
+                                                className="align-items-center mb-3 g-2",
+                                            ),
+                                            create_responsive_table(
+                                                table_id="rate-limit-breaches-table",
+                                                table_type="rate_limit_breaches",
+                                                height="520px",
+                                                style_data_conditional=[
+                                                    {
+                                                        "condition": "params.data && params.data.is_active",
+                                                        "style": {
+                                                            "backgroundColor": "#fff4e0",
+                                                        },
+                                                    },
+                                                    {
+                                                        "condition": "params.node && params.node.isSelected()",
+                                                        "style": {
+                                                            "boxShadow": "inset 0 0 0 2px #fd7e14",
+                                                        },
+                                                    },
+                                                ],
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.Span(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-circle text-warning me-2",
+                                                            ),
+                                                            "Highlighted rows are active and can be cancelled individually.",
+                                                        ],
+                                                        className="text-muted small",
+                                                    ),
+                                                ],
+                                                className="mt-2",
+                                            ),
+                                            dbc.Alert(
+                                                id="admin-reset-rate-limits-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=5000,
+                                                className="mt-3",
+                                            ),
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                ]
+                            ),
+                        ],
+                        className="mb-4",
+                    ),
+                ]
+                if role in ("ADMIN", "SUPERADMIN")
+                else []
+            ),
             # Create New User Section (SUPERADMIN only)
             *(
                 [
@@ -1318,152 +1463,6 @@ def admin_tab_content(role, is_admin):
                     )
                 ]
                 if role == "SUPERADMIN"
-                else []
-            ),
-            # Rate Limiting Management Section (ADMIN and SUPERADMIN)
-            *(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardHeader(
-                                html.H4(
-                                    [
-                                        html.I(className="fas fa-tachometer-alt me-2"),
-                                        "Rate Limiting Management",
-                                    ]
-                                )
-                            ),
-                            dbc.CardBody(
-                                [
-                                    # Rate Limiting Status Summary
-                                    html.Div(
-                                        [
-                                            html.H5(
-                                                "Current & Historical Rate Limit Breaches",
-                                                className="mb-3",
-                                            ),
-                                            dbc.Row(
-                                                [
-                                                    dbc.Col(
-                                                        dbc.Button(
-                                                            [
-                                                                html.I(
-                                                                    className="fas fa-sync-alt me-2"
-                                                                ),
-                                                                "Refresh Breaches",
-                                                            ],
-                                                            id="refresh-rate-limit-breaches-btn",
-                                                            color="outline-secondary",
-                                                            className="mb-2",
-                                                        ),
-                                                        width="auto",
-                                                    ),
-                                                    dbc.Col(
-                                                        dbc.Button(
-                                                            [
-                                                                html.I(
-                                                                    className="fas fa-undo me-2"
-                                                                ),
-                                                                "Cancel Selected Limit",
-                                                            ],
-                                                            id="reset-selected-rate-limit-btn",
-                                                            color="warning",
-                                                            outline=True,
-                                                            className="mb-2",
-                                                            disabled=role != "SUPERADMIN",
-                                                            style={
-                                                                "display": "inline-flex"
-                                                                if role == "SUPERADMIN"
-                                                                else "none"
-                                                            },
-                                                        ),
-                                                        width="auto",
-                                                    ),
-                                                    dbc.Col(
-                                                        html.Div(
-                                                            [
-                                                                html.Span(
-                                                                    id="rate-limit-breaches-total-count",
-                                                                    children="Total: 0",
-                                                                    className="text-muted fw-bold",
-                                                                ),
-                                                                html.Span(
-                                                                    " · Active and historical events",
-                                                                    className="text-muted ms-2",
-                                                                ),
-                                                            ],
-                                                            className="d-flex align-items-center justify-content-end",
-                                                        ),
-                                                        width=True,
-                                                    ),
-                                                ],
-                                                className="align-items-center mb-3 g-2",
-                                            ),
-                                            create_responsive_table(
-                                                table_id="rate-limit-breaches-table",
-                                                table_type="rate_limit_breaches",
-                                                height="520px",
-                                                style_data_conditional=[
-                                                    {
-                                                        "condition": "params.data && params.data.is_active",
-                                                        "style": {
-                                                            "backgroundColor": "#fff4e0",
-                                                        },
-                                                    },
-                                                    {
-                                                        "condition": "params.node && params.node.isSelected()",
-                                                        "style": {
-                                                            "boxShadow": "inset 0 0 0 2px #fd7e14",
-                                                        },
-                                                    },
-                                                ],
-                                            ),
-                                            html.Div(
-                                                [
-                                                    html.Span(
-                                                        [
-                                                            html.I(
-                                                                className="fas fa-circle text-warning me-2",
-                                                            ),
-                                                            "Highlighted rows are active and can be cancelled individually.",
-                                                        ],
-                                                        className="text-muted small",
-                                                    ),
-                                                ],
-                                                className="mt-2",
-                                            ),
-                                        ],
-                                        className="mb-4",
-                                    ),
-                                    # Reset Rate Limits Section
-                                    html.Hr(),
-                                    html.H5("Reset Rate Limits", className="mb-3"),
-                                    html.P(
-                                        "Reset all rate limits for the API. This will clear all rate limiting restrictions for all users and endpoints.",
-                                        className="mb-3",
-                                    ),
-                                    dbc.Button(
-                                        [
-                                            html.I(className="fas fa-refresh me-2"),
-                                            "Reset All Rate Limits",
-                                        ],
-                                        id="admin-reset-rate-limits-btn",
-                                        color="warning",
-                                        className="me-2",
-                                    ),
-                                    dbc.Alert(
-                                        id="admin-reset-rate-limits-alert",
-                                        is_open=False,
-                                        dismissable=True,
-                                        duration=5000,
-                                    ),
-                                ]
-                            ),
-                        ],
-                        className="mb-4",
-                    ),
-                ]
-                if role in ("ADMIN", "SUPERADMIN")
                 else []
             ),
             # Upload New Script Section
