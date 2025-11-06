@@ -435,14 +435,6 @@ def _query_rate_limit_breaches(
 
         data_section = payload.get("data") if isinstance(payload, dict) else payload
         events_page_raw, total_candidate = _extract_rate_limit_events(data_section)
-        print(
-            "[rate-limit-table] fetched",
-            len(events_page_raw),
-            "events (raw) with params",
-            params,
-            "total_candidate=",
-            total_candidate,
-        )
 
         if total_candidate is not None:
             total_row_count = (
@@ -523,14 +515,6 @@ def _query_rate_limit_breaches(
         is_first_page = False
 
     rows = _format_combined_rate_limit_rows(combined_events, user_timezone)
-    print(
-        "[rate-limit-table] combined_events=",
-        len(combined_events),
-        "formatted_rows=",
-        len(rows),
-        "start_row=",
-        start_row,
-    )
 
     produced_rows = len(rows)
     minimal_total = start_row + produced_rows
