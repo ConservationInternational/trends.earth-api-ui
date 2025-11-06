@@ -1,6 +1,7 @@
 """Admin functionality callbacks."""
 
 import base64
+from datetime import datetime, timezone
 from typing import Any
 
 from dash import Input, Output, State, callback_context, html, no_update
@@ -62,15 +63,19 @@ def _format_rate_limit_events(
     if not events:
         return []
 
-    timezone = user_timezone or "UTC"
+    resolved_timezone = user_timezone or "UTC"
     rows: list[dict[str, Any]] = []
 
     for event in events:
         event = dict(event)
-        event["occurred_at"] = parse_date(event.get("occurred_at"), timezone)
+        occurred_display = parse_date(event.get("occurred_at"), resolved_timezone)
+        event["occurred_at"] = occurred_display or "-"
+        expires_display = parse_date(event.get("expires_at"), resolved_timezone)
+        event["expires_at_display"] = expires_display or "-"
         event["time_window_display"] = _format_duration_label(event.get("time_window_seconds"))
         event["retry_after_display"] = _format_duration_label(event.get("retry_after_seconds"))
         event["limit_count_display"] = _format_limit_count(event.get("limit_count"))
+        event["current_count_display"] = _format_limit_count(event.get("current_count"))
         rows.append(event)
 
     return rows
@@ -87,168 +92,245 @@ def _normalise_rate_limit_type(value: Any) -> str:
     return text.replace("_", " ").title()
 
 
-def _fetch_rate_limit_status_data(token: str | None) -> dict[str, Any] | None:
-    """Safely fetch rate limit status information from the API."""
+def _parse_iso_datetime(value: Any) -> datetime | None:
+    """Safely parse ISO formatted timestamps into aware datetimes."""
 
-    if not token:
+    if value in (None, ""):
         return None
+
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+
+    text = str(value)
+    if not text:
+        return None
+
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
 
     try:
-        response = make_authenticated_request("/rate-limit/status", token, method="GET")
-    except Exception as exc:  # pragma: no cover - defensive guard
-        print(f"Error fetching rate limit status data: {exc}")
-        return None
-
-    if response.status_code != 200:
-        return None
-
-    try:
-        payload = response.json()
+        parsed = datetime.fromisoformat(text)
     except ValueError:
         return None
 
-    data = payload.get("data") if isinstance(payload, dict) else None
-    return data if isinstance(data, dict) else None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
 
 
-def _format_active_limits_for_table(
-    active_limits: list[dict[str, Any]] | None,
+def _format_combined_rate_limit_rows(
+    events: list[dict[str, Any]] | None,
     user_timezone: str | None,
 ) -> list[dict[str, Any]]:
-    """Transform active rate limits into rows compatible with the unified table."""
+    """Transform rate limit events (active + historical) for the unified table."""
 
-    if not active_limits:
+    if not events:
         return []
 
-    timezone = user_timezone or "UTC"
+    formatted_events = _format_rate_limit_events(events, user_timezone)
+    now_utc = datetime.now(timezone.utc)
+    timezone_label = user_timezone or "UTC"
     rows: list[dict[str, Any]] = []
 
-    for idx, raw_limit in enumerate(active_limits):
-        limit = dict(raw_limit or {})
+    for idx, raw_event in enumerate(formatted_events):
+        event = dict(raw_event or {})
 
-        key = limit.get("key") or limit.get("identifier") or f"active-{idx}"
-        user_info = limit.get("user_info") or {}
-        user_name = (user_info.get("name") or "").strip()
-        user_email = (user_info.get("email") or "").strip()
-        identifier = (limit.get("identifier") or "").strip()
+        is_active = bool(event.get("is_active"))
+        status_value = event.get("status") or event.get("state")
+        if isinstance(status_value, str):
+            is_active = status_value.strip().lower() == "active"
+        else:
+            active_flag = event.get("active")
+            if isinstance(active_flag, bool):
+                is_active = active_flag
+            elif active_flag not in (None, ""):
+                try:
+                    is_active = bool(int(active_flag))
+                except (TypeError, ValueError):
+                    is_active = bool(active_flag)
 
-        identifier_candidates = [
-            f"{user_name} ({user_email})" if user_name and user_email else None,
-            user_email or None,
-            user_name or None,
-            identifier or None,
-            key,
-        ]
-        identifier_display = next((value for value in identifier_candidates if value), "Unknown")
+        if not is_active:
+            expires_dt = _parse_iso_datetime(event.get("expires_at"))
+            if expires_dt and expires_dt > now_utc:
+                is_active = True
 
-        ip_address = limit.get("ip_address") or (
-            identifier if identifier and "@" not in identifier else "-"
+        expires_display = event.get("expires_at_display") if is_active else "-"
+        if is_active and (not expires_display or expires_display == "-"):
+            expires_display = parse_date(event.get("expires_at"), timezone_label) or "-"
+
+        user_info_raw = event.get("user_info")
+        user_info = user_info_raw if isinstance(user_info_raw, dict) else {}
+        user_name = (user_info.get("name") or event.get("user_name") or "").strip()
+        user_email = (event.get("user_email") or user_info.get("email") or "").strip()
+
+        identifier_candidates: list[str] = []
+        if user_name and user_email:
+            identifier_candidates.append(f"{user_name} ({user_email})")
+
+        for candidate in (
+            event.get("identifier"),
+            user_email,
+            user_name,
+            event.get("ip_address"),
+            event.get("limit_key"),
+        ):
+            if candidate:
+                identifier_candidates.append(str(candidate))
+
+        identifier_display = identifier_candidates[0] if identifier_candidates else "-"
+
+        current_display = event.get("current_count_display") or _format_limit_count(
+            event.get("current_count")
+        )
+        limit_total_display = event.get("limit_count_display") or _format_limit_count(
+            event.get("limit_count")
         )
 
-        occurred_at = parse_date(limit.get("occurred_at"), timezone) or "-"
-        expires_at = parse_date(limit.get("expires_at"), timezone) or "-"
+        if current_display in (None, ""):
+            current_display = "-"
+        if limit_total_display in (None, ""):
+            limit_total_display = "-"
 
-        current_display = _format_limit_count(limit.get("current_count"))
-        limit_cap_value = limit.get("limit") or limit.get("limit_count")
-        limit_cap_display = _format_limit_count(limit_cap_value)
-
-        if limit_cap_display not in ("-", "0") and current_display not in ("-", "0"):
-            usage_display = f"{current_display} / {limit_cap_display}"
-        elif limit_cap_display not in ("-", "0"):
+        if limit_total_display not in ("-", "0") and current_display not in ("-", "0"):
+            usage_display = f"{current_display} / {limit_total_display}"
+        elif limit_total_display not in ("-", "0"):
             usage_display = (
-                f"{current_display} / {limit_cap_display}"
+                f"{current_display} / {limit_total_display}"
                 if current_display != "-"
-                else limit_cap_display
+                else limit_total_display
             )
         else:
             usage_display = current_display
 
-        time_window_display = _format_duration_label(limit.get("time_window_seconds"))
-        retry_after_display = _format_duration_label(limit.get("retry_after_seconds"))
+        time_window_display = event.get("time_window_display") or _format_duration_label(
+            event.get("time_window_seconds")
+        )
+        retry_after_display = event.get("retry_after_display") or _format_duration_label(
+            event.get("retry_after_seconds")
+        )
 
-        limit_definition = limit.get("limit_definition")
+        limit_definition = event.get("limit_definition")
         if not limit_definition:
-            if limit_cap_display != "-" and time_window_display != "-":
-                limit_definition = f"{limit_cap_display} per {time_window_display}"
-            elif limit_cap_display != "-":
-                limit_definition = limit_cap_display
+            if limit_total_display not in ("-", "0") and time_window_display != "-":
+                limit_definition = f"{limit_total_display} per {time_window_display}"
+            elif limit_total_display not in ("-", "0"):
+                limit_definition = limit_total_display
             else:
                 limit_definition = "-"
 
+        raw_id = event.get("id") or event.get("limit_key") or event.get("identifier")
+        if raw_id in (None, ""):
+            raw_id = f"event-{idx}"
+
+        row_id = str(raw_id)
+
         rows.append(
             {
-                "id": f"active:{key}",
-                "is_active": True,
-                "status_display": "Active",
-                "occurred_at": occurred_at,
-                "expires_at_display": expires_at,
+                "id": f"{'active' if is_active else 'event'}:{row_id}",
+                "is_active": is_active,
+                "status_display": "Active" if is_active else "Historical",
+                "occurred_at": event.get("occurred_at") or "-",
+                "expires_at_display": expires_display,
                 "identifier_display": identifier_display,
                 "user_email": user_email or "-",
-                "user_role": user_info.get("role") or "-",
-                "ip_address": ip_address or "-",
-                "endpoint": limit.get("endpoint") or "-",
-                "method": limit.get("method") or "-",
+                "user_role": user_info.get("role") or event.get("user_role") or "-",
+                "ip_address": event.get("ip_address") or "-",
+                "endpoint": event.get("endpoint") or "-",
+                "method": event.get("method") or "-",
                 "limit_definition": limit_definition or "-",
                 "limit_count_display": usage_display or "-",
                 "time_window_display": time_window_display or "-",
                 "retry_after_display": retry_after_display or "-",
                 "rate_limit_type": _normalise_rate_limit_type(
-                    limit.get("type") or limit.get("rate_limit_type")
+                    event.get("rate_limit_type") or event.get("type")
                 ),
-                "limit_key": limit.get("key") or key,
-                "cancel_allowed": bool(limit.get("key")),
+                "limit_key": event.get("limit_key"),
+                "cancel_allowed": is_active and bool(event.get("limit_key")),
             }
         )
 
     return rows
 
 
-def _format_historical_events_for_table(
-    events: list[dict[str, Any]] | None,
-    user_timezone: str | None,
-) -> list[dict[str, Any]]:
-    """Transform historical rate limit events for the unified table."""
+def _extract_rate_limit_events(payload: Any) -> tuple[list[dict[str, Any]], int | None]:
+    """Normalise API payloads into a combined event list and total count."""
 
-    formatted_events = _format_rate_limit_events(events, user_timezone)
-    rows: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    total_candidates: list[int] = []
 
-    for idx, event in enumerate(formatted_events):
-        event_id = event.get("id") or event.get("limit_key") or event.get("occurred_at")
-        if not event_id:
-            event_id = f"event-{idx}"
+    def _extend(items: Any, *, force_active: bool | None = None) -> None:
+        if not isinstance(items, list):
+            return
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            entry = dict(item)
+            if force_active is not None and "is_active" not in entry:
+                entry["is_active"] = force_active
+            events.append(entry)
 
-        identifier_candidates = [
-            event.get("identifier"),
-            event.get("user_email"),
-            event.get("ip_address"),
-            event.get("limit_key"),
-        ]
-        identifier_display = next((value for value in identifier_candidates if value), "-")
+    if isinstance(payload, dict):
+        events_list = payload.get("events")
+        if isinstance(events_list, list):
+            _extend(events_list)
 
-        rows.append(
-            {
-                "id": f"event:{event_id}",
-                "is_active": False,
-                "status_display": "Historical",
-                "occurred_at": event.get("occurred_at") or "-",
-                "expires_at_display": "-",
-                "identifier_display": identifier_display,
-                "user_email": event.get("user_email") or "-",
-                "user_role": event.get("user_role") or "-",
-                "ip_address": event.get("ip_address") or "-",
-                "endpoint": event.get("endpoint") or "-",
-                "method": event.get("method") or "-",
-                "limit_definition": event.get("limit_definition") or "-",
-                "limit_count_display": event.get("limit_count_display") or "-",
-                "time_window_display": event.get("time_window_display") or "-",
-                "retry_after_display": event.get("retry_after_display") or "-",
-                "rate_limit_type": _normalise_rate_limit_type(event.get("rate_limit_type")),
-                "limit_key": event.get("limit_key") or event.get("id"),
-                "cancel_allowed": False,
-            }
+        for key in ("items", "records"):
+            value = payload.get(key)
+            if isinstance(value, list):
+                _extend(value)
+
+        results_section = payload.get("results")
+        if isinstance(results_section, dict):
+            nested_events, nested_total = _extract_rate_limit_events(results_section)
+            events.extend(nested_events)
+            if nested_total is not None:
+                total_candidates.append(int(nested_total))
+
+        events_include_active = any(
+            isinstance(item, dict)
+            and (
+                bool(item.get("is_active"))
+                or str(item.get("status", "")).strip().lower() == "active"
+                or str(item.get("state", "")).strip().lower() == "active"
+            )
+            for item in events
         )
 
-    return rows
+        if not events_include_active:
+            active_sources: list[dict[str, Any]] = []
+            for key in ("active_limits", "active_events", "active"):
+                candidate = payload.get(key)
+                if isinstance(candidate, list):
+                    active_sources.extend(candidate)
+            if active_sources:
+                _extend(active_sources, force_active=True)
+
+        for key in (
+            "total_combined",
+            "total",
+            "count",
+            "row_count",
+            "rowCount",
+            "combined_total",
+        ):
+            value = payload.get(key)
+            if isinstance(value, (int, float)):
+                total_candidates.append(int(value))
+
+        active_total = payload.get("total_active") or payload.get("active_total")
+        hist_total = payload.get("total_historical") or payload.get("historical_total")
+        if isinstance(active_total, (int, float)) and isinstance(hist_total, (int, float)):
+            total_candidates.append(int(active_total) + int(hist_total))
+        elif isinstance(active_total, (int, float)):
+            total_candidates.append(int(active_total))
+        elif isinstance(hist_total, (int, float)):
+            total_candidates.append(int(hist_total))
+
+    elif isinstance(payload, list):
+        _extend(payload)
+
+    total = max(total_candidates) if total_candidates else None
+    return events, total
 
 
 def _query_rate_limit_breaches(
@@ -279,23 +361,23 @@ def _query_rate_limit_breaches(
     except (TypeError, ValueError):
         end_row = None
 
-    default_block = stored_state.get("page_size") or DEFAULT_PAGE_SIZE
+    default_block = stored_state.get("page_size")
     if not isinstance(default_block, int) or default_block <= 0:
         default_block = DEFAULT_PAGE_SIZE
 
     if end_row is None or end_row <= start_row:
-        end_row = start_row + max(default_block, DEFAULT_PAGE_SIZE)
+        requested_block = max(default_block, DEFAULT_PAGE_SIZE)
+        end_row = start_row + requested_block
+    else:
+        requested_block = end_row - start_row
 
-    requested_block = max(end_row - start_row, 0)
+    requested_block = max(requested_block, 1)
+    page_size = max(requested_block, default_block, DEFAULT_PAGE_SIZE)
+    page_size = min(page_size, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
 
-    if start_row == 0:
-        desired_block = max(default_block, DEFAULT_PAGE_SIZE)
-        desired_block = min(desired_block, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
-        if requested_block < desired_block:
-            end_row = start_row + desired_block
-            requested_block = desired_block
-
-    page_size = max(requested_block, 1)
+    page = (start_row // page_size) + 1
+    offset_within_page = start_row - ((page - 1) * page_size)
+    remaining_needed = requested_block
 
     sort_model = request_data.get("sortModel")
     if sort_model is None:
@@ -306,106 +388,139 @@ def _query_rate_limit_breaches(
     table_state = build_table_state(sort_model, {}, sort_sql, None)
     table_state["page_size"] = page_size
 
-    status_data = _fetch_rate_limit_status_data(token)
-    active_limits = status_data.get("active_limits", []) if status_data else []
-    active_rows = _format_active_limits_for_table(active_limits, user_timezone)
-    active_count = len(active_rows)
+    combined_events: list[dict[str, Any]] = []
+    seen_identifiers: set[str] = set()
+    total_row_count: int | None = None
+    current_page = page
+    is_first_page = True
+    last_raw_count = 0
+    serial_counter = 0
 
-    hist_start_row = max(start_row - active_count, 0)
-    hist_needed = max(0, end_row - max(start_row, active_count))
+    while remaining_needed > 0:
+        params = {
+            "page": current_page,
+            "per_page": page_size,
+            "include_active": "true",
+        }
+        if sort_sql:
+            params["sort"] = sort_sql
 
-    hist_rows: list[dict[str, Any]] = []
-    hist_total = 0
+        try:
+            response = make_authenticated_request(
+                RATE_LIMIT_EVENTS_ENDPOINT,
+                token,
+                params=params,
+                timeout=10,
+            )
+        except Exception as exc:  # pragma: no cover - defensive guard
+            print(f"Error fetching rate limit events: {exc}")
+            combined_events = []
+            total_row_count = 0
+            break
 
-    fetch_historical = hist_needed > 0 or start_row == 0
+        if response.status_code != 200:
+            print(f"Failed to fetch rate limit events: status {response.status_code}")
+            combined_events = []
+            total_row_count = 0
+            break
 
-    if fetch_historical:
-        per_page = max(DEFAULT_PAGE_SIZE, hist_needed, page_size, 1)
-        per_page = min(per_page, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
-        initial_page = (hist_start_row // per_page) + 1 if hist_needed > 0 else 1
-        current_page = initial_page
-        offset = hist_start_row % per_page if hist_needed > 0 else 0
-        remaining_needed = hist_needed
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = {}
 
-        while True:
-            params = {
-                "page": current_page,
-                "per_page": per_page,
-            }
-            if sort_sql:
-                params["sort"] = sort_sql
+        data_section = payload.get("data") if isinstance(payload, dict) else payload
+        events_page_raw, total_candidate = _extract_rate_limit_events(data_section)
 
-            try:
-                response = make_authenticated_request(
-                    RATE_LIMIT_EVENTS_ENDPOINT,
-                    token,
-                    params=params,
-                    timeout=10,
-                )
-            except Exception as exc:  # pragma: no cover - defensive guard
-                print(f"Error fetching rate limit events: {exc}")
-                hist_rows = []
-                hist_total = 0
+        if total_candidate is not None:
+            total_row_count = (
+                max(total_row_count or 0, int(total_candidate))
+                if total_row_count is not None
+                else int(total_candidate)
+            )
+
+        last_raw_count = len(events_page_raw)
+        if not events_page_raw:
+            break
+
+        if is_first_page and offset_within_page:
+            if offset_within_page >= last_raw_count:
+                events_page = []
+            else:
+                events_page = events_page_raw[offset_within_page:]
+            offset_within_page = 0
+        else:
+            events_page = events_page_raw
+
+        if not events_page:
+            if last_raw_count < page_size:
                 break
-
-            if response.status_code != 200:
-                print(f"Failed to fetch rate limit events: status {response.status_code}")
-                hist_rows = []
-                hist_total = 0
-                break
-
-            try:
-                payload = response.json()
-            except ValueError:
-                payload = {}
-
-            data = payload.get("data", {}) if isinstance(payload, dict) else {}
-            events = data.get("events", []) if isinstance(data, dict) else []
-            if not hist_total:
-                try:
-                    hist_total = int(data.get("total", 0) or 0)
-                except (TypeError, ValueError):
-                    hist_total = 0
-
-            formatted_events = _format_historical_events_for_table(events, user_timezone)
-
-            if hist_needed > 0:
-                chunk = (
-                    formatted_events[offset:] if current_page == initial_page else formatted_events
-                )
-                if chunk:
-                    take = min(len(chunk), remaining_needed)
-                    hist_rows.extend(chunk[:take])
-                    remaining_needed -= take
-                else:
-                    remaining_needed = 0
-
-            if hist_needed == 0:
-                break
-
-            if remaining_needed <= 0:
-                break
-
-            if len(formatted_events) < per_page:
-                break
-
             current_page += 1
-            offset = 0
+            is_first_page = False
+            continue
 
-    total_row_count = active_count + hist_total
-    if not total_row_count:
-        total_row_count = active_count + len(hist_rows)
+        filtered_events: list[dict[str, Any]] = []
+        for event in events_page:
+            if not isinstance(event, dict):
+                continue
+            unique_id: str | None = None
+
+            event_id = event.get("id")
+            if event_id not in (None, ""):
+                unique_id = str(event_id)
+            else:
+                limit_key = event.get("limit_key")
+                occurred_at = event.get("occurred_at")
+                if limit_key not in (None, "") and occurred_at not in (None, ""):
+                    unique_id = f"{limit_key}:{occurred_at}"
+                else:
+                    identifier = event.get("identifier")
+                    if identifier not in (None, "") and occurred_at not in (None, ""):
+                        unique_id = f"{identifier}:{occurred_at}"
+                    elif occurred_at not in (None, ""):
+                        unique_id = str(occurred_at)
+                    elif limit_key not in (None, ""):
+                        unique_id = str(limit_key)
+
+            if unique_id is None:
+                unique_id = f"event-{current_page}-{serial_counter}"
+            serial_counter += 1
+            if unique_id in seen_identifiers:
+                continue
+            seen_identifiers.add(unique_id)
+            filtered_events.append(event)
+
+        if not filtered_events:
+            if last_raw_count < page_size:
+                break
+            current_page += 1
+            is_first_page = False
+            continue
+
+        take = min(len(filtered_events), remaining_needed)
+        combined_events.extend(filtered_events[:take])
+        remaining_needed -= take
+
+        if remaining_needed <= 0:
+            break
+
+        if last_raw_count < page_size:
+            break
+
+        current_page += 1
+        is_first_page = False
+
+    rows = _format_combined_rate_limit_rows(combined_events, user_timezone)
+
+    if total_row_count is None:
+        base_count = start_row + len(rows)
+        if remaining_needed <= 0 and last_raw_count == page_size:
+            total_row_count = base_count + page_size
+        else:
+            total_row_count = base_count
 
     if total_row_count and start_row >= total_row_count:
         return {"rowData": [], "rowCount": total_row_count}, table_state, total_row_count
-
-    rows: list[dict[str, Any]] = []
-
-    if active_count and start_row < active_count:
-        active_slice_end = min(active_count, end_row)
-        rows.extend(active_rows[start_row:active_slice_end])
-
-    rows.extend(hist_rows)
 
     return {"rowData": rows, "rowCount": total_row_count}, table_state, total_row_count
 
