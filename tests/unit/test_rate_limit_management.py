@@ -57,16 +57,18 @@ def test_rate_limit_breaches_initial_prefetch(monkeypatch):
         for idx in range(5)
     ]
 
-    monkeypatch.setattr(
-        admin,
-        "_fetch_rate_limit_status_data",
-        lambda token: {"active_limits": active_limits},
-    )
-
     def fake_make_request(url: str, token: str, params: dict[str, Any] | None = None, **_: Any):
         assert params is not None
         assert params.get("per_page", 0) >= admin.DEFAULT_PAGE_SIZE
-        return _StubResponse({"data": {"events": events, "total": len(events)}})
+        return _StubResponse(
+            {
+                "data": {
+                    "events": events,
+                    "active_limits": active_limits,
+                    "total": len(events),
+                }
+            }
+        )
 
     monkeypatch.setattr(admin, "make_authenticated_request", fake_make_request)
 
@@ -83,6 +85,8 @@ def test_rate_limit_breaches_initial_prefetch(monkeypatch):
     assert state["page_size"] >= admin.DEFAULT_PAGE_SIZE
     assert response["rowCount"] == expected_total
     assert len(response["rowData"]) == expected_total
-    assert response["rowData"][0]["is_active"] is True
-    assert response["rowData"][1]["is_active"] is False
+
+    active_rows = [row for row in response["rowData"] if row.get("is_active")]
+    assert len(active_rows) == len(active_limits)
+    assert any(not row.get("is_active") for row in response["rowData"])
     assert total == expected_total

@@ -12,6 +12,16 @@ import requests
 
 from trendsearth_ui.app import app
 
+MOCK_AUTH_TOKEN = os.environ.setdefault("MOCK_AUTH_TOKEN", "playwright-secret")
+os.environ.setdefault("ENABLE_MOCK_AUTH", "1")
+
+
+def _mock_auth_url(base_url: str) -> str:
+    """Construct a mock auth URL with the configured token."""
+
+    return f"{base_url}?mock_auth=1&mock_auth_token={MOCK_AUTH_TOKEN}"
+
+
 # Perform the Playwright browser availability check at import-time so that
 # skip markers created below see the correct state during collection.
 try:
@@ -148,8 +158,8 @@ def authenticated_page(page: Page, live_server):
     setup_api_mocking(page, user_role="ADMIN")
 
     # Navigate directly to the app with mock_auth parameter
-    print("🎭 Navigating to app with mock_auth=1 parameter")
-    page.goto(f"{live_server}?mock_auth=1")
+    print("🎭 Navigating to app with secured mock auth parameters")
+    page.goto(_mock_auth_url(live_server))
 
     # Wait for the app to load and check if we get the dashboard
     try:
@@ -174,7 +184,7 @@ def authenticated_page(page: Page, live_server):
             # Try alternative approach: go to app, wait briefly, then try mock auth again
             page.goto(live_server)
             page.wait_for_timeout(2000)  # Wait for initial load
-            page.goto(f"{live_server}?mock_auth=1")
+            page.goto(_mock_auth_url(live_server))
 
             try:
                 page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
@@ -200,7 +210,7 @@ def authenticated_user_page(page: Page, live_server):
 
     # Navigate to the app with mock auth query parameter
     # Note: The built-in mock auth always creates an ADMIN user, but we can still test with API mocking for USER role
-    page.goto(f"{live_server}?mock_auth=1")
+    page.goto(_mock_auth_url(live_server))
 
     # Wait for the dashboard to load
     try:

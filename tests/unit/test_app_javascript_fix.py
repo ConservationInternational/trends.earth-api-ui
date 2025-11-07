@@ -1,86 +1,47 @@
-"""
-Test to verify the JavaScript console filtering fix in app.py.
-"""
-
-import re
+"""Tests verifying the app index template avoids inline console scripts."""
 
 
-def test_app_index_string_has_safe_shouldfilter():
-    """Test that the shouldFilter function in app.index_string safely handles undefined arguments."""
+def _get_project_root():
+    import os
+
+    return os.path.join(os.path.dirname(__file__), "..", "..")
+
+
+def test_app_index_string_has_no_console_filter_script():
+    """The index template should not embed inline console filtering JavaScript."""
     import os
     import sys
 
-    # Add the project root to the path
-    project_root = os.path.join(os.path.dirname(__file__), "..", "..")
+    project_root = _get_project_root()
     sys.path.insert(0, project_root)
 
     try:
         from trendsearth_ui import app
 
-        # Get the index string
         index_string = app.app.index_string
 
-        # Check that the shouldFilter function exists
-        assert "function shouldFilter(args)" in index_string, (
-            "shouldFilter function should be present in index_string"
-        )
+        assert "function shouldFilter" not in index_string
+        assert "console.error = function" not in index_string
+        assert "console.warn = function" not in index_string
 
-        # Check that it has the safety check for undefined/null args
-        assert "if (!args || typeof args.length !== 'number')" in index_string, (
-            "shouldFilter should check for undefined/null args before using join"
-        )
-
-        # Check that it returns false for invalid args
-        assert "return false;" in index_string, (
-            "shouldFilter should return false for invalid arguments"
-        )
-
-        # Verify the complete pattern exists (safety check before Array.prototype.join.call)
-        pattern = re.compile(
-            r"function shouldFilter\(args\)\s*\{\s*try\s*\{\s*"
-            r".*?if\s*\(\s*!args\s*\|\|\s*typeof\s+args\.length\s*!==\s*['\"]number['\"]\s*\)",
-            re.DOTALL,
-        )
-        assert pattern.search(index_string), (
-            "shouldFilter should have safety check before calling Array.prototype.join.call"
-        )
-
-    except ImportError as e:
+    except ImportError as exc:  # pragma: no cover - defensive
         import pytest
 
-        pytest.skip(f"Could not import app module: {e}")
+        pytest.skip(f"Could not import app module: {exc}")
 
 
-def test_app_index_string_console_error_wrapper():
-    """Test that console.error is properly wrapped with the fixed shouldFilter function."""
+def test_dash_renderer_asset_exists():
+    """The Dash renderer should be initialized via a static asset."""
     import os
-    import sys
+    from pathlib import Path
 
-    # Add the project root to the path
-    project_root = os.path.join(os.path.dirname(__file__), "..", "..")
-    sys.path.insert(0, project_root)
+    asset_path = Path(_get_project_root()) / "trendsearth_ui" / "assets" / "dash_renderer.js"
 
-    try:
-        from trendsearth_ui import app
+    assert asset_path.exists(), "dash_renderer.js asset should exist"
 
-        # Get the index string
-        index_string = app.app.index_string
-
-        # Check that console.error is wrapped
-        assert "console.error = function ()" in index_string, "console.error should be wrapped"
-
-        # Check that it calls shouldFilter with arguments
-        assert "if (shouldFilter(arguments))" in index_string, (
-            "console.error wrapper should call shouldFilter with arguments"
-        )
-
-        # Check that console.warn is also wrapped
-        assert "console.warn = function ()" in index_string, "console.warn should also be wrapped"
-
-    except ImportError as e:
-        import pytest
-
-        pytest.skip(f"Could not import app module: {e}")
+    contents = asset_path.read_text(encoding="utf-8")
+    assert "DashRenderer" in contents
+    assert "window.__dash_renderer__" in contents
 
 
 if __name__ == "__main__":

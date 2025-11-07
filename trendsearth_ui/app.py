@@ -1,4 +1,6 @@
+import base64
 import os
+import re
 
 import dash
 import dash_bootstrap_components as dbc
@@ -61,6 +63,7 @@ app = dash.Dash(
     ],
 )
 app.title = APP_TITLE
+app.renderer = ""
 
 # Add favicon links to the HTML head
 app.index_string = """
@@ -71,51 +74,6 @@ app.index_string = """
         <title>{%title%}</title>
         <link rel="icon" href="/favicon.ico" type="image/x-icon">
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-        <!-- Suppress noisy React warnings from third-party libraries (dbc, etc.) in dev -->
-        <script>
-        (function () {
-            try {
-                var patterns = [
-                    "Support for defaultProps will be removed from function components",
-                    "componentWillMount has been renamed",
-                    "componentWillReceiveProps has been renamed"
-                ];
-                var origError = window.console && window.console.error ? console.error.bind(console) : function () {};
-                var origWarn = window.console && window.console.warn ? console.warn.bind(console) : function () {};
-
-                function shouldFilter(args) {
-                    try {
-                        // Check if args is null, undefined, or not array-like
-                        if (!args || typeof args.length !== 'number') {
-                            return false;
-                        }
-                        var msg = Array.prototype.join.call(args, " ");
-                        if (msg.indexOf("Warning:") !== -1) {
-                            for (var i = 0; i < patterns.length; i++) {
-                                if (msg.indexOf(patterns[i]) !== -1) {
-                                    return true;
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        // no-op
-                    }
-                    return false;
-                }
-
-                console.error = function () {
-                    if (shouldFilter(arguments)) { return; }
-                    return origError.apply(console, arguments);
-                };
-                console.warn = function () {
-                    if (shouldFilter(arguments)) { return; }
-                    return origWarn.apply(console, arguments);
-                };
-            } catch (e) {
-                // Swallow any errors here to avoid impacting app startup
-            }
-        })();
-        </script>
         {%favicon%}
         {%css%}
     </head>
@@ -129,6 +87,41 @@ app.index_string = """
     </body>
 </html>
 """
+
+
+def _generate_csp_nonce() -> str:
+    """Return a per-request CSP nonce."""
+    return base64.b64encode(os.urandom(16)).decode("utf-8")
+
+
+def _get_csp_nonce() -> str:
+    """Fetch or create the nonce stored on flask.g for this request."""
+    nonce = getattr(flask.g, "csp_nonce", None)
+    if nonce:
+        return nonce
+
+    nonce = _generate_csp_nonce()
+    flask.g.csp_nonce = nonce
+    return nonce
+
+
+def _inject_nonce_into_scripts(html: str, nonce: str) -> str:
+    """Ensure every script tag carries the CSP nonce."""
+    script_pattern = re.compile(r"(<script)(?![^>]*nonce=)", flags=re.IGNORECASE)
+    return script_pattern.sub(rf'\1 nonce="{nonce}"', html)
+
+
+_original_index = app.index
+
+
+def _index_with_csp_nonce(**kwargs):
+    """Render the Dash index HTML with CSP nonces applied."""
+    nonce = _get_csp_nonce()
+    html = _original_index(**kwargs)
+    return _inject_nonce_into_scripts(html, nonce)
+
+
+app.index = _index_with_csp_nonce  # type: ignore[assignment]
 
 
 @server.route("/api-ui-health")
@@ -157,6 +150,12 @@ def serve_assets(filename):
 app.layout = create_main_layout()
 
 
+@server.before_request
+def set_csp_nonce() -> None:
+    """Guarantee a CSP nonce exists for the current request."""
+    _get_csp_nonce()
+
+
 # Add global error handlers
 _CSP_STYLE_SOURCES = [
     "'self'",
@@ -180,6 +179,12 @@ _CSP_CONNECT_SOURCES = [
     "https://cdn.plot.ly",
 ]
 
+_CSP_SCRIPT_SOURCES = [
+    "'self'",
+    "https://cdn.plot.ly",
+    "https://cdn.jsdelivr.net",
+]
+
 
 @server.after_request
 def add_security_headers(response):
@@ -190,9 +195,15 @@ def add_security_headers(response):
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
 
+    nonce = getattr(flask.g, "csp_nonce", None)
+    script_sources = list(dict.fromkeys(_CSP_SCRIPT_SOURCES))
+    if nonce:
+        script_sources.insert(0, f"'nonce-{nonce}'")
+        script_sources.insert(1, "'strict-dynamic'")
+
     csp_value = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        f"script-src {' '.join(script_sources)}; "
         f"style-src {' '.join(_CSP_STYLE_SOURCES)}; "
         f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
         f"font-src {' '.join(_CSP_FONT_SOURCES)}; "

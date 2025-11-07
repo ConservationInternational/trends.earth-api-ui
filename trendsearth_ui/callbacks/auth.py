@@ -1,9 +1,11 @@
 """Authentication and navigation callbacks."""
 
 from datetime import datetime, timedelta
+import hmac
 import json
 import os
 import re
+from urllib.parse import parse_qs
 
 from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
@@ -25,6 +27,39 @@ from ..utils.logging_config import get_logger, log_exception
 logger = get_logger()
 
 _SECURE_COOKIE_ENVIRONMENTS = {"production", "staging"}
+_MOCK_AUTH_FLAG_VALUES = {"1", "true", "yes"}
+
+
+def _is_mock_auth_enabled(search_query: str | None) -> bool:
+    """Return True when mock authentication bypass is allowed."""
+
+    if not search_query:
+        return False
+
+    if os.environ.get("ENABLE_MOCK_AUTH", "").lower() not in _MOCK_AUTH_FLAG_VALUES:
+        return False
+
+    env = os.environ.get("DEPLOYMENT_ENVIRONMENT", "").lower()
+    if env in _SECURE_COOKIE_ENVIRONMENTS:
+        return False
+
+    params = parse_qs(search_query[1:] if search_query.startswith("?") else search_query)
+
+    if params.get("mock_auth", ["0"])[0].lower() not in _MOCK_AUTH_FLAG_VALUES:
+        return False
+
+    secret = os.environ.get("MOCK_AUTH_TOKEN", "")
+    if not secret:
+        return False
+
+    provided_token = params.get("mock_auth_token", [""])[0]
+    if not provided_token:
+        return False
+
+    try:
+        return hmac.compare_digest(provided_token, secret)
+    except Exception:
+        return False
 
 
 def _should_use_secure_cookie() -> bool:
@@ -82,11 +117,8 @@ def register_callbacks(app):
         It checks for a token in the store, then falls back to checking the
         auth cookie, ensuring a single, reliable path for session initialization.
         """
-        # Test hook: allow mock auth via query param (used only in E2E tests)
-        if search and "mock_auth=1" in search:
-            print(
-                "🎭 Mock auth detected via URL search parameters - bypassing normal authentication"
-            )
+        if _is_mock_auth_enabled(search):
+            print("🎭 Auth bypass enabled via secure mock auth configuration")
             user_data = {
                 "id": "test_user_123",
                 "name": "Test User",
@@ -180,11 +212,8 @@ def register_callbacks(app):
             f"🔐 Login attempt - Email: {email}, Button clicks: {_n}, Remember: {remember_me}, Environment: {api_environment}"
         )
 
-        # Check if we're in mock auth mode and should skip normal login
-        if search and "mock_auth=1" in search:
-            print(
-                "🎭 Mock auth mode detected in login_api via URL search - skipping normal login process"
-            )
+        if _is_mock_auth_enabled(search):
+            print("🎭 Secure mock auth mode detected in login_api - skipping credential exchange")
             return (
                 None,
                 None,

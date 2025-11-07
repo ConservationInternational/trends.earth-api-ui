@@ -866,7 +866,7 @@ def reset_rate_limits_modal():
                             dbc.Alert(
                                 [
                                     html.I(className="fas fa-exclamation-triangle me-2"),
-                                    "This is a system-wide operation that affects all users and should only be used in emergency situations or for maintenance purposes.",
+                                    "This is a system-wide operation that affects all users and should only be used for emergency or maintenance purposes.",
                                 ],
                                 color="warning",
                                 className="mb-3",
