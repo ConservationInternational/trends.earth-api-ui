@@ -27,10 +27,9 @@ def test_csp_header_uses_nonce_and_excludes_unsafe():
             "",
         )
 
-        assert f"'nonce-{nonce}'" in script_directive
-        assert "'strict-dynamic'" in script_directive
-        assert "'unsafe-inline'" not in script_directive
-        assert "'unsafe-eval'" not in script_directive
+    assert f"'nonce-{nonce}'" in script_directive
+    assert "'unsafe-inline'" not in script_directive
+    assert "'unsafe-eval'" not in script_directive
 
 
 def test_dash_index_scripts_receive_nonce():

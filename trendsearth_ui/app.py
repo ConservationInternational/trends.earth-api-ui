@@ -199,7 +199,6 @@ def add_security_headers(response):
     script_sources = list(dict.fromkeys(_CSP_SCRIPT_SOURCES))
     if nonce:
         script_sources.insert(0, f"'nonce-{nonce}'")
-        script_sources.insert(1, "'strict-dynamic'")
 
     csp_value = (
         "default-src 'self'; "
