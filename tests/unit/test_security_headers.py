@@ -42,6 +42,8 @@ def test_dash_index_scripts_receive_nonce():
 
         assert f'nonce="{nonce}"' in html
         assert html.count('nonce="') >= 1
+    assert f'data-csp-nonce="{nonce}"' in html
+    assert '<meta name="dash-csp-nonce"' in html
 
 
 if __name__ == "__main__":  # pragma: no cover - manual debug hook

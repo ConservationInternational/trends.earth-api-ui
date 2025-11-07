@@ -111,6 +111,20 @@ def _inject_nonce_into_scripts(html: str, nonce: str) -> str:
     return script_pattern.sub(rf'\1 nonce="{nonce}"', html)
 
 
+def _inject_nonce_metadata(html: str, nonce: str) -> str:
+    """Expose the CSP nonce to client-side scripts via head and body attributes."""
+    meta_tag = f'<meta name="dash-csp-nonce" content="{nonce}">'
+    if "</head>" in html:
+        html = html.replace("</head>", f"    {meta_tag}\n    </head>", 1)
+    else:
+        html = f"{meta_tag}{html}"
+
+    body_pattern = re.compile(r"(<body)([^>]*)(>)", flags=re.IGNORECASE)
+    if body_pattern.search(html):
+        html = body_pattern.sub(rf'\1\2 data-csp-nonce="{nonce}"\3', html, count=1)
+    return html
+
+
 _original_index = app.index
 
 
@@ -118,6 +132,7 @@ def _index_with_csp_nonce(**kwargs):
     """Render the Dash index HTML with CSP nonces applied."""
     nonce = _get_csp_nonce()
     html = _original_index(**kwargs)
+    html = _inject_nonce_metadata(html, nonce)
     return _inject_nonce_into_scripts(html, nonce)
 
 
