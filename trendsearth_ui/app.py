@@ -53,7 +53,7 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     suppress_callback_exceptions=True,
     assets_folder=assets_dir,
-    assets_url_path="/assets/",
+    assets_url_path="/assets",
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
         {
@@ -139,6 +139,20 @@ def _index_with_csp_nonce(**kwargs):
 app.index = _index_with_csp_nonce  # type: ignore[assignment]
 
 
+def _swap_dash_index_route(route: str) -> None:
+    view = server.view_functions.get(route)
+    if not view:
+        return
+    target = getattr(view, "__func__", view)
+    original_target = getattr(_original_index, "__func__", _original_index)
+    if target is original_target:
+        server.view_functions[route] = _index_with_csp_nonce
+
+
+for _route in ("/", "/<path:path>"):
+    _swap_dash_index_route(_route)
+
+
 @server.route("/api-ui-health")
 def health_check():
     """Health check endpoint with deployment information."""
@@ -158,7 +172,8 @@ def favicon():
 
 @server.route("/assets/<path:filename>")
 def serve_assets(filename):
-    return send_from_directory(assets_dir, filename)
+    safe_filename = filename.lstrip("/")
+    return send_from_directory(assets_dir, safe_filename)
 
 
 # Create the main layout
