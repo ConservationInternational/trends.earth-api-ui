@@ -356,7 +356,11 @@ class StatusDataManager:
         if not use_aggregation:
             if start_time is not None:
                 duration_seconds = max((end_time - start_time).total_seconds(), 0)
-                base_interval_seconds = 300  # Approximate five-minute sampling cadence
+
+                base_interval_seconds = (
+                    60 if time_period in {"week", "day"} else 300
+                )  # Expect up to one data point per minute for shorter periods
+
                 estimated_points = math.ceil(duration_seconds / base_interval_seconds) + 1
                 estimated_points = max(estimated_points, target_points)
                 # Cap to avoid excessive payloads while ensuring full coverage for month-scale views
