@@ -266,14 +266,18 @@ class TestAuthenticationPersistence:
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
+        # Get the base URL without mock_auth query parameters
+        current_url = authenticated_page.url
+        base_url = current_url.split("?")[0]
+
         # Clear authentication manually (simulating logout)
-        # Must clear both cookies AND session/local storage since Dash uses dcc.Store
         authenticated_page.context.clear_cookies()
         authenticated_page.evaluate("window.sessionStorage.clear()")
         authenticated_page.evaluate("window.localStorage.clear()")
 
-        # Reload page
-        authenticated_page.reload()
+        # Navigate to base URL without mock_auth parameters (not just reload)
+        # This ensures the mock auth query params are removed
+        authenticated_page.goto(base_url)
 
         # Wait for page to load and redirect to login
         authenticated_page.wait_for_load_state("networkidle")
