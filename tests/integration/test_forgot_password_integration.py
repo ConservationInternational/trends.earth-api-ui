@@ -145,7 +145,8 @@ class TestForgotPasswordIntegration:
         assert send_reset_callback is not None
 
         test_email = "test@example.com"
-        expected_url = f"{API_BASE}/user/{test_email}/recover-password"
+        # URL now includes legacy=false to use secure token-based password reset
+        expected_url = f"{API_BASE}/user/{test_email}/recover-password?legacy=false"
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", Mock()):
             with patch("trendsearth_ui.callbacks.auth.requests.post") as mock_post:
