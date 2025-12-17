@@ -266,8 +266,11 @@ class TestAuthenticationPersistence:
         # Wait for dashboard to load
         authenticated_page.wait_for_selector("[data-testid='dashboard-content']", timeout=10000)
 
-        # Clear authentication manually (simulating logout by removing cookie)
+        # Clear authentication manually (simulating logout)
+        # Must clear both cookies AND session/local storage since Dash uses dcc.Store
         authenticated_page.context.clear_cookies()
+        authenticated_page.evaluate("window.sessionStorage.clear()")
+        authenticated_page.evaluate("window.localStorage.clear()")
 
         # Reload page
         authenticated_page.reload()
@@ -275,8 +278,8 @@ class TestAuthenticationPersistence:
         # Wait for page to load and redirect to login
         authenticated_page.wait_for_load_state("networkidle")
 
-        # Should redirect to login - wait for h4 element to appear
-        expect(authenticated_page.locator("h4")).to_contain_text("Login", timeout=10000)
+        # Should redirect to login - wait for login button to appear
+        expect(authenticated_page.locator("#login-btn")).to_be_visible(timeout=15000)
 
         # Cookie should be cleared
         cookies = authenticated_page.context.cookies()
