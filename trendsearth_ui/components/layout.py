@@ -316,6 +316,146 @@ def login_layout():
     )
 
 
+def reset_password_layout(token=None, api_environment="production"):
+    """Create the password reset page layout.
+
+    This page is shown when users click the password reset link from their email.
+    They can enter a new password here.
+
+    Args:
+        token: The password reset token from the URL
+        api_environment: The API environment to use
+    """
+    return html.Div(
+        [
+            # Forgot password modal placeholder (needed for consistent page structure)
+            dbc.Modal(id="forgot-password-modal", is_open=False),
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Img(
+                                                src=LOGO_URL,
+                                                height=LOGO_HEIGHT,
+                                                className="mb-4",
+                                            ),
+                                            html.H4(
+                                                "Set Your New Password",
+                                                className="mb-4",
+                                            ),
+                                            html.P(
+                                                "Enter your new password below.",
+                                                className="text-muted mb-4",
+                                            ),
+                                            # Hidden stores for token and environment
+                                            dcc.Store(
+                                                id="reset-password-token",
+                                                data=token,
+                                            ),
+                                            dcc.Store(
+                                                id="reset-password-api-env",
+                                                data=api_environment,
+                                            ),
+                                            dbc.Form(
+                                                [
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("New Password", width=4),
+                                                            dbc.Col(
+                                                                dbc.Input(
+                                                                    id="reset-new-password",
+                                                                    type="password",
+                                                                    placeholder="Enter new password",
+                                                                ),
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Confirm Password", width=4),
+                                                            dbc.Col(
+                                                                dbc.Input(
+                                                                    id="reset-confirm-password",
+                                                                    type="password",
+                                                                    placeholder="Confirm new password",
+                                                                ),
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    html.Div(
+                                                        [
+                                                            html.Small(
+                                                                "Password must be at least 12 characters "
+                                                                "and include uppercase, lowercase, number, "
+                                                                "and special character.",
+                                                                className="text-muted",
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Button(
+                                                                        "Set Password",
+                                                                        id="reset-password-submit-btn",
+                                                                        color="primary",
+                                                                        className="w-100",
+                                                                    ),
+                                                                ],
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Button(
+                                                                        "Back to Login",
+                                                                        id="reset-password-back-btn",
+                                                                        color="link",
+                                                                        className="w-100",
+                                                                        href="/",
+                                                                    ),
+                                                                ],
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ]
+                                            ),
+                                            dbc.Alert(
+                                                id="reset-password-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=None,
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "450px"},
+                                width=6,
+                                className="mx-auto mt-4",
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+    )
+
+
 def dashboard_layout():
     """Create the main dashboard layout."""
     layout = [

@@ -11,7 +11,7 @@ from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
 import requests
 
-from ..components import dashboard_layout, login_layout
+from ..components import dashboard_layout, login_layout, reset_password_layout
 from ..config import get_api_base, get_auth_url
 from ..utils import (
     create_auth_cookie_data,
@@ -117,6 +117,28 @@ def register_callbacks(app):
         It checks for a token in the store, then falls back to checking the
         auth cookie, ensuring a single, reliable path for session initialization.
         """
+        # Check if this is a password reset page request
+        if _pathname and _pathname.startswith("/reset-password"):
+            # Extract token from query parameters
+            reset_token = None
+            api_env = current_api_environment or "production"
+            if search:
+                params = parse_qs(search[1:] if search.startswith("?") else search)
+                reset_token = params.get("token", [None])[0]
+                # Also check for environment parameter
+                env_param = params.get("env", [None])[0]
+                if env_param:
+                    api_env = env_param
+
+            return (
+                reset_password_layout(token=reset_token, api_environment=api_env),
+                True,  # Clear auth stores for this public page
+                None,
+                None,
+                None,
+                api_env,
+            )
+
         if _is_mock_auth_enabled(search):
             print("🎭 Auth bypass enabled via secure mock auth configuration")
             user_data = {
@@ -598,8 +620,10 @@ def register_callbacks(app):
             api_base = get_api_base(api_environment)
 
             # Use the email as the user_id parameter in the endpoint
+            # Use legacy=false to send a secure reset link instead of emailing
+            # the password directly
             resp = requests.post(
-                f"{api_base}/user/{email}/recover-password",
+                f"{api_base}/user/{email}/recover-password?legacy=false",
                 timeout=10,
             )
 
@@ -881,3 +905,151 @@ def register_callbacks(app):
             return None, None
 
         return no_update, no_update
+
+    # Password reset with token callback
+    @app.callback(
+        [
+            Output("reset-password-alert", "children"),
+            Output("reset-password-alert", "color"),
+            Output("reset-password-alert", "is_open"),
+            Output("reset-new-password", "value"),
+            Output("reset-confirm-password", "value"),
+        ],
+        [Input("reset-password-submit-btn", "n_clicks")],
+        [
+            State("reset-new-password", "value"),
+            State("reset-confirm-password", "value"),
+            State("reset-password-token", "data"),
+            State("reset-password-api-env", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def submit_password_reset(n_clicks, new_password, confirm_password, reset_token, api_env):
+        """Handle password reset form submission."""
+        if not n_clicks:
+            return no_update, no_update, no_update, no_update, no_update
+
+        # Validate inputs
+        if not reset_token:
+            return (
+                "Invalid or missing reset token. Please request a new password reset.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if not new_password or not confirm_password:
+            return (
+                "Please enter and confirm your new password.",
+                "warning",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if new_password != confirm_password:
+            return (
+                "Passwords do not match. Please try again.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if len(new_password) < 12:
+            return (
+                "Password must be at least 12 characters long.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        # Call the API to reset the password
+        try:
+            api_base = get_api_base(api_env or "production")
+            print(f"🔐 Submitting password reset to {api_base}")
+
+            resp = requests.post(
+                f"{api_base}/user/reset-password",
+                json={"token": reset_token, "password": new_password},
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                print("✅ Password reset successful")
+                return (
+                    "Password reset successful! You can now log in with your new password.",
+                    "success",
+                    True,
+                    "",  # Clear password field
+                    "",  # Clear confirm field
+                )
+            elif resp.status_code == 404:
+                print("❌ Invalid or expired reset token")
+                return (
+                    "This reset link is invalid or has expired. Please request a new password reset.",
+                    "danger",
+                    True,
+                    no_update,
+                    no_update,
+                )
+            elif resp.status_code == 422:
+                print("❌ Password validation failed")
+                error_msg = "Password does not meet requirements."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("msg", error_msg)
+                except Exception:
+                    pass
+                return (
+                    error_msg,
+                    "danger",
+                    True,
+                    no_update,
+                    no_update,
+                )
+            else:
+                print(f"❌ Password reset failed with status: {resp.status_code}")
+                error_msg = "Failed to reset password."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("msg", error_msg)
+                except Exception:
+                    pass
+                return (
+                    f"{error_msg} Please try again.",
+                    "danger",
+                    True,
+                    no_update,
+                    no_update,
+                )
+
+        except requests.exceptions.Timeout:
+            print("⏰ Password reset request timed out")
+            return (
+                "Request timed out. Please try again.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+        except requests.exceptions.ConnectionError:
+            print("❌ Connection error during password reset")
+            return (
+                "Cannot connect to the server. Please check your connection.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+        except Exception as e:
+            print(f"💥 Error during password reset: {str(e)}")
+            return (
+                f"An error occurred: {str(e)}",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )

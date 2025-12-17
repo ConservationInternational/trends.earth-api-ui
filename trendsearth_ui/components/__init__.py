@@ -1,6 +1,6 @@
 """Initialize components package."""
 
-from .layout import create_main_layout, dashboard_layout, login_layout
+from .layout import create_main_layout, dashboard_layout, login_layout, reset_password_layout
 from .modals import (
     delete_script_modal,
     delete_user_modal,
@@ -23,6 +23,7 @@ from .tabs import (
 __all__ = [
     "create_main_layout",
     "login_layout",
+    "reset_password_layout",
     "dashboard_layout",
     "json_modal",
     "edit_user_modal",
