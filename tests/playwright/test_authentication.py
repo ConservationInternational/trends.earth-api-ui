@@ -272,8 +272,11 @@ class TestAuthenticationPersistence:
         # Reload page
         authenticated_page.reload()
 
-        # Should redirect to login
-        expect(authenticated_page.locator("h4")).to_contain_text("Login")
+        # Wait for page to load and redirect to login
+        authenticated_page.wait_for_load_state("networkidle")
+
+        # Should redirect to login - wait for h4 element to appear
+        expect(authenticated_page.locator("h4")).to_contain_text("Login", timeout=10000)
 
         # Cookie should be cleared
         cookies = authenticated_page.context.cookies()
