@@ -30,8 +30,12 @@ class TestAuthenticationFlow:
 
     def test_login_form_interaction(self, app_page: Page):
         """Test login form interactions."""
-        # Fill in email field
+        # Wait for the form to be ready
         email_input = app_page.locator("input[type='email']")
+        expect(email_input).to_be_visible()
+        email_input.wait_for(state="visible")
+
+        # Fill in email field
         email_input.fill("test@example.com")
         expect(email_input).to_have_value("test@example.com")
 
