@@ -906,6 +906,44 @@ def register_callbacks(app):
 
         return no_update, no_update
 
+    # Real-time password validation callback
+    @app.callback(
+        [
+            Output("req-length", "className"),
+            Output("req-uppercase", "className"),
+            Output("req-lowercase", "className"),
+            Output("req-number", "className"),
+            Output("req-special", "className"),
+        ],
+        [Input("reset-new-password", "value")],
+        prevent_initial_call=True,
+    )
+    def validate_password_requirements(password):
+        """Validate password requirements in real-time and update UI indicators."""
+        import re
+
+        if not password:
+            # Return all as muted when no password entered
+            return ["text-muted"] * 5
+
+        special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+
+        # Check each requirement
+        has_length = len(password) >= 12
+        has_upper = bool(re.search(r"[A-Z]", password))
+        has_lower = bool(re.search(r"[a-z]", password))
+        has_number = bool(re.search(r"\d", password))
+        has_special = bool(re.search(f"[{special_chars}]", password))
+
+        # Return success (green) or danger (red) class for each requirement
+        return [
+            "text-success" if has_length else "text-danger",
+            "text-success" if has_upper else "text-danger",
+            "text-success" if has_lower else "text-danger",
+            "text-success" if has_number else "text-danger",
+            "text-success" if has_special else "text-danger",
+        ]
+
     # Password reset with token callback
     @app.callback(
         [
@@ -1000,7 +1038,7 @@ def register_callbacks(app):
                 error_msg = "Password does not meet requirements."
                 try:
                     error_data = resp.json()
-                    error_msg = error_data.get("msg", error_msg)
+                    error_msg = error_data["detail"]
                 except Exception:
                     pass
                 return (
@@ -1015,7 +1053,7 @@ def register_callbacks(app):
                 error_msg = "Failed to reset password."
                 try:
                     error_data = resp.json()
-                    error_msg = error_data.get("msg", error_msg)
+                    error_msg = error_data["detail"]
                 except Exception:
                     pass
                 return (

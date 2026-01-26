@@ -391,12 +391,42 @@ def reset_password_layout(token=None, api_environment="production"):
                                                         className="mb-3",
                                                     ),
                                                     html.Div(
-                                                        [
+                                                        id="password-requirements",
+                                                        children=[
                                                             html.Small(
-                                                                "Password must be at least 12 characters "
-                                                                "and include uppercase, lowercase, number, "
-                                                                "and special character.",
-                                                                className="text-muted",
+                                                                "Password requirements:",
+                                                                className="text-muted d-block mb-1",
+                                                            ),
+                                                            html.Ul(
+                                                                [
+                                                                    html.Li(
+                                                                        "At least 12 characters",
+                                                                        id="req-length",
+                                                                        className="text-muted",
+                                                                    ),
+                                                                    html.Li(
+                                                                        "Uppercase letter (A-Z)",
+                                                                        id="req-uppercase",
+                                                                        className="text-muted",
+                                                                    ),
+                                                                    html.Li(
+                                                                        "Lowercase letter (a-z)",
+                                                                        id="req-lowercase",
+                                                                        className="text-muted",
+                                                                    ),
+                                                                    html.Li(
+                                                                        "Number (0-9)",
+                                                                        id="req-number",
+                                                                        className="text-muted",
+                                                                    ),
+                                                                    html.Li(
+                                                                        "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)",
+                                                                        id="req-special",
+                                                                        className="text-muted",
+                                                                    ),
+                                                                ],
+                                                                className="small mb-0 ps-3",
+                                                                style={"listStyleType": "none"},
                                                             ),
                                                         ],
                                                         className="mb-3",
