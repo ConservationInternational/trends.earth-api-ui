@@ -383,9 +383,8 @@ def reset_password_layout(token=None, api_environment="production"):
                                                     },
                                                 ),
                                                 style={
-                                                    "backgroundColor": "#6c757d",
+                                                    "backgroundColor": "#495057",
                                                     "padding": "20px 30px",
-                                                    "borderRadius": "8px",
                                                     "textAlign": "center",
                                                     "display": "flex",
                                                     "justifyContent": "center",
@@ -520,6 +519,37 @@ def reset_password_layout(token=None, api_environment="production"):
                                                 is_open=False,
                                                 dismissable=True,
                                                 duration=None,
+                                            ),
+                                            html.Hr(),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        "Privacy Policy",
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        "Terms of Use",
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
                                             ),
                                         ]
                                     ),
