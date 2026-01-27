@@ -8,7 +8,6 @@ from ..config import (
     API_ENVIRONMENTS,
     APP_TITLE,
     DEFAULT_API_ENVIRONMENT,
-    LOGO_HEIGHT,
     LOGO_SQUARE_URL,
     LOGO_URL,
 )
@@ -184,7 +183,9 @@ def login_layout():
                                                 src=LOGO_URL,
                                                 alt="Trends.Earth Logo",
                                                 style={
-                                                    "height": LOGO_HEIGHT,
+                                                    "maxWidth": "100%",
+                                                    "width": "300px",
+                                                    "height": "auto",
                                                     "marginBottom": "15px",
                                                 },
                                             ),
@@ -192,7 +193,10 @@ def login_layout():
                                         ],
                                         className="text-center",
                                     ),
-                                    style={"backgroundColor": "#495057"},
+                                    style={
+                                        "backgroundColor": "#495057",
+                                        "padding": "20px",
+                                    },
                                 ),
                                 dbc.CardBody(
                                     [
@@ -371,13 +375,20 @@ def reset_password_layout(token=None, api_environment="production"):
                                             html.Div(
                                                 html.Img(
                                                     src=LOGO_URL,
-                                                    height=LOGO_HEIGHT,
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "300px",
+                                                        "height": "auto",
+                                                    },
                                                 ),
                                                 style={
                                                     "backgroundColor": "#6c757d",
-                                                    "padding": "15px 20px",
+                                                    "padding": "20px 30px",
                                                     "borderRadius": "8px",
                                                     "textAlign": "center",
+                                                    "display": "flex",
+                                                    "justifyContent": "center",
+                                                    "alignItems": "center",
                                                 },
                                                 className="mb-4",
                                             ),
