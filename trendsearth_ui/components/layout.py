@@ -341,10 +341,11 @@ def login_layout():
                             ],
                             style={"maxWidth": "400px"},
                         ),
-                        width=6,
+                        width="auto",
                         className="mx-auto mt-4",
                     ),
-                ]
+                ],
+                className="justify-content-center",
             ),
         ]
     )
