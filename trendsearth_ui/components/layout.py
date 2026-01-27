@@ -302,6 +302,36 @@ def login_layout():
                                             dismissable=True,
                                             duration=4000,
                                         ),
+                                        html.Div(
+                                            [
+                                                html.A(
+                                                    "Privacy Policy",
+                                                    href="https://www.conservation.org/policies/privacy",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                html.Span(
+                                                    " | ",
+                                                    className="text-muted",
+                                                    style={"fontSize": "12px"},
+                                                ),
+                                                html.A(
+                                                    "Terms of Use",
+                                                    href="https://www.conservation.org/policies/terms-of-use",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                            ],
+                                            className="text-center mt-3",
+                                        ),
                                     ]
                                 ),
                             ],
@@ -347,7 +377,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                                     "backgroundColor": "#6c757d",
                                                     "padding": "15px 20px",
                                                     "borderRadius": "8px",
-                                                    "display": "inline-block",
+                                                    "textAlign": "center",
                                                 },
                                                 className="mb-4",
                                             ),
