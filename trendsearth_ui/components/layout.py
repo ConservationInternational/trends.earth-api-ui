@@ -184,7 +184,7 @@ def login_layout():
                                                 alt="Trends.Earth Logo",
                                                 style={
                                                     "maxWidth": "100%",
-                                                    "width": "300px",
+                                                    "width": "450px",
                                                     "height": "auto",
                                                     "marginBottom": "15px",
                                                 },
@@ -378,7 +378,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                                     src=LOGO_URL,
                                                     style={
                                                         "maxWidth": "100%",
-                                                        "width": "300px",
+                                                        "width": "450px",
                                                         "height": "auto",
                                                     },
                                                 ),
