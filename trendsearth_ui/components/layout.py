@@ -338,9 +338,17 @@ def reset_password_layout(token=None, api_environment="production"):
                                 [
                                     html.Div(
                                         [
-                                            html.Img(
-                                                src=LOGO_URL,
-                                                height=LOGO_HEIGHT,
+                                            html.Div(
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    height=LOGO_HEIGHT,
+                                                ),
+                                                style={
+                                                    "backgroundColor": "#6c757d",
+                                                    "padding": "15px 20px",
+                                                    "borderRadius": "8px",
+                                                    "display": "inline-block",
+                                                },
                                                 className="mb-4",
                                             ),
                                             html.H4(
