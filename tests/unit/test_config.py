@@ -40,7 +40,9 @@ class TestConfigurationConstants:
         assert LOGO_URL.startswith(("http", "/assets/"))
 
         assert isinstance(LOGO_HEIGHT, str)
-        assert "px" in LOGO_HEIGHT
+        # Logo height can be CSS units or 'auto'
+        valid_values = ["px", "em", "rem", "%", "vh", "vw", "auto"]
+        assert any(val in LOGO_HEIGHT for val in valid_values)
 
     def test_pagination_settings(self):
         """Test pagination and refresh settings."""
@@ -112,9 +114,9 @@ class TestConfigurationConsistency:
     def test_logo_dimensions_format(self):
         """Test that logo height is in valid CSS format."""
         assert isinstance(LOGO_HEIGHT, str)
-        # Should be in CSS units (px, em, rem, %, etc.)
-        valid_units = ["px", "em", "rem", "%", "vh", "vw"]
-        assert any(unit in LOGO_HEIGHT for unit in valid_units)
+        # Should be in CSS units (px, em, rem, %, etc.) or 'auto'
+        valid_values = ["px", "em", "rem", "%", "vh", "vw", "auto"]
+        assert any(val in LOGO_HEIGHT for val in valid_values)
 
     def test_url_consistency(self):
         """Test URL format consistency."""
