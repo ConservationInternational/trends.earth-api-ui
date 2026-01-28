@@ -307,6 +307,52 @@ def edit_user_modal():
                                         width=6,
                                     ),
                                 ],
+                                className="mb-2",
+                            ),
+                            html.Div(
+                                id="admin-password-requirements",
+                                children=[
+                                    html.Small(
+                                        "Password requirements:",
+                                        className="text-muted d-block mb-1",
+                                    ),
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                "At least 12 characters",
+                                                id="admin-req-length",
+                                                className="text-muted",
+                                            ),
+                                            html.Li(
+                                                "Uppercase letter (A-Z)",
+                                                id="admin-req-uppercase",
+                                                className="text-muted",
+                                            ),
+                                            html.Li(
+                                                "Lowercase letter (a-z)",
+                                                id="admin-req-lowercase",
+                                                className="text-muted",
+                                            ),
+                                            html.Li(
+                                                "Number (0-9)",
+                                                id="admin-req-number",
+                                                className="text-muted",
+                                            ),
+                                            html.Li(
+                                                "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)",
+                                                id="admin-req-special",
+                                                className="text-muted",
+                                            ),
+                                            html.Li(
+                                                "Passwords match",
+                                                id="admin-req-match",
+                                                className="text-muted",
+                                            ),
+                                        ],
+                                        className="small mb-0 ps-3",
+                                        style={"listStyleType": "none"},
+                                    ),
+                                ],
                                 className="mb-3",
                             ),
                             dbc.Row(

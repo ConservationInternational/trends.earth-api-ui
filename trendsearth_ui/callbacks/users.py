@@ -15,14 +15,26 @@ USER_DATE_COLUMNS = ("created_at", "updated_at")
 
 
 def _format_user_rows(
-    users: list[dict[str, Any]], is_superadmin: bool, user_timezone: str | None
+    users: list[dict[str, Any]],
+    current_user_role: str | None,
+    user_timezone: str | None,
 ) -> list[dict[str, Any]]:
-    """Normalize user rows for display in AG-Grid."""
+    """Normalize user rows for display in AG-Grid.
+
+    Edit button visibility rules:
+    - SUPERADMIN: Can edit all users
+    - ADMIN: Can edit users except SUPERADMIN users
+    """
     rows: list[dict[str, Any]] = []
     timezone = user_timezone or "UTC"
+    is_superadmin = current_user_role == "SUPERADMIN"
+    is_admin = current_user_role == "ADMIN"
     for user_row in users:
         row = user_row.copy()
-        if is_superadmin:
+        target_user_role = user_row.get("role", "USER")
+        # SUPERADMIN can edit all users
+        # ADMIN can edit users except SUPERADMIN
+        if is_superadmin or (is_admin and target_user_role != "SUPERADMIN"):
             row["edit"] = "Edit"
         for date_col in USER_DATE_COLUMNS:
             if date_col in row:
@@ -35,7 +47,7 @@ def _fetch_users_page(
     token: str,
     params: dict[str, Any],
     *,
-    is_superadmin: bool,
+    current_user_role: str | None,
     user_timezone: str | None,
 ) -> tuple[list[dict[str, Any]], int]:
     """Fetch a page of users from the API and format the rows."""
@@ -46,7 +58,7 @@ def _fetch_users_page(
     payload = response.json()
     users = payload.get("data", [])
     total_rows = payload.get("total", 0)
-    tabledata = _format_user_rows(users, is_superadmin, user_timezone)
+    tabledata = _format_user_rows(users, current_user_role, user_timezone)
     return tabledata, total_rows
 
 
@@ -91,7 +103,7 @@ def register_callbacks(app):
             tabledata, total_rows = _fetch_users_page(
                 token,
                 params,
-                is_superadmin=role == "SUPERADMIN",
+                current_user_role=role,
                 user_timezone=user_timezone,
             )
 
@@ -137,7 +149,7 @@ def register_callbacks(app):
             tabledata, total_rows = _fetch_users_page(
                 token,
                 params,
-                is_superadmin=role == "SUPERADMIN",
+                current_user_role=role,
                 user_timezone=user_timezone,
             )
 

@@ -104,9 +104,58 @@ def register_callbacks(app):
         if new_password != confirm_password:
             return "New passwords do not match.", "danger", True, no_update, no_update, no_update
 
-        if len(new_password) < 6:
+        # Validate password meets API requirements:
+        # - At least 12 characters
+        # - At least one uppercase letter
+        # - At least one lowercase letter
+        # - At least one digit
+        # - At least one special character
+        import re
+
+        if len(new_password) < 12:
             return (
-                "Password must be at least 6 characters long.",
+                "Password must be at least 12 characters long.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"[A-Z]", new_password):
+            return (
+                "Password must include an uppercase letter.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"[a-z]", new_password):
+            return (
+                "Password must include a lowercase letter.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"\d", new_password):
+            return (
+                "Password must include a number.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                no_update,
+            )
+
+        special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+        if not re.search(f"[{special_chars}]", new_password):
+            return (
+                "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/).",
                 "danger",
                 True,
                 no_update,
@@ -138,7 +187,8 @@ def register_callbacks(app):
                 error_msg = "Failed to change password."
                 try:
                     error_data = resp.json()
-                    error_msg = error_data.get("msg", error_msg)
+                    # Check for both "detail" and "msg" keys as API may return either
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                     print(f"🔍 API error response: {error_data}")
                 except Exception:
                     pass

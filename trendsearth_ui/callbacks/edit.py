@@ -32,9 +32,15 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def open_edit_user_modal(cell_clicked, role, token, table_state):
-        """Open edit user modal from user table."""
+        """Open edit user modal from user table.
+
+        Access rules:
+        - SUPERADMIN: Can open edit modal for any user
+        - ADMIN: Can open edit modal for non-SUPERADMIN users only
+        """
         print(f"🔧 USER EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
-        if not cell_clicked or role != "SUPERADMIN":
+        # Only ADMIN and SUPERADMIN can edit users
+        if not cell_clicked or role not in ("ADMIN", "SUPERADMIN"):
             return False, None, "", "", "", "", "USER", "", ""
         if cell_clicked.get("colId") != "edit":
             return False, None, "", "", "", "", "USER", "", ""
@@ -45,6 +51,12 @@ def register_callbacks(app):
             return False, None, "", "", "", "", "USER", "", ""
         else:
             print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
+
+        # ADMIN cannot edit SUPERADMIN users
+        target_user_role = user.get("role", "USER")
+        if role == "ADMIN" and target_user_role == "SUPERADMIN":
+            print("❌ ADMIN cannot edit SUPERADMIN users")
+            return False, None, "", "", "", "", "USER", "", ""
 
         return (
             True,
@@ -401,13 +413,40 @@ def register_callbacks(app):
             State("admin-confirm-password", "value"),
             State("edit-user-data", "data"),
             State("token-store", "data"),
+            State("role-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def admin_change_password(n_clicks, new_password, confirm_password, user_data, token):
-        """Change password for another user (admin only)."""
+    def admin_change_password(n_clicks, new_password, confirm_password, user_data, token, role):
+        """Change password for another user (admin only).
+
+        Access rules:
+        - SUPERADMIN: Can change any user's password
+        - ADMIN: Can change passwords for non-SUPERADMIN users only
+        """
         if not n_clicks or not token or not user_data:
             return no_update, no_update, no_update, no_update, no_update
+
+        # Check if current user has permission to change passwords
+        if role not in ("ADMIN", "SUPERADMIN"):
+            return (
+                "You do not have permission to change passwords.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        # Check if ADMIN is trying to change SUPERADMIN password
+        target_user_role = user_data.get("role", "USER")
+        if role == "ADMIN" and target_user_role == "SUPERADMIN":
+            return (
+                "Administrators cannot change superadmin passwords.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
 
         if not new_password or not confirm_password:
             return (
@@ -421,9 +460,54 @@ def register_callbacks(app):
         if new_password != confirm_password:
             return "Passwords do not match.", "danger", True, no_update, no_update
 
-        if len(new_password) < 6:
+        # Validate password meets API requirements:
+        # - At least 12 characters
+        # - At least one uppercase letter
+        # - At least one lowercase letter
+        # - At least one digit
+        # - At least one special character
+        import re
+
+        if len(new_password) < 12:
             return (
-                "Password must be at least 6 characters long.",
+                "Password must be at least 12 characters long.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"[A-Z]", new_password):
+            return (
+                "Password must include an uppercase letter.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"[a-z]", new_password):
+            return (
+                "Password must include a lowercase letter.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        if not re.search(r"\d", new_password):
+            return (
+                "Password must include a number.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
+
+        special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+        if not re.search(f"[{special_chars}]", new_password):
+            return (
+                "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/).",
                 "danger",
                 True,
                 no_update,
@@ -438,7 +522,7 @@ def register_callbacks(app):
 
         try:
             print(
-                f"🔐 Admin attempting password change for user: {user_data.get('email', 'unknown')}"
+                f"🔐 {role} attempting password change for user: {user_data.get('email', 'unknown')}"
             )
 
             resp = make_authenticated_request(
@@ -458,7 +542,8 @@ def register_callbacks(app):
                 error_msg = "Failed to change password."
                 try:
                     error_data = resp.json()
-                    error_msg = error_data.get("msg", error_msg)
+                    # Check for both "msg" and "detail" keys as API may return either
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                     print(f"🔍 API error response: {error_data}")
                 except Exception:
                     pass
@@ -469,6 +554,50 @@ def register_callbacks(app):
         except Exception as e:
             print(f"💥 Network error during admin password change: {str(e)}")
             return f"Network error: {str(e)}", "danger", True, no_update, no_update
+
+    # Real-time password validation callback for admin password change
+    @app.callback(
+        [
+            Output("admin-req-length", "className"),
+            Output("admin-req-uppercase", "className"),
+            Output("admin-req-lowercase", "className"),
+            Output("admin-req-number", "className"),
+            Output("admin-req-special", "className"),
+            Output("admin-req-match", "className"),
+        ],
+        [
+            Input("admin-new-password", "value"),
+            Input("admin-confirm-password", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def validate_admin_password_requirements(password, confirm_password):
+        """Validate password requirements in real-time and update UI indicators."""
+        import re
+
+        if not password:
+            # Return all as muted when no password entered
+            return ["text-muted"] * 6
+
+        special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+
+        # Check each requirement
+        has_length = len(password) >= 12
+        has_upper = bool(re.search(r"[A-Z]", password))
+        has_lower = bool(re.search(r"[a-z]", password))
+        has_number = bool(re.search(r"\d", password))
+        has_special = bool(re.search(f"[{special_chars}]", password))
+        passwords_match = bool(password and confirm_password and password == confirm_password)
+
+        # Return success (green) or danger (red) class for each requirement
+        return [
+            "text-success" if has_length else "text-danger",
+            "text-success" if has_upper else "text-danger",
+            "text-success" if has_lower else "text-danger",
+            "text-success" if has_number else "text-danger",
+            "text-success" if has_special else "text-danger",
+            "text-success" if passwords_match else "text-danger",
+        ]
 
 
 # Legacy callback decorators for backward compatibility (these won't be executed)
