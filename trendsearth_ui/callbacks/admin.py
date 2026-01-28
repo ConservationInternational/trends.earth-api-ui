@@ -799,6 +799,15 @@ def register_callbacks(app):
             return "", True
 
         if filename:
+            # Validate file extension - API requires .tar.gz archives
+            if not filename.endswith(".tar.gz"):
+                return html.Div(
+                    [
+                        html.I(className="fas fa-exclamation-triangle text-warning me-2"),
+                        f"Invalid file type: {filename}. Must be a .tar.gz archive containing configuration.json.",
+                    ]
+                ), True
+
             # Get file size from base64 content
             content_string = contents.split(",")[1]
             decoded = base64.b64decode(content_string)
@@ -816,7 +825,7 @@ def register_callbacks(app):
             return html.Div(
                 [
                     html.I(className="fas fa-check-circle text-success me-2"),
-                    f"File ready: {filename} ({file_size_mb:.2f}MB)",
+                    f"Archive ready: {filename} ({file_size_mb:.2f}MB)",
                 ]
             ), False
 
@@ -827,9 +836,6 @@ def register_callbacks(app):
             Output("admin-upload-script-alert", "children"),
             Output("admin-upload-script-alert", "color"),
             Output("admin-upload-script-alert", "is_open"),
-            Output("admin-new-script-name", "value"),
-            Output("admin-new-script-description", "value"),
-            Output("admin-new-script-status", "value"),
             Output("admin-script-upload", "contents"),
             Output("admin-script-upload", "filename"),
         ],
@@ -838,9 +844,6 @@ def register_callbacks(app):
             Input("admin-clear-script-form-btn", "n_clicks"),
         ],
         [
-            State("admin-new-script-name", "value"),
-            State("admin-new-script-description", "value"),
-            State("admin-new-script-status", "value"),
             State("admin-script-upload", "contents"),
             State("admin-script-upload", "filename"),
             State("token-store", "data"),
@@ -851,9 +854,6 @@ def register_callbacks(app):
     def handle_upload_script(
         upload_clicks,
         _clear_clicks,
-        name,
-        description,
-        status,
         contents,
         filename,
         token,
@@ -863,9 +863,6 @@ def register_callbacks(app):
         ctx = callback_context
         if not ctx.triggered:
             return (
-                no_update,
-                no_update,
-                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -883,80 +880,79 @@ def register_callbacks(app):
                 True,
                 no_update,
                 no_update,
-                no_update,
-                no_update,
-                no_update,
             )
 
         if trigger_id == "admin-clear-script-form-btn":
             # Clear the form
-            return "", "info", False, "", "", "DRAFT", None, None
+            return "", "info", False, None, None
 
         if trigger_id == "admin-upload-script-btn" and upload_clicks:
-            # Validate inputs
-            if not name or not contents or not filename:
+            # Validate inputs - only file is required, name/description come from configuration.json in archive
+            if not contents or not filename:
                 return (
-                    "Please fill in the script name and select a file to upload.",
+                    "Please select a .tar.gz script archive to upload.",
                     "warning",
                     True,
                     no_update,
                     no_update,
-                    no_update,
+                )
+
+            # Validate file extension
+            if not filename.endswith(".tar.gz"):
+                return (
+                    "Invalid file type. The API requires a .tar.gz archive containing a configuration.json file.",
+                    "warning",
+                    True,
                     no_update,
                     no_update,
                 )
 
             try:
-                # Prepare script data
+                # Decode the file content
                 content_string = contents.split(",")[1]
                 decoded_content = base64.b64decode(content_string)
 
-                script_data = {
-                    "name": name.strip(),
-                    "description": description.strip() if description else "",
-                    "status": status,
-                    "filename": filename,
-                }
-
-                # Create multipart form data
-                files = {"file": (filename, decoded_content)}
+                # Create multipart form data - API only expects the file
+                # Script metadata (name, description, etc.) is extracted from configuration.json inside the archive
+                files = {"file": (filename, decoded_content, "application/gzip")}
 
                 response = make_authenticated_request(
-                    "/script", token, method="POST", data=script_data, files=files, timeout=30
+                    "/script", token, method="POST", files=files, timeout=60
                 )
 
                 if response.status_code in [200, 201]:
-                    # Success - clear form and show success message
+                    # Success - extract script name from response if available
+                    try:
+                        script_data = response.json().get("data", {})
+                        script_name = script_data.get("name", filename)
+                    except Exception:
+                        script_name = filename
+                    # Clear form and show success message
                     return (
-                        f"Script '{name}' uploaded successfully.",
+                        f"Script '{script_name}' uploaded successfully.",
                         "success",
                         True,
-                        "",
-                        "",
-                        "DRAFT",
                         None,
                         None,
-                    )
-                elif response.status_code == 409:
-                    return (
-                        "A script with this name already exists.",
-                        "warning",
-                        True,
-                        no_update,
-                        no_update,
-                        no_update,
-                        no_update,
-                        no_update,
                     )
                 elif response.status_code == 400:
-                    error_detail = response.json().get("detail", "Invalid script data.")
+                    # Handle duplicate script (ScriptDuplicated) or invalid file (InvalidFile)
+                    try:
+                        error_detail = response.json().get("detail", "Invalid script archive.")
+                    except Exception:
+                        error_detail = response.text or "Invalid script archive."
                     return (
                         f"Error uploading script: {error_detail}",
                         "danger",
                         True,
                         no_update,
                         no_update,
-                        no_update,
+                    )
+                elif response.status_code == 403:
+                    return (
+                        "Permission denied. Only admins and superadmins can create scripts.",
+                        "danger",
+                        True,
                         no_update,
                         no_update,
                     )
@@ -965,9 +961,6 @@ def register_callbacks(app):
                         f"Failed to upload script. Server responded with status {response.status_code}.",
                         "danger",
                         True,
-                        no_update,
-                        no_update,
-                        no_update,
                         no_update,
                         no_update,
                     )
@@ -979,18 +972,12 @@ def register_callbacks(app):
                     True,
                     no_update,
                     no_update,
-                    no_update,
-                    no_update,
-                    no_update,
                 )
             except requests.exceptions.ConnectionError:
                 return (
                     "Cannot connect to server. Please check your connection.",
                     "danger",
                     True,
-                    no_update,
-                    no_update,
-                    no_update,
                     no_update,
                     no_update,
                 )
@@ -1001,15 +988,9 @@ def register_callbacks(app):
                     True,
                     no_update,
                     no_update,
-                    no_update,
-                    no_update,
-                    no_update,
                 )
 
         return (
-            no_update,
-            no_update,
-            no_update,
             no_update,
             no_update,
             no_update,

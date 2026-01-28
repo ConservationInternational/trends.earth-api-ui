@@ -1478,63 +1478,23 @@ def admin_tab_content(role, is_admin):
                     ),
                     dbc.CardBody(
                         [
+                            dbc.Alert(
+                                [
+                                    html.I(className="fas fa-info-circle me-2"),
+                                    "Upload a .tar.gz archive containing your script and a ",
+                                    html.Code("configuration.json"),
+                                    " file. The script name and metadata are read from the configuration file.",
+                                ],
+                                color="info",
+                                className="mb-3",
+                            ),
                             dbc.Form(
                                 [
                                     dbc.Row(
                                         [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Script Name *"),
-                                                    dbc.Input(
-                                                        id="admin-new-script-name",
-                                                        type="text",
-                                                        placeholder="Enter script name",
-                                                        required=True,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Script Status"),
-                                                    dbc.Select(
-                                                        id="admin-new-script-status",
-                                                        options=[
-                                                            {"label": "Draft", "value": "DRAFT"},
-                                                            {
-                                                                "label": "Published",
-                                                                "value": "PUBLISHED",
-                                                            },
-                                                        ],
-                                                        value="DRAFT",
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Description"),
-                                                    dbc.Textarea(
-                                                        id="admin-new-script-description",
-                                                        placeholder="Enter script description",
-                                                        rows=3,
-                                                    ),
-                                                ],
-                                                width=12,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Script File *"),
+                                                    dbc.Label("Script Archive (.tar.gz) *"),
                                                     dcc.Upload(
                                                         id="admin-script-upload",
                                                         children=html.Div(
@@ -1543,7 +1503,7 @@ def admin_tab_content(role, is_admin):
                                                                     className="fas fa-cloud-upload-alt me-2"
                                                                 ),
                                                                 "Drag and Drop or ",
-                                                                html.A("Select Script File"),
+                                                                html.A("Select Script Archive"),
                                                             ]
                                                         ),
                                                         style={
@@ -1559,7 +1519,7 @@ def admin_tab_content(role, is_admin):
                                                             "backgroundColor": "#f8f9fa",
                                                         },
                                                         multiple=False,
-                                                        accept=".py,.js,.sh,.bat,.r,.ipynb",
+                                                        accept=".tar.gz,.gz",
                                                     ),
                                                     html.Div(
                                                         id="admin-script-upload-status",
@@ -1607,7 +1567,7 @@ def admin_tab_content(role, is_admin):
                                         duration=5000,
                                     ),
                                 ]
-                            )
+                            ),
                         ]
                     ),
                 ],

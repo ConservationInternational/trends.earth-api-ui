@@ -219,6 +219,12 @@ def register_callbacks(app):
         if token is None or user_data is None:
             return no_update, no_update, no_update, no_update
 
+        # Check if the value actually changed from what's stored
+        # This prevents showing success message on initial page load
+        current_value = user_data.get("email_notifications_enabled", True)
+        if enabled == current_value:
+            return no_update, no_update, no_update, no_update
+
         try:
             from ..utils.helpers import make_authenticated_request
 

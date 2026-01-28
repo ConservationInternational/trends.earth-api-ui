@@ -458,11 +458,17 @@ def edit_script_modal():
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Upload New Script File (optional)"),
+                                            dbc.Label("Upload New Script Archive (optional)"),
                                             dcc.Upload(
                                                 id="edit-script-upload",
                                                 children=html.Div(
-                                                    ["Drag and Drop or ", html.A("Select Files")]
+                                                    [
+                                                        html.I(
+                                                            className="fas fa-cloud-upload-alt me-2"
+                                                        ),
+                                                        "Drag and Drop or ",
+                                                        html.A("Select .tar.gz Archive"),
+                                                    ]
                                                 ),
                                                 style={
                                                     "width": "100%",
@@ -475,6 +481,11 @@ def edit_script_modal():
                                                     "margin": "10px",
                                                 },
                                                 multiple=False,
+                                                accept=".tar.gz,.gz",
+                                            ),
+                                            dbc.FormText(
+                                                "Upload a new .tar.gz archive to update the script code. "
+                                                "The archive must contain a configuration.json file."
                                             ),
                                         ],
                                         width=12,
