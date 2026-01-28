@@ -241,7 +241,15 @@ def get_mobile_column_config():
                 },
             ],
             "secondary_columns": [
-                {"headerName": "ID", "field": "id", "width": 80, "cellStyle": {"fontSize": "11px"}},
+                {
+                    "headerName": "ID",
+                    "field": "id",
+                    "flex": 0.8,
+                    "minWidth": 100,
+                    "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
+                    "tooltipField": "id",
+                    "resizable": True,
+                },
                 {
                     "headerName": "Edit",
                     "field": "edit",
