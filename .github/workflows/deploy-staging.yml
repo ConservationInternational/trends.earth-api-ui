@@ -118,6 +118,35 @@ jobs:
         echo "S3_BUCKET=$CODEDEPLOY_S3_BUCKET" >> $GITHUB_ENV
         echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
 
+    - name: Cancel in-progress deployments
+      run: |
+        echo "🔍 Checking for in-progress deployments..."
+        
+        # Get list of in-progress deployments for this deployment group
+        IN_PROGRESS=$(aws deploy list-deployments \
+          --application-name ${{ env.CODEDEPLOY_APPLICATION }} \
+          --deployment-group-name ${{ env.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+          --include-only-statuses "InProgress" "Queued" "Created" \
+          --query 'deployments' \
+          --output text)
+        
+        if [ -n "$IN_PROGRESS" ] && [ "$IN_PROGRESS" != "None" ]; then
+          echo "⚠️ Found in-progress deployments: $IN_PROGRESS"
+          
+          for DEPLOY_ID in $IN_PROGRESS; do
+            echo "🛑 Stopping deployment: $DEPLOY_ID"
+            aws deploy stop-deployment \
+              --deployment-id "$DEPLOY_ID" \
+              --auto-rollback-enabled || echo "Could not stop $DEPLOY_ID (may have already completed)"
+          done
+          
+          # Wait a moment for deployments to stop
+          sleep 10
+          echo "✅ Cancelled previous in-progress deployments"
+        else
+          echo "✅ No in-progress deployments found"
+        fi
+
     - name: Create CodeDeploy deployment
       id: deploy
       run: |
