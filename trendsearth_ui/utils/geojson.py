@@ -1,11 +1,14 @@
 """GeoJSON utilities for map functionality."""
 
 import json
+import logging
 
 from dash import html
 import dash_leaflet as dl
 
 from ..config import DEFAULT_MAP_TILE_PROVIDER, MAP_TILE_PROVIDERS
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_geojson_feature(geojson_data):
@@ -86,15 +89,7 @@ def extract_coordinates_from_geometry(geometry):
 def create_map_from_geojsons(geojsons, exec_id):
     """Create a Leaflet map from geojsons data."""
     try:
-        print(f"DEBUG: create_map_from_geojsons called with geojsons type: {type(geojsons)}")
-        if isinstance(geojsons, list):
-            print(f"DEBUG: geojsons is a list with {len(geojsons)} items")
-        elif isinstance(geojsons, dict):
-            print(f"DEBUG: geojsons is a dict with keys: {list(geojsons.keys())}")
-        elif isinstance(geojsons, str):
-            print(f"DEBUG: geojsons is a string with length: {len(geojsons)}")
-        else:
-            print(f"DEBUG: geojsons is of unexpected type: {type(geojsons)}")
+        logger.debug("create_map_from_geojsons called with geojsons type: %s", type(geojsons))
 
         # Initialize map layers
         map_layers = []
@@ -104,17 +99,15 @@ def create_map_from_geojsons(geojsons, exec_id):
         zoom = 2
 
         if isinstance(geojsons, list):
-            print(f"DEBUG: Processing list of {len(geojsons)} geojsons")
+            logger.debug("Processing list of %d geojsons", len(geojsons))
             all_coordinates = []
 
             for i, geojson in enumerate(geojsons):
-                print(f"DEBUG: Processing geojson {i}: {type(geojson)}")
                 if isinstance(geojson, str):
                     try:
                         geojson_dict = json.loads(geojson)
-                        print(f"DEBUG: Parsed JSON string to {type(geojson_dict)}")
                     except json.JSONDecodeError:
-                        print("DEBUG: Failed to parse JSON string")
+                        logger.debug("Failed to parse JSON string at index %d", i)
                         continue
                 else:
                     geojson_dict = geojson
@@ -124,23 +117,12 @@ def create_map_from_geojsons(geojsons, exec_id):
                     isinstance(geojson_dict, dict)
                     and geojson_dict.get("type") == "FeatureCollection"
                 ):
-                    print(
-                        f"DEBUG: Found FeatureCollection with {len(geojson_dict.get('features', []))} features"
-                    )
                     features = geojson_dict.get("features", [])
                     for j, feature in enumerate(features):
-                        print(f"DEBUG: Processing feature {j} from FeatureCollection")
                         feature_data = ensure_geojson_feature(feature)
                         if feature_data:
                             # Add this feature as a separate layer
                             geometry = feature_data.get("geometry")
-                            if geometry:
-                                print(f"DEBUG: Feature {j} geometry type: {geometry.get('type')}")
-                                coords = geometry.get("coordinates", [])
-                                if coords:
-                                    print(
-                                        f"DEBUG: Feature {j} first few coordinates: {coords[:2] if isinstance(coords, list) else 'Not a list'}"
-                                    )
 
                             # Add GeoJSON layer
                             layer = dl.GeoJSON(
@@ -159,34 +141,19 @@ def create_map_from_geojsons(geojsons, exec_id):
                                 hoverStyle={"weight": 8, "color": "#0000FF", "fillOpacity": 0.7},
                             )
                             map_layers.append(layer)
-                            print(f"DEBUG: Added GeoJSON layer {i}-{j} to map_layers")
 
                             # Extract coordinates for centering
                             if geometry and geometry.get("type") in ["Polygon", "MultiPolygon"]:
                                 extracted_coords = extract_coordinates_from_geometry(geometry)
                                 all_coordinates.extend(extracted_coords)
-                                print(
-                                    f"DEBUG: Extracted {len(extracted_coords)} coordinates from feature {j}"
-                                )
 
                 # Handle regular geometry or feature
                 elif isinstance(geojson_dict, dict):
                     # Convert bare geometry to GeoJSON Feature if needed
                     feature_data = ensure_geojson_feature(geojson_dict)
-                    print(
-                        f"DEBUG: Created feature data: {feature_data.get('type', 'unknown') if isinstance(feature_data, dict) else type(feature_data)}"
-                    )
 
                     if feature_data:
-                        # Debug: Print the geometry type and coordinates
                         geometry = feature_data.get("geometry")
-                        if geometry:
-                            print(f"DEBUG: Geometry type: {geometry.get('type')}")
-                            coords = geometry.get("coordinates", [])
-                            if coords:
-                                print(
-                                    f"DEBUG: First few coordinates: {coords[:2] if isinstance(coords, list) else 'Not a list'}"
-                                )
 
                         # Add GeoJSON layer (always red)
                         layer = dl.GeoJSON(
@@ -205,7 +172,6 @@ def create_map_from_geojsons(geojsons, exec_id):
                             hoverStyle={"weight": 8, "color": "#0000FF", "fillOpacity": 0.7},
                         )
                         map_layers.append(layer)
-                        print(f"DEBUG: Added GeoJSON layer {i} to map_layers")
 
                         # Also try adding a Polygon component as fallback
                         if geometry and geometry.get("type") == "Polygon":
@@ -227,17 +193,11 @@ def create_map_from_geojsons(geojsons, exec_id):
                                     children=[dl.Tooltip("Area of Interest")],
                                 )
                                 map_layers.append(polygon_layer)
-                                print(f"DEBUG: Added Polygon layer {i} to map_layers")
 
                         # Extract coordinates for centering
                         if geometry and geometry.get("type") in ["Polygon", "MultiPolygon"]:
                             extracted_coords = extract_coordinates_from_geometry(geometry)
                             all_coordinates.extend(extracted_coords)
-                            print(
-                                f"DEBUG: Extracted {len(extracted_coords)} coordinates from geojson {i}"
-                            )
-                else:
-                    print(f"DEBUG: Skipping non-dict geojson_dict: {type(geojson_dict)}")
 
             # Calculate center and zoom from all coordinates
             if all_coordinates:
@@ -274,49 +234,51 @@ def create_map_from_geojsons(geojsons, exec_id):
                 else:
                     zoom = 8
 
-                print(f"DEBUG: Calculated center from {len(all_coordinates)} coordinates: {center}")
-                print(f"DEBUG: Bounds: lat({min_lat}, {max_lat}), lon({min_lon}, {max_lon})")
-                print(f"DEBUG: Max span: {max_span}, calculated zoom: {zoom}")
+                logger.debug("Calculated center from %d coordinates: %s", len(all_coordinates), center)
+                logger.debug("Bounds: lat(%s, %s), lon(%s, %s)", min_lat, max_lat, min_lon, max_lon)
+                logger.debug("Max span: %s, calculated zoom: %s", max_span, zoom)
             else:
-                print("DEBUG: No coordinates found, using default center")
+                logger.debug("No coordinates found, using default center")
 
         elif isinstance(geojsons, (dict, str)):
-            print("DEBUG: Processing single geojson")
+            logger.debug("Processing single geojson")
             # Single geojson
             if isinstance(geojsons, str):
                 try:
                     parsed_data = json.loads(geojsons)
-                    print(f"DEBUG: Parsed single JSON string to {type(parsed_data)}")
+                    logger.debug("Parsed single JSON string to %s", type(parsed_data))
 
                     # Check if the parsed string is actually a list
                     if isinstance(parsed_data, list):
-                        print(
-                            "DEBUG: Parsed string is actually a list, redirecting to list processing"
+                        logger.debug(
+                            "Parsed string is actually a list, redirecting to list processing"
                         )
                         # Recursively call with the parsed list
                         return create_map_from_geojsons(parsed_data, exec_id)
                     else:
                         geojson_dict = parsed_data
                 except json.JSONDecodeError:
-                    print("DEBUG: Failed to parse single JSON string")
+                    logger.debug("Failed to parse single JSON string")
                     return [html.P("Could not parse GeoJSON data.")]
             else:
                 geojson_dict = geojsons
 
             # Convert bare geometry to GeoJSON Feature if needed
             feature_data = ensure_geojson_feature(geojson_dict)
-            print(
-                f"DEBUG: Created single feature data: {feature_data.get('type', 'unknown') if isinstance(feature_data, dict) else type(feature_data)}"
+            logger.debug(
+                "Created single feature data: %s",
+                feature_data.get('type', 'unknown') if isinstance(feature_data, dict) else type(feature_data)
             )
 
-            # Debug: Print the geometry type and coordinates
+            # Log the geometry type and coordinates for debugging
             geometry = feature_data.get("geometry")
             if geometry:
-                print(f"DEBUG: Single geometry type: {geometry.get('type')}")
+                logger.debug("Single geometry type: %s", geometry.get('type'))
                 coords = geometry.get("coordinates", [])
                 if coords:
-                    print(
-                        f"DEBUG: Single first few coordinates: {coords[:2] if isinstance(coords, list) else 'Not a list'}"
+                    logger.debug(
+                        "Single first few coordinates: %s",
+                        coords[:2] if isinstance(coords, list) else 'Not a list'
                     )
 
             layer = dl.GeoJSON(
@@ -335,7 +297,7 @@ def create_map_from_geojsons(geojsons, exec_id):
                 hoverStyle={"weight": 8, "color": "#0000FF", "fillOpacity": 0.7},
             )
             map_layers.append(layer)
-            print("DEBUG: Added single GeoJSON layer to map_layers")
+            logger.debug("Added single GeoJSON layer to map_layers")
 
             # Also try adding a Polygon component as fallback
             geometry = get_geometry_from_geojson(feature_data)
@@ -358,7 +320,7 @@ def create_map_from_geojsons(geojsons, exec_id):
                         children=[dl.Tooltip("Area of Interest")],
                     )
                     map_layers.append(polygon_layer)
-                    print("DEBUG: Added single Polygon layer to map_layers")
+                    logger.debug("Added single Polygon layer to map_layers")
 
             # Add a visible marker at the center as a fallback
             if geometry:
@@ -378,7 +340,7 @@ def create_map_from_geojsons(geojsons, exec_id):
                         fillOpacity=0.8,
                     )
                     map_layers.append(center_marker)
-                    print(f"DEBUG: Added single center marker at {center_coord}")
+                    logger.debug("Added single center marker at %s", center_coord)
 
             # Extract coordinates for centering
             geometry = get_geometry_from_geojson(feature_data)
@@ -418,16 +380,16 @@ def create_map_from_geojsons(geojsons, exec_id):
                     else:
                         zoom = 8
 
-                    print(f"DEBUG: Calculated single center: {center}, zoom: {zoom}")
-                    print(
-                        f"DEBUG: Single bounds: lat({min_lat}, {max_lat}), lon({min_lon}, {max_lon})"
+                    logger.debug("Calculated single center: %s, zoom: %s", center, zoom)
+                    logger.debug(
+                        "Single bounds: lat(%s, %s), lon(%s, %s)", min_lat, max_lat, min_lon, max_lon
                     )
-                    print(f"DEBUG: Single max span: {max_span}")
+                    logger.debug("Single max span: %s", max_span)
         else:
-            print(f"DEBUG: No valid geojsons provided or unsupported type: {type(geojsons)}")
+            logger.debug("No valid geojsons provided or unsupported type: %s", type(geojsons))
 
-        print(f"DEBUG: Final map_layers count: {len(map_layers)}")
-        print(f"DEBUG: Final center: {center}, zoom: {zoom}")
+        logger.debug("Final map_layers count: %d", len(map_layers))
+        logger.debug("Final center: %s, zoom: %s", center, zoom)
 
         # Create the map with English-only tile layer
         map_component = dl.Map(

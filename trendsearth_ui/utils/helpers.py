@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import json
+import logging
 from typing import Optional
 
 import requests
@@ -9,6 +10,8 @@ import requests
 from ..config import API_BASE, AUTH_URL
 from .http_client import apply_default_headers
 from .timezone_utils import format_local_time, get_safe_timezone
+
+logger = logging.getLogger(__name__)
 
 
 def parse_date(date_str, user_timezone="UTC"):
@@ -62,96 +65,71 @@ def safe_table_data(data, column_ids=None):
 def get_user_info(token, api_base=None):
     """Get user information from API with improved error handling."""
     if not token:
-        print("❌ get_user_info: No token provided")
+        logger.debug("get_user_info: No token provided")
         return None
 
     # Use provided api_base or fallback to default
     base_url = api_base or API_BASE
     headers = apply_default_headers({"Authorization": f"Bearer {token}"})
 
-    print(f"🔍 get_user_info: Using API base URL: {base_url}")
-    print(f"🔍 get_user_info: Token length: {len(token)} characters")
+    logger.debug("get_user_info: Using API base URL: %s", base_url)
 
     try:
         # Try /user/me endpoint first
         me_url = f"{base_url}/user/me"
-        print(f"🌐 get_user_info: Attempting GET request to {me_url}")
+        logger.debug("get_user_info: Attempting GET request to %s", me_url)
 
         resp = requests.get(me_url, headers=headers, timeout=10)
-        print(f"📊 get_user_info: /user/me response status: {resp.status_code}")
+        logger.debug("get_user_info: /user/me response status: %s", resp.status_code)
 
         if resp.status_code == 200:
             try:
                 response_json = resp.json()
-                print(
-                    f"✅ get_user_info: /user/me response JSON keys: {list(response_json.keys()) if isinstance(response_json, dict) else 'Not a dict'}"
-                )
                 user_data = response_json.get("data", {})
                 if user_data:
-                    print("✅ get_user_info: Successfully retrieved user data from /user/me")
-                    print(
-                        f"🔍 get_user_info: User data keys: {list(user_data.keys()) if isinstance(user_data, dict) else 'Not a dict'}"
-                    )
+                    logger.debug("get_user_info: Successfully retrieved user data from /user/me")
                     return user_data
                 else:
-                    print("⚠️ get_user_info: /user/me returned empty data field")
+                    logger.debug("get_user_info: /user/me returned empty data field")
             except ValueError as e:
-                print(f"❌ get_user_info: Failed to parse /user/me JSON response: {e}")
-                print(f"🔍 get_user_info: Raw response text: {resp.text[:500]}...")
+                logger.debug("get_user_info: Failed to parse /user/me JSON response: %s", e)
         else:
-            print(f"❌ get_user_info: /user/me failed with status {resp.status_code}")
-            print(f"🔍 get_user_info: Error response text: {resp.text[:500]}...")
+            logger.debug("get_user_info: /user/me failed with status %s", resp.status_code)
 
         # Try /user endpoint as fallback
         user_url = f"{base_url}/user"
-        print(f"🌐 get_user_info: Attempting fallback GET request to {user_url}")
+        logger.debug("get_user_info: Attempting fallback GET request to %s", user_url)
 
         resp = requests.get(user_url, headers=headers, timeout=10)
-        print(f"📊 get_user_info: /user response status: {resp.status_code}")
+        logger.debug("get_user_info: /user response status: %s", resp.status_code)
 
         if resp.status_code == 200:
             try:
                 response_json = resp.json()
-                print(
-                    f"✅ get_user_info: /user response JSON keys: {list(response_json.keys()) if isinstance(response_json, dict) else 'Not a dict'}"
-                )
                 users = response_json.get("data", [])
-                print(
-                    f"🔍 get_user_info: Found {len(users) if isinstance(users, list) else 'non-list'} users in response"
-                )
 
                 if users and isinstance(users, list) and len(users) > 0:
                     user_data = users[0]
-                    print(
-                        "✅ get_user_info: Successfully retrieved user data from /user (first user)"
-                    )
-                    print(
-                        f"🔍 get_user_info: User data keys: {list(user_data.keys()) if isinstance(user_data, dict) else 'Not a dict'}"
-                    )
+                    logger.debug("get_user_info: Successfully retrieved user data from /user")
                     return user_data
                 else:
-                    print("⚠️ get_user_info: /user returned empty or invalid users array")
+                    logger.debug("get_user_info: /user returned empty or invalid users array")
             except ValueError as e:
-                print(f"❌ get_user_info: Failed to parse /user JSON response: {e}")
-                print(f"🔍 get_user_info: Raw response text: {resp.text[:500]}...")
+                logger.debug("get_user_info: Failed to parse /user JSON response: %s", e)
         else:
-            print(f"❌ get_user_info: /user failed with status {resp.status_code}")
-            print(f"🔍 get_user_info: Error response text: {resp.text[:500]}...")
+            logger.debug("get_user_info: /user failed with status %s", resp.status_code)
 
     except requests.exceptions.Timeout:
-        print("⏰ get_user_info: Timeout occurred while fetching user info")
+        logger.debug("get_user_info: Timeout occurred while fetching user info")
         return None
     except requests.exceptions.ConnectionError as e:
-        print(f"🌐 get_user_info: Connection error occurred while fetching user info: {e}")
+        logger.debug("get_user_info: Connection error occurred: %s", e)
         return None
     except Exception as e:
-        print(f"💥 get_user_info: Unexpected error fetching user info: {e}")
-        import traceback
-
-        print(f"🔍 get_user_info: Stack trace: {traceback.format_exc()}")
+        logger.debug("get_user_info: Unexpected error fetching user info: %s", e)
         return None
 
-    print("❌ get_user_info: All attempts to retrieve user info failed")
+    logger.debug("get_user_info: All attempts to retrieve user info failed")
     return None
 
 
@@ -189,20 +167,20 @@ def refresh_access_token(
             data = resp.json()
             access_token = data.get("access_token")
             expires_in = data.get("expires_in")
-            print("✅ Access token refreshed successfully")
+            logger.debug("Access token refreshed successfully")
             return access_token, expires_in
         else:
-            print(f"❌ Token refresh failed with status: {resp.status_code}")
+            logger.debug("Token refresh failed with status: %s", resp.status_code)
             return None, None
 
     except requests.exceptions.Timeout:
-        print("⏰ Token refresh request timed out")
+        logger.debug("Token refresh request timed out")
         return None, None
     except requests.exceptions.ConnectionError:
-        print("❌ Connection error during token refresh")
+        logger.debug("Connection error during token refresh")
         return None, None
     except Exception as e:
-        print(f"💥 Error during token refresh: {str(e)}")
+        logger.debug("Error during token refresh: %s", str(e))
         return None, None
 
 
@@ -242,20 +220,20 @@ def logout_user(access_token: str, refresh_token: str = None, api_environment: s
         )
 
         if resp.status_code == 200:
-            print("✅ User logged out successfully")
+            logger.debug("User logged out successfully")
             return True
         else:
-            print(f"❌ Logout failed with status: {resp.status_code}")
+            logger.debug("Logout failed with status: %s", resp.status_code)
             return False
 
     except requests.exceptions.Timeout:
-        print("⏰ Logout request timed out")
+        logger.debug("Logout request timed out")
         return False
     except requests.exceptions.ConnectionError:
-        print("❌ Connection error during logout")
+        logger.debug("Connection error during logout")
         return False
     except Exception as e:
-        print(f"💥 Error during logout: {str(e)}")
+        logger.debug("Error during logout: %s", str(e))
         return False
 
 
@@ -276,20 +254,20 @@ def logout_all_devices(access_token: str) -> bool:
         resp = requests.post(f"{AUTH_URL}/logout-all", headers=headers, timeout=10)
 
         if resp.status_code == 200:
-            print("✅ User logged out from all devices successfully")
+            logger.debug("User logged out from all devices successfully")
             return True
         else:
-            print(f"❌ Logout from all devices failed with status: {resp.status_code}")
+            logger.debug("Logout from all devices failed with status: %s", resp.status_code)
             return False
 
     except requests.exceptions.Timeout:
-        print("⏰ Logout all devices request timed out")
+        logger.debug("Logout all devices request timed out")
         return False
     except requests.exceptions.ConnectionError:
-        print("❌ Connection error during logout from all devices")
+        logger.debug("Connection error during logout from all devices")
         return False
     except Exception as e:
-        print(f"💥 Error during logout from all devices: {str(e)}")
+        logger.debug("Error during logout from all devices: %s", str(e))
         return False
 
 
@@ -328,13 +306,16 @@ def make_authenticated_request(
 
         from .jwt_helpers import should_refresh_token
 
-        print(
-            f"🔄 Authentication failed for {method} {full_url} (status: {resp.status_code}), attempting token refresh..."
+        logger.debug(
+            "Authentication failed for %s %s (status: %s), attempting token refresh",
+            method,
+            full_url,
+            resp.status_code,
         )
 
         # Check if the token actually needs refreshing (might be an API issue, not token expiry)
         if not should_refresh_token(token, buffer_minutes=1):
-            print("⚠️ Token appears to still be valid, API authentication issue may be server-side")
+            logger.debug("Token appears to still be valid, API authentication issue may be server-side")
             return resp  # Return original response if token seems fine
 
         # Try to get refresh token from cookie
@@ -349,12 +330,12 @@ def make_authenticated_request(
                     refresh_token = cookie_data.get("refresh_token")
                     api_environment = cookie_data.get("api_environment", "production")
         except Exception as e:
-            print(f"Error reading refresh token from cookie: {e}")
+            logger.debug("Error reading refresh token from cookie: %s", e)
 
         if refresh_token:
             new_access_token, expires_in = refresh_access_token(refresh_token, api_environment)
             if new_access_token:
-                print(f"✅ Token refreshed successfully, retrying {method} {full_url}...")
+                logger.debug("Token refreshed successfully, retrying %s %s", method, full_url)
 
                 # Update cookie with new access token to maintain session
                 try:
@@ -372,9 +353,9 @@ def make_authenticated_request(
                             new_access_token, refresh_token, email, user_data, api_environment
                         )
                         g.updated_auth_cookie = json.dumps(new_cookie_data)
-                        print("📝 Prepared updated cookie data for session maintenance")
+                        logger.debug("Prepared updated cookie data for session maintenance")
                 except Exception as e:
-                    print(f"Error preparing updated cookie: {e}")
+                    logger.debug("Error preparing updated cookie: %s", e)
 
                 # Retry with new token
                 headers = apply_default_headers(kwargs.get("headers"))
@@ -382,8 +363,8 @@ def make_authenticated_request(
                 kwargs["headers"] = headers
                 resp = getattr(requests, method.lower())(full_url, **kwargs)
             else:
-                print("❌ Token refresh failed")
+                logger.debug("Token refresh failed")
         else:
-            print("❌ No refresh token available")
+            logger.debug("No refresh token available")
 
     return resp

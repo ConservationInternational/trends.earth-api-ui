@@ -3,7 +3,10 @@
 import base64
 from datetime import datetime, timedelta, timezone
 import json
+import logging
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 def should_refresh_token(access_token: str, buffer_minutes: int = 5) -> bool:
@@ -32,7 +35,7 @@ def should_refresh_token(access_token: str, buffer_minutes: int = 5) -> bool:
 
     if should_refresh:
         time_left = (exp_time - now).total_seconds() / 60
-        print(f"🔄 Token should be refreshed - {time_left:.1f} minutes until expiry")
+        logger.debug("Token should be refreshed - %.1f minutes until expiry", time_left)
 
     return should_refresh
 
@@ -70,7 +73,7 @@ def decode_jwt_payload(token: str) -> Optional[dict[str, Any]]:
         return payload
 
     except Exception as e:
-        print(f"Error decoding JWT payload: {e}")
+        logger.debug("Error decoding JWT payload: %s", e)
         return None
 
 
@@ -95,7 +98,7 @@ def get_token_expiration(token: str) -> Optional[datetime]:
         # Convert Unix timestamp to datetime (UTC)
         return datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
     except Exception as e:
-        print(f"Error converting expiration timestamp: {e}")
+        logger.debug("Error converting expiration timestamp: %s", e)
         return None
 
 
@@ -177,65 +180,65 @@ def get_token_info(token: str) -> dict[str, Any]:
         info["issuer"] = payload.get("iss")
 
     except Exception as e:
-        print(f"Error getting token info: {e}")
+        logger.debug("Error getting token info: %s", e)
 
     return info
 
 
 def debug_token_expiration(access_token: str, refresh_token: str = None) -> None:
-    """Debug token expiration information (prints detailed info).
+    """Debug token expiration information (logs detailed info at DEBUG level).
 
     Args:
         access_token: Access token to analyze
         refresh_token: Optional refresh token to analyze
     """
-    print("🔍 JWT Token Analysis")
-    print("=" * 50)
+    logger.debug("JWT Token Analysis")
+    logger.debug("=" * 50)
 
     if access_token:
-        print("\n📄 ACCESS TOKEN:")
+        logger.debug("ACCESS TOKEN:")
         access_info = get_token_info(access_token)
 
         if access_info["valid"]:
-            print("   ✅ Valid JWT structure")
+            logger.debug("   Valid JWT structure")
             if access_info["exp_datetime"]:
-                print(f"   ⏰ Expires: {access_info['exp_local']}")
+                logger.debug("   Expires: %s", access_info["exp_local"])
                 if access_info["is_expired"]:
-                    print("   ❌ STATUS: EXPIRED")
+                    logger.debug("   STATUS: EXPIRED")
                 else:
-                    print("   ✅ STATUS: VALID")
+                    logger.debug("   STATUS: VALID")
                     exp_info = access_info["time_until_expiry"]
-                    print(f"   ⏳ Time until expiry: {exp_info['readable']}")
-                    print(f"   📊 Minutes remaining: {exp_info['minutes']:.1f}")
+                    logger.debug("   Time until expiry: %s", exp_info["readable"])
+                    logger.debug("   Minutes remaining: %.1f", exp_info["minutes"])
             else:
-                print("   ⚠️  No expiration claim found")
+                logger.debug("   No expiration claim found")
 
             if access_info["issued_at"]:
-                print(f"   📅 Issued: {access_info['issued_at']}")
+                logger.debug("   Issued: %s", access_info["issued_at"])
 
             if access_info["subject"]:
-                print(f"   👤 Subject: {access_info['subject']}")
+                logger.debug("   Subject: %s", access_info["subject"])
         else:
-            print("   ❌ Invalid JWT structure")
+            logger.debug("   Invalid JWT structure")
 
     if refresh_token:
-        print("\n🔄 REFRESH TOKEN:")
+        logger.debug("REFRESH TOKEN:")
         refresh_info = get_token_info(refresh_token)
 
         if refresh_info["valid"]:
-            print("   ✅ Valid JWT structure")
+            logger.debug("   Valid JWT structure")
             if refresh_info["exp_datetime"]:
-                print(f"   ⏰ Expires: {refresh_info['exp_local']}")
+                logger.debug("   Expires: %s", refresh_info["exp_local"])
                 if refresh_info["is_expired"]:
-                    print("   ❌ STATUS: EXPIRED")
+                    logger.debug("   STATUS: EXPIRED")
                 else:
-                    print("   ✅ STATUS: VALID")
+                    logger.debug("   STATUS: VALID")
                     exp_info = refresh_info["time_until_expiry"]
-                    print(f"   ⏳ Time until expiry: {exp_info['readable']}")
-                    print(f"   📊 Hours remaining: {exp_info['hours']:.1f}")
+                    logger.debug("   Time until expiry: %s", exp_info["readable"])
+                    logger.debug("   Hours remaining: %.1f", exp_info["hours"])
             else:
-                print("   ⚠️  No expiration claim found")
+                logger.debug("   No expiration claim found")
         else:
-            print("   ❌ Invalid JWT structure")
+            logger.debug("   Invalid JWT structure")
 
-    print("=" * 50)
+    logger.debug("=" * 50)
