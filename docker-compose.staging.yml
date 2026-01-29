@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api-ui:
     # ECR image resolved via DOCKER_REGISTRY environment variable

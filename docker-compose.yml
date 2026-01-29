@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   trendsearth-api-ui:
     build: 
