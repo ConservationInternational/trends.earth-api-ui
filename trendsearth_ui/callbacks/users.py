@@ -1,5 +1,6 @@
 """Users table callbacks."""
 
+import logging
 from typing import Any
 
 from dash import Input, Output, State, callback_context, html
@@ -9,6 +10,8 @@ from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
 from ..utils.helpers import make_authenticated_request
+
+logger = logging.getLogger(__name__)
 
 USER_ENDPOINT = "/user"
 USER_DATE_COLUMNS = ("created_at", "updated_at")
@@ -110,7 +113,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error in get_users_rows: {exc}")
+            logger.exception("Error in get_users_rows: %s", exc)
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
@@ -156,7 +159,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error in refresh_users_table: {exc}")
+            logger.exception("Error in refresh_users_table: %s", exc)
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
@@ -214,7 +217,7 @@ def register_callbacks(app):
             return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error updating user email notifications: {exc}")
+            logger.exception("Error updating user email notifications: %s", exc)
             return f"Network error: {exc}", "danger", True
 
     @app.callback(
@@ -283,7 +286,7 @@ def register_callbacks(app):
             )
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error getting user GEE status: {exc}")
+            logger.exception("Error getting user GEE status: %s", exc)
             return dbc.Alert("Error retrieving credentials status.", color="danger"), True, True
 
     @app.callback(
@@ -358,7 +361,7 @@ def register_callbacks(app):
             return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error uploading user service account: {exc}")
+            logger.exception("Error uploading user service account: %s", exc)
             return f"Error processing file: {exc}", "danger", True
 
     @app.callback(
@@ -440,7 +443,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error with user GEE management action: {exc}")
+            logger.exception("Error with user GEE management action: %s", exc)
             return f"Network error: {exc}", "danger", True
 
         return "", "info", False

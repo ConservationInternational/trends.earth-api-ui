@@ -1,8 +1,12 @@
 """Map modal callbacks."""
 
+import logging
+
 from dash import MATCH, Input, Output, State, html, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -88,10 +92,10 @@ def register_callbacks(app):
                 return False, [], f"Error fetching execution data: {str(e)}"
 
         if not execution_id:
-            print("DEBUG: Could not get execution ID")
+            logger.debug("Could not get execution ID")
             return False, [], f"Could not get execution ID. Cell data: {cell_clicked}"
 
-        print(f"DEBUG: Fetching execution details for ID: {execution_id}")
+        logger.debug("Fetching execution details for ID: %s", execution_id)
         try:
             from ..utils.helpers import make_authenticated_request
 

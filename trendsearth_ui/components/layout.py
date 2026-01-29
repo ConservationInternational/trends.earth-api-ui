@@ -1,5 +1,7 @@
 """Base layout components for the Trends.Earth API Dashboard."""
 
+import logging
+
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
@@ -23,6 +25,8 @@ from .modals import (
     reset_individual_rate_limit_modal,
     reset_rate_limits_modal,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def create_main_layout():
@@ -754,7 +758,9 @@ def dashboard_layout():
             n_intervals=0,
         ),
     ]
-    print(f"🏗️ Dashboard layout created with {len(layout)} components:")
+    logger.debug("Dashboard layout created with %d components", len(layout))
     for i, component in enumerate(layout):
-        print(f"  {i}: {type(component).__name__} - {getattr(component, 'id', 'no id')}")
+        logger.debug(
+            "  %d: %s - %s", i, type(component).__name__, getattr(component, "id", "no id")
+        )
     return layout

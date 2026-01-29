@@ -1,6 +1,10 @@
 """Manual tab switching callbacks to replace dbc.Tabs functionality."""
 
+import logging
+
 from dash import Input, Output, callback_context
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -149,7 +153,7 @@ def register_callbacks(app):
             else:
                 nav_classes.append("nav-link")
 
-        print(f"🔄 Tab switched to: {active_tab}")
+        logger.debug("Tab switched to: %s", active_tab)
 
         # Return all classes and active tab
         return (

@@ -1,10 +1,13 @@
 """Initialize callbacks package."""
 
 import importlib
+import logging
 
 from ..utils.custom_filters import register_filter_callbacks
 from ..utils.mobile_utils import register_mobile_callbacks
 from . import status
+
+logger = logging.getLogger(__name__)
 
 
 def register_all_callbacks(app):
@@ -46,11 +49,11 @@ def register_all_callbacks(app):
             elif hasattr(module, "register_responsive_callbacks"):
                 module.register_responsive_callbacks(app)
             else:
-                print(f"Warning: Module {module_name} does not have register_callbacks function")
+                logger.warning("Module %s does not have register_callbacks function", module_name)
         except ImportError as e:
-            print(f"Warning: Could not import {module_name} callbacks: {e}")
+            logger.warning("Could not import %s callbacks: %s", module_name, e)
         except Exception as e:
-            print(f"Error registering {module_name} callbacks: {e}")
+            logger.error("Error registering %s callbacks: %s", module_name, e)
 
 
 __all__ = [

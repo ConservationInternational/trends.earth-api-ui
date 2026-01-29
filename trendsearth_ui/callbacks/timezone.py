@@ -1,6 +1,10 @@
 """Timezone detection and management callbacks."""
 
+import logging
+
 from dash import Input, Output, callback, clientside_callback, dcc, html
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -21,7 +25,7 @@ def register_callbacks(app):
             app=app,
         )
     except Exception as e:
-        print(f"Error registering timezone clientside callback: {e}")
+        logger.error("Error registering timezone clientside callback: %s", e)
 
     @callback(
         Output("timezone-detection-status", "children"),

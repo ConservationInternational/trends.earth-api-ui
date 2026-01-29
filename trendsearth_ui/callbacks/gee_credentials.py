@@ -2,9 +2,12 @@
 
 import base64
 import json
+import logging
 
 from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -80,7 +83,7 @@ def register_callbacks(app):
                 )
 
         except Exception as e:
-            print(f"Error getting GEE status: {e}")
+            logger.exception("Error getting GEE status: %s", e)
             return dbc.Alert(
                 "Error retrieving credentials status.",
                 color="danger",
@@ -175,7 +178,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True
 
         except Exception as e:
-            print(f"Error initiating OAuth: {e}")
+            logger.exception("Error initiating OAuth: %s", e)
             return f"Network error: {str(e)}", "danger", True
 
     @app.callback(
@@ -253,7 +256,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True
 
         except Exception as e:
-            print(f"Error uploading service account: {e}")
+            logger.exception("Error uploading service account: %s", e)
             return f"Error processing file: {str(e)}", "danger", True
 
     @app.callback(
@@ -338,7 +341,7 @@ def register_callbacks(app):
                     return error_msg, "danger", True
 
         except Exception as e:
-            print(f"Error with GEE management action: {e}")
+            logger.exception("Error with GEE management action: %s", e)
             return f"Network error: {str(e)}", "danger", True
 
         return no_update, no_update, no_update

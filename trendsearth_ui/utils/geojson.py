@@ -234,7 +234,9 @@ def create_map_from_geojsons(geojsons, exec_id):
                 else:
                     zoom = 8
 
-                logger.debug("Calculated center from %d coordinates: %s", len(all_coordinates), center)
+                logger.debug(
+                    "Calculated center from %d coordinates: %s", len(all_coordinates), center
+                )
                 logger.debug("Bounds: lat(%s, %s), lon(%s, %s)", min_lat, max_lat, min_lon, max_lon)
                 logger.debug("Max span: %s, calculated zoom: %s", max_span, zoom)
             else:
@@ -267,18 +269,20 @@ def create_map_from_geojsons(geojsons, exec_id):
             feature_data = ensure_geojson_feature(geojson_dict)
             logger.debug(
                 "Created single feature data: %s",
-                feature_data.get('type', 'unknown') if isinstance(feature_data, dict) else type(feature_data)
+                feature_data.get("type", "unknown")
+                if isinstance(feature_data, dict)
+                else type(feature_data),
             )
 
             # Log the geometry type and coordinates for debugging
             geometry = feature_data.get("geometry")
             if geometry:
-                logger.debug("Single geometry type: %s", geometry.get('type'))
+                logger.debug("Single geometry type: %s", geometry.get("type"))
                 coords = geometry.get("coordinates", [])
                 if coords:
                     logger.debug(
                         "Single first few coordinates: %s",
-                        coords[:2] if isinstance(coords, list) else 'Not a list'
+                        coords[:2] if isinstance(coords, list) else "Not a list",
                     )
 
             layer = dl.GeoJSON(
@@ -382,7 +386,11 @@ def create_map_from_geojsons(geojsons, exec_id):
 
                     logger.debug("Calculated single center: %s, zoom: %s", center, zoom)
                     logger.debug(
-                        "Single bounds: lat(%s, %s), lon(%s, %s)", min_lat, max_lat, min_lon, max_lon
+                        "Single bounds: lat(%s, %s), lon(%s, %s)",
+                        min_lat,
+                        max_lat,
+                        min_lon,
+                        max_lon,
                     )
                     logger.debug("Single max span: %s", max_span)
         else:

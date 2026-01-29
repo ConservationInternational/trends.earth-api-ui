@@ -315,7 +315,9 @@ def make_authenticated_request(
 
         # Check if the token actually needs refreshing (might be an API issue, not token expiry)
         if not should_refresh_token(token, buffer_minutes=1):
-            logger.debug("Token appears to still be valid, API authentication issue may be server-side")
+            logger.debug(
+                "Token appears to still be valid, API authentication issue may be server-side"
+            )
             return resp  # Return original response if token seems fine
 
         # Try to get refresh token from cookie

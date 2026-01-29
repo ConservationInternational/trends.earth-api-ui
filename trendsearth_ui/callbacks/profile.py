@@ -1,7 +1,11 @@
 """Profile and password change callbacks."""
 
+import logging
+
 from dash import Input, Output, State, no_update
 import requests  # noqa: F401
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -166,7 +170,9 @@ def register_callbacks(app):
         password_data = {"old_password": current_password, "new_password": new_password}
 
         try:
-            print(f"🔐 Attempting password change for user: {user_data.get('email', 'unknown')}")
+            logger.debug(
+                "Attempting password change for user: %s", user_data.get("email", "unknown")
+            )
 
             from ..utils.helpers import make_authenticated_request
 
@@ -179,17 +185,17 @@ def register_callbacks(app):
             )
 
             if resp.status_code == 200:
-                print("✅ Password changed successfully")
+                logger.debug("Password changed successfully")
                 # Clear password fields on success
                 return "Password changed successfully!", "success", True, "", "", ""
             else:
-                print(f"❌ Password change failed with status: {resp.status_code}")
+                logger.warning("Password change failed with status: %s", resp.status_code)
                 error_msg = "Failed to change password."
                 try:
                     error_data = resp.json()
                     # Check for both "detail" and "msg" keys as API may return either
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                    print(f"🔍 API error response: {error_data}")
+                    logger.debug("API error response: %s", error_data)
                 except Exception:
                     pass
                 # Add status code to error message for debugging
@@ -197,7 +203,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True, no_update, no_update, no_update
 
         except Exception as e:
-            print(f"💥 Network error during password change: {str(e)}")
+            logger.exception("Network error during password change: %s", e)
             return f"Network error: {str(e)}", "danger", True, no_update, no_update, no_update
 
     @app.callback(
@@ -260,7 +266,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
-            print(f"Error updating email notifications: {e}")
+            logger.exception("Error updating email notifications: %s", e)
             return f"Network error: {str(e)}", "danger", True, no_update
 
 

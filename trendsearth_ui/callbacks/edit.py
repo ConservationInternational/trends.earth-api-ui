@@ -1,11 +1,15 @@
 """Edit modal callbacks for users and scripts."""
 
+import logging
+
 from dash import Input, Output, State, no_update
 
 from ..config import get_api_base
 from ..utils import get_user_info
 from ..utils.helpers import make_authenticated_request
 from ._table_helpers import RowResolutionError, resolve_row_data
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -38,7 +42,7 @@ def register_callbacks(app):
         - SUPERADMIN: Can open edit modal for any user
         - ADMIN: Can open edit modal for non-SUPERADMIN users only
         """
-        print(f"🔧 USER EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
+        logger.debug("User edit callback triggered: cell_clicked=%s, role=%s", cell_clicked, role)
         # Only ADMIN and SUPERADMIN can edit users
         if not cell_clicked or role not in ("ADMIN", "SUPERADMIN"):
             return False, None, "", "", "", "", "USER", "", ""
@@ -47,15 +51,15 @@ def register_callbacks(app):
         try:
             user = resolve_row_data(cell_clicked, token, table_state, "/user")
         except RowResolutionError as exc:
-            print(f"❌ {exc}")
+            logger.debug("Row resolution error: %s", exc)
             return False, None, "", "", "", "", "USER", "", ""
         else:
-            print(f"✅ Found user data: {user.get('id')} - {user.get('email')}")
+            logger.debug("Found user data: %s - %s", user.get("id"), user.get("email"))
 
         # ADMIN cannot edit SUPERADMIN users
         target_user_role = user.get("role", "USER")
         if role == "ADMIN" and target_user_role == "SUPERADMIN":
-            print("❌ ADMIN cannot edit SUPERADMIN users")
+            logger.debug("ADMIN cannot edit SUPERADMIN users")
             return False, None, "", "", "", "", "USER", "", ""
 
         return (
@@ -87,7 +91,7 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def open_edit_script_modal(cell_clicked, role, token, table_state):
-        print(f"🔧 SCRIPT EDIT CALLBACK TRIGGERED: cell_clicked={cell_clicked}, role={role}")
+        logger.debug("Script edit callback triggered: cell_clicked=%s, role=%s", cell_clicked, role)
         if not cell_clicked or role not in ["ADMIN", "SUPERADMIN"]:
             return False, None, "", "", "DRAFT"
         if cell_clicked.get("colId") != "edit":
@@ -102,10 +106,10 @@ def register_callbacks(app):
                 include="user_name",
             )
         except RowResolutionError as exc:
-            print(f"❌ {exc}")
+            logger.debug("Row resolution error: %s", exc)
             return False, None, "", "", "DRAFT"
         else:
-            print(f"✅ Found script data: {script.get('id')} - {script.get('name')}")
+            logger.debug("Found script data: %s - %s", script.get("id"), script.get("name"))
 
         return (
             True,
@@ -182,11 +186,11 @@ def register_callbacks(app):
         )
 
         if resp.status_code == 200:
-            print(f"✅ User {user_id} updated successfully")
+            logger.debug("User %s updated successfully", user_id)
             # Close modal and trigger table refresh
             return False, (current_refresh_clicks or 0) + 1
         else:
-            print(f"❌ Failed to update user: {resp.status_code} {resp.text}")
+            logger.warning("Failed to update user: %s %s", resp.status_code, resp.text)
             return no_update, no_update
 
     @app.callback(
@@ -230,11 +234,11 @@ def register_callbacks(app):
         )
 
         if resp.status_code == 200:
-            print(f"✅ Script {script_id} updated successfully")
+            logger.debug("Script %s updated successfully", script_id)
             # Close modal and trigger table refresh
             return False, (current_refresh_clicks or 0) + 1
         else:
-            print(f"❌ Failed to update script: {resp.status_code} {resp.text}")
+            logger.warning("Failed to update script: %s %s", resp.status_code, resp.text)
             return no_update, no_update
 
     @app.callback(
@@ -296,13 +300,13 @@ def register_callbacks(app):
 
         user_id = user_data.get("id")
         if not user_id:
-            print("❌ No user ID found for deletion")
+            logger.debug("No user ID found for deletion")
             return no_update, no_update, no_update
 
         api_base = get_api_base(api_environment)
         current_user = get_user_info(token, api_base)
         if not current_user or current_user.get("role") != "SUPERADMIN":
-            print("❌ Unauthorized delete attempt blocked")
+            logger.warning("Unauthorized delete attempt blocked")
             return no_update, no_update, no_update
 
         try:
@@ -311,16 +315,16 @@ def register_callbacks(app):
             )
 
             if resp.status_code in [200, 204]:
-                print(f"✅ User {user_id} deleted successfully")
+                logger.debug("User %s deleted successfully", user_id)
                 # Close both modals and refresh users table
                 return False, False, (current_refresh_clicks or 0) + 1
             else:
-                print(f"❌ Failed to delete user: {resp.status_code} {resp.text}")
+                logger.warning("Failed to delete user: %s %s", resp.status_code, resp.text)
                 # Close delete modal but keep edit modal open
                 return False, no_update, no_update
 
         except Exception as e:
-            print(f"❌ Error deleting user: {e}")
+            logger.exception("Error deleting user: %s", e)
             # Close delete modal but keep edit modal open
             return False, no_update, no_update
 
@@ -386,16 +390,16 @@ def register_callbacks(app):
             )
 
             if resp.status_code in [200, 204]:
-                print(f"✅ Script {script_id} deleted successfully")
+                logger.debug("Script %s deleted successfully", script_id)
                 # Close both modals and refresh scripts table
                 return False, False, (current_refresh_clicks or 0) + 1
             else:
-                print(f"❌ Failed to delete script: {resp.status_code} {resp.text}")
+                logger.warning("Failed to delete script: %s %s", resp.status_code, resp.text)
                 # Close delete modal but keep edit modal open
                 return False, no_update, no_update
 
         except Exception as e:
-            print(f"❌ Error deleting script: {e}")
+            logger.exception("Error deleting script: %s", e)
             # Close delete modal but keep edit modal open
             return False, no_update, no_update
 
@@ -521,8 +525,10 @@ def register_callbacks(app):
         password_data = {"new_password": new_password}
 
         try:
-            print(
-                f"🔐 {role} attempting password change for user: {user_data.get('email', 'unknown')}"
+            logger.debug(
+                "%s attempting password change for user: %s",
+                role,
+                user_data.get("email", "unknown"),
             )
 
             resp = make_authenticated_request(
@@ -534,17 +540,17 @@ def register_callbacks(app):
             )
 
             if resp.status_code == 200:
-                print("✅ Password changed successfully by admin")
+                logger.debug("Password changed successfully by admin")
                 # Clear password fields on success
                 return "Password changed successfully!", "success", True, "", ""
             else:
-                print(f"❌ Password change failed with status: {resp.status_code}")
+                logger.warning("Password change failed with status: %s", resp.status_code)
                 error_msg = "Failed to change password."
                 try:
                     error_data = resp.json()
                     # Check for both "msg" and "detail" keys as API may return either
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                    print(f"🔍 API error response: {error_data}")
+                    logger.debug("API error response: %s", error_data)
                 except Exception:
                     pass
                 # Add status code to error message for debugging
@@ -552,7 +558,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True, no_update, no_update
 
         except Exception as e:
-            print(f"💥 Network error during admin password change: {str(e)}")
+            logger.exception("Network error during admin password change: %s", e)
             return f"Network error: {str(e)}", "danger", True, no_update, no_update
 
     # Real-time password validation callback for admin password change

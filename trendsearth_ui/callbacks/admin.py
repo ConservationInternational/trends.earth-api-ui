@@ -2,6 +2,7 @@
 
 import base64
 from datetime import datetime, timezone
+import logging
 from typing import Any
 
 from dash import Input, Output, State, callback_context, html, no_update
@@ -11,6 +12,8 @@ import requests
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils.aggrid import build_sort_clause, build_table_state
 from ..utils.helpers import make_authenticated_request, parse_date
+
+logger = logging.getLogger(__name__)
 
 RATE_LIMIT_EVENTS_ENDPOINT = "/rate-limit/events"
 MAX_RATE_LIMIT_EVENT_PAGE_SIZE = 500
@@ -417,13 +420,13 @@ def _query_rate_limit_breaches(
                 timeout=10,
             )
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error fetching rate limit events: {exc}")
+            logger.exception("Error fetching rate limit events: %s", exc)
             combined_events = []
             total_row_count = 0
             break
 
         if response.status_code != 200:
-            print(f"Failed to fetch rate limit events: status {response.status_code}")
+            logger.warning("Failed to fetch rate limit events: status %s", response.status_code)
             combined_events = []
             total_row_count = 0
             break
@@ -1056,7 +1059,7 @@ def register_callbacks(app):
             return str(total_users), str(total_scripts), str(active_executions)
 
         except Exception as e:
-            print(f"Error fetching admin stats: {e}")
+            logger.exception("Error fetching admin stats: %s", e)
             return "Error", "Error", "Error"
 
     @app.callback(

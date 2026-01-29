@@ -140,14 +140,14 @@ def register_callbacks(app):
             )
 
         if _is_mock_auth_enabled(search):
-            print("🎭 Auth bypass enabled via secure mock auth configuration")
+            logger.debug("Auth bypass enabled via secure mock auth configuration")
             user_data = {
                 "id": "test_user_123",
                 "name": "Test User",
                 "email": "test@example.com",
                 "role": "ADMIN",
             }
-            print("✅ Returning mock authenticated dashboard layout")
+            logger.debug("Returning mock authenticated dashboard layout")
             return (
                 dashboard_layout(),
                 False,
@@ -230,12 +230,18 @@ def register_callbacks(app):
     )
     def login_api(_n, email, password, remember_me, api_environment, search):
         """Handle login authentication."""
-        print(
-            f"🔐 Login attempt - Email: {email}, Button clicks: {_n}, Remember: {remember_me}, Environment: {api_environment}"
+        logger.debug(
+            "Login attempt - Email: %s, Button clicks: %s, Remember: %s, Environment: %s",
+            email,
+            _n,
+            remember_me,
+            api_environment,
         )
 
         if _is_mock_auth_enabled(search):
-            print("🎭 Secure mock auth mode detected in login_api - skipping credential exchange")
+            logger.debug(
+                "Secure mock auth mode detected in login_api - skipping credential exchange"
+            )
             return (
                 None,
                 None,
@@ -247,7 +253,7 @@ def register_callbacks(app):
             )
 
         if not email or not password:
-            print("⚠️ Missing email or password")
+            logger.debug("Missing email or password")
             return (
                 None,
                 None,
@@ -262,7 +268,7 @@ def register_callbacks(app):
         auth_url = get_auth_url(api_environment)
         api_base = get_api_base(api_environment)
 
-        print(f"🌐 Attempting to connect to: {auth_url}")
+        logger.debug("Attempting to connect to: %s", auth_url)
         try:
             auth_data = {"email": email, "password": password}
             resp = requests.post(
@@ -273,15 +279,16 @@ def register_callbacks(app):
             )
 
             if resp.status_code == 200:
-                print("✅ Login API response successful")
+                logger.debug("Login API response successful")
                 try:
                     data = resp.json()
-                    print(
-                        f"🔍 Login: Auth response JSON keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}"
+                    logger.debug(
+                        "Login: Auth response JSON keys: %s",
+                        list(data.keys()) if isinstance(data, dict) else "Not a dict",
                     )
                 except ValueError as e:
-                    print(f"❌ Login: Failed to parse auth response JSON: {e}")
-                    print(f"🔍 Login: Raw auth response: {resp.text[:500]}...")
+                    logger.warning("Login: Failed to parse auth response JSON: %s", e)
+                    logger.debug("Login: Raw auth response: %s...", resp.text[:500])
                     return (
                         None,
                         None,
@@ -295,21 +302,24 @@ def register_callbacks(app):
                 access_token = data.get("access_token")
                 refresh_token = data.get("refresh_token")
 
-                print(f"🔍 Login: Received access_token: {'Yes' if access_token else 'No'}")
-                print(f"🔍 Login: Received refresh_token: {'Yes' if refresh_token else 'No'}")
-                print(f"🔍 Login: Access token length: {len(access_token) if access_token else 0}")
+                logger.debug("Login: Received access_token: %s", "Yes" if access_token else "No")
+                logger.debug("Login: Received refresh_token: %s", "Yes" if refresh_token else "No")
+                logger.debug(
+                    "Login: Access token length: %s", len(access_token) if access_token else 0
+                )
 
                 # Use the API base for the selected environment to get user info
-                print(f"🔍 Login: About to call get_user_info with api_base: {api_base}")
+                logger.debug("Login: About to call get_user_info with api_base: %s", api_base)
                 user_data = get_user_info(access_token, api_base)
 
-                print(
-                    f"🔍 Login: get_user_info returned: {'Valid data' if user_data else 'None/Empty'}"
+                logger.debug(
+                    "Login: get_user_info returned: %s",
+                    "Valid data" if user_data else "None/Empty",
                 )
 
                 if user_data and access_token and refresh_token:
                     role = user_data.get("role", "USER")
-                    print(f"✅ Login successful for user: {user_data.get('email', 'unknown')}")
+                    logger.debug("Login successful for user: %s", user_data.get("email", "unknown"))
 
                     # Set HTTP cookie if remember me is checked
                     if remember_me:
@@ -323,7 +333,7 @@ def register_callbacks(app):
                         if hasattr(ctx, "response") and ctx.response:
                             expiration = datetime.now() + timedelta(days=30)
                             _set_auth_cookie(ctx.response, cookie_value, expiration)
-                            print("🍪 Set HTTP authentication cookie with 30-day expiration")
+                            logger.debug("Set HTTP authentication cookie with 30-day expiration")
 
                     return (
                         access_token,
@@ -335,14 +345,18 @@ def register_callbacks(app):
                         True,
                     )
                 else:
-                    print("❌ Failed to retrieve user information")
-                    print("🔍 Login failure analysis:")
-                    print(f"   - user_data: {'Present' if user_data else 'Missing/None'}")
-                    print(f"   - access_token: {'Present' if access_token else 'Missing/None'}")
-                    print(f"   - refresh_token: {'Present' if refresh_token else 'Missing/None'}")
+                    logger.warning("Failed to retrieve user information")
+                    logger.debug("Login failure analysis:")
+                    logger.debug("   - user_data: %s", "Present" if user_data else "Missing/None")
+                    logger.debug(
+                        "   - access_token: %s", "Present" if access_token else "Missing/None"
+                    )
+                    logger.debug(
+                        "   - refresh_token: %s", "Present" if refresh_token else "Missing/None"
+                    )
                     if user_data:
-                        print(f"   - user_data type: {type(user_data)}")
-                        print(f"   - user_data content: {user_data}")
+                        logger.debug("   - user_data type: %s", type(user_data))
+                        logger.debug("   - user_data content: %s", user_data)
                     return (
                         None,
                         None,
@@ -353,11 +367,11 @@ def register_callbacks(app):
                         True,
                     )
             else:
-                print(f"❌ Login failed with status code: {resp.status_code}")
+                logger.warning("Login failed with status code: %s", resp.status_code)
                 return (None, None, None, None, "Invalid credentials.", "danger", True)
 
         except requests.exceptions.Timeout:
-            print("⏰ Login request timed out")
+            logger.warning("Login request timed out")
             return (
                 None,
                 None,
@@ -401,7 +415,7 @@ def register_callbacks(app):
     def logout_user_callback(header_logout_clicks, current_token):
         """Handle user logout and clear authentication cookie."""
         if header_logout_clicks:
-            print("🚪 User logging out - clearing authentication data")
+            logger.debug("User logging out - clearing authentication data")
 
             # Extract refresh token and API environment from cookie for proper logout
             refresh_token_to_revoke = None
@@ -414,7 +428,7 @@ def register_callbacks(app):
                         refresh_token_to_revoke = cookie_data.get("refresh_token")
                         api_environment = cookie_data.get("api_environment", "production")
             except Exception as e:
-                print(f"Error reading refresh token from cookie: {e}")
+                logger.debug("Error reading refresh token from cookie: %s", e)
 
             # Call logout API to revoke refresh token
             if current_token and refresh_token_to_revoke:
@@ -422,15 +436,15 @@ def register_callbacks(app):
                     current_token, refresh_token_to_revoke, api_environment or "production"
                 )
                 if logout_success:
-                    print("✅ Successfully logged out from API")
+                    logger.debug("Successfully logged out from API")
                 else:
-                    print("⚠️ API logout failed, but clearing local session anyway")
+                    logger.warning("API logout failed, but clearing local session anyway")
 
             # Clear HTTP cookie
             ctx = callback_context
             if hasattr(ctx, "response") and ctx.response:
                 _set_auth_cookie(ctx.response, "", 0)
-                print("🍪 Cleared HTTP authentication cookie")
+                logger.debug("Cleared HTTP authentication cookie")
 
             return (True, True, True, login_layout(), [])
         return (no_update, no_update, no_update, no_update, no_update)
@@ -451,7 +465,7 @@ def register_callbacks(app):
                 if auth_cookie:
                     cookie_data = json.loads(auth_cookie)
             except Exception as e:
-                print(f"Error reading auth cookie for email population: {e}")
+                logger.debug("Error reading auth cookie for email population: %s", e)
                 cookie_data = None
 
             if cookie_data and isinstance(cookie_data, dict):
@@ -619,8 +633,10 @@ def register_callbacks(app):
             )
 
         try:
-            print(
-                f"🔐 Attempting password recovery for email: {email} (Environment: {api_environment})"
+            logger.debug(
+                "Attempting password recovery for email: %s (Environment: %s)",
+                email,
+                api_environment,
             )
 
             # Get the API base for the selected environment
@@ -635,7 +651,7 @@ def register_callbacks(app):
             )
 
             if resp.status_code == 200:
-                print(f"✅ Password recovery email sent to: {email}")
+                logger.debug("Password recovery email sent to: %s", email)
                 return (
                     f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
                     "success",
@@ -646,7 +662,7 @@ def register_callbacks(app):
                     {"display": "block"},  # Show success buttons (OK button)
                 )
             elif resp.status_code == 404:
-                print(f"❌ User not found with email: {email}")
+                logger.debug("User not found with email: %s", email)
                 # Return the same message as success to prevent email enumeration
                 return (
                     f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
@@ -658,12 +674,12 @@ def register_callbacks(app):
                     {"display": "block"},  # Show success buttons (OK button)
                 )
             else:
-                print(f"❌ Password recovery failed with status: {resp.status_code}")
+                logger.warning("Password recovery failed with status: %s", resp.status_code)
                 error_msg = "Failed to send password recovery email."
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("msg", error_msg)
-                    print(f"🔍 API error response: {error_data}")
+                    logger.debug("API error response: %s", error_data)
                 except Exception:
                     pass
                 return (
@@ -677,7 +693,7 @@ def register_callbacks(app):
                 )
 
         except requests.exceptions.Timeout:
-            print("⏰ Password recovery request timed out")
+            logger.warning("Password recovery request timed out")
             return (
                 "Request timed out. Please try again later.",
                 "danger",
@@ -688,7 +704,7 @@ def register_callbacks(app):
                 {"display": "none"},  # Keep success buttons hidden
             )
         except requests.exceptions.ConnectionError:
-            print("❌ Connection error during password recovery")
+            logger.warning("Connection error during password recovery")
             return (
                 "Cannot connect to the server. Please check your internet connection and try again.",
                 "danger",
@@ -699,7 +715,7 @@ def register_callbacks(app):
                 {"display": "none"},  # Keep success buttons hidden
             )
         except Exception as e:
-            print(f"💥 Error during password recovery: {str(e)}")
+            logger.exception("Error during password recovery: %s", e)
             return (
                 f"An error occurred: {str(e)}. Please try again later.",
                 "danger",
@@ -776,7 +792,7 @@ def register_callbacks(app):
                     refresh_token = cookie_data.get("refresh_token")
                     api_environment = cookie_data.get("api_environment", "production")
         except Exception as e:
-            print(f"Error reading refresh token from cookie: {e}")
+            logger.debug("Error reading refresh token from cookie: %s", e)
             return no_update
 
         if not refresh_token:
@@ -787,7 +803,7 @@ def register_callbacks(app):
             refresh_token, api_environment or "production"
         )
         if new_access_token and new_access_token != current_token:
-            print("🔄 Auto-refreshed access token")
+            logger.debug("Auto-refreshed access token")
 
             # Update cookie with new access token
             try:
@@ -811,7 +827,7 @@ def register_callbacks(app):
                             expiration = datetime.now() + timedelta(days=30)
                             _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
-                print(f"Error updating cookie during auto-refresh: {e}")
+                logger.debug("Error updating cookie during auto-refresh: %s", e)
 
             return new_access_token
 
@@ -865,12 +881,12 @@ def register_callbacks(app):
                         try:
                             cookie_expiration = datetime.fromisoformat(expires_at)
                             if datetime.now() >= cookie_expiration:
-                                print("🍪 Cookie has expired, clearing session")
+                                logger.debug("Cookie has expired, clearing session")
                                 return None, None
                         except Exception as e:
-                            print(f"Error parsing cookie expiration: {e}")
+                            logger.debug("Error parsing cookie expiration: %s", e)
         except Exception as e:
-            print(f"Error reading refresh token from cookie during proactive refresh: {e}")
+            logger.debug("Error reading refresh token from cookie during proactive refresh: %s", e)
             return no_update, no_update
 
         if not refresh_token:
@@ -882,7 +898,7 @@ def register_callbacks(app):
         )
         if new_access_token:
             if new_access_token != current_token:
-                print("🔄 Proactively refreshed access token")
+                logger.debug("Proactively refreshed access token")
 
             # Always update cookie to extend session even if token didn't change
             try:
@@ -903,12 +919,12 @@ def register_callbacks(app):
                         expiration = datetime.now() + timedelta(days=30)
                         _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
-                print(f"Error updating cookie during proactive refresh: {e}")
+                logger.debug("Error updating cookie during proactive refresh: %s", e)
 
             return new_access_token, user_data
         else:
             # Refresh failed, user needs to log in again
-            print("❌ Proactive token refresh failed, clearing session")
+            logger.warning("Proactive token refresh failed, clearing session")
             return None, None
 
         return no_update, no_update
@@ -1014,7 +1030,7 @@ def register_callbacks(app):
         # Call the API to reset the password
         try:
             api_base = get_api_base(api_env or "production")
-            print(f"🔐 Submitting password reset to {api_base}")
+            logger.debug("Submitting password reset to %s", api_base)
 
             resp = requests.post(
                 f"{api_base}/user/reset-password",
@@ -1023,7 +1039,7 @@ def register_callbacks(app):
             )
 
             if resp.status_code == 200:
-                print("✅ Password reset successful")
+                logger.debug("Password reset successful")
                 return (
                     "Password reset successful! You can now log in with your new password.",
                     "success",
@@ -1032,7 +1048,7 @@ def register_callbacks(app):
                     "",  # Clear confirm field
                 )
             elif resp.status_code == 404:
-                print("❌ Invalid or expired reset token")
+                logger.debug("Invalid or expired reset token")
                 return (
                     "This reset link is invalid or has expired. Please request a new password reset.",
                     "danger",
@@ -1041,7 +1057,7 @@ def register_callbacks(app):
                     no_update,
                 )
             elif resp.status_code == 422:
-                print("❌ Password validation failed")
+                logger.debug("Password validation failed")
                 error_msg = "Password does not meet requirements."
                 try:
                     error_data = resp.json()
@@ -1056,7 +1072,7 @@ def register_callbacks(app):
                     no_update,
                 )
             else:
-                print(f"❌ Password reset failed with status: {resp.status_code}")
+                logger.warning("Password reset failed with status: %s", resp.status_code)
                 error_msg = "Failed to reset password."
                 try:
                     error_data = resp.json()
@@ -1072,7 +1088,7 @@ def register_callbacks(app):
                 )
 
         except requests.exceptions.Timeout:
-            print("⏰ Password reset request timed out")
+            logger.warning("Password reset request timed out")
             return (
                 "Request timed out. Please try again.",
                 "danger",
@@ -1081,7 +1097,7 @@ def register_callbacks(app):
                 no_update,
             )
         except requests.exceptions.ConnectionError:
-            print("❌ Connection error during password reset")
+            logger.warning("Connection error during password reset")
             return (
                 "Cannot connect to the server. Please check your connection.",
                 "danger",
@@ -1090,7 +1106,7 @@ def register_callbacks(app):
                 no_update,
             )
         except Exception as e:
-            print(f"💥 Error during password reset: {str(e)}")
+            logger.exception("Error during password reset: %s", e)
             return (
                 f"An error occurred: {str(e)}",
                 "danger",

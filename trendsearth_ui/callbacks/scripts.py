@@ -1,5 +1,6 @@
 """Scripts table callbacks."""
 
+import logging
 from typing import Any
 
 from dash import Input, Output, State
@@ -8,6 +9,8 @@ from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
 from ..utils.helpers import make_authenticated_request
+
+logger = logging.getLogger(__name__)
 
 SCRIPT_ENDPOINT = "/script"
 SCRIPT_INCLUDE_FIELDS = "user_name,access_control"
@@ -57,7 +60,7 @@ def _fetch_scripts_page(
 ):
     response = make_authenticated_request(SCRIPT_ENDPOINT, token, params=params)
     if response.status_code != 200:
-        print(f"Scripts API error: {response.status_code} - {response.text}")
+        logger.error("Scripts API error: %s - %s", response.status_code, response.text)
         return [], 0
 
     payload = response.json()
@@ -109,7 +112,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error in get_scripts_rows: {exc}")
+            logger.exception("Error in get_scripts_rows: %s", exc)
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
@@ -155,7 +158,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error in refresh_scripts_table: {exc}")
+            logger.exception("Error in refresh_scripts_table: %s", exc)
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(

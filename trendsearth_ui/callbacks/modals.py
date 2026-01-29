@@ -1,11 +1,15 @@
 """Modal callbacks for JSON display, logs, and downloads."""
 
+import logging
+
 from dash import ALL, Input, Output, State, html, no_update
 import dash_bootstrap_components as dbc
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date, render_json_tree
 from ._table_helpers import RowResolutionError, resolve_row_data
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -239,12 +243,12 @@ def register_callbacks(app):
                                     {"label": f"User ID: {user_id}", "value": user_id}
                                 )
                         except Exception as e:
-                            print(f"Error fetching user {user_id}: {str(e)}")
+                            logger.debug("Error fetching user %s: %s", user_id, e)
                             # Fallback for this specific user
                             users_options.append({"label": f"User ID: {user_id}", "value": user_id})
 
                 except Exception as e:
-                    print(f"Error fetching user details: {str(e)}")
+                    logger.debug("Error fetching user details: %s", e)
                     # Fallback if there's an error fetching user details
                     for user_id in users:
                         users_options.append({"label": f"User ID: {user_id}", "value": user_id})
@@ -349,7 +353,7 @@ def register_callbacks(app):
 
         # If we don't have execution_id from row data, fall back to pagination approach
         if not execution_id:
-            print(f"DEBUG: No execution_id from row_data, resolving via helper for column {col}")
+            logger.debug("No execution_id from row_data, resolving via helper for column %s", col)
             try:
                 execution = resolve_row_data(
                     cell,
@@ -361,8 +365,10 @@ def register_callbacks(app):
                 )
                 execution_id = execution.get("id") if execution else None
                 if execution_id:
-                    print(
-                        f"DEBUG: Resolved execution_id {execution_id} with helper for column {col}"
+                    logger.debug(
+                        "Resolved execution_id %s with helper for column %s",
+                        execution_id,
+                        col,
                     )
             except RowResolutionError as exc:
                 return (
@@ -376,7 +382,7 @@ def register_callbacks(app):
                 )
 
         if not execution_id:
-            print(f"DEBUG: Final check - no execution_id available for column {col}")
+            logger.debug("Final check - no execution_id available for column %s", col)
             return (
                 True,
                 "Could not get execution ID from row or pagination data.",
@@ -387,7 +393,7 @@ def register_callbacks(app):
                 None,
             )
 
-        print(f"DEBUG: Proceeding to fetch {col} data for execution_id {execution_id}")
+        logger.debug("Proceeding to fetch %s data for execution_id %s", col, execution_id)
 
         # Verify the execution exists before fetching logs to prevent wrong execution issues
         try:
@@ -395,7 +401,7 @@ def register_callbacks(app):
                 f"/execution/{execution_id}", token, params={"include": "id,script_name,status"}
             )
             if verification_resp.status_code == 404:
-                print(f"DEBUG: Execution {execution_id} not found - may be invalid ID")
+                logger.debug("Execution %s not found - may be invalid ID", execution_id)
                 return (
                     True,
                     f"Execution {execution_id} not found. This may indicate a data synchronization issue.",
@@ -412,13 +418,16 @@ def register_callbacks(app):
                     exec_info = verification_data["data"]
                 else:
                     exec_info = verification_data
-                print(
-                    f"DEBUG: Verified execution {execution_id}: script={exec_info.get('script_name')}, status={exec_info.get('status')}"
+                logger.debug(
+                    "Verified execution %s: script=%s, status=%s",
+                    execution_id,
+                    exec_info.get("script_name"),
+                    exec_info.get("status"),
                 )
             else:
-                print(f"DEBUG: Unexpected verification response: {verification_resp.status_code}")
+                logger.debug("Unexpected verification response: %s", verification_resp.status_code)
         except Exception as e:
-            print(f"DEBUG: Error verifying execution {execution_id}: {str(e)}")
+            logger.debug("Error verifying execution %s: %s", execution_id, e)
             # Continue anyway, as verification failure shouldn't block the logs
 
         try:
@@ -529,7 +538,7 @@ def register_callbacks(app):
                     execution_status = row_data.get("status")
 
                 # For logs, try the execution-specific endpoint first
-                print(f"DEBUG: Fetching logs for execution {execution_id}")
+                logger.debug("Fetching logs for execution %s", execution_id)
                 resp = make_authenticated_request(f"/execution/{execution_id}/log", token)
 
                 if resp.status_code != 200:
@@ -634,13 +643,13 @@ def register_callbacks(app):
 
                 try:
                     # For docker logs, use the specific docker logs endpoint with longer timeout
-                    print(f"Fetching docker logs for execution {execution_id}")
+                    logger.debug("Fetching docker logs for execution %s", execution_id)
                     resp = make_authenticated_request(
                         f"/execution/{execution_id}/docker-logs",
                         token,
                         timeout=30,  # 30 second timeout for docker logs
                     )
-                    print(f"Docker logs API response: {resp.status_code}")
+                    logger.debug("Docker logs API response: %s", resp.status_code)
 
                     if resp.status_code == 403:
                         return (
@@ -703,7 +712,7 @@ def register_callbacks(app):
                         )
 
                 except Exception as e:
-                    print(f"Exception while fetching docker logs: {str(e)}")
+                    logger.debug("Exception while fetching docker logs: %s", e)
                     return (
                         True,
                         f"Error fetching docker logs: {str(e)}",
@@ -974,7 +983,7 @@ def register_callbacks(app):
 
         # If we don't have row data or script_id, fall back to pagination approach
         if not script_id:
-            print("DEBUG: No script_id from row_data, resolving via helper for script logs")
+            logger.debug("No script_id from row_data, resolving via helper for script logs")
             try:
                 script = resolve_row_data(
                     cell,
@@ -985,7 +994,7 @@ def register_callbacks(app):
                 )
                 script_id = script.get("id") if script else None
                 if script_id:
-                    print(f"DEBUG: Resolved script_id {script_id} via helper for script logs")
+                    logger.debug("Resolved script_id %s via helper for script logs", script_id)
             except RowResolutionError as exc:
                 return (
                     True,
@@ -998,14 +1007,14 @@ def register_callbacks(app):
                 )
 
         if not script_id:
-            print("DEBUG: Final check - no script_id available for script logs")
+            logger.debug("Final check - no script_id available for script logs")
             return True, "Could not get script ID.", None, "Error", {"display": "none"}, True, None
 
-        print(f"DEBUG: Proceeding to fetch script logs for script_id {script_id}")
+        logger.debug("Proceeding to fetch script logs for script_id %s", script_id)
 
         try:
             # Get the logs for this script with automatic token refresh
-            print(f"DEBUG: Fetching logs for script {script_id}")
+            logger.debug("Fetching logs for script %s", script_id)
             resp = make_authenticated_request(f"/script/{script_id}/log", token)
 
             if resp.status_code != 200:
@@ -1116,7 +1125,7 @@ def register_callbacks(app):
                     name_data = name_resp.json()
                     name_results = name_data.get("data", [])
             except Exception as e:
-                print(f"Error searching by name: {str(e)}")
+                logger.debug("Error searching by name: %s", e)
 
             # Search by email (filter like)
             email_results = []
@@ -1133,7 +1142,7 @@ def register_callbacks(app):
                     email_data = email_resp.json()
                     email_results = email_data.get("data", [])
             except Exception as e:
-                print(f"Error searching by email: {str(e)}")
+                logger.debug("Error searching by email: %s", e)
 
             # Merge results and remove duplicates
             all_users = {}
@@ -1167,7 +1176,7 @@ def register_callbacks(app):
             return options, {"display": "none"}
 
         except Exception as e:
-            print(f"Error searching users: {str(e)}")
+            logger.debug("Error searching users: %s", e)
             return [], {"display": "none"}
 
     @app.callback(

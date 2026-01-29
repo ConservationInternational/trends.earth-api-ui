@@ -1,6 +1,7 @@
 """Executions table callbacks."""
 
 from collections.abc import Mapping
+import logging
 from typing import Any
 
 from dash import Input, Output, State, html, no_update
@@ -10,6 +11,8 @@ from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
 from ..utils.mobile_utils import get_executions_columns_for_role
+
+logger = logging.getLogger(__name__)
 
 EXECUTION_ENDPOINT = "/execution"
 EXECUTION_BASE_INCLUDE = "script_name,user_id,duration"
@@ -212,7 +215,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
         except Exception as e:
-            print(f"Error in get_execution_rows: {str(e)}")
+            logger.exception("Error in get_execution_rows: %s", e)
             return {"rowData": [], "rowCount": 0}, {}, 0
 
     @app.callback(
@@ -273,7 +276,7 @@ def register_callbacks(app):
             )
 
         except Exception as exc:  # pragma: no cover - defensive guard
-            print(f"Error in refresh_executions_table: {exc}")
+            logger.exception("Error in refresh_executions_table: %s", exc)
             return {"rowData": [], "rowCount": 0}, table_state or {}, 0, 0
 
     @app.callback(
@@ -330,7 +333,7 @@ def register_callbacks(app):
             return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows
 
         except Exception as e:
-            print(f"Error in auto_refresh_executions_table: {str(e)}")
+            logger.exception("Error in auto_refresh_executions_table: %s", e)
             return {"rowData": [], "rowCount": 0}, table_state or {}, 0
 
     @app.callback(
@@ -381,18 +384,17 @@ def register_callbacks(app):
     )
     def show_cancel_confirmation_modal(cell, is_open, token, table_state, user_data, role):
         """Show the cancel confirmation modal when status is clicked for cancellable executions."""
-        print("🎯 Cancel modal callback triggered!")
-        print(f"   Cell: {cell}")
+        logger.debug("Cancel modal callback triggered - Cell: %s", cell)
 
         if not cell:
-            print("❌ No cell data, returning current state")
+            logger.debug("No cell data, returning current state")
             return is_open, no_update, no_update, no_update, no_update
 
         col = cell.get("colId")
-        print(f"   Column ID: {col}")
+        logger.debug("Column ID: %s", col)
 
         if col != "status":
-            print("❌ Column is not 'status', returning current state")
+            logger.debug("Column is not 'status', returning current state")
             return is_open, no_update, no_update, no_update, no_update
 
         # Get row data
@@ -402,18 +404,22 @@ def register_callbacks(app):
         status = "Unknown"
         execution_user_id = None
 
-        print(f"   Row data from cell: {row_data}")
+        logger.debug("Row data from cell: %s", row_data)
 
         if row_data:
             execution_id = row_data.get("id")
             script_name = row_data.get("script_name", "Unknown Script")
             status = row_data.get("status", "Unknown")
             execution_user_id = row_data.get("user_id")
-            print(
-                f"   ✅ Got data from cell - ID: {execution_id}, Script: {script_name}, Status: {status}, User: {execution_user_id}"
+            logger.debug(
+                "Got data from cell - ID: %s, Script: %s, Status: %s, User: %s",
+                execution_id,
+                script_name,
+                status,
+                execution_user_id,
             )
         else:
-            print("🔍 No row data in cell, trying API fallback like logs callback...")
+            logger.debug("No row data in cell, trying API fallback...")
 
             # Use exact same pattern as logs callback - get row index and try pagination
             row_index = cell.get("rowIndex", 0)
@@ -423,8 +429,7 @@ def register_callbacks(app):
             page = (row_index // page_size) + 1
             row_in_page = row_index % page_size
 
-            print(f"   Row index: {row_index}")
-            print(f"   Page: {page}, row_in_page: {row_in_page}")
+            logger.debug("Row index: %s, Page: %s, row_in_page: %s", row_index, page, row_in_page)
 
             if token:
                 try:
@@ -443,7 +448,7 @@ def register_callbacks(app):
                         if table_state.get("filter_sql"):
                             params["filter"] = table_state["filter_sql"]
 
-                    print(f"   API params: {params}")
+                    logger.debug("API params: %s", params)
 
                     # Make API request exactly like logs callback
                     response = make_authenticated_request(
@@ -454,14 +459,14 @@ def register_callbacks(app):
                         timeout=10,
                     )
 
-                    print(f"   API response status: {response.status_code}")
+                    logger.debug("API response status: %s", response.status_code)
 
                     if response.status_code == 200:
                         data = response.json()
                         results = data.get(
                             "data", []
                         )  # Note: logs callback uses "data" not "results"
-                        print(f"   Found {len(results)} executions on page {page}")
+                        logger.debug("Found %s executions on page %s", len(results), page)
 
                         # Get the specific execution at the row_in_page index
                         if row_in_page < len(results):
@@ -470,27 +475,34 @@ def register_callbacks(app):
                             script_name = execution.get("script_name", "Unknown Script")
                             status = execution.get("status", "Unknown")
                             execution_user_id = execution.get("user_id")
-                            print(
-                                f"   ✅ Found execution at row_in_page {row_in_page} - ID: {execution_id}, Script: {script_name}, Status: {status}, User: {execution_user_id}"
+                            logger.debug(
+                                "Found execution at row_in_page %s - ID: %s, Script: %s, Status: %s, User: %s",
+                                row_in_page,
+                                execution_id,
+                                script_name,
+                                status,
+                                execution_user_id,
                             )
                         else:
-                            print(
-                                f"   ❌ Row {row_in_page} not found in page with {len(results)} executions"
+                            logger.debug(
+                                "Row %s not found in page with %s executions",
+                                row_in_page,
+                                len(results),
                             )
                     else:
-                        print(f"   ❌ API request failed: {response.status_code}")
+                        logger.debug("API request failed: %s", response.status_code)
 
                 except Exception as e:
-                    print(f"   ❌ Error in API fallback: {str(e)}")
+                    logger.debug("Error in API fallback: %s", e)
 
         if not execution_id:
-            print("❌ Still no execution_id found, returning current state")
+            logger.debug("Still no execution_id found, returning current state")
             return is_open, no_update, no_update, no_update, no_update
 
         # Check if status is cancellable
         cancellable_statuses = ["READY", "PENDING", "RUNNING"]
         if status not in cancellable_statuses:
-            print(f"❌ Status '{status}' is not cancellable, returning current state")
+            logger.debug("Status '%s' is not cancellable, returning current state", status)
             return is_open, no_update, no_update, no_update, no_update
 
         # Check permissions: user can cancel their own tasks OR user is admin/superadmin
@@ -498,13 +510,16 @@ def register_callbacks(app):
         is_admin = role in ["ADMIN", "SUPERADMIN"] if role else False
 
         if not is_admin and execution_user_id != current_user_id:
-            print(
-                f"❌ Permission denied: user {current_user_id} cannot cancel execution by user {execution_user_id}"
+            logger.debug(
+                "Permission denied: user %s cannot cancel execution by user %s",
+                current_user_id,
+                execution_user_id,
             )
             return is_open, no_update, no_update, no_update, no_update
 
-        print(
-            f"✅ Permission granted and status is cancellable! Opening modal for execution {execution_id}"
+        logger.debug(
+            "Permission granted and status is cancellable! Opening modal for execution %s",
+            execution_id,
         )
 
         execution_data = {
