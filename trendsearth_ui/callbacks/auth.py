@@ -497,11 +497,18 @@ def register_callbacks(app):
 
     @app.callback(
         Output("environment-indicator", "children"),
-        [Input("api-environment-store", "data")],
+        [Input("api-environment-store", "data"), Input("role-store", "data")],
         prevent_initial_call=True,
     )
-    def update_environment_indicator(api_environment):
-        """Update the environment indicator in the header to show both API and UI environments."""
+    def update_environment_indicator(api_environment, role):
+        """Update the environment indicator in the header to show both API and UI environments.
+
+        Only visible to ADMIN and SUPERADMIN users.
+        """
+        # Hide environment indicator for non-admin users
+        if role not in ["ADMIN", "SUPERADMIN"]:
+            return ""
+
         if not api_environment:
             return ""
 

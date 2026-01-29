@@ -8,6 +8,9 @@ TRUNCATED_CELL_STYLE = {
     "textOverflow": "ellipsis",
 }
 
+# Fields that are only available to admin/superadmin users
+ADMIN_ONLY_FIELDS = {"user_name", "user_email", "docker_logs"}
+
 
 def create_mobile_detection_components():
     """Create components for mobile device detection."""
@@ -26,6 +29,27 @@ def create_mobile_detection_components():
         # Hidden div to trigger clientside callbacks
         html.Div(id="window-size-trigger", style={"display": "none"}),
     ]
+
+
+def get_executions_columns_for_role(role: str | None) -> list[dict]:
+    """Get executions table columns filtered by user role.
+
+    Args:
+        role: User role (ADMIN, SUPERADMIN, USER, or None)
+
+    Returns:
+        List of column definitions appropriate for the user's role
+    """
+    config = get_mobile_column_config().get("executions", {})
+    primary_cols = config.get("primary_columns", [])
+    secondary_cols = config.get("secondary_columns", [])
+    all_columns = primary_cols + secondary_cols
+
+    # Filter out admin-only columns for non-admin users
+    if role not in ["ADMIN", "SUPERADMIN"]:
+        all_columns = [col for col in all_columns if col.get("field") not in ADMIN_ONLY_FIELDS]
+
+    return all_columns
 
 
 def get_mobile_column_config():
@@ -132,7 +156,7 @@ def get_mobile_column_config():
                     "minWidth": 100,
                     "sortable": False,
                     "filter": False,
-                    "cellStyle": {"fontSize": "11px"},
+                    "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "resizable": True,
                 },
                 {

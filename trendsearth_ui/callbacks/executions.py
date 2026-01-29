@@ -9,6 +9,7 @@ import requests  # noqa: F401
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+from ..utils.mobile_utils import get_executions_columns_for_role
 
 EXECUTION_ENDPOINT = "/execution"
 EXECUTION_BASE_INCLUDE = "script_name,user_id,duration"
@@ -150,6 +151,19 @@ def process_execution_data(executions, role, user_timezone):
 
 def register_callbacks(app):
     """Register executions table callbacks."""
+
+    @app.callback(
+        Output("executions-table", "columnDefs"),
+        Input("role-store", "data"),
+        prevent_initial_call=False,
+    )
+    def update_executions_columns_for_role(role):
+        """Update executions table columns based on user role.
+
+        Hides User and Email columns for non-admin users since they
+        don't have API access to those fields.
+        """
+        return get_executions_columns_for_role(role)
 
     @app.callback(
         [
