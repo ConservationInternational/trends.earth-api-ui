@@ -8,7 +8,7 @@ on:
       force_deploy:
         description: 'Force deployment even if no changes detected'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 env:
@@ -22,6 +22,9 @@ jobs:
     name: Build and Deploy to Production
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
     env:
       ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
