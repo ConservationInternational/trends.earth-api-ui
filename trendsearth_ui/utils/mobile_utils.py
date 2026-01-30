@@ -183,10 +183,10 @@ def get_mobile_column_config():
                     "headerName": "Docker Logs",
                     "field": "docker_logs",
                     "flex": 1,
-                    "minWidth": 120,
+                    "minWidth": 130,
                     "sortable": False,
                     "filter": False,
-                    "cellStyle": {"fontSize": "11px"},
+                    "cellStyle": {"fontSize": "11px", "whiteSpace": "nowrap"},
                     "resizable": True,
                 },
                 {
