@@ -190,21 +190,26 @@ jobs:
         echo "✅ Deployment verification will be handled by CodeDeploy validation hooks"
 
     - name: Notify Rollbar of deployment
-      if: ${{ env.ROLLBAR_ACCESS_TOKEN != '' }}
-      run: |
-        cat <<EOF > rollbar-payload.json
-        {
-          "environment": "production",
-          "revision": "$GITHUB_SHA",
-          "local_username": "github-actions",
-          "comment": "Production deployment via CodeDeploy"
-        }
-        EOF
+      if: success() && env.ROLLBAR_ACCESS_TOKEN != ''
+      uses: rollbar/github-deploy-action@2.1.2
+      with:
+        environment: 'production'
+        version: ${{ github.sha }}
+        status: 'succeeded'
+        local_username: ${{ github.actor }}
+      env:
+        ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
 
-        curl -X POST https://api.rollbar.com/api/1/deploy \
-          -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d @rollbar-payload.json
+    - name: Notify Rollbar of deployment failure
+      if: failure() && env.ROLLBAR_ACCESS_TOKEN != ''
+      uses: rollbar/github-deploy-action@2.1.2
+      with:
+        environment: 'production'
+        version: ${{ github.sha }}
+        status: 'failed'
+        local_username: ${{ github.actor }}
+      env:
+        ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
 
     - name: Deployment summary
       run: |

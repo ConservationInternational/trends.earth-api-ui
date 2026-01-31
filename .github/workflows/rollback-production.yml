@@ -202,23 +202,26 @@ jobs:
         echo "✅ Rollback verification will be handled by CodeDeploy validation hooks"
 
     - name: Notify Rollbar of rollback
-      if: ${{ env.ROLLBAR_ACCESS_TOKEN != '' }}
+      if: success() && env.ROLLBAR_ACCESS_TOKEN != ''
+      uses: rollbar/github-deploy-action@2.1.2
+      with:
+        environment: 'production'
+        version: ${{ steps.rollback-strategy.outputs.target-commit || github.sha }}
+        status: 'succeeded'
+        local_username: ${{ github.actor }}
       env:
-        COMMIT_SHA: ${{ steps.rollback-strategy.outputs.target-commit || 'automatic-rollback' }}
-      run: |
-        cat <<EOF > rollbar-payload.json
-        {
-          "environment": "production",
-          "revision": "$COMMIT_SHA",
-          "local_username": "github-actions-rollback",
-          "comment": "ROLLBACK: ${{ github.event.inputs.reason }}"
-        }
-        EOF
+        ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
 
-        curl -X POST https://api.rollbar.com/api/1/deploy \
-          -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d @rollbar-payload.json
+    - name: Notify Rollbar of rollback failure
+      if: failure() && env.ROLLBAR_ACCESS_TOKEN != ''
+      uses: rollbar/github-deploy-action@2.1.2
+      with:
+        environment: 'production'
+        version: ${{ steps.rollback-strategy.outputs.target-commit || github.sha }}
+        status: 'failed'
+        local_username: ${{ github.actor }}
+      env:
+        ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
 
     - name: Rollback summary
       run: |
