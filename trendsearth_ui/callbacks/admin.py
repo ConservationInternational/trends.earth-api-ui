@@ -541,6 +541,23 @@ def register_callbacks(app):
     """Register admin-related callbacks."""
 
     @app.callback(
+        Output("admin-new-user-country", "options"),
+        [Input("token-store", "data")],
+        prevent_initial_call=False,
+    )
+    def populate_admin_country_dropdown(token):
+        """Populate the country dropdown for the admin new user form.
+
+        Uses the boundaries API if available (with auth), otherwise falls back
+        to the static country list.
+        """
+        from ..config import detect_api_environment_from_host
+        from ..utils.boundaries_utils import get_country_options
+
+        api_environment = detect_api_environment_from_host()
+        return get_country_options(api_environment=api_environment, token=token)
+
+    @app.callback(
         [
             Output("admin-create-user-alert", "children"),
             Output("admin-create-user-alert", "color"),

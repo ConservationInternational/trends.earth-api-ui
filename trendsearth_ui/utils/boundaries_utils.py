@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from difflib import get_close_matches
 import json
 import logging
+from pathlib import Path
 import re
 from threading import Lock
 
@@ -368,3 +369,155 @@ def clear_country_iso_cache() -> int:
         cleared = len(_BOUNDARIES_CACHE)
         _BOUNDARIES_CACHE.clear()
         return cleared
+
+
+# ---- Country dropdown utilities ----
+
+# Path to the fallback countries JSON file
+_FALLBACK_COUNTRIES_PATH = (
+    Path(__file__).parent.parent / "data" / "countries_fallback.json"
+)
+
+# Cache for country options (per API environment)
+_COUNTRY_OPTIONS_CACHE: TTLCache[str, list[dict]] = TTLCache(maxsize=4, ttl=3600)
+_COUNTRY_OPTIONS_LOCK = Lock()
+
+
+def _load_fallback_country_options() -> list[dict]:
+    """Load the fallback country list from the JSON file.
+
+    Returns:
+        List of dicts with 'label' (country name) and 'value' (ISO code) keys,
+        suitable for use in Dash dropdowns.
+    """
+    try:
+        with open(_FALLBACK_COUNTRIES_PATH, encoding="utf-8") as f:
+            countries = json.load(f)
+        # Convert to dropdown options format
+        return [{"label": c["name"], "value": c["code"]} for c in countries]
+    except FileNotFoundError:
+        logger.warning("Fallback countries file not found: %s", _FALLBACK_COUNTRIES_PATH)
+        return []
+    except (json.JSONDecodeError, KeyError) as e:
+        logger.warning("Error parsing fallback countries file: %s", e)
+        return []
+
+
+def get_country_options(
+    api_environment: str | None = None,
+    token: str | None = None,
+    use_cache: bool = True,
+) -> list[dict]:
+    """Get country options for dropdowns, with API fetch and fallback support.
+
+    This function attempts to fetch countries from the boundaries API if a token
+    is provided. If the API is unavailable or returns an error, it falls back
+    to the static country list.
+
+    Args:
+        api_environment: The API environment (e.g., 'production', 'staging').
+                         If None, only the fallback list is used.
+        token: Optional authentication token for API access.
+        use_cache: Whether to use cached results (default True).
+
+    Returns:
+        List of dicts with 'label' (country name) and 'value' (ISO code) keys.
+    """
+    cache_key = api_environment or "fallback"
+
+    # Check cache first
+    if use_cache:
+        with _COUNTRY_OPTIONS_LOCK:
+            cached = _COUNTRY_OPTIONS_CACHE.get(cache_key)
+            if cached is not None:
+                return cached
+
+    # Try to fetch from API if we have credentials
+    if api_environment and token:
+        options = _fetch_country_options_from_api(api_environment, token)
+        if options:
+            with _COUNTRY_OPTIONS_LOCK:
+                _COUNTRY_OPTIONS_CACHE[cache_key] = options
+            return options
+
+    # Try fetching without auth (for registration flow)
+    if api_environment:
+        options = _fetch_country_options_from_api(api_environment, None)
+        if options:
+            with _COUNTRY_OPTIONS_LOCK:
+                _COUNTRY_OPTIONS_CACHE[cache_key] = options
+            return options
+
+    # Fall back to static list
+    logger.debug("Using fallback country list")
+    fallback = _load_fallback_country_options()
+    if fallback:
+        with _COUNTRY_OPTIONS_LOCK:
+            _COUNTRY_OPTIONS_CACHE[cache_key] = fallback
+    return fallback
+
+
+def _fetch_country_options_from_api(
+    api_environment: str, token: str | None
+) -> list[dict] | None:
+    """Fetch country options from the boundaries API.
+
+    Args:
+        api_environment: The API environment.
+        token: Optional authentication token.
+
+    Returns:
+        List of dropdown options, or None if fetch failed.
+    """
+    url = f"{get_api_base(api_environment)}/data/boundaries"
+    headers = apply_default_headers()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    try:
+        response = requests.get(
+            url,
+            headers=headers,
+            params={"level": "0", "per_page": "300"},
+            timeout=10,
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            countries = data.get("data", [])
+
+            options = []
+            for country in countries:
+                iso_code = country.get("boundaryISO", "")
+                name = country.get("boundaryName", "")
+                if iso_code and name:
+                    options.append({"label": name, "value": iso_code})
+
+            options.sort(key=lambda x: x["label"])
+            logger.debug("Fetched %d countries from boundaries API", len(options))
+            return options
+        else:
+            logger.warning(
+                "Boundaries API returned status %d, will use fallback",
+                response.status_code,
+            )
+            return None
+
+    except requests.exceptions.Timeout:
+        logger.warning("Boundaries API request timed out")
+        return None
+    except requests.exceptions.ConnectionError:
+        logger.warning("Cannot connect to boundaries API")
+        return None
+    except Exception as e:
+        logger.exception("Error fetching countries from API: %s", e)
+        return None
+
+
+def get_fallback_country_options() -> list[dict]:
+    """Get the fallback country options (convenience function for backwards compatibility).
+
+    Returns:
+        List of dicts with 'label' and 'value' keys for Dash dropdowns.
+    """
+    return _load_fallback_country_options()

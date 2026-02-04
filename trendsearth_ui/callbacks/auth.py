@@ -1165,58 +1165,17 @@ def register_callbacks(app):
     )
     def fetch_countries_for_registration(_api_environment_input):
         """Fetch countries from the boundary API for the registration dropdown."""
-        try:
-            # Auto-detect API environment from subdomain
-            api_environment = detect_api_environment_from_host()
-            api_base = get_api_base(api_environment)
-            logger.debug(
-                "Fetching countries from boundary API: %s (environment: %s)",
-                api_base,
-                api_environment,
-            )
+        from ..utils.boundaries_utils import get_country_options
 
-            # Fetch boundaries at level 0 (countries)
-            # Note: This endpoint requires authentication, but for registration
-            # we'll attempt without auth first. If it fails, we use a fallback list.
-            resp = requests.get(
-                f"{api_base}/data/boundaries",
-                params={"level": "0", "per_page": "300"},
-                headers=apply_default_headers(),
-                timeout=10,
-            )
+        # Auto-detect API environment from subdomain
+        api_environment = detect_api_environment_from_host()
+        logger.debug(
+            "Fetching countries for registration (environment: %s)",
+            api_environment,
+        )
 
-            if resp.status_code == 200:
-                data = resp.json()
-                countries = data.get("data", [])
-
-                # Build dropdown options from boundary data
-                options = []
-                for country in countries:
-                    iso_code = country.get("boundaryISO", "")
-                    name = country.get("boundaryName", "")
-                    if iso_code and name:
-                        options.append({"label": name, "value": iso_code})
-
-                # Sort by label (country name)
-                options.sort(key=lambda x: x["label"])
-                logger.debug("Loaded %d countries from boundary API", len(options))
-                return options
-            else:
-                logger.warning(
-                    "Failed to fetch countries from boundary API (status %d), using fallback",
-                    resp.status_code,
-                )
-                return _get_fallback_country_options()
-
-        except requests.exceptions.Timeout:
-            logger.warning("Boundary API request timed out, using fallback country list")
-            return _get_fallback_country_options()
-        except requests.exceptions.ConnectionError:
-            logger.warning("Cannot connect to boundary API, using fallback country list")
-            return _get_fallback_country_options()
-        except Exception as e:
-            logger.exception("Error fetching countries: %s", e)
-            return _get_fallback_country_options()
+        # Use the centralized country options utility (handles API fetch + fallback)
+        return get_country_options(api_environment=api_environment, token=None)
 
     # Registration form submission callback
     @app.callback(
@@ -1344,61 +1303,3 @@ def register_callbacks(app):
         except Exception as e:
             logger.exception("Error during registration: %s", e)
             return f"An error occurred: {str(e)}", "danger", True
-
-
-def _get_fallback_country_options():
-    """Return a fallback list of common countries when API is unavailable."""
-    # Common countries as fallback
-    countries = [
-        ("AFG", "Afghanistan"),
-        ("ALB", "Albania"),
-        ("DZA", "Algeria"),
-        ("ARG", "Argentina"),
-        ("AUS", "Australia"),
-        ("AUT", "Austria"),
-        ("BGD", "Bangladesh"),
-        ("BEL", "Belgium"),
-        ("BRA", "Brazil"),
-        ("CAN", "Canada"),
-        ("CHL", "Chile"),
-        ("CHN", "China"),
-        ("COL", "Colombia"),
-        ("COD", "Democratic Republic of the Congo"),
-        ("EGY", "Egypt"),
-        ("ETH", "Ethiopia"),
-        ("FRA", "France"),
-        ("DEU", "Germany"),
-        ("GHA", "Ghana"),
-        ("IND", "India"),
-        ("IDN", "Indonesia"),
-        ("IRN", "Iran"),
-        ("IRQ", "Iraq"),
-        ("ITA", "Italy"),
-        ("JPN", "Japan"),
-        ("KEN", "Kenya"),
-        ("MEX", "Mexico"),
-        ("MAR", "Morocco"),
-        ("MMR", "Myanmar"),
-        ("NPL", "Nepal"),
-        ("NLD", "Netherlands"),
-        ("NGA", "Nigeria"),
-        ("PAK", "Pakistan"),
-        ("PER", "Peru"),
-        ("PHL", "Philippines"),
-        ("POL", "Poland"),
-        ("RUS", "Russia"),
-        ("SAU", "Saudi Arabia"),
-        ("ZAF", "South Africa"),
-        ("KOR", "South Korea"),
-        ("ESP", "Spain"),
-        ("SDN", "Sudan"),
-        ("TZA", "Tanzania"),
-        ("THA", "Thailand"),
-        ("TUR", "Turkey"),
-        ("UGA", "Uganda"),
-        ("GBR", "United Kingdom"),
-        ("USA", "United States"),
-        ("VNM", "Vietnam"),
-        ("ZWE", "Zimbabwe"),
-    ]
-    return [{"label": name, "value": code} for code, name in countries]

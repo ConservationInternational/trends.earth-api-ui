@@ -1375,10 +1375,13 @@ def admin_tab_content(role, is_admin):
                                                     dbc.Col(
                                                         [
                                                             dbc.Label("Country"),
-                                                            dbc.Input(
+                                                            dcc.Dropdown(
                                                                 id="admin-new-user-country",
-                                                                type="text",
-                                                                placeholder="Enter country",
+                                                                options=[],
+                                                                placeholder="Select country...",
+                                                                searchable=True,
+                                                                clearable=True,
+                                                                className="dash-dropdown",
                                                             ),
                                                         ],
                                                         width=6,
