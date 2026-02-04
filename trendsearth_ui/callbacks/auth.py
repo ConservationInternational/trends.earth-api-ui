@@ -199,6 +199,22 @@ def register_callbacks(app):
             log_exception(logger, f"Cookie processing failed in display_page: {e}")
 
         # If all checks fail, show the login page
+        # Use callback_context to check what triggered this callback
+        ctx = callback_context
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else None
+
+        # If triggered by token-store becoming None (e.g., failed login),
+        # don't re-render the page - just keep the current login page with its alert state
+        if triggered_id == "token-store":
+            return (
+                no_update,
+                True,  # Clear stores
+                None,
+                None,
+                None,
+                (current_api_environment or "production"),
+            )
+
         return (
             login_layout(),
             True,  # Clear stores

@@ -1,8 +1,14 @@
 """Configuration settings for the Trends.Earth API Dashboard."""
 
+import os
+
 # API Configuration
-# Default API environment (can be overridden by user selection)
+# Default API environment (used when host detection fails)
 DEFAULT_API_ENVIRONMENT = "production"
+
+# Environment variable to force a specific API environment (useful for local development)
+# Set FORCE_API_ENVIRONMENT=staging to use staging API from localhost
+FORCE_API_ENVIRONMENT = os.environ.get("FORCE_API_ENVIRONMENT", "").lower() or None
 
 # API Environment configurations
 API_ENVIRONMENTS = {
@@ -10,13 +16,59 @@ API_ENVIRONMENTS = {
         "base": "https://api.trends.earth/api/v1",
         "auth": "https://api.trends.earth/auth",
         "display_name": "Production (api.trends.earth)",
+        "host_pattern": "api.trends.earth",
     },
     "staging": {
         "base": "https://api-staging.trends.earth/api/v1",
         "auth": "https://api-staging.trends.earth/auth",
         "display_name": "Staging (api-staging.trends.earth)",
+        "host_pattern": "api-staging.trends.earth",
     },
 }
+
+
+def detect_api_environment_from_host():
+    """
+    Detect the API environment based on the request host/subdomain.
+
+    Priority:
+    1. FORCE_API_ENVIRONMENT env var (if set to a valid environment)
+    2. Host-based detection (api.trends.earth -> production, api-staging.trends.earth -> staging)
+    3. DEFAULT_API_ENVIRONMENT fallback
+
+    If the UI is accessed from api.trends.earth, use production.
+    If the UI is accessed from api-staging.trends.earth, use staging.
+    Falls back to DEFAULT_API_ENVIRONMENT for localhost or unknown hosts.
+
+    Returns:
+        str: The detected environment key ('production' or 'staging')
+    """
+    # Check for forced environment first (useful for local development)
+    if FORCE_API_ENVIRONMENT and FORCE_API_ENVIRONMENT in API_ENVIRONMENTS:
+        return FORCE_API_ENVIRONMENT
+
+    try:
+        from flask import request
+
+        host = request.host.lower() if request.host else ""
+        # Remove port if present (e.g., localhost:8050 -> localhost)
+        host = host.split(":")[0]
+
+        # Check for staging first (more specific pattern)
+        if "api-staging" in host or "staging" in host:
+            return "staging"
+
+        # Check for production pattern
+        if "api.trends.earth" in host:
+            return "production"
+
+        # For localhost or other development hosts, use default
+        return DEFAULT_API_ENVIRONMENT
+
+    except Exception:
+        # If we can't access the request context, use default
+        return DEFAULT_API_ENVIRONMENT
+
 
 # Legacy constants for backward compatibility (using default environment)
 API_BASE = API_ENVIRONMENTS[DEFAULT_API_ENVIRONMENT]["base"]
@@ -36,20 +88,17 @@ def get_auth_url(environment=None):
 
 
 def get_current_api_environment():
-    """Get the current API environment from cookie or default."""
-    try:
-        import json
+    """
+    Get the current API environment.
 
-        from flask import request
+    Priority:
+    1. Detect from request host (subdomain-based detection)
+    2. Fall back to DEFAULT_API_ENVIRONMENT
 
-        auth_cookie = request.cookies.get("auth_token")
-        if auth_cookie:
-            cookie_data = json.loads(auth_cookie)
-            if cookie_data and isinstance(cookie_data, dict):
-                return cookie_data.get("api_environment", DEFAULT_API_ENVIRONMENT)
-    except Exception:
-        pass
-    return DEFAULT_API_ENVIRONMENT
+    Note: Host-based detection takes precedence to ensure users
+    always interact with the correct API based on which UI they access.
+    """
+    return detect_api_environment_from_host()
 
 
 def get_current_api_base():
