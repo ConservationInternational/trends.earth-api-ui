@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 
 from ..callbacks.timezone import get_timezone_components
 from ..config import (
+    API_ENVIRONMENTS,
     APP_TITLE,
     DEFAULT_API_ENVIRONMENT,
     LOGO_SQUARE_URL,
@@ -233,15 +234,29 @@ def login_layout():
                                                     ],
                                                     className="mb-3",
                                                 ),
-                                                # Hidden dummy input to maintain callback compatibility
-                                                # API environment is now auto-detected from subdomain
-                                                html.Div(
-                                                    dcc.Input(
-                                                        id="api-environment-dropdown",
-                                                        type="hidden",
-                                                        value="",
-                                                    ),
-                                                    style={"display": "none"},
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Label("API Environment", width=3),
+                                                        dbc.Col(
+                                                            dcc.Dropdown(
+                                                                id="api-environment-dropdown",
+                                                                options=[
+                                                                    {
+                                                                        "label": env_config[
+                                                                            "display_name"
+                                                                        ],
+                                                                        "value": env_key,
+                                                                    }
+                                                                    for env_key, env_config in API_ENVIRONMENTS.items()
+                                                                ],
+                                                                value=DEFAULT_API_ENVIRONMENT,
+                                                                clearable=False,
+                                                                style={"fontSize": "14px"},
+                                                            ),
+                                                            width=9,
+                                                        ),
+                                                    ],
+                                                    className="mb-3",
                                                 ),
                                                 dbc.Row(
                                                     [
@@ -564,10 +579,11 @@ def reset_password_layout(token=None, api_environment="production"):
     )
 
 
-def registration_layout():
+def registration_layout(api_environment="production"):
     """Create the user registration page layout.
 
-    Note: API environment is now auto-detected from the request subdomain.
+    Args:
+        api_environment: The API environment to use for registration
     """
     return html.Div(
         [
@@ -693,15 +709,29 @@ def registration_layout():
                                                         ],
                                                         className="mb-3",
                                                     ),
-                                                    # Hidden dummy input to maintain callback compatibility
-                                                    # API environment is now auto-detected from subdomain
-                                                    html.Div(
-                                                        dcc.Input(
-                                                            id="register-api-environment",
-                                                            type="hidden",
-                                                            value="",
-                                                        ),
-                                                        style={"display": "none"},
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("API Environment", width=4),
+                                                            dbc.Col(
+                                                                dcc.Dropdown(
+                                                                    id="register-api-environment",
+                                                                    options=[
+                                                                        {
+                                                                            "label": env_config[
+                                                                                "display_name"
+                                                                            ],
+                                                                            "value": env_key,
+                                                                        }
+                                                                        for env_key, env_config in API_ENVIRONMENTS.items()
+                                                                    ],
+                                                                    value=api_environment,
+                                                                    clearable=False,
+                                                                    style={"fontSize": "14px"},
+                                                                ),
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
                                                     ),
                                                     dbc.Row(
                                                         [
