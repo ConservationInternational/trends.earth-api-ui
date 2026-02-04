@@ -1357,6 +1357,52 @@ def admin_tab_content(role, is_admin):
                                                         width=6,
                                                     ),
                                                 ],
+                                                className="mb-2",
+                                            ),
+                                            html.Div(
+                                                id="admin-new-user-password-requirements",
+                                                children=[
+                                                    html.Small(
+                                                        "Password requirements:",
+                                                        className="text-muted d-block mb-1",
+                                                    ),
+                                                    html.Ul(
+                                                        [
+                                                            html.Li(
+                                                                "At least 12 characters",
+                                                                id="admin-new-user-req-length",
+                                                                className="text-muted",
+                                                            ),
+                                                            html.Li(
+                                                                "Uppercase letter (A-Z)",
+                                                                id="admin-new-user-req-uppercase",
+                                                                className="text-muted",
+                                                            ),
+                                                            html.Li(
+                                                                "Lowercase letter (a-z)",
+                                                                id="admin-new-user-req-lowercase",
+                                                                className="text-muted",
+                                                            ),
+                                                            html.Li(
+                                                                "Number (0-9)",
+                                                                id="admin-new-user-req-number",
+                                                                className="text-muted",
+                                                            ),
+                                                            html.Li(
+                                                                "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)",
+                                                                id="admin-new-user-req-special",
+                                                                className="text-muted",
+                                                            ),
+                                                            html.Li(
+                                                                "Passwords match",
+                                                                id="admin-new-user-req-match",
+                                                                className="text-muted",
+                                                            ),
+                                                        ],
+                                                        className="small mb-0 ps-3",
+                                                        style={"listStyleType": "none"},
+                                                    ),
+                                                ],
                                                 className="mb-3",
                                             ),
                                             dbc.Row(

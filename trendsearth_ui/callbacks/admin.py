@@ -557,6 +557,50 @@ def register_callbacks(app):
         api_environment = detect_api_environment_from_host()
         return get_country_options(api_environment=api_environment, token=token)
 
+    # Real-time password validation callback for admin new user form
+    @app.callback(
+        [
+            Output("admin-new-user-req-length", "className"),
+            Output("admin-new-user-req-uppercase", "className"),
+            Output("admin-new-user-req-lowercase", "className"),
+            Output("admin-new-user-req-number", "className"),
+            Output("admin-new-user-req-special", "className"),
+            Output("admin-new-user-req-match", "className"),
+        ],
+        [
+            Input("admin-new-user-password", "value"),
+            Input("admin-new-user-confirm-password", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def validate_admin_new_user_password_requirements(password, confirm_password):
+        """Validate password requirements in real-time and update UI indicators."""
+        import re
+
+        if not password:
+            # Return all as muted when no password entered
+            return ["text-muted"] * 6
+
+        special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+
+        # Check each requirement
+        has_length = len(password) >= 12
+        has_upper = bool(re.search(r"[A-Z]", password))
+        has_lower = bool(re.search(r"[a-z]", password))
+        has_number = bool(re.search(r"\d", password))
+        has_special = bool(re.search(f"[{special_chars}]", password))
+        passwords_match = bool(password and confirm_password and password == confirm_password)
+
+        # Return success (green) or danger (red) class for each requirement
+        return [
+            "text-success" if has_length else "text-danger",
+            "text-success" if has_upper else "text-danger",
+            "text-success" if has_lower else "text-danger",
+            "text-success" if has_number else "text-danger",
+            "text-success" if has_special else "text-danger",
+            "text-success" if passwords_match else "text-danger",
+        ]
+
     @app.callback(
         [
             Output("admin-create-user-alert", "children"),
@@ -667,9 +711,25 @@ def register_callbacks(app):
                     no_update,
                 )
 
-            if len(password) < 6:
+            # Validate password meets API requirements
+            import re
+
+            special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
+            password_errors = []
+            if len(password) < 12:
+                password_errors.append("at least 12 characters")
+            if not re.search(r"[A-Z]", password):
+                password_errors.append("an uppercase letter")
+            if not re.search(r"[a-z]", password):
+                password_errors.append("a lowercase letter")
+            if not re.search(r"\d", password):
+                password_errors.append("a number")
+            if not re.search(f"[{special_chars}]", password):
+                password_errors.append("a special character")
+
+            if password_errors:
                 return (
-                    "Password must be at least 6 characters long.",
+                    f"Password must contain {', '.join(password_errors)}.",
                     "warning",
                     True,
                     no_update,
