@@ -257,13 +257,13 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Last Login",
-                    "field": "last_login_at",
+                    "headerName": "Last Activity",
+                    "field": "last_activity_at",
                     "flex": 1,
                     "minWidth": 150,
                     "filter": "agDateColumnFilter",
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
-                    "tooltipField": "last_login_at",
+                    "tooltipField": "last_activity_at",
                     "resizable": True,
                 },
                 {
