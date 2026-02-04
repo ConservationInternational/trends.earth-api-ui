@@ -11,7 +11,7 @@ from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
 import requests
 
-from ..components import dashboard_layout, login_layout, reset_password_layout
+from ..components import dashboard_layout, login_layout, registration_layout, reset_password_layout
 from ..config import get_api_base, get_auth_url
 from ..utils import (
     create_auth_cookie_data,
@@ -1114,3 +1114,261 @@ def register_callbacks(app):
                 no_update,
                 no_update,
             )
+
+    # Registration page navigation callbacks
+    @app.callback(
+        Output("page-content", "children", allow_duplicate=True),
+        [Input("register-btn", "n_clicks")],
+        [State("api-environment-dropdown", "value")],
+        prevent_initial_call=True,
+    )
+    def navigate_to_register(n_clicks, api_environment):
+        """Navigate to registration page when Register button is clicked."""
+        if n_clicks:
+            return registration_layout(api_environment or "production")
+        return no_update
+
+    @app.callback(
+        Output("page-content", "children", allow_duplicate=True),
+        [Input("register-back-btn", "n_clicks")],
+        prevent_initial_call=True,
+    )
+    def navigate_back_to_login(n_clicks):
+        """Navigate back to login page from registration."""
+        if n_clicks:
+            return login_layout()
+        return no_update
+
+    @app.callback(
+        Output("register-country", "options"),
+        [Input("register-api-environment", "value")],
+        prevent_initial_call=False,
+    )
+    def fetch_countries_for_registration(api_environment):
+        """Fetch countries from the boundary API for the registration dropdown."""
+        try:
+            api_base = get_api_base(api_environment or "production")
+            logger.debug("Fetching countries from boundary API: %s", api_base)
+
+            # Fetch boundaries at level 0 (countries)
+            # Note: This endpoint requires authentication, but for registration
+            # we'll attempt without auth first. If it fails, we use a fallback list.
+            resp = requests.get(
+                f"{api_base}/data/boundaries",
+                params={"level": "0", "per_page": "300"},
+                headers=apply_default_headers(),
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                data = resp.json()
+                countries = data.get("data", [])
+
+                # Build dropdown options from boundary data
+                options = []
+                for country in countries:
+                    iso_code = country.get("boundaryISO", "")
+                    name = country.get("boundaryName", "")
+                    if iso_code and name:
+                        options.append({"label": name, "value": iso_code})
+
+                # Sort by label (country name)
+                options.sort(key=lambda x: x["label"])
+                logger.debug("Loaded %d countries from boundary API", len(options))
+                return options
+            else:
+                logger.warning(
+                    "Failed to fetch countries from boundary API (status %d), using fallback",
+                    resp.status_code,
+                )
+                return _get_fallback_country_options()
+
+        except requests.exceptions.Timeout:
+            logger.warning("Boundary API request timed out, using fallback country list")
+            return _get_fallback_country_options()
+        except requests.exceptions.ConnectionError:
+            logger.warning("Cannot connect to boundary API, using fallback country list")
+            return _get_fallback_country_options()
+        except Exception as e:
+            logger.exception("Error fetching countries: %s", e)
+            return _get_fallback_country_options()
+
+    # Registration form submission callback
+    @app.callback(
+        [
+            Output("register-alert", "children"),
+            Output("register-alert", "color"),
+            Output("register-alert", "is_open"),
+        ],
+        [Input("register-submit-btn", "n_clicks")],
+        [
+            State("register-email", "value"),
+            State("register-name", "value"),
+            State("register-country", "value"),
+            State("register-institution", "value"),
+            State("register-api-environment", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def submit_registration(n_clicks, email, name, country, institution, api_environment):
+        """Handle user registration form submission.
+
+        This uses the secure registration flow (legacy=false) where:
+        1. User provides email and profile info only
+        2. API creates account with temporary password
+        3. User receives email with link to verify and set password
+        """
+        if not n_clicks:
+            return no_update, no_update, no_update
+
+        # Validate required fields
+        if not email:
+            return "Please enter your email address.", "warning", True
+
+        if not name:
+            return "Please enter your name.", "warning", True
+
+        # Validate email format
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_pattern, email):
+            return "Please enter a valid email address.", "warning", True
+
+        try:
+            api_base = get_api_base(api_environment or "production")
+            logger.debug("Submitting registration to %s", api_base)
+
+            # Build registration payload (no password - user sets it via email link)
+            payload = {
+                "email": email,
+                "name": name,
+                "role": "USER",
+            }
+
+            if country:
+                payload["country"] = country
+
+            if institution:
+                payload["institution"] = institution
+
+            # Use legacy=false to send secure reset link instead of emailing password
+            resp = requests.post(
+                f"{api_base}/user?legacy=false",
+                json=payload,
+                headers=apply_default_headers(),
+                timeout=15,
+            )
+
+            if resp.status_code == 200:
+                logger.debug("User registration successful for: %s", email)
+                return (
+                    "Account created successfully! Please check your email to verify your account, "
+                    "then you can log in.",
+                    "success",
+                    True,
+                )
+            elif resp.status_code == 400:
+                error_msg = "Registration failed."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
+                except Exception:
+                    pass
+                logger.warning("Registration failed (400): %s", error_msg)
+                return error_msg, "danger", True
+            elif resp.status_code == 422:
+                error_msg = "Validation failed."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_msg)
+                except Exception:
+                    pass
+                logger.warning("Registration validation failed (422): %s", error_msg)
+                return error_msg, "danger", True
+            elif resp.status_code == 429:
+                logger.warning("Registration rate limit exceeded")
+                return (
+                    "Too many registration attempts. Please try again later.",
+                    "danger",
+                    True,
+                )
+            else:
+                logger.warning("Registration failed with status: %s", resp.status_code)
+                error_msg = "Registration failed."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
+                except Exception:
+                    pass
+                return f"{error_msg} Please try again.", "danger", True
+
+        except requests.exceptions.Timeout:
+            logger.warning("Registration request timed out")
+            return "Request timed out. Please try again.", "danger", True
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error during registration")
+            return (
+                "Cannot connect to the server. Please check your connection.",
+                "danger",
+                True,
+            )
+        except Exception as e:
+            logger.exception("Error during registration: %s", e)
+            return f"An error occurred: {str(e)}", "danger", True
+
+
+def _get_fallback_country_options():
+    """Return a fallback list of common countries when API is unavailable."""
+    # Common countries as fallback
+    countries = [
+        ("AFG", "Afghanistan"),
+        ("ALB", "Albania"),
+        ("DZA", "Algeria"),
+        ("ARG", "Argentina"),
+        ("AUS", "Australia"),
+        ("AUT", "Austria"),
+        ("BGD", "Bangladesh"),
+        ("BEL", "Belgium"),
+        ("BRA", "Brazil"),
+        ("CAN", "Canada"),
+        ("CHL", "Chile"),
+        ("CHN", "China"),
+        ("COL", "Colombia"),
+        ("COD", "Democratic Republic of the Congo"),
+        ("EGY", "Egypt"),
+        ("ETH", "Ethiopia"),
+        ("FRA", "France"),
+        ("DEU", "Germany"),
+        ("GHA", "Ghana"),
+        ("IND", "India"),
+        ("IDN", "Indonesia"),
+        ("IRN", "Iran"),
+        ("IRQ", "Iraq"),
+        ("ITA", "Italy"),
+        ("JPN", "Japan"),
+        ("KEN", "Kenya"),
+        ("MEX", "Mexico"),
+        ("MAR", "Morocco"),
+        ("MMR", "Myanmar"),
+        ("NPL", "Nepal"),
+        ("NLD", "Netherlands"),
+        ("NGA", "Nigeria"),
+        ("PAK", "Pakistan"),
+        ("PER", "Peru"),
+        ("PHL", "Philippines"),
+        ("POL", "Poland"),
+        ("RUS", "Russia"),
+        ("SAU", "Saudi Arabia"),
+        ("ZAF", "South Africa"),
+        ("KOR", "South Korea"),
+        ("ESP", "Spain"),
+        ("SDN", "Sudan"),
+        ("TZA", "Tanzania"),
+        ("THA", "Thailand"),
+        ("TUR", "Turkey"),
+        ("UGA", "Uganda"),
+        ("GBR", "United Kingdom"),
+        ("USA", "United States"),
+        ("VNM", "Vietnam"),
+        ("ZWE", "Zimbabwe"),
+    ]
+    return [{"label": name, "value": code} for code, name in countries]

@@ -279,6 +279,15 @@ def login_layout():
                                                     n_clicks=0,
                                                     style={"width": "100%"},
                                                 ),
+                                                dbc.Button(
+                                                    "Register",
+                                                    id="register-btn",
+                                                    color="secondary",
+                                                    outline=True,
+                                                    className="mt-2",
+                                                    n_clicks=0,
+                                                    style={"width": "100%"},
+                                                ),
                                                 html.Div(
                                                     [
                                                         html.A(
@@ -308,7 +317,7 @@ def login_layout():
                                             id="login-alert",
                                             is_open=False,
                                             dismissable=True,
-                                            duration=4000,
+                                            duration=None,
                                         ),
                                         html.Div(
                                             [
@@ -559,6 +568,245 @@ def reset_password_layout(token=None, api_environment="production"):
                                     ),
                                 ],
                                 style={"maxWidth": "450px"},
+                                width=6,
+                                className="mx-auto mt-4",
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+    )
+
+
+def registration_layout(api_environment="production"):
+    """Create the user registration page layout.
+
+    Args:
+        api_environment: The API environment to use for registration
+    """
+    return html.Div(
+        [
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "450px",
+                                                        "height": "auto",
+                                                    },
+                                                ),
+                                                style={
+                                                    "backgroundColor": "#495057",
+                                                    "padding": "20px 30px",
+                                                    "textAlign": "center",
+                                                    "display": "flex",
+                                                    "justifyContent": "center",
+                                                    "alignItems": "center",
+                                                },
+                                                className="mb-4",
+                                            ),
+                                            html.H4(
+                                                "Create Your Account",
+                                                className="mb-4 text-center",
+                                            ),
+                                            html.P(
+                                                "After registration, you'll receive an email to verify your address and set your password.",
+                                                className="text-muted text-center mb-4",
+                                                style={"fontSize": "14px"},
+                                            ),
+                                            dbc.Form(
+                                                [
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Email", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-email",
+                                                                        type="email",
+                                                                        placeholder="Enter your email address",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Name", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-name",
+                                                                        type="text",
+                                                                        placeholder="Enter your full name",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Hidden password inputs to satisfy callback dependencies
+                                                    html.Div(
+                                                        [
+                                                            dbc.Input(
+                                                                id="register-password",
+                                                                type="hidden",
+                                                                value="",
+                                                            ),
+                                                            dbc.Input(
+                                                                id="register-password-confirm",
+                                                                type="hidden",
+                                                                value="",
+                                                            ),
+                                                        ],
+                                                        style={"display": "none"},
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Country", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="register-country",
+                                                                        placeholder="Select your country",
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                    dcc.Store(
+                                                                        id="register-countries-store"
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Institution", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-institution",
+                                                                        type="text",
+                                                                        placeholder="Your organization (optional)",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("API Environment", width=4),
+                                                            dbc.Col(
+                                                                dcc.Dropdown(
+                                                                    id="register-api-environment",
+                                                                    options=[
+                                                                        {
+                                                                            "label": env_config[
+                                                                                "display_name"
+                                                                            ],
+                                                                            "value": env_key,
+                                                                        }
+                                                                        for env_key, env_config in API_ENVIRONMENTS.items()
+                                                                    ],
+                                                                    value=api_environment,
+                                                                    clearable=False,
+                                                                    style={"fontSize": "14px"},
+                                                                ),
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Button(
+                                                                        "Create Account",
+                                                                        id="register-submit-btn",
+                                                                        color="primary",
+                                                                        className="w-100",
+                                                                    ),
+                                                                ],
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Button(
+                                                                        "Back to Login",
+                                                                        id="register-back-btn",
+                                                                        color="link",
+                                                                        className="w-100",
+                                                                    ),
+                                                                ],
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ]
+                                            ),
+                                            dbc.Alert(
+                                                id="register-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=None,
+                                            ),
+                                            html.Hr(),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        "Privacy Policy",
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        "Terms of Use",
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "500px"},
                                 width=6,
                                 className="mx-auto mt-4",
                             ),
