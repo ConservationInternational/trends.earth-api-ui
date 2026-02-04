@@ -374,9 +374,7 @@ def clear_country_iso_cache() -> int:
 # ---- Country dropdown utilities ----
 
 # Path to the fallback countries JSON file
-_FALLBACK_COUNTRIES_PATH = (
-    Path(__file__).parent.parent / "data" / "countries_fallback.json"
-)
+_FALLBACK_COUNTRIES_PATH = Path(__file__).parent.parent / "data" / "countries_fallback.json"
 
 # Cache for country options (per API environment)
 _COUNTRY_OPTIONS_CACHE: TTLCache[str, list[dict]] = TTLCache(maxsize=4, ttl=3600)
@@ -457,9 +455,7 @@ def get_country_options(
     return fallback
 
 
-def _fetch_country_options_from_api(
-    api_environment: str, token: str | None
-) -> list[dict] | None:
+def _fetch_country_options_from_api(api_environment: str, token: str | None) -> list[dict] | None:
     """Fetch country options from the boundaries API.
 
     Args:
