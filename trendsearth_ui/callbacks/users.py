@@ -14,7 +14,7 @@ from ..utils.helpers import make_authenticated_request
 logger = logging.getLogger(__name__)
 
 USER_ENDPOINT = "/user"
-USER_DATE_COLUMNS = ("created_at", "updated_at")
+USER_DATE_COLUMNS = ("created_at", "updated_at", "last_login_at", "email_verified_at")
 
 
 def _format_user_rows(
@@ -42,6 +42,15 @@ def _format_user_rows(
         for date_col in USER_DATE_COLUMNS:
             if date_col in row:
                 row[date_col] = parse_date(row.get(date_col), timezone)
+        # Format email_verified boolean as readable text
+        if "email_verified" in row:
+            email_verified = row.get("email_verified")
+            if email_verified is True:
+                row["email_verified"] = "✓ Yes"
+            elif email_verified is False:
+                row["email_verified"] = "✗ No"
+            else:
+                row["email_verified"] = "—"
         rows.append(row)
     return rows
 
