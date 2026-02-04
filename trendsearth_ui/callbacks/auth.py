@@ -12,7 +12,7 @@ from flask import request
 import requests
 
 from ..components import dashboard_layout, login_layout, registration_layout, reset_password_layout
-from ..config import get_api_base, get_auth_url
+from ..config import detect_api_environment_from_host, get_api_base, get_auth_url
 from ..utils import (
     create_auth_cookie_data,
     get_user_info,
@@ -244,10 +244,13 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def login_api(_n, email, password, remember_me, api_environment, search):
+    def login_api(_n, email, password, remember_me, _api_environment_dropdown, search):
         """Handle login authentication."""
+        # Auto-detect API environment from subdomain instead of using dropdown
+        api_environment = detect_api_environment_from_host()
+
         logger.debug(
-            "Login attempt - Email: %s, Button clicks: %s, Remember: %s, Environment: %s",
+            "Login attempt - Email: %s, Button clicks: %s, Remember: %s, Environment: %s (auto-detected)",
             email,
             _n,
             remember_me,
@@ -1138,10 +1141,10 @@ def register_callbacks(app):
         [State("api-environment-dropdown", "value")],
         prevent_initial_call=True,
     )
-    def navigate_to_register(n_clicks, api_environment):
+    def navigate_to_register(n_clicks, _api_environment_input):
         """Navigate to registration page when Register button is clicked."""
         if n_clicks:
-            return registration_layout(api_environment or "production")
+            return registration_layout()
         return no_update
 
     @app.callback(
@@ -1160,11 +1163,17 @@ def register_callbacks(app):
         [Input("register-api-environment", "value")],
         prevent_initial_call=False,
     )
-    def fetch_countries_for_registration(api_environment):
+    def fetch_countries_for_registration(_api_environment_input):
         """Fetch countries from the boundary API for the registration dropdown."""
         try:
-            api_base = get_api_base(api_environment or "production")
-            logger.debug("Fetching countries from boundary API: %s", api_base)
+            # Auto-detect API environment from subdomain
+            api_environment = detect_api_environment_from_host()
+            api_base = get_api_base(api_environment)
+            logger.debug(
+                "Fetching countries from boundary API: %s (environment: %s)",
+                api_base,
+                api_environment,
+            )
 
             # Fetch boundaries at level 0 (countries)
             # Note: This endpoint requires authentication, but for registration
@@ -1226,7 +1235,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def submit_registration(n_clicks, email, name, country, institution, api_environment):
+    def submit_registration(n_clicks, email, name, country, institution, _api_environment_input):
         """Handle user registration form submission.
 
         This uses the secure registration flow (legacy=false) where:
@@ -1234,6 +1243,9 @@ def register_callbacks(app):
         2. API creates account with temporary password
         3. User receives email with link to verify and set password
         """
+        # Auto-detect API environment from subdomain
+        api_environment = detect_api_environment_from_host()
+
         if not n_clicks:
             return no_update, no_update, no_update
 
@@ -1250,8 +1262,10 @@ def register_callbacks(app):
             return "Please enter a valid email address.", "warning", True
 
         try:
-            api_base = get_api_base(api_environment or "production")
-            logger.debug("Submitting registration to %s", api_base)
+            api_base = get_api_base(api_environment)
+            logger.debug(
+                "Submitting registration to %s (environment: %s)", api_base, api_environment
+            )
 
             # Build registration payload (no password - user sets it via email link)
             payload = {
