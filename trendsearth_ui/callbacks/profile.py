@@ -269,5 +269,148 @@ def register_callbacks(app):
             logger.exception("Error updating email notifications: %s", e)
             return f"Network error: {str(e)}", "danger", True, no_update
 
+    # Delete Account Callbacks
+    @app.callback(
+        Output("delete-account-modal", "is_open"),
+        [
+            Input("delete-account-btn", "n_clicks"),
+            Input("delete-account-cancel-btn", "n_clicks"),
+            Input("delete-account-confirm-btn", "n_clicks"),
+        ],
+        [State("delete-account-modal", "is_open")],
+        prevent_initial_call=True,
+    )
+    def toggle_delete_account_modal(
+        _open_clicks, _cancel_clicks, _confirm_clicks, _is_open
+    ):
+        """Toggle the delete account confirmation modal."""
+        from dash import ctx
+
+        if not ctx.triggered:
+            return no_update
+
+        trigger_id = ctx.triggered_id
+
+        if trigger_id == "delete-account-btn":
+            # Open modal when delete button clicked
+            return True
+        elif trigger_id in ["delete-account-cancel-btn", "delete-account-confirm-btn"]:
+            # Close modal when cancel or confirm clicked
+            return False
+
+        return no_update
+
+    @app.callback(
+        Output("delete-account-confirm-btn", "disabled"),
+        [Input("delete-account-confirm-email", "value")],
+        [State("user-store", "data")],
+        prevent_initial_call=True,
+    )
+    def validate_delete_confirmation(email_input, user_data):
+        """Enable delete button only when email matches."""
+        if not user_data or not email_input:
+            return True
+
+        user_email = user_data.get("email", "")
+        # Enable button only if email matches exactly
+        return email_input.strip().lower() != user_email.lower()
+
+    @app.callback(
+        [
+            Output("delete-account-alert", "children"),
+            Output("delete-account-alert", "color"),
+            Output("delete-account-alert", "is_open"),
+            Output("token-store", "data", allow_duplicate=True),
+            Output("user-store", "data", allow_duplicate=True),
+            Output("delete-account-confirm-email", "value"),
+        ],
+        [Input("delete-account-confirm-btn", "n_clicks")],
+        [
+            State("delete-account-confirm-email", "value"),
+            State("token-store", "data"),
+            State("user-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def delete_account(n_clicks, confirm_email, token, user_data):
+        """Delete user account after confirmation."""
+        if not n_clicks or not token or not user_data:
+            return no_update, no_update, no_update, no_update, no_update, no_update
+
+        user_email = user_data.get("email", "")
+
+        # Double-check email confirmation
+        if confirm_email.strip().lower() != user_email.lower():
+            return (
+                "Email confirmation does not match. Please try again.",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                "",
+            )
+
+        try:
+            from ..utils.helpers import make_authenticated_request
+
+            logger.info("User %s requested account deletion", user_email)
+
+            resp = make_authenticated_request(
+                "/user/me",
+                token,
+                method="DELETE",
+                timeout=30,  # Longer timeout for deletion
+            )
+
+            if resp.status_code == 200:
+                logger.info("Account deletion successful for user: %s", user_email)
+                # Clear user data and token to log out
+                return (
+                    "Your account has been deleted. You will be logged out.",
+                    "success",
+                    True,
+                    None,  # Clear token
+                    None,  # Clear user data
+                    "",
+                )
+            elif resp.status_code == 403:
+                logger.warning("Account deletion forbidden for user: %s", user_email)
+                return (
+                    "Admin accounts cannot be deleted through self-service. "
+                    "Please contact a system administrator.",
+                    "warning",
+                    True,
+                    no_update,
+                    no_update,
+                    "",
+                )
+            else:
+                logger.warning(
+                    "Account deletion failed with status %s for user: %s",
+                    resp.status_code,
+                    user_email,
+                )
+                error_msg = "Failed to delete account."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
+                except Exception:
+                    pass
+                # Avoid duplicate "try again" if message already contains it
+                if "try again" not in error_msg.lower():
+                    error_msg = f"{error_msg} Please try again."
+                return error_msg, "danger", True, no_update, no_update, ""
+
+        except Exception as e:
+            logger.exception("Network error during account deletion: %s", e)
+            return (
+                f"Network error: {str(e)}",
+                "danger",
+                True,
+                no_update,
+                no_update,
+                "",
+            )
+
 
 # Legacy callback decorators for backward compatibility (these won't be executed)

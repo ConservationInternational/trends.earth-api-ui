@@ -728,8 +728,11 @@ def register_callbacks(app):
                     logger.debug("API error response: %s", error_data)
                 except Exception:
                     pass
+                # Avoid duplicate "Please try again" if message already contains it
+                if "try again" not in error_msg.lower():
+                    error_msg = f"{error_msg} Please try again later."
                 return (
-                    f"{error_msg} Please try again later.",
+                    error_msg,
                     "danger",
                     True,
                     no_update,
@@ -1125,8 +1128,11 @@ def register_callbacks(app):
                     error_msg = error_data["detail"]
                 except Exception:
                     pass
+                # Avoid duplicate "Please try again" if message already contains it
+                if "try again" not in error_msg.lower():
+                    error_msg = f"{error_msg} Please try again."
                 return (
-                    f"{error_msg} Please try again.",
+                    error_msg,
                     "danger",
                     True,
                     no_update,
@@ -1315,7 +1321,10 @@ def register_callbacks(app):
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
                     pass
-                return f"{error_msg} Please try again.", "danger", True
+                # Avoid duplicate "Please try again" if message already contains it
+                if "try again" not in error_msg.lower():
+                    error_msg = f"{error_msg} Please try again."
+                return error_msg, "danger", True
 
         except requests.exceptions.Timeout:
             logger.warning("Registration request timed out")

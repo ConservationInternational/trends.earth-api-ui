@@ -839,6 +839,105 @@ def profile_tab_content(user_data):
                     ),
                 ]
             ),
+            # Delete Account Section
+            dbc.Card(
+                [
+                    dbc.CardHeader(html.H4("Delete Account", className="text-danger")),
+                    dbc.CardBody(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.P(
+                                                [
+                                                    html.Strong("Warning: "),
+                                                    "Deleting your account is permanent and cannot be undone. "
+                                                    "All your data, including executions and scripts, will be permanently removed.",
+                                                ],
+                                                className="text-muted",
+                                            ),
+                                            dbc.Button(
+                                                "Delete My Account",
+                                                id="delete-account-btn",
+                                                color="danger",
+                                                outline=True,
+                                            ),
+                                            dbc.Alert(
+                                                id="delete-account-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ),
+                ],
+                className="mt-4 border-danger",
+            ),
+            # Delete Account Confirmation Modal
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Confirm Account Deletion"),
+                        close_button=True,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            html.P(
+                                "Are you sure you want to delete your account?",
+                                className="fw-bold",
+                            ),
+                            html.P(
+                                "This action is irreversible. All your data will be permanently deleted, including:",
+                                className="text-muted",
+                            ),
+                            html.Ul(
+                                [
+                                    html.Li("All your execution history and logs"),
+                                    html.Li("Any scripts you have created"),
+                                    html.Li("Your Google Earth Engine credentials"),
+                                    html.Li("Your account settings and profile"),
+                                ],
+                                className="text-muted",
+                            ),
+                            html.Hr(),
+                            html.P(
+                                "To confirm, type your email address below:",
+                                className="mb-2",
+                            ),
+                            dbc.Input(
+                                id="delete-account-confirm-email",
+                                type="email",
+                                placeholder="Enter your email address",
+                                className="mb-3",
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button(
+                                "Cancel",
+                                id="delete-account-cancel-btn",
+                                color="secondary",
+                                outline=True,
+                            ),
+                            dbc.Button(
+                                "Delete My Account",
+                                id="delete-account-confirm-btn",
+                                color="danger",
+                                disabled=True,
+                            ),
+                        ]
+                    ),
+                ],
+                id="delete-account-modal",
+                is_open=False,
+                centered=True,
+            ),
         ]
     )
 
