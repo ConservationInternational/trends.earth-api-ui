@@ -14,7 +14,13 @@ from ..utils.helpers import make_authenticated_request
 logger = logging.getLogger(__name__)
 
 USER_ENDPOINT = "/user"
-USER_DATE_COLUMNS = ("created_at", "updated_at", "last_login_at", "email_verified_at")
+USER_DATE_COLUMNS = (
+    "created_at",
+    "updated_at",
+    "last_login_at",
+    "last_activity_at",
+    "email_verified_at",
+)
 
 
 def _format_user_rows(

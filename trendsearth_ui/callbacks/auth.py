@@ -387,7 +387,34 @@ def register_callbacks(app):
                     )
             else:
                 logger.warning("Login failed with status code: %s", resp.status_code)
-                return (None, None, None, None, "Invalid credentials.", "danger", True)
+
+                # Try to parse error response for lockout information
+                error_msg = "Invalid credentials."
+                try:
+                    error_data = resp.json()
+                    if error_data.get("error_code") == "account_locked":
+                        requires_reset = error_data.get("requires_password_reset", False)
+                        minutes_remaining = error_data.get("minutes_remaining")
+                        if requires_reset:
+                            error_msg = (
+                                "Your account is locked due to too many failed login attempts. "
+                                "Please use the 'Forgot Password' link below to reset your password."
+                            )
+                        elif minutes_remaining:
+                            error_msg = (
+                                f"Your account is temporarily locked. "
+                                f"Please try again in {minutes_remaining} minute(s)."
+                            )
+                        else:
+                            error_msg = error_data.get("message", error_msg)
+                    elif "message" in error_data:
+                        error_msg = error_data["message"]
+                    elif "msg" in error_data:
+                        error_msg = error_data["msg"]
+                except (ValueError, KeyError):
+                    pass
+
+                return (None, None, None, None, error_msg, "danger", True)
 
         except requests.exceptions.Timeout:
             logger.warning("Login request timed out")
