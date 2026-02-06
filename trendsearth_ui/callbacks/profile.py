@@ -5,6 +5,8 @@ import logging
 from dash import Input, Output, State, no_update
 import requests  # noqa: F401
 
+from ..components import login_layout
+
 logger = logging.getLogger(__name__)
 
 
@@ -280,9 +282,7 @@ def register_callbacks(app):
         [State("delete-account-modal", "is_open")],
         prevent_initial_call=True,
     )
-    def toggle_delete_account_modal(
-        _open_clicks, _cancel_clicks, _confirm_clicks, _is_open
-    ):
+    def toggle_delete_account_modal(_open_clicks, _cancel_clicks, _confirm_clicks, _is_open):
         """Toggle the delete account confirmation modal."""
         from dash import ctx
 
@@ -322,7 +322,10 @@ def register_callbacks(app):
             Output("delete-account-alert", "is_open"),
             Output("token-store", "data", allow_duplicate=True),
             Output("user-store", "data", allow_duplicate=True),
+            Output("role-store", "data", allow_duplicate=True),
             Output("delete-account-confirm-email", "value"),
+            Output("page-content", "children", allow_duplicate=True),
+            Output("tab-content", "children", allow_duplicate=True),
         ],
         [Input("delete-account-confirm-btn", "n_clicks")],
         [
@@ -335,7 +338,17 @@ def register_callbacks(app):
     def delete_account(n_clicks, confirm_email, token, user_data):
         """Delete user account after confirmation."""
         if not n_clicks or not token or not user_data:
-            return no_update, no_update, no_update, no_update, no_update, no_update
+            return (
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+            )
 
         user_email = user_data.get("email", "")
 
@@ -347,7 +360,10 @@ def register_callbacks(app):
                 True,
                 no_update,
                 no_update,
+                no_update,
                 "",
+                no_update,
+                no_update,
             )
 
         try:
@@ -364,14 +380,17 @@ def register_callbacks(app):
 
             if resp.status_code == 200:
                 logger.info("Account deletion successful for user: %s", user_email)
-                # Clear user data and token to log out
+                # Clear user data and token, redirect to login page
                 return (
-                    "Your account has been deleted. You will be logged out.",
+                    "Your account has been deleted.",
                     "success",
                     True,
                     None,  # Clear token
                     None,  # Clear user data
+                    None,  # Clear role
                     "",
+                    login_layout(),  # Redirect to login page
+                    [],  # Clear tab content
                 )
             elif resp.status_code == 403:
                 logger.warning("Account deletion forbidden for user: %s", user_email)
@@ -382,7 +401,10 @@ def register_callbacks(app):
                     True,
                     no_update,
                     no_update,
+                    no_update,
                     "",
+                    no_update,
+                    no_update,
                 )
             else:
                 logger.warning(
@@ -399,7 +421,17 @@ def register_callbacks(app):
                 # Avoid duplicate "try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = f"{error_msg} Please try again."
-                return error_msg, "danger", True, no_update, no_update, ""
+                return (
+                    error_msg,
+                    "danger",
+                    True,
+                    no_update,
+                    no_update,
+                    no_update,
+                    "",
+                    no_update,
+                    no_update,
+                )
 
         except Exception as e:
             logger.exception("Network error during account deletion: %s", e)
@@ -409,7 +441,10 @@ def register_callbacks(app):
                 True,
                 no_update,
                 no_update,
+                no_update,
                 "",
+                no_update,
+                no_update,
             )
 
 
