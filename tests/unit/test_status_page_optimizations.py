@@ -202,11 +202,12 @@ class TestStatusPageOptimizations:
         Note: The 'exclude' parameter was removed as it's not supported by the API.
         This test now verifies that only supported parameters are sent.
         """
-        with patch("requests.get") as mock_get:
+        with patch("trendsearth_ui.utils.status_data_manager.get_session") as mock_get_session:
+            mock_session = mock_get_session.return_value
             mock_response = MagicMock()
             mock_response.status_code = 200
             mock_response.json.return_value = {"data": [{"timestamp": "2023-01-01T00:00:00Z"}]}
-            mock_get.return_value = mock_response
+            mock_session.get.return_value = mock_response
 
             # Fetch time series data
             StatusDataManager.fetch_time_series_status_data(
@@ -217,7 +218,7 @@ class TestStatusPageOptimizations:
             )
 
             # Verify only supported parameters are used (no 'exclude')
-            call_args = mock_get.call_args
+            call_args = mock_session.get.call_args
             assert call_args is not None
             params = call_args[1]["params"]
             # Verify exclude is NOT in params (it's unsupported by the API)
@@ -228,11 +229,12 @@ class TestStatusPageOptimizations:
 
     def test_adaptive_max_points_based_on_time_period(self):
         """Test that max points provide sufficient coverage for each time period."""
-        with patch("requests.get") as mock_get:
+        with patch("trendsearth_ui.utils.status_data_manager.get_session") as mock_get_session:
+            mock_session = mock_get_session.return_value
             mock_response = MagicMock()
             mock_response.status_code = 200
             mock_response.json.return_value = {"data": []}
-            mock_get.return_value = mock_response
+            mock_session.get.return_value = mock_response
 
             # Test different time periods with sufficient data points for full coverage
             test_cases = [
@@ -256,7 +258,7 @@ class TestStatusPageOptimizations:
                 )
 
                 # Check the latest call's parameters
-                call_args = mock_get.call_args
+                call_args = mock_session.get.call_args
                 params = call_args[1]["params"]
                 assert params["per_page"] >= expected_max_points
                 assert params["per_page"] <= 20000

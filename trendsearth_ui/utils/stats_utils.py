@@ -6,8 +6,10 @@ NOTE: Caching is handled by StatusDataManager. These functions are pure API fetc
 import requests
 
 from ..config import get_api_base
-from .http_client import apply_default_headers
+from .http_client import apply_default_headers, get_session
 from .logging_config import get_logger, log_error
+
+logger = get_logger()
 
 
 def check_stats_access(role):
@@ -67,10 +69,6 @@ def fetch_dashboard_stats(
     Returns:
         dict: Dashboard statistics data or None if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
-
     # Enhanced logging for debugging
     logger.info(
         f"Dashboard stats: Fetching data for period={period}, environment={api_environment}"
@@ -90,7 +88,7 @@ def fetch_dashboard_stats(
         params["include"] = ",".join(include_sections)
 
     try:
-        resp = requests.get(
+        resp = get_session().get(
             f"{get_api_base(api_environment)}/stats/dashboard",
             headers=headers,
             params=params,
@@ -141,10 +139,6 @@ def fetch_scripts_count(token, api_environment="production"):
     Returns:
         int: Total number of scripts or 0 if error
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
-
     logger.info(f"Scripts count: Fetching data for environment={api_environment}")
 
     if not token:
@@ -156,7 +150,7 @@ def fetch_scripts_count(token, api_environment="production"):
     params = {"page": 1, "per_page": 1}  # Minimal data transfer
 
     try:
-        resp = requests.get(
+        resp = get_session().get(
             f"{get_api_base(api_environment)}/script",
             headers=headers,
             params=params,
@@ -195,8 +189,6 @@ def fetch_user_stats(
     Returns:
         dict: User statistics data or None if error
     """
-    logger = get_logger()
-
     logger.info(
         f"User stats: Fetching data for period={period}, group_by={group_by}, country={country}, environment={api_environment}"
     )
@@ -214,7 +206,7 @@ def fetch_user_stats(
         params["country"] = country
 
     try:
-        resp = requests.get(
+        resp = get_session().get(
             f"{get_api_base(api_environment)}/stats/users",
             headers=headers,
             params=params,
@@ -276,8 +268,6 @@ def fetch_execution_stats(
     Returns:
         dict: Execution statistics data or None if error
     """
-    logger = get_logger()
-
     logger.info(
         f"Execution stats: Fetching data for period={period}, group_by={group_by}, task_type={task_type}, status={status}, environment={api_environment}"
     )
@@ -297,7 +287,7 @@ def fetch_execution_stats(
         params["status"] = status
 
     try:
-        resp = requests.get(
+        resp = get_session().get(
             f"{get_api_base(api_environment)}/stats/executions",
             headers=headers,
             params=params,

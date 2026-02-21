@@ -110,9 +110,11 @@ def register_callbacks(app):
                     # Fallback for non-dict log entries
                     parsed_logs.append(("", str(log)))
 
-            # Sort by timestamp in descending order
-            parsed_logs.sort(key=lambda x: x[0], reverse=True)
-            logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+            # Sort by timestamp in descending order (skip if already sorted)
+            timestamps = [t for t, _ in parsed_logs]
+            if timestamps != sorted(timestamps, reverse=True):
+                parsed_logs.sort(key=lambda x: x[0], reverse=True)
+            logs_content = "\n".join(log_line for _, log_line in parsed_logs)
         else:
             logs_content = str(logs_data)
 

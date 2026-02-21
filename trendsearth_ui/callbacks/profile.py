@@ -3,7 +3,6 @@
 import logging
 
 from dash import Input, Output, State, no_update
-import requests  # noqa: F401
 
 from ..components import login_layout
 

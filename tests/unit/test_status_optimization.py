@@ -63,16 +63,17 @@ class TestStatusDataManager:
         cleared_count = StatusDataManager.invalidate_cache()
         assert cleared_count >= 1  # Should clear remaining entries
 
-    @patch("trendsearth_ui.utils.status_data_manager.requests.get")
-    def test_consolidated_status_data_fetching(self, mock_get):
+    @patch("trendsearth_ui.utils.status_data_manager.get_session")
+    def test_consolidated_status_data_fetching(self, mock_get_session):
         """Test consolidated status data fetching with caching."""
         # Mock successful response
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "data": [{"timestamp": "2023-01-01", "executions_running": 5}]
         }
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         # Mock the helper functions
         with (
@@ -110,7 +111,7 @@ class TestStatusDataManager:
             assert result1 == result2
 
             # Should have only made one API call due to caching
-            assert mock_get.call_count == 1
+            assert mock_session.get.call_count == 1
 
     def test_consolidated_stats_data_permission_check(self):
         """Test that stats data fetching checks for SUPERADMIN permissions."""
@@ -294,17 +295,18 @@ class TestStatusDataManager:
         mock_set_cached.assert_not_called()
         assert result["execution_stats"] == {"error": True, "status_code": 400}
 
-    @patch("trendsearth_ui.utils.status_data_manager.requests.get")
-    def test_time_series_data_fetching_with_caching(self, mock_get):
+    @patch("trendsearth_ui.utils.status_data_manager.get_session")
+    def test_time_series_data_fetching_with_caching(self, mock_get_session):
         """Test time series data fetching with caching."""
         # Mock successful response
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.raise_for_status.return_value = None
         mock_response.json.return_value = {
             "data": [{"timestamp": "2023-01-01", "executions_active": 3}]
         }
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         # First call should fetch from API
         result1 = StatusDataManager.fetch_time_series_status_data(
@@ -325,7 +327,7 @@ class TestStatusDataManager:
         assert result1 == result2
 
         # Should have only made one API call due to caching
-        assert mock_get.call_count == 1
+        assert mock_session.get.call_count == 1
 
 
 class TestStatusCallbackOptimization:

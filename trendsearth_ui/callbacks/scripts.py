@@ -18,14 +18,32 @@ DATE_COLUMNS = ("start_date", "end_date", "created_at", "updated_at")
 
 # Must match the API's SCRIPT_ALLOWED_FILTER_FIELDS / SORT_FIELDS
 SCRIPT_ALLOWED_SORT_COLUMNS = {
-    "id", "name", "slug", "status", "public", "restricted",
-    "created_at", "updated_at", "environment", "environment_version",
-    "user_name", "user_email",
+    "id",
+    "name",
+    "slug",
+    "status",
+    "public",
+    "restricted",
+    "created_at",
+    "updated_at",
+    "environment",
+    "environment_version",
+    "user_name",
+    "user_email",
 }
 SCRIPT_ALLOWED_FILTER_COLUMNS = {
-    "id", "name", "slug", "status", "public", "restricted",
-    "created_at", "updated_at", "environment", "environment_version",
-    "user_name", "user_email",
+    "id",
+    "name",
+    "slug",
+    "status",
+    "public",
+    "restricted",
+    "created_at",
+    "updated_at",
+    "environment",
+    "environment_version",
+    "user_name",
+    "user_email",
 }
 
 

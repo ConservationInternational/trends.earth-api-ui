@@ -16,10 +16,10 @@ class TestPasswordChange:
         register_callbacks(dash_app)
 
         # Mock successful API response
-        with patch("trendsearth_ui.callbacks.profile.requests.patch") as mock_patch:
+        with patch("trendsearth_ui.utils.helpers.make_authenticated_request") as mock_request:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_patch.return_value = mock_response
+            mock_request.return_value = mock_response
 
             # Mock callback inputs
             n_clicks = 1
@@ -54,7 +54,7 @@ class TestPasswordChange:
                 assert result[5] == ""
 
                 # Verify API was called
-                mock_patch.assert_called()
+                mock_request.assert_called()
 
     def test_password_change_validation_errors(self, dash_app, mock_token, mock_user_data):
         """Test password change validation errors."""
@@ -92,11 +92,11 @@ class TestPasswordChange:
         register_callbacks(dash_app)
 
         # Mock API error response
-        with patch("trendsearth_ui.callbacks.profile.requests.patch") as mock_patch:
+        with patch("trendsearth_ui.utils.helpers.make_authenticated_request") as mock_request:
             mock_response = Mock()
             mock_response.status_code = 400
             mock_response.json.return_value = {"msg": "Current password is incorrect"}
-            mock_patch.return_value = mock_response
+            mock_request.return_value = mock_response
 
             # Get the callback function
             callback_func = None

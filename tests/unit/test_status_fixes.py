@@ -11,9 +11,10 @@ from trendsearth_ui.utils.status_helpers import fetch_deployment_info, fetch_swa
 class TestDeploymentInfoFixes:
     """Test deployment information fixes using actual API endpoints."""
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_api_endpoint_success(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_deployment_info_with_api_endpoint_success(self, mock_get_session):
         """Test successful fetch from API health endpoint."""
+        mock_session = mock_get_session.return_value
 
         def mock_requests_side_effect(url, *args, **kwargs):
             """Mock different responses based on URL"""
@@ -33,7 +34,7 @@ class TestDeploymentInfoFixes:
                 mock_response.status_code = 404
             return mock_response
 
-        mock_get.side_effect = mock_requests_side_effect
+        mock_session.get.side_effect = mock_requests_side_effect
 
         result = fetch_deployment_info("production", "test_token")
 
@@ -49,9 +50,10 @@ class TestDeploymentInfoFixes:
         # UI info should NOT be present (removed as per requirement)
         assert "Trends.Earth UI" not in result_str
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_api_error(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_deployment_info_with_api_error(self, mock_get_session):
         """Test handling when API endpoint returns an error."""
+        mock_session = mock_get_session.return_value
 
         def mock_requests_side_effect(url, *args, **kwargs):
             mock_response = Mock()
@@ -59,7 +61,7 @@ class TestDeploymentInfoFixes:
                 mock_response.status_code = 500
             return mock_response
 
-        mock_get.side_effect = mock_requests_side_effect
+        mock_session.get.side_effect = mock_requests_side_effect
 
         result = fetch_deployment_info("production", "test_token")
 
@@ -69,10 +71,11 @@ class TestDeploymentInfoFixes:
 
         assert "Trends.Earth UI" not in result_str
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_deployment_info_with_connection_error(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_deployment_info_with_connection_error(self, mock_get_session):
         """Test handling of network connection errors."""
-        mock_get.side_effect = requests.exceptions.RequestException("Network error")
+        mock_session = mock_get_session.return_value
+        mock_session.get.side_effect = requests.exceptions.RequestException("Network error")
 
         result = fetch_deployment_info("production", "test_token")
 
@@ -93,9 +96,10 @@ class TestDeploymentInfoFixes:
 class TestSwarmInfoFixes:
     """Test Docker swarm information fixes using actual API endpoints."""
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_active_swarm(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_active_swarm(self, mock_get_session):
         """Test swarm info for active Docker swarm."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -134,7 +138,7 @@ class TestSwarmInfoFixes:
                 ],
             }
         }
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result, status = fetch_swarm_info("production", "test_token")
 
@@ -157,9 +161,10 @@ class TestSwarmInfoFixes:
         assert "12.0 GB Memory" in result_str  # Summary memory
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_inactive_swarm(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_inactive_swarm(self, mock_get_session):
         """Test swarm info for inactive Docker swarm."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -173,7 +178,7 @@ class TestSwarmInfoFixes:
                 "nodes": [],
             }
         }
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result, status = fetch_swarm_info("staging", "test_token")
 
@@ -183,9 +188,10 @@ class TestSwarmInfoFixes:
         assert "Error: Not in swarm mode" in result_str
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_inactive_swarm_no_error(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_inactive_swarm_no_error(self, mock_get_session):
         """Test swarm info for inactive Docker swarm without explicit error."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
@@ -198,7 +204,7 @@ class TestSwarmInfoFixes:
                 "nodes": [],
             }
         }
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result, status = fetch_swarm_info("staging", "test_token")
 
@@ -208,12 +214,13 @@ class TestSwarmInfoFixes:
         assert "No nodes to display" in result_str
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_auth_error(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_auth_error(self, mock_get_session):
         """Test swarm info authentication error."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 401
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result, status = fetch_swarm_info("production", "invalid_token")
 
@@ -222,12 +229,13 @@ class TestSwarmInfoFixes:
         assert "Please check your login status" in result_str
         assert status == " (Auth Error)"
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_access_denied(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_access_denied(self, mock_get_session):
         """Test swarm info access denied."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 403
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result, status = fetch_swarm_info("production", "user_token")
 
@@ -245,10 +253,11 @@ class TestSwarmInfoFixes:
         assert "Please log in to view swarm status" in result_str
         assert status == " (Auth Required)"
 
-    @patch("trendsearth_ui.utils.status_helpers.requests.get")
-    def test_fetch_swarm_info_network_error(self, mock_get):
+    @patch("trendsearth_ui.utils.status_helpers.get_session")
+    def test_fetch_swarm_info_network_error(self, mock_get_session):
         """Test swarm info network error handling."""
-        mock_get.side_effect = requests.exceptions.RequestException("Connection error")
+        mock_session = mock_get_session.return_value
+        mock_session.get.side_effect = requests.exceptions.RequestException("Connection error")
 
         result, status = fetch_swarm_info("production", "test_token")
 

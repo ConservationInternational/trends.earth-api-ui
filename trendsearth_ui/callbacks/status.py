@@ -212,7 +212,6 @@ def register_callbacks(app):
         if is_manual_refresh:
             StatusDataManager.invalidate_cache("status")
             _request_cache.clear()
-            _request_cache.clear()
 
         try:
             # Fetch time-independent data (use default "day" period for any stats needed)

@@ -20,7 +20,7 @@ from ..utils import (
     refresh_access_token,
     should_refresh_token,
 )
-from ..utils.http_client import apply_default_headers
+from ..utils.http_client import apply_default_headers, get_session
 from ..utils.logging_config import get_logger, log_exception
 
 # Get the configured logger
@@ -291,7 +291,7 @@ def register_callbacks(app):
         logger.debug("Attempting to connect to: %s", auth_url)
         try:
             auth_data = {"email": email, "password": password}
-            resp = requests.post(
+            resp = get_session().post(
                 auth_url,
                 headers=apply_default_headers(),
                 json=auth_data,
@@ -692,7 +692,7 @@ def register_callbacks(app):
             # Use the email as the user_id parameter in the endpoint
             # Use legacy=false to send a secure reset link instead of emailing
             # the password directly
-            resp = requests.post(
+            resp = get_session().post(
                 f"{api_base}/user/{email}/recover-password?legacy=false",
                 headers=apply_default_headers(),
                 timeout=10,
@@ -1084,7 +1084,7 @@ def register_callbacks(app):
             api_base = get_api_base(api_env or "production")
             logger.debug("Submitting password reset to %s", api_base)
 
-            resp = requests.post(
+            resp = get_session().post(
                 f"{api_base}/user/reset-password",
                 json={"token": reset_token, "password": new_password},
                 timeout=10,
@@ -1276,7 +1276,7 @@ def register_callbacks(app):
                 payload["institution"] = institution
 
             # Use legacy=false to send secure reset link instead of emailing password
-            resp = requests.post(
+            resp = get_session().post(
                 f"{api_base}/user?legacy=false",
                 json=payload,
                 headers=apply_default_headers(),

@@ -99,42 +99,45 @@ class TestSafeTableDataFunction:
 class TestGetUserInfoFunction:
     """Test the get_user_info utility function."""
 
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_get_user_info_success(self, mock_get, mock_user_data):
+    @patch("trendsearth_ui.utils.helpers.get_session")
+    def test_get_user_info_success(self, mock_get_session, mock_user_data):
         """Test successful user info retrieval."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": mock_user_data}
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         token = "test_token"
         result = get_user_info(token)
 
         assert result == mock_user_data
-        mock_get.assert_called_once()
-        call_args = mock_get.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         assert call_args[0][0] == f"{API_BASE}/user/me"
         headers = call_args[1]["headers"]
         assert headers["Authorization"] == f"Bearer {token}"
         assert headers["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert call_args[1]["timeout"] == 10
 
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_get_user_info_failure(self, mock_get):
+    @patch("trendsearth_ui.utils.helpers.get_session")
+    def test_get_user_info_failure(self, mock_get_session):
         """Test user info retrieval failure."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 401
-        mock_get.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         token = "invalid_token"
         result = get_user_info(token)
 
         assert result is None
 
-    @patch("trendsearth_ui.utils.helpers.requests.get")
-    def test_get_user_info_exception(self, mock_get):
+    @patch("trendsearth_ui.utils.helpers.get_session")
+    def test_get_user_info_exception(self, mock_get_session):
         """Test user info retrieval with exception."""
-        mock_get.side_effect = Exception("Network error")
+        mock_session = mock_get_session.return_value
+        mock_session.get.side_effect = Exception("Network error")
 
         token = "test_token"
         result = get_user_info(token)

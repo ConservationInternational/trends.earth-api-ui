@@ -10,7 +10,7 @@ import requests
 
 from ..config import get_api_base
 from .boundaries_utils import clear_country_iso_cache, get_country_iso_resolver
-from .http_client import apply_default_headers
+from .http_client import apply_default_headers, get_session
 from .stats_utils import (
     fetch_dashboard_stats,
     fetch_execution_stats,
@@ -135,7 +135,7 @@ class StatusDataManager:
 
             # Fetch latest status data with optimized parameters
             headers = apply_default_headers({"Authorization": f"Bearer {token}"})
-            resp = requests.get(
+            resp = get_session().get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
                 params={
@@ -401,7 +401,7 @@ class StatusDataManager:
                 if request_limit is not None:
                     params["per_page"] = request_limit
 
-            resp = requests.get(
+            resp = get_session().get(
                 f"{get_api_base(api_environment)}/status",
                 headers=headers,
                 params=params,

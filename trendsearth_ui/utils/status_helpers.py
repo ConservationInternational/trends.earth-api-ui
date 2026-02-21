@@ -2,7 +2,6 @@
 
 from datetime import datetime
 import logging
-import time
 
 from dash import html
 import requests
@@ -11,7 +10,7 @@ from trendsearth_ui.config import get_api_base
 from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
 from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
 
-from .http_client import apply_default_headers
+from .http_client import apply_default_headers, get_session
 
 logger = logging.getLogger(__name__)
 
@@ -31,63 +30,30 @@ def _create_commit_link(commit_sha, repo_url):
 
 def _fetch_health_status(url, headers=None, timeout=10):
     """
-    Fetch health status from a given URL with retry logic.
+    Fetch health status from a given URL.
+
+    Retries are disabled because the single Gunicorn worker would block all
+    concurrent users during the ``time.sleep`` between attempts.
 
     Returns:
         tuple: (success: bool, data: dict, status_code: int, error_msg: str)
     """
-    max_retries = 2
-    retry_delay = 1  # seconds
-
     merged_headers = apply_default_headers(headers)
 
-    for attempt in range(max_retries + 1):
-        try:
-            resp = requests.get(url, headers=merged_headers, timeout=timeout)
-            if resp.status_code == 200:
-                return True, resp.json(), resp.status_code, None
-            else:
-                # Don't retry on client errors (4xx), only on server errors or network issues
-                if resp.status_code < 500:
-                    return False, None, resp.status_code, f"HTTP {resp.status_code}"
-                # For 5xx errors, log and potentially retry
-                if attempt < max_retries:
-                    logger.warning(
-                        f"Health check failed with {resp.status_code}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
-                    )
-                    time.sleep(retry_delay)
-                    continue
-                return False, None, resp.status_code, f"HTTP {resp.status_code}"
-        except requests.exceptions.Timeout:
-            if attempt < max_retries:
-                logger.warning(
-                    f"Health check timeout for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
-                )
-                time.sleep(retry_delay)
-                continue
-            logger.warning(f"Health check timed out for {url} after {max_retries + 1} attempts")
-            return False, None, 0, "Timeout"
-        except requests.exceptions.ConnectionError:
-            if attempt < max_retries:
-                logger.warning(
-                    f"Connection error for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1})"
-                )
-                time.sleep(retry_delay)
-                continue
-            logger.warning(f"Connection failed for {url} after {max_retries + 1} attempts")
-            return False, None, 0, "Connection Error"
-        except Exception as e:
-            # For other exceptions, retry if it might be transient
-            if attempt < max_retries and (
-                "timeout" in str(e).lower() or "connection" in str(e).lower()
-            ):
-                logger.warning(
-                    f"Health check failed for {url}, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries + 1}): {e}"
-                )
-                time.sleep(retry_delay)
-                continue
-            logger.warning(f"Could not fetch health status from {url}: {e}")
-            return False, None, 0, "Connection Error"
+    try:
+        resp = get_session().get(url, headers=merged_headers, timeout=timeout)
+        if resp.status_code == 200:
+            return True, resp.json(), resp.status_code, None
+        return False, None, resp.status_code, f"HTTP {resp.status_code}"
+    except requests.exceptions.Timeout:
+        logger.warning(f"Health check timed out for {url}")
+        return False, None, 0, "Timeout"
+    except requests.exceptions.ConnectionError:
+        logger.warning(f"Connection failed for {url}")
+        return False, None, 0, "Connection Error"
+    except Exception as e:
+        logger.warning(f"Could not fetch health status from {url}: {e}")
+        return False, None, 0, "Connection Error"
 
     return False, None, 0, "Connection Error"
 
@@ -213,7 +179,7 @@ def fetch_swarm_info(api_environment, token=None, user_timezone=None):
         # Fetch raw swarm data from API
         headers = apply_default_headers({"Authorization": f"Bearer {token}"})
         swarm_url = f"{get_api_base(api_environment)}/status/swarm"
-        resp = requests.get(
+        resp = get_session().get(
             swarm_url,
             headers=headers,
             timeout=5,
@@ -301,7 +267,7 @@ def is_status_endpoint_available(token, api_environment):
     """Check if the /status endpoint is available and returns data."""
     headers = apply_default_headers({"Authorization": f"Bearer {token}"})
     try:
-        resp = requests.get(
+        resp = get_session().get(
             f"{get_api_base(api_environment)}/status",
             headers=headers,
             params={"per_page": 1},

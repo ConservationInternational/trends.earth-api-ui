@@ -103,13 +103,14 @@ class TestForgotPasswordCallbacks:
             result = toggle_callback["func"](1, 1, 0, True)
             assert result is False
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_send_password_reset_callback_success(self, mock_post):
+    @patch("trendsearth_ui.callbacks.auth.get_session")
+    def test_send_password_reset_callback_success(self, mock_get_session):
         """Test the send password reset callback with successful response."""
         # Mock successful API response
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_post.return_value = mock_response
+        mock_session.post.return_value = mock_response
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             register_callbacks(self.mock_app)
@@ -132,13 +133,14 @@ class TestForgotPasswordCallbacks:
         assert result[5] == {"display": "none"}  # Initial buttons should be hidden
         assert result[6] == {"display": "block"}  # Success buttons should be shown
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_send_password_reset_callback_user_not_found(self, mock_post):
+    @patch("trendsearth_ui.callbacks.auth.get_session")
+    def test_send_password_reset_callback_user_not_found(self, mock_get_session):
         """Test the send password reset callback with user not found."""
         # Mock 404 response
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 404
-        mock_post.return_value = mock_response
+        mock_session.post.return_value = mock_response
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             register_callbacks(self.mock_app)
@@ -199,11 +201,12 @@ class TestForgotPasswordCallbacks:
         assert result[1] == "warning"
         assert result[2] is True
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_send_password_reset_callback_network_error(self, mock_post):
+    @patch("trendsearth_ui.callbacks.auth.get_session")
+    def test_send_password_reset_callback_network_error(self, mock_get_session):
         """Test the send password reset callback with network error."""
         # Mock network error
-        mock_post.side_effect = Exception("Network error")
+        mock_session = mock_get_session.return_value
+        mock_session.post.side_effect = Exception("Network error")
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             register_callbacks(self.mock_app)
@@ -222,13 +225,14 @@ class TestForgotPasswordCallbacks:
         assert result[1] == "danger"
         assert result[2] is True
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_send_password_reset_callback_timeout(self, mock_post):
+    @patch("trendsearth_ui.callbacks.auth.get_session")
+    def test_send_password_reset_callback_timeout(self, mock_get_session):
         """Test the send password reset callback with timeout."""
         # Mock timeout error
         import requests
 
-        mock_post.side_effect = requests.exceptions.Timeout()
+        mock_session = mock_get_session.return_value
+        mock_session.post.side_effect = requests.exceptions.Timeout()
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             register_callbacks(self.mock_app)
@@ -247,13 +251,14 @@ class TestForgotPasswordCallbacks:
         assert result[1] == "danger"
         assert result[2] is True
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_send_password_reset_callback_connection_error(self, mock_post):
+    @patch("trendsearth_ui.callbacks.auth.get_session")
+    def test_send_password_reset_callback_connection_error(self, mock_get_session):
         """Test the send password reset callback with connection error."""
         # Mock connection error
         import requests
 
-        mock_post.side_effect = requests.exceptions.ConnectionError()
+        mock_session = mock_get_session.return_value
+        mock_session.post.side_effect = requests.exceptions.ConnectionError()
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", self.mock_context):
             register_callbacks(self.mock_app)

@@ -58,57 +58,60 @@ class TestEnhancedUserStats:
     Note: Cache mocking removed - caching now handled by StatusDataManager.
     """
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_user_stats_with_group_by(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_user_stats_with_group_by(self, mock_get_session):
         """Test user stats with group_by parameter."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"time_series": []}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_user_stats("token", "production", "last_week", group_by="day")
 
         # Check that the API was called with group_by parameter
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
         assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_user_stats_with_country_filter(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_user_stats_with_country_filter(self, mock_get_session):
         """Test user stats with country filter."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"geographic_distribution": {}}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_user_stats("token", "production", "last_week", country="Kenya")
 
         # Check that the API was called with country parameter
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         assert call_args[1]["params"]["country"] == "Kenya"
         assert call_args[1]["params"]["period"] == "last_week"
         assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"geographic_distribution": {}}}
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_user_stats_with_all_parameters(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_user_stats_with_all_parameters(self, mock_get_session):
         """Test user stats with all optional parameters."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"time_series": []}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_user_stats(
             "token", "production", "last_month", group_by="week", country="Kenya"
         )
 
         # Check that the API was called with all parameters
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         params = call_args[1]["params"]
         assert params["group_by"] == "week"
         assert params["country"] == "Kenya"
@@ -132,39 +135,41 @@ class TestEnhancedExecutionStats:
     Note: Cache mocking removed - caching now handled by StatusDataManager.
     """
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_execution_stats_with_group_by(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_execution_stats_with_group_by(self, mock_get_session):
         """Test execution stats with group_by parameter."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"time_series": []}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_execution_stats("token", "production", "last_week", group_by="day")
 
         # Check that the API was called with group_by parameter
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         assert call_args[1]["params"]["group_by"] == "day"
         assert call_args[1]["params"]["period"] == "last_week"
         assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"time_series": []}}
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_execution_stats_with_filters(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_execution_stats_with_filters(self, mock_get_session):
         """Test execution stats with task_type and status filters."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"task_performance": []}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_execution_stats(
             "token", "production", "last_week", task_type="download", status="FINISHED"
         )
 
         # Check that the API was called with filter parameters
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         params = call_args[1]["params"]
         assert params["task_type"] == "download"
         assert params["status"] == "FINISHED"
@@ -172,13 +177,14 @@ class TestEnhancedExecutionStats:
         assert call_args[1]["headers"]["Accept-Encoding"] == DEFAULT_ACCEPT_ENCODING
         assert result == {"data": {"task_performance": []}}
 
-    @patch("trendsearth_ui.utils.stats_utils.requests.get")
-    def test_fetch_execution_stats_with_all_parameters(self, mock_requests):
+    @patch("trendsearth_ui.utils.stats_utils.get_session")
+    def test_fetch_execution_stats_with_all_parameters(self, mock_get_session):
         """Test execution stats with all optional parameters."""
+        mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"data": {"time_series": []}}
-        mock_requests.return_value = mock_response
+        mock_session.get.return_value = mock_response
 
         result = fetch_execution_stats(
             "token",
@@ -190,8 +196,8 @@ class TestEnhancedExecutionStats:
         )
 
         # Check that the API was called with all parameters
-        mock_requests.assert_called_once()
-        call_args = mock_requests.call_args
+        mock_session.get.assert_called_once()
+        call_args = mock_session.get.call_args
         params = call_args[1]["params"]
         assert params["group_by"] == "week"
         assert params["task_type"] == "analysis"

@@ -20,7 +20,7 @@ from cachetools import TTLCache
 import requests
 
 from ..config import get_api_base
-from .http_client import apply_default_headers
+from .http_client import apply_default_headers, get_session
 
 logger = logging.getLogger(__name__)
 
@@ -327,7 +327,7 @@ def _fetch_resolver(
     params = {"release_type": release_type}
 
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=20)
+        response = get_session().get(url, headers=headers, params=params, timeout=20)
     except requests.exceptions.RequestException as exc:
         logger.error("Failed to fetch boundaries list: %s", exc)
         return None
@@ -471,7 +471,7 @@ def _fetch_country_options_from_api(api_environment: str, token: str | None) -> 
         headers["Authorization"] = f"Bearer {token}"
 
     try:
-        response = requests.get(
+        response = get_session().get(
             url,
             headers=headers,
             params={"level": "0", "per_page": "300"},

@@ -120,10 +120,14 @@ def _get_csp_nonce() -> str:
     return nonce
 
 
+# Pre-compiled patterns used in nonce injection – avoids re-compiling on every request.
+_SCRIPT_TAG_PATTERN = re.compile(r"(<script)(?![^>]*nonce=)", flags=re.IGNORECASE)
+_BODY_TAG_PATTERN = re.compile(r"(<body)([^>]*)(>)", flags=re.IGNORECASE)
+
+
 def _inject_nonce_into_scripts(html: str, nonce: str) -> str:
     """Ensure every script tag carries the CSP nonce."""
-    script_pattern = re.compile(r"(<script)(?![^>]*nonce=)", flags=re.IGNORECASE)
-    return script_pattern.sub(rf'\1 nonce="{nonce}"', html)
+    return _SCRIPT_TAG_PATTERN.sub(rf'\1 nonce="{nonce}"', html)
 
 
 def _inject_nonce_metadata(html: str, nonce: str) -> str:
@@ -134,9 +138,8 @@ def _inject_nonce_metadata(html: str, nonce: str) -> str:
     else:
         html = f"{meta_tag}{html}"
 
-    body_pattern = re.compile(r"(<body)([^>]*)(>)", flags=re.IGNORECASE)
-    if body_pattern.search(html):
-        html = body_pattern.sub(rf'\1\2 data-csp-nonce="{nonce}"\3', html, count=1)
+    if _BODY_TAG_PATTERN.search(html):
+        html = _BODY_TAG_PATTERN.sub(rf'\1\2 data-csp-nonce="{nonce}"\3', html, count=1)
     return html
 
 
@@ -230,6 +233,17 @@ _CSP_SCRIPT_SOURCES = [
     "https://cdn.jsdelivr.net",
 ]
 
+# Pre-build the static portions of the CSP header so we only format the nonce
+# at request time.  Everything except the script-src directive is constant.
+_CSP_STATIC_SCRIPT_SOURCES = " ".join(dict.fromkeys(_CSP_SCRIPT_SOURCES))
+_CSP_STATIC_SUFFIX = (
+    f"style-src {' '.join(_CSP_STYLE_SOURCES)}; "
+    f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
+    f"font-src {' '.join(_CSP_FONT_SOURCES)}; "
+    f"connect-src {' '.join(_CSP_CONNECT_SOURCES)}; "
+    "frame-ancestors 'none';"
+)
+
 
 @server.after_request
 def add_security_headers(response):
@@ -241,19 +255,12 @@ def add_security_headers(response):
     response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
 
     nonce = getattr(flask.g, "csp_nonce", None)
-    script_sources = list(dict.fromkeys(_CSP_SCRIPT_SOURCES))
     if nonce:
-        script_sources.insert(0, f"'nonce-{nonce}'")
+        script_src = f"'nonce-{nonce}' {_CSP_STATIC_SCRIPT_SOURCES}"
+    else:
+        script_src = _CSP_STATIC_SCRIPT_SOURCES
 
-    csp_value = (
-        "default-src 'self'; "
-        f"script-src {' '.join(script_sources)}; "
-        f"style-src {' '.join(_CSP_STYLE_SOURCES)}; "
-        f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
-        f"font-src {' '.join(_CSP_FONT_SOURCES)}; "
-        f"connect-src {' '.join(_CSP_CONNECT_SOURCES)}; "
-        "frame-ancestors 'none';"
-    )
+    csp_value = f"default-src 'self'; script-src {script_src}; {_CSP_STATIC_SUFFIX}"
 
     response.headers.setdefault("Content-Security-Policy", csp_value)
 
@@ -265,34 +272,19 @@ def add_security_headers(response):
     return response
 
 
+_BOT_PATTERN = re.compile(
+    r"libredtail-http|python-requests|curl/|wget/|go-http-client|apache-httpclient"
+    r"|nikto|sqlmap|nuclei|masscan|nmap|scanner|bot|crawl|spider|scraper",
+    re.IGNORECASE,
+)
+
+
 def _is_bot_request(user_agent: str) -> bool:
     """Check if the User-Agent indicates a bot, scanner, or automated tool."""
     if not user_agent:
         return False
 
-    user_agent_lower = user_agent.lower()
-
-    # Known bot/scanner user agents that should not report to Rollbar
-    bot_indicators = [
-        "libredtail-http",
-        "python-requests",
-        "curl/",
-        "wget/",
-        "go-http-client",
-        "apache-httpclient",
-        "nikto",
-        "sqlmap",
-        "nuclei",
-        "masscan",
-        "nmap",
-        "scanner",
-        "bot",
-        "crawl",
-        "spider",
-        "scraper",
-    ]
-
-    return any(indicator in user_agent_lower for indicator in bot_indicators)
+    return _BOT_PATTERN.search(user_agent) is not None
 
 
 @server.errorhandler(400)

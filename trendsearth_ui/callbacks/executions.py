@@ -4,7 +4,6 @@ import logging
 from typing import Any
 
 from dash import Input, Output, State, html, no_update
-import requests  # noqa: F401
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request, parse_date
@@ -19,13 +18,29 @@ ADMIN_INCLUDE_SUFFIX = ",user_name,user_email"
 
 # Must match the API's EXECUTION_ALLOWED_SORT_FIELDS / FILTER_FIELDS
 EXECUTION_ALLOWED_SORT_COLUMNS = {
-    "id", "status", "progress", "start_date", "end_date",
-    "script_id", "script_name", "user_name", "user_email",
-    "user_id", "duration",
+    "id",
+    "status",
+    "progress",
+    "start_date",
+    "end_date",
+    "script_id",
+    "script_name",
+    "user_name",
+    "user_email",
+    "user_id",
+    "duration",
 }
 EXECUTION_ALLOWED_FILTER_COLUMNS = {
-    "id", "status", "progress", "start_date", "end_date",
-    "script_id", "script_name", "user_name", "user_email", "user_id",
+    "id",
+    "status",
+    "progress",
+    "start_date",
+    "end_date",
+    "script_id",
+    "script_name",
+    "user_name",
+    "user_email",
+    "user_id",
 }
 
 

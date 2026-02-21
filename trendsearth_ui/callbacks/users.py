@@ -24,9 +24,18 @@ USER_DATE_COLUMNS = (
 
 # Must match the API's USER_ALLOWED_FILTER_FIELDS / SORT_FIELDS
 USER_ALLOWED_SORT_COLUMNS = {
-    "id", "email", "name", "role", "country", "institution",
-    "created_at", "updated_at", "last_login_at", "last_activity_at",
-    "email_verified", "email_verified_at",
+    "id",
+    "email",
+    "name",
+    "role",
+    "country",
+    "institution",
+    "created_at",
+    "updated_at",
+    "last_login_at",
+    "last_activity_at",
+    "email_verified",
+    "email_verified_at",
 }
 USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 
