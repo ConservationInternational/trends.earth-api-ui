@@ -10,8 +10,10 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 ENV GIT_COMMIT=${GIT_COMMIT}
 ENV DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT}
 
-# Note: ROLLBAR_ACCESS_TOKEN is set at runtime via ECS task definition
-# to avoid exposing secrets in the Docker image layers
+# Note: ROLLBAR_ACCESS_TOKEN is injected at runtime by the CodeDeploy
+# before_install.sh script, which reads it from deployment-info.json
+# (populated by CI from the GitHub repo secret). This avoids exposing
+# secrets in the Docker image layers.
 
 # Install build tools and dependencies
 RUN apt-get update \

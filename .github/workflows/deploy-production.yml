@@ -94,6 +94,7 @@ jobs:
           "image": "${{ steps.build-image.outputs.image }}",
           "registry": "${{ steps.build-image.outputs.registry }}",
           "environment": "production",
+          "rollbarAccessToken": "${ROLLBAR_ACCESS_TOKEN}",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         }
         EOF

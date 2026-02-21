@@ -77,15 +77,18 @@ with open(sys.argv[1], encoding="utf-8") as fp:
 print(info.get("image", ""))
 print(info.get("branch", ""))
 print(info.get("deploymentId", ""))
+print(info.get("rollbarAccessToken", ""))
 PY
         )
         DEPLOYMENT_IMAGE="${_DEPLOYMENT_METADATA[0]}"
         BRANCH_NAME_METADATA="${_DEPLOYMENT_METADATA[1]}"
         DEPLOYMENT_COMMIT="${_DEPLOYMENT_METADATA[2]}"
+        ROLLBAR_TOKEN_METADATA="${_DEPLOYMENT_METADATA[3]}"
     else
         DEPLOYMENT_IMAGE=$(grep '"image"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"image"[[:space:]]*:[[:space:]]*"//; s/".*//')
         BRANCH_NAME_METADATA=$(grep '"branch"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"branch"[[:space:]]*:[[:space:]]*"//; s/".*//')
         DEPLOYMENT_COMMIT=$(grep '"deploymentId"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"deploymentId"[[:space:]]*:[[:space:]]*"//; s/".*//')
+        ROLLBAR_TOKEN_METADATA=$(grep '"rollbarAccessToken"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"rollbarAccessToken"[[:space:]]*:[[:space:]]*"//; s/".*//')
     fi
 
     if [ -n "$DEPLOYMENT_IMAGE" ]; then
@@ -113,6 +116,13 @@ PY
     if [ -n "$DEPLOYMENT_COMMIT" ]; then
         echo "  • Commit: $DEPLOYMENT_COMMIT"
         echo "export GIT_COMMIT_SHA=$DEPLOYMENT_COMMIT" >> /opt/deploy-env
+    fi
+
+    if [ -n "$ROLLBAR_TOKEN_METADATA" ]; then
+        echo "  • ROLLBAR_ACCESS_TOKEN: (set)"
+        echo "export ROLLBAR_ACCESS_TOKEN=$ROLLBAR_TOKEN_METADATA" >> /opt/deploy-env
+    else
+        echo "  ⚠️ ROLLBAR_ACCESS_TOKEN not found in deployment metadata"
     fi
 else
     echo "ℹ️ deployment-info.json not found; default image tag will be used"
