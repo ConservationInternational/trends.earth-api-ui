@@ -22,8 +22,8 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Install poetry first
-RUN pip install --no-cache-dir poetry
+# Install poetry first (also upgrade pip to address CVE-2026-1703)
+RUN pip install --no-cache-dir --upgrade pip poetry
 
 # Configure Poetry: Disable virtualenv (install in system site-packages)
 RUN poetry config virtualenvs.create false
