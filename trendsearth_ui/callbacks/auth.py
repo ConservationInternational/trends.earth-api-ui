@@ -813,9 +813,7 @@ def register_callbacks(app):
         return no_update
 
     @app.callback(
-        [
-            Output("token-store", "data", allow_duplicate=True),
-        ],
+        Output("token-store", "data", allow_duplicate=True),
         [
             Input("token-store", "data"),
         ],
