@@ -102,7 +102,9 @@ def test_log_functions():
 
     # Test log_warning with extra data
     log_warning(logger, "Warning with data", {"some": "context"})
-    logger.warning.assert_called_with("Warning with data", extra={"extra_data": {"some": "context"}})
+    logger.warning.assert_called_with(
+        "Warning with data", extra={"extra_data": {"some": "context"}}
+    )
 
 
 def test_environment_variables():

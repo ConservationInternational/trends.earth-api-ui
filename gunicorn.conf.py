@@ -45,6 +45,7 @@ module = "trendsearth_ui.app:server"
 # Rollbar integration – report worker-level errors that never reach Flask
 # ---------------------------------------------------------------------------
 
+
 def _init_rollbar():
     """Initialise Rollbar in the current worker process (if configured)."""
     import os
