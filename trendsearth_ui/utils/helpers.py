@@ -7,7 +7,7 @@ from typing import Optional
 
 import requests
 
-from ..config import API_BASE, AUTH_URL
+from ..config import API_BASE
 from .http_client import apply_default_headers
 from .timezone_utils import format_local_time, get_safe_timezone
 
@@ -237,11 +237,12 @@ def logout_user(access_token: str, refresh_token: str = None, api_environment: s
         return False
 
 
-def logout_all_devices(access_token: str) -> bool:
+def logout_all_devices(access_token: str, api_environment: str = None) -> bool:
     """Logout user from all devices by revoking all refresh tokens.
 
     Args:
         access_token: Current access token
+        api_environment: API environment to use for logout
 
     Returns:
         True if logout successful, False otherwise
@@ -249,9 +250,15 @@ def logout_all_devices(access_token: str) -> bool:
     if not access_token:
         return False
 
+    # Import here to avoid circular imports
+    from ..config import get_auth_url
+
+    # Get the auth URL for the specified environment
+    auth_url = get_auth_url(api_environment)
+
     try:
         headers = apply_default_headers({"Authorization": f"Bearer {access_token}"})
-        resp = requests.post(f"{AUTH_URL}/logout-all", headers=headers, timeout=10)
+        resp = requests.post(f"{auth_url}/logout-all", headers=headers, timeout=10)
 
         if resp.status_code == 200:
             logger.debug("User logged out from all devices successfully")
@@ -359,10 +366,11 @@ def make_authenticated_request(
                 except Exception as e:
                     logger.debug("Error preparing updated cookie: %s", e)
 
-                # Retry with new token
-                headers = apply_default_headers(kwargs.get("headers"))
-                headers["Authorization"] = f"Bearer {new_access_token}"
-                kwargs["headers"] = headers
+                # Retry with new token – build fresh headers to avoid
+                # mutating the dict that was already sent on the first attempt.
+                retry_headers = apply_default_headers()
+                retry_headers["Authorization"] = f"Bearer {new_access_token}"
+                kwargs["headers"] = retry_headers
                 resp = getattr(requests, method.lower())(full_url, **kwargs)
             else:
                 logger.debug("Token refresh failed")

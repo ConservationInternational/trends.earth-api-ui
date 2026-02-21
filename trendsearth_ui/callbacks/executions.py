@@ -711,9 +711,8 @@ def register_callbacks(app):
 
             else:
                 # Error response
-                error_data = (
-                    resp.json() if resp.headers.get("content-type") == "application/json" else {}
-                )
+                content_type = resp.headers.get("content-type", "")
+                error_data = resp.json() if "application/json" in content_type else {}
                 result_content = [
                     html.H5("Cancellation Failed", className="text-danger mb-3"),
                     html.Div(

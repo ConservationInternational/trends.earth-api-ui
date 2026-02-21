@@ -104,9 +104,13 @@ def _build_request_cache_key(
     safe_timezone: str,
 ) -> tuple:
     """Create a request-level cache key for comprehensive status data."""
+    import hashlib
+
+    # Hash the token to avoid storing the full sensitive value in the cache key
+    token_hash = hashlib.sha256((token or "").encode()).hexdigest()[:16]
 
     return (
-        token or "",
+        token_hash,
         api_environment or "",
         time_period or "",
         role or "",

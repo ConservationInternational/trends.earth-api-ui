@@ -1,6 +1,6 @@
 """Cookie utility functions for authentication persistence."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 
@@ -25,7 +25,7 @@ def create_auth_cookie_data(
     """
     # Set expiration to 30 days from now for "remember me" functionality
     # This allows refresh tokens to keep users logged in for an extended period
-    expiration = datetime.now() + timedelta(days=30)
+    expiration = datetime.now(timezone.utc) + timedelta(days=30)
 
     return {
         "access_token": access_token,
@@ -34,7 +34,7 @@ def create_auth_cookie_data(
         "user_data": user_data,
         "api_environment": api_environment,
         "expires_at": expiration.isoformat(),
-        "created_at": datetime.now().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -56,7 +56,11 @@ def is_auth_cookie_valid(cookie_data: Optional[dict]) -> bool:
 
     try:
         expiration = datetime.fromisoformat(cookie_data["expires_at"])
-        return datetime.now() < expiration
+        # Ensure both datetimes are timezone-aware for comparison
+        now = datetime.now(timezone.utc)
+        if expiration.tzinfo is None:
+            expiration = expiration.replace(tzinfo=timezone.utc)
+        return now < expiration
     except (ValueError, TypeError):
         return False
 

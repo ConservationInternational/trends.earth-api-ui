@@ -109,11 +109,11 @@ def is_token_expired(token: str) -> bool:
         token: JWT token string
 
     Returns:
-        True if token is expired, False if still valid, None if unable to determine
+        True if token is expired or unable to determine, False if still valid
     """
     exp_time = get_token_expiration(token)
     if exp_time is None:
-        return None
+        return True  # Treat indeterminate tokens as expired for safety
 
     now = datetime.now(timezone.utc)
     return now >= exp_time

@@ -63,7 +63,6 @@ app = dash.Dash(
     ],
 )
 app.title = APP_TITLE
-app.renderer = ""
 
 # Add favicon links to the HTML head
 app.index_string = """

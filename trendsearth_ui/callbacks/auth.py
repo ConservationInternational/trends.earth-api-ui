@@ -1,6 +1,6 @@
 """Authentication and navigation callbacks."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hmac
 import json
 import os
@@ -350,7 +350,7 @@ def register_callbacks(app):
                         # Access Flask response through callback context
                         ctx = callback_context
                         if hasattr(ctx, "response") and ctx.response:
-                            expiration = datetime.now() + timedelta(days=30)
+                            expiration = datetime.now(timezone.utc) + timedelta(days=30)
                             _set_auth_cookie(ctx.response, cookie_value, expiration)
                             logger.debug("Set HTTP authentication cookie with 30-day expiration")
 
@@ -693,6 +693,7 @@ def register_callbacks(app):
             # the password directly
             resp = requests.post(
                 f"{api_base}/user/{email}/recover-password?legacy=false",
+                headers=apply_default_headers(),
                 timeout=10,
             )
 
@@ -873,7 +874,7 @@ def register_callbacks(app):
                                 api_environment or "production",
                             )
                             cookie_value = json.dumps(new_cookie_data)
-                            expiration = datetime.now() + timedelta(days=30)
+                            expiration = datetime.now(timezone.utc) + timedelta(days=30)
                             _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
                 logger.debug("Error updating cookie during auto-refresh: %s", e)
@@ -929,7 +930,10 @@ def register_callbacks(app):
                     if expires_at:
                         try:
                             cookie_expiration = datetime.fromisoformat(expires_at)
-                            if datetime.now() >= cookie_expiration:
+                            now = datetime.now(timezone.utc)
+                            if cookie_expiration.tzinfo is None:
+                                cookie_expiration = cookie_expiration.replace(tzinfo=timezone.utc)
+                            if now >= cookie_expiration:
                                 logger.debug("Cookie has expired, clearing session")
                                 return None, None
                         except Exception as e:
@@ -965,7 +969,7 @@ def register_callbacks(app):
                             api_environment or "production",
                         )
                         cookie_value = json.dumps(new_cookie_data)
-                        expiration = datetime.now() + timedelta(days=30)
+                        expiration = datetime.now(timezone.utc) + timedelta(days=30)
                         _set_auth_cookie(ctx.response, cookie_value, expiration)
             except Exception as e:
                 logger.debug("Error updating cookie during proactive refresh: %s", e)
@@ -975,8 +979,6 @@ def register_callbacks(app):
             # Refresh failed, user needs to log in again
             logger.warning("Proactive token refresh failed, clearing session")
             return None, None
-
-        return no_update, no_update
 
     # Real-time password validation callback
     @app.callback(

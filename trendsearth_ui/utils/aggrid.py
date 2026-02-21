@@ -13,10 +13,19 @@ RequestData = Mapping[str, Any]
 FilterHandler = Callable[[Mapping[str, Any]], tuple[str | None, dict[str, Any]]]
 
 
-def _sanitize_value(value: Any) -> str:
-    """Escape single quotes in filter values to minimise SQL injection risk."""
+def _sanitize_value(value: Any, *, escape_like: bool = False) -> str:
+    """Escape single quotes in filter values to minimise SQL injection risk.
+
+    Args:
+        value: The value to sanitize.
+        escape_like: When True, also escape SQL LIKE wildcard characters
+            (``%`` and ``_``) so they are treated as literals.
+    """
     text = "" if value is None else str(value)
-    return text.replace("'", "''")
+    text = text.replace("'", "''")
+    if escape_like:
+        text = text.replace("%", "\\%").replace("_", "\\_")
+    return text
 
 
 def compute_pagination(
@@ -112,19 +121,24 @@ def build_filter_clause(
             if or_clauses:
                 clauses.append(f"({' OR '.join(or_clauses)})")
         elif filter_type == "text":
-            value = _sanitize_value(config.get("filter", "").strip())
-            if not value:
+            raw_value = config.get("filter", "").strip()
+            if not raw_value:
                 continue
             condition = config.get("type", "contains")
             if condition == "equals":
+                value = _sanitize_value(raw_value)
                 clauses.append(f"{field}='{value}'")
             elif condition == "notEquals":
+                value = _sanitize_value(raw_value)
                 clauses.append(f"{field}!='{value}'")
             elif condition == "startsWith":
+                value = _sanitize_value(raw_value, escape_like=True)
                 clauses.append(f"{field} like '{value}%'")
             elif condition == "endsWith":
+                value = _sanitize_value(raw_value, escape_like=True)
                 clauses.append(f"{field} like '%{value}'")
             else:  # contains / default
+                value = _sanitize_value(raw_value, escape_like=True)
                 clauses.append(f"{field} like '%{value}%'")
         elif filter_type == "number":
             value = config.get("filter")
