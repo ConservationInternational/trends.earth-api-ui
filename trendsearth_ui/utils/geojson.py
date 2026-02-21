@@ -173,27 +173,6 @@ def create_map_from_geojsons(geojsons, exec_id):
                         )
                         map_layers.append(layer)
 
-                        # Also try adding a Polygon component as fallback
-                        if geometry and geometry.get("type") == "Polygon":
-                            coords = geometry.get("coordinates", [])
-                            if coords and len(coords) > 0:
-                                # Convert coordinates to [lat, lon] format for Leaflet
-                                polygon_positions = []
-                                for ring in coords:
-                                    ring_positions = [[coord[1], coord[0]] for coord in ring]
-                                    polygon_positions.append(ring_positions)
-
-                                polygon_layer = dl.Polygon(
-                                    positions=polygon_positions,
-                                    color="#FF0000",
-                                    weight=5,
-                                    opacity=1.0,
-                                    fillColor="#FF0000",
-                                    fillOpacity=0.5,
-                                    children=[dl.Tooltip("Area of Interest")],
-                                )
-                                map_layers.append(polygon_layer)
-
                         # Extract coordinates for centering
                         if geometry and geometry.get("type") in ["Polygon", "MultiPolygon"]:
                             extracted_coords = extract_coordinates_from_geometry(geometry)
@@ -302,49 +281,6 @@ def create_map_from_geojsons(geojsons, exec_id):
             )
             map_layers.append(layer)
             logger.debug("Added single GeoJSON layer to map_layers")
-
-            # Also try adding a Polygon component as fallback
-            geometry = get_geometry_from_geojson(feature_data)
-            if geometry and geometry.get("type") == "Polygon":
-                coords = geometry.get("coordinates", [])
-                if coords and len(coords) > 0:
-                    # Convert coordinates to [lat, lon] format for Leaflet
-                    polygon_positions = []
-                    for ring in coords:
-                        ring_positions = [[coord[1], coord[0]] for coord in ring]
-                        polygon_positions.append(ring_positions)
-
-                    polygon_layer = dl.Polygon(
-                        positions=polygon_positions,
-                        color="#FF0000",
-                        weight=5,
-                        opacity=1.0,
-                        fillColor="#FF0000",
-                        fillOpacity=0.5,
-                        children=[dl.Tooltip("Area of Interest")],
-                    )
-                    map_layers.append(polygon_layer)
-                    logger.debug("Added single Polygon layer to map_layers")
-
-            # Add a visible marker at the center as a fallback
-            if geometry:
-                coords = extract_coordinates_from_geometry(geometry)
-                if coords:
-                    center_coord = [
-                        sum(coord[0] for coord in coords) / len(coords),
-                        sum(coord[1] for coord in coords) / len(coords),
-                    ]
-                    center_marker = dl.CircleMarker(
-                        center=center_coord,
-                        radius=10,
-                        children=[dl.Tooltip(f"Area center: {center_coord}")],
-                        color="blue",
-                        fill=True,
-                        fillColor="blue",
-                        fillOpacity=0.8,
-                    )
-                    map_layers.append(center_marker)
-                    logger.debug("Added single center marker at %s", center_coord)
 
             # Extract coordinates for centering
             geometry = get_geometry_from_geojson(feature_data)
