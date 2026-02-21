@@ -63,6 +63,9 @@ app = dash.Dash(
     ],
 )
 app.title = APP_TITLE
+# Suppress the default Dash renderer so the custom CSP nonce-aware
+# dash_renderer.js in the assets/ folder is used instead.
+app.renderer = ""
 
 # Add favicon links to the HTML head
 app.index_string = """

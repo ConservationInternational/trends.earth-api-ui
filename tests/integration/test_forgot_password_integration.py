@@ -157,8 +157,12 @@ class TestForgotPasswordIntegration:
                 # Execute the callback
                 send_reset_callback(1, test_email, "production")
 
-                # Verify the correct URL was called
+                # Verify the correct URL was called (includes default headers)
                 mock_post.assert_called_once_with(
                     expected_url,
+                    headers=mock_post.call_args.kwargs["headers"],
                     timeout=10,
                 )
+                # Verify headers contain Accept-Encoding
+                call_headers = mock_post.call_args.kwargs.get("headers", {})
+                assert "Accept-Encoding" in call_headers
