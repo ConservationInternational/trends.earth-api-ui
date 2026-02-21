@@ -121,7 +121,7 @@ def register_callbacks(app):
                             script_data_resp = script_resp.json()
                             script_name = script_data_resp.get("name", "Script")
                     except Exception:
-                        pass
+                        logger.debug("Could not fetch script name for %s", script_id, exc_info=True)
 
                 # Check if script has access restrictions
                 restricted = access_data.get("restricted", False)
@@ -165,7 +165,7 @@ def register_callbacks(app):
                             script_data_resp = script_resp.json()
                             script_name = script_data_resp.get("name", "Script")
                     except Exception:
-                        pass
+                        logger.debug("Could not fetch script name for %s", script_id, exc_info=True)
                 status = "Unrestricted"
                 ac_type = "unrestricted"
                 roles = []
@@ -694,7 +694,7 @@ def register_callbacks(app):
                             if error_detail:
                                 error_text += f": {error_detail}"
                         except Exception:
-                            pass
+                            logger.debug("Could not read error response text", exc_info=True)
                         return (
                             True,
                             f"Failed to fetch docker logs: {error_text}",
@@ -946,6 +946,7 @@ def register_callbacks(app):
 
                 json_str = json.dumps(json_data, indent=2)
             except Exception:
+                logger.debug("Could not serialize JSON data", exc_info=True)
                 json_str = str(json_data)
             return {"content": json_str, "filename": "data.json"}
         return no_update

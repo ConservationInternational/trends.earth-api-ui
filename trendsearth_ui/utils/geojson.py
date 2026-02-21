@@ -496,6 +496,7 @@ def create_minimap(center, zoom, map_id, geojsons=None):
                 try:
                     geo = json.loads(geo)
                 except Exception:
+                    logger.debug("Could not parse GeoJSON string, skipping", exc_info=True)
                     continue
             feature = ensure_geojson_feature(geo)
             geometry = get_geometry_from_geojson(feature)

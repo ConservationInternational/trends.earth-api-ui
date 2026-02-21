@@ -9,6 +9,10 @@ from typing import Any, Optional
 import rollbar
 from rollbar.logger import RollbarHandler
 
+# Module-level flag to track whether Rollbar was successfully initialised.
+# This avoids relying on the private ``rollbar._initialized`` attribute.
+_rollbar_initialized: bool = False
+
 
 class EnhancedRollbarHandler(RollbarHandler):
     """
@@ -84,8 +88,19 @@ class EnhancedRollbarHandler(RollbarHandler):
             super().emit(record)
 
 
+def _attach_rollbar_handler(target_logger: logging.Logger) -> None:
+    """Add an ``EnhancedRollbarHandler`` to *target_logger* if it doesn't already have one."""
+    for h in target_logger.handlers:
+        if isinstance(h, EnhancedRollbarHandler):
+            return
+    handler = EnhancedRollbarHandler()
+    handler.setLevel(logging.WARNING)
+    target_logger.addHandler(handler)
+
+
 def setup_logging(rollbar_token: Optional[str] = None) -> logging.Logger:
     """Set up logging with Rollbar integration if token is provided."""
+    global _rollbar_initialized  # noqa: PLW0603
 
     # Get logger for the application
     logger = logging.getLogger("trendsearth_ui")
@@ -123,11 +138,17 @@ def setup_logging(rollbar_token: Optional[str] = None) -> logging.Logger:
                     "enabled": False  # Don't capture local variables for security
                 },
             )
+            _rollbar_initialized = True
 
-            # Add Rollbar handler to logger
-            rollbar_handler = EnhancedRollbarHandler()
-            rollbar_handler.setLevel(logging.WARNING)  # Only send warnings and errors to Rollbar
-            logger.addHandler(rollbar_handler)
+            # Add Rollbar handler to the application logger.
+            # Child loggers (e.g. trendsearth_ui.callbacks.auth) propagate
+            # to this parent automatically.
+            _attach_rollbar_handler(logger)
+
+            # Also attach the handler to Dash's internal logger so that
+            # unhandled callback exceptions are forwarded to Rollbar.
+            for dash_logger_name in ("dash", "dash.dash"):
+                _attach_rollbar_handler(logging.getLogger(dash_logger_name))
 
             logger.info("Rollbar logging initialized successfully")
 
@@ -135,6 +156,11 @@ def setup_logging(rollbar_token: Optional[str] = None) -> logging.Logger:
             logger.warning(f"Failed to initialize Rollbar: {e}")
 
     return logger
+
+
+def is_rollbar_initialized() -> bool:
+    """Return ``True`` if Rollbar has been successfully initialised."""
+    return _rollbar_initialized
 
 
 def get_logger() -> logging.Logger:
@@ -211,37 +237,34 @@ def _get_automatic_context() -> dict[str, Any]:
 
 
 def log_exception(logger: logging.Logger, message: str, exc_info=True):
-    """Log an exception with Rollbar integration and automatic context."""
+    """Log an exception with Rollbar integration and automatic context.
+
+    The ``EnhancedRollbarHandler`` attached to the *trendsearth_ui* logger
+    (and propagated to by child loggers) automatically forwards WARNING+
+    messages to Rollbar with enriched context, so there is no need to call
+    ``rollbar.report_exc_info`` directly — doing so would create duplicate
+    events in Rollbar.
+    """
     logger.exception(message, exc_info=exc_info)
 
-    # If Rollbar is configured, also report to Rollbar with automatic context
-    if rollbar._initialized:
-        context = _get_automatic_context()
-        context["message"] = message
-        rollbar.report_exc_info(extra_data=context)
+
+def log_error(logger: logging.Logger, message: str, extra_data: dict | None = None):
+    """Log an error with optional extra data and automatic context.
+
+    Rollbar dispatch happens automatically via the ``EnhancedRollbarHandler``.
+    """
+    if extra_data:
+        logger.error(message, extra={"extra_data": extra_data})
+    else:
+        logger.error(message)
 
 
-def log_error(logger: logging.Logger, message: str, extra_data: dict = None):
-    """Log an error with optional extra data and automatic context."""
-    logger.error(message)
+def log_warning(logger: logging.Logger, message: str, extra_data: dict | None = None):
+    """Log a warning with optional extra data and automatic context.
 
-    # If Rollbar is configured, also report to Rollbar with enhanced context
-    if rollbar._initialized:
-        context = _get_automatic_context()
-        if extra_data:
-            context.update(extra_data)
-        context["message"] = message
-        rollbar.report_message(message, level="error", extra_data=context)
-
-
-def log_warning(logger: logging.Logger, message: str, extra_data: dict = None):
-    """Log a warning with optional extra data and automatic context."""
-    logger.warning(message)
-
-    # If Rollbar is configured, also report to Rollbar with enhanced context
-    if rollbar._initialized:
-        context = _get_automatic_context()
-        if extra_data:
-            context.update(extra_data)
-        context["message"] = message
-        rollbar.report_message(message, level="warning", extra_data=context)
+    Rollbar dispatch happens automatically via the ``EnhancedRollbarHandler``.
+    """
+    if extra_data:
+        logger.warning(message, extra={"extra_data": extra_data})
+    else:
+        logger.warning(message)

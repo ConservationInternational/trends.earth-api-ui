@@ -8,6 +8,7 @@ import pytest
 
 from trendsearth_ui.utils.logging_config import (
     get_logger,
+    is_rollbar_initialized,
     log_error,
     log_exception,
     log_warning,
@@ -30,27 +31,30 @@ def test_setup_logging_without_rollbar():
 
 def test_setup_logging_with_rollbar():
     """Test logging setup with Rollbar token."""
+    import trendsearth_ui.utils.logging_config as lc
+
     with (
         patch("rollbar.init") as mock_rollbar_init,
-        patch("trendsearth_ui.utils.logging_config.EnhancedRollbarHandler") as mock_rollbar_handler,
+        patch.object(lc, "_attach_rollbar_handler") as mock_attach,
     ):
-        mock_handler = MagicMock()
-        # Configure the mock handler to have a proper level attribute
-        mock_handler.level = logging.WARNING
-        mock_rollbar_handler.return_value = mock_handler
-
         # Clear any existing handlers to ensure clean test
         logger = logging.getLogger("trendsearth_ui")
         logger.handlers.clear()
+        # Reset the module-level flag
+        old_flag = lc._rollbar_initialized
+        lc._rollbar_initialized = False
 
-        logger = setup_logging("test_token")
+        try:
+            logger = setup_logging("test_token")
 
-        # Verify Rollbar was initialized
-        mock_rollbar_init.assert_called_once()
+            # Verify Rollbar was initialized
+            mock_rollbar_init.assert_called_once()
 
-        # Verify handler was added
-        mock_rollbar_handler.assert_called_once()
-        assert mock_handler in logger.handlers
+            # Verify handler was attached
+            assert mock_attach.called
+            assert lc._rollbar_initialized is True
+        finally:
+            lc._rollbar_initialized = old_flag
 
 
 def test_setup_logging_rollbar_failure():
@@ -72,52 +76,33 @@ def test_get_logger():
 
 
 def test_log_functions():
-    """Test log wrapper functions with enhanced context."""
-    with (
-        patch("rollbar._initialized", True),
-        patch("rollbar.report_exc_info") as mock_exc_info,
-        patch("rollbar.report_message") as mock_message,
-    ):
-        logger = MagicMock()
+    """Test log wrapper functions.
 
-        # Test log_exception
-        log_exception(logger, "Test exception")
-        logger.exception.assert_called_with("Test exception", exc_info=True)
-        mock_exc_info.assert_called_once()
+    The log_* helpers now delegate entirely to the standard logging module.
+    Rollbar dispatch is handled by the EnhancedRollbarHandler attached to the
+    parent logger, so we just verify the correct logger methods are called.
+    """
+    logger = MagicMock()
 
-        # Verify that enhanced context was included
-        call_args = mock_exc_info.call_args[1]  # Get keyword arguments
-        extra_data = call_args["extra_data"]
-        assert "function_name" in extra_data
-        assert "filename" in extra_data
-        assert "line_number" in extra_data
-        assert "environment" in extra_data
-        assert extra_data["message"] == "Test exception"
+    # Test log_exception
+    log_exception(logger, "Test exception")
+    logger.exception.assert_called_with("Test exception", exc_info=True)
 
-        # Test log_error with additional context
-        log_error(logger, "Test error", {"key": "value"})
-        logger.error.assert_called_with("Test error")
+    # Test log_error with extra data
+    log_error(logger, "Test error", {"key": "value"})
+    logger.error.assert_called_with("Test error", extra={"extra_data": {"key": "value"}})
 
-        # Verify enhanced context includes both automatic and provided data
-        call_args = mock_message.call_args[1]  # Get keyword arguments
-        extra_data = call_args["extra_data"]
-        assert extra_data["key"] == "value"  # User-provided data
-        assert "function_name" in extra_data  # Automatic context
-        assert "filename" in extra_data
-        assert "line_number" in extra_data
-        assert "environment" in extra_data
-        assert extra_data["message"] == "Test error"
+    # Test log_error without extra data
+    log_error(logger, "Simple error")
+    logger.error.assert_called_with("Simple error")
 
-        # Test log_warning with no additional context
-        log_warning(logger, "Test warning")
-        logger.warning.assert_called_with("Test warning")
+    # Test log_warning
+    log_warning(logger, "Test warning")
+    logger.warning.assert_called_with("Test warning")
 
-        # Verify enhanced context is still added even with no user data
-        call_args = mock_message.call_args[1]  # Get keyword arguments
-        extra_data = call_args["extra_data"]
-        assert "function_name" in extra_data
-        assert "environment" in extra_data
-        assert extra_data["message"] == "Test warning"
+    # Test log_warning with extra data
+    log_warning(logger, "Warning with data", {"some": "context"})
+    logger.warning.assert_called_with("Warning with data", extra={"extra_data": {"some": "context"}})
 
 
 def test_environment_variables():

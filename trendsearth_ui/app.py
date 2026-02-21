@@ -5,7 +5,7 @@ import re
 import dash
 import dash_bootstrap_components as dbc
 import flask
-from flask import send_from_directory
+from flask import got_request_exception, send_from_directory
 
 # Import and register callbacks
 from .callbacks import register_all_callbacks
@@ -20,13 +20,26 @@ from .config import APP_HOST, APP_PORT, APP_TITLE
 from .utils.deployment_info import get_health_response
 
 # Import logging configuration
-from .utils.logging_config import setup_logging
+from .utils.logging_config import is_rollbar_initialized, setup_logging
 
 # Initialize logging with Rollbar if token is available
 rollbar_token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
 logger = setup_logging(rollbar_token)
 
 server = flask.Flask(__name__)
+
+
+def _rollbar_report_exception(sender, exception, **_extra):  # noqa: ARG001
+    """Report unhandled Flask exceptions to Rollbar via the signal hook."""
+    if is_rollbar_initialized():
+        import rollbar
+
+        rollbar.report_exc_info()
+
+
+# Connect the Flask signal so that any exception that bubbles up outside
+# of Dash callbacks (e.g. in regular Flask routes) is forwarded to Rollbar.
+got_request_exception.connect(_rollbar_report_exception, server)
 
 _SECURE_ENVIRONMENTS = {"production", "staging"}
 
@@ -285,7 +298,7 @@ def _is_bot_request(user_agent: str) -> bool:
 @server.errorhandler(400)
 def bad_request(error):  # noqa: ARG001
     """Handle 400 Bad Request errors, especially JSON decode errors."""
-    from .utils.logging_config import log_exception
+    from .utils.logging_config import log_warning
 
     # Log detailed request information for debugging
     request_info = f"Path: {flask.request.path}, Method: {flask.request.method}"
@@ -312,7 +325,7 @@ def bad_request(error):  # noqa: ARG001
     except Exception as e:
         request_data_info = f", Data read error: {str(e)}"
 
-    log_exception(logger, f"400 Bad Request: {request_info}{request_data_info}")
+    log_warning(logger, f"400 Bad Request: {request_info}{request_data_info}")
 
     # Return JSON error response for API endpoints and Dash callbacks
     if (
@@ -331,7 +344,7 @@ def bad_request(error):  # noqa: ARG001
 @server.errorhandler(405)
 def method_not_allowed(error):  # noqa: ARG001
     """Handle 405 Method Not Allowed errors."""
-    from .utils.logging_config import log_exception
+    from .utils.logging_config import log_warning
 
     # Log the request details to help debug
     request_info = f"Path: {flask.request.path}, Method: {flask.request.method}"
@@ -347,19 +360,15 @@ def method_not_allowed(error):  # noqa: ARG001
 
     if is_bot:
         # For bot requests: log locally for debugging but don't report to Rollbar
-        logger.warning(f"405 Method Not Allowed (bot filtered): {request_info}")
+        logger.info("405 Method Not Allowed (bot filtered): %s", request_info)
     else:
-        # For legitimate requests: log to both local and Rollbar
-        log_exception(logger, f"405 Method Not Allowed: {request_info}")
-
-        # Log available routes for debugging (only for legitimate requests to reduce noise)
+        # For legitimate requests: log to Rollbar as a warning
         route_info = []
         for rule in server.url_map.iter_rules():
             methods = sorted(rule.methods or [])
             route_info.append(f"{rule.rule} -> {methods}")
-        log_exception(
-            logger, f"Available routes: {'; '.join(route_info[:10])}"
-        )  # Log first 10 routes
+        extra = {"available_routes": "; ".join(route_info[:10])}
+        log_warning(logger, f"405 Method Not Allowed: {request_info}", extra_data=extra)
 
     # Return JSON error response for API endpoints or HTML for regular pages
     if flask.request.path.startswith("/api") or flask.request.headers.get(
@@ -376,18 +385,16 @@ def method_not_allowed(error):  # noqa: ARG001
 @server.errorhandler(500)
 def internal_error(error):
     """Handle internal server errors."""
-    from .utils.logging_config import log_exception
+    from .utils.logging_config import log_error
 
-    log_exception(logger, f"Internal server error: {str(error)}")
+    log_error(logger, f"Internal server error: {error}")
     return {"status": "error", "message": "Internal server error"}, 500
 
 
 @server.errorhandler(Exception)
 def handle_exception(e):
     """Handle uncaught exceptions."""
-    from .utils.logging_config import log_exception
-
-    log_exception(logger, f"Uncaught exception: {str(e)}")
+    logger.exception("Uncaught exception: %s", e)
     # Return JSON error response for API endpoints or HTML for regular pages
     if flask.request.path.startswith("/api"):
         return {"status": "error", "message": "An unexpected error occurred"}, 500
@@ -397,7 +404,23 @@ def handle_exception(e):
 
 @server.errorhandler(404)
 def not_found(_error):
-    """Gracefully handle 404s to avoid noisy console errors in E2E tests."""
+    """Handle 404 errors with logging.
+
+    Asset requests and bot traffic are logged at DEBUG level to avoid noise.
+    All other 404s are logged at WARNING level so they reach Rollbar.
+    """
+    path = flask.request.path
+    user_agent = flask.request.headers.get("User-Agent", "")
+
+    # Determine whether this 404 warrants a Rollbar notification
+    is_asset = path.startswith(("/assets/", "/favicon", "/_dash-"))
+    is_bot = _is_bot_request(user_agent)
+
+    if is_asset or is_bot:
+        logger.debug("404 Not Found: %s (filtered)", path)
+    else:
+        logger.warning("404 Not Found: Path=%s, Method=%s", path, flask.request.method)
+
     # For API-style requests return JSON; for others return lightweight HTML
     if flask.request.path.startswith("/api") or flask.request.headers.get(
         "Content-Type", ""

@@ -1,10 +1,13 @@
 """JSON utilities for rendering and processing."""
 
 import json
+import logging
 from typing import Any, Optional
 
 from dash import html
 import dash_bootstrap_components as dbc
+
+logger = logging.getLogger(__name__)
 
 
 def render_json_tree(data, level=0, parent_id="root", enable_interactive=True):
@@ -23,6 +26,7 @@ def render_json_tree(data, level=0, parent_id="root", enable_interactive=True):
         try:
             data = json.loads(data)
         except Exception:
+            logger.debug("Could not parse JSON string, rendering as primitive", exc_info=True)
             return _render_primitive_value(data, level, f"{parent_id}-string")
 
     # Create container with controls if this is the root level and interactive features are enabled

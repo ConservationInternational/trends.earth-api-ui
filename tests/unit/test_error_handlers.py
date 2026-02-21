@@ -49,8 +49,8 @@ class TestBadRequestHandler:
 
     def test_400_bad_request_handler_with_request_data_logging(self, test_client):
         """Test that the 400 handler logs request details including data preview."""
-        # Mock the specific log_exception call to capture the log message
-        with patch("trendsearth_ui.utils.logging_config.log_exception") as mock_log:
+        # Mock the specific log_warning call to capture the log message
+        with patch("trendsearth_ui.utils.logging_config.log_warning") as mock_log:
             # Simulate malformed JSON request exactly like the Rollbar error
             response = test_client.post(
                 "/_dash-update-component",
@@ -61,7 +61,7 @@ class TestBadRequestHandler:
 
             assert response.status_code == 400
 
-            # Verify that log_exception was called with detailed request info
+            # Verify that log_warning was called with detailed request info
             mock_log.assert_called()
             log_call_args = mock_log.call_args[0]
             log_message = log_call_args[1]  # Second argument is the message
@@ -174,7 +174,7 @@ class TestErrorHandlers:
     def test_405_error_handler_with_legitimate_user_agent(self):
         """Test 405 handler with legitimate user agent reports to Rollbar."""
         with server.test_client() as client:
-            with patch("trendsearth_ui.utils.logging_config.log_exception") as mock_log:
+            with patch("trendsearth_ui.utils.logging_config.log_warning") as mock_log:
                 # Test POST to non-existent endpoint with legitimate user agent
                 response = client.post(
                     "/nonexistent",
@@ -182,10 +182,10 @@ class TestErrorHandlers:
                 )
 
                 assert response.status_code == 405
-                # Should have called log_exception (which reports to Rollbar)
+                # Should have called log_warning (which reports to Rollbar)
                 assert mock_log.called
 
-                # Check that the first call was for the 405 error
+                # Check that the call was for the 405 error
                 first_call_args = mock_log.call_args_list[0][0]
                 assert "405 Method Not Allowed" in first_call_args[1]
                 assert "Path: /nonexistent" in first_call_args[1]
@@ -194,12 +194,12 @@ class TestErrorHandlers:
     def test_405_error_handler_with_bot_user_agent(self):
         """Test 405 handler with bot user agent does not report to Rollbar."""
         with server.test_client() as client:
-            with patch("trendsearth_ui.utils.logging_config.log_exception") as mock_log:
+            with patch("trendsearth_ui.utils.logging_config.log_warning") as mock_log:
                 # Test POST to non-existent endpoint with bot user agent
                 response = client.post("/hello.world", headers={"User-Agent": "libredtail-http"})
 
                 assert response.status_code == 405
-                # Should not have called log_exception for bot requests
+                # Should not have called log_warning for bot requests
                 assert not mock_log.called
 
     def test_405_error_handler_with_various_bot_user_agents(self):
@@ -218,11 +218,11 @@ class TestErrorHandlers:
 
         with server.test_client() as client:
             for user_agent in bot_user_agents:
-                with patch("trendsearth_ui.utils.logging_config.log_exception") as mock_log:
+                with patch("trendsearth_ui.utils.logging_config.log_warning") as mock_log:
                     response = client.post("/test-endpoint", headers={"User-Agent": user_agent})
 
                     assert response.status_code == 405
-                    # Should not have called log_exception for bot requests
+                    # Should not have called log_warning for bot requests
                     assert not mock_log.called, f"Should not log for user agent: {user_agent}"
 
     def test_405_error_handler_still_logs_locally(self):
@@ -232,13 +232,13 @@ class TestErrorHandlers:
                 response = client.post("/hello.world", headers={"User-Agent": "libredtail-http"})
 
                 assert response.status_code == 405
-                # Should still log locally for debugging
-                assert mock_logger.warning.called
+                # Should still log locally for debugging (at info level for bots)
+                assert mock_logger.info.called
 
-                # Check the warning message
-                call_args = mock_logger.warning.call_args[0]
+                # Check the info message
+                call_args = mock_logger.info.call_args[0]
                 assert "405 Method Not Allowed (bot filtered)" in call_args[0]
-                assert "libredtail-http" in call_args[0]
+                assert "libredtail-http" in str(call_args)
 
     def test_405_error_handler_with_api_endpoint(self):
         """Test 405 handler returns JSON for API endpoints."""

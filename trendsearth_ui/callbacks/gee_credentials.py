@@ -45,6 +45,7 @@ def register_callbacks(app):
                             dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
                             created_date = dt.strftime("%Y-%m-%d %H:%M UTC")
                         except Exception:
+                            logger.debug("Could not parse date: %s", created_at, exc_info=True)
                             created_date = str(created_at)
 
                     type_label = "OAuth" if credentials_type == "oauth" else "Service Account"
@@ -174,7 +175,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 return error_msg, "danger", True
 
         except Exception as e:
@@ -252,7 +253,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 return error_msg, "danger", True
 
         except Exception as e:
@@ -310,7 +311,7 @@ def register_callbacks(app):
                         error_data = resp.json()
                         error_msg = error_data.get("detail", error_msg)
                     except Exception:
-                        pass
+                        logger.debug("Could not parse API error response", exc_info=True)
                     return error_msg, "danger", True
 
             elif button_id == "profile-gee-delete-btn" and delete_clicks:
@@ -337,7 +338,7 @@ def register_callbacks(app):
                         error_data = resp.json()
                         error_msg = error_data.get("detail", error_msg)
                     except Exception:
-                        pass
+                        logger.debug("Could not parse API error response", exc_info=True)
                     return error_msg, "danger", True
 
         except Exception as e:

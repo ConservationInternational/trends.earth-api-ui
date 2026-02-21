@@ -1,5 +1,7 @@
 """Tab rendering callbacks."""
 
+import logging
+
 from dash import Input, Output, State, html
 
 from ..components import (
@@ -10,6 +12,8 @@ from ..components import (
     status_tab_content,
     users_tab_content,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app):
@@ -42,6 +46,7 @@ def register_callbacks(app):
             if not token:
                 return no_update
         except Exception:
+            logger.debug("Tab render guard encountered error", exc_info=True)
             return no_update
 
         # Handle initial load when stores might not be populated yet

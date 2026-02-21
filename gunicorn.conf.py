@@ -39,3 +39,62 @@ tmp_upload_dir = None
 
 # Application
 module = "trendsearth_ui.app:server"
+
+
+# ---------------------------------------------------------------------------
+# Rollbar integration – report worker-level errors that never reach Flask
+# ---------------------------------------------------------------------------
+
+def _init_rollbar():
+    """Initialise Rollbar in the current worker process (if configured)."""
+    import os
+
+    token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
+    if not token:
+        return
+
+    import rollbar
+
+    rollbar.init(
+        access_token=token,
+        environment=os.environ.get("DEPLOYMENT_ENVIRONMENT", "production"),
+        code_version=os.environ.get("GIT_COMMIT", "unknown"),
+        branch=os.environ.get("GIT_BRANCH", "unknown"),
+        capture_email=False,
+        capture_username=False,
+        capture_ip=False,
+        locals={"enabled": False},
+    )
+
+
+def post_fork(server, worker):  # noqa: ARG001
+    """Called after a Gunicorn worker has been forked."""
+    _init_rollbar()
+
+
+def worker_exit(server, worker):  # noqa: ARG001
+    """Called when a Gunicorn worker is shutting down."""
+    import logging
+
+    logger = logging.getLogger("trendsearth_ui")
+    logger.warning("Gunicorn worker %s exiting", worker.pid)
+
+
+def child_exit(server, worker):  # noqa: ARG001
+    """Called in the master when a worker process exits unexpectedly."""
+    import logging
+    import os
+
+    logger = logging.getLogger("trendsearth_ui")
+    logger.error("Gunicorn worker %s died unexpectedly", worker.pid)
+
+    token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
+    if token:
+        import rollbar
+
+        if not getattr(rollbar, "_initialized", False):
+            _init_rollbar()
+        rollbar.report_message(
+            f"Gunicorn worker {worker.pid} died unexpectedly",
+            level="error",
+        )

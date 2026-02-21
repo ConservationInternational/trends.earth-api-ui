@@ -65,7 +65,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("msg", error_msg)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -199,7 +199,7 @@ def register_callbacks(app):
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                     logger.debug("API error response: %s", error_data)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse password change response", exc_info=True)
                 # Add status code to error message for debugging
                 error_msg += f" (Status: {resp.status_code})"
                 return error_msg, "danger", True, no_update, no_update, no_update
@@ -264,7 +264,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -417,7 +417,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 # Avoid duplicate "try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = f"{error_msg} Please try again."

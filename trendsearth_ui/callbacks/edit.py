@@ -552,7 +552,7 @@ def register_callbacks(app):
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                     logger.debug("API error response: %s", error_data)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse password change response", exc_info=True)
                 # Add status code to error message for debugging
                 error_msg += f" (Status: {resp.status_code})"
                 return error_msg, "danger", True, no_update, no_update

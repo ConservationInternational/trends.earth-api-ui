@@ -1,8 +1,12 @@
 """Responsive design callbacks for mobile device handling."""
 
+import logging
+
 from dash import Input, Output, no_update
 
 from ..components.tabs import get_responsive_grid_options
+
+logger = logging.getLogger(__name__)
 
 
 def register_responsive_callbacks(app):
@@ -21,6 +25,7 @@ def register_responsive_callbacks(app):
         try:
             return get_responsive_grid_options(is_mobile=is_mobile)
         except Exception:
+            logger.debug("Executions grid options update failed", exc_info=True)
             return no_update
 
     @app.callback(
@@ -35,6 +40,7 @@ def register_responsive_callbacks(app):
         try:
             return get_responsive_grid_options(is_mobile=is_mobile)
         except Exception:
+            logger.debug("Users grid options update failed", exc_info=True)
             return no_update
 
     @app.callback(
@@ -49,6 +55,7 @@ def register_responsive_callbacks(app):
         try:
             return get_responsive_grid_options(is_mobile=is_mobile)
         except Exception:
+            logger.debug("Scripts grid options update failed", exc_info=True)
             return no_update
 
     # Individual callbacks for each table scroll hint to avoid missing component errors

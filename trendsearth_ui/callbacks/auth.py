@@ -59,6 +59,7 @@ def _is_mock_auth_enabled(search_query: str | None) -> bool:
     try:
         return hmac.compare_digest(provided_token, secret)
     except Exception:
+        logger.warning("Token comparison failed", exc_info=True)
         return False
 
 
@@ -728,7 +729,7 @@ def register_callbacks(app):
                     error_msg = error_data.get("msg", error_msg)
                     logger.debug("API error response: %s", error_data)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse API error response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = f"{error_msg} Please try again later."
@@ -1114,7 +1115,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data["detail"]
                 except Exception:
-                    pass
+                    logger.debug("Could not parse password validation response", exc_info=True)
                 return (
                     error_msg,
                     "danger",
@@ -1129,7 +1130,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data["detail"]
                 except Exception:
-                    pass
+                    logger.debug("Could not parse password reset response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = f"{error_msg} Please try again."
@@ -1296,7 +1297,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
-                    pass
+                    logger.debug("Could not parse registration error response", exc_info=True)
                 logger.warning("Registration failed (400): %s", error_msg)
                 return error_msg, "danger", True
             elif resp.status_code == 422:
@@ -1305,7 +1306,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
-                    pass
+                    logger.debug("Could not parse validation error response", exc_info=True)
                 logger.warning("Registration validation failed (422): %s", error_msg)
                 return error_msg, "danger", True
             elif resp.status_code == 429:
@@ -1322,7 +1323,7 @@ def register_callbacks(app):
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
-                    pass
+                    logger.debug("Could not parse registration error response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = f"{error_msg} Please try again."
