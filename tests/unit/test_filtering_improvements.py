@@ -56,17 +56,17 @@ class TestColumnFilterConfiguration:
         assert status_column["filterParams"]["trimInput"] is True
 
     def test_scripts_access_filter(self):
-        """Test that scripts access_control column has filtering disabled.
+        """Test that scripts access_control column has text filter enabled.
 
-        access_control is a computed/display-only field that doesn't
-        correspond to a real database column, so filtering is disabled.
+        access_control is a real API field included via SCRIPT_INCLUDE_FIELDS,
+        so text filtering is enabled to allow users to filter by access type.
         """
         config = get_mobile_column_config()
         scripts_columns = config["scripts"]["primary_columns"]
 
         access_column = next(col for col in scripts_columns if col["field"] == "access_control")
 
-        assert access_column.get("filter") is False
+        assert access_column.get("filter") == "agTextColumnFilter"
         assert access_column.get("sortable") is False
 
     def test_users_role_filter(self):

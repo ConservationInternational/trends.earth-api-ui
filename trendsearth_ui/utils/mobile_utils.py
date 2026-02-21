@@ -347,7 +347,14 @@ def get_mobile_column_config():
                     "cellStyle": {"fontSize": "11px", "textAlign": "center", "cursor": "pointer"},
                     "resizable": True,
                     "sortable": False,
-                    "filter": False,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Status",

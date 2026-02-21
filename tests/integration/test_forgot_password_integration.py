@@ -81,11 +81,12 @@ class TestForgotPasswordIntegration:
 
         # Test both success and not found cases return same message
         with patch("trendsearth_ui.callbacks.auth.callback_context", Mock()):
-            with patch("trendsearth_ui.callbacks.auth.requests.post") as mock_post:
+            mock_session = Mock()
+            mock_response = Mock()
+            mock_session.post.return_value = mock_response
+            with patch("trendsearth_ui.callbacks.auth.get_session", return_value=mock_session):
                 # Test success case
-                mock_response = Mock()
                 mock_response.status_code = 200
-                mock_post.return_value = mock_response
 
                 result_success = send_reset_callback(1, "existing@example.com", "production")
 
@@ -149,20 +150,20 @@ class TestForgotPasswordIntegration:
         expected_url = f"{API_BASE}/user/{test_email}/recover-password?legacy=false"
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", Mock()):
-            with patch("trendsearth_ui.callbacks.auth.requests.post") as mock_post:
-                mock_response = Mock()
-                mock_response.status_code = 200
-                mock_post.return_value = mock_response
-
+            mock_session = Mock()
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_session.post.return_value = mock_response
+            with patch("trendsearth_ui.callbacks.auth.get_session", return_value=mock_session):
                 # Execute the callback
                 send_reset_callback(1, test_email, "production")
 
                 # Verify the correct URL was called (includes default headers)
-                mock_post.assert_called_once_with(
+                mock_session.post.assert_called_once_with(
                     expected_url,
-                    headers=mock_post.call_args.kwargs["headers"],
+                    headers=mock_session.post.call_args.kwargs["headers"],
                     timeout=10,
                 )
                 # Verify headers contain Accept-Encoding
-                call_headers = mock_post.call_args.kwargs.get("headers", {})
+                call_headers = mock_session.post.call_args.kwargs.get("headers", {})
                 assert "Accept-Encoding" in call_headers
