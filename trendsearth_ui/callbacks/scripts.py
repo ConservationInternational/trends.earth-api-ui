@@ -16,6 +16,18 @@ SCRIPT_ENDPOINT = "/script"
 SCRIPT_INCLUDE_FIELDS = "user_name,access_control"
 DATE_COLUMNS = ("start_date", "end_date", "created_at", "updated_at")
 
+# Must match the API's SCRIPT_ALLOWED_FILTER_FIELDS / SORT_FIELDS
+SCRIPT_ALLOWED_SORT_COLUMNS = {
+    "id", "name", "slug", "status", "public", "restricted",
+    "created_at", "updated_at", "environment", "environment_version",
+    "user_name", "user_email",
+}
+SCRIPT_ALLOWED_FILTER_COLUMNS = {
+    "id", "name", "slug", "status", "public", "restricted",
+    "created_at", "updated_at", "environment", "environment_version",
+    "user_name", "user_email",
+}
+
 
 def _access_control_label(script_row: dict[str, Any]) -> str:
     """Return a compact label describing script access restrictions."""
@@ -99,6 +111,8 @@ def register_callbacks(app):
             params, table_state = build_aggrid_request_params(
                 request,
                 base_params={"include": SCRIPT_INCLUDE_FIELDS},
+                allowed_sort_columns=SCRIPT_ALLOWED_SORT_COLUMNS,
+                allowed_filter_columns=SCRIPT_ALLOWED_FILTER_COLUMNS,
             )
 
             is_admin = role in ["ADMIN", "SUPERADMIN"]
@@ -145,6 +159,7 @@ def register_callbacks(app):
             params = build_refresh_request_params(
                 base_params=base_params,
                 table_state=table_state,
+                allowed_filter_columns=SCRIPT_ALLOWED_FILTER_COLUMNS,
             )
 
             is_admin = role in ["ADMIN", "SUPERADMIN"]

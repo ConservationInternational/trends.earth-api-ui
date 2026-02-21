@@ -22,6 +22,14 @@ USER_DATE_COLUMNS = (
     "email_verified_at",
 )
 
+# Must match the API's USER_ALLOWED_FILTER_FIELDS / SORT_FIELDS
+USER_ALLOWED_SORT_COLUMNS = {
+    "id", "email", "name", "role", "country", "institution",
+    "created_at", "updated_at", "last_login_at", "last_activity_at",
+    "email_verified", "email_verified_at",
+}
+USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
+
 
 def _format_user_rows(
     users: list[dict[str, Any]],
@@ -115,6 +123,8 @@ def register_callbacks(app):
             params, table_state = build_aggrid_request_params(
                 request,
                 allow_filters=is_admin,
+                allowed_sort_columns=USER_ALLOWED_SORT_COLUMNS,
+                allowed_filter_columns=USER_ALLOWED_FILTER_COLUMNS,
                 filter_model_overrides=filter_overrides,
             )
 
@@ -162,6 +172,7 @@ def register_callbacks(app):
                 base_params=base_params,
                 table_state=table_state,
                 allow_filters=role in ("ADMIN", "SUPERADMIN"),
+                allowed_filter_columns=USER_ALLOWED_FILTER_COLUMNS,
             )
 
             tabledata, total_rows = _fetch_users_page(

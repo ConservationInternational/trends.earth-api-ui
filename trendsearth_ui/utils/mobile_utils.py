@@ -273,14 +273,8 @@ def get_mobile_column_config():
                     "minWidth": 100,
                     "cellStyle": {"fontSize": "12px", "textAlign": "center"},
                     "resizable": True,
-                    "filter": "agTextColumnFilter",
-                    "filterParams": {
-                        "buttons": ["clear", "apply"],
-                        "closeOnApply": True,
-                        "caseSensitive": False,
-                        "trimInput": True,
-                        "debounceMs": 500,
-                    },
+                    "sortable": False,
+                    "filter": False,
                 },
                 {
                     "headerName": "Verified At",
@@ -352,14 +346,8 @@ def get_mobile_column_config():
                     "minWidth": 100,
                     "cellStyle": {"fontSize": "11px", "textAlign": "center", "cursor": "pointer"},
                     "resizable": True,
-                    "filter": "agTextColumnFilter",
-                    "filterParams": {
-                        "buttons": ["clear", "apply"],
-                        "closeOnApply": True,
-                        "caseSensitive": False,
-                        "trimInput": True,
-                        "debounceMs": 500,
-                    },
+                    "sortable": False,
+                    "filter": False,
                 },
                 {
                     "headerName": "Status",
@@ -416,6 +404,7 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "tooltipField": "description",
                     "resizable": True,
+                    "filter": False,
                 },
                 {
                     "headerName": "ID",

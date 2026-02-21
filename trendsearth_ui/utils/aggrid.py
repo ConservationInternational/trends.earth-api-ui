@@ -167,7 +167,33 @@ def build_filter_clause(
             elif condition == "lessThanOrEqual":
                 clauses.append(f"{field}<={numeric_str}")
             # Other numeric conditions (e.g. inRange) are not currently used
-        # Other filter types (date, boolean) should be handled via custom handlers
+        elif filter_type == "date":
+            # AG-Grid date column filter — translate to SQL-like comparison clauses
+            raw_type = config.get("type", "equals")
+            date_from = config.get("dateFrom")
+            date_to = config.get("dateTo")
+
+            if raw_type == "equals" and date_from:
+                sanitized = _sanitize_value(date_from)
+                clauses.append(f"{field}>='{sanitized}'")
+                clauses.append(f"{field}<='{sanitized}'")
+            elif raw_type in ("greaterThan", "greaterThanOrEqual") and date_from:
+                sanitized = _sanitize_value(date_from)
+                clauses.append(f"{field}>='{sanitized}'")
+            elif raw_type in ("lessThan", "lessThanOrEqual") and date_from:
+                sanitized = _sanitize_value(date_from)
+                clauses.append(f"{field}<='{sanitized}'")
+            elif raw_type == "inRange":
+                if date_from:
+                    sanitized_from = _sanitize_value(date_from)
+                    clauses.append(f"{field}>='{sanitized_from}'")
+                if date_to:
+                    sanitized_to = _sanitize_value(date_to)
+                    clauses.append(f"{field}<='{sanitized_to}'")
+            elif raw_type == "notEqual" and date_from:
+                sanitized = _sanitize_value(date_from)
+                clauses.append(f"{field}!='{sanitized}'")
+        # Boolean filter types are not currently supported
 
     clause_string = joiner.join(clauses) if clauses else None
     return clause_string, extra_params

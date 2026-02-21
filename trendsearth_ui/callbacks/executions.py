@@ -1,6 +1,5 @@
 """Executions table callbacks."""
 
-from collections.abc import Mapping
 import logging
 from typing import Any
 
@@ -17,6 +16,17 @@ logger = logging.getLogger(__name__)
 EXECUTION_ENDPOINT = "/execution"
 EXECUTION_BASE_INCLUDE = "script_name,user_id,duration"
 ADMIN_INCLUDE_SUFFIX = ",user_name,user_email"
+
+# Must match the API's EXECUTION_ALLOWED_SORT_FIELDS / FILTER_FIELDS
+EXECUTION_ALLOWED_SORT_COLUMNS = {
+    "id", "status", "progress", "start_date", "end_date",
+    "script_id", "script_name", "user_name", "user_email",
+    "user_id", "duration",
+}
+EXECUTION_ALLOWED_FILTER_COLUMNS = {
+    "id", "status", "progress", "start_date", "end_date",
+    "script_id", "script_name", "user_name", "user_email", "user_id",
+}
 
 
 def _build_base_params(role: str | None, *, include_paging: bool = False) -> dict[str, Any]:
@@ -43,60 +53,6 @@ def _build_status_filter_override(
             "status": {"filterType": "set", "values": status_filter_selected},
         }
     return None
-
-
-def _make_date_filter_handler(gte_key: str, lte_key: str):
-    """Create a handler that converts AG-Grid date filters into API params."""
-
-    def handler(config: Mapping[str, Any]) -> tuple[str | None, dict[str, Any]]:
-        if not isinstance(config, Mapping):
-            return None, {}
-
-        raw_type = config.get("type")
-        if isinstance(raw_type, str):
-            filter_type = raw_type.strip()
-        elif raw_type:
-            filter_type = str(raw_type)
-        else:
-            filter_type = "equals"
-        date_from = config.get("dateFrom")
-        date_to = config.get("dateTo")
-
-        params: dict[str, Any] = {}
-
-        def set_param(key: str, value: Any) -> None:
-            if value:
-                params[key] = value
-
-        if filter_type == "equals":
-            if date_from:
-                set_param(gte_key, date_from)
-                set_param(lte_key, date_from)
-        elif filter_type in ("greaterThan", "greaterThanOrEqual"):
-            if date_from:
-                set_param(gte_key, date_from)
-        elif filter_type in ("lessThan", "lessThanOrEqual"):
-            if date_from:
-                set_param(lte_key, date_from)
-        elif filter_type == "inRange":
-            if date_from:
-                set_param(gte_key, date_from)
-            if date_to:
-                set_param(lte_key, date_to)
-        else:
-            if date_from:
-                set_param(gte_key, date_from)
-                set_param(lte_key, date_from)
-
-        return None, params
-
-    return handler
-
-
-DATE_FILTER_HANDLERS = {
-    "start_date": _make_date_filter_handler("start_date_gte", "start_date_lte"),
-    "end_date": _make_date_filter_handler("end_date_gte", "end_date_lte"),
-}
 
 
 def format_duration(duration_seconds):
@@ -196,8 +152,9 @@ def register_callbacks(app):
             params, table_state = build_aggrid_request_params(
                 request,
                 base_params=_build_base_params(role),
+                allowed_sort_columns=EXECUTION_ALLOWED_SORT_COLUMNS,
+                allowed_filter_columns=EXECUTION_ALLOWED_FILTER_COLUMNS,
                 filter_model_overrides=filter_overrides,
-                custom_filter_handlers=DATE_FILTER_HANDLERS,
             )
 
             resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
@@ -248,7 +205,7 @@ def register_callbacks(app):
                 base_params=_build_base_params(role, include_paging=True),
                 table_state=table_state,
                 additional_filters=filter_overrides,
-                custom_filter_handlers=DATE_FILTER_HANDLERS,
+                allowed_filter_columns=EXECUTION_ALLOWED_FILTER_COLUMNS,
             )
 
             resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
@@ -314,7 +271,7 @@ def register_callbacks(app):
                 base_params=_build_base_params(role, include_paging=True),
                 table_state=table_state,
                 additional_filters=filter_overrides,
-                custom_filter_handlers=DATE_FILTER_HANDLERS,
+                allowed_filter_columns=EXECUTION_ALLOWED_FILTER_COLUMNS,
             )
 
             resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)

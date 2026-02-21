@@ -8,7 +8,7 @@ from typing import Optional
 import requests
 
 from ..config import API_BASE
-from .http_client import apply_default_headers
+from .http_client import apply_default_headers, get_session
 from .timezone_utils import format_local_time, get_safe_timezone
 
 logger = logging.getLogger(__name__)
@@ -79,7 +79,7 @@ def get_user_info(token, api_base=None):
         me_url = f"{base_url}/user/me"
         logger.debug("get_user_info: Attempting GET request to %s", me_url)
 
-        resp = requests.get(me_url, headers=headers, timeout=10)
+        resp = get_session().get(me_url, headers=headers, timeout=10)
         logger.debug("get_user_info: /user/me response status: %s", resp.status_code)
 
         if resp.status_code == 200:
@@ -100,7 +100,7 @@ def get_user_info(token, api_base=None):
         user_url = f"{base_url}/user"
         logger.debug("get_user_info: Attempting fallback GET request to %s", user_url)
 
-        resp = requests.get(user_url, headers=headers, timeout=10)
+        resp = get_session().get(user_url, headers=headers, timeout=10)
         logger.debug("get_user_info: /user response status: %s", resp.status_code)
 
         if resp.status_code == 200:
@@ -156,7 +156,7 @@ def refresh_access_token(
 
     try:
         refresh_data = {"refresh_token": refresh_token}
-        resp = requests.post(
+        resp = get_session().post(
             f"{auth_url}/refresh",
             headers=apply_default_headers(),
             json=refresh_data,
@@ -212,7 +212,7 @@ def logout_user(access_token: str, refresh_token: str = None, api_environment: s
         if refresh_token:
             logout_data["refresh_token"] = refresh_token
 
-        resp = requests.post(
+        resp = get_session().post(
             f"{auth_url}/logout",
             headers=headers,
             json=logout_data if logout_data else None,
@@ -258,7 +258,7 @@ def logout_all_devices(access_token: str, api_environment: str = None) -> bool:
 
     try:
         headers = apply_default_headers({"Authorization": f"Bearer {access_token}"})
-        resp = requests.post(f"{auth_url}/logout-all", headers=headers, timeout=10)
+        resp = get_session().post(f"{auth_url}/logout-all", headers=headers, timeout=10)
 
         if resp.status_code == 200:
             logger.debug("User logged out from all devices successfully")
@@ -302,7 +302,8 @@ def make_authenticated_request(
     kwargs["headers"] = headers
 
     # Make the initial request
-    resp = getattr(requests, method.lower())(full_url, **kwargs)
+    session = get_session()
+    resp = getattr(session, method.lower())(full_url, **kwargs)
 
     # If authentication failed, try to refresh the token and retry
     # Look for 401 Unauthorized or 422 with signature-related errors
@@ -371,7 +372,7 @@ def make_authenticated_request(
                 retry_headers = apply_default_headers()
                 retry_headers["Authorization"] = f"Bearer {new_access_token}"
                 kwargs["headers"] = retry_headers
-                resp = getattr(requests, method.lower())(full_url, **kwargs)
+                resp = getattr(session, method.lower())(full_url, **kwargs)
             else:
                 logger.debug("Token refresh failed")
         else:
