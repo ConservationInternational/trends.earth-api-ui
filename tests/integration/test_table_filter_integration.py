@@ -74,17 +74,10 @@ class TestTableColumnFilterIntegration:
         assert "buttons" in status_col["filterParams"]
         assert "closeOnApply" in status_col["filterParams"]
 
-        # Find access control column and verify it has enhanced text filter
+        # Find access control column and verify its filter configuration
         access_col = next((col for col in column_defs if col["field"] == "access_control"), None)
         assert access_col is not None
-        assert access_col["filter"] == "agTextColumnFilter"
-        assert "filterParams" in access_col
-        # Verify enhanced text filter parameters
-        assert access_col["filterParams"]["caseSensitive"] is False
-        assert access_col["filterParams"]["trimInput"] is True
-        assert access_col["filterParams"]["debounceMs"] == 500
-        assert "buttons" in access_col["filterParams"]
-        assert "closeOnApply" in access_col["filterParams"]
+        assert access_col["filter"] is False
 
     def test_users_table_has_filter_config(self):
         """Test that users table has proper filter configuration."""
