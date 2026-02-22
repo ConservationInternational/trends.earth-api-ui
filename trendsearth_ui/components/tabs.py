@@ -562,6 +562,7 @@ def profile_tab_content(user_data):
                                                 [
                                                     dbc.Switch(
                                                         id="profile-email-notifications-switch",
+                                                        label="Enable email notifications",
                                                         value=user_data.get(
                                                             "email_notifications_enabled", True
                                                         )

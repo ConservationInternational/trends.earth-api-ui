@@ -21,11 +21,9 @@ def register_callbacks(app):
 
     @app.callback(
         Output("tab-content-dynamic", "children"),
+        [Input("active-tab-store", "data")],
         [
-            Input("active-tab-store", "data"),
-            Input("user-store", "data"),
-        ],
-        [
+            State("user-store", "data"),
             State("token-store", "data"),
             State("role-store", "data"),
         ],

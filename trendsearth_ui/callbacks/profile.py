@@ -250,9 +250,7 @@ def register_callbacks(app):
 
                 status_text = "enabled" if enabled else "disabled"
                 return (
-                    [
-                        f"Email notifications {status_text} successfully!",
-                    ],
+                    f"Email notifications {status_text} successfully!",
                     "success",
                     True,
                     updated_data,
