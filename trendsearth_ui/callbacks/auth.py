@@ -706,20 +706,12 @@ def register_callbacks(app):
                 timeout=10,
             )
 
-            if resp.status_code == 200:
-                logger.debug("Password recovery email sent to: %s", email)
-                return (
-                    f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
-                    "success",
-                    True,
-                    "",  # Clear the email field
-                    {"display": "none"},  # Hide form
-                    {"display": "none"},  # Hide initial buttons
-                    {"display": "block"},  # Show success buttons (OK button)
-                )
-            elif resp.status_code == 404:
-                logger.debug("User not found with email: %s", email)
-                # Return the same message as success to prevent email enumeration
+            if resp.status_code in (200, 404):
+                # The API returns a generic 200 for all cases (existing and
+                # non-existing users) to prevent email enumeration.  We also
+                # accept 404 for backward-compatibility with older API
+                # versions.
+                logger.debug("Password recovery request accepted for: %s", email)
                 return (
                     f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
                     "success",
