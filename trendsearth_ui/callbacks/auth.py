@@ -180,14 +180,22 @@ def register_callbacks(app):
                 cookie_data = _json.loads(auth_cookie)
                 if isinstance(cookie_data, dict):
                     access_token = cookie_data.get("access_token")
-                    user_data = cookie_data.get("user_data") or {}
-                    role = user_data.get("role") if isinstance(user_data, dict) else None
+                    cookie_user_data = cookie_data.get("user_data") or {}
                     api_env = cookie_data.get("api_environment") or (
                         current_api_environment or "production"
                     )
 
                     # If cookie has a valid token, hydrate stores and show dashboard
                     if access_token:
+                        # Re-fetch user data from the API so that preferences
+                        # changed in a previous session (e.g. email notifications)
+                        # are reflected immediately instead of using the stale
+                        # snapshot stored in the cookie.
+                        api_base = get_api_base(api_env)
+                        fresh_user_data = get_user_info(access_token, api_base)
+                        user_data = fresh_user_data if fresh_user_data else cookie_user_data
+                        role = user_data.get("role") if isinstance(user_data, dict) else None
+
                         return (
                             dashboard_layout(),
                             False,
@@ -978,6 +986,60 @@ def register_callbacks(app):
             # Refresh failed, user needs to log in again
             logger.warning("Proactive token refresh failed, clearing session")
             return None, None
+
+    @app.callback(
+        Output("user-store-cookie-sync", "data"),
+        [Input("user-store", "data")],
+        [State("token-store", "data")],
+        prevent_initial_call=True,
+    )
+    def sync_user_data_to_cookie(user_data, current_token):
+        """Keep the auth cookie's user_data in sync with the live user-store.
+
+        When user preferences change (e.g. email_notifications_enabled),
+        the user-store is updated by the relevant callback.  This callback
+        propagates those changes into the HTTP cookie so that a page reload
+        restores the latest settings.
+        """
+        if not user_data or not current_token:
+            return no_update
+
+        try:
+            auth_cookie = request.cookies.get("auth_token")
+            if not auth_cookie:
+                return no_update
+
+            cookie_data = json.loads(auth_cookie)
+            if not isinstance(cookie_data, dict):
+                return no_update
+
+            # Only rewrite the cookie when user_data actually differs
+            stored_user_data = cookie_data.get("user_data") or {}
+            if stored_user_data == user_data:
+                return no_update
+
+            # Rebuild the cookie with the fresh user_data
+            refresh_token = cookie_data.get("refresh_token")
+            email = cookie_data.get("email") or user_data.get("email", "")
+            api_environment = cookie_data.get("api_environment", "production")
+
+            ctx = callback_context
+            if hasattr(ctx, "response") and ctx.response:
+                new_cookie_data = create_auth_cookie_data(
+                    current_token,
+                    refresh_token,
+                    email,
+                    user_data,
+                    api_environment,
+                )
+                cookie_value = json.dumps(new_cookie_data)
+                expiration = datetime.now(timezone.utc) + timedelta(days=30)
+                _set_auth_cookie(ctx.response, cookie_value, expiration)
+                logger.debug("Synced updated user_data to auth cookie")
+        except Exception as e:
+            logger.debug("Error syncing user data to cookie: %s", e)
+
+        return no_update
 
     # Real-time password validation callback
     @app.callback(

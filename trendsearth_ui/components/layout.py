@@ -73,6 +73,7 @@ def create_main_layout():
                 id="rate-limit-breaches-total-count-store", data=0
             ),  # Store total count for rate limit breaches
             dcc.Store(id="active-tab-store", data="executions"),
+            dcc.Store(id="user-store-cookie-sync"),  # Hidden sink for cookie sync callback
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             dcc.Store(id="selected-rate-limit-data"),  # Store data for selected rate limit to reset
