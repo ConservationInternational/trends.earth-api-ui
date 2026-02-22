@@ -52,6 +52,7 @@ def create_main_layout():
             dcc.Store(id="users-raw-data"),
             dcc.Store(id="current-log-context"),
             dcc.Store(id="edit-user-data"),
+            dcc.Store(id="edit-user-modal-user-id"),  # Derived user ID for admin edit sub-callbacks
             dcc.Store(id="edit-script-data"),
             dcc.Store(
                 id="executions-table-state"

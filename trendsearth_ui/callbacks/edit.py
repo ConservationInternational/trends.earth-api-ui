@@ -26,6 +26,8 @@ def register_callbacks(app):
             Output("edit-user-role", "value"),
             Output("admin-new-password", "value"),
             Output("admin-confirm-password", "value"),
+            Output("edit-user-modal-user-id", "data"),
+            Output("edit-user-email-notifications-switch", "value"),
         ],
         [Input("users-table", "cellClicked")],
         [
@@ -45,14 +47,14 @@ def register_callbacks(app):
         logger.debug("User edit callback triggered: cell_clicked=%s, role=%s", cell_clicked, role)
         # Only ADMIN and SUPERADMIN can edit users
         if not cell_clicked or role not in ("ADMIN", "SUPERADMIN"):
-            return False, None, "", "", "", "", "USER", "", ""
+            return False, None, "", "", "", "", "USER", "", "", None, True
         if cell_clicked.get("colId") != "edit":
-            return False, None, "", "", "", "", "USER", "", ""
+            return False, None, "", "", "", "", "USER", "", "", None, True
         try:
             user = resolve_row_data(cell_clicked, token, table_state, "/user")
         except RowResolutionError as exc:
             logger.debug("Row resolution error: %s", exc)
-            return False, None, "", "", "", "", "USER", "", ""
+            return False, None, "", "", "", "", "USER", "", "", None, True
         else:
             logger.debug("Found user data: %s - %s", user.get("id"), user.get("email"))
 
@@ -60,7 +62,7 @@ def register_callbacks(app):
         target_user_role = user.get("role", "USER")
         if role == "ADMIN" and target_user_role == "SUPERADMIN":
             logger.debug("ADMIN cannot edit SUPERADMIN users")
-            return False, None, "", "", "", "", "USER", "", ""
+            return False, None, "", "", "", "", "USER", "", "", None, True
 
         return (
             True,
@@ -72,6 +74,8 @@ def register_callbacks(app):
             user.get("role", "USER"),
             "",  # Clear admin password field
             "",  # Clear admin confirm password field
+            user.get("id"),  # Set user ID for admin sub-callbacks
+            user.get("email_notifications_enabled", True),  # Set notification switch
         )
 
     @app.callback(

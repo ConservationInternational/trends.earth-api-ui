@@ -3,7 +3,7 @@
 import logging
 from typing import Any
 
-from dash import Input, Output, State, callback_context, html
+from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 
 from ..config import DEFAULT_PAGE_SIZE
@@ -216,17 +216,24 @@ def register_callbacks(app):
         [
             State("edit-user-modal-user-id", "data"),
             State("token-store", "data"),
+            State("edit-user-data", "data"),
         ],
         prevent_initial_call=True,
     )
-    def admin_update_user_email_notifications(enabled, user_id, token):
+    def admin_update_user_email_notifications(enabled, user_id, token, user_data):
         """Admin update of user email notification preferences."""
         if token is None or user_id is None:
             return "", "info", False
 
+        # Skip if value matches current user data (prevents firing on modal open)
+        if user_data:
+            current_value = user_data.get("email_notifications_enabled", True)
+            if enabled == current_value:
+                return no_update, no_update, no_update
+
         try:
             resp = make_authenticated_request(
-                f"/admin/users/{user_id}",
+                f"/user/{user_id}",
                 token,
                 method="PATCH",
                 json={"email_notifications_enabled": enabled},
