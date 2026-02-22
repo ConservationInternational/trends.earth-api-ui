@@ -4,13 +4,14 @@ import base64
 from datetime import datetime, timezone
 import logging
 from typing import Any
+from urllib.parse import quote as url_quote
 
 from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 import requests
 
 from ..config import DEFAULT_PAGE_SIZE
-from ..utils.aggrid import build_sort_clause, build_table_state
+from ..utils.aggrid import build_aggrid_request_params
 from ..utils.helpers import make_authenticated_request, parse_date
 
 logger = logging.getLogger(__name__)
@@ -336,6 +337,89 @@ def _extract_rate_limit_events(payload: Any) -> tuple[list[dict[str, Any]], int 
     return events, total
 
 
+# -- Rate limit breaches: field remapping and filter helpers -----------------
+# These map AG-Grid display-field names to the API column names, following the
+# same ``build_aggrid_request_params`` pattern used by executions / users /
+# scripts tables.
+
+_RATE_LIMIT_FIELD_REMAP: dict[str, str] = {
+    "expires_at_display": "expires_at",
+    "identifier_display": "limit_key",
+    "status_display": "status",
+}
+
+_RATE_LIMIT_SORT_COLUMNS: tuple[str, ...] = (
+    "occurred_at",
+    "expires_at",
+    "user_email",
+    "user_role",
+    "endpoint",
+    "method",
+    "limit_key",
+)
+
+_RATE_LIMIT_FILTER_COLUMNS: tuple[str, ...] = (
+    "occurred_at",
+    "expires_at",
+    "user_email",
+    "user_role",
+    "endpoint",
+    "method",
+    "limit_key",
+    "rate_limit_type",
+    "status",
+)
+
+
+def _status_filter_handler(
+    config: dict[str, Any],
+) -> tuple[str | None, dict[str, Any]]:
+    """Custom AG-Grid filter handler for the virtual ``status`` field.
+
+    Translates an AG-Grid set filter (e.g. ``["Active"]``) into an extra
+    ``status`` query parameter understood by the rate-limit events API.
+    """
+    values = config.get("values") or []
+    if len(values) == 1:
+        raw = str(values[0]).strip().lower()
+        if raw in ("active", "historical"):
+            return None, {"status": raw}
+    return None, {}
+
+
+def _remap_rate_limit_request(
+    request_data: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Remap AG-Grid display-field names to API column names.
+
+    The mapping is idempotent — already-remapped names pass through unchanged.
+    """
+    if not request_data:
+        return request_data
+
+    remapped: dict[str, Any] = dict(request_data)
+
+    sort_model = remapped.get("sortModel")
+    if sort_model:
+        remapped["sortModel"] = [
+            {
+                **entry,
+                "colId": _RATE_LIMIT_FIELD_REMAP.get(
+                    entry.get("colId", ""), entry.get("colId", "")
+                ),
+            }
+            for entry in sort_model
+        ]
+
+    filter_model = remapped.get("filterModel")
+    if filter_model:
+        remapped["filterModel"] = {
+            _RATE_LIMIT_FIELD_REMAP.get(k, k): v for k, v in filter_model.items()
+        }
+
+    return remapped
+
+
 def _query_rate_limit_breaches(
     request_data: dict[str, Any] | None,
     token: str | None,
@@ -344,197 +428,68 @@ def _query_rate_limit_breaches(
     *,
     stored_state: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any], int]:
-    """Fetch combined active and historical rate limit rows for the unified table."""
+    """Fetch combined active and historical rate limit rows for the unified table.
+
+    Uses the same ``build_aggrid_request_params`` helper as the executions,
+    users, and scripts tables to avoid code duplication.
+    """
 
     if not token or role not in ("ADMIN", "SUPERADMIN"):
         return {"rowData": [], "rowCount": 0}, stored_state or {}, 0
 
-    stored_state = stored_state or {}
-    request_data = request_data or {}
+    request_data = dict(request_data or {})
+
+    # For refresh calls that only carry sortModel, fall back to stored state
+    # for filter models so active filters are preserved across refreshes.
+    if stored_state:
+        if not request_data.get("sortModel") and stored_state.get("sort_model"):
+            request_data["sortModel"] = stored_state["sort_model"]
+        if not request_data.get("filterModel") and stored_state.get("filter_model"):
+            request_data["filterModel"] = stored_state["filter_model"]
+
+    # Remap AG-Grid display field names to API column names.
+    remapped = _remap_rate_limit_request(request_data)
+
+    params, table_state = build_aggrid_request_params(
+        remapped,
+        allowed_sort_columns=_RATE_LIMIT_SORT_COLUMNS,
+        allowed_filter_columns=_RATE_LIMIT_FILTER_COLUMNS,
+        custom_filter_handlers={"status": _status_filter_handler},
+    )
+
+    # Enforce maximum page size for rate limit events.
+    if params.get("per_page", 0) > MAX_RATE_LIMIT_EVENT_PAGE_SIZE:
+        params["per_page"] = MAX_RATE_LIMIT_EVENT_PAGE_SIZE
 
     try:
-        start_row = int(request_data.get("startRow") or 0)
-    except (TypeError, ValueError):
-        start_row = 0
-    start_row = max(start_row, 0)
+        response = make_authenticated_request(
+            RATE_LIMIT_EVENTS_ENDPOINT,
+            token,
+            params=params,
+            timeout=10,
+        )
+    except Exception as exc:  # pragma: no cover - defensive guard
+        logger.exception("Error fetching rate limit events: %s", exc)
+        return {"rowData": [], "rowCount": 0}, table_state, 0
+
+    if response.status_code != 200:
+        logger.warning("Failed to fetch rate limit events: status %s", response.status_code)
+        return {"rowData": [], "rowCount": 0}, table_state, 0
 
     try:
-        raw_end_row = request_data.get("endRow")
-        end_row = int(raw_end_row) if raw_end_row is not None else None
-    except (TypeError, ValueError):
-        end_row = None
+        payload = response.json()
+    except ValueError:
+        payload = {}
 
-    default_block = stored_state.get("page_size")
-    if not isinstance(default_block, int) or default_block <= 0:
-        default_block = DEFAULT_PAGE_SIZE
+    # Standardised response shape: {"data": [...], "total": N}
+    events = payload.get("data", [])
+    if not isinstance(events, list):
+        events = []
+    total_rows = payload.get("total", len(events))
 
-    if end_row is None or end_row <= start_row:
-        requested_block = max(default_block, DEFAULT_PAGE_SIZE)
-        end_row = start_row + requested_block
-    else:
-        requested_block = end_row - start_row
+    rows = _format_combined_rate_limit_rows(events, user_timezone)
 
-    if start_row == 0 and requested_block < default_block:
-        requested_block = max(default_block, DEFAULT_PAGE_SIZE)
-        end_row = start_row + requested_block
-
-    requested_block = max(requested_block, 1)
-    page_size = max(requested_block, default_block, DEFAULT_PAGE_SIZE)
-    page_size = min(page_size, MAX_RATE_LIMIT_EVENT_PAGE_SIZE)
-
-    page = (start_row // page_size) + 1
-    offset_within_page = start_row - ((page - 1) * page_size)
-    remaining_needed = requested_block
-
-    sort_model = request_data.get("sortModel")
-    if sort_model is None:
-        sort_model = stored_state.get("sort_model") if stored_state else []
-    sort_model = list(sort_model or [])
-
-    sort_sql = build_sort_clause(sort_model, allowed_columns=("occurred_at",))
-    table_state = build_table_state(sort_model, {}, sort_sql, None)
-    table_state["page_size"] = page_size
-
-    combined_events: list[dict[str, Any]] = []
-    seen_identifiers: set[str] = set()
-    total_row_count: int | None = None
-    current_page = page
-    is_first_page = True
-    last_raw_count = 0
-    serial_counter = 0
-
-    while remaining_needed > 0:
-        params = {
-            "page": current_page,
-            "per_page": page_size,
-            "include_active": "true",
-        }
-        if sort_sql:
-            params["sort"] = sort_sql
-
-        try:
-            response = make_authenticated_request(
-                RATE_LIMIT_EVENTS_ENDPOINT,
-                token,
-                params=params,
-                timeout=10,
-            )
-        except Exception as exc:  # pragma: no cover - defensive guard
-            logger.exception("Error fetching rate limit events: %s", exc)
-            combined_events = []
-            total_row_count = 0
-            break
-
-        if response.status_code != 200:
-            logger.warning("Failed to fetch rate limit events: status %s", response.status_code)
-            combined_events = []
-            total_row_count = 0
-            break
-
-        try:
-            payload = response.json()
-        except ValueError:
-            payload = {}
-
-        data_section = payload.get("data") if isinstance(payload, dict) else payload
-        events_page_raw, total_candidate = _extract_rate_limit_events(data_section)
-
-        if total_candidate is not None:
-            total_row_count = (
-                max(total_row_count or 0, int(total_candidate))
-                if total_row_count is not None
-                else int(total_candidate)
-            )
-
-        last_raw_count = len(events_page_raw)
-        if not events_page_raw:
-            break
-
-        if is_first_page and offset_within_page:
-            if offset_within_page >= last_raw_count:
-                events_page = []
-            else:
-                events_page = events_page_raw[offset_within_page:]
-            offset_within_page = 0
-        else:
-            events_page = events_page_raw
-
-        if not events_page:
-            if last_raw_count < page_size:
-                break
-            current_page += 1
-            is_first_page = False
-            continue
-
-        filtered_events: list[dict[str, Any]] = []
-        for event in events_page:
-            if not isinstance(event, dict):
-                continue
-            unique_id: str | None = None
-
-            event_id = event.get("id")
-            if event_id not in (None, ""):
-                unique_id = str(event_id)
-            else:
-                limit_key = event.get("limit_key")
-                occurred_at = event.get("occurred_at")
-                if limit_key not in (None, "") and occurred_at not in (None, ""):
-                    unique_id = f"{limit_key}:{occurred_at}"
-                else:
-                    identifier = event.get("identifier")
-                    if identifier not in (None, "") and occurred_at not in (None, ""):
-                        unique_id = f"{identifier}:{occurred_at}"
-                    elif occurred_at not in (None, ""):
-                        unique_id = str(occurred_at)
-                    elif limit_key not in (None, ""):
-                        unique_id = str(limit_key)
-
-            if unique_id is None:
-                unique_id = f"event-{current_page}-{serial_counter}"
-            serial_counter += 1
-            if unique_id in seen_identifiers:
-                continue
-            seen_identifiers.add(unique_id)
-            filtered_events.append(event)
-
-        if not filtered_events:
-            if last_raw_count < page_size:
-                break
-            current_page += 1
-            is_first_page = False
-            continue
-
-        take = min(len(filtered_events), remaining_needed)
-        combined_events.extend(filtered_events[:take])
-        remaining_needed -= take
-
-        if remaining_needed <= 0:
-            break
-
-        if last_raw_count < page_size:
-            break
-
-        current_page += 1
-        is_first_page = False
-
-    rows = _format_combined_rate_limit_rows(combined_events, user_timezone)
-
-    produced_rows = len(rows)
-    minimal_total = start_row + produced_rows
-
-    if total_row_count is None:
-        if remaining_needed <= 0 and last_raw_count == page_size:
-            total_row_count = minimal_total + page_size
-        else:
-            total_row_count = minimal_total
-    else:
-        if total_row_count < minimal_total:
-            total_row_count = minimal_total
-
-    if total_row_count and start_row >= total_row_count:
-        return {"rowData": [], "rowCount": total_row_count}, table_state, total_row_count
-
-    return {"rowData": rows, "rowCount": total_row_count}, table_state, total_row_count
+    return {"rowData": rows, "rowCount": total_rows}, table_state, total_rows
 
 
 def register_callbacks(app):
@@ -1468,14 +1423,14 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                no_update,
                 rate_limit_data,
             )
 
         try:
             # Make API call to reset specific rate limit
+            encoded_key = url_quote(str(limit_key), safe="")
             resp = make_authenticated_request(
-                f"/rate-limit/reset/{limit_key}", token, method="POST", json={}
+                f"/rate-limit/reset/{encoded_key}", token, method="POST", json={}
             )
 
             should_refresh_grid = resp.status_code in (200, 404)
