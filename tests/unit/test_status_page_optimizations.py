@@ -507,10 +507,14 @@ class TestOptimizedStatusCallbacks:
             patch(
                 "trendsearth_ui.callbacks.status.create_execution_statistics_chart"
             ) as mock_exec_chart,
+            patch(
+                "trendsearth_ui.callbacks.status.create_script_version_histogram"
+            ) as mock_version_chart,
         ):
             mock_map.return_value = "map"
             mock_user_chart.return_value = ["user_chart"]
             mock_exec_chart.return_value = ["exec_chart"]
+            mock_version_chart.return_value = ["version_chart"]
 
             time_series_data = []
             stats_cards, user_map, additional_charts = _build_stats_components(
@@ -520,7 +524,7 @@ class TestOptimizedStatusCallbacks:
             # Verify components were created
             assert isinstance(stats_cards, html.Div)
             assert user_map == "map"
-            assert len(additional_charts) == 2  # user + exec charts
+            assert len(additional_charts) == 3  # exec + user + version charts
 
             # Verify scripts count was added
             latest_status = status_data["latest_status"]

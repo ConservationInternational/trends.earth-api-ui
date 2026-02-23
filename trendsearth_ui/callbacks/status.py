@@ -9,6 +9,8 @@ from dash import Input, Output, State, callback_context, dcc, html, no_update
 from ..config import STATUS_REFRESH_INTERVAL
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
+    create_script_version_histogram,
+    create_top_users_chart,
     create_user_geographic_map,
     create_user_statistics_chart,
 )
@@ -589,18 +591,29 @@ def _build_stats_components(
         time_series_data.get("data") if isinstance(time_series_data, dict) else time_series_data
     )
 
-    additional_charts = create_execution_statistics_chart(
-        execution_stats,
-        status_time_series,
-        title_suffix="",
-        user_timezone=user_timezone,
-        ui_period=ui_period,
-    ) + create_user_statistics_chart(
-        user_stats,
-        title_suffix="",
-        user_timezone=user_timezone,
-        status_time_series=status_time_series,
-        ui_period=ui_period,
+    additional_charts = (
+        create_execution_statistics_chart(
+            execution_stats,
+            status_time_series,
+            title_suffix="",
+            user_timezone=user_timezone,
+            ui_period=ui_period,
+        )
+        + create_script_version_histogram(
+            execution_stats,
+            title_suffix="",
+        )
+        + create_top_users_chart(
+            execution_stats,
+            title_suffix="",
+        )
+        + create_user_statistics_chart(
+            user_stats,
+            title_suffix="",
+            user_timezone=user_timezone,
+            status_time_series=status_time_series,
+            ui_period=ui_period,
+        )
     )
 
     return stats_cards, user_map, additional_charts

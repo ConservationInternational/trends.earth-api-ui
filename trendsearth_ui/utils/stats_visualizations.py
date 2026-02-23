@@ -923,7 +923,7 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6(f"Execution performance{suffix_label}"),
+                            html.H6(f"Execution count{suffix_label}"),
                             dcc.Graph(
                                 figure=fig_tasks,
                                 config={"displayModeBar": False, "responsive": True},
@@ -980,104 +980,76 @@ def create_execution_statistics_chart(
                     )
                 )
 
-                fig_combined = go.Figure()
-
-                fig_combined.add_trace(
-                    go.Scatter(
-                        x=durations,
-                        y=execution_counts,
-                        mode="markers+text",
-                        text=task_names,
-                        textposition="top center",
-                        hovertemplate="<b>%{text}</b><br>Duration: %{x:.1f} minutes<br>Executions: %{y}<br>Success Rate: %{customdata}%<extra></extra>",
-                        customdata=success_rates,
-                        marker={
-                            "size": [max(8, min(20, count / 2)) for count in execution_counts],
-                            "color": success_rates,
-                            "colorscale": "Plasma",
-                            "showscale": True,
-                            "colorbar": {
-                                "title": {"text": "Success Rate (%)", "side": "right"},
-                                "thickness": 15,
-                                "len": 0.8,
-                            },
-                        },
-                    )
-                )
-
-                fig_combined.update_layout(
-                    xaxis_title="Average Duration (minutes)",
-                    yaxis_title="Total Executions",
-                    height=400,
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                    showlegend=False,
-                )
-
-                charts.append(
-                    html.Div(
-                        [
-                            html.H6(f"Execution outcome vs duration{suffix_label}"),
-                            html.P(
-                                "Bubble size indicates execution count, color indicates success rate.",
-                                className="text-muted small mb-2",
-                            ),
-                            dcc.Graph(
-                                figure=fig_combined,
-                                config={"displayModeBar": False, "responsive": True},
-                            ),
-                        ],
-                        className="mb-3",
-                    )
-                )
-
-        # 4. Top Users (instead of task types)
-        # API has 'top_users' instead of 'task_types'
-        top_users_data = data.get("top_users", [])
-        if top_users_data and isinstance(top_users_data, list):
-            # Extract user data for chart
-            user_names = []
-            execution_counts = []
-
-            for user_data in top_users_data[:10]:  # Top 10 users
-                if isinstance(user_data, dict):
-                    name = user_data.get("name", user_data.get("email", "Unknown"))
-                    count = user_data.get("execution_count", user_data.get("count", 0))
-                    user_names.append(name)
-                    execution_counts.append(count)
-
-            if user_names and execution_counts:
-                # Create horizontal bar chart for top users
-                fig_users = go.Figure(
-                    data=[
-                        go.Bar(
-                            x=execution_counts,
-                            y=user_names,
-                            orientation="h",
-                            hovertemplate="<b>%{y}</b><br>Executions: %{x}<extra></extra>",
+                # Top 10 scripts by failure count with failure-rate bars
+                failure_entries: list[dict[str, Any]] = []
+                for task in task_performance_data:
+                    if not isinstance(task, dict):
+                        continue
+                    total = task.get("total_executions", 0) or 0
+                    rate = task.get("success_rate", 100)
+                    try:
+                        failure_rate = round(100 - float(rate), 1)
+                    except (ValueError, TypeError):
+                        failure_rate = 0.0
+                    failures = round(total * failure_rate / 100)
+                    if failures > 0:
+                        failure_entries.append(
+                            {
+                                "task": task.get("task", "Unknown"),
+                                "failure_rate": failure_rate,
+                                "failures": failures,
+                                "total": total,
+                            }
                         )
-                    ]
-                )
 
-                fig_users.update_layout(
-                    xaxis_title="Number of Executions",
-                    height=max(
-                        300, len(user_names) * 30
-                    ),  # Dynamic height based on number of users
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                )
+                if failure_entries:
+                    failure_entries.sort(key=lambda e: e["failures"], reverse=True)
+                    top_failures = failure_entries[:10]
+                    # Reverse so largest is at top of horizontal bar chart
+                    top_failures.reverse()
 
-                charts.append(
-                    html.Div(
-                        [
-                            html.H6(f"Top Users by Activity{suffix_label}"),
-                            dcc.Graph(
-                                figure=fig_users,
-                                config={"displayModeBar": False, "responsive": True},
-                            ),
-                        ],
-                        className="mb-3",
+                    fig_failure = go.Figure(
+                        data=[
+                            go.Bar(
+                                x=[e["failure_rate"] for e in top_failures],
+                                y=[e["task"] for e in top_failures],
+                                orientation="h",
+                                marker_color="#e53935",
+                                hovertemplate=(
+                                    "<b>%{y}</b><br>"
+                                    "Failure rate: %{x:.1f}%<br>"
+                                    "Failures: %{customdata[0]}<br>"
+                                    "Total: %{customdata[1]}"
+                                    "<extra></extra>"
+                                ),
+                                customdata=[[e["failures"], e["total"]] for e in top_failures],
+                            )
+                        ]
                     )
-                )
+
+                    fig_failure.update_layout(
+                        xaxis_title="Failure Rate (%)",
+                        xaxis={"range": [0, 100]},
+                        height=max(300, len(top_failures) * 30),
+                        margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                        template="plotly_white",
+                    )
+
+                    charts.append(
+                        html.Div(
+                            [
+                                html.H6(f"Top scripts by failure count{suffix_label}"),
+                                dcc.Graph(
+                                    figure=fig_failure,
+                                    config={
+                                        "displayModeBar": False,
+                                        "responsive": True,
+                                    },
+                                ),
+                            ],
+                            className="mb-3",
+                        )
+                    )
 
         return (
             charts
@@ -1114,6 +1086,252 @@ def create_execution_statistics_chart(
         ]
 
 
+def create_top_users_chart(
+    execution_stats_data: dict | None,
+    title_suffix: str = "",
+) -> list:
+    """Create a horizontal bar chart of the top users by execution count.
+
+    Args:
+        execution_stats_data: Execution statistics dict as returned by the API
+            (expects ``data.top_users``).
+        title_suffix: Optional label appended to the chart title.
+
+    Returns:
+        list: Dash component(s) containing the chart, or an empty list.
+    """
+    suffix_label = f" ({title_suffix})" if title_suffix else ""
+
+    if not execution_stats_data or not isinstance(execution_stats_data, dict):
+        return []
+    if execution_stats_data.get("error"):
+        return []
+
+    data = execution_stats_data.get("data", {})
+    top_users_data = data.get("top_users", []) if isinstance(data, dict) else []
+    if not top_users_data or not isinstance(top_users_data, list):
+        return []
+
+    user_names = []
+    execution_counts = []
+    for user_data in top_users_data[:10]:
+        if isinstance(user_data, dict):
+            name = user_data.get("name", user_data.get("email", "Unknown"))
+            count = user_data.get("execution_count", user_data.get("count", 0))
+            user_names.append(name)
+            execution_counts.append(count)
+
+    if not user_names or not execution_counts:
+        return []
+
+    fig_users = go.Figure(
+        data=[
+            go.Bar(
+                x=execution_counts,
+                y=user_names,
+                orientation="h",
+                hovertemplate="<b>%{y}</b><br>Executions: %{x}<extra></extra>",
+            )
+        ]
+    )
+    fig_users.update_layout(
+        xaxis_title="Number of Executions",
+        height=max(300, len(user_names) * 30),
+        margin={"l": 40, "r": 40, "t": 40, "b": 40},
+    )
+
+    return [
+        html.Div(
+            [
+                html.H6(f"Top users by activity{suffix_label}"),
+                dcc.Graph(
+                    figure=fig_users,
+                    config={"displayModeBar": False, "responsive": True},
+                ),
+            ],
+            className="mb-3",
+        )
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Regex for extracting a version from a script slug or name.
+#
+# Matches patterns like:
+#   "productivity-v2.1.0"  → "2.1.0"
+#   "land_cover_1_2_3"     → "1.2.3"  (trailing _X_Y_Z)
+#   "script-v10.0"         → "10.0"
+#
+def _parse_script_version(name: str) -> str | None:
+    """Extract a dotted version string from a task name.
+
+    Handles trailing dash-separated digit groups, e.g.
+    ``time-series-2-2-2`` → ``2.2.2``.
+
+    Returns the version as a dotted string or *None* if no version pattern is
+    found.
+    """
+    if not name:
+        return None
+
+    parts = name.split("-")
+    version_parts: list[str] = []
+    for part in reversed(parts):
+        if part.isdigit():
+            version_parts.append(part)
+        else:
+            break
+    if len(version_parts) >= 2:
+        version_parts.reverse()
+        return ".".join(version_parts)
+
+    return None
+
+
+def create_script_version_histogram(
+    execution_stats_data: dict | None,
+    title_suffix: str = "",
+) -> list:
+    """Create a histogram of execution script versions from task performance data.
+
+    Parses version strings from the ``task`` field in ``task_performance``
+    entries (already filtered by the user's selected time period) and weights
+    each version by its ``total_executions`` count.
+
+    Args:
+        execution_stats_data: Execution statistics dict as returned by the API
+            (expects ``data.task_performance`` with ``task`` and
+            ``total_executions`` fields).
+        title_suffix: Optional label appended to the chart title.
+
+    Returns:
+        list: Dash component(s) containing the histogram chart.
+    """
+    _logger = logging.getLogger(__name__)
+
+    suffix_label = f" ({title_suffix})" if title_suffix else ""
+
+    if not execution_stats_data or not isinstance(execution_stats_data, dict):
+        return [
+            _build_message_block(
+                "No script version data available.",
+                detail="Execution statistics were not provided.",
+            )
+        ]
+
+    if execution_stats_data.get("error"):
+        return []  # Execution chart already shows the error
+
+    data = execution_stats_data.get("data", {})
+    task_performance = data.get("task_performance", []) if isinstance(data, dict) else []
+
+    if not task_performance:
+        return [
+            _build_message_block(
+                "No script version data available.",
+                detail="No task performance data for the selected period.",
+            )
+        ]
+
+    try:
+        version_executions: dict[str, int] = {}
+        unparsed_executions = 0
+        total_tasks = 0
+
+        for entry in task_performance:
+            if not isinstance(entry, dict):
+                continue
+            total_tasks += 1
+            task = entry.get("task", "") or ""
+            executions = int(entry.get("total_executions", 0))
+
+            version = _parse_script_version(task)
+            if version:
+                version_executions[version] = version_executions.get(version, 0) + executions
+            else:
+                unparsed_executions += executions
+
+        if not version_executions:
+            return [
+                _build_message_block(
+                    "No version information found in script names.",
+                    detail=(
+                        f"Examined {total_tasks} scripts but could not parse "
+                        f"a version from any slug."
+                    ),
+                )
+            ]
+
+        # Sort versions using tuple comparison for natural ordering
+        def _version_sort_key(v: str):
+            try:
+                return tuple(int(p) for p in v.split("."))
+            except ValueError:
+                return (0,)
+
+        sorted_versions = sorted(version_executions.keys(), key=_version_sort_key)
+        counts = [version_executions[v] for v in sorted_versions]
+
+        fig = go.Figure(
+            data=[
+                go.Bar(
+                    x=sorted_versions,
+                    y=counts,
+                    marker_color="#1e88e5",
+                    hovertemplate=("<b>Version %{x}</b><br>Executions: %{y}<extra></extra>"),
+                )
+            ]
+        )
+
+        fig.update_layout(
+            xaxis_title="Script Version",
+            yaxis_title="Number of Executions",
+            height=360,
+            margin={"l": 40, "r": 40, "t": 40, "b": 40},
+            template="plotly_white",
+            bargap=0.15,
+        )
+
+        total_execs = sum(counts)
+        detail_parts = [f"{len(version_executions)} distinct versions, {total_execs:,} executions"]
+        if unparsed_executions:
+            detail_parts.append(
+                f"{unparsed_executions:,} executions from scripts with no parseable version"
+            )
+
+        return [
+            html.Div(
+                [
+                    html.H6(f"Execution script version distribution{suffix_label}"),
+                    html.P(
+                        "; ".join(detail_parts) + ".",
+                        className="text-muted small mb-2",
+                    ),
+                    dcc.Graph(
+                        figure=fig,
+                        config={"displayModeBar": False, "responsive": True},
+                    ),
+                ],
+                className="mb-3",
+            )
+        ]
+
+    except Exception as e:
+        _logger.error(f"Error creating script version histogram: {e}")
+        return [
+            html.Div(
+                [
+                    html.P(
+                        "Error creating script version histogram.",
+                        className="text-danger text-center",
+                    ),
+                    html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
+                ],
+                className="p-4",
+            )
+        ]
+
+
 def create_user_statistics_chart(
     user_stats_data,
     title_suffix="",
@@ -1140,7 +1358,7 @@ def create_user_statistics_chart(
     suffix_label = f" ({title_suffix})" if title_suffix else ""
     target_freq = {
         "day": "15min",
-        "week": "1H",
+        "week": "1h",
         "month": "1D",
     }.get(ui_period or "")
 
@@ -1433,7 +1651,7 @@ def create_user_statistics_chart(
                     charts.append(
                         html.Div(
                             [
-                                html.H6(f"Top Countries{suffix_label}"),
+                                html.H6(f"Top countries{suffix_label}"),
                                 dcc.Graph(
                                     figure=fig_countries,
                                     config={"displayModeBar": False, "responsive": True},
