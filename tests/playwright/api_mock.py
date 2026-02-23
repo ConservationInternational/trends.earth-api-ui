@@ -355,7 +355,7 @@ class APIRouteHandler:
             route.fulfill(json={"error": "Status fetch failed", "message": str(e)}, status=500)
 
     def handle_user_endpoint(self, route: Route):
-        """Handle /api/v1/user endpoint (fallback for user info)."""
+        """Handle /api/v1/user endpoint (admin list users)."""
         try:
             # Check authorization header
             auth_header = route.request.headers.get("authorization", "")
@@ -367,7 +367,7 @@ class APIRouteHandler:
                 return
 
             if self.authenticated:
-                # Return user data in array format (as expected by fallback code)
+                # Return user data in array format (admin list endpoint)
                 user_data = create_mock_user_me_response(self.current_user_role)["data"]
                 response = {"data": [user_data]}
                 route.fulfill(json=response, status=200)
@@ -403,7 +403,7 @@ def setup_api_mocking(page, user_role: str = "ADMIN"):
 
     # API data endpoints
     page.route("**/api/v1/user/me", handler.handle_user_me)
-    page.route("**/api/v1/user", handler.handle_user_endpoint)  # Fallback endpoint
+    page.route("**/api/v1/user", handler.handle_user_endpoint)  # Admin list users endpoint
     page.route("**/api/v1/executions**", handler.handle_executions)
     page.route("**/api/v1/scripts**", handler.handle_scripts)
     page.route("**/api/v1/users**", handler.handle_users)

@@ -96,29 +96,6 @@ def get_user_info(token, api_base=None):
         else:
             logger.debug("get_user_info: /user/me failed with status %s", resp.status_code)
 
-        # Try /user endpoint as fallback
-        user_url = f"{base_url}/user"
-        logger.debug("get_user_info: Attempting fallback GET request to %s", user_url)
-
-        resp = get_session().get(user_url, headers=headers, timeout=10)
-        logger.debug("get_user_info: /user response status: %s", resp.status_code)
-
-        if resp.status_code == 200:
-            try:
-                response_json = resp.json()
-                users = response_json.get("data", [])
-
-                if users and isinstance(users, list) and len(users) > 0:
-                    user_data = users[0]
-                    logger.debug("get_user_info: Successfully retrieved user data from /user")
-                    return user_data
-                else:
-                    logger.debug("get_user_info: /user returned empty or invalid users array")
-            except ValueError as e:
-                logger.debug("get_user_info: Failed to parse /user JSON response: %s", e)
-        else:
-            logger.debug("get_user_info: /user failed with status %s", resp.status_code)
-
     except requests.exceptions.Timeout:
         logger.debug("get_user_info: Timeout occurred while fetching user info")
         return None
@@ -306,8 +283,15 @@ def make_authenticated_request(
     resp = getattr(session, method.lower())(full_url, **kwargs)
 
     # If authentication failed, try to refresh the token and retry
-    # Look for 401 Unauthorized or 422 with signature-related errors
-    if resp.status_code in [401, 422] and "signature" in resp.text.lower():
+    # Look for 401 Unauthorized or 422 with token-related errors
+    # (signature verification failure, revoked tokens, expired tokens)
+    resp_text_lower = resp.text.lower()
+    if resp.status_code in [401, 422] and (
+        "signature" in resp_text_lower
+        or "revoked" in resp_text_lower
+        or "expired" in resp_text_lower
+        or "token" in resp_text_lower
+    ):
         import json
 
         from flask import request
