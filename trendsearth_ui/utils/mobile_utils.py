@@ -104,6 +104,8 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "end_date",
                     "resizable": True,
+                    "sort": "desc",
+                    "sortIndex": 0,
                 },
                 {
                     "headerName": "Duration",
