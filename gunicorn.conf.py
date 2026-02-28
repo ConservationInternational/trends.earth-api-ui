@@ -1,5 +1,7 @@
 # Gunicorn configuration file for Trends.Earth UI
 
+import multiprocessing as _mp
+
 # Server socket
 bind = "0.0.0.0:8000"
 backlog = 2048
@@ -13,9 +15,10 @@ worker_connections = 1000
 timeout = 120
 keepalive = 2
 
-# Restart workers after this many requests, with up to 50% jitter
-max_requests = 1000
-max_requests_jitter = 50
+# Restart the worker after this many requests to guard against memory leaks.
+# Jitter is pointless with workers=1.
+max_requests = 10000
+max_requests_jitter = 0
 
 # Logging
 loglevel = "info"
@@ -44,6 +47,13 @@ module = "trendsearth_ui.app:server"
 # ---------------------------------------------------------------------------
 # Rollbar integration – report worker-level errors that never reach Flask
 # ---------------------------------------------------------------------------
+
+# Shared-memory int visible to both master and forked workers (backed by
+# mmap, so writes in one process are immediately visible in the other).
+# Stores the PID of the last worker that exited gracefully.  The master's
+# child_exit hook compares this to the dead worker's PID to distinguish
+# routine max_requests restarts from genuine crashes (OOM, SIGKILL, etc.).
+_graceful_exit_pid = _mp.Value("i", 0)
 
 
 def _init_rollbar():
@@ -74,19 +84,34 @@ def post_fork(server, worker):  # noqa: ARG001
 
 
 def worker_exit(server, worker):  # noqa: ARG001
-    """Called when a Gunicorn worker is shutting down."""
+    """Called in the *worker* process during graceful shutdown.
+
+    Fires for normal exits (max_requests restart, SIGTERM, etc.) but NOT
+    when the worker is killed by the OS (OOM, SIGKILL).
+    """
     import logging
 
-    logger = logging.getLogger("trendsearth_ui")
-    logger.warning("Gunicorn worker %s exiting", worker.pid)
+    logging.getLogger("trendsearth_ui").info("Gunicorn worker %s exiting gracefully", worker.pid)
+    _graceful_exit_pid.value = worker.pid
 
 
 def child_exit(server, worker):  # noqa: ARG001
-    """Called in the master when a worker process exits unexpectedly."""
+    """Called in the *master* when a worker process exits.
+
+    Only report to Rollbar when the exit was genuinely unexpected
+    (worker_exit never ran → shared value was never set to this PID).
+    """
     import logging
     import os
 
     logger = logging.getLogger("trendsearth_ui")
+
+    if _graceful_exit_pid.value == worker.pid:
+        _graceful_exit_pid.value = 0
+        logger.info("Gunicorn worker %s restarted (max_requests or shutdown)", worker.pid)
+        return
+
+    # Truly unexpected death (OOM kill, segfault, unhandled signal, …)
     logger.error("Gunicorn worker %s died unexpectedly", worker.pid)
 
     token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
