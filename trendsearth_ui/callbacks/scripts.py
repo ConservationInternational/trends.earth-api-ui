@@ -13,7 +13,7 @@ from ..utils.helpers import make_authenticated_request
 logger = logging.getLogger(__name__)
 
 SCRIPT_ENDPOINT = "/script"
-SCRIPT_INCLUDE_FIELDS = "user_name,access_control"
+SCRIPT_INCLUDE_FIELDS = "user_name,user_email,access_control,environment"
 DATE_COLUMNS = ("start_date", "end_date", "created_at", "updated_at")
 
 # Must match the API's SCRIPT_ALLOWED_FILTER_FIELDS / SORT_FIELDS

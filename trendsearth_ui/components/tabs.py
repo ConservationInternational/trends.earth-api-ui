@@ -765,6 +765,290 @@ def profile_tab_content(user_data):
                 ],
                 className="mb-4",
             ),
+            # Service Credentials Section
+            dbc.Card(
+                [
+                    dbc.CardHeader(html.H4("Service Credentials")),
+                    dbc.CardBody(
+                        [
+                            html.P(
+                                "Service credentials allow external applications to authenticate "
+                                "with the Trends.Earth API using the OAuth2 client credentials grant. "
+                                "The client secret is shown only once at creation time.",
+                                className="text-muted",
+                            ),
+                            # Credentials table
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-sync-alt me-2"),
+                                                    "Refresh",
+                                                ],
+                                                id="service-creds-refresh-btn",
+                                                color="secondary",
+                                                outline=True,
+                                                size="sm",
+                                                className="mb-2",
+                                            ),
+                                        ],
+                                        width="auto",
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-plus me-2"),
+                                                    "New Credential",
+                                                ],
+                                                id="service-creds-create-btn",
+                                                color="primary",
+                                                size="sm",
+                                                className="mb-2",
+                                            ),
+                                        ],
+                                        width="auto",
+                                    ),
+                                ],
+                                className="mb-2",
+                            ),
+                            html.Div(id="service-creds-table-container"),
+                            dbc.Alert(
+                                id="service-creds-alert",
+                                is_open=False,
+                                dismissable=True,
+                                className="mt-2",
+                            ),
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            # Create Credential Modal
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Create Service Credential"),
+                        close_button=True,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            dbc.Form(
+                                [
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Name *"),
+                                                    dbc.Input(
+                                                        id="service-creds-name-input",
+                                                        type="text",
+                                                        placeholder="e.g. My CLI Tool",
+                                                    ),
+                                                    dbc.FormText(
+                                                        "A descriptive label for this credential."
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Scopes"),
+                                                    dbc.Input(
+                                                        id="service-creds-scopes-input",
+                                                        type="text",
+                                                        placeholder="Leave blank for full access",
+                                                    ),
+                                                    dbc.FormText(
+                                                        "Space-delimited OAuth2 scopes (optional)."
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Expires in Days"),
+                                                    dbc.Input(
+                                                        id="service-creds-expires-input",
+                                                        type="number",
+                                                        placeholder="Leave blank for no expiry",
+                                                        min=1,
+                                                    ),
+                                                    dbc.FormText(
+                                                        "Optional. Credential will expire after this many days."
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                ]
+                            ),
+                            dbc.Alert(
+                                id="service-creds-create-alert",
+                                is_open=False,
+                                dismissable=True,
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button(
+                                "Cancel",
+                                id="service-creds-create-cancel-btn",
+                                color="secondary",
+                                outline=True,
+                            ),
+                            dbc.Button(
+                                "Create",
+                                id="service-creds-create-confirm-btn",
+                                color="primary",
+                            ),
+                        ]
+                    ),
+                ],
+                id="service-creds-create-modal",
+                is_open=False,
+                centered=True,
+            ),
+            # New Credential Secret Modal (one-time display)
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Credential Created — Save Your Secret"),
+                        close_button=False,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            dbc.Alert(
+                                [
+                                    html.I(className="fas fa-exclamation-triangle me-2"),
+                                    html.Strong("Important: "),
+                                    "Copy your client secret now. It will not be shown again.",
+                                ],
+                                color="warning",
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Client ID"),
+                                            dbc.Input(
+                                                id="service-creds-new-client-id",
+                                                type="text",
+                                                readonly=True,
+                                                className="font-monospace",
+                                            ),
+                                        ],
+                                        width=12,
+                                        className="mb-3",
+                                    ),
+                                ]
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Client Secret"),
+                                            dbc.InputGroup(
+                                                [
+                                                    dbc.Input(
+                                                        id="service-creds-new-secret",
+                                                        type="text",
+                                                        readonly=True,
+                                                        className="font-monospace",
+                                                    ),
+                                                    dbc.Button(
+                                                        html.I(className="fas fa-copy"),
+                                                        id="service-creds-copy-secret-btn",
+                                                        color="secondary",
+                                                        outline=True,
+                                                        title="Copy to clipboard",
+                                                    ),
+                                                ]
+                                            ),
+                                            dbc.FormText(
+                                                "Store this secret securely — it cannot be retrieved after closing this dialog."
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button(
+                                "I've saved my secret — Close",
+                                id="service-creds-secret-close-btn",
+                                color="success",
+                            ),
+                        ]
+                    ),
+                ],
+                id="service-creds-secret-modal",
+                is_open=False,
+                centered=True,
+                backdrop="static",
+            ),
+            # Revoke Confirmation Modal
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        dbc.ModalTitle("Revoke Service Credential"),
+                        close_button=True,
+                    ),
+                    dbc.ModalBody(
+                        [
+                            html.P("Are you sure you want to revoke this credential?"),
+                            html.P(
+                                id="service-creds-revoke-name",
+                                className="fw-bold",
+                            ),
+                            html.P(
+                                "Revoked credentials cannot be used to obtain new access tokens. "
+                                "This action cannot be undone.",
+                                className="text-muted",
+                            ),
+                        ]
+                    ),
+                    dbc.ModalFooter(
+                        [
+                            dbc.Button(
+                                "Cancel",
+                                id="service-creds-revoke-cancel-btn",
+                                color="secondary",
+                                outline=True,
+                            ),
+                            dbc.Button(
+                                "Revoke",
+                                id="service-creds-revoke-confirm-btn",
+                                color="danger",
+                            ),
+                        ]
+                    ),
+                ],
+                id="service-creds-revoke-modal",
+                is_open=False,
+                centered=True,
+            ),
+            # Hidden store for revoke target
+            dcc.Store(id="service-creds-revoke-target", data=None),
             dbc.Card(
                 [
                     dbc.CardHeader(html.H4("Change Password")),
