@@ -113,7 +113,35 @@ def _build_credentials_table(clients):
 def register_callbacks(app):
     """Register service credentials callbacks."""
 
-    @app.callback(
+    # Mutual exclusion between "all" and specific scopes.
+    # Implemented as a clientside callback so it runs synchronously in
+    # the browser and avoids circular-callback issues with Dash.
+    app.clientside_callback(
+        """
+        function(newValue, prev) {
+            var nu = window.dash_clientside.no_update;
+            if (!newValue || newValue.length === 0) {
+                return [nu, prev || []];
+            }
+
+            var hasAll = newValue.includes("all");
+            var specific = newValue.filter(function(s) { return s !== "all"; });
+
+            if (hasAll && specific.length > 0) {
+                var prevHadAll = Array.isArray(prev) && prev.includes("all");
+                if (prevHadAll) {
+                    // "all" was already selected — user added a specific scope
+                    return [specific, specific];
+                } else {
+                    // user just ticked "all" — clear everything else
+                    return [["all"], ["all"]];
+                }
+            }
+
+            // No conflict — keep the store in sync
+            return [nu, newValue];
+        }
+        """,
         [
             Output("service-creds-scopes-input", "value", allow_duplicate=True),
             Output("service-creds-scopes-prev", "data"),
@@ -122,34 +150,6 @@ def register_callbacks(app):
         State("service-creds-scopes-prev", "data"),
         prevent_initial_call=True,
     )
-    def enforce_scope_mutual_exclusion(new_value, prev):
-        """Ensure 'all' is mutually exclusive with specific scopes.
-
-        If the user just checked 'all', remove every other scope.
-        If the user just checked a specific scope while 'all' is
-        selected, remove 'all'.
-
-        Uses a hidden ``dcc.Store`` (service-creds-scopes-prev) to
-        remember the last settled value so we can detect *which*
-        checkbox was toggled.
-        """
-        if not new_value:
-            return no_update, no_update
-
-        has_all = "all" in new_value
-        specific = [s for s in new_value if s != "all"]
-
-        if has_all and specific:
-            prev_had_all = prev and "all" in prev
-            if prev_had_all:
-                # "all" was already selected → user added a specific scope
-                return specific, specific
-            else:
-                # user just ticked "all" → clear everything else
-                return ["all"], ["all"]
-
-        # No conflict — just keep the store in sync
-        return no_update, new_value
 
     @app.callback(
         Output("service-creds-table-container", "children"),
