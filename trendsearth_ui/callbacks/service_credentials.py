@@ -211,8 +211,10 @@ def register_callbacks(app):
             )
 
         body = {"name": name.strip()}
-        if scopes and scopes.strip():
-            body["scopes"] = scopes.strip()
+        if scopes and isinstance(scopes, list) and len(scopes) > 0:
+            body["scopes"] = " ".join(scopes)
+        else:
+            body["scopes"] = "all"
         if expires_in_days is not None:
             try:
                 days = int(expires_in_days)
@@ -248,7 +250,17 @@ def register_callbacks(app):
                 client_id = data.get("client_id", "")
                 client_secret = data.get("client_secret", "")
                 # Clear form and open secret modal
-                return client_id, client_secret, True, no_update, no_update, False, "", "", None
+                return (
+                    client_id,
+                    client_secret,
+                    True,
+                    no_update,
+                    no_update,
+                    False,
+                    "",
+                    ["all"],
+                    None,
+                )
             else:
                 error_msg = _extract_error_msg(resp, "Failed to create credential.")
                 return (

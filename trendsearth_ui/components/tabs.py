@@ -861,13 +861,61 @@ def profile_tab_content(user_data):
                                             dbc.Col(
                                                 [
                                                     dbc.Label("Scopes"),
-                                                    dbc.Input(
+                                                    dbc.Checklist(
                                                         id="service-creds-scopes-input",
-                                                        type="text",
-                                                        placeholder="Leave blank for full access",
+                                                        options=[
+                                                            {
+                                                                "label": "All (full access)",
+                                                                "value": "all",
+                                                            },
+                                                            {
+                                                                "label": "Execution: Read",
+                                                                "value": "execution:read",
+                                                            },
+                                                            {
+                                                                "label": "Execution: Write",
+                                                                "value": "execution:write",
+                                                            },
+                                                            {
+                                                                "label": "Script: Read",
+                                                                "value": "script:read",
+                                                            },
+                                                            {
+                                                                "label": "Script: Write",
+                                                                "value": "script:write",
+                                                            },
+                                                            {
+                                                                "label": "User: Read",
+                                                                "value": "user:read",
+                                                            },
+                                                            {
+                                                                "label": "User: Write",
+                                                                "value": "user:write",
+                                                            },
+                                                            {
+                                                                "label": "Boundary: Read",
+                                                                "value": "boundary:read",
+                                                            },
+                                                            {
+                                                                "label": "GEE: Read",
+                                                                "value": "gee:read",
+                                                            },
+                                                            {
+                                                                "label": "GEE: Write",
+                                                                "value": "gee:write",
+                                                            },
+                                                            {
+                                                                "label": "Stats: Read",
+                                                                "value": "stats:read",
+                                                            },
+                                                        ],
+                                                        value=["all"],
+                                                        inline=False,
+                                                        className="mt-1",
                                                     ),
                                                     dbc.FormText(
-                                                        "Space-delimited OAuth2 scopes (optional)."
+                                                        "Select scopes to restrict access. "
+                                                        "'All' grants full access."
                                                     ),
                                                 ],
                                                 width=12,
