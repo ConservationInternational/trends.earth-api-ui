@@ -139,12 +139,8 @@ def register_callbacks(app):
             # ticked "all", keep only "all".
             trigger = ctx.triggered
             if trigger:
-                prop_value = trigger[0].get("value", new_value)
-                # Dash sends the full list; compare lengths to infer
-                # whether "all" was the new addition.
-                # Heuristic: if the previous render had "all" in it
-                # (stored in State), the user just added a specific
-                # scope; otherwise they just added "all".
+                # Dash sends the full list; compare with the previous
+                # value to infer whether "all" was the new addition.
                 if _prev and "all" in _prev:
                     # "all" was already checked → user added a specific
                     return specific
