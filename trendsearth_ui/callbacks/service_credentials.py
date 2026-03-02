@@ -114,6 +114,48 @@ def register_callbacks(app):
     """Register service credentials callbacks."""
 
     @app.callback(
+        Output("service-creds-scopes-input", "value", allow_duplicate=True),
+        Input("service-creds-scopes-input", "value"),
+        State("service-creds-scopes-input", "value"),
+        prevent_initial_call=True,
+    )
+    def enforce_scope_mutual_exclusion(new_value, _prev):
+        """Ensure 'all' is mutually exclusive with specific scopes.
+
+        If the user just checked 'all', remove every other scope.
+        If the user just checked a specific scope while 'all' is
+        selected, remove 'all'.
+        """
+        if not new_value:
+            return no_update
+
+        has_all = "all" in new_value
+        specific = [s for s in new_value if s != "all"]
+
+        if has_all and specific:
+            # Figure out which direction the user moved.
+            # If "all" was already selected and they added a specific
+            # scope, keep only the specific scopes.  If they just
+            # ticked "all", keep only "all".
+            trigger = ctx.triggered
+            if trigger:
+                prop_value = trigger[0].get("value", new_value)
+                # Dash sends the full list; compare lengths to infer
+                # whether "all" was the new addition.
+                # Heuristic: if the previous render had "all" in it
+                # (stored in State), the user just added a specific
+                # scope; otherwise they just added "all".
+                if _prev and "all" in _prev:
+                    # "all" was already checked → user added a specific
+                    return specific
+                else:
+                    # user just checked "all"
+                    return ["all"]
+            return ["all"]
+
+        return no_update
+
+    @app.callback(
         Output("service-creds-table-container", "children"),
         [
             Input("token-store", "data"),
@@ -289,15 +331,33 @@ def register_callbacks(app):
             )
 
     @app.callback(
-        Output("service-creds-secret-modal", "is_open", allow_duplicate=True),
+        [
+            Output("service-creds-secret-modal", "is_open", allow_duplicate=True),
+            Output("service-creds-table-container", "children", allow_duplicate=True),
+        ],
         Input("service-creds-secret-close-btn", "n_clicks"),
+        State("token-store", "data"),
         prevent_initial_call=True,
     )
-    def close_secret_modal(n_clicks):
-        """Close the one-time secret modal."""
-        if n_clicks:
-            return False
-        return no_update
+    def close_secret_modal(n_clicks, token):
+        """Close the one-time secret modal and refresh the credentials table."""
+        if not n_clicks:
+            return no_update, no_update
+
+        # Refresh the table so the newly created credential appears
+        table = no_update
+        if token:
+            try:
+                from ..utils.helpers import make_authenticated_request
+
+                resp = make_authenticated_request(SERVICE_CREDS_ENDPOINT, token)
+                if resp.status_code == 200:
+                    clients = resp.json().get("data", [])
+                    table = _build_credentials_table(clients)
+            except Exception as e:
+                logger.exception("Error refreshing credentials after close: %s", e)
+
+        return False, table
 
     @app.callback(
         [
