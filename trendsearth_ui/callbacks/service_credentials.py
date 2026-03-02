@@ -114,42 +114,42 @@ def register_callbacks(app):
     """Register service credentials callbacks."""
 
     @app.callback(
-        Output("service-creds-scopes-input", "value", allow_duplicate=True),
+        [
+            Output("service-creds-scopes-input", "value", allow_duplicate=True),
+            Output("service-creds-scopes-prev", "data"),
+        ],
         Input("service-creds-scopes-input", "value"),
-        State("service-creds-scopes-input", "value"),
+        State("service-creds-scopes-prev", "data"),
         prevent_initial_call=True,
     )
-    def enforce_scope_mutual_exclusion(new_value, _prev):
+    def enforce_scope_mutual_exclusion(new_value, prev):
         """Ensure 'all' is mutually exclusive with specific scopes.
 
         If the user just checked 'all', remove every other scope.
         If the user just checked a specific scope while 'all' is
         selected, remove 'all'.
+
+        Uses a hidden ``dcc.Store`` (service-creds-scopes-prev) to
+        remember the last settled value so we can detect *which*
+        checkbox was toggled.
         """
         if not new_value:
-            return no_update
+            return no_update, no_update
 
         has_all = "all" in new_value
         specific = [s for s in new_value if s != "all"]
 
         if has_all and specific:
-            # Figure out which direction the user moved.
-            # If "all" was already selected and they added a specific
-            # scope, keep only the specific scopes.  If they just
-            # ticked "all", keep only "all".
-            trigger = ctx.triggered
-            if trigger:
-                # Dash sends the full list; compare with the previous
-                # value to infer whether "all" was the new addition.
-                if _prev and "all" in _prev:
-                    # "all" was already checked → user added a specific
-                    return specific
-                else:
-                    # user just checked "all"
-                    return ["all"]
-            return ["all"]
+            prev_had_all = prev and "all" in prev
+            if prev_had_all:
+                # "all" was already selected → user added a specific scope
+                return specific, specific
+            else:
+                # user just ticked "all" → clear everything else
+                return ["all"], ["all"]
 
-        return no_update
+        # No conflict — just keep the store in sync
+        return no_update, new_value
 
     @app.callback(
         Output("service-creds-table-container", "children"),
@@ -210,6 +210,7 @@ def register_callbacks(app):
             Output("service-creds-name-input", "value"),
             Output("service-creds-scopes-input", "value"),
             Output("service-creds-expires-input", "value"),
+            Output("service-creds-scopes-prev", "data", allow_duplicate=True),
         ],
         Input("service-creds-create-confirm-btn", "n_clicks"),
         [
@@ -222,18 +223,20 @@ def register_callbacks(app):
     )
     def create_service_credential(n_clicks, name, scopes, expires_in_days, token):
         """Create a new service credential and show the one-time secret."""
+        _no_change = (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+        )
         if not n_clicks or not token:
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return _no_change
 
         if not name or not name.strip():
             return (
@@ -243,6 +246,7 @@ def register_callbacks(app):
                 "Name is required.",
                 "danger",
                 True,
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -267,6 +271,7 @@ def register_callbacks(app):
                     "Expires in days must be a positive integer.",
                     "danger",
                     True,
+                    no_update,
                     no_update,
                     no_update,
                     no_update,
@@ -298,6 +303,7 @@ def register_callbacks(app):
                     "",
                     ["all"],
                     None,
+                    ["all"],
                 )
             else:
                 error_msg = _extract_error_msg(resp, "Failed to create credential.")
@@ -311,6 +317,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                 )
         except Exception as e:
             logger.exception("Error creating service credential: %s", e)
@@ -321,6 +328,7 @@ def register_callbacks(app):
                 f"Network error: {e}",
                 "danger",
                 True,
+                no_update,
                 no_update,
                 no_update,
                 no_update,

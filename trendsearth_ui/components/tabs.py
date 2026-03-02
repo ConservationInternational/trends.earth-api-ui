@@ -1097,6 +1097,8 @@ def profile_tab_content(user_data):
             ),
             # Hidden store for revoke target
             dcc.Store(id="service-creds-revoke-target", data=None),
+            # Hidden store for scope mutual-exclusion (tracks previous value)
+            dcc.Store(id="service-creds-scopes-prev", data=["all"]),
             dbc.Card(
                 [
                     dbc.CardHeader(html.H4("Change Password")),
