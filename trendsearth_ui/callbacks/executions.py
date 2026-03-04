@@ -106,9 +106,10 @@ def process_execution_data(executions, role, user_timezone):
         row["params"] = "Show Params"
         row["results"] = "Show Results"
         row["logs"] = "Show Logs"
-        # Add docker logs column for admin/superadmin users only
+        # Add docker/batch logs columns for admin/superadmin users only
         if role in ["ADMIN", "SUPERADMIN"]:
             row["docker_logs"] = "Show Docker Logs"
+            row["batch_logs"] = "Show Batch Logs"
         row["map"] = "Show Map"
 
         # Format duration in Hours:Minutes:Seconds format

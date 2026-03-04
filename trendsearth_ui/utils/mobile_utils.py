@@ -9,7 +9,7 @@ TRUNCATED_CELL_STYLE = {
 }
 
 # Fields that are only available to admin/superadmin users
-ADMIN_ONLY_FIELDS = {"user_name", "user_email", "docker_logs"}
+ADMIN_ONLY_FIELDS = {"user_name", "user_email", "docker_logs", "batch_logs"}
 
 
 def create_mobile_detection_components():
@@ -184,6 +184,16 @@ def get_mobile_column_config():
                 {
                     "headerName": "Docker Logs",
                     "field": "docker_logs",
+                    "flex": 1,
+                    "minWidth": 130,
+                    "sortable": False,
+                    "filter": False,
+                    "cellStyle": {"fontSize": "11px", "whiteSpace": "nowrap"},
+                    "resizable": True,
+                },
+                {
+                    "headerName": "Batch Logs",
+                    "field": "batch_logs",
                     "flex": 1,
                     "minWidth": 130,
                     "sortable": False,

@@ -343,7 +343,7 @@ def register_callbacks(app):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         col = cell.get("colId")
-        if col not in ("params", "results", "logs", "docker_logs"):
+        if col not in ("params", "results", "logs", "docker_logs", "batch_logs"):
             return is_open, no_update, no_update, no_update, no_update, no_update, no_update
 
         # Try to get row data from cell click event first
@@ -785,6 +785,167 @@ def register_callbacks(app):
                         "execution_id": execution_id,
                         "type": "execution",
                         "log_type": "docker",
+                        "id": execution_id,
+                        "status": execution_status,
+                        "user_timezone": user_timezone,
+                    },
+                )
+
+            elif col == "batch_logs":
+                # Get execution status from row data for auto-refresh control
+                execution_status = None
+                if row_data:
+                    execution_status = row_data.get("status")
+
+                try:
+                    # For batch logs, use the specific batch logs endpoint with longer timeout
+                    logger.debug("Fetching batch logs for execution %s", execution_id)
+                    resp = make_authenticated_request(
+                        f"/execution/{execution_id}/batch-logs",
+                        token,
+                        timeout=30,  # 30 second timeout for batch logs
+                    )
+                    logger.debug("Batch logs API response: %s", resp.status_code)
+
+                    if resp.status_code == 403:
+                        return (
+                            True,
+                            html.P(
+                                "Access denied. Batch logs are only available to admin and superadmin users."
+                            ),
+                            None,
+                            f"Execution {execution_id} - Batch Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+                    elif resp.status_code == 404:
+                        return (
+                            True,
+                            html.P(
+                                "Batch logs not found for this execution. "
+                                "The execution may not have been run on AWS Batch."
+                            ),
+                            None,
+                            f"Execution {execution_id} - Batch Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+                    elif resp.status_code != 200:
+                        error_text = f"HTTP {resp.status_code}"
+                        try:
+                            error_detail = resp.text[:200]  # Limit error text length
+                            if error_detail:
+                                error_text += f": {error_detail}"
+                        except Exception:
+                            logger.debug("Could not read error response text", exc_info=True)
+                        return (
+                            True,
+                            f"Failed to fetch batch logs: {error_text}",
+                            None,
+                            f"Execution {execution_id} - Batch Logs",
+                            {"display": "none"},
+                            True,
+                            {
+                                "execution_id": execution_id,
+                                "type": "execution",
+                                "id": execution_id,
+                                "status": execution_status,
+                                "user_timezone": user_timezone,
+                            },
+                        )
+
+                except Exception as e:
+                    logger.debug("Exception while fetching batch logs: %s", e)
+                    return (
+                        True,
+                        f"Error fetching batch logs: {str(e)}",
+                        None,
+                        f"Execution {execution_id} - Batch Logs",
+                        {"display": "none"},
+                        True,
+                        {
+                            "execution_id": execution_id,
+                            "type": "execution",
+                            "id": execution_id,
+                            "status": execution_status,
+                            "user_timezone": user_timezone,
+                        },
+                    )
+
+                result = resp.json()
+                batch_logs = result.get("data", [])
+
+                if not batch_logs:
+                    log_content = html.P("No batch logs found for this execution.")
+                else:
+                    # Parse and format batch logs using the same format as docker logs
+                    if isinstance(batch_logs, list):
+                        parsed_logs = []
+                        for log in batch_logs:
+                            if isinstance(log, dict):
+                                created_at = log.get("created_at", "")
+                                text = log.get("text", "")
+                                job_name = log.get("job_name", "")
+
+                                # Parse and format the date
+                                formatted_date = parse_date(created_at, user_timezone) or created_at
+
+                                # Create formatted log line with job name prefix
+                                if job_name:
+                                    log_line = f"{formatted_date} [{job_name}] {text}"
+                                else:
+                                    log_line = f"{formatted_date} - {text}"
+                                parsed_logs.append((created_at, log_line))
+                            else:
+                                # Fallback for non-dict log entries
+                                parsed_logs.append(("", str(log)))
+
+                        # Sort by created_at in descending order
+                        parsed_logs.sort(key=lambda x: x[0], reverse=True)
+                        logs_content = "\n".join([log_line for _, log_line in parsed_logs])
+                        log_content = html.Pre(
+                            logs_content,
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
+                        )
+                    else:
+                        log_content = html.Pre(
+                            str(batch_logs),
+                            style={
+                                "whiteSpace": "pre-wrap",
+                                "fontSize": "12px",
+                                "fontFamily": "monospace",
+                            },
+                        )
+
+                return (
+                    True,
+                    log_content,
+                    None,
+                    f"Execution {execution_id} - Batch Logs",
+                    {"display": "inline-block"},
+                    False,
+                    {
+                        "execution_id": execution_id,
+                        "type": "execution",
+                        "log_type": "batch",
                         "id": execution_id,
                         "status": execution_status,
                         "user_timezone": user_timezone,

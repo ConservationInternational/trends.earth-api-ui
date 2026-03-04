@@ -39,7 +39,7 @@ def register_callbacks(app):
         log_id = log_context.get("id")
         log_subtype = log_context.get(
             "log_type", "regular"
-        )  # For execution logs: "regular" or "docker"
+        )  # For execution logs: "regular", "docker", or "batch"
 
         if not log_type or not log_id:
             return no_update, no_update, no_update
@@ -51,6 +51,8 @@ def register_callbacks(app):
             if log_type == "execution":
                 if log_subtype == "docker":
                     resp = make_authenticated_request(f"/execution/{log_id}/docker-logs", token)
+                elif log_subtype == "batch":
+                    resp = make_authenticated_request(f"/execution/{log_id}/batch-logs", token)
                 else:
                     resp = make_authenticated_request(f"/execution/{log_id}/log", token)
             elif log_type == "script":
@@ -91,12 +93,19 @@ def register_callbacks(app):
             for log in logs_data:
                 if isinstance(log, dict):
                     # Handle different log formats based on log type
-                    if log_type == "execution" and log_subtype == "docker":
-                        # Docker logs format: created_at and text
+                    if log_type == "execution" and log_subtype in (
+                        "docker",
+                        "batch",
+                    ):
+                        # Docker/Batch logs format: created_at and text
                         timestamp = log.get("created_at", "")
                         text = log.get("text", "")
+                        job_name = log.get("job_name", "")
                         formatted_date = parse_date(timestamp, user_timezone) or timestamp
-                        log_line = f"{formatted_date} - {text}"
+                        if job_name:
+                            log_line = f"{formatted_date} [{job_name}] {text}"
+                        else:
+                            log_line = f"{formatted_date} - {text}"
                         parsed_logs.append((timestamp, log_line))
                     else:
                         # Regular logs format: register_date, level, text
