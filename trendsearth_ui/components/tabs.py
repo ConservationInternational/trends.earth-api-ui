@@ -104,8 +104,6 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         "style": {
             "height": height,
             "width": "100%",
-            "overflowX": "auto",  # Force horizontal scroll
-            "overflowY": "auto",  # Force vertical scroll
         },
         "className": "ag-theme-alpine responsive-table",
     }
@@ -129,8 +127,6 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         **{"data-testid": table_id},  # Add data-testid for playwright testing
         style={
             "width": "100%",
-            "overflowX": "auto",  # Ensure container allows horizontal overflow
-            "overflowY": "hidden",  # Container doesn't need vertical overflow
         },
     )
 

@@ -94,7 +94,21 @@
 /* Optimize table rendering */
 .ag-theme-alpine .ag-row {
     /* Improve row rendering performance */
-    contain: layout style;
+    contain: style;
+}
+
+/* Ensure AG-Grid horizontal scrollbar is always visible */
+.ag-theme-alpine .ag-body-horizontal-scroll {
+    min-height: 12px !important;
+    display: block !important;
+}
+
+.ag-theme-alpine .ag-body-horizontal-scroll-viewport {
+    overflow-x: auto !important;
+}
+
+.table-container {
+    overflow: visible;
 }
 
 /* Progressive enhancement for chart loading */
