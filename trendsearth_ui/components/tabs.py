@@ -24,6 +24,9 @@ def get_responsive_grid_options(is_mobile=False):
         # Force horizontal scroll to always be visible
         "suppressHorizontalScroll": False,
         "alwaysShowHorizontalScroll": True,
+        # Tell AG-Grid the scrollbar width so it reserves space even when OS
+        # reports 0-width (overlay) scrollbars
+        "scrollbarWidth": 12,
     }
 
     if is_mobile:
@@ -40,7 +43,6 @@ def get_responsive_grid_options(is_mobile=False):
                 "suppressColumnResize": False,  # Allow column resizing
                 "suppressAutoSize": False,  # Allow auto-sizing
                 "skipHeaderOnAutoSize": False,  # Include header when auto-sizing
-                "suppressSizeToFit": False,  # Enable size to fit
             }
         )
     else:
@@ -50,16 +52,15 @@ def get_responsive_grid_options(is_mobile=False):
                 "rowHeight": 32,
                 "headerHeight": 32,
                 "suppressColumnResize": False,
-                # Desktop-specific scrolling options
-                "suppressColumnVirtualisation": False,
-                "suppressSizeToFit": True,  # Disable auto-fit to allow horizontal scroll
+                # Render all columns so horizontal scroll container gets correct width
+                "suppressColumnVirtualisation": True,
             }
         )
 
     return base_options
 
 
-def create_responsive_table(table_id, table_type, style_data_conditional=None, height="800px"):
+def create_responsive_table(table_id, table_type, style_data_conditional=None, height=None):
     """Create a responsive AG-Grid table with mobile-optimized columns."""
     # Get column configuration
     column_config = get_mobile_column_config()
@@ -78,8 +79,6 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         "resizable": True,
         "sortable": True,
         "filter": True,
-        "minWidth": 50,
-        "suppressSizeToFit": True,  # Prevent auto-sizing that can hide scroll
         "wrapText": True,
         "autoHeight": False,
     }
@@ -91,14 +90,15 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
     if grid_options_overrides:
         base_grid_options.update(grid_options_overrides)
 
+    # Default to filling remaining viewport height
+    if height is None:
+        height = "calc(100vh - 180px)"
+
     # Base AG-Grid configuration
     base_config = {
         "id": table_id,
         "columnDefs": all_columns,
         "defaultColDef": default_col_def,
-        "columnSize": "sizeToFit"
-        if not all_columns or len(all_columns) <= 5
-        else None,  # Use autoSize for many columns
         "rowModelType": "infinite",
         "dashGridOptions": base_grid_options,
         "style": {
@@ -125,9 +125,6 @@ def create_responsive_table(table_id, table_type, style_data_conditional=None, h
         ],
         className="table-container",
         **{"data-testid": table_id},  # Add data-testid for playwright testing
-        style={
-            "width": "100%",
-        },
     )
 
 

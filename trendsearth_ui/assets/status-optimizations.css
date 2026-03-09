@@ -97,18 +97,39 @@
     contain: style;
 }
 
-/* Ensure AG-Grid horizontal scrollbar is always visible */
-.ag-theme-alpine .ag-body-horizontal-scroll {
-    min-height: 12px !important;
-    display: block !important;
+/* Prevent page-level scrolling - all scrolling should happen within AG-Grid */
+html, body {
+    overflow: hidden;
+    height: 100vh;
 }
 
-.ag-theme-alpine .ag-body-horizontal-scroll-viewport {
-    overflow-x: auto !important;
+/* Force classic (non-overlay) scrollbars globally.
+   Windows with "auto-hide scrollbars" enabled makes Chrome/Edge use overlay
+   scrollbars that are invisible until hovered. Defining ::-webkit-scrollbar
+   on all elements forces Chrome out of overlay mode entirely. */
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 
-.table-container {
-    overflow: visible;
+*::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Firefox scrollbar styling */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #999 #f1f1f1;
 }
 
 /* Progressive enhancement for chart loading */
