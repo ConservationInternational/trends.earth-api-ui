@@ -247,6 +247,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "email",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Name",
@@ -255,6 +263,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "name",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Institution",
@@ -263,6 +279,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "institution",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Country",
@@ -271,6 +295,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "country",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Role",
@@ -341,6 +373,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "tooltipField": "id",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Edit",
