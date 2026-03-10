@@ -1394,10 +1394,10 @@ def status_tab_content(is_admin, role=None):
                                 color="#007bff",
                             ),
                             html.Hr(),
-                            html.Div(id="swarm-status-title"),
+                            html.Div(id="cluster-status-title"),
                             dcc.Loading(
-                                id="loading-swarm-info",
-                                children=[html.Div(id="swarm-info-summary")],
+                                id="loading-cluster-info",
+                                children=[html.Div(id="cluster-info-summary")],
                                 type="default",
                                 color="#007bff",
                             ),

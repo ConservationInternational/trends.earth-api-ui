@@ -36,8 +36,7 @@ class TestColumnFilterConfiguration:
         # Duration column should have basic properties
         assert duration_column["field"] == "duration"
         assert duration_column["headerName"] == "Duration"
-        assert "flex" in duration_column
-        assert "minWidth" in duration_column
+        assert "width" in duration_column
 
     def test_scripts_status_filter(self):
         """Test that scripts status column has proper enhanced text filter."""

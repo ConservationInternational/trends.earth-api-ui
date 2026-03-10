@@ -21,7 +21,7 @@ class TestStatusPageOptimizations:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.StatusDataManager.fetch_consolidated_stats_data"
             ) as mock_stats,
@@ -35,7 +35,7 @@ class TestStatusPageOptimizations:
                 "latest_status": {"executions_running": 5},
             }
             mock_deployment.return_value = {"status": "healthy"}
-            mock_swarm.return_value = ({"nodes": []}, "")
+            mock_cluster.return_value = ({"nodes": []}, "")
             mock_stats.return_value = {"dashboard_stats": {}}
             mock_timeseries.return_value = {"data": []}
 
@@ -51,14 +51,14 @@ class TestStatusPageOptimizations:
             # Verify all components were called once
             mock_status.assert_called_once()
             mock_deployment.assert_called_once()
-            mock_swarm.assert_called_once()
+            mock_cluster.assert_called_once()
             mock_stats.assert_called_once()
             mock_timeseries.assert_called_once()
 
             # Verify result structure
             assert "status_data" in result
             assert "deployment_data" in result
-            assert "swarm_data" in result
+            assert "cluster_data" in result
             assert "stats_data" in result
             assert "time_series_data" in result
             assert "meta" in result
@@ -85,7 +85,7 @@ class TestStatusPageOptimizations:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.StatusDataManager.fetch_consolidated_stats_data"
             ) as mock_stats,
@@ -105,7 +105,7 @@ class TestStatusPageOptimizations:
 
             mock_status.side_effect = status_response
             mock_deployment.return_value = {"status": "healthy"}
-            mock_swarm.return_value = ({"nodes": []}, "")
+            mock_cluster.return_value = ({"nodes": []}, "")
             mock_stats.return_value = {"dashboard_stats": {}}
             mock_timeseries.return_value = {"data": []}
 
@@ -158,7 +158,7 @@ class TestStatusPageOptimizations:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.StatusDataManager.fetch_consolidated_stats_data"
             ) as mock_stats,
@@ -172,7 +172,7 @@ class TestStatusPageOptimizations:
                 "latest_status": {"executions_running": 5},
             }
             mock_deployment.return_value = {"status": "healthy"}
-            mock_swarm.return_value = ({"nodes": []}, "")
+            mock_cluster.return_value = ({"nodes": []}, "")
             mock_timeseries.return_value = {"data": []}
 
             # Call with non-SUPERADMIN role
@@ -190,7 +190,7 @@ class TestStatusPageOptimizations:
             # But other components should still be called
             mock_status.assert_called_once()
             mock_deployment.assert_called_once()
-            mock_swarm.assert_called_once()
+            mock_cluster.assert_called_once()
             mock_timeseries.assert_called_once()
 
             # Verify optimization was recorded
@@ -321,7 +321,7 @@ class TestStatusPageOptimizations:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.StatusDataManager.fetch_time_series_status_data"
             ) as mock_timeseries,
@@ -329,7 +329,7 @@ class TestStatusPageOptimizations:
             # Mock responses
             mock_status.return_value = {"summary": "SUCCESS", "latest_status": {}}
             mock_deployment.return_value = {"status": "healthy"}
-            mock_swarm.return_value = ({}, "")
+            mock_cluster.return_value = ({}, "")
             mock_timeseries.return_value = {"data": [], "optimization_applied": True}
 
             result = StatusDataManager.fetch_comprehensive_status_page_data(
@@ -372,14 +372,14 @@ class TestStatusPageOptimizations:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.StatusDataManager.fetch_time_series_status_data"
             ) as mock_timeseries,
         ):
             mock_status.return_value = {"summary": "SUCCESS", "latest_status": {}}
             mock_deployment.return_value = {"status": "healthy"}
-            mock_swarm.return_value = ({}, "")
+            mock_cluster.return_value = ({}, "")
             mock_timeseries.return_value = {"data": []}
 
             # Populate cache

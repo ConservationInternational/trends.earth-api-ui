@@ -80,13 +80,13 @@ class TestStatusDataManager:
             patch(
                 "trendsearth_ui.utils.status_data_manager.fetch_deployment_info"
             ) as mock_deployment,
-            patch("trendsearth_ui.utils.status_data_manager.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_data_manager.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.utils.status_data_manager.is_status_endpoint_available"
             ) as mock_available,
         ):
             mock_deployment.return_value = {"deployment": "info"}
-            mock_swarm.return_value = ({"swarm": "info"}, " (cached)")
+            mock_cluster.return_value = ({"cluster": "info"}, " (cached)")
             mock_available.return_value = True
 
             # First call should fetch from API
@@ -97,8 +97,8 @@ class TestStatusDataManager:
             # Verify the result structure
             assert result1["summary"] == "SUCCESS"
             assert result1["deployment"] == {"deployment": "info"}
-            assert result1["swarm"]["info"] == {"swarm": "info"}
-            assert result1["swarm"]["cached_time"] == " (cached)"
+            assert result1["cluster"]["info"] == {"cluster": "info"}
+            assert result1["cluster"]["cached_time"] == " (cached)"
             assert result1["status_endpoint_available"] is True
             assert result1["latest_status"]["executions_running"] == 5
 
@@ -362,7 +362,7 @@ class TestStatusCallbackOptimization:
         with (
             patch("trendsearth_ui.callbacks.status.callback_context") as mock_ctx,
             patch("trendsearth_ui.utils.status_helpers.fetch_deployment_info") as mock_deployment,
-            patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
+            patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
             patch(
                 "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data"
             ) as mock_status_data,
@@ -370,11 +370,11 @@ class TestStatusCallbackOptimization:
             # Set up mocks
             mock_ctx.triggered = [{"prop_id": "refresh-status-btn.n_clicks"}]
             mock_deployment.return_value = {"deployment": "info"}
-            mock_swarm.return_value = ({"swarm": "info"}, "")
+            mock_cluster.return_value = ({"cluster": "info"}, "")
             mock_status_data.return_value = {
                 "status_data": {"summary": "SUCCESS"},
                 "deployment_data": {"deployment": "info"},
-                "swarm_data": {"info": {"swarm": "info"}, "cached_time": ""},
+                "cluster_data": {"info": {"cluster": "info"}, "cached_time": ""},
                 "stats_data": {},
                 "meta": {"cache_hit": False},
             }

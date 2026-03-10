@@ -7,7 +7,7 @@ from dash import html
 import requests
 
 from trendsearth_ui.config import get_api_base
-from trendsearth_ui.utils.stats_visualizations import create_docker_swarm_status_table
+from trendsearth_ui.utils.stats_visualizations import create_cluster_status_table
 from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
 
 from .http_client import apply_default_headers, get_session
@@ -161,96 +161,96 @@ def fetch_deployment_info(api_environment, token=None):
     )
 
 
-def fetch_swarm_info(api_environment, token=None, user_timezone=None):
-    """Fetch Docker Swarm information from the API's swarm status endpoint."""
+def fetch_cluster_info(api_environment, token=None, user_timezone=None):
+    """Fetch cluster status information from the API's cluster status endpoint."""
     if not token:
         # Return basic info if no token available
-        swarm_info = html.Div(
+        cluster_info = html.Div(
             [
                 html.P("Authentication required", className="mb-1 text-muted"),
-                html.P("Please log in to view swarm status", className="mb-1 text-muted"),
+                html.P("Please log in to view cluster status", className="mb-1 text-muted"),
             ]
         )
-        return swarm_info, " (Auth Required)"
+        return cluster_info, " (Auth Required)"
 
     safe_timezone = get_safe_timezone(user_timezone)
 
     try:
-        # Fetch raw swarm data from API
+        # Fetch raw cluster data from API
         headers = apply_default_headers({"Authorization": f"Bearer {token}"})
-        swarm_url = f"{get_api_base(api_environment)}/status/swarm"
+        cluster_url = f"{get_api_base(api_environment)}/status/cluster"
         resp = get_session().get(
-            swarm_url,
+            cluster_url,
             headers=headers,
             timeout=5,
         )
 
         if resp.status_code == 200:
-            swarm_response = resp.json()
-            swarm_data = swarm_response.get("data", {})
-            swarm_info = create_docker_swarm_status_table(swarm_data)
-            cache_info = swarm_data.get("cache_info", {})
+            cluster_response = resp.json()
+            cluster_data = cluster_response.get("data", {})
+            cluster_info = create_cluster_status_table(cluster_data)
+            cache_info = cluster_data.get("cache_info", {})
             cached_at_raw = cache_info.get("cached_at")
 
-            swarm_cached_time = " (Live)"
+            cluster_cached_time = " (Live)"
             if isinstance(cached_at_raw, str) and cached_at_raw:
                 try:
                     cached_dt = datetime.fromisoformat(cached_at_raw.replace("Z", "+00:00"))
                     formatted_time, tz_abbrev = format_local_time(cached_dt, safe_timezone)
                     if tz_abbrev and tz_abbrev != "UTC":
-                        swarm_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
+                        cluster_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
                     else:
                         iso_timestamp = (
                             cached_at_raw[:19] if "T" in cached_at_raw else formatted_time
                         )
-                        swarm_cached_time = f" (Updated: {iso_timestamp})"
+                        cluster_cached_time = f" (Updated: {iso_timestamp})"
                 except (ValueError, TypeError):
                     # Fallback to original string if parsing fails
-                    swarm_cached_time = f" (Updated: {cached_at_raw[:19]})"
-            return swarm_info, swarm_cached_time
+                    cluster_cached_time = f" (Updated: {cached_at_raw[:19]})"
+            return cluster_info, cluster_cached_time
         elif resp.status_code == 401:
             # Handle authentication error
-            swarm_info = html.Div(
+            cluster_info = html.Div(
                 [
                     html.P("Authentication failed", className="mb-1 text-warning"),
                     html.P("Please check your login status", className="mb-1 text-muted"),
                 ]
             )
-            return swarm_info, " (Auth Error)"
+            return cluster_info, " (Auth Error)"
         elif resp.status_code == 403:
             # Handle permission error
-            swarm_info = html.Div(
+            cluster_info = html.Div(
                 [
                     html.P("Access denied", className="mb-1 text-warning"),
                     html.P(
-                        "Admin privileges required for swarm status",
+                        "Admin privileges required for cluster status",
                         className="mb-1 text-muted",
                     ),
                 ]
             )
-            return swarm_info, " (Access Denied)"
+            return cluster_info, " (Access Denied)"
         else:
             # Handle other errors
-            swarm_info = html.Div(
+            cluster_info = html.Div(
                 [
                     html.P(
-                        f"Swarm Status: Error ({resp.status_code})",
+                        f"Cluster Status: Error ({resp.status_code})",
                         className="mb-1 text-danger",
                     ),
-                    html.P("Unable to retrieve swarm information", className="mb-1 text-muted"),
+                    html.P("Unable to retrieve cluster information", className="mb-1 text-muted"),
                 ]
             )
-            return swarm_info, " (Error)"
+            return cluster_info, " (Error)"
     except Exception as e:
         # Handle connection errors
-        logger.error(f"Error fetching swarm data: {e}")
-        swarm_info = html.Div(
+        logger.error(f"Error fetching cluster data: {e}")
+        cluster_info = html.Div(
             [
-                html.P("Swarm Status: Connection Error", className="mb-1 text-danger"),
-                html.P("Unable to reach swarm status endpoint", className="mb-1 text-muted"),
+                html.P("Cluster Status: Connection Error", className="mb-1 text-danger"),
+                html.P("Unable to reach cluster status endpoint", className="mb-1 text-muted"),
             ]
         )
-        return swarm_info, " (Connection Error)"
+        return cluster_info, " (Connection Error)"
 
 
 def get_fallback_summary():

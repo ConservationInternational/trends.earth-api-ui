@@ -19,8 +19,8 @@ from .stats_utils import (
     get_optimal_grouping_for_period,
 )
 from .status_helpers import (
+    fetch_cluster_info,
     fetch_deployment_info,
-    fetch_swarm_info,
     get_fallback_summary,
     is_status_endpoint_available,
 )
@@ -87,7 +87,7 @@ class StatusDataManager:
         Fetch all status-related data in one consolidated call.
 
         Returns:
-            dict: Contains summary, deployment, swarm, and basic stats data
+            dict: Contains summary, deployment, cluster, and basic stats data
         """
         safe_timezone = get_safe_timezone(user_timezone)
 
@@ -108,19 +108,19 @@ class StatusDataManager:
         result = {
             "summary": None,
             "deployment": None,
-            "swarm": None,
+            "cluster": None,
             "status_endpoint_available": False,
             "latest_status": None,
             "error": None,
         }
 
         try:
-            # Fetch deployment and swarm info (these are fast and can be done in parallel)
+            # Fetch deployment and cluster info (these are fast and can be done in parallel)
             result["deployment"] = fetch_deployment_info(api_environment, token)
-            swarm_info, swarm_cached_time = fetch_swarm_info(api_environment, token, safe_timezone)
-            result["swarm"] = {
-                "info": swarm_info,
-                "cached_time": swarm_cached_time,
+            cluster_info, cluster_cached_time = fetch_cluster_info(api_environment, token, safe_timezone)
+            result["cluster"] = {
+                "info": cluster_info,
+                "cached_time": cluster_cached_time,
             }
 
             # Check if status endpoint is available
@@ -582,7 +582,7 @@ class StatusDataManager:
             dict: Comprehensive status page data including:
                 - status_data: Latest status information
                 - deployment_data: Deployment and health info
-                - swarm_data: Docker swarm status
+                - cluster_data: Cluster status
                 - stats_data: Enhanced statistics (if SUPERADMIN)
                 - time_series_data: Chart data
                 - meta: Performance metadata
@@ -614,7 +614,7 @@ class StatusDataManager:
         result = {
             "status_data": None,
             "deployment_data": None,
-            "swarm_data": None,
+            "cluster_data": None,
             "stats_data": None,
             "time_series_data": None,
             "meta": {
@@ -636,7 +636,7 @@ class StatusDataManager:
             result["status_data"] = status_result
             result["meta"]["api_calls_made"].append("consolidated_status")
 
-            # 2. Reuse deployment and swarm info gathered with consolidated status fetch
+            # 2. Reuse deployment and cluster info gathered with consolidated status fetch
             deployment_from_status = status_result.get("deployment")
             if deployment_from_status is not None:
                 result["deployment_data"] = deployment_from_status
@@ -645,24 +645,24 @@ class StatusDataManager:
                 result["deployment_data"] = fetch_deployment_info(api_environment, token)
                 result["meta"]["api_calls_made"].append("deployment_info")
 
-            swarm_from_status = status_result.get("swarm") or {}
-            swarm_info = swarm_from_status.get("info")
-            swarm_time = swarm_from_status.get("cached_time")
+            cluster_from_status = status_result.get("cluster") or {}
+            cluster_info = cluster_from_status.get("info")
+            cluster_time = cluster_from_status.get("cached_time")
 
-            if swarm_info is not None:
-                result["swarm_data"] = {"info": swarm_info, "cached_time": swarm_time or ""}
-                result["meta"]["optimizations_applied"].append("swarm_reused")
+            if cluster_info is not None:
+                result["cluster_data"] = {"info": cluster_info, "cached_time": cluster_time or ""}
+                result["meta"]["optimizations_applied"].append("cluster_reused")
             else:
-                fetched_swarm_info, fetched_swarm_time = fetch_swarm_info(
+                fetched_cluster_info, fetched_cluster_time = fetch_cluster_info(
                     api_environment,
                     token,
                     user_timezone=safe_timezone,
                 )
-                result["swarm_data"] = {
-                    "info": fetched_swarm_info,
-                    "cached_time": fetched_swarm_time,
+                result["cluster_data"] = {
+                    "info": fetched_cluster_info,
+                    "cached_time": fetched_cluster_time,
                 }
-                result["meta"]["api_calls_made"].append("swarm_info")
+                result["meta"]["api_calls_made"].append("cluster_info")
 
             # 3. Fetch stats data (only for SUPERADMIN)
             if role == "SUPERADMIN":

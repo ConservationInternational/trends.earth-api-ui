@@ -2231,15 +2231,15 @@ def create_deployment_information(api_environment="production"):
         )
 
 
-def create_docker_swarm_status_table(swarm_data):
+def create_cluster_status_table(swarm_data):
     """
-    Create a table showing Docker swarm nodes and their details.
+    Create a table showing cluster nodes and their details.
 
     Args:
-        swarm_data: Docker swarm data from the API
+        swarm_data: Cluster data from the API
 
     Returns:
-        html.Div: Table showing swarm node details
+        html.Div: Table showing cluster node details
     """
     import logging
 
@@ -2249,7 +2249,7 @@ def create_docker_swarm_status_table(swarm_data):
         if not swarm_data or not isinstance(swarm_data, dict):
             return html.Div(
                 [
-                    html.P("No swarm data available.", className="text-muted text-center"),
+                    html.P("No cluster data available.", className="text-muted text-center"),
                 ],
                 className="p-4",
             )
@@ -2259,22 +2259,22 @@ def create_docker_swarm_status_table(swarm_data):
         if error_msg:
             return html.Div(
                 [
-                    html.P("Docker swarm status unavailable.", className="text-muted text-center"),
+                    html.P("Cluster status unavailable.", className="text-muted text-center"),
                     html.Small(f"Error: {error_msg}", className="text-muted text-center d-block"),
                 ],
                 className="p-4",
             )
 
-        # Extract swarm information directly (data layer already extracted in callback)
+        # Extract cluster information directly (data layer already extracted in callback)
         nodes = swarm_data.get("nodes", [])
         swarm_active = swarm_data.get("swarm_active", False)
 
         if not swarm_active:
-            error_msg = swarm_data.get("error", "Swarm not active")
+            error_msg = swarm_data.get("error", "Cluster not active")
             return html.Div(
                 [
                     html.P(
-                        f"Docker Swarm Status: {error_msg}", className="text-warning text-center"
+                        f"Cluster Status: {error_msg}", className="text-warning text-center"
                     ),
                     html.P("No nodes to display.", className="text-muted text-center"),
                 ],
@@ -2284,7 +2284,7 @@ def create_docker_swarm_status_table(swarm_data):
         if not nodes:
             return html.Div(
                 [
-                    html.P("No swarm nodes available.", className="text-muted text-center"),
+                    html.P("No cluster nodes available.", className="text-muted text-center"),
                 ],
                 className="p-4",
             )
@@ -2344,7 +2344,7 @@ def create_docker_swarm_status_table(swarm_data):
 
         table_body = html.Tbody(table_rows)
 
-        # Calculate swarm summary statistics using actual resource usage data
+        # Calculate cluster summary statistics using actual resource usage data
         total_cpu = sum(node.get("cpu_count", 0) for node in nodes)
         total_memory_gb = sum(node.get("memory_gb", 0) for node in nodes)
         total_running_tasks = sum(node.get("running_tasks", 0) for node in nodes)
@@ -2409,10 +2409,10 @@ def create_docker_swarm_status_table(swarm_data):
         )
 
     except Exception as e:
-        logger.error(f"Error creating Docker swarm status table: {e}")
+        logger.error(f"Error creating cluster status table: {e}")
         return html.Div(
             [
-                html.P("Error creating swarm status table.", className="text-danger text-center"),
+                html.P("Error creating cluster status table.", className="text-danger text-center"),
                 html.Small(f"Error: {str(e)}", className="text-muted text-center d-block"),
             ],
             className="p-4",

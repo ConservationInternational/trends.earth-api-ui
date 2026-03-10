@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 import pytest
 import requests
 
-from trendsearth_ui.utils.status_helpers import fetch_deployment_info, fetch_swarm_info
+from trendsearth_ui.utils.status_helpers import fetch_cluster_info, fetch_deployment_info
 
 
 class TestDeploymentInfoFixes:
@@ -93,12 +93,12 @@ class TestDeploymentInfoFixes:
         assert "Please log in to view deployment status" in result_str
 
 
-class TestSwarmInfoFixes:
-    """Test Docker swarm information fixes using actual API endpoints."""
+class TestClusterInfoFixes:
+    """Test cluster information fixes using actual API endpoints."""
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_active_swarm(self, mock_get_session):
-        """Test swarm info for active Docker swarm."""
+    def test_fetch_cluster_info_active_cluster(self, mock_get_session):
+        """Test cluster info for active cluster."""
         mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
@@ -140,7 +140,7 @@ class TestSwarmInfoFixes:
         }
         mock_session.get.return_value = mock_response
 
-        result, status = fetch_swarm_info("production", "test_token")
+        result, status = fetch_cluster_info("production", "test_token")
 
         result_str = str(result)
         # Check for table headers
@@ -162,8 +162,8 @@ class TestSwarmInfoFixes:
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_inactive_swarm(self, mock_get_session):
-        """Test swarm info for inactive Docker swarm."""
+    def test_fetch_cluster_info_inactive_cluster(self, mock_get_session):
+        """Test cluster info for inactive cluster."""
         mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
@@ -180,17 +180,17 @@ class TestSwarmInfoFixes:
         }
         mock_session.get.return_value = mock_response
 
-        result, status = fetch_swarm_info("staging", "test_token")
+        result, status = fetch_cluster_info("staging", "test_token")
 
         result_str = str(result)
         # For error case, the table function shows a generic error message
-        assert "Docker swarm status unavailable" in result_str
+        assert "Cluster status unavailable" in result_str
         assert "Error: Not in swarm mode" in result_str
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_inactive_swarm_no_error(self, mock_get_session):
-        """Test swarm info for inactive Docker swarm without explicit error."""
+    def test_fetch_cluster_info_inactive_no_error(self, mock_get_session):
+        """Test cluster info for inactive cluster without explicit error."""
         mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 200
@@ -206,23 +206,23 @@ class TestSwarmInfoFixes:
         }
         mock_session.get.return_value = mock_response
 
-        result, status = fetch_swarm_info("staging", "test_token")
+        result, status = fetch_cluster_info("staging", "test_token")
 
         result_str = str(result)
-        # For inactive swarm without error, should show the default message
-        assert "Docker Swarm Status: Swarm not active" in result_str
+        # For inactive cluster without error, should show the default message
+        assert "Cluster Status: Cluster not active" in result_str
         assert "No nodes to display" in result_str
         assert status == " (Updated: 2023-01-01T12:00:00)"
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_auth_error(self, mock_get_session):
-        """Test swarm info authentication error."""
+    def test_fetch_cluster_info_auth_error(self, mock_get_session):
+        """Test cluster info authentication error."""
         mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 401
         mock_session.get.return_value = mock_response
 
-        result, status = fetch_swarm_info("production", "invalid_token")
+        result, status = fetch_cluster_info("production", "invalid_token")
 
         result_str = str(result)
         assert "Authentication failed" in result_str
@@ -230,40 +230,40 @@ class TestSwarmInfoFixes:
         assert status == " (Auth Error)"
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_access_denied(self, mock_get_session):
-        """Test swarm info access denied."""
+    def test_fetch_cluster_info_access_denied(self, mock_get_session):
+        """Test cluster info access denied."""
         mock_session = mock_get_session.return_value
         mock_response = Mock()
         mock_response.status_code = 403
         mock_session.get.return_value = mock_response
 
-        result, status = fetch_swarm_info("production", "user_token")
+        result, status = fetch_cluster_info("production", "user_token")
 
         result_str = str(result)
         assert "Access denied" in result_str
         assert "Admin privileges required" in result_str
         assert status == " (Access Denied)"
 
-    def test_fetch_swarm_info_no_token(self):
-        """Test swarm info without token."""
-        result, status = fetch_swarm_info("production", None)
+    def test_fetch_cluster_info_no_token(self):
+        """Test cluster info without token."""
+        result, status = fetch_cluster_info("production", None)
 
         result_str = str(result)
         assert "Authentication required" in result_str
-        assert "Please log in to view swarm status" in result_str
+        assert "Please log in to view cluster status" in result_str
         assert status == " (Auth Required)"
 
     @patch("trendsearth_ui.utils.status_helpers.get_session")
-    def test_fetch_swarm_info_network_error(self, mock_get_session):
-        """Test swarm info network error handling."""
+    def test_fetch_cluster_info_network_error(self, mock_get_session):
+        """Test cluster info network error handling."""
         mock_session = mock_get_session.return_value
         mock_session.get.side_effect = requests.exceptions.RequestException("Connection error")
 
-        result, status = fetch_swarm_info("production", "test_token")
+        result, status = fetch_cluster_info("production", "test_token")
 
         result_str = str(result)
-        assert "Swarm Status: Connection Error" in result_str
-        assert "Unable to reach swarm status endpoint" in result_str
+        assert "Cluster Status: Connection Error" in result_str
+        assert "Unable to reach cluster status endpoint" in result_str
         assert status == " (Connection Error)"
 
 
@@ -349,8 +349,8 @@ class TestStatusPageIntegration:
         expected_main_outputs = [
             "status-summary",
             "deployment-info-summary",
-            "swarm-info-summary",
-            "swarm-status-title",
+            "cluster-info-summary",
+            "cluster-status-title",
         ]
 
         # Stats callback should return 3 outputs
@@ -373,8 +373,8 @@ class TestStatusPageIntegration:
         required_component_ids = [
             "status-summary",
             "deployment-info-summary",
-            "swarm-info-summary",
-            "swarm-status-title",
+            "cluster-info-summary",
+            "cluster-status-title",
             "stats-summary-cards",
             "stats-user-map",
             "stats-additional-charts",

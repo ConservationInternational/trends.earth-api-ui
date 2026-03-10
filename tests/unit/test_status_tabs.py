@@ -465,15 +465,15 @@ class TestStatusTabsErrorHandling:
                 patch(
                     "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
                 ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
+                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
-                mock_swarm.return_value = ("mock swarm info", " (Live)")
+                mock_cluster.return_value = ("mock cluster info", " (Live)")
 
                 # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
+                # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
                 # We want to check the first output (summary)
                 summary_result = (
                     result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
@@ -572,11 +572,11 @@ class TestStatusTabsErrorHandling:
                 patch(
                     "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
                 ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
+                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
-                mock_swarm.return_value = ("mock swarm info", " (Live)")
+                mock_cluster.return_value = ("mock cluster info", " (Live)")
 
                 # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
@@ -681,15 +681,15 @@ class TestStatusTabsErrorHandling:
                 patch(
                     "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
                 ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_swarm_info") as mock_swarm,
+                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
             ):
                 # Mock the helper function returns
                 mock_deployment.return_value = "mock deployment info"
-                mock_swarm.return_value = ("mock swarm info", " (Live)")
+                mock_cluster.return_value = ("mock cluster info", " (Live)")
 
                 # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
                 result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns four outputs: (summary, deployment_info, swarm_info, swarm_title)
+                # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
                 # We want to check the first output (summary)
                 summary_result = (
                     result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result

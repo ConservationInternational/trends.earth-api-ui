@@ -162,8 +162,8 @@ def register_callbacks(app):
             Output("current-system-status-title", "children"),
             Output("status-summary", "children"),
             Output("deployment-info-summary", "children"),
-            Output("swarm-info-summary", "children"),
-            Output("swarm-status-title", "children"),
+            Output("cluster-info-summary", "children"),
+            Output("cluster-status-title", "children"),
         ],
         [
             Input("status-auto-refresh-interval", "n_intervals"),
@@ -190,7 +190,7 @@ def register_callbacks(app):
         """
             Update time-independent status components (not affected by time period selection).
 
-        This includes: status summary, deployment info, and swarm info.
+        This includes: status summary, deployment info, and cluster info.
             These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
         """
         # Guard: Skip if not logged in
@@ -237,7 +237,7 @@ def register_callbacks(app):
             # Extract data components
             status_data = comprehensive_data.get("status_data", {})
             deployment_data = comprehensive_data.get("deployment_data")
-            swarm_data = comprehensive_data.get("swarm_data", {})
+            cluster_data = comprehensive_data.get("cluster_data", {})
             # 1. Build status summary
             status_summary, last_updated_label = _build_status_summary(status_data, safe_timezone)
 
@@ -254,18 +254,18 @@ def register_callbacks(app):
             # 2. Deployment info is already formatted
             deployment_info = deployment_data
 
-            # 3. Swarm info and title
-            swarm_info = swarm_data.get("info", html.Div("Swarm data unavailable"))
-            swarm_cached_time = swarm_data.get("cached_time", "")
-            swarm_title = html.H5(
-                f"Docker Swarm Status{swarm_cached_time}", className="card-title mt-4"
+            # 3. Cluster info and title
+            cluster_info = cluster_data.get("info", html.Div("Cluster data unavailable"))
+            cluster_cached_time = cluster_data.get("cached_time", "")
+            cluster_title = html.H5(
+                f"Cluster Status{cluster_cached_time}", className="card-title mt-4"
             )
             return (
                 current_status_title,
                 status_summary,
                 deployment_info,
-                swarm_info,
-                swarm_title,
+                cluster_info,
+                cluster_title,
             )
 
         except Exception as e:

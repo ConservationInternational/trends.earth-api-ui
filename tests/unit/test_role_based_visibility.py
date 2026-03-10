@@ -108,8 +108,8 @@ class TestGetExecutionsColumnsForRole:
         admin_columns = get_executions_columns_for_role("ADMIN")
         user_columns = get_executions_columns_for_role("USER")
 
-        # Admin should have exactly 3 more columns (user_name, user_email, docker_logs)
-        assert len(admin_columns) == len(user_columns) + 3
+        # Admin should have exactly 4 more columns (user_name, user_email, docker_logs, batch_logs)
+        assert len(admin_columns) == len(user_columns) + 4
 
     def test_column_structure_preserved(self):
         """Test that column definitions maintain their structure after filtering."""
