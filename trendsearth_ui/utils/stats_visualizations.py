@@ -2273,9 +2273,7 @@ def create_cluster_status_table(swarm_data):
             error_msg = swarm_data.get("error", "Cluster not active")
             return html.Div(
                 [
-                    html.P(
-                        f"Cluster Status: {error_msg}", className="text-warning text-center"
-                    ),
+                    html.P(f"Cluster Status: {error_msg}", className="text-warning text-center"),
                     html.P("No nodes to display.", className="text-muted text-center"),
                 ],
                 className="p-4",

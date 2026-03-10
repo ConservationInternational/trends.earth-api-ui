@@ -86,7 +86,12 @@ def build_filter_clause(
     joiner: str = ",",
     custom_handlers: Mapping[str, FilterHandler] | None = None,
 ) -> tuple[str | None, dict[str, Any]]:
-    """Translate AG-Grid filters into API-compatible filter strings and params."""
+    """Translate AG-Grid filters into API-compatible filter strings and params.
+
+    Supports both simple filter models and compound filter models
+    (AG Grid v31+ with ``operator`` + ``conditions`` array, or older
+    ``condition1``/``condition2`` format).
+    """
     if not filter_model:
         return None, {}
 
@@ -112,91 +117,128 @@ def build_filter_clause(
                 extra_params.update(params)
             continue
 
-        filter_type = config.get("filterType")
-        if filter_type == "set":
-            values = config.get("values") or []
-            or_clauses = [
-                f"{field}='{_sanitize_value(val)}'" for val in values if val not in (None, "")
-            ]
-            if or_clauses:
-                clauses.append(f"({' OR '.join(or_clauses)})")
-        elif filter_type == "text":
-            raw_value = config.get("filter", "").strip()
-            if not raw_value:
-                continue
-            condition = config.get("type", "contains")
-            if condition == "equals":
-                value = _sanitize_value(raw_value)
-                clauses.append(f"{field}='{value}'")
-            elif condition == "notEquals":
-                value = _sanitize_value(raw_value)
-                clauses.append(f"{field}!='{value}'")
-            elif condition == "startsWith":
-                value = _sanitize_value(raw_value, escape_like=True)
-                clauses.append(f"{field} like '{value}%'")
-            elif condition == "endsWith":
-                value = _sanitize_value(raw_value, escape_like=True)
-                clauses.append(f"{field} like '%{value}'")
-            else:  # contains / default
-                value = _sanitize_value(raw_value, escape_like=True)
-                clauses.append(f"{field} like '%{value}%'")
-        elif filter_type == "number":
-            value = config.get("filter")
-            if value is None or value == "":
-                continue
-            try:
-                # Preserve numeric formatting when possible
-                numeric_value = float(value)
-                if numeric_value.is_integer():
-                    numeric_str = str(int(numeric_value))
+        # Handle compound filter models (AG Grid v31+ sends these when
+        # two conditions are filled).  Extract individual conditions and
+        # process each one, joining them with the compound operator.
+        if "operator" in config and ("conditions" in config or "condition1" in config):
+            sub_configs = config.get("conditions") or []
+            if not sub_configs:
+                # Older AG Grid format with condition1/condition2
+                for key in ("condition1", "condition2"):
+                    cond = config.get(key)
+                    if isinstance(cond, Mapping):
+                        sub_configs.append(cond)
+            compound_op = config.get("operator", "AND").upper()
+            sub_clauses = []
+            for sub_config in sub_configs:
+                sub_clause = _build_single_filter(field, sub_config)
+                if sub_clause:
+                    sub_clauses.append(sub_clause)
+            if sub_clauses:
+                if compound_op == "OR":
+                    clauses.append(f"({' OR '.join(sub_clauses)})")
                 else:
-                    numeric_str = str(numeric_value)
-            except (TypeError, ValueError):
-                numeric_str = _sanitize_value(value)
-            condition = config.get("type", "equals")
-            if condition == "equals":
-                clauses.append(f"{field}={numeric_str}")
-            elif condition == "notEqual":
-                clauses.append(f"{field}!={numeric_str}")
-            elif condition == "greaterThan":
-                clauses.append(f"{field}>{numeric_str}")
-            elif condition == "greaterThanOrEqual":
-                clauses.append(f"{field}>={numeric_str}")
-            elif condition == "lessThan":
-                clauses.append(f"{field}<{numeric_str}")
-            elif condition == "lessThanOrEqual":
-                clauses.append(f"{field}<={numeric_str}")
-            # Other numeric conditions (e.g. inRange) are not currently used
-        elif filter_type == "date":
-            # AG-Grid date column filter — translate to SQL-like comparison clauses
-            raw_type = config.get("type", "equals")
-            date_from = config.get("dateFrom")
-            date_to = config.get("dateTo")
+                    clauses.extend(sub_clauses)
+            continue
 
-            if raw_type == "equals" and date_from:
-                sanitized = _sanitize_value(date_from)
-                clauses.append(f"{field}>='{sanitized}'")
-                clauses.append(f"{field}<='{sanitized}'")
-            elif raw_type in ("greaterThan", "greaterThanOrEqual") and date_from:
-                sanitized = _sanitize_value(date_from)
-                clauses.append(f"{field}>='{sanitized}'")
-            elif raw_type in ("lessThan", "lessThanOrEqual") and date_from:
-                sanitized = _sanitize_value(date_from)
-                clauses.append(f"{field}<='{sanitized}'")
-            elif raw_type == "inRange":
-                if date_from:
-                    sanitized_from = _sanitize_value(date_from)
-                    clauses.append(f"{field}>='{sanitized_from}'")
-                if date_to:
-                    sanitized_to = _sanitize_value(date_to)
-                    clauses.append(f"{field}<='{sanitized_to}'")
-            elif raw_type == "notEqual" and date_from:
-                sanitized = _sanitize_value(date_from)
-                clauses.append(f"{field}!='{sanitized}'")
-        # Boolean filter types are not currently supported
+        # Simple (single-condition) filter model
+        single_clause = _build_single_filter(field, config)
+        if single_clause:
+            clauses.append(single_clause)
 
     clause_string = joiner.join(clauses) if clauses else None
     return clause_string, extra_params
+
+
+def _build_single_filter(field: str, config: Mapping[str, Any]) -> str | None:
+    """Build a single filter clause from a simple AG-Grid filter config."""
+    filter_type = config.get("filterType")
+
+    if filter_type == "set":
+        values = config.get("values") or []
+        or_clauses = [
+            f"{field}='{_sanitize_value(val)}'" for val in values if val not in (None, "")
+        ]
+        if or_clauses:
+            return f"({' OR '.join(or_clauses)})"
+    elif filter_type == "text":
+        raw_value = config.get("filter", "").strip()
+        if not raw_value:
+            return None
+        condition = config.get("type", "contains")
+        if condition == "equals":
+            value = _sanitize_value(raw_value)
+            return f"{field}='{value}'"
+        elif condition == "notEquals":
+            value = _sanitize_value(raw_value)
+            return f"{field}!='{value}'"
+        elif condition == "startsWith":
+            value = _sanitize_value(raw_value, escape_like=True)
+            return f"{field} like '{value}%'"
+        elif condition == "endsWith":
+            value = _sanitize_value(raw_value, escape_like=True)
+            return f"{field} like '%{value}'"
+        else:  # contains / default
+            value = _sanitize_value(raw_value, escape_like=True)
+            return f"{field} like '%{value}%'"
+    elif filter_type == "number":
+        value = config.get("filter")
+        if value is None or value == "":
+            return None
+        try:
+            # Preserve numeric formatting when possible
+            numeric_value = float(value)
+            if numeric_value.is_integer():
+                numeric_str = str(int(numeric_value))
+            else:
+                numeric_str = str(numeric_value)
+        except (TypeError, ValueError):
+            numeric_str = _sanitize_value(value)
+        _NUMBER_OPS = {
+            "equals": "=",
+            "notEqual": "!=",
+            "greaterThan": ">",
+            "greaterThanOrEqual": ">=",
+            "lessThan": "<",
+            "lessThanOrEqual": "<=",
+        }
+        condition = config.get("type", "equals")
+        op = _NUMBER_OPS.get(condition)
+        if op:
+            return f"{field}{op}{numeric_str}"
+        # Other numeric conditions (e.g. inRange) are not currently used
+    elif filter_type == "date":
+        # AG-Grid date column filter — translate to SQL-like comparison clauses
+        raw_type = config.get("type", "equals")
+        date_from = config.get("dateFrom")
+        date_to = config.get("dateTo")
+
+        # Date filters can produce multiple clauses; collect and return joined
+        date_clauses = []
+        if raw_type == "equals" and date_from:
+            sanitized = _sanitize_value(date_from)
+            date_clauses.append(f"{field}>='{sanitized}'")
+            date_clauses.append(f"{field}<='{sanitized}'")
+        elif raw_type in ("greaterThan", "greaterThanOrEqual") and date_from:
+            sanitized = _sanitize_value(date_from)
+            date_clauses.append(f"{field}>='{sanitized}'")
+        elif raw_type in ("lessThan", "lessThanOrEqual") and date_from:
+            sanitized = _sanitize_value(date_from)
+            date_clauses.append(f"{field}<='{sanitized}'")
+        elif raw_type == "inRange":
+            if date_from:
+                sanitized_from = _sanitize_value(date_from)
+                date_clauses.append(f"{field}>='{sanitized_from}'")
+            if date_to:
+                sanitized_to = _sanitize_value(date_to)
+                date_clauses.append(f"{field}<='{sanitized_to}'")
+        elif raw_type == "notEqual" and date_from:
+            sanitized = _sanitize_value(date_from)
+            date_clauses.append(f"{field}!='{sanitized}'")
+        if date_clauses:
+            return ",".join(date_clauses)
+    # Boolean filter types are not currently supported
+    return None
 
 
 def build_table_state(

@@ -117,7 +117,9 @@ class StatusDataManager:
         try:
             # Fetch deployment and cluster info (these are fast and can be done in parallel)
             result["deployment"] = fetch_deployment_info(api_environment, token)
-            cluster_info, cluster_cached_time = fetch_cluster_info(api_environment, token, safe_timezone)
+            cluster_info, cluster_cached_time = fetch_cluster_info(
+                api_environment, token, safe_timezone
+            )
             result["cluster"] = {
                 "info": cluster_info,
                 "cached_time": cluster_cached_time,

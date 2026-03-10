@@ -65,6 +65,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "10px"},
                     "tooltipField": "script_name",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "User",
@@ -73,6 +81,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "user_name",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Email",
@@ -81,6 +97,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
                     "tooltipField": "user_email",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Start",
@@ -108,6 +132,7 @@ def get_mobile_column_config():
                     "width": 120,
                     "cellStyle": {"fontSize": "12px"},
                     "resizable": True,
+                    "filter": False,
                 },
                 {
                     "headerName": "Status",
@@ -133,6 +158,13 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "tooltipField": "id",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "User ID",
@@ -141,6 +173,13 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "tooltipField": "user_id",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Params",
@@ -323,6 +362,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "10px"},
                     "tooltipField": "name",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "Slug",
@@ -432,6 +479,14 @@ def get_mobile_column_config():
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
                     "tooltipField": "user_name",
                     "resizable": True,
+                    "filter": "agTextColumnFilter",
+                    "filterParams": {
+                        "buttons": ["clear", "apply"],
+                        "closeOnApply": True,
+                        "caseSensitive": False,
+                        "trimInput": True,
+                        "debounceMs": 500,
+                    },
                 },
                 {
                     "headerName": "User Email",
