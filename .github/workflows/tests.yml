@@ -82,12 +82,13 @@ jobs:
 
     - name: Run Playwright tests
       run: |
-        poetry run python -m pytest tests/playwright/ -v
+        poetry run python -m pytest tests/playwright/ -v --output=playwright-report --tracing=retain-on-failure
 
     - name: Upload Playwright report
       uses: actions/upload-artifact@v7
-      if: always()
+      if: failure()
       with:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+        if-no-files-found: ignore
