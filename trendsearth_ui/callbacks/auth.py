@@ -140,6 +140,17 @@ def register_callbacks(app):
                 api_env,
             )
 
+        # Check if this is a registration page request
+        if _pathname and _pathname.startswith("/register"):
+            return (
+                registration_layout(),
+                True,  # Clear auth stores for this public page
+                None,
+                None,
+                None,
+                current_api_environment or "production",
+            )
+
         if _is_mock_auth_enabled(search):
             logger.debug("Auth bypass enabled via secure mock auth configuration")
             user_data = {

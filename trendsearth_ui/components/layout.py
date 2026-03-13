@@ -670,7 +670,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Email",
+                                                                    html.Strong("Email"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -696,7 +696,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Full Name",
+                                                                    html.Strong("Full Name"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -739,7 +739,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Organization",
+                                                                    html.Strong("Organization"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -765,7 +765,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Sector",
+                                                                    html.Strong("Sector"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -812,7 +812,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Purpose of Use",
+                                                                    html.Strong("Purpose of Use"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -859,7 +859,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Country",
+                                                                    html.Strong("Country"),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
