@@ -36,6 +36,10 @@ USER_ALLOWED_SORT_COLUMNS = {
     "last_activity_at",
     "email_verified",
     "email_verified_at",
+    "role_title",
+    "sector",
+    "purpose_of_use",
+    "gee_license_acknowledged",
 }
 USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 
@@ -74,6 +78,15 @@ def _format_user_rows(
                 row["email_verified"] = "✗ No"
             else:
                 row["email_verified"] = "—"
+        # Format gee_license_acknowledged boolean as readable text
+        if "gee_license_acknowledged" in row:
+            gee_ack = row.get("gee_license_acknowledged")
+            if gee_ack is True:
+                row["gee_license_acknowledged"] = "✓ Yes"
+            elif gee_ack is False:
+                row["gee_license_acknowledged"] = "✗ No"
+            else:
+                row["gee_license_acknowledged"] = "—"
         rows.append(row)
     return rows
 
