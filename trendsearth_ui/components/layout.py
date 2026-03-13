@@ -905,9 +905,9 @@ def registration_layout():
                                                     ),
                                                     # Gender note
                                                     html.P(
-                                                        "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary, your selection will not affect your access to the tool.",
+                                                        "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary; your selection will not affect your access to the tool.",
                                                         className="text-muted mb-3",
-                                                        style={"fontSize": "10px"},
+                                                        style={"fontSize": "12px"},
                                                     ),
                                                     # Gender Description (conditional)
                                                     dbc.Row(
@@ -980,13 +980,15 @@ def registration_layout():
                                                                     ". Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing.",
                                                                 ],
                                                                 className="text-muted mb-3",
-                                                                style={"fontSize": "10px"},
+                                                                style={"fontSize": "12px"},
                                                             ),
-                                                            dbc.Checkbox(
-                                                                id="register-gee-acknowledged",
-                                                                label="Yes, I acknowledge",
-                                                                value=False,
-                                                                className="mb-3",
+                                                            html.Div(
+                                                                dbc.Checkbox(
+                                                                    id="register-gee-acknowledged",
+                                                                    label="Yes, I acknowledge",
+                                                                    value=False,
+                                                                ),
+                                                                className="mb-3 d-flex justify-content-center",
                                                             ),
                                                         ],
                                                         style={
@@ -995,6 +997,13 @@ def registration_layout():
                                                             "padding": "15px",
                                                             "marginBottom": "15px",
                                                         },
+                                                    ),
+                                                    # Alert for validation messages (above button so visible without scrolling)
+                                                    dbc.Alert(
+                                                        id="register-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                        duration=None,
                                                     ),
                                                     dbc.Row(
                                                         [
@@ -1028,12 +1037,6 @@ def registration_layout():
                                                         ],
                                                     ),
                                                 ]
-                                            ),
-                                            dbc.Alert(
-                                                id="register-alert",
-                                                is_open=False,
-                                                dismissable=True,
-                                                duration=None,
                                             ),
                                             html.Hr(),
                                             html.Div(
@@ -1077,7 +1080,12 @@ def registration_layout():
                     ),
                 ]
             ),
-        ]
+        ],
+        style={
+            "height": "100vh",
+            "overflowY": "auto",
+            "paddingBottom": "40px",
+        },
     )
 
 
