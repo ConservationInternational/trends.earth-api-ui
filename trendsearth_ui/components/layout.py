@@ -571,6 +571,52 @@ def registration_layout():
 
     Note: API environment is now auto-detected from the request subdomain.
     """
+    # Dropdown options matching QGIS plugin
+    sector_options = [
+        {"label": "", "value": ""},
+        {"label": "Government - Environment/Natural Resources", "value": "gov_environment"},
+        {"label": "Government - Agriculture", "value": "gov_agriculture"},
+        {"label": "Government - Land Management/Planning", "value": "gov_land_management"},
+        {"label": "Government - Other", "value": "gov_other"},
+        {"label": "International/Multilateral Organization", "value": "international_org"},
+        {"label": "NGO - Development/Aid", "value": "ngo_development"},
+        {"label": "NGO - Community-Based", "value": "ngo_community"},
+        {"label": "NGO - Conservation", "value": "ngo_conservation"},
+        {"label": "NGO - Other", "value": "ngo_other"},
+        {"label": "Academic/Research Institution", "value": "academic"},
+        {"label": "Consulting/Professional Services", "value": "consulting"},
+        {"label": "Private Sector - Agriculture/Forestry", "value": "private_agri_forestry"},
+        {"label": "Private Sector - Other", "value": "private_other"},
+        {"label": "Independent Researcher", "value": "independent_researcher"},
+        {"label": "Student", "value": "student"},
+        {"label": "Other", "value": "other"},
+    ]
+
+    purpose_options = [
+        {"label": "", "value": ""},
+        {"label": "National/International Reporting (UNCCD, SDGs, etc.)", "value": "reporting"},
+        {"label": "Academic Research", "value": "academic_research"},
+        {"label": "Policy Development & Planning", "value": "policy_planning"},
+        {"label": "Land Restoration/Management Planning", "value": "land_restoration"},
+        {"label": "Project Monitoring & Evaluation", "value": "project_monitoring"},
+        {"label": "Environmental Impact Assessment", "value": "environmental_assessment"},
+        {"label": "Agriculture/Forestry Planning", "value": "agriculture_forestry"},
+        {"label": "Teaching & Education", "value": "teaching_education"},
+        {"label": "Conservation Planning", "value": "conservation_planning"},
+        {"label": "Commercial Services/Products", "value": "commercial"},
+        {"label": "Community/Grassroots Initiatives", "value": "community_initiatives"},
+        {"label": "Other", "value": "other"},
+    ]
+
+    gender_options = [
+        {"label": "", "value": ""},
+        {"label": "Woman", "value": "woman"},
+        {"label": "Man", "value": "man"},
+        {"label": "Non-binary", "value": "non_binary"},
+        {"label": "Prefer to self-describe", "value": "self_describe"},
+        {"label": "Prefer not to say", "value": "prefer_not_to_say"},
+    ]
+
     return html.Div(
         [
             dbc.Container(
@@ -609,11 +655,29 @@ def registration_layout():
                                                 className="text-muted text-center mb-4",
                                                 style={"fontSize": "14px"},
                                             ),
+                                            html.P(
+                                                [
+                                                    html.Span("* ", style={"color": "red"}),
+                                                    "Required field",
+                                                ],
+                                                className="text-muted mb-3",
+                                                style={"fontSize": "12px"},
+                                            ),
                                             dbc.Form(
                                                 [
+                                                    # Email
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Email", width=4),
+                                                            dbc.Label(
+                                                                [
+                                                                    "Email",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
@@ -627,9 +691,19 @@ def registration_layout():
                                                         ],
                                                         className="mb-3",
                                                     ),
+                                                    # Name
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Name", width=4),
+                                                            dbc.Label(
+                                                                [
+                                                                    "Full Name",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
@@ -643,25 +717,156 @@ def registration_layout():
                                                         ],
                                                         className="mb-3",
                                                     ),
-                                                    # Hidden password inputs to satisfy callback dependencies
-                                                    html.Div(
-                                                        [
-                                                            dbc.Input(
-                                                                id="register-password",
-                                                                type="hidden",
-                                                                value="",
-                                                            ),
-                                                            dbc.Input(
-                                                                id="register-password-confirm",
-                                                                type="hidden",
-                                                                value="",
-                                                            ),
-                                                        ],
-                                                        style={"display": "none"},
-                                                    ),
+                                                    # Role/Title
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Country", width=4),
+                                                            dbc.Label("Role/Title", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-role-title",
+                                                                        type="text",
+                                                                        placeholder="Your job title (optional)",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Institution/Organization
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Organization",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-institution",
+                                                                        type="text",
+                                                                        placeholder="Your organization",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Sector
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Sector",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="register-sector",
+                                                                        options=sector_options,
+                                                                        placeholder="Select your sector",
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Sector Other (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Please specify", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-sector-other",
+                                                                        type="text",
+                                                                        placeholder="Please specify your sector",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="register-sector-other-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Purpose of Use
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Purpose of Use",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="register-purpose",
+                                                                        options=purpose_options,
+                                                                        placeholder="Select your purpose of use",
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Purpose Other (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Please specify", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-purpose-other",
+                                                                        type="text",
+                                                                        placeholder="Please specify your purpose",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="register-purpose-other-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Country
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Country",
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
                                                             dbc.Col(
                                                                 [
                                                                     dcc.Dropdown(
@@ -679,21 +884,65 @@ def registration_layout():
                                                         ],
                                                         className="mb-3",
                                                     ),
+                                                    # Gender Identity
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Institution", width=4),
+                                                            dbc.Label("Gender Identity", width=4),
                                                             dbc.Col(
                                                                 [
-                                                                    dbc.Input(
-                                                                        id="register-institution",
-                                                                        type="text",
-                                                                        placeholder="Your organization (optional)",
+                                                                    dcc.Dropdown(
+                                                                        id="register-gender",
+                                                                        options=gender_options,
+                                                                        placeholder="Select (optional)",
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
                                                                     ),
                                                                 ],
                                                                 width=8,
                                                             ),
                                                         ],
                                                         className="mb-3",
+                                                    ),
+                                                    # Gender note
+                                                    html.P(
+                                                        "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary, your selection will not affect your access to the tool.",
+                                                        className="text-muted mb-3",
+                                                        style={"fontSize": "10px"},
+                                                    ),
+                                                    # Gender Description (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label("Please describe", width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="register-gender-description",
+                                                                        type="text",
+                                                                        placeholder="Please describe",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="register-gender-description-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Hidden password inputs to satisfy callback dependencies
+                                                    html.Div(
+                                                        [
+                                                            dbc.Input(
+                                                                id="register-password",
+                                                                type="hidden",
+                                                                value="",
+                                                            ),
+                                                            dbc.Input(
+                                                                id="register-password-confirm",
+                                                                type="hidden",
+                                                                value="",
+                                                            ),
+                                                        ],
+                                                        style={"display": "none"},
                                                     ),
                                                     # Hidden input to maintain callback compatibility
                                                     # API environment is now auto-detected from subdomain
@@ -704,6 +953,48 @@ def registration_layout():
                                                             value="",
                                                         ),
                                                         style={"display": "none"},
+                                                    ),
+                                                    # GEE License Acknowledgment
+                                                    html.Div(
+                                                        [
+                                                            html.P(
+                                                                [
+                                                                    html.Strong(
+                                                                        "Do you acknowledge that some Trends.Earth features use Google Earth Engine, and, depending on your use, you may be required to have in place a commercial license to use Google Earth Engine?"
+                                                                    ),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                className="mb-2",
+                                                            ),
+                                                            html.P(
+                                                                [
+                                                                    "Google Earth Engine (GEE) imposes restrictions on commercial use. For more details see the ",
+                                                                    html.A(
+                                                                        "Google Earth Engine Terms of Use",
+                                                                        href="https://earthengine.google.com/terms/",
+                                                                        target="_blank",
+                                                                    ),
+                                                                    ". Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing.",
+                                                                ],
+                                                                className="text-muted mb-3",
+                                                                style={"fontSize": "10px"},
+                                                            ),
+                                                            dbc.Checkbox(
+                                                                id="register-gee-acknowledged",
+                                                                label="Yes, I acknowledge",
+                                                                value=False,
+                                                                className="mb-3",
+                                                            ),
+                                                        ],
+                                                        style={
+                                                            "border": "1px solid #dee2e6",
+                                                            "borderRadius": "5px",
+                                                            "padding": "15px",
+                                                            "marginBottom": "15px",
+                                                        },
                                                     ),
                                                     dbc.Row(
                                                         [
@@ -778,7 +1069,7 @@ def registration_layout():
                                         ]
                                     ),
                                 ],
-                                style={"maxWidth": "500px"},
+                                style={"maxWidth": "600px"},
                                 width=6,
                                 className="mx-auto mt-4",
                             ),

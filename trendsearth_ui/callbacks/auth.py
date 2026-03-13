@@ -1246,6 +1246,40 @@ def register_callbacks(app):
             return login_layout()
         return no_update
 
+    # Conditional field visibility callbacks for registration form
+    @app.callback(
+        Output("register-sector-other-row", "style"),
+        [Input("register-sector", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_sector_other_visibility(sector_value):
+        """Show/hide the sector 'other' input field based on selection."""
+        if sector_value == "other":
+            return {"display": "flex"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("register-purpose-other-row", "style"),
+        [Input("register-purpose", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_purpose_other_visibility(purpose_value):
+        """Show/hide the purpose 'other' input field based on selection."""
+        if purpose_value == "other":
+            return {"display": "flex"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("register-gender-description-row", "style"),
+        [Input("register-gender", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_gender_description_visibility(gender_value):
+        """Show/hide the gender description input field based on selection."""
+        if gender_value == "self_describe":
+            return {"display": "flex"}
+        return {"display": "none"}
+
     @app.callback(
         Output("register-country", "options"),
         [Input("register-api-environment", "value")],
@@ -1279,10 +1313,33 @@ def register_callbacks(app):
             State("register-country", "value"),
             State("register-institution", "value"),
             State("register-api-environment", "value"),
+            State("register-role-title", "value"),
+            State("register-sector", "value"),
+            State("register-sector-other", "value"),
+            State("register-purpose", "value"),
+            State("register-purpose-other", "value"),
+            State("register-gender", "value"),
+            State("register-gender-description", "value"),
+            State("register-gee-acknowledged", "value"),
         ],
         prevent_initial_call=True,
     )
-    def submit_registration(n_clicks, email, name, country, institution, _api_environment_input):
+    def submit_registration(
+        n_clicks,
+        email,
+        name,
+        country,
+        institution,
+        _api_environment_input,
+        role_title,
+        sector,
+        sector_other,
+        purpose,
+        purpose_other,
+        gender,
+        gender_description,
+        gee_acknowledged,
+    ):
         """Handle user registration form submission.
 
         This uses the secure registration flow (legacy=false) where:
@@ -1303,6 +1360,34 @@ def register_callbacks(app):
         if not name:
             return "Please enter your name.", "warning", True
 
+        if not institution:
+            return "Please enter your organization.", "warning", True
+
+        if not sector:
+            return "Please select your sector.", "warning", True
+
+        if sector == "other" and not sector_other:
+            return "Please specify your sector.", "warning", True
+
+        if not purpose:
+            return "Please select your purpose of use.", "warning", True
+
+        if purpose == "other" and not purpose_other:
+            return "Please specify your purpose of use.", "warning", True
+
+        if not country:
+            return "Please select your country.", "warning", True
+
+        if gender == "self_describe" and not gender_description:
+            return "Please describe your gender identity.", "warning", True
+
+        if not gee_acknowledged:
+            return (
+                "Please acknowledge the Google Earth Engine license terms.",
+                "warning",
+                True,
+            )
+
         # Validate email format
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(email_pattern, email):
@@ -1319,13 +1404,27 @@ def register_callbacks(app):
                 "email": email,
                 "name": name,
                 "role": "USER",
+                "country": country,
+                "institution": institution,
+                "sector": sector,
+                "purpose_of_use": purpose,
+                "gee_license_acknowledged": gee_acknowledged,
             }
 
-            if country:
-                payload["country"] = country
+            # Add optional/conditional fields
+            if role_title:
+                payload["role_title"] = role_title
 
-            if institution:
-                payload["institution"] = institution
+            if sector == "other" and sector_other:
+                payload["sector_other"] = sector_other
+
+            if purpose == "other" and purpose_other:
+                payload["purpose_of_use_other"] = purpose_other
+
+            if gender:
+                payload["gender_identity"] = gender
+                if gender == "self_describe" and gender_description:
+                    payload["gender_identity_description"] = gender_description
 
             # Use legacy=false to send secure reset link instead of emailing password
             resp = get_session().post(
