@@ -1,3 +1,8 @@
 **__pycache__**
 **venv**
-*.pycpoetry-installer-error-*.log
+*.pyc
+poetry-installer-error-*.log
+
+# Translation files (generated)
+*.mo
+*.pot
