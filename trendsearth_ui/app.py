@@ -16,6 +16,10 @@ from .components import create_main_layout
 # Import configuration
 from .config import APP_HOST, APP_PORT, APP_TITLE
 
+# Import internationalization support
+from .i18n import SUPPORTED_LANGUAGES, get_current_language, init_i18n
+from .i18n.dash_i18n import register_language_callbacks
+
 # Import deployment utilities
 from .utils.deployment_info import get_health_response
 
@@ -27,6 +31,12 @@ rollbar_token = os.environ.get("ROLLBAR_ACCESS_TOKEN")
 logger = setup_logging(rollbar_token)
 
 server = flask.Flask(__name__)
+
+# Configure Flask session for i18n language persistence
+server.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+
+# Initialize internationalization (i18n) support
+babel = init_i18n(server)
 
 
 def _rollbar_report_exception(sender, exception, **_extra):  # noqa: ARG001
@@ -429,6 +439,49 @@ def not_found(_error):
 # Register all callbacks
 register_all_callbacks(app)
 
+# Register language-related callbacks for i18n
+register_language_callbacks(app)
+
+
+@server.route("/api/set-language/<lang>")
+def set_language_route(lang):
+    """API endpoint to set the user's preferred language.
+
+    Args:
+        lang: Language code (e.g., 'en', 'es', 'fr')
+
+    Returns:
+        JSON response with success status and current language.
+    """
+    from .i18n import set_language
+
+    if lang in SUPPORTED_LANGUAGES:
+        set_language(lang)
+        return {
+            "status": "success",
+            "language": lang,
+            "language_name": SUPPORTED_LANGUAGES[lang],
+        }, 200
+    else:
+        return {
+            "status": "error",
+            "message": f"Unsupported language: {lang}",
+            "supported_languages": list(SUPPORTED_LANGUAGES.keys()),
+        }, 400
+
+
+@server.route("/api/languages")
+def get_languages():
+    """API endpoint to get list of supported languages.
+
+    Returns:
+        JSON response with list of supported languages.
+    """
+    return {
+        "current_language": get_current_language(),
+        "languages": [{"code": code, "name": name} for code, name in SUPPORTED_LANGUAGES.items()],
+    }, 200
+
 
 def main():
     """Main entry point for console script."""
@@ -439,6 +492,9 @@ def main():
     # Log deployment information
     deployment_info = get_health_response()["deployment"]
     logger.info(f"Deployment info: {deployment_info}")
+
+    # Log i18n information
+    logger.info(f"Supported languages: {', '.join(SUPPORTED_LANGUAGES.keys())}")
 
     if rollbar_token:
         logger.info("Rollbar error tracking is enabled")

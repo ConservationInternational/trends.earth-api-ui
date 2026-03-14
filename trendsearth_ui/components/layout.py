@@ -12,6 +12,7 @@ from ..config import (
     LOGO_SQUARE_URL,
     LOGO_URL,
 )
+from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     access_control_modal,
@@ -24,6 +25,7 @@ from .modals import (
     reset_individual_rate_limit_modal,
     reset_rate_limits_modal,
 )
+from .news import create_news_banner
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +83,8 @@ def create_main_layout():
             *timezone_components,
             # Mobile detection components
             *mobile_components,
+            # Language controls for i18n
+            *create_language_controls(),
             # Modals
             json_modal(),
             edit_user_modal(),
@@ -179,32 +183,38 @@ def login_layout():
             dbc.Row(
                 [
                     dbc.Col(
-                        dbc.Card(
-                            [
-                                dbc.CardHeader(
-                                    html.Div(
-                                        [
-                                            html.Img(
-                                                src=LOGO_URL,
-                                                alt="Trends.Earth Logo",
-                                                style={
-                                                    "maxWidth": "100%",
-                                                    "width": "450px",
-                                                    "height": "auto",
-                                                    "marginBottom": "15px",
-                                                },
-                                            ),
-                                            html.H4("Login", style={"color": "white"}),
-                                        ],
-                                        className="text-center",
-                                    ),
-                                    style={
-                                        "backgroundColor": "#495057",
+                        [
+                            dbc.Card(
+                                [
+                                    dbc.CardHeader(
+                                        html.Div(
+                                            [
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    alt="Trends.Earth Logo",
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "450px",
+                                                        "height": "auto",
+                                                        "marginBottom": "15px",
+                                                    },
+                                                ),
+                                                html.H4("Login", style={"color": "white"}),
+                                            ],
+                                            className="text-center",
+                                        ),
+                                        style={
+                                            "backgroundColor": "#495057",
                                         "padding": "20px",
                                     },
                                 ),
                                 dbc.CardBody(
                                     [
+                                        # Language selector just above the form
+                                        html.Div(
+                                            create_language_selector(id_prefix="login-lang"),
+                                            className="mb-3",
+                                        ),
                                         dbc.Form(
                                             [
                                                 dbc.Row(
@@ -341,6 +351,7 @@ def login_layout():
                             ],
                             style={"maxWidth": "400px"},
                         ),
+                        ],
                         width="auto",
                         className="mx-auto mt-4",
                     ),
@@ -399,6 +410,13 @@ def reset_password_layout(token=None, api_environment="production"):
                                             html.P(
                                                 "Enter your new password below.",
                                                 className="text-muted mb-4",
+                                            ),
+                                            # Language selector
+                                            html.Div(
+                                                create_language_selector(
+                                                    id_prefix="reset-lang"
+                                                ),
+                                                className="mb-3",
                                             ),
                                             # Hidden stores for token and environment
                                             dcc.Store(
@@ -654,6 +672,13 @@ def registration_layout():
                                                 "After registration, you'll receive an email to verify your address and set your password.",
                                                 className="text-muted text-center mb-4",
                                                 style={"fontSize": "14px"},
+                                            ),
+                                            # Language selector
+                                            html.Div(
+                                                create_language_selector(
+                                                    id_prefix="register-lang"
+                                                ),
+                                                className="mb-3",
                                             ),
                                             html.P(
                                                 [
@@ -1136,6 +1161,8 @@ def dashboard_layout():
                                                 id="header-user-info",
                                                 className="me-3 text-muted",
                                             ),
+                                            # Language selector dropdown
+                                            create_language_selector(),
                                             dbc.Button(
                                                 [
                                                     html.I(className="fas fa-sign-out-alt me-2"),
@@ -1173,6 +1200,8 @@ def dashboard_layout():
             dismissable=True,
             duration=4000,
         ),
+        # News banner for announcements
+        create_news_banner(),
         # Collapsible main panel containing the tabs
         dbc.Collapse(
             html.Div(

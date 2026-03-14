@@ -39,6 +39,7 @@ def register_all_callbacks(app):
         "service_credentials",  # Add service credentials callbacks
         "edit",
         "refresh",
+        "news",  # Add news callbacks
     ]
 
     for module_name in callback_modules:

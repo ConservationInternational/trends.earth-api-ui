@@ -17,6 +17,10 @@ from .modals import (
     reset_individual_rate_limit_modal,
     reset_rate_limits_modal,
 )
+from .news import (
+    create_news_banner,
+    create_news_item_card,
+)
 from .tabs import (
     admin_tab_content,
     executions_tab_content,
@@ -46,4 +50,6 @@ __all__ = [
     "scripts_tab_content",
     "profile_tab_content",
     "status_tab_content",
+    "create_news_banner",
+    "create_news_item_card",
 ]

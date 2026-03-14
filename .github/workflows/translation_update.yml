@@ -1,0 +1,129 @@
+name: Update translations
+
+on:
+  schedule:
+    # Run on Monday, Wednesday, and Friday at 4 AM UTC
+    - cron: "0 4 * * 1,3,5"
+  workflow_dispatch:
+    inputs:
+      force_pull:
+        description: 'Force pull translations regardless of timestamps'
+        required: false
+        type: boolean
+        default: false
+      force_push:
+        description: 'Force push source strings to Transifex'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  translation_update:
+    if: ${{ github.ref_name == 'master' }}
+    name: Update translations from Transifex
+    runs-on: ubuntu-latest
+    env:
+      TX_TOKEN: ${{ secrets.TX_TOKEN }}
+      TX_HOSTNAME: ${{ secrets.TX_HOSTNAME }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install --with dev
+          pip install babel flask-babel invoke
+
+      - name: Install Transifex CLI
+        run: |
+          curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Extract translatable strings
+        run: |
+          poetry run pybabel extract -F babel.cfg -k _l -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot trendsearth_ui/
+
+      - name: Update PO files from POT
+        run: |
+          for lang in ar en es fa fr pt ru sw zh; do
+            poetry run pybabel update -i trendsearth_ui/i18n/translations/messages.pot -d trendsearth_ui/i18n/translations -l $lang --no-fuzzy-matching || true
+          done
+
+      - name: Pull updated strings from Transifex
+        run: |
+          if [ "${{ inputs.force_pull }}" = "true" ]; then
+            tx pull -f
+          else
+            tx pull
+          fi
+
+      - name: Push source strings to Transifex
+        run: |
+          if [ "${{ inputs.force_push }}" = "true" ]; then
+            tx push -f -s
+          else
+            tx push -s
+          fi
+
+      - name: Compile translations
+        run: |
+          poetry run pybabel compile -d trendsearth_ui/i18n/translations
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update translations
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: translation-updates
+          delete-branch: true
+          title: "Update translations"
+          body: |
+            ## Translation Update
+
+            This PR updates translations from Transifex.
+
+            ### Changes
+            - Extracted new translatable strings from source code
+            - Pulled updated translations from Transifex
+            - Pushed new source strings to Transifex
+            - Compiled translation files
+
+            ### Languages
+            - Arabic (ar)
+            - Chinese (zh)
+            - English (en)
+            - Farsi (fa)
+            - French (fr)
+            - Portuguese (pt)
+            - Russian (ru)
+            - Spanish (es)
+            - Swahili (sw)
+          labels: |
+            i18n
+            automated pr
+          add-paths: |
+            trendsearth_ui/i18n/translations/**/*.po
+            trendsearth_ui/i18n/translations/**/*.pot
+            trendsearth_ui/i18n/translations/**/*.mo
+
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"

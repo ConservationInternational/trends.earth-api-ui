@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[o:conservation-international:p:trendsearth-api-ui:r:messages]
+file_filter = trendsearth_ui/i18n/translations/<lang>/LC_MESSAGES/messages.po
+source_file = trendsearth_ui/i18n/translations/messages.pot
+source_lang = en
+type = PO
