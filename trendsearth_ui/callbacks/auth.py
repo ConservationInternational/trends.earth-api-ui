@@ -11,7 +11,13 @@ from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
 import requests
 
-from ..components import dashboard_layout, login_layout, registration_layout, reset_password_layout
+from ..components import (
+    dashboard_layout,
+    login_layout,
+    registration_layout,
+    reset_password_layout,
+    update_profile_standalone_layout,
+)
 from ..config import detect_api_environment_from_host, get_api_base, get_auth_url
 from ..utils import (
     create_auth_cookie_data,
@@ -149,6 +155,35 @@ def register_callbacks(app):
                 None,
                 None,
                 current_api_environment or "production",
+            )
+
+        # Check if this is a standalone profile update page request
+        if _pathname and _pathname.startswith("/update-profile"):
+            # Extract token and language from query parameters
+            profile_token = None
+            api_env = current_api_environment or "production"
+            lang = None
+            if search:
+                params = parse_qs(search[1:] if search.startswith("?") else search)
+                profile_token = params.get("token", [None])[0]
+                # Also check for environment parameter
+                env_param = params.get("env", [None])[0]
+                if env_param:
+                    api_env = env_param
+                # Check for language parameter
+                lang_param = params.get("lang", [None])[0]
+                if lang_param:
+                    lang = lang_param
+
+            return (
+                update_profile_standalone_layout(
+                    token=profile_token, api_environment=api_env, lang=lang
+                ),
+                True,  # Clear auth stores for this standalone page
+                None,
+                None,
+                None,
+                api_env,
             )
 
         if _is_mock_auth_enabled(search):
@@ -1503,4 +1538,361 @@ def register_callbacks(app):
             )
         except Exception as e:
             logger.exception("Error during registration: %s", e)
+            return f"An error occurred: {str(e)}", "danger", True
+
+    # =============================
+    # Standalone Profile Update Callbacks
+    # =============================
+
+    @app.callback(
+        Output("language-store", "data", allow_duplicate=True),
+        [Input("standalone-profile-lang", "data")],
+        prevent_initial_call=True,
+    )
+    def set_language_from_url_param(lang):
+        """Set language from URL parameter when standalone profile page loads."""
+        if lang:
+            # Validate the language code
+            from ..i18n import SUPPORTED_LANGUAGES
+
+            if lang in SUPPORTED_LANGUAGES:
+                logger.debug("Setting language from URL parameter: %s", lang)
+                return lang
+        return no_update
+
+    @app.callback(
+        Output("standalone-profile-sector-other-row", "style"),
+        [Input("standalone-profile-sector", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_standalone_sector_other_visibility(sector_value):
+        """Show/hide the sector 'other' input field based on selection."""
+        if sector_value == "other":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("standalone-profile-purpose-other-row", "style"),
+        [Input("standalone-profile-purpose", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_standalone_purpose_other_visibility(purpose_value):
+        """Show/hide the purpose 'other' input field based on selection."""
+        if purpose_value == "other":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("standalone-profile-gender-description-row", "style"),
+        [Input("standalone-profile-gender", "value")],
+        prevent_initial_call=True,
+    )
+    def toggle_standalone_gender_description_visibility(gender_value):
+        """Show/hide the gender description input field based on selection."""
+        if gender_value == "self_describe":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("standalone-profile-countries-store", "data"),
+        [Input("standalone-profile-api-env", "data")],
+    )
+    def load_standalone_profile_countries(api_environment):
+        """Load country options for the standalone profile form."""
+        from ..utils.boundaries_utils import get_country_options
+
+        if not api_environment:
+            api_environment = "production"
+        logger.debug(
+            "Fetching countries for standalone profile (environment: %s)",
+            api_environment,
+        )
+        return get_country_options(api_environment=api_environment, token=None)
+
+    @app.callback(
+        Output("standalone-profile-country", "options"),
+        [Input("standalone-profile-countries-store", "data")],
+    )
+    def update_standalone_profile_country_options(countries_data):
+        """Update country dropdown options from store."""
+        if not countries_data:
+            return []
+        return countries_data
+
+    @app.callback(
+        [
+            Output("standalone-profile-user-data", "data"),
+            Output("standalone-profile-email", "value"),
+            Output("standalone-profile-name", "value"),
+            Output("standalone-profile-role-title", "value"),
+            Output("standalone-profile-institution", "value"),
+            Output("standalone-profile-sector", "value"),
+            Output("standalone-profile-sector-other", "value"),
+            Output("standalone-profile-purpose", "value"),
+            Output("standalone-profile-purpose-other", "value"),
+            Output("standalone-profile-country", "value"),
+            Output("standalone-profile-gender", "value"),
+            Output("standalone-profile-gender-description", "value"),
+            # Control visibility of loading spinner, error alert, and form
+            Output("standalone-profile-loading", "style"),
+            Output("standalone-profile-error-alert", "children"),
+            Output("standalone-profile-error-alert", "is_open"),
+            Output("standalone-profile-form-container", "style"),
+        ],
+        [Input("standalone-profile-token", "data")],
+        [State("standalone-profile-api-env", "data")],
+    )
+    def load_standalone_profile_user_data(token, api_environment):
+        """Load user data using the JWT token from the URL."""
+        # Style constants
+        hide_style = {"display": "none"}
+        show_style = {"display": "block"}
+
+        if not token:
+            return (
+                None,  # user data
+                "",  # email
+                "",  # name
+                "",  # role_title
+                "",  # institution
+                "",  # sector
+                "",  # sector_other
+                "",  # purpose
+                "",  # purpose_other
+                "",  # country
+                "",  # gender
+                "",  # gender_description
+                hide_style,  # hide loading spinner
+                "No token provided. Please use a valid profile update link.",
+                True,  # show error alert
+                hide_style,  # hide form
+            )
+
+        try:
+            api_base = get_api_base(api_environment or "production")
+            user_data = get_user_info(token, api_base)
+
+            if not user_data:
+                return (
+                    None,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    hide_style,  # hide loading spinner
+                    "Invalid or expired token. Please request a new profile update link.",
+                    True,  # show error alert
+                    hide_style,  # hide form
+                )
+
+            logger.debug("Loaded user data for standalone profile: %s", user_data.get("email"))
+
+            return (
+                user_data,
+                user_data.get("email", ""),
+                user_data.get("name", ""),
+                user_data.get("role_title", ""),
+                user_data.get("institution", ""),
+                user_data.get("sector", ""),
+                user_data.get("sector_other", ""),
+                user_data.get("purpose_of_use", ""),
+                user_data.get("purpose_of_use_other", ""),
+                user_data.get("country", ""),
+                user_data.get("gender_identity", ""),
+                user_data.get("gender_identity_description", ""),
+                hide_style,  # hide loading spinner
+                "",  # no error message
+                False,  # hide error alert
+                show_style,  # show form
+            )
+
+        except Exception as e:
+            logger.exception("Error loading user data: %s", e)
+            return (
+                None,
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                hide_style,  # hide loading spinner
+                f"Error loading profile: {str(e)}",
+                True,  # show error alert
+                hide_style,  # hide form
+            )
+
+    @app.callback(
+        [
+            Output("standalone-profile-submit-alert", "children", allow_duplicate=True),
+            Output("standalone-profile-submit-alert", "color", allow_duplicate=True),
+            Output("standalone-profile-submit-alert", "is_open", allow_duplicate=True),
+        ],
+        [Input("standalone-profile-submit-btn", "n_clicks")],
+        [
+            State("standalone-profile-token", "data"),
+            State("standalone-profile-api-env", "data"),
+            State("standalone-profile-name", "value"),
+            State("standalone-profile-role-title", "value"),
+            State("standalone-profile-institution", "value"),
+            State("standalone-profile-sector", "value"),
+            State("standalone-profile-sector-other", "value"),
+            State("standalone-profile-purpose", "value"),
+            State("standalone-profile-purpose-other", "value"),
+            State("standalone-profile-country", "value"),
+            State("standalone-profile-gender", "value"),
+            State("standalone-profile-gender-description", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def submit_standalone_profile_update(
+        n_clicks,
+        token,
+        api_environment,
+        name,
+        role_title,
+        institution,
+        sector,
+        sector_other,
+        purpose,
+        purpose_other,
+        country,
+        gender,
+        gender_description,
+    ):
+        """Submit profile update using JWT token from URL."""
+        if not n_clicks:
+            return no_update, no_update, no_update
+
+        if not token:
+            return (
+                "No authentication token. Please use a valid profile update link.",
+                "danger",
+                True,
+            )
+
+        # Validate required fields
+        if not name:
+            return "Please enter your name.", "warning", True
+
+        if not institution:
+            return "Please enter your organization.", "warning", True
+
+        if not sector:
+            return "Please select your sector.", "warning", True
+
+        if sector == "other" and not sector_other:
+            return "Please specify your sector.", "warning", True
+
+        if not purpose:
+            return "Please select your purpose of use.", "warning", True
+
+        if purpose == "other" and not purpose_other:
+            return "Please specify your purpose of use.", "warning", True
+
+        if not country:
+            return "Please select your country.", "warning", True
+
+        if gender == "self_describe" and not gender_description:
+            return "Please describe your gender identity.", "warning", True
+
+        try:
+            api_base = get_api_base(api_environment or "production")
+            logger.debug(
+                "Submitting standalone profile update to %s (environment: %s)",
+                api_base,
+                api_environment,
+            )
+
+            # Build update payload
+            payload = {
+                "name": name,
+                "country": country,
+                "institution": institution,
+                "sector": sector,
+                "purpose_of_use": purpose,
+            }
+
+            # Add optional/conditional fields
+            if role_title:
+                payload["role_title"] = role_title
+
+            if sector == "other" and sector_other:
+                payload["sector_other"] = sector_other
+            elif sector != "other":
+                # Clear sector_other if sector is not "other"
+                payload["sector_other"] = ""
+
+            if purpose == "other" and purpose_other:
+                payload["purpose_of_use_other"] = purpose_other
+            elif purpose != "other":
+                # Clear purpose_other if purpose is not "other"
+                payload["purpose_of_use_other"] = ""
+
+            if gender:
+                payload["gender_identity"] = gender
+                if gender == "self_describe" and gender_description:
+                    payload["gender_identity_description"] = gender_description
+                elif gender != "self_describe":
+                    # Clear description if gender is not "self_describe"
+                    payload["gender_identity_description"] = ""
+
+            # Make authenticated request using the JWT token
+            headers = apply_default_headers()
+            headers["Authorization"] = f"Bearer {token}"
+
+            resp = get_session().patch(
+                f"{api_base}/user/me",
+                json=payload,
+                headers=headers,
+                timeout=15,
+            )
+
+            if resp.status_code == 200:
+                logger.debug("Standalone profile update successful")
+                return "Profile updated successfully!", "success", True
+            elif resp.status_code == 401:
+                return "Session expired. Please request a new profile update link.", "danger", True
+            elif resp.status_code == 422:
+                error_msg = "Invalid token. Please request a new profile update link."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
+                except Exception:
+                    pass
+                return error_msg, "danger", True
+            else:
+                logger.warning("Profile update failed with status: %s", resp.status_code)
+                error_msg = "Failed to update profile."
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
+                except Exception:
+                    logger.debug("Could not parse profile update error response", exc_info=True)
+                return error_msg, "danger", True
+
+        except requests.exceptions.Timeout:
+            logger.warning("Profile update request timed out")
+            return "Request timed out. Please try again.", "danger", True
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error during profile update")
+            return (
+                "Cannot connect to the server. Please check your connection.",
+                "danger",
+                True,
+            )
+        except Exception as e:
+            logger.exception("Error during profile update: %s", e)
             return f"An error occurred: {str(e)}", "danger", True

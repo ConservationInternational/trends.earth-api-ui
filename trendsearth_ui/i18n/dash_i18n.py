@@ -164,8 +164,8 @@ def register_language_callbacks(app):  # noqa: ARG001
         prevent_initial_call=True,
     )
 
-    # ID prefixes for language selectors (dashboard, login, register, reset password pages)
-    id_prefixes = ["lang", "login-lang", "register-lang", "reset-lang"]
+    # ID prefixes for language selectors (dashboard, login, register, reset password, standalone profile pages)
+    id_prefixes = ["lang", "login-lang", "register-lang", "reset-lang", "standalone-profile-lang"]
 
     # Create individual callbacks for each language option and each selector
     for prefix in id_prefixes:

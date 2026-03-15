@@ -31,6 +31,80 @@ from .news import create_news_banner
 logger = logging.getLogger(__name__)
 
 
+# =============================================================================
+# Shared dropdown options for registration and profile forms
+# =============================================================================
+# These functions return translated dropdown options. They must be called at
+# render time (inside layout functions) so that translations are evaluated
+# with the current request's language context.
+
+
+def get_sector_options():
+    """Get sector dropdown options with translations.
+
+    Returns:
+        list: Sector options for dcc.Dropdown or dbc.Select.
+    """
+    return [
+        {"label": "", "value": ""},
+        {"label": _("Government - Environment/Natural Resources"), "value": "gov_environment"},
+        {"label": _("Government - Agriculture"), "value": "gov_agriculture"},
+        {"label": _("Government - Land Management/Planning"), "value": "gov_land_management"},
+        {"label": _("Government - Other"), "value": "gov_other"},
+        {"label": _("International/Multilateral Organization"), "value": "international_org"},
+        {"label": _("NGO - Development/Aid"), "value": "ngo_development"},
+        {"label": _("NGO - Community-Based"), "value": "ngo_community"},
+        {"label": _("NGO - Conservation"), "value": "ngo_conservation"},
+        {"label": _("NGO - Other"), "value": "ngo_other"},
+        {"label": _("Academic/Research Institution"), "value": "academic"},
+        {"label": _("Consulting/Professional Services"), "value": "consulting"},
+        {"label": _("Private Sector - Agriculture/Forestry"), "value": "private_agri_forestry"},
+        {"label": _("Private Sector - Other"), "value": "private_other"},
+        {"label": _("Independent Researcher"), "value": "independent_researcher"},
+        {"label": _("Student"), "value": "student"},
+        {"label": _("Other"), "value": "other"},
+    ]
+
+
+def get_purpose_options():
+    """Get purpose of use dropdown options with translations.
+
+    Returns:
+        list: Purpose options for dcc.Dropdown or dbc.Select.
+    """
+    return [
+        {"label": "", "value": ""},
+        {"label": _("National/International Reporting (UNCCD, SDGs, etc.)"), "value": "reporting"},
+        {"label": _("Academic Research"), "value": "academic_research"},
+        {"label": _("Policy Development & Planning"), "value": "policy_planning"},
+        {"label": _("Land Restoration/Management Planning"), "value": "land_restoration"},
+        {"label": _("Project Monitoring & Evaluation"), "value": "project_monitoring"},
+        {"label": _("Environmental Impact Assessment"), "value": "environmental_assessment"},
+        {"label": _("Agriculture/Forestry Planning"), "value": "agriculture_forestry"},
+        {"label": _("Teaching & Education"), "value": "teaching_education"},
+        {"label": _("Conservation Planning"), "value": "conservation_planning"},
+        {"label": _("Commercial Services/Products"), "value": "commercial"},
+        {"label": _("Community/Grassroots Initiatives"), "value": "community_initiatives"},
+        {"label": _("Other"), "value": "other"},
+    ]
+
+
+def get_gender_options():
+    """Get gender identity dropdown options with translations.
+
+    Returns:
+        list: Gender options for dcc.Dropdown or dbc.Select.
+    """
+    return [
+        {"label": "", "value": ""},
+        {"label": _("Woman"), "value": "woman"},
+        {"label": _("Man"), "value": "man"},
+        {"label": _("Non-binary"), "value": "non_binary"},
+        {"label": _("Prefer to self-describe"), "value": "self_describe"},
+        {"label": _("Prefer not to say"), "value": "prefer_not_to_say"},
+    ]
+
+
 def create_main_layout():
     """Create the main application layout with all stores and modals."""
     # Get timezone detection components
@@ -600,53 +674,12 @@ def registration_layout():
 
     Note: API environment is now auto-detected from the request subdomain.
     """
-    # Dropdown options matching QGIS plugin
-    # Note: We use _() (gettext) for immediate translation - returns a regular string
-    # that is JSON serializable, unlike lazy_gettext which returns LazyString
-    sector_options = [
-        {"label": "", "value": ""},
-        {"label": _("Government - Environment/Natural Resources"), "value": "gov_environment"},
-        {"label": _("Government - Agriculture"), "value": "gov_agriculture"},
-        {"label": _("Government - Land Management/Planning"), "value": "gov_land_management"},
-        {"label": _("Government - Other"), "value": "gov_other"},
-        {"label": _("International/Multilateral Organization"), "value": "international_org"},
-        {"label": _("NGO - Development/Aid"), "value": "ngo_development"},
-        {"label": _("NGO - Community-Based"), "value": "ngo_community"},
-        {"label": _("NGO - Conservation"), "value": "ngo_conservation"},
-        {"label": _("NGO - Other"), "value": "ngo_other"},
-        {"label": _("Academic/Research Institution"), "value": "academic"},
-        {"label": _("Consulting/Professional Services"), "value": "consulting"},
-        {"label": _("Private Sector - Agriculture/Forestry"), "value": "private_agri_forestry"},
-        {"label": _("Private Sector - Other"), "value": "private_other"},
-        {"label": _("Independent Researcher"), "value": "independent_researcher"},
-        {"label": _("Student"), "value": "student"},
-        {"label": _("Other"), "value": "other"},
-    ]
-
-    purpose_options = [
-        {"label": "", "value": ""},
-        {"label": _("National/International Reporting (UNCCD, SDGs, etc.)"), "value": "reporting"},
-        {"label": _("Academic Research"), "value": "academic_research"},
-        {"label": _("Policy Development & Planning"), "value": "policy_planning"},
-        {"label": _("Land Restoration/Management Planning"), "value": "land_restoration"},
-        {"label": _("Project Monitoring & Evaluation"), "value": "project_monitoring"},
-        {"label": _("Environmental Impact Assessment"), "value": "environmental_assessment"},
-        {"label": _("Agriculture/Forestry Planning"), "value": "agriculture_forestry"},
-        {"label": _("Teaching & Education"), "value": "teaching_education"},
-        {"label": _("Conservation Planning"), "value": "conservation_planning"},
-        {"label": _("Commercial Services/Products"), "value": "commercial"},
-        {"label": _("Community/Grassroots Initiatives"), "value": "community_initiatives"},
-        {"label": _("Other"), "value": "other"},
-    ]
-
-    gender_options = [
-        {"label": "", "value": ""},
-        {"label": _("Woman"), "value": "woman"},
-        {"label": _("Man"), "value": "man"},
-        {"label": _("Non-binary"), "value": "non_binary"},
-        {"label": _("Prefer to self-describe"), "value": "self_describe"},
-        {"label": _("Prefer not to say"), "value": "prefer_not_to_say"},
-    ]
+    # Get dropdown options from shared helper functions
+    # Note: These functions use _() (gettext) for immediate translation - returns regular strings
+    # that are JSON serializable, unlike lazy_gettext which returns LazyString
+    sector_options = get_sector_options()
+    purpose_options = get_purpose_options()
+    gender_options = get_gender_options()
 
     return html.Div(
         [
@@ -1113,6 +1146,462 @@ def registration_layout():
                                                         ],
                                                     ),
                                                 ]
+                                            ),
+                                            html.Hr(),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        _("Privacy Policy"),
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        _("Terms of Use"),
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "600px"},
+                                width=6,
+                                className="mx-auto mt-4",
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ],
+        style={
+            "height": "100vh",
+            "overflowY": "auto",
+            "paddingBottom": "40px",
+        },
+    )
+
+
+def update_profile_standalone_layout(token=None, api_environment=None, lang=None):
+    """Create the standalone profile update page layout.
+
+    This page allows users to update their profile via a direct URL with JWT token,
+    without needing to log in through the normal flow.
+
+    Args:
+        token: JWT token from URL query parameter
+        api_environment: API environment (production/staging)
+        lang: Language code from URL query parameter (e.g., 'en', 'es', 'fr')
+    """
+    # Get dropdown options from shared helper functions (same as registration form)
+    sector_options = get_sector_options()
+    purpose_options = get_purpose_options()
+    gender_options = get_gender_options()
+
+    return html.Div(
+        [
+            # Hidden stores for token, language, and user data
+            dcc.Store(id="standalone-profile-token", data=token),
+            dcc.Store(id="standalone-profile-api-env", data=api_environment or "production"),
+            dcc.Store(id="standalone-profile-lang", data=lang),
+            dcc.Store(id="standalone-profile-user-data", data=None),
+            dcc.Store(id="standalone-profile-countries-store", data=None),
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "450px",
+                                                        "height": "auto",
+                                                    },
+                                                ),
+                                                style={
+                                                    "backgroundColor": "#495057",
+                                                    "padding": "20px 30px",
+                                                    "textAlign": "center",
+                                                    "display": "flex",
+                                                    "justifyContent": "center",
+                                                    "alignItems": "center",
+                                                },
+                                                className="mb-4",
+                                            ),
+                                            html.H4(
+                                                _("Update Your Profile"),
+                                                className="mb-4 text-center",
+                                            ),
+                                            # Language selector
+                                            html.Div(
+                                                create_language_selector(
+                                                    id_prefix="standalone-profile-lang"
+                                                ),
+                                                className="mb-3",
+                                            ),
+                                            # Loading indicator for initial data fetch
+                                            html.Div(
+                                                dbc.Spinner(
+                                                    html.Div("Loading profile..."),
+                                                    color="primary",
+                                                    size="sm",
+                                                ),
+                                                id="standalone-profile-loading",
+                                                className="text-center my-3",
+                                            ),
+                                            # Alert for error messages (shown when token is invalid)
+                                            dbc.Alert(
+                                                id="standalone-profile-error-alert",
+                                                is_open=False,
+                                                color="danger",
+                                            ),
+                                            # Main form container (hidden until user data is loaded)
+                                            html.Div(
+                                                id="standalone-profile-form-container",
+                                                style={"display": "none"},
+                                                children=[
+                                                    html.P(
+                                                        [
+                                                            html.Span("* ", style={"color": "red"}),
+                                                            _("Required field"),
+                                                        ],
+                                                        className="text-muted mb-3",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    # Email (display only)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                html.Strong(_("Email")),
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-email",
+                                                                        type="email",
+                                                                        disabled=True,
+                                                                    ),
+                                                                    html.Small(
+                                                                        _(
+                                                                            "Email cannot be changed"
+                                                                        ),
+                                                                        className="text-muted",
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Name
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    html.Strong(_("Full Name")),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-name",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Enter your full name"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Role/Title
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(_("Role/Title"), width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-role-title",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Your job title (optional)"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Organization
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    html.Strong(_("Organization")),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-institution",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Your organization"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Sector
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    html.Strong(_("Sector")),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="standalone-profile-sector",
+                                                                        options=sector_options,
+                                                                        placeholder=_(
+                                                                            "Select your sector"
+                                                                        ),
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Sector Other (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(_("Please specify"), width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-sector-other",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Please specify your sector"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="standalone-profile-sector-other-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Purpose of Use
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    html.Strong(
+                                                                        _("Purpose of Use")
+                                                                    ),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="standalone-profile-purpose",
+                                                                        options=purpose_options,
+                                                                        placeholder=_(
+                                                                            "Select your purpose of use"
+                                                                        ),
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Purpose Other (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(_("Please specify"), width=4),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-purpose-other",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Please specify your purpose"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="standalone-profile-purpose-other-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Country
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    html.Strong(_("Country")),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                width=4,
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="standalone-profile-country",
+                                                                        placeholder=_(
+                                                                            "Select your country"
+                                                                        ),
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Gender Identity
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                _("Gender Identity"), width=4
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dcc.Dropdown(
+                                                                        id="standalone-profile-gender",
+                                                                        options=gender_options,
+                                                                        placeholder=_(
+                                                                            "Select (optional)"
+                                                                        ),
+                                                                        clearable=True,
+                                                                        style={"fontSize": "14px"},
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Gender note
+                                                    html.P(
+                                                        _(
+                                                            "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary; your selection will not affect your access to the tool."
+                                                        ),
+                                                        className="text-muted mb-3",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    # Gender Description (conditional)
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(
+                                                                _("Please describe"), width=4
+                                                            ),
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Input(
+                                                                        id="standalone-profile-gender-description",
+                                                                        type="text",
+                                                                        placeholder=_(
+                                                                            "Please describe"
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                width=8,
+                                                            ),
+                                                        ],
+                                                        id="standalone-profile-gender-description-row",
+                                                        className="mb-3",
+                                                        style={"display": "none"},
+                                                    ),
+                                                    # Success/Error alert for form submission
+                                                    dbc.Alert(
+                                                        id="standalone-profile-submit-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                        duration=None,
+                                                    ),
+                                                    # Submit button
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                [
+                                                                    dbc.Button(
+                                                                        _("Update Profile"),
+                                                                        id="standalone-profile-submit-btn",
+                                                                        color="primary",
+                                                                        className="w-100",
+                                                                    ),
+                                                                ],
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                ],
                                             ),
                                             html.Hr(),
                                             html.Div(

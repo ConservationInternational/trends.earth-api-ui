@@ -6,6 +6,7 @@ from .layout import (
     login_layout,
     registration_layout,
     reset_password_layout,
+    update_profile_standalone_layout,
 )
 from .modals import (
     delete_script_modal,
@@ -35,6 +36,7 @@ __all__ = [
     "login_layout",
     "registration_layout",
     "reset_password_layout",
+    "update_profile_standalone_layout",
     "dashboard_layout",
     "json_modal",
     "edit_user_modal",
