@@ -46,12 +46,17 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install google-cloud-translate polib
+          pip install google-cloud-translate polib babel flask-babel
 
       - name: Setup Google Cloud credentials
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/gcloud-credentials.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-credentials.json" >> $GITHUB_ENV
+
+      - name: Extract translatable strings
+        run: |
+          mkdir -p trendsearth_ui/i18n/translations
+          pybabel extract -F babel.cfg -k _ -k _l -k _g -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot trendsearth_ui/
 
       - name: Determine target languages
         id: languages
