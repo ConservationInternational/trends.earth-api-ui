@@ -10,432 +10,546 @@ msgstr ""
 "POT-Creation-Date: 2026-03-14 14:26-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: fa\n"
 "Language-Team: fa <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/components/layout.py:114
+#, fuzzy
 msgid "Forgot Password"
-msgstr ""
+msgstr "رمز عبور را فراموش کرده‌ام"
 
 #: trendsearth_ui/components/layout.py:124
+#, fuzzy
 msgid ""
 "Enter your email address and we'll send you instructions to reset your "
 "password."
 msgstr ""
+"آدرس ایمیل خود را وارد کنید و ما دستورالعمل‌های بازنشانی رمز عبور را برای "
+"شما ارسال خواهیم کرد."
 
 #: trendsearth_ui/components/layout.py:127
+#, fuzzy
 msgid "Email Address"
-msgstr ""
+msgstr "آدرس ایمیل"
 
 #: trendsearth_ui/components/layout.py:131
 #: trendsearth_ui/components/layout.py:726
+#, fuzzy
 msgid "Enter your email address"
-msgstr ""
+msgstr "آدرس ایمیل خود را وارد کنید"
 
 #: trendsearth_ui/components/layout.py:153
+#, fuzzy
 msgid "Cancel"
-msgstr ""
+msgstr "لغو"
 
 #: trendsearth_ui/components/layout.py:159
+#, fuzzy
 msgid "Send Reset Instructions"
-msgstr ""
+msgstr "ارسال دستورالعمل‌های بازنشانی"
 
 #: trendsearth_ui/components/layout.py:171
+#, fuzzy
 msgid "OK"
-msgstr ""
+msgstr "باشه"
 
 #: trendsearth_ui/components/layout.py:206
 #: trendsearth_ui/components/layout.py:278
+#, fuzzy
 msgid "Login"
-msgstr ""
+msgstr "ورود"
 
 #: trendsearth_ui/components/layout.py:226
 #: trendsearth_ui/components/layout.py:712
+#, fuzzy
 msgid "Email"
-msgstr ""
+msgstr "ایمیل"
 
 #: trendsearth_ui/components/layout.py:231
+#, fuzzy
 msgid "Enter email"
-msgstr ""
+msgstr "ایمیل را وارد کنید"
 
 #: trendsearth_ui/components/layout.py:240
+#, fuzzy
 msgid "Password"
-msgstr ""
+msgstr "رمز عبور"
 
 #: trendsearth_ui/components/layout.py:245
+#, fuzzy
 msgid "Enter password"
-msgstr ""
+msgstr "رمز عبور را وارد کنید"
 
 #: trendsearth_ui/components/layout.py:268
+#, fuzzy
 msgid "Remember me (keep me logged in)"
-msgstr ""
+msgstr "مرا به خاطر بسپار (مرا به خاطر بسپار)"
 
 #: trendsearth_ui/components/layout.py:286
+#, fuzzy
 msgid "Register"
-msgstr ""
+msgstr "ثبت نام"
 
 #: trendsearth_ui/components/layout.py:297
+#, fuzzy
 msgid "Forgot your password?"
-msgstr ""
+msgstr "رمز عبور خود را فراموش کرده‌اید؟"
 
 #: trendsearth_ui/components/layout.py:328
 #: trendsearth_ui/components/layout.py:557
 #: trendsearth_ui/components/layout.py:1122
+#, fuzzy
 msgid "Privacy Policy"
-msgstr ""
+msgstr "سیاست حفظ حریم خصوصی"
 
 #: trendsearth_ui/components/layout.py:343
 #: trendsearth_ui/components/layout.py:572
 #: trendsearth_ui/components/layout.py:1137
+#, fuzzy
 msgid "Terms of Use"
-msgstr ""
+msgstr "شرایط استفاده"
 
 #: trendsearth_ui/components/layout.py:413
+#, fuzzy
 msgid "Set Your New Password"
-msgstr ""
+msgstr "رمز عبور جدید خود را تنظیم کنید"
 
 #: trendsearth_ui/components/layout.py:417
+#, fuzzy
 msgid "Enter your new password below."
-msgstr ""
+msgstr "رمز عبور جدید خود را در زیر وارد کنید."
 
 #: trendsearth_ui/components/layout.py:438
+#, fuzzy
 msgid "New Password"
-msgstr ""
+msgstr "رمز عبور جدید"
 
 #: trendsearth_ui/components/layout.py:444
+#, fuzzy
 msgid "Enter new password"
-msgstr ""
+msgstr "رمز عبور جدید را وارد کنید"
 
 #: trendsearth_ui/components/layout.py:455
+#, fuzzy
 msgid "Confirm Password"
-msgstr ""
+msgstr "تأیید رمز عبور"
 
 #: trendsearth_ui/components/layout.py:462
+#, fuzzy
 msgid "Confirm new password"
-msgstr ""
+msgstr "رمز عبور جدید را تأیید کنید"
 
 #: trendsearth_ui/components/layout.py:474
+#, fuzzy
 msgid "Password requirements:"
-msgstr ""
+msgstr "الزامات رمز عبور:"
 
 #: trendsearth_ui/components/layout.py:480
+#, fuzzy
 msgid "At least 12 characters"
-msgstr ""
+msgstr "حداقل ۱۲ کاراکتر"
 
 #: trendsearth_ui/components/layout.py:485
+#, fuzzy
 msgid "Uppercase letter (A-Z)"
-msgstr ""
+msgstr "حرف بزرگ (AZ)"
 
 #: trendsearth_ui/components/layout.py:490
+#, fuzzy
 msgid "Lowercase letter (a-z)"
-msgstr ""
+msgstr "حرف کوچک (az)"
 
 #: trendsearth_ui/components/layout.py:495
+#, fuzzy
 msgid "Number (0-9)"
-msgstr ""
+msgstr "شماره (0-9)"
 
 #: trendsearth_ui/components/layout.py:501
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr ""
+msgstr "کاراکتر ویژه (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
 #: trendsearth_ui/components/layout.py:518
+#, fuzzy
 msgid "Set Password"
-msgstr ""
+msgstr "تنظیم رمز عبور"
 
 #: trendsearth_ui/components/layout.py:534
 #: trendsearth_ui/components/layout.py:1106
+#, fuzzy
 msgid "Back to Login"
-msgstr ""
+msgstr "بازگشت به ورود"
 
 #: trendsearth_ui/components/layout.py:609
+#, fuzzy
 msgid "Government - Environment/Natural Resources"
-msgstr ""
+msgstr "دولت - محیط زیست/منابع طبیعی"
 
 #: trendsearth_ui/components/layout.py:610
+#, fuzzy
 msgid "Government - Agriculture"
-msgstr ""
+msgstr "دولت - کشاورزی"
 
 #: trendsearth_ui/components/layout.py:611
+#, fuzzy
 msgid "Government - Land Management/Planning"
-msgstr ""
+msgstr "دولت - مدیریت/برنامه‌ریزی زمین"
 
 #: trendsearth_ui/components/layout.py:612
+#, fuzzy
 msgid "Government - Other"
-msgstr ""
+msgstr "دولت - سایر"
 
 #: trendsearth_ui/components/layout.py:613
+#, fuzzy
 msgid "International/Multilateral Organization"
-msgstr ""
+msgstr "سازمان بین‌المللی/چندجانبه"
 
 #: trendsearth_ui/components/layout.py:614
+#, fuzzy
 msgid "NGO - Development/Aid"
-msgstr ""
+msgstr "سازمان مردم نهاد - توسعه/کمک"
 
 #: trendsearth_ui/components/layout.py:615
+#, fuzzy
 msgid "NGO - Community-Based"
-msgstr ""
+msgstr "سازمان مردم نهاد - مبتنی بر جامعه"
 
 #: trendsearth_ui/components/layout.py:616
+#, fuzzy
 msgid "NGO - Conservation"
-msgstr ""
+msgstr "سازمان مردم نهاد - حفاظت از محیط زیست"
 
 #: trendsearth_ui/components/layout.py:617
+#, fuzzy
 msgid "NGO - Other"
-msgstr ""
+msgstr "سازمان مردم نهاد - سایر"
 
 #: trendsearth_ui/components/layout.py:618
+#, fuzzy
 msgid "Academic/Research Institution"
-msgstr ""
+msgstr "موسسه علمی/تحقیقاتی"
 
 #: trendsearth_ui/components/layout.py:619
+#, fuzzy
 msgid "Consulting/Professional Services"
-msgstr ""
+msgstr "خدمات مشاوره‌ای/حرفه‌ای"
 
 #: trendsearth_ui/components/layout.py:620
+#, fuzzy
 msgid "Private Sector - Agriculture/Forestry"
-msgstr ""
+msgstr "بخش خصوصی - کشاورزی/جنگلداری"
 
 #: trendsearth_ui/components/layout.py:621
+#, fuzzy
 msgid "Private Sector - Other"
-msgstr ""
+msgstr "بخش خصوصی - سایر"
 
 #: trendsearth_ui/components/layout.py:622
+#, fuzzy
 msgid "Independent Researcher"
-msgstr ""
+msgstr "محقق مستقل"
 
 #: trendsearth_ui/components/layout.py:623
+#, fuzzy
 msgid "Student"
-msgstr ""
+msgstr "دانشجو"
 
 #: trendsearth_ui/components/layout.py:624
 #: trendsearth_ui/components/layout.py:640
+#, fuzzy
 msgid "Other"
-msgstr ""
+msgstr "دیگر"
 
 #: trendsearth_ui/components/layout.py:629
+#, fuzzy
 msgid "National/International Reporting (UNCCD, SDGs, etc.)"
 msgstr ""
+"گزارش‌دهی ملی/بین‌المللی (کنوانسیون ملل متحد برای بیابان‌زایی، اهداف توسعه "
+"پایدار و غیره)"
 
 #: trendsearth_ui/components/layout.py:630
+#, fuzzy
 msgid "Academic Research"
-msgstr ""
+msgstr "تحقیقات دانشگاهی"
 
 #: trendsearth_ui/components/layout.py:631
+#, fuzzy
 msgid "Policy Development & Planning"
-msgstr ""
+msgstr "توسعه و برنامه‌ریزی سیاست"
 
 #: trendsearth_ui/components/layout.py:632
+#, fuzzy
 msgid "Land Restoration/Management Planning"
-msgstr ""
+msgstr "برنامه ریزی احیای زمین/مدیریت زمین"
 
 #: trendsearth_ui/components/layout.py:633
+#, fuzzy
 msgid "Project Monitoring & Evaluation"
-msgstr ""
+msgstr "نظارت و ارزیابی پروژه"
 
 #: trendsearth_ui/components/layout.py:634
+#, fuzzy
 msgid "Environmental Impact Assessment"
-msgstr ""
+msgstr "ارزیابی اثرات زیست‌محیطی"
 
 #: trendsearth_ui/components/layout.py:635
+#, fuzzy
 msgid "Agriculture/Forestry Planning"
-msgstr ""
+msgstr "برنامه‌ریزی کشاورزی/جنگلداری"
 
 #: trendsearth_ui/components/layout.py:636
+#, fuzzy
 msgid "Teaching & Education"
-msgstr ""
+msgstr "آموزش و پرورش"
 
 #: trendsearth_ui/components/layout.py:637
+#, fuzzy
 msgid "Conservation Planning"
-msgstr ""
+msgstr "برنامه‌ریزی حفاظت"
 
 #: trendsearth_ui/components/layout.py:638
+#, fuzzy
 msgid "Commercial Services/Products"
-msgstr ""
+msgstr "خدمات/محصولات تجاری"
 
 #: trendsearth_ui/components/layout.py:639
+#, fuzzy
 msgid "Community/Grassroots Initiatives"
-msgstr ""
+msgstr "ابتکارات اجتماعی/مردمی"
 
 #: trendsearth_ui/components/layout.py:645
+#, fuzzy
 msgid "Woman"
-msgstr ""
+msgstr "زن"
 
 #: trendsearth_ui/components/layout.py:646
+#, fuzzy
 msgid "Man"
-msgstr ""
+msgstr "مرد"
 
 #: trendsearth_ui/components/layout.py:647
+#, fuzzy
 msgid "Non-binary"
-msgstr ""
+msgstr "غیر دودویی"
 
 #: trendsearth_ui/components/layout.py:648
+#, fuzzy
 msgid "Prefer to self-describe"
-msgstr ""
+msgstr "ترجیح می‌دهند خودشان را توصیف کنند"
 
 #: trendsearth_ui/components/layout.py:649
+#, fuzzy
 msgid "Prefer not to say"
-msgstr ""
+msgstr "ترجیح میدم نگم"
 
 #: trendsearth_ui/components/layout.py:682
+#, fuzzy
 msgid "Create Your Account"
-msgstr ""
+msgstr "حساب کاربری خود را ایجاد کنید"
 
 #: trendsearth_ui/components/layout.py:687
+#, fuzzy
 msgid ""
-"After registration, you'll receive an email to verify your address and "
-"set your password."
+"After registration, you'll receive an email to verify your address and set "
+"your password."
 msgstr ""
+"پس از ثبت نام، ایمیلی برای تأیید آدرس و تنظیم رمز عبور دریافت خواهید کرد."
 
 #: trendsearth_ui/components/layout.py:700
+#, fuzzy
 msgid "Required field"
-msgstr ""
+msgstr "فیلد مورد نیاز"
 
 #: trendsearth_ui/components/layout.py:740
+#, fuzzy
 msgid "Full Name"
-msgstr ""
+msgstr "نام و نام خانوادگی"
 
 #: trendsearth_ui/components/layout.py:754
+#, fuzzy
 msgid "Enter your full name"
-msgstr ""
+msgstr "نام کامل خود را وارد کنید"
 
 #: trendsearth_ui/components/layout.py:766
+#, fuzzy
 msgid "Role/Title"
-msgstr ""
+msgstr "نقش/عنوان"
 
 #: trendsearth_ui/components/layout.py:773
+#, fuzzy
 msgid "Your job title (optional)"
-msgstr ""
+msgstr "عنوان شغلی شما (اختیاری)"
 
 #: trendsearth_ui/components/layout.py:787
+#, fuzzy
 msgid "Organization"
-msgstr ""
+msgstr "سازمان"
 
 #: trendsearth_ui/components/layout.py:801
+#, fuzzy
 msgid "Your organization"
-msgstr ""
+msgstr "سازمان شما"
 
 #: trendsearth_ui/components/layout.py:815
+#, fuzzy
 msgid "Sector"
-msgstr ""
+msgstr "بخش"
 
 #: trendsearth_ui/components/layout.py:829
+#, fuzzy
 msgid "Select your sector"
-msgstr ""
+msgstr "بخش خود را انتخاب کنید"
 
 #: trendsearth_ui/components/layout.py:843
 #: trendsearth_ui/components/layout.py:896
+#, fuzzy
 msgid "Please specify"
-msgstr ""
+msgstr "لطفا مشخص کنید"
 
 #: trendsearth_ui/components/layout.py:850
+#, fuzzy
 msgid "Please specify your sector"
-msgstr ""
+msgstr "لطفا حوزه فعالیت خود را مشخص کنید"
 
 #: trendsearth_ui/components/layout.py:867
+#, fuzzy
 msgid "Purpose of Use"
-msgstr ""
+msgstr "هدف از استفاده"
 
 #: trendsearth_ui/components/layout.py:882
+#, fuzzy
 msgid "Select your purpose of use"
-msgstr ""
+msgstr "هدف استفاده خود را انتخاب کنید"
 
 #: trendsearth_ui/components/layout.py:903
+#, fuzzy
 msgid "Please specify your purpose"
-msgstr ""
+msgstr "لطفا هدف خود را مشخص کنید"
 
 #: trendsearth_ui/components/layout.py:919
+#, fuzzy
 msgid "Country"
-msgstr ""
+msgstr "کشور"
 
 #: trendsearth_ui/components/layout.py:932
+#, fuzzy
 msgid "Select your country"
-msgstr ""
+msgstr "کشور خود را انتخاب کنید"
 
 #: trendsearth_ui/components/layout.py:950
+#, fuzzy
 msgid "Gender Identity"
-msgstr ""
+msgstr "هویت جنسیتی"
 
 #: trendsearth_ui/components/layout.py:958
+#, fuzzy
 msgid "Select (optional)"
-msgstr ""
+msgstr "انتخاب کنید (اختیاری)"
 
 #: trendsearth_ui/components/layout.py:972
+#, fuzzy
 msgid ""
 "We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity "
-"development and tool access. Providing this information is voluntary; "
-"your selection will not affect your access to the tool."
+"requirements and to assess equitable participation in capacity development "
+"and tool access. Providing this information is voluntary; your selection "
+"will not affect your access to the tool."
 msgstr ""
+"ما اطلاعات هویت جنسیتی را برای رعایت الزامات گزارش‌دهی اهداکنندگان و ارزیابی"
+" مشارکت عادلانه در توسعه ظرفیت و دسترسی به ابزار جمع‌آوری می‌کنیم. ارائه این"
+" اطلاعات داوطلبانه است؛ انتخاب شما تاثیری بر دسترسی شما به ابزار نخواهد "
+"داشت."
 
 #: trendsearth_ui/components/layout.py:981
 #: trendsearth_ui/components/layout.py:989
+#, fuzzy
 msgid "Please describe"
-msgstr ""
+msgstr "لطفا شرح دهید"
 
 #: trendsearth_ui/components/layout.py:1033
+#, fuzzy
 msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth "
-"Engine, and, depending on your use, you may be required to have in place "
-"a commercial license to use Google Earth Engine?"
+"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
+"and, depending on your use, you may be required to have in place a "
+"commercial license to use Google Earth Engine?"
 msgstr ""
+"آیا تصدیق می‌کنید که برخی از ویژگی‌های Trends.Earth از موتور گوگل ارث "
+"استفاده می‌کنند و بسته به نوع استفاده شما، ممکن است لازم باشد مجوز تجاری "
+"برای استفاده از موتور گوگل ارث داشته باشید؟"
 
 #: trendsearth_ui/components/layout.py:1046
+#, fuzzy
 msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
-"more details see the "
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
+"details see the "
 msgstr ""
+"موتور گوگل ارث (GEE) محدودیت‌هایی را برای استفاده تجاری اعمال می‌کند. برای "
+"جزئیات بیشتر به ... مراجعه کنید. "
 
 #: trendsearth_ui/components/layout.py:1050
+#, fuzzy
 msgid "Google Earth Engine Terms of Use"
-msgstr ""
+msgstr "شرایط استفاده از موتور گوگل ارث"
 
 #: trendsearth_ui/components/layout.py:1056
+#, fuzzy
 msgid ""
 " . Conservation International does not provide or manage commercial GEE "
 "licenses. Users are solely responsible for ensuring their use of GEE "
 "complies with Google's commercial licensing requirements. Access to this "
 "tool does not grant or imply the provision of commercial licensing."
 msgstr ""
+" . شرکت Conservation International مجوزهای تجاری GEE را ارائه یا مدیریت "
+"نمی‌کند. کاربران صرفاً مسئول حصول اطمینان از مطابقت استفاده خود از GEE با "
+"الزامات مجوز تجاری گوگل هستند. دسترسی به این ابزار به معنای اعطای مجوز تجاری"
+" یا ارائه آن نیست."
 
 #: trendsearth_ui/components/layout.py:1065
+#, fuzzy
 msgid "Yes, I acknowledge"
-msgstr ""
+msgstr "بله، تصدیق می‌کنم."
 
 #: trendsearth_ui/components/layout.py:1090
+#, fuzzy
 msgid "Create Account"
-msgstr ""
+msgstr "ایجاد حساب کاربری"
 
 #: trendsearth_ui/components/layout.py:1221
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "خروج"
 
 #: trendsearth_ui/components/layout.py:1267
+#, fuzzy
 msgid "Executions"
-msgstr ""
+msgstr "اعدام‌ها"
 
 #: trendsearth_ui/components/layout.py:1277
+#, fuzzy
 msgid "Users"
-msgstr ""
+msgstr "کاربران"
 
 #: trendsearth_ui/components/layout.py:1291
+#, fuzzy
 msgid "Scripts"
-msgstr ""
+msgstr "اسکریپت‌ها"
 
 #: trendsearth_ui/components/layout.py:1305
+#, fuzzy
 msgid "Admin"
-msgstr ""
+msgstr "مدیر"
 
 #: trendsearth_ui/components/layout.py:1319
+#, fuzzy
 msgid "Status"
-msgstr ""
+msgstr "وضعیت"
 
 #: trendsearth_ui/components/layout.py:1333
+#, fuzzy
 msgid "Profile"
-msgstr ""
-
+msgstr "پروفایل"
