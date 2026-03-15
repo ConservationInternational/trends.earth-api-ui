@@ -2,6 +2,8 @@
 
 from dash import Input, Output, clientside_callback, dcc, html
 
+from ..i18n import gettext as _
+
 TRUNCATED_CELL_STYLE = {
     "whiteSpace": "nowrap",
     "overflow": "hidden",
@@ -58,7 +60,7 @@ def get_mobile_column_config():
         "executions": {
             "primary_columns": [
                 {
-                    "headerName": "Script",
+                    "headerName": _("Script"),
                     "field": "script_name",
                     "width": 200,
                     "pinned": "left",
@@ -91,7 +93,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Email",
+                    "headerName": _("Email"),
                     "field": "user_email",
                     "width": 250,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -107,7 +109,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Start",
+                    "headerName": _("Start"),
                     "field": "start_date",
                     "width": 160,
                     "filter": "agDateColumnFilter",
@@ -116,7 +118,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "End",
+                    "headerName": _("End"),
                     "field": "end_date",
                     "width": 160,
                     "filter": "agDateColumnFilter",
@@ -127,7 +129,7 @@ def get_mobile_column_config():
                     "sortIndex": 0,
                 },
                 {
-                    "headerName": "Duration",
+                    "headerName": _("Duration"),
                     "field": "duration",
                     "width": 120,
                     "cellStyle": {"fontSize": "12px"},
@@ -135,7 +137,7 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
-                    "headerName": "Status",
+                    "headerName": _("Status"),
                     "field": "status",
                     "width": 120,
                     "cellStyle": {"fontSize": "12px", "cursor": "pointer"},
@@ -152,7 +154,7 @@ def get_mobile_column_config():
             ],
             "secondary_columns": [
                 {
-                    "headerName": "ID",
+                    "headerName": _("ID"),
                     "field": "id",
                     "width": 100,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -182,7 +184,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Params",
+                    "headerName": _("Params"),
                     "field": "params",
                     "width": 100,
                     "sortable": False,
@@ -191,7 +193,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Results",
+                    "headerName": _("Results"),
                     "field": "results",
                     "width": 100,
                     "sortable": False,
@@ -209,7 +211,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Docker Logs",
+                    "headerName": _("Docker Logs"),
                     "field": "docker_logs",
                     "width": 130,
                     "sortable": False,
@@ -218,7 +220,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Batch Logs",
+                    "headerName": _("Batch Logs"),
                     "field": "batch_logs",
                     "width": 130,
                     "sortable": False,
@@ -227,7 +229,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Map",
+                    "headerName": _("Map"),
                     "field": "map",
                     "width": 100,
                     "sortable": False,
@@ -240,7 +242,7 @@ def get_mobile_column_config():
         "users": {
             "primary_columns": [
                 {
-                    "headerName": "Email",
+                    "headerName": _("Email"),
                     "field": "email",
                     "width": 250,
                     "pinned": "left",
@@ -257,7 +259,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Name",
+                    "headerName": _("Name"),
                     "field": "name",
                     "width": 180,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -273,7 +275,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Institution",
+                    "headerName": _("Institution"),
                     "field": "institution",
                     "width": 200,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -289,7 +291,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Country",
+                    "headerName": _("Country"),
                     "field": "country",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -305,7 +307,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Role",
+                    "headerName": _("Role"),
                     "field": "role",
                     "width": 120,
                     "cellStyle": {"fontSize": "12px"},
@@ -320,7 +322,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Last Activity",
+                    "headerName": _("Last Activity"),
                     "field": "last_activity_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -329,7 +331,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Verified",
+                    "headerName": _("Verified"),
                     "field": "email_verified",
                     "width": 100,
                     "cellStyle": {"fontSize": "12px", "textAlign": "center"},
@@ -338,7 +340,7 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
-                    "headerName": "Verified At",
+                    "headerName": _("Verified At"),
                     "field": "email_verified_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -349,7 +351,7 @@ def get_mobile_column_config():
             ],
             "secondary_columns": [
                 {
-                    "headerName": "Created",
+                    "headerName": _("Created"),
                     "field": "created_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -367,7 +369,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "ID",
+                    "headerName": _("ID"),
                     "field": "id",
                     "width": 100,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -383,7 +385,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Role/Title",
+                    "headerName": _("Role/Title"),
                     "field": "role_title",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -399,7 +401,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Sector",
+                    "headerName": _("Sector"),
                     "field": "sector",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -415,7 +417,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Purpose of Use",
+                    "headerName": _("Purpose of Use"),
                     "field": "purpose_of_use",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -431,7 +433,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "GEE License",
+                    "headerName": _("GEE License"),
                     "field": "gee_license_acknowledged",
                     "width": 120,
                     "cellStyle": {"fontSize": "12px", "textAlign": "center"},
@@ -452,7 +454,7 @@ def get_mobile_column_config():
         "scripts": {
             "primary_columns": [
                 {
-                    "headerName": "Name",
+                    "headerName": _("Name"),
                     "field": "name",
                     "width": 200,
                     "pinned": "left",
@@ -469,7 +471,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Slug",
+                    "headerName": _("Slug"),
                     "field": "slug",
                     "width": 180,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -485,7 +487,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Access",
+                    "headerName": _("Access"),
                     "field": "access_control",
                     "width": 100,
                     "cellStyle": {"fontSize": "11px", "textAlign": "center", "cursor": "pointer"},
@@ -494,7 +496,7 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
-                    "headerName": "Status",
+                    "headerName": _("Status"),
                     "field": "status",
                     "width": 120,
                     "cellStyle": {"fontSize": "12px"},
@@ -509,7 +511,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Environment",
+                    "headerName": _("Environment"),
                     "field": "environment",
                     "width": 180,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -525,7 +527,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Env Version",
+                    "headerName": _("Env Version"),
                     "field": "environment_version",
                     "width": 130,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -541,7 +543,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Compute",
+                    "headerName": _("Compute"),
                     "field": "compute_type",
                     "width": 110,
                     "cellStyle": {"fontSize": "11px"},

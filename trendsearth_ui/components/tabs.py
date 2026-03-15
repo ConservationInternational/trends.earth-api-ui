@@ -5,6 +5,7 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 
 from ..config import EXECUTIONS_REFRESH_INTERVAL, STATUS_REFRESH_INTERVAL
+from ..i18n import gettext as _
 from ..utils.mobile_utils import get_mobile_column_config
 
 
@@ -160,7 +161,7 @@ def executions_tab_content():
                     dbc.Col(
                         [
                             dbc.Button(
-                                "Refresh Executions",
+                                _("Refresh Executions"),
                                 id="refresh-executions-btn",
                                 color="primary",
                                 className="mb-3",
@@ -172,7 +173,7 @@ def executions_tab_content():
                         [
                             html.Div(
                                 [
-                                    html.Span("Auto-refresh in: ", className="me-2"),
+                                    html.Span(_("Auto-refresh in:") + " ", className="me-2"),
                                     html.Span(
                                         id="executions-countdown",
                                         children="30s",
@@ -211,38 +212,38 @@ def executions_tab_content():
             dbc.Modal(
                 [
                     dbc.ModalHeader(
-                        dbc.ModalTitle("Cancel Execution"),
+                        dbc.ModalTitle(_("Cancel Execution")),
                         close_button=True,
                     ),
                     dbc.ModalBody(
                         [
                             html.P(
-                                "Are you sure you want to cancel this execution?",
+                                _("Are you sure you want to cancel this execution?"),
                                 className="mb-3",
                             ),
                             html.Div(
                                 [
-                                    html.Strong("Execution ID: "),
+                                    html.Strong(_("Execution ID:") + " "),
                                     html.Span(id="cancel-execution-id"),
                                 ],
                                 className="mb-2",
                             ),
                             html.Div(
                                 [
-                                    html.Strong("Script: "),
+                                    html.Strong(_("Script:") + " "),
                                     html.Span(id="cancel-execution-script"),
                                 ],
                                 className="mb-2",
                             ),
                             html.Div(
                                 [
-                                    html.Strong("Status: "),
+                                    html.Strong(_("Status:") + " "),
                                     html.Span(id="cancel-execution-status"),
                                 ],
                                 className="mb-3",
                             ),
                             dbc.Alert(
-                                "This action cannot be undone.",
+                                _("This action cannot be undone."),
                                 color="warning",
                                 className="mb-0",
                             ),
@@ -251,7 +252,7 @@ def executions_tab_content():
                     dbc.ModalFooter(
                         [
                             dbc.Button(
-                                "Cancel",
+                                _("Cancel"),
                                 id="cancel-execution-close-btn",
                                 color="secondary",
                                 className="me-2",
@@ -259,7 +260,7 @@ def executions_tab_content():
                             dbc.Button(
                                 [
                                     html.I(className="fas fa-stop me-2"),
-                                    "Confirm Cancel",
+                                    _("Confirm Cancel"),
                                 ],
                                 id="cancel-execution-confirm-btn",
                                 color="danger",
@@ -298,10 +299,10 @@ def executions_tab_content():
             # Modal to display cancellation results
             dbc.Modal(
                 [
-                    dbc.ModalHeader(dbc.ModalTitle("Cancellation Result"), close_button=True),
+                    dbc.ModalHeader(dbc.ModalTitle(_("Cancellation Result")), close_button=True),
                     dbc.ModalBody(id="cancel-execution-result-body"),
                     dbc.ModalFooter(
-                        dbc.Button("Close", id="cancel-result-close-btn", color="secondary")
+                        dbc.Button(_("Close"), id="cancel-result-close-btn", color="secondary")
                     ),
                 ],
                 id="cancel-execution-result-modal",
@@ -323,7 +324,7 @@ def users_tab_content():
                     dbc.Col(
                         [
                             dbc.Button(
-                                "Refresh Users",
+                                _("Refresh Users"),
                                 id="refresh-users-btn",
                                 color="primary",
                                 className="mb-3",
@@ -397,7 +398,7 @@ def scripts_tab_content():
                     dbc.Col(
                         [
                             dbc.Button(
-                                "Refresh Scripts",
+                                _("Refresh Scripts"),
                                 id="refresh-scripts-btn",
                                 color="primary",
                                 className="mb-3",
@@ -449,7 +450,7 @@ def profile_tab_content(user_data):
         [
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Profile Settings")),
+                    dbc.CardHeader(html.H4(_("Profile Settings"))),
                     dbc.CardBody(
                         [
                             dbc.Form(
@@ -458,11 +459,11 @@ def profile_tab_content(user_data):
                                         [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Name"),
+                                                    dbc.Label(_("Name")),
                                                     dbc.Input(
                                                         id="profile-name",
                                                         type="text",
-                                                        placeholder="Enter your name",
+                                                        placeholder=_("Enter your name"),
                                                         value=current_name,
                                                     ),
                                                 ],
@@ -470,11 +471,11 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Email"),
+                                                    dbc.Label(_("Email")),
                                                     dbc.Input(
                                                         id="profile-email",
                                                         type="email",
-                                                        placeholder="Enter your email",
+                                                        placeholder=_("Enter your email"),
                                                         value=current_email,
                                                         disabled=True,
                                                     ),
@@ -488,11 +489,11 @@ def profile_tab_content(user_data):
                                         [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Institution"),
+                                                    dbc.Label(_("Institution")),
                                                     dbc.Input(
                                                         id="profile-institution",
                                                         type="text",
-                                                        placeholder="Enter your institution",
+                                                        placeholder=_("Enter your institution"),
                                                         value=current_institution,
                                                     ),
                                                 ],
@@ -500,7 +501,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Role"),
+                                                    dbc.Label(_("Role")),
                                                     dbc.Input(
                                                         id="profile-role",
                                                         type="text",
@@ -518,7 +519,7 @@ def profile_tab_content(user_data):
                                             dbc.Col(
                                                 [
                                                     dbc.Button(
-                                                        "Update Profile",
+                                                        _("Update Profile"),
                                                         id="update-profile-btn",
                                                         color="primary",
                                                         className="me-2",
@@ -543,19 +544,19 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Email Notifications")),
+                    dbc.CardHeader(html.H4(_("Email Notifications"))),
                     dbc.CardBody(
                         [
                             dbc.Row(
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Execution Completion Notifications"),
+                                            dbc.Label(_("Execution Completion Notifications")),
                                             html.Div(
                                                 [
                                                     dbc.Switch(
                                                         id="profile-email-notifications-switch",
-                                                        label="Enable email notifications",
+                                                        label=_("Enable email notifications"),
                                                         value=user_data.get(
                                                             "email_notifications_enabled", True
                                                         )
@@ -564,7 +565,7 @@ def profile_tab_content(user_data):
                                                         className="mb-2",
                                                     ),
                                                     html.Small(
-                                                        "Receive email notifications when your script executions finish, fail, or are cancelled.",
+                                                        _("Receive email notifications when your script executions finish, fail, or are cancelled."),
                                                         className="text-muted",
                                                     ),
                                                 ],
@@ -596,7 +597,7 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Google Earth Engine Account")),
+                    dbc.CardHeader(html.H4(_("Google Earth Engine Account"))),
                     dbc.CardBody(
                         [
                             # Current credentials status
@@ -604,7 +605,7 @@ def profile_tab_content(user_data):
                                 [
                                     dbc.Col(
                                         [
-                                            html.H6("Current Credentials Status"),
+                                            html.H6(_("Current Credentials Status")),
                                             html.Div(id="profile-gee-status-display"),
                                         ],
                                         width=12,
@@ -618,9 +619,9 @@ def profile_tab_content(user_data):
                                 [
                                     dbc.Col(
                                         [
-                                            html.H6("Setup Your GEE Account"),
+                                            html.H6(_("Setup Your GEE Account")),
                                             html.P(
-                                                "Choose one of the options below to configure your Google Earth Engine credentials:",
+                                                _("Choose one of the options below to configure your Google Earth Engine credentials:"),
                                                 className="text-muted",
                                             ),
                                         ],
@@ -639,15 +640,15 @@ def profile_tab_content(user_data):
                                                     dbc.CardBody(
                                                         [
                                                             html.H6(
-                                                                "Option 1: Connect Your GEE Account (OAuth)",
+                                                                _("Option 1: Connect Your GEE Account (OAuth)"),
                                                                 className="mb-3",
                                                             ),
                                                             html.P(
-                                                                "Connect your personal Google Earth Engine account using OAuth authentication.",
+                                                                _("Connect your personal Google Earth Engine account using OAuth authentication."),
                                                                 className="text-muted",
                                                             ),
                                                             dbc.Button(
-                                                                "Connect GEE Account",
+                                                                _("Connect GEE Account"),
                                                                 id="profile-gee-oauth-btn",
                                                                 color="primary",
                                                                 className="mb-2",
@@ -679,11 +680,11 @@ def profile_tab_content(user_data):
                                                     dbc.CardBody(
                                                         [
                                                             html.H6(
-                                                                "Option 2: Upload Service Account Key",
+                                                                _("Option 2: Upload Service Account Key"),
                                                                 className="mb-3",
                                                             ),
                                                             html.P(
-                                                                "Upload a Google Cloud service account JSON key with Earth Engine access.",
+                                                                _("Upload a Google Cloud service account JSON key with Earth Engine access."),
                                                                 className="text-muted",
                                                             ),
                                                             dcc.Upload(
@@ -693,7 +694,7 @@ def profile_tab_content(user_data):
                                                                         html.I(
                                                                             className="fas fa-upload me-2"
                                                                         ),
-                                                                        "Upload Service Account Key",
+                                                                        _("Upload Service Account Key"),
                                                                     ],
                                                                     color="secondary",
                                                                     outline=True,
@@ -723,18 +724,18 @@ def profile_tab_content(user_data):
                                 [
                                     dbc.Col(
                                         [
-                                            html.H6("Manage Credentials"),
+                                            html.H6(_("Manage Credentials")),
                                             dbc.ButtonGroup(
                                                 [
                                                     dbc.Button(
-                                                        "Test Credentials",
+                                                        _("Test Credentials"),
                                                         id="profile-gee-test-btn",
                                                         color="info",
                                                         outline=True,
                                                         disabled=True,
                                                     ),
                                                     dbc.Button(
-                                                        "Delete Credentials",
+                                                        _("Delete Credentials"),
                                                         id="profile-gee-delete-btn",
                                                         color="danger",
                                                         outline=True,
@@ -761,13 +762,13 @@ def profile_tab_content(user_data):
             # Service Credentials Section
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("Service Credentials")),
+                    dbc.CardHeader(html.H4(_("Service Credentials"))),
                     dbc.CardBody(
                         [
                             html.P(
-                                "Service credentials allow external applications to authenticate "
+                                _("Service credentials allow external applications to authenticate "
                                 "with the Trends.Earth API using the OAuth2 client credentials grant. "
-                                "The client secret is shown only once at creation time.",
+                                "The client secret is shown only once at creation time."),
                                 className="text-muted",
                             ),
                             # Credentials table
@@ -778,7 +779,7 @@ def profile_tab_content(user_data):
                                             dbc.Button(
                                                 [
                                                     html.I(className="fas fa-sync-alt me-2"),
-                                                    "Refresh",
+                                                    _("Refresh"),
                                                 ],
                                                 id="service-creds-refresh-btn",
                                                 color="secondary",
@@ -794,7 +795,7 @@ def profile_tab_content(user_data):
                                             dbc.Button(
                                                 [
                                                     html.I(className="fas fa-plus me-2"),
-                                                    "New Credential",
+                                                    _("New Credential"),
                                                 ],
                                                 id="service-creds-create-btn",
                                                 color="primary",
@@ -823,7 +824,7 @@ def profile_tab_content(user_data):
             dbc.Modal(
                 [
                     dbc.ModalHeader(
-                        dbc.ModalTitle("Create Service Credential"),
+                        dbc.ModalTitle(_("Create Service Credential")),
                         close_button=True,
                     ),
                     dbc.ModalBody(
@@ -834,14 +835,14 @@ def profile_tab_content(user_data):
                                         [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Name *"),
+                                                    dbc.Label(_("Name") + " *"),
                                                     dbc.Input(
                                                         id="service-creds-name-input",
                                                         type="text",
-                                                        placeholder="e.g. My CLI Tool",
+                                                        placeholder=_("e.g. My CLI Tool"),
                                                     ),
                                                     dbc.FormText(
-                                                        "A descriptive label for this credential."
+                                                        _("A descriptive label for this credential.")
                                                     ),
                                                 ],
                                                 width=12,
