@@ -1711,6 +1711,499 @@ def admin_tab_content(role, is_admin):
                 if role in ("ADMIN", "SUPERADMIN")
                 else []
             ),
+            # News Management Section (ADMIN and SUPERADMIN)
+            *(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4(
+                                    [
+                                        html.I(className="fas fa-newspaper me-2"),
+                                        "News Management",
+                                    ]
+                                )
+                            ),
+                            dbc.CardBody(
+                                [
+                                    html.Div(
+                                        [
+                                            html.H5(
+                                                "Manage News Items",
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-sync-alt me-2"
+                                                                ),
+                                                                "Refresh",
+                                                            ],
+                                                            id="admin-refresh-news-btn",
+                                                            color="secondary",
+                                                            outline=True,
+                                                            className="mb-2",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-plus me-2"
+                                                                ),
+                                                                "Create News Item",
+                                                            ],
+                                                            id="admin-create-news-btn",
+                                                            color="primary",
+                                                            className="mb-2",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-edit me-2"
+                                                                ),
+                                                                "Edit",
+                                                            ],
+                                                            id="admin-edit-news-btn",
+                                                            color="secondary",
+                                                            outline=True,
+                                                            className="mb-2",
+                                                            disabled=True,
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-trash me-2"
+                                                                ),
+                                                                "Delete",
+                                                            ],
+                                                            id="admin-delete-news-btn",
+                                                            color="secondary",
+                                                            outline=True,
+                                                            className="mb-2",
+                                                            disabled=True,
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                ],
+                                                className="align-items-center mb-3 g-2",
+                                            ),
+                                            # News Items Table
+                                            html.Div(
+                                                id="admin-news-table-container",
+                                                children=[
+                                                    dcc.Loading(
+                                                        id="admin-news-loading",
+                                                        type="circle",
+                                                        children=html.Div(
+                                                            id="admin-news-table",
+                                                            children="Loading news items...",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                            # Store for selected news item
+                                            dcc.Store(id="admin-selected-news-id"),
+                                            # Interval to trigger initial news load
+                                            dcc.Interval(
+                                                id="admin-news-load-interval",
+                                                interval=500,  # 500ms delay after render
+                                                max_intervals=1,  # Only fire once
+                                            ),
+                                            dbc.Alert(
+                                                id="admin-news-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=5000,
+                                                className="mt-3",
+                                            ),
+                                        ],
+                                        className="mb-4",
+                                    ),
+                                ]
+                            ),
+                        ],
+                        className="mb-4",
+                    ),
+                    # News Create/Edit Modal
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(
+                                dbc.ModalTitle(
+                                    id="admin-news-modal-title",
+                                    children="Create News Item",
+                                ),
+                                close_button=True,
+                            ),
+                            dbc.ModalBody(
+                                [
+                                    dbc.Form(
+                                        [
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Title *"),
+                                                            dbc.Input(
+                                                                id="admin-news-title",
+                                                                type="text",
+                                                                placeholder="Enter news title",
+                                                                required=True,
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Message (Markdown supported) *",
+                                                                    html.I(
+                                                                        className="fas fa-info-circle ms-2",
+                                                                        id="admin-news-markdown-tooltip",
+                                                                        style={"cursor": "pointer"},
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Tooltip(
+                                                                "Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will be converted to HTML.",
+                                                                target="admin-news-markdown-tooltip",
+                                                            ),
+                                                            dbc.Textarea(
+                                                                id="admin-news-message",
+                                                                placeholder="Enter news message using Markdown...",
+                                                                style={"height": "150px"},
+                                                                required=True,
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Preview"),
+                                                            html.Div(
+                                                                id="admin-news-preview",
+                                                                className="border rounded p-3 bg-light",
+                                                                style={
+                                                                    "minHeight": "100px",
+                                                                    "maxHeight": "200px",
+                                                                    "overflow": "auto",
+                                                                },
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Link URL (optional)"),
+                                                            dbc.Input(
+                                                                id="admin-news-link-url",
+                                                                type="url",
+                                                                placeholder="https://example.com",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Link Text (optional)"),
+                                                            dbc.Input(
+                                                                id="admin-news-link-text",
+                                                                type="text",
+                                                                placeholder="Read more...",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Target Platforms *"),
+                                                            dcc.Dropdown(
+                                                                id="admin-news-platforms",
+                                                                options=[
+                                                                    {
+                                                                        "label": "QGIS Plugin",
+                                                                        "value": "qgis_plugin",
+                                                                    },
+                                                                    {
+                                                                        "label": "Web App",
+                                                                        "value": "web",
+                                                                    },
+                                                                    {
+                                                                        "label": "API UI",
+                                                                        "value": "api_ui",
+                                                                    },
+                                                                ],
+                                                                multi=True,
+                                                                placeholder="Select target platforms...",
+                                                                value=[
+                                                                    "qgis_plugin",
+                                                                    "web",
+                                                                    "api_ui",
+                                                                ],
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    "Target Roles (optional)",
+                                                                    html.I(
+                                                                        className="fas fa-info-circle ms-2",
+                                                                        id="admin-news-roles-tooltip",
+                                                                        style={"cursor": "pointer"},
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Tooltip(
+                                                                "Leave empty to show to all users including unauthenticated. Select specific roles to restrict visibility.",
+                                                                target="admin-news-roles-tooltip",
+                                                            ),
+                                                            dcc.Dropdown(
+                                                                id="admin-news-roles",
+                                                                options=[
+                                                                    {
+                                                                        "label": "Regular Users",
+                                                                        "value": "USER",
+                                                                    },
+                                                                    {
+                                                                        "label": "Admins",
+                                                                        "value": "ADMIN",
+                                                                    },
+                                                                    {
+                                                                        "label": "Super Admins",
+                                                                        "value": "SUPERADMIN",
+                                                                    },
+                                                                ],
+                                                                multi=True,
+                                                                placeholder="All users (no restriction)",
+                                                                value=[],
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("News Type"),
+                                                            dbc.Select(
+                                                                id="admin-news-type",
+                                                                options=[
+                                                                    {
+                                                                        "label": "Info",
+                                                                        "value": "info",
+                                                                    },
+                                                                    {
+                                                                        "label": "Warning",
+                                                                        "value": "warning",
+                                                                    },
+                                                                    {
+                                                                        "label": "Error",
+                                                                        "value": "error",
+                                                                    },
+                                                                    {
+                                                                        "label": "Success",
+                                                                        "value": "success",
+                                                                    },
+                                                                ],
+                                                                value="info",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Priority"),
+                                                            dbc.Input(
+                                                                id="admin-news-priority",
+                                                                type="number",
+                                                                value=0,
+                                                                min=0,
+                                                                max=100,
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                "Min Plugin Version (optional)"
+                                                            ),
+                                                            dbc.Input(
+                                                                id="admin-news-min-version",
+                                                                type="text",
+                                                                placeholder="e.g., 1.0.0",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                "Max Plugin Version (optional)"
+                                                            ),
+                                                            dbc.Input(
+                                                                id="admin-news-max-version",
+                                                                type="text",
+                                                                placeholder="e.g., 2.0.0",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Start Date (optional)"),
+                                                            dcc.DatePickerSingle(
+                                                                id="admin-news-start-date",
+                                                                placeholder="Select start date...",
+                                                                display_format="YYYY-MM-DD",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("End Date (optional)"),
+                                                            dcc.DatePickerSingle(
+                                                                id="admin-news-end-date",
+                                                                placeholder="Select end date...",
+                                                                display_format="YYYY-MM-DD",
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Checkbox(
+                                                                id="admin-news-is-active",
+                                                                label="Active (visible to users)",
+                                                                value=True,
+                                                            ),
+                                                        ],
+                                                        width=12,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                        ]
+                                    ),
+                                    dbc.Alert(
+                                        id="admin-news-modal-alert",
+                                        is_open=False,
+                                        dismissable=True,
+                                        duration=5000,
+                                    ),
+                                ]
+                            ),
+                            dbc.ModalFooter(
+                                [
+                                    dbc.Button(
+                                        "Cancel",
+                                        id="admin-news-cancel-btn",
+                                        color="secondary",
+                                        className="me-2",
+                                    ),
+                                    dbc.Button(
+                                        "Save",
+                                        id="admin-news-save-btn",
+                                        color="primary",
+                                    ),
+                                ]
+                            ),
+                        ],
+                        id="admin-news-modal",
+                        size="lg",
+                        is_open=False,
+                    ),
+                    # Delete Confirmation Modal
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(
+                                dbc.ModalTitle("Confirm Delete"),
+                                close_button=True,
+                            ),
+                            dbc.ModalBody(
+                                "Are you sure you want to delete this news item? This action cannot be undone."
+                            ),
+                            dbc.ModalFooter(
+                                [
+                                    dbc.Button(
+                                        "Cancel",
+                                        id="admin-news-delete-cancel-btn",
+                                        color="secondary",
+                                        className="me-2",
+                                    ),
+                                    dbc.Button(
+                                        "Delete",
+                                        id="admin-news-delete-confirm-btn",
+                                        color="danger",
+                                    ),
+                                ]
+                            ),
+                        ],
+                        id="admin-news-delete-modal",
+                        is_open=False,
+                    ),
+                ]
+                if role in ("ADMIN", "SUPERADMIN")
+                else []
+            ),
             # Create New User Section (SUPERADMIN only)
             *(
                 [

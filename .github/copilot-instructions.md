@@ -159,6 +159,8 @@ tests/
 - `.github/workflows/quality.yml` - Ruff linting and formatting (**ENFORCED**)
 - `.github/workflows/deploy.yml` - AWS ECS deployment
 - `.github/workflows/rollback.yml` - Production rollback
+- `.github/workflows/translation_update.yml` - Transifex translation sync
+- `.github/workflows/machine_translation.yml` - Google Translate prepopulation
 
 ### Copilot Agent Workflow Integration
 **When using Copilot agents or automated tools:**
@@ -234,6 +236,50 @@ This UI connects to the Trends.Earth REST API, which provides the core functiona
 - **Dev**: pytest, pytest-mock, pytest-cov, ruff, selenium
 - **E2E Testing**: playwright, pytest-playwright (requires browser installation)
 - **Production**: gunicorn, rollbar
+- **Internationalization**: flask-babel, babel
+
+### Internationalization (i18n)
+
+The application supports multiple languages using Flask-Babel with gettext-based PO files. Translations are managed through Transifex.
+
+**Supported languages**: English, Arabic, Chinese, Farsi, French, Portuguese, Russian, Spanish, Swahili (same as trends.earth)
+
+**Translation structure**:
+```
+trendsearth_ui/i18n/
+├── __init__.py          # Main i18n module
+├── dash_i18n.py         # Dash-specific utilities
+└── translations/        # PO/POT files
+    ├── messages.pot     # Source template
+    └── {lang}/LC_MESSAGES/messages.po
+```
+
+**Key translation commands**:
+```bash
+# Extract translatable strings
+invoke translate-extract
+
+# Update PO files from template
+invoke translate-update
+
+# Compile translations to binary format
+invoke translate-compile
+
+# Check translation status
+invoke translate-status
+
+# Pull translations from Transifex
+invoke translate-pull  # Requires TX_TOKEN
+
+# Push source strings to Transifex
+invoke translate-push  # Requires TX_TOKEN
+```
+
+**GitHub Workflows**:
+- `translation_update.yml` - Syncs with Transifex (Mon/Wed/Fri 4AM UTC)
+- `machine_translation.yml` - Prepopulate translations using Google Translate
+
+**Documentation**: See `docs/TRANSLATIONS.md` for complete translation guide.
 
 ## File Locations Reference
 

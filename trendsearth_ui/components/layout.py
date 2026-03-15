@@ -12,6 +12,7 @@ from ..config import (
     LOGO_SQUARE_URL,
     LOGO_URL,
 )
+from ..i18n import gettext as _
 from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
@@ -109,7 +110,7 @@ def login_layout():
             dbc.Modal(
                 [
                     dbc.ModalHeader(
-                        dbc.ModalTitle("Forgot Password"),
+                        dbc.ModalTitle(_("Forgot Password")),
                         close_button=True,
                     ),
                     dbc.ModalBody(
@@ -118,13 +119,15 @@ def login_layout():
                             html.Div(
                                 [
                                     html.P(
-                                        "Enter your email address and we'll send you instructions to reset your password."
+                                        _(
+                                            "Enter your email address and we'll send you instructions to reset your password."
+                                        )
                                     ),
-                                    dbc.Label("Email Address"),
+                                    dbc.Label(_("Email Address")),
                                     dbc.Input(
                                         id="forgot-password-email",
                                         type="email",
-                                        placeholder="Enter your email address",
+                                        placeholder=_("Enter your email address"),
                                         className="mb-3",
                                     ),
                                 ],
@@ -146,13 +149,13 @@ def login_layout():
                             html.Div(
                                 [
                                     dbc.Button(
-                                        "Cancel",
+                                        _("Cancel"),
                                         id="cancel-forgot-password",
                                         color="secondary",
                                         className="me-2",
                                     ),
                                     dbc.Button(
-                                        "Send Reset Instructions",
+                                        _("Send Reset Instructions"),
                                         id="send-reset-btn",
                                         color="primary",
                                     ),
@@ -164,7 +167,7 @@ def login_layout():
                             html.Div(
                                 [
                                     dbc.Button(
-                                        "OK",
+                                        _("OK"),
                                         id="forgot-password-ok-btn",
                                         color="primary",
                                     ),
@@ -199,158 +202,160 @@ def login_layout():
                                                         "marginBottom": "15px",
                                                     },
                                                 ),
-                                                html.H4("Login", style={"color": "white"}),
+                                                html.H4(_("Login"), style={"color": "white"}),
                                             ],
                                             className="text-center",
                                         ),
                                         style={
                                             "backgroundColor": "#495057",
-                                        "padding": "20px",
-                                    },
-                                ),
-                                dbc.CardBody(
-                                    [
-                                        # Language selector just above the form
-                                        html.Div(
-                                            create_language_selector(id_prefix="login-lang"),
-                                            className="mb-3",
-                                        ),
-                                        dbc.Form(
-                                            [
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Email", width=3),
-                                                        dbc.Col(
-                                                            dbc.Input(
-                                                                id="login-email",
-                                                                type="email",
-                                                                placeholder="Enter email",
+                                            "padding": "20px",
+                                        },
+                                    ),
+                                    dbc.CardBody(
+                                        [
+                                            # Language selector just above the form
+                                            html.Div(
+                                                create_language_selector(id_prefix="login-lang"),
+                                                className="mb-3",
+                                            ),
+                                            dbc.Form(
+                                                [
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(_("Email"), width=3),
+                                                            dbc.Col(
+                                                                dbc.Input(
+                                                                    id="login-email",
+                                                                    type="email",
+                                                                    placeholder=_("Enter email"),
+                                                                ),
+                                                                width=9,
                                                             ),
-                                                            width=9,
-                                                        ),
-                                                    ],
-                                                    className="mb-3",
-                                                ),
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Label("Password", width=3),
-                                                        dbc.Col(
-                                                            dbc.Input(
-                                                                id="login-password",
-                                                                type="password",
-                                                                placeholder="Enter password",
-                                                            ),
-                                                            width=9,
-                                                        ),
-                                                    ],
-                                                    className="mb-3",
-                                                ),
-                                                # Hidden input to maintain callback compatibility
-                                                # API environment is now auto-detected from subdomain
-                                                html.Div(
-                                                    dcc.Input(
-                                                        id="api-environment-dropdown",
-                                                        type="hidden",
-                                                        value="",
+                                                        ],
+                                                        className="mb-3",
                                                     ),
-                                                    style={"display": "none"},
-                                                ),
-                                                dbc.Row(
-                                                    [
-                                                        dbc.Col(
-                                                            dbc.Checkbox(
-                                                                id="remember-me-checkbox",
-                                                                label="Remember me (keep me logged in)",
-                                                                value=True,
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Label(_("Password"), width=3),
+                                                            dbc.Col(
+                                                                dbc.Input(
+                                                                    id="login-password",
+                                                                    type="password",
+                                                                    placeholder=_("Enter password"),
+                                                                ),
+                                                                width=9,
                                                             ),
-                                                            width=12,
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    # Hidden input to maintain callback compatibility
+                                                    # API environment is now auto-detected from subdomain
+                                                    html.Div(
+                                                        dcc.Input(
+                                                            id="api-environment-dropdown",
+                                                            type="hidden",
+                                                            value="",
                                                         ),
-                                                    ],
-                                                    className="mb-3",
-                                                ),
-                                                dbc.Button(
-                                                    "Login",
-                                                    id="login-btn",
-                                                    color="primary",
-                                                    className="mt-2",
-                                                    n_clicks=0,
-                                                    style={"width": "100%"},
-                                                ),
-                                                dbc.Button(
-                                                    "Register",
-                                                    id="register-btn",
-                                                    color="secondary",
-                                                    outline=True,
-                                                    className="mt-2",
-                                                    n_clicks=0,
-                                                    style={"width": "100%"},
-                                                ),
-                                                html.Div(
-                                                    [
-                                                        html.A(
-                                                            "Forgot your password?",
-                                                            id="forgot-password-link",
-                                                            href="#",
-                                                            className="text-primary",
-                                                            style={
-                                                                "textDecoration": "none",
-                                                                "fontSize": "14px",
-                                                            },
-                                                        ),
-                                                    ],
-                                                    className="text-center mt-3",
-                                                ),
-                                                html.Div(
-                                                    id="login-feedback",
-                                                    style={
-                                                        "marginTop": "10px",
-                                                        "minHeight": "20px",
-                                                    },
-                                                ),
-                                            ]
-                                        ),
-                                        html.Hr(),
-                                        dbc.Alert(
-                                            id="login-alert",
-                                            is_open=False,
-                                            dismissable=True,
-                                            duration=None,
-                                        ),
-                                        html.Div(
-                                            [
-                                                html.A(
-                                                    "Privacy Policy",
-                                                    href="https://www.conservation.org/policies/privacy",
-                                                    target="_blank",
-                                                    className="text-muted",
-                                                    style={
-                                                        "textDecoration": "none",
-                                                        "fontSize": "12px",
-                                                    },
-                                                ),
-                                                html.Span(
-                                                    " | ",
-                                                    className="text-muted",
-                                                    style={"fontSize": "12px"},
-                                                ),
-                                                html.A(
-                                                    "Terms of Use",
-                                                    href="https://www.conservation.org/policies/terms-of-use",
-                                                    target="_blank",
-                                                    className="text-muted",
-                                                    style={
-                                                        "textDecoration": "none",
-                                                        "fontSize": "12px",
-                                                    },
-                                                ),
-                                            ],
-                                            className="text-center mt-3",
-                                        ),
-                                    ]
-                                ),
-                            ],
-                            style={"maxWidth": "400px"},
-                        ),
+                                                        style={"display": "none"},
+                                                    ),
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                dbc.Checkbox(
+                                                                    id="remember-me-checkbox",
+                                                                    label=_(
+                                                                        "Remember me (keep me logged in)"
+                                                                    ),
+                                                                    value=True,
+                                                                ),
+                                                                width=12,
+                                                            ),
+                                                        ],
+                                                        className="mb-3",
+                                                    ),
+                                                    dbc.Button(
+                                                        _("Login"),
+                                                        id="login-btn",
+                                                        color="primary",
+                                                        className="mt-2",
+                                                        n_clicks=0,
+                                                        style={"width": "100%"},
+                                                    ),
+                                                    dbc.Button(
+                                                        _("Register"),
+                                                        id="register-btn",
+                                                        color="secondary",
+                                                        outline=True,
+                                                        className="mt-2",
+                                                        n_clicks=0,
+                                                        style={"width": "100%"},
+                                                    ),
+                                                    html.Div(
+                                                        [
+                                                            html.A(
+                                                                _("Forgot your password?"),
+                                                                id="forgot-password-link",
+                                                                href="#",
+                                                                className="text-primary",
+                                                                style={
+                                                                    "textDecoration": "none",
+                                                                    "fontSize": "14px",
+                                                                },
+                                                            ),
+                                                        ],
+                                                        className="text-center mt-3",
+                                                    ),
+                                                    html.Div(
+                                                        id="login-feedback",
+                                                        style={
+                                                            "marginTop": "10px",
+                                                            "minHeight": "20px",
+                                                        },
+                                                    ),
+                                                ]
+                                            ),
+                                            html.Hr(),
+                                            dbc.Alert(
+                                                id="login-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=None,
+                                            ),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        _("Privacy Policy"),
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        _("Terms of Use"),
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "400px"},
+                            ),
                         ],
                         width="auto",
                         className="mx-auto mt-4",
@@ -404,18 +409,16 @@ def reset_password_layout(token=None, api_environment="production"):
                                                 className="mb-4",
                                             ),
                                             html.H4(
-                                                "Set Your New Password",
+                                                _("Set Your New Password"),
                                                 className="mb-4",
                                             ),
                                             html.P(
-                                                "Enter your new password below.",
+                                                _("Enter your new password below."),
                                                 className="text-muted mb-4",
                                             ),
                                             # Language selector
                                             html.Div(
-                                                create_language_selector(
-                                                    id_prefix="reset-lang"
-                                                ),
+                                                create_language_selector(id_prefix="reset-lang"),
                                                 className="mb-3",
                                             ),
                                             # Hidden stores for token and environment
@@ -431,12 +434,14 @@ def reset_password_layout(token=None, api_environment="production"):
                                                 [
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("New Password", width=4),
+                                                            dbc.Label(_("New Password"), width=4),
                                                             dbc.Col(
                                                                 dbc.Input(
                                                                     id="reset-new-password",
                                                                     type="password",
-                                                                    placeholder="Enter new password",
+                                                                    placeholder=_(
+                                                                        "Enter new password"
+                                                                    ),
                                                                 ),
                                                                 width=8,
                                                             ),
@@ -445,12 +450,16 @@ def reset_password_layout(token=None, api_environment="production"):
                                                     ),
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Confirm Password", width=4),
+                                                            dbc.Label(
+                                                                _("Confirm Password"), width=4
+                                                            ),
                                                             dbc.Col(
                                                                 dbc.Input(
                                                                     id="reset-confirm-password",
                                                                     type="password",
-                                                                    placeholder="Confirm new password",
+                                                                    placeholder=_(
+                                                                        "Confirm new password"
+                                                                    ),
                                                                 ),
                                                                 width=8,
                                                             ),
@@ -461,33 +470,35 @@ def reset_password_layout(token=None, api_environment="production"):
                                                         id="password-requirements",
                                                         children=[
                                                             html.Small(
-                                                                "Password requirements:",
+                                                                _("Password requirements:"),
                                                                 className="text-muted d-block mb-1",
                                                             ),
                                                             html.Ul(
                                                                 [
                                                                     html.Li(
-                                                                        "At least 12 characters",
+                                                                        _("At least 12 characters"),
                                                                         id="req-length",
                                                                         className="text-muted",
                                                                     ),
                                                                     html.Li(
-                                                                        "Uppercase letter (A-Z)",
+                                                                        _("Uppercase letter (A-Z)"),
                                                                         id="req-uppercase",
                                                                         className="text-muted",
                                                                     ),
                                                                     html.Li(
-                                                                        "Lowercase letter (a-z)",
+                                                                        _("Lowercase letter (a-z)"),
                                                                         id="req-lowercase",
                                                                         className="text-muted",
                                                                     ),
                                                                     html.Li(
-                                                                        "Number (0-9)",
+                                                                        _("Number (0-9)"),
                                                                         id="req-number",
                                                                         className="text-muted",
                                                                     ),
                                                                     html.Li(
-                                                                        "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)",
+                                                                        _(
+                                                                            "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+                                                                        ),
                                                                         id="req-special",
                                                                         className="text-muted",
                                                                     ),
@@ -503,7 +514,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Button(
-                                                                        "Set Password",
+                                                                        _("Set Password"),
                                                                         id="reset-password-submit-btn",
                                                                         color="primary",
                                                                         className="w-100",
@@ -519,7 +530,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Button(
-                                                                        "Back to Login",
+                                                                        _("Back to Login"),
                                                                         id="reset-password-back-btn",
                                                                         color="link",
                                                                         className="w-100",
@@ -542,7 +553,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                             html.Div(
                                                 [
                                                     html.A(
-                                                        "Privacy Policy",
+                                                        _("Privacy Policy"),
                                                         href="https://www.conservation.org/policies/privacy",
                                                         target="_blank",
                                                         className="text-muted",
@@ -557,7 +568,7 @@ def reset_password_layout(token=None, api_environment="production"):
                                                         style={"fontSize": "12px"},
                                                     ),
                                                     html.A(
-                                                        "Terms of Use",
+                                                        _("Terms of Use"),
                                                         href="https://www.conservation.org/policies/terms-of-use",
                                                         target="_blank",
                                                         className="text-muted",
@@ -590,49 +601,51 @@ def registration_layout():
     Note: API environment is now auto-detected from the request subdomain.
     """
     # Dropdown options matching QGIS plugin
+    # Note: We use _() (gettext) for immediate translation - returns a regular string
+    # that is JSON serializable, unlike lazy_gettext which returns LazyString
     sector_options = [
         {"label": "", "value": ""},
-        {"label": "Government - Environment/Natural Resources", "value": "gov_environment"},
-        {"label": "Government - Agriculture", "value": "gov_agriculture"},
-        {"label": "Government - Land Management/Planning", "value": "gov_land_management"},
-        {"label": "Government - Other", "value": "gov_other"},
-        {"label": "International/Multilateral Organization", "value": "international_org"},
-        {"label": "NGO - Development/Aid", "value": "ngo_development"},
-        {"label": "NGO - Community-Based", "value": "ngo_community"},
-        {"label": "NGO - Conservation", "value": "ngo_conservation"},
-        {"label": "NGO - Other", "value": "ngo_other"},
-        {"label": "Academic/Research Institution", "value": "academic"},
-        {"label": "Consulting/Professional Services", "value": "consulting"},
-        {"label": "Private Sector - Agriculture/Forestry", "value": "private_agri_forestry"},
-        {"label": "Private Sector - Other", "value": "private_other"},
-        {"label": "Independent Researcher", "value": "independent_researcher"},
-        {"label": "Student", "value": "student"},
-        {"label": "Other", "value": "other"},
+        {"label": _("Government - Environment/Natural Resources"), "value": "gov_environment"},
+        {"label": _("Government - Agriculture"), "value": "gov_agriculture"},
+        {"label": _("Government - Land Management/Planning"), "value": "gov_land_management"},
+        {"label": _("Government - Other"), "value": "gov_other"},
+        {"label": _("International/Multilateral Organization"), "value": "international_org"},
+        {"label": _("NGO - Development/Aid"), "value": "ngo_development"},
+        {"label": _("NGO - Community-Based"), "value": "ngo_community"},
+        {"label": _("NGO - Conservation"), "value": "ngo_conservation"},
+        {"label": _("NGO - Other"), "value": "ngo_other"},
+        {"label": _("Academic/Research Institution"), "value": "academic"},
+        {"label": _("Consulting/Professional Services"), "value": "consulting"},
+        {"label": _("Private Sector - Agriculture/Forestry"), "value": "private_agri_forestry"},
+        {"label": _("Private Sector - Other"), "value": "private_other"},
+        {"label": _("Independent Researcher"), "value": "independent_researcher"},
+        {"label": _("Student"), "value": "student"},
+        {"label": _("Other"), "value": "other"},
     ]
 
     purpose_options = [
         {"label": "", "value": ""},
-        {"label": "National/International Reporting (UNCCD, SDGs, etc.)", "value": "reporting"},
-        {"label": "Academic Research", "value": "academic_research"},
-        {"label": "Policy Development & Planning", "value": "policy_planning"},
-        {"label": "Land Restoration/Management Planning", "value": "land_restoration"},
-        {"label": "Project Monitoring & Evaluation", "value": "project_monitoring"},
-        {"label": "Environmental Impact Assessment", "value": "environmental_assessment"},
-        {"label": "Agriculture/Forestry Planning", "value": "agriculture_forestry"},
-        {"label": "Teaching & Education", "value": "teaching_education"},
-        {"label": "Conservation Planning", "value": "conservation_planning"},
-        {"label": "Commercial Services/Products", "value": "commercial"},
-        {"label": "Community/Grassroots Initiatives", "value": "community_initiatives"},
-        {"label": "Other", "value": "other"},
+        {"label": _("National/International Reporting (UNCCD, SDGs, etc.)"), "value": "reporting"},
+        {"label": _("Academic Research"), "value": "academic_research"},
+        {"label": _("Policy Development & Planning"), "value": "policy_planning"},
+        {"label": _("Land Restoration/Management Planning"), "value": "land_restoration"},
+        {"label": _("Project Monitoring & Evaluation"), "value": "project_monitoring"},
+        {"label": _("Environmental Impact Assessment"), "value": "environmental_assessment"},
+        {"label": _("Agriculture/Forestry Planning"), "value": "agriculture_forestry"},
+        {"label": _("Teaching & Education"), "value": "teaching_education"},
+        {"label": _("Conservation Planning"), "value": "conservation_planning"},
+        {"label": _("Commercial Services/Products"), "value": "commercial"},
+        {"label": _("Community/Grassroots Initiatives"), "value": "community_initiatives"},
+        {"label": _("Other"), "value": "other"},
     ]
 
     gender_options = [
         {"label": "", "value": ""},
-        {"label": "Woman", "value": "woman"},
-        {"label": "Man", "value": "man"},
-        {"label": "Non-binary", "value": "non_binary"},
-        {"label": "Prefer to self-describe", "value": "self_describe"},
-        {"label": "Prefer not to say", "value": "prefer_not_to_say"},
+        {"label": _("Woman"), "value": "woman"},
+        {"label": _("Man"), "value": "man"},
+        {"label": _("Non-binary"), "value": "non_binary"},
+        {"label": _("Prefer to self-describe"), "value": "self_describe"},
+        {"label": _("Prefer not to say"), "value": "prefer_not_to_say"},
     ]
 
     return html.Div(
@@ -665,25 +678,25 @@ def registration_layout():
                                                 className="mb-4",
                                             ),
                                             html.H4(
-                                                "Create Your Account",
+                                                _("Create Your Account"),
                                                 className="mb-4 text-center",
                                             ),
                                             html.P(
-                                                "After registration, you'll receive an email to verify your address and set your password.",
+                                                _(
+                                                    "After registration, you'll receive an email to verify your address and set your password."
+                                                ),
                                                 className="text-muted text-center mb-4",
                                                 style={"fontSize": "14px"},
                                             ),
                                             # Language selector
                                             html.Div(
-                                                create_language_selector(
-                                                    id_prefix="register-lang"
-                                                ),
+                                                create_language_selector(id_prefix="register-lang"),
                                                 className="mb-3",
                                             ),
                                             html.P(
                                                 [
                                                     html.Span("* ", style={"color": "red"}),
-                                                    "Required field",
+                                                    _("Required field"),
                                                 ],
                                                 className="text-muted mb-3",
                                                 style={"fontSize": "12px"},
@@ -695,7 +708,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Email"),
+                                                                    html.Strong(_("Email")),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -708,7 +721,9 @@ def registration_layout():
                                                                     dbc.Input(
                                                                         id="register-email",
                                                                         type="email",
-                                                                        placeholder="Enter your email address",
+                                                                        placeholder=_(
+                                                                            "Enter your email address"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -721,7 +736,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Full Name"),
+                                                                    html.Strong(_("Full Name")),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -734,7 +749,9 @@ def registration_layout():
                                                                     dbc.Input(
                                                                         id="register-name",
                                                                         type="text",
-                                                                        placeholder="Enter your full name",
+                                                                        placeholder=_(
+                                                                            "Enter your full name"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -745,13 +762,15 @@ def registration_layout():
                                                     # Role/Title
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Role/Title", width=4),
+                                                            dbc.Label(_("Role/Title"), width=4),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
                                                                         id="register-role-title",
                                                                         type="text",
-                                                                        placeholder="Your job title (optional)",
+                                                                        placeholder=_(
+                                                                            "Your job title (optional)"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -764,7 +783,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Organization"),
+                                                                    html.Strong(_("Organization")),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -777,7 +796,9 @@ def registration_layout():
                                                                     dbc.Input(
                                                                         id="register-institution",
                                                                         type="text",
-                                                                        placeholder="Your organization",
+                                                                        placeholder=_(
+                                                                            "Your organization"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -790,7 +811,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Sector"),
+                                                                    html.Strong(_("Sector")),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -803,7 +824,9 @@ def registration_layout():
                                                                     dcc.Dropdown(
                                                                         id="register-sector",
                                                                         options=sector_options,
-                                                                        placeholder="Select your sector",
+                                                                        placeholder=_(
+                                                                            "Select your sector"
+                                                                        ),
                                                                         clearable=True,
                                                                         style={"fontSize": "14px"},
                                                                     ),
@@ -816,13 +839,15 @@ def registration_layout():
                                                     # Sector Other (conditional)
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Please specify", width=4),
+                                                            dbc.Label(_("Please specify"), width=4),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
                                                                         id="register-sector-other",
                                                                         type="text",
-                                                                        placeholder="Please specify your sector",
+                                                                        placeholder=_(
+                                                                            "Please specify your sector"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -837,7 +862,9 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Purpose of Use"),
+                                                                    html.Strong(
+                                                                        _("Purpose of Use")
+                                                                    ),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -850,7 +877,9 @@ def registration_layout():
                                                                     dcc.Dropdown(
                                                                         id="register-purpose",
                                                                         options=purpose_options,
-                                                                        placeholder="Select your purpose of use",
+                                                                        placeholder=_(
+                                                                            "Select your purpose of use"
+                                                                        ),
                                                                         clearable=True,
                                                                         style={"fontSize": "14px"},
                                                                     ),
@@ -863,13 +892,15 @@ def registration_layout():
                                                     # Purpose Other (conditional)
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Please specify", width=4),
+                                                            dbc.Label(_("Please specify"), width=4),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
                                                                         id="register-purpose-other",
                                                                         type="text",
-                                                                        placeholder="Please specify your purpose",
+                                                                        placeholder=_(
+                                                                            "Please specify your purpose"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -884,7 +915,7 @@ def registration_layout():
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    html.Strong("Country"),
+                                                                    html.Strong(_("Country")),
                                                                     html.Span(
                                                                         " *",
                                                                         style={"color": "red"},
@@ -896,7 +927,9 @@ def registration_layout():
                                                                 [
                                                                     dcc.Dropdown(
                                                                         id="register-country",
-                                                                        placeholder="Select your country",
+                                                                        placeholder=_(
+                                                                            "Select your country"
+                                                                        ),
                                                                         clearable=True,
                                                                         style={"fontSize": "14px"},
                                                                     ),
@@ -912,13 +945,17 @@ def registration_layout():
                                                     # Gender Identity
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Gender Identity", width=4),
+                                                            dbc.Label(
+                                                                _("Gender Identity"), width=4
+                                                            ),
                                                             dbc.Col(
                                                                 [
                                                                     dcc.Dropdown(
                                                                         id="register-gender",
                                                                         options=gender_options,
-                                                                        placeholder="Select (optional)",
+                                                                        placeholder=_(
+                                                                            "Select (optional)"
+                                                                        ),
                                                                         clearable=True,
                                                                         style={"fontSize": "14px"},
                                                                     ),
@@ -930,20 +967,26 @@ def registration_layout():
                                                     ),
                                                     # Gender note
                                                     html.P(
-                                                        "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary; your selection will not affect your access to the tool.",
+                                                        _(
+                                                            "We collect gender identity information to comply with donor reporting requirements and to assess equitable participation in capacity development and tool access. Providing this information is voluntary; your selection will not affect your access to the tool."
+                                                        ),
                                                         className="text-muted mb-3",
                                                         style={"fontSize": "12px"},
                                                     ),
                                                     # Gender Description (conditional)
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label("Please describe", width=4),
+                                                            dbc.Label(
+                                                                _("Please describe"), width=4
+                                                            ),
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Input(
                                                                         id="register-gender-description",
                                                                         type="text",
-                                                                        placeholder="Please describe",
+                                                                        placeholder=_(
+                                                                            "Please describe"
+                                                                        ),
                                                                     ),
                                                                 ],
                                                                 width=8,
@@ -985,7 +1028,9 @@ def registration_layout():
                                                             html.P(
                                                                 [
                                                                     html.Strong(
-                                                                        "Do you acknowledge that some Trends.Earth features use Google Earth Engine, and, depending on your use, you may be required to have in place a commercial license to use Google Earth Engine?"
+                                                                        _(
+                                                                            "Do you acknowledge that some Trends.Earth features use Google Earth Engine, and, depending on your use, you may be required to have in place a commercial license to use Google Earth Engine?"
+                                                                        )
                                                                     ),
                                                                     html.Span(
                                                                         " *",
@@ -996,13 +1041,19 @@ def registration_layout():
                                                             ),
                                                             html.P(
                                                                 [
-                                                                    "Google Earth Engine (GEE) imposes restrictions on commercial use. For more details see the ",
+                                                                    _(
+                                                                        "Google Earth Engine (GEE) imposes restrictions on commercial use. For more details see the "
+                                                                    ),
                                                                     html.A(
-                                                                        "Google Earth Engine Terms of Use",
+                                                                        _(
+                                                                            "Google Earth Engine Terms of Use"
+                                                                        ),
                                                                         href="https://earthengine.google.com/terms/",
                                                                         target="_blank",
                                                                     ),
-                                                                    ". Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing.",
+                                                                    _(
+                                                                        " . Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing."
+                                                                    ),
                                                                 ],
                                                                 className="text-muted mb-3",
                                                                 style={"fontSize": "12px"},
@@ -1010,7 +1061,7 @@ def registration_layout():
                                                             html.Div(
                                                                 dbc.Checkbox(
                                                                     id="register-gee-acknowledged",
-                                                                    label="Yes, I acknowledge",
+                                                                    label=_("Yes, I acknowledge"),
                                                                     value=False,
                                                                 ),
                                                                 className="mb-3 d-flex justify-content-center",
@@ -1035,7 +1086,7 @@ def registration_layout():
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Button(
-                                                                        "Create Account",
+                                                                        _("Create Account"),
                                                                         id="register-submit-btn",
                                                                         color="primary",
                                                                         className="w-100",
@@ -1051,7 +1102,7 @@ def registration_layout():
                                                             dbc.Col(
                                                                 [
                                                                     dbc.Button(
-                                                                        "Back to Login",
+                                                                        _("Back to Login"),
                                                                         id="register-back-btn",
                                                                         color="link",
                                                                         className="w-100",
@@ -1067,7 +1118,7 @@ def registration_layout():
                                             html.Div(
                                                 [
                                                     html.A(
-                                                        "Privacy Policy",
+                                                        _("Privacy Policy"),
                                                         href="https://www.conservation.org/policies/privacy",
                                                         target="_blank",
                                                         className="text-muted",
@@ -1082,7 +1133,7 @@ def registration_layout():
                                                         style={"fontSize": "12px"},
                                                     ),
                                                     html.A(
-                                                        "Terms of Use",
+                                                        _("Terms of Use"),
                                                         href="https://www.conservation.org/policies/terms-of-use",
                                                         target="_blank",
                                                         className="text-muted",
@@ -1166,7 +1217,7 @@ def dashboard_layout():
                                             dbc.Button(
                                                 [
                                                     html.I(className="fas fa-sign-out-alt me-2"),
-                                                    "Logout",
+                                                    _("Logout"),
                                                 ],
                                                 id="header-logout-btn",
                                                 color="outline-secondary",
@@ -1212,7 +1263,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Executions",
+                                        _("Executions"),
                                         id="executions-tab-btn",
                                         className="nav-link active",
                                     )
@@ -1222,7 +1273,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Users",
+                                        _("Users"),
                                         id="users-tab-btn",
                                         className="nav-link",
                                     )
@@ -1236,7 +1287,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Scripts",
+                                        _("Scripts"),
                                         id="scripts-tab-btn",
                                         className="nav-link",
                                     )
@@ -1250,7 +1301,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Admin",
+                                        _("Admin"),
                                         id="admin-tab-btn",
                                         className="nav-link",
                                     )
@@ -1264,7 +1315,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Status",
+                                        _("Status"),
                                         id="status-tab-btn",
                                         className="nav-link",
                                     )
@@ -1278,7 +1329,7 @@ def dashboard_layout():
                             html.Li(
                                 [
                                     html.Button(
-                                        "Profile",
+                                        _("Profile"),
                                         id="profile-tab-btn",
                                         className="nav-link",
                                     )

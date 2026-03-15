@@ -1,94 +1,441 @@
-# Portuguese translations for Trends.Earth API UI
-# Copyright (C) 2024 Conservation International
-# This file is distributed under the MIT license.
+# Portuguese translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Trends.Earth API UI 1.0\n"
-"Report-Msgid-Bugs-To: azvoleff@conservation.org\n"
-"POT-Creation-Date: 2026-03-14 12:15-0400\n"
-"PO-Revision-Date: 2024-01-01 00:00+0000\n"
-"Last-Translator: Trends.Earth Team <trendsearth@conservation.org>\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-14 14:26-0400\n"
+"PO-Revision-Date: 2026-03-14 14:01-0400\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
-"Language-Team: Portuguese <pt@li.org>\n"
+"Language-Team: pt <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#~ msgid "Login"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:114
+msgid "Forgot Password"
+msgstr "Esqueceu a senha"
 
-#~ msgid "Email"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:124
+msgid ""
+"Enter your email address and we'll send you instructions to reset your "
+"password."
+msgstr ""
 
-#~ msgid "Password"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:127
+msgid "Email Address"
+msgstr ""
 
-#~ msgid "Enter email"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:131
+#: trendsearth_ui/components/layout.py:726
+msgid "Enter your email address"
+msgstr ""
 
-#~ msgid "Enter password"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:153
+msgid "Cancel"
+msgstr "Cancelar"
 
-#~ msgid "Remember me (keep me logged in)"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:159
+msgid "Send Reset Instructions"
+msgstr ""
 
-#~ msgid "Register"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:171
+msgid "OK"
+msgstr ""
 
-#~ msgid "Logout"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:206
+#: trendsearth_ui/components/layout.py:278
+msgid "Login"
+msgstr ""
 
-#~ msgid "Executions"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:226
+#: trendsearth_ui/components/layout.py:712
+msgid "Email"
+msgstr ""
 
-#~ msgid "Users"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:231
+msgid "Enter email"
+msgstr ""
 
-#~ msgid "Scripts"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:240
+msgid "Password"
+msgstr ""
 
-#~ msgid "Status"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:245
+msgid "Enter password"
+msgstr ""
 
-#~ msgid "Cancel"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:268
+msgid "Remember me (keep me logged in)"
+msgstr ""
 
-#~ msgid "OK"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:286
+msgid "Register"
+msgstr ""
 
-#~ msgid "Save Changes"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:297
+msgid "Forgot your password?"
+msgstr ""
 
-#~ msgid "Close"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:328
+#: trendsearth_ui/components/layout.py:557
+#: trendsearth_ui/components/layout.py:1122
+msgid "Privacy Policy"
+msgstr ""
 
-#~ msgid "Delete"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:343
+#: trendsearth_ui/components/layout.py:572
+#: trendsearth_ui/components/layout.py:1137
+msgid "Terms of Use"
+msgstr ""
 
-#~ msgid "Loading..."
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:413
+msgid "Set Your New Password"
+msgstr ""
 
-#~ msgid "Search"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:417
+msgid "Enter your new password below."
+msgstr ""
 
-#~ msgid "Refresh"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:438
+msgid "New Password"
+msgstr ""
 
-#~ msgid "Dashboard"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:444
+msgid "Enter new password"
+msgstr ""
 
-#~ msgid "Yes"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:455
+msgid "Confirm Password"
+msgstr ""
 
-#~ msgid "No"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:462
+msgid "Confirm new password"
+msgstr ""
 
-#~ msgid "Welcome"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:474
+msgid "Password requirements:"
+msgstr ""
 
-#~ msgid "Language"
-#~ msgstr ""
+#: trendsearth_ui/components/layout.py:480
+msgid "At least 12 characters"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:485
+msgid "Uppercase letter (A-Z)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:490
+msgid "Lowercase letter (a-z)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:495
+msgid "Number (0-9)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:501
+#, python-brace-format
+msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:518
+msgid "Set Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:534
+#: trendsearth_ui/components/layout.py:1106
+msgid "Back to Login"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:609
+msgid "Government - Environment/Natural Resources"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:610
+msgid "Government - Agriculture"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:611
+msgid "Government - Land Management/Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:612
+msgid "Government - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:613
+msgid "International/Multilateral Organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:614
+msgid "NGO - Development/Aid"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:615
+msgid "NGO - Community-Based"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:616
+msgid "NGO - Conservation"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:617
+msgid "NGO - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:618
+msgid "Academic/Research Institution"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:619
+msgid "Consulting/Professional Services"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:620
+msgid "Private Sector - Agriculture/Forestry"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:621
+msgid "Private Sector - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:622
+msgid "Independent Researcher"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:623
+msgid "Student"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:624
+#: trendsearth_ui/components/layout.py:640
+msgid "Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:629
+msgid "National/International Reporting (UNCCD, SDGs, etc.)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:630
+msgid "Academic Research"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:631
+msgid "Policy Development & Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:632
+msgid "Land Restoration/Management Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:633
+msgid "Project Monitoring & Evaluation"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:634
+msgid "Environmental Impact Assessment"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:635
+msgid "Agriculture/Forestry Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:636
+msgid "Teaching & Education"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:637
+msgid "Conservation Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:638
+msgid "Commercial Services/Products"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:639
+msgid "Community/Grassroots Initiatives"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:645
+msgid "Woman"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:646
+msgid "Man"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:647
+msgid "Non-binary"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:648
+msgid "Prefer to self-describe"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:649
+msgid "Prefer not to say"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:682
+msgid "Create Your Account"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:687
+msgid ""
+"After registration, you'll receive an email to verify your address and "
+"set your password."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:700
+msgid "Required field"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:740
+msgid "Full Name"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:754
+msgid "Enter your full name"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:766
+msgid "Role/Title"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:773
+msgid "Your job title (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:787
+msgid "Organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:801
+msgid "Your organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:815
+msgid "Sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:829
+msgid "Select your sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:843
+#: trendsearth_ui/components/layout.py:896
+msgid "Please specify"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:850
+msgid "Please specify your sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:867
+msgid "Purpose of Use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:882
+msgid "Select your purpose of use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:903
+msgid "Please specify your purpose"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:919
+msgid "Country"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:932
+msgid "Select your country"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:950
+msgid "Gender Identity"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:958
+msgid "Select (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:972
+msgid ""
+"We collect gender identity information to comply with donor reporting "
+"requirements and to assess equitable participation in capacity "
+"development and tool access. Providing this information is voluntary; "
+"your selection will not affect your access to the tool."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:981
+#: trendsearth_ui/components/layout.py:989
+msgid "Please describe"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1033
+msgid ""
+"Do you acknowledge that some Trends.Earth features use Google Earth "
+"Engine, and, depending on your use, you may be required to have in place "
+"a commercial license to use Google Earth Engine?"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1046
+msgid ""
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
+"more details see the "
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1050
+msgid "Google Earth Engine Terms of Use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1056
+msgid ""
+" . Conservation International does not provide or manage commercial GEE "
+"licenses. Users are solely responsible for ensuring their use of GEE "
+"complies with Google's commercial licensing requirements. Access to this "
+"tool does not grant or imply the provision of commercial licensing."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1065
+msgid "Yes, I acknowledge"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1090
+msgid "Create Account"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1221
+msgid "Logout"
+msgstr "Terminar Sessão"
+
+#: trendsearth_ui/components/layout.py:1267
+msgid "Executions"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1277
+msgid "Users"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1291
+msgid "Scripts"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1305
+msgid "Admin"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1319
+msgid "Status"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1333
+msgid "Profile"
+msgstr ""
 

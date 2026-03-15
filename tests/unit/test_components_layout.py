@@ -71,7 +71,11 @@ class TestLoginLayout:
         col = row.children[0]
         assert hasattr(col, "children")
 
+        # col.children may be a Card directly or a list containing the Card
         card = col.children
+        if isinstance(card, list):
+            card = card[0] if card else None
+        assert card is not None
         assert hasattr(card, "children")
 
     def test_login_layout_form_elements(self):

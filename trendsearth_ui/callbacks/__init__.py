@@ -40,6 +40,7 @@ def register_all_callbacks(app):
         "edit",
         "refresh",
         "news",  # Add news callbacks
+        "news_admin",  # Add news admin callbacks
     ]
 
     for module_name in callback_modules:

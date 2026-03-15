@@ -204,8 +204,9 @@ def serve_assets(filename):
     return send_from_directory(assets_dir, safe_filename)
 
 
-# Create the main layout
-app.layout = create_main_layout()
+# Create the main layout - use a callable so it's evaluated within request context
+# This allows gettext translations to work properly (evaluated within Flask request context)
+app.layout = create_main_layout
 
 
 @server.before_request

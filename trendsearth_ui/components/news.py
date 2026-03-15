@@ -44,14 +44,29 @@ def create_news_banner():
     Returns:
         A Dash component containing the news banner structure and stores.
     """
+    # Poll once per day: 24 hours = 24 * 60 * 60 * 1000 ms
+    DAILY_POLL_INTERVAL = 24 * 60 * 60 * 1000
+
     return html.Div(
         [
-            # Store for news items
-            dcc.Store(id="news-items-store", data=[]),
+            # Store for news items (session storage - cleared on browser close)
+            dcc.Store(id="news-items-store", data=[], storage_type="session"),
             # Store for current news index
             dcc.Store(id="news-current-index", data=0),
-            # Store for dismissed news IDs (local tracking)
-            dcc.Store(id="news-dismissed-ids", data=[]),
+            # Store for dismissed news IDs (local storage - persistent)
+            dcc.Store(id="news-dismissed-ids", data=[], storage_type="local"),
+            # Store for last fetch timestamp (local storage)
+            dcc.Store(id="news-last-fetch", data=None, storage_type="local"),
+            # Hidden placeholder buttons for callbacks - will be replaced when news renders
+            # These need to exist in initial layout for Dash callback validation
+            html.Div(
+                [
+                    html.Button(id="news-refresh-btn", style={"display": "none"}),
+                    html.Button(id="news-prev-btn", style={"display": "none"}),
+                    html.Button(id="news-next-btn", style={"display": "none"}),
+                ],
+                style={"display": "none"},
+            ),
             # Loading state
             dcc.Loading(
                 id="news-loading",
@@ -65,10 +80,10 @@ def create_news_banner():
                 ],
                 style={"minHeight": "0"},
             ),
-            # Interval for refreshing news (every 5 minutes)
+            # Interval for automatic refresh (once per day)
             dcc.Interval(
                 id="news-refresh-interval",
-                interval=5 * 60 * 1000,  # 5 minutes
+                interval=DAILY_POLL_INTERVAL,
                 n_intervals=0,
             ),
         ],
@@ -174,6 +189,15 @@ def create_news_item_card(news_item, current_index, total_count):
                                             style={
                                                 "display": "flex" if total_count > 1 else "none"
                                             },
+                                        ),
+                                        # Refresh button
+                                        dbc.Button(
+                                            html.I(className="fas fa-sync-alt"),
+                                            id="news-refresh-btn",
+                                            color="link",
+                                            size="sm",
+                                            className="p-1 text-muted me-2",
+                                            title="Refresh news",
                                         ),
                                         # Dismiss button
                                         dbc.Button(

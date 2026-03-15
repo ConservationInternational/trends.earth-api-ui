@@ -97,11 +97,15 @@
     contain: style;
 }
 
-/* Prevent page-level scrolling - all scrolling should happen within AG-Grid */
-html, body {
-    overflow: hidden;
-    height: 100vh;
-}
+/* 
+ * NOTE: We previously had html, body { overflow: hidden; height: 100vh; }
+ * to prevent page-level scrolling on AG-Grid pages. This was removed because
+ * it blocked scrolling on ALL pages including Status, Profile, etc.
+ * 
+ * AG-Grid handles its own scrolling internally, so no global override is needed.
+ * If specific AG-Grid containers need scroll constraints, apply classes to those
+ * specific containers rather than globally.
+ */
 
 /* Force classic (non-overlay) scrollbars globally.
    Windows with "auto-hide scrollbars" enabled makes Chrome/Edge use overlay
