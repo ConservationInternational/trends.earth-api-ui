@@ -132,9 +132,7 @@ def register_callbacks(app):
         Input("token-store", "data"),
         prevent_initial_call="initial_duplicate",
     )
-    def load_admin_news_items(
-        _n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token
-    ):
+    def load_admin_news_items(_n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token):
         """Load news items for admin management."""
         # Must have a token to load news
         if not token:

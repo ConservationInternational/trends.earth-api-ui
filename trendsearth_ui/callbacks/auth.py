@@ -1,8 +1,6 @@
 """Authentication and navigation callbacks."""
 
 from datetime import datetime, timedelta, timezone
-
-from ..i18n import gettext as _
 import hmac
 import json
 import os
@@ -21,6 +19,7 @@ from ..components import (
     update_profile_standalone_layout,
 )
 from ..config import detect_api_environment_from_host, get_api_base, get_auth_url
+from ..i18n import gettext as _
 from ..utils import (
     create_auth_cookie_data,
     get_user_info,

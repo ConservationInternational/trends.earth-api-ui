@@ -565,7 +565,9 @@ def profile_tab_content(user_data):
                                                         className="mb-2",
                                                     ),
                                                     html.Small(
-                                                        _("Receive email notifications when your script executions finish, fail, or are cancelled."),
+                                                        _(
+                                                            "Receive email notifications when your script executions finish, fail, or are cancelled."
+                                                        ),
                                                         className="text-muted",
                                                     ),
                                                 ],
@@ -621,7 +623,9 @@ def profile_tab_content(user_data):
                                         [
                                             html.H6(_("Setup Your GEE Account")),
                                             html.P(
-                                                _("Choose one of the options below to configure your Google Earth Engine credentials:"),
+                                                _(
+                                                    "Choose one of the options below to configure your Google Earth Engine credentials:"
+                                                ),
                                                 className="text-muted",
                                             ),
                                         ],
@@ -640,11 +644,15 @@ def profile_tab_content(user_data):
                                                     dbc.CardBody(
                                                         [
                                                             html.H6(
-                                                                _("Option 1: Connect Your GEE Account (OAuth)"),
+                                                                _(
+                                                                    "Option 1: Connect Your GEE Account (OAuth)"
+                                                                ),
                                                                 className="mb-3",
                                                             ),
                                                             html.P(
-                                                                _("Connect your personal Google Earth Engine account using OAuth authentication."),
+                                                                _(
+                                                                    "Connect your personal Google Earth Engine account using OAuth authentication."
+                                                                ),
                                                                 className="text-muted",
                                                             ),
                                                             dbc.Button(
@@ -680,11 +688,15 @@ def profile_tab_content(user_data):
                                                     dbc.CardBody(
                                                         [
                                                             html.H6(
-                                                                _("Option 2: Upload Service Account Key"),
+                                                                _(
+                                                                    "Option 2: Upload Service Account Key"
+                                                                ),
                                                                 className="mb-3",
                                                             ),
                                                             html.P(
-                                                                _("Upload a Google Cloud service account JSON key with Earth Engine access."),
+                                                                _(
+                                                                    "Upload a Google Cloud service account JSON key with Earth Engine access."
+                                                                ),
                                                                 className="text-muted",
                                                             ),
                                                             dcc.Upload(
@@ -694,7 +706,9 @@ def profile_tab_content(user_data):
                                                                         html.I(
                                                                             className="fas fa-upload me-2"
                                                                         ),
-                                                                        _("Upload Service Account Key"),
+                                                                        _(
+                                                                            "Upload Service Account Key"
+                                                                        ),
                                                                     ],
                                                                     color="secondary",
                                                                     outline=True,
@@ -766,9 +780,11 @@ def profile_tab_content(user_data):
                     dbc.CardBody(
                         [
                             html.P(
-                                _("Service credentials allow external applications to authenticate "
-                                "with the Trends.Earth API using the OAuth2 client credentials grant. "
-                                "The client secret is shown only once at creation time."),
+                                _(
+                                    "Service credentials allow external applications to authenticate "
+                                    "with the Trends.Earth API using the OAuth2 client credentials grant. "
+                                    "The client secret is shown only once at creation time."
+                                ),
                                 className="text-muted",
                             ),
                             # Credentials table
@@ -842,7 +858,9 @@ def profile_tab_content(user_data):
                                                         placeholder=_("e.g. My CLI Tool"),
                                                     ),
                                                     dbc.FormText(
-                                                        _("A descriptive label for this credential.")
+                                                        _(
+                                                            "A descriptive label for this credential."
+                                                        )
                                                     ),
                                                 ],
                                                 width=12,
