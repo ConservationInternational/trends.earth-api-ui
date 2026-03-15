@@ -63,14 +63,15 @@ def create_news_table(news_items):
         roles = ", ".join(item.get("target_roles", [])) or "All"
         is_active = item.get("is_active", False)
         created_at = item.get("created_at", "")[:10] if item.get("created_at") else ""
-        news_type = item.get("news_type", "info")
+        news_type = item.get("news_type", "announcement")
 
         # Type badge color
         type_colors = {
-            "info": "primary",
+            "announcement": "primary",
             "warning": "warning",
-            "error": "danger",
-            "success": "success",
+            "release": "success",
+            "tip": "info",
+            "maintenance": "secondary",
         }
 
         row = html.Tr(
@@ -129,37 +130,24 @@ def register_callbacks(app):
         Input("admin-news-save-btn", "n_clicks"),
         Input("admin-news-delete-confirm-btn", "n_clicks"),
         Input("token-store", "data"),
-        State("api-environment-store", "data"),
         prevent_initial_call="initial_duplicate",
     )
     def load_admin_news_items(
-        _n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token, api_environment
+        _n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token
     ):
         """Load news items for admin management."""
-        logger.info(
-            f"load_admin_news_items called: intervals={_n_intervals}, "
-            f"refresh={_refresh_clicks}, save={_save_clicks}, delete={_delete_clicks}, "
-            f"token_exists={bool(token)}, api_env={api_environment}"
-        )
         # Must have a token to load news
         if not token:
-            logger.warning("No token provided to load_admin_news_items")
             return "Please log in to manage news.", "", "warning", True
 
         try:
             # Fetch all news including inactive
-            logger.info(f"Fetching admin news from API (env={api_environment})...")
-            response = make_api_request(
-                "GET", "/admin/news?include_inactive=true", token, api_environment=api_environment
-            )
-            logger.info(f"Admin news API response: status={response.status_code}")
+            response = make_api_request("GET", "/admin/news?include_inactive=true", token)
 
             if response.status_code == 200:
                 data = response.json()
                 news_items = data.get("data", [])
-                logger.info(f"Successfully loaded {len(news_items)} news items")
-                table = create_news_table(news_items)
-                return table, no_update, no_update, no_update
+                return create_news_table(news_items), no_update, no_update, no_update
             elif response.status_code == 401:
                 return (
                     "Session expired. Please log in again.",
@@ -179,7 +167,6 @@ def register_callbacks(app):
                 return error_msg, error_msg, "danger", True
 
         except Exception as e:
-            logger.exception(f"Exception in load_admin_news_items: {e}")
             error_msg = f"Error loading news: {str(e)}"
             return error_msg, error_msg, "danger", True
 
@@ -224,17 +211,15 @@ def register_callbacks(app):
         Input("admin-news-save-btn", "n_clicks"),
         State("admin-selected-news-id", "data"),
         State("token-store", "data"),
-        State("api-environment-store", "data"),
         prevent_initial_call=True,
     )
-    def toggle_news_modal(  # noqa: ARG001
+    def toggle_news_modal(
         _create_clicks,
         _edit_clicks,
         _cancel_clicks,
         _save_clicks,
         selected_id,
         token,
-        api_environment,  # noqa: ARG001 - used conditionally in edit branch
     ):
         """Toggle the news create/edit modal."""
         ctx = callback_context
@@ -251,7 +236,7 @@ def register_callbacks(app):
                 "",  # link_text
                 ["qgis_plugin", "web", "api_ui"],  # platforms
                 [],  # roles (empty = all users)
-                "info",  # type
+                "announcement",  # type
                 0,  # priority
                 "",  # min_version
                 "",  # max_version
@@ -271,7 +256,7 @@ def register_callbacks(app):
                 "",  # link_text
                 ["qgis_plugin", "web", "api_ui"],  # platforms
                 [],  # roles (empty = all users)
-                "info",  # type
+                "announcement",  # type
                 0,  # priority
                 "",  # min_version
                 "",  # max_version
@@ -283,12 +268,7 @@ def register_callbacks(app):
         # Open modal for edit - need to fetch news item data
         if triggered_id == "admin-edit-news-btn" and selected_id and token:
             try:
-                response = make_api_request(
-                    "GET",
-                    f"/admin/news/{selected_id}",
-                    token,
-                    api_environment=api_environment,
-                )
+                response = make_api_request("GET", f"/admin/news/{selected_id}", token)
                 if response.status_code == 200:
                     item = response.json()
                     return (
@@ -300,12 +280,12 @@ def register_callbacks(app):
                         item.get("link_text", "") or "",
                         item.get("target_platforms", ["qgis_plugin", "web", "api_ui"]),
                         item.get("target_roles", []),
-                        item.get("news_type", "info"),
+                        item.get("news_type", "announcement"),
                         item.get("priority", 0),
                         item.get("min_version", "") or "",
                         item.get("max_version", "") or "",
-                        item.get("publish_at"),  # API returns publish_at
-                        item.get("expires_at"),  # API returns expires_at
+                        item.get("start_date"),
+                        item.get("end_date"),
                         item.get("is_active", True),
                     )
             except Exception:
@@ -356,7 +336,6 @@ def register_callbacks(app):
         State("admin-news-is-active", "value"),
         State("admin-selected-news-id", "data"),
         State("token-store", "data"),
-        State("api-environment-store", "data"),
         prevent_initial_call=True,
     )
     def save_news_item(
@@ -377,7 +356,6 @@ def register_callbacks(app):
         is_active,
         selected_id,
         token,
-        api_environment,
     ):
         """Save a news item (create or update)."""
         if not token:
@@ -442,28 +420,18 @@ def register_callbacks(app):
         if max_version:
             data["max_version"] = max_version.strip()
         if start_date:
-            data["publish_at"] = start_date
+            data["start_date"] = start_date
         if end_date:
-            data["expires_at"] = end_date
+            data["end_date"] = end_date
 
         try:
             is_edit = modal_title == "Edit News Item"
             if is_edit and selected_id:
                 response = make_api_request(
-                    "PUT",
-                    f"/admin/news/{selected_id}",
-                    token,
-                    api_environment=api_environment,
-                    json_data=data,
+                    "PUT", f"/admin/news/{selected_id}", token, json_data=data
                 )
             else:
-                response = make_api_request(
-                    "POST",
-                    "/admin/news",
-                    token,
-                    api_environment=api_environment,
-                    json_data=data,
-                )
+                response = make_api_request("POST", "/admin/news", token, json_data=data)
 
             if response.status_code in (200, 201):
                 action = "updated" if is_edit else "created"
@@ -537,10 +505,9 @@ def register_callbacks(app):
         Input("admin-news-delete-confirm-btn", "n_clicks"),
         State("admin-selected-news-id", "data"),
         State("token-store", "data"),
-        State("api-environment-store", "data"),
         prevent_initial_call=True,
     )
-    def delete_news_item(_n_clicks, selected_id, token, api_environment):
+    def delete_news_item(_n_clicks, selected_id, token):
         """Delete a news item."""
         if not token:
             return "Please log in first.", "warning", True
@@ -549,12 +516,7 @@ def register_callbacks(app):
             return "No news item selected.", "warning", True
 
         try:
-            response = make_api_request(
-                "DELETE",
-                f"/admin/news/{selected_id}",
-                token,
-                api_environment=api_environment,
-            )
+            response = make_api_request("DELETE", f"/admin/news/{selected_id}", token)
 
             if response.status_code in (200, 204):
                 return "News item deleted successfully!", "success", True

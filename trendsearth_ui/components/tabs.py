@@ -1802,13 +1802,12 @@ def admin_tab_content(role, is_admin):
                                             html.Div(
                                                 id="admin-news-table-container",
                                                 children=[
-                                                    dcc.Loading(
-                                                        id="admin-news-loading",
-                                                        type="circle",
-                                                        children=html.Div(
+                                                    dbc.Spinner(
+                                                        html.Div(
                                                             id="admin-news-table",
                                                             children="Loading news items...",
                                                         ),
+                                                        color="primary",
                                                     ),
                                                 ],
                                             ),
@@ -2031,23 +2030,27 @@ def admin_tab_content(role, is_admin):
                                                                 id="admin-news-type",
                                                                 options=[
                                                                     {
-                                                                        "label": "Info",
-                                                                        "value": "info",
+                                                                        "label": "Announcement",
+                                                                        "value": "announcement",
                                                                     },
                                                                     {
                                                                         "label": "Warning",
                                                                         "value": "warning",
                                                                     },
                                                                     {
-                                                                        "label": "Error",
-                                                                        "value": "error",
+                                                                        "label": "Release",
+                                                                        "value": "release",
                                                                     },
                                                                     {
-                                                                        "label": "Success",
-                                                                        "value": "success",
+                                                                        "label": "Tip",
+                                                                        "value": "tip",
+                                                                    },
+                                                                    {
+                                                                        "label": "Maintenance",
+                                                                        "value": "maintenance",
                                                                     },
                                                                 ],
-                                                                value="info",
+                                                                value="announcement",
                                                             ),
                                                         ],
                                                         width=6,

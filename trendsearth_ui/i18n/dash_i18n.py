@@ -11,7 +11,6 @@ from dash import Input, Output, callback, clientside_callback, dcc, html
 import dash_bootstrap_components as dbc
 
 from . import (
-    DEFAULT_LANGUAGE,
     SUPPORTED_LANGUAGES,
     get_current_language,
 )
@@ -59,7 +58,7 @@ def create_language_store() -> dcc.Store:
     """
     return dcc.Store(
         id="language-store",
-        storage_type="local",  # Persist across sessions
+        storage_type="memory",  # Use memory - we handle persistence manually via localStorage
         data=None,  # Start with None to detect browser language on first load
     )
 
@@ -79,16 +78,50 @@ def create_language_controls() -> list:
     ]
 
 
-# Client-side callback for language persistence
-# This stores the language in localStorage and cookie for persistence across page loads
+# Client-side callback for language persistence and page reload
+# This stores the language in localStorage and cookie
+# Only reloads when user explicitly changes the language (not on initial detection)
 LANGUAGE_PERSISTENCE_CALLBACK = """
-function(lang) {
+function(lang, previousLang) {
+    console.log('PERSISTENCE CALLBACK: lang=' + lang + ', previousLang=' + previousLang);
     if (lang) {
         localStorage.setItem('trendsearth_language', lang);
+        console.log('Saved to localStorage: ' + localStorage.getItem('trendsearth_language'));
         // Set cookie for server-side detection (1 year expiry)
         document.cookie = 'trendsearth_language=' + lang + ';path=/;max-age=31536000;SameSite=Lax';
+        // Only reload if there was a previous language and it's different
+        // This prevents reload on initial page load when browser language is detected
+        if (previousLang && previousLang !== lang) {
+            console.log('Reloading page...');
+            // Small delay to ensure localStorage write completes
+            setTimeout(function() {
+                window.location.reload();
+            }, 50);
+        }
     }
-    return window.dash_clientside.no_update;
+    // Store current language as the "previous" for next comparison
+    return lang || '';
+}
+"""
+
+# Client-side callback for updating dropdown label with current language
+LANGUAGE_LABEL_UPDATE_CALLBACK = """
+function(currentLang) {
+    const langNames = {
+        'en': '🌐 English',
+        'ar': '🌐 العربية',
+        'es': '🌐 Español',
+        'fa': '🌐 فارسی',
+        'fr': '🌐 Français',
+        'pt': '🌐 Português',
+        'ru': '🌐 Русский',
+        'sw': '🌐 Kiswahili',
+        'zh': '🌐 中文'
+    };
+    if (currentLang && langNames[currentLang]) {
+        return langNames[currentLang];
+    }
+    return '🌐 Select language';
 }
 """
 
@@ -96,17 +129,21 @@ function(lang) {
 # This detects the browser's language and sets it if supported
 BROWSER_LANGUAGE_DETECTION_CALLBACK = """
 function(currentLang) {
+    console.log('DETECTION CALLBACK: currentLang=' + currentLang);
+    console.log('localStorage value: ' + localStorage.getItem('trendsearth_language'));
     // Supported language codes
     const supportedLangs = ['en', 'ar', 'es', 'fa', 'fr', 'pt', 'ru', 'sw', 'zh'];
 
-    // If a language is already set (from localStorage), keep it
+    // If a language is already set (from store), keep it
     if (currentLang && supportedLangs.includes(currentLang)) {
+        console.log('Keeping current lang from store: ' + currentLang);
         return currentLang;
     }
 
     // Check localStorage first (might have been set in a previous session)
     const storedLang = localStorage.getItem('trendsearth_language');
     if (storedLang && supportedLangs.includes(storedLang)) {
+        console.log('Using localStorage lang: ' + storedLang);
         return storedLang;
     }
 
@@ -115,6 +152,7 @@ function(currentLang) {
     if (cookieMatch) {
         const cookieLang = cookieMatch[1];
         if (supportedLangs.includes(cookieLang)) {
+            console.log('Using cookie lang: ' + cookieLang);
             // Sync back to localStorage
             localStorage.setItem('trendsearth_language', cookieLang);
             return cookieLang;
@@ -126,6 +164,7 @@ function(currentLang) {
 
     // Try exact match first (e.g., 'en-US' -> 'en')
     const langCode = browserLang.split('-')[0].toLowerCase();
+    console.log('Detected browser lang: ' + langCode);
 
     if (supportedLangs.includes(langCode)) {
         // Store in localStorage and cookie for persistence
@@ -135,6 +174,7 @@ function(currentLang) {
     }
 
     // Default to English and save it
+    console.log('Defaulting to English');
     localStorage.setItem('trendsearth_language', 'en');
     document.cookie = 'trendsearth_language=en;path=/;max-age=31536000;SameSite=Lax';
     return 'en';
@@ -148,6 +188,8 @@ def register_language_callbacks(app):  # noqa: ARG001
     Args:
         app: The Dash application instance.
     """
+    from dash import State
+
     # Client-side callback to detect browser language on initial load
     clientside_callback(
         BROWSER_LANGUAGE_DETECTION_CALLBACK,
@@ -156,18 +198,30 @@ def register_language_callbacks(app):  # noqa: ARG001
         prevent_initial_call=False,  # Run on initial load
     )
 
-    # Client-side callback to persist language selection
+    # Client-side callback to persist language selection and reload page
     clientside_callback(
         LANGUAGE_PERSISTENCE_CALLBACK,
         Output("language-refresh-trigger", "children"),
         Input("language-store", "data"),
+        State("language-refresh-trigger", "children"),
         prevent_initial_call=True,
     )
 
     # ID prefixes for language selectors (dashboard, login, register, reset password, standalone profile pages)
     id_prefixes = ["lang", "login-lang", "register-lang", "reset-lang", "standalone-profile-lang"]
 
+    # Client-side callbacks to update each dropdown's label with the selected language
+    for prefix in id_prefixes:
+        clientside_callback(
+            LANGUAGE_LABEL_UPDATE_CALLBACK,
+            Output(f"{prefix}-selector", "label"),
+            Input("language-store", "data"),
+            prevent_initial_call=False,  # Run on initial load to show current language
+        )
+
     # Create individual callbacks for each language option and each selector
+    from dash import no_update
+
     for prefix in id_prefixes:
         for lang_code in SUPPORTED_LANGUAGES:
 
@@ -179,7 +233,7 @@ def register_language_callbacks(app):  # noqa: ARG001
             def set_lang(n_clicks, lang=lang_code):
                 if n_clicks:
                     return lang
-                return DEFAULT_LANGUAGE
+                return no_update
 
 
 def get_translation_file_path(lang_code: str = None) -> str:

@@ -5,34 +5,29 @@ import dash_bootstrap_components as dbc
 
 # News type colors and configurations
 NEWS_TYPE_STYLES = {
-    "info": {
-        "color": "info",
-        "icon": "fas fa-info-circle",
-        "bg_class": "bg-info bg-opacity-10",
+    "announcement": {
+        "color": "primary",
+        "icon": "fas fa-bullhorn",
+        "bg_class": "bg-primary bg-opacity-10",
     },
     "warning": {
         "color": "warning",
         "icon": "fas fa-exclamation-triangle",
         "bg_class": "bg-warning bg-opacity-10",
     },
-    "success": {
+    "release": {
         "color": "success",
-        "icon": "fas fa-check-circle",
+        "icon": "fas fa-rocket",
         "bg_class": "bg-success bg-opacity-10",
     },
-    "danger": {
-        "color": "danger",
-        "icon": "fas fa-exclamation-circle",
-        "bg_class": "bg-danger bg-opacity-10",
+    "tip": {
+        "color": "info",
+        "icon": "fas fa-lightbulb",
+        "bg_class": "bg-info bg-opacity-10",
     },
-    "announcement": {
-        "color": "primary",
-        "icon": "fas fa-bullhorn",
-        "bg_class": "bg-primary bg-opacity-10",
-    },
-    "update": {
+    "maintenance": {
         "color": "secondary",
-        "icon": "fas fa-sync-alt",
+        "icon": "fas fa-wrench",
         "bg_class": "bg-secondary bg-opacity-10",
     },
 }
@@ -106,8 +101,8 @@ def create_news_item_card(news_item, current_index, total_count):
     if not news_item:
         return None
 
-    news_type = news_item.get("news_type", "info")
-    style_config = NEWS_TYPE_STYLES.get(news_type, NEWS_TYPE_STYLES["info"])
+    news_type = news_item.get("news_type", "announcement")
+    style_config = NEWS_TYPE_STYLES.get(news_type, NEWS_TYPE_STYLES["announcement"])
 
     title = news_item.get("title", "")
     message = news_item.get("message", "")

@@ -43,6 +43,9 @@ COPY gunicorn.conf.py ./
 # Now install the project itself
 RUN poetry install --no-interaction --no-ansi
 
+# Compile translations (generates .mo files from .po files)
+RUN pybabel compile -d trendsearth_ui/i18n/translations --use-fuzzy
+
 # Expose port 8000 (gunicorn default)
 EXPOSE 8000
 

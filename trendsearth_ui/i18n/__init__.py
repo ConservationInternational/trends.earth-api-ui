@@ -50,9 +50,10 @@ def get_locale() -> str:
 
     Priority:
         1. URL parameter (?lang=xx)
-        2. Session cookie
-        3. Accept-Language header
-        4. Default language
+        2. Browser cookie (set by JavaScript)
+        3. Flask session
+        4. Accept-Language header
+        5. Default language
 
     Returns:
         str: The selected language code.
@@ -64,7 +65,12 @@ def get_locale() -> str:
         session[LANGUAGE_COOKIE_NAME] = lang
         return lang
 
-    # Check session/cookie
+    # Check browser cookie (set by JavaScript language selector)
+    lang = request.cookies.get(LANGUAGE_COOKIE_NAME)
+    if lang and lang in SUPPORTED_LANGUAGES:
+        return lang
+
+    # Check Flask session (server-side)
     lang = session.get(LANGUAGE_COOKIE_NAME)
     if lang and lang in SUPPORTED_LANGUAGES:
         return lang

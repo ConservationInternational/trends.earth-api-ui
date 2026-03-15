@@ -1,6 +1,8 @@
 """Authentication and navigation callbacks."""
 
 from datetime import datetime, timedelta, timezone
+
+from ..i18n import gettext as _
 import hmac
 import json
 import os
@@ -333,7 +335,7 @@ def register_callbacks(app):
                 None,
                 None,
                 None,
-                "Please enter both email and password.",
+                _("Please enter both email and password."),
                 "warning",
                 True,
             )

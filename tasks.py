@@ -149,7 +149,7 @@ def translate_compile(c: Context):
     """Compile PO files to MO files.
 
     This compiles the human-readable PO files into binary MO files that are
-    used at runtime.
+    used at runtime. Uses --use-fuzzy to include machine-translated entries.
     """
     print("Compiling translation files...")
 
@@ -158,6 +158,7 @@ def translate_compile(c: Context):
         "compile",
         "-d",
         str(TRANSLATIONS_DIR),
+        "--use-fuzzy",
     ]
 
     result = c.run(" ".join(cmd), warn=True)

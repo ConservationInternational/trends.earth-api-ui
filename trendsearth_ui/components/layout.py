@@ -296,28 +296,28 @@ def login_layout():
                                                 [
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label(_("Email"), width=3),
+                                                            dbc.Label(_("Email"), width=4),
                                                             dbc.Col(
                                                                 dbc.Input(
                                                                     id="login-email",
                                                                     type="email",
                                                                     placeholder=_("Enter email"),
                                                                 ),
-                                                                width=9,
+                                                                width=8,
                                                             ),
                                                         ],
                                                         className="mb-3",
                                                     ),
                                                     dbc.Row(
                                                         [
-                                                            dbc.Label(_("Password"), width=3),
+                                                            dbc.Label(_("Password"), width=4),
                                                             dbc.Col(
                                                                 dbc.Input(
                                                                     id="login-password",
                                                                     type="password",
                                                                     placeholder=_("Enter password"),
                                                                 ),
-                                                                width=9,
+                                                                width=8,
                                                             ),
                                                         ],
                                                         className="mb-3",
