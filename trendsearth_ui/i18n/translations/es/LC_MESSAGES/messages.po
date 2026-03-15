@@ -10,17 +10,18 @@ msgstr ""
 "POT-Creation-Date: 2026-03-15 14:41-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/callbacks/auth.py:338
+#, fuzzy
 msgid "Please enter both email and password."
-msgstr ""
+msgstr "Por favor, introduzca su correo electrónico y su contraseña."
 
 #: trendsearth_ui/components/layout.py:50
 #, fuzzy
@@ -193,8 +194,8 @@ msgid ""
 "Enter your email address and we'll send you instructions to reset your "
 "password."
 msgstr ""
-"Introduce tu dirección de correo electrónico y te enviaremos "
-"instrucciones para restablecer tu contraseña."
+"Introduce tu dirección de correo electrónico y te enviaremos instrucciones "
+"para restablecer tu contraseña."
 
 #: trendsearth_ui/components/layout.py:200
 #, fuzzy
@@ -363,8 +364,8 @@ msgstr "Crea tu cuenta"
 #: trendsearth_ui/components/layout.py:719
 #, fuzzy
 msgid ""
-"After registration, you'll receive an email to verify your address and "
-"set your password."
+"After registration, you'll receive an email to verify your address and set "
+"your password."
 msgstr ""
 "Tras registrarte, recibirás un correo electrónico para verificar tu "
 "dirección y establecer tu contraseña."
@@ -488,15 +489,15 @@ msgstr "Seleccione (opcional)"
 #, fuzzy
 msgid ""
 "We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity "
-"development and tool access. Providing this information is voluntary; "
-"your selection will not affect your access to the tool."
+"requirements and to assess equitable participation in capacity development "
+"and tool access. Providing this information is voluntary; your selection "
+"will not affect your access to the tool."
 msgstr ""
 "Recopilamos información sobre identidad de género para cumplir con los "
 "requisitos de presentación de informes de los donantes y para evaluar la "
-"participación equitativa en el desarrollo de capacidades y el acceso a "
-"las herramientas. Proporcionar esta información es voluntario; su "
-"elección no afectará su acceso a la herramienta."
+"participación equitativa en el desarrollo de capacidades y el acceso a las "
+"herramientas. Proporcionar esta información es voluntario; su elección no "
+"afectará su acceso a la herramienta."
 
 #: trendsearth_ui/components/layout.py:1013
 #: trendsearth_ui/components/layout.py:1021
@@ -509,19 +510,19 @@ msgstr "Por favor, describa"
 #: trendsearth_ui/components/layout.py:1065
 #, fuzzy
 msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth "
-"Engine, and, depending on your use, you may be required to have in place "
-"a commercial license to use Google Earth Engine?"
+"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
+"and, depending on your use, you may be required to have in place a "
+"commercial license to use Google Earth Engine?"
 msgstr ""
-"¿Reconoce usted que algunas funciones de Trends.Earth utilizan Google "
-"Earth Engine y que, dependiendo de su uso, es posible que necesite una "
-"licencia comercial para utilizar Google Earth Engine?"
+"¿Reconoce usted que algunas funciones de Trends.Earth utilizan Google Earth "
+"Engine y que, dependiendo de su uso, es posible que necesite una licencia "
+"comercial para utilizar Google Earth Engine?"
 
 #: trendsearth_ui/components/layout.py:1078
 #, fuzzy
 msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
-"more details see the "
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
+"details see the "
 msgstr ""
 "Google Earth Engine (GEE) impone restricciones al uso comercial. Para "
 "obtener más detalles, consulte la "
@@ -539,11 +540,11 @@ msgid ""
 "complies with Google's commercial licensing requirements. Access to this "
 "tool does not grant or imply the provision of commercial licensing."
 msgstr ""
-" Conservation International no proporciona ni gestiona licencias "
-"comerciales de GEE. Los usuarios son los únicos responsables de "
-"garantizar que su uso de GEE cumpla con los requisitos de licencia "
-"comercial de Google. El acceso a esta herramienta no otorga ni implica la"
-" concesión de una licencia comercial."
+" Conservation International no proporciona ni gestiona licencias comerciales"
+" de GEE. Los usuarios son los únicos responsables de garantizar que su uso "
+"de GEE cumpla con los requisitos de licencia comercial de Google. El acceso "
+"a esta herramienta no otorga ni implica la concesión de una licencia "
+"comercial."
 
 #: trendsearth_ui/components/layout.py:1097
 #, fuzzy
@@ -556,12 +557,14 @@ msgid "Create Account"
 msgstr "Crear una cuenta"
 
 #: trendsearth_ui/components/layout.py:1253
+#, fuzzy
 msgid "Update Your Profile"
-msgstr ""
+msgstr "Actualiza tu perfil"
 
 #: trendsearth_ui/components/layout.py:1308
+#, fuzzy
 msgid "Email cannot be changed"
-msgstr ""
+msgstr "El correo electrónico no se puede cambiar."
 
 #: trendsearth_ui/components/layout.py:1593
 #: trendsearth_ui/components/tabs.py:522
@@ -611,8 +614,9 @@ msgid "Refresh Executions"
 msgstr "Ejecuciones"
 
 #: trendsearth_ui/components/tabs.py:176
+#, fuzzy
 msgid "Auto-refresh in:"
-msgstr ""
+msgstr "Actualización automática en:"
 
 #: trendsearth_ui/components/tabs.py:215
 #, fuzzy
@@ -620,8 +624,9 @@ msgid "Cancel Execution"
 msgstr "Ejecuciones"
 
 #: trendsearth_ui/components/tabs.py:221
+#, fuzzy
 msgid "Are you sure you want to cancel this execution?"
-msgstr ""
+msgstr "¿Está seguro de que desea cancelar esta ejecución?"
 
 #: trendsearth_ui/components/tabs.py:226
 #, fuzzy
@@ -639,8 +644,9 @@ msgid "Status:"
 msgstr "Estado"
 
 #: trendsearth_ui/components/tabs.py:246
+#, fuzzy
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Esta acción no se puede deshacer."
 
 #: trendsearth_ui/components/tabs.py:263
 #, fuzzy
@@ -648,16 +654,19 @@ msgid "Confirm Cancel"
 msgstr "confirmar Contraseña"
 
 #: trendsearth_ui/components/tabs.py:302
+#, fuzzy
 msgid "Cancellation Result"
-msgstr ""
+msgstr "Resultado de la cancelación"
 
 #: trendsearth_ui/components/tabs.py:305
+#, fuzzy
 msgid "Close"
-msgstr ""
+msgstr "Cerca"
 
 #: trendsearth_ui/components/tabs.py:327
+#, fuzzy
 msgid "Refresh Users"
-msgstr ""
+msgstr "Actualizar usuarios"
 
 #: trendsearth_ui/components/tabs.py:401
 #, fuzzy
@@ -688,8 +697,9 @@ msgstr "Introduce tu correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:492
 #: trendsearth_ui/utils/mobile_utils.py:278
+#, fuzzy
 msgid "Institution"
-msgstr ""
+msgstr "Institución"
 
 #: trendsearth_ui/components/tabs.py:496
 #, fuzzy
@@ -703,22 +713,28 @@ msgid "Role"
 msgstr "Perfil"
 
 #: trendsearth_ui/components/tabs.py:547
+#, fuzzy
 msgid "Email Notifications"
-msgstr ""
+msgstr "Notificaciones por correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:554
+#, fuzzy
 msgid "Execution Completion Notifications"
-msgstr ""
+msgstr "Notificaciones de finalización de ejecución"
 
 #: trendsearth_ui/components/tabs.py:559
+#, fuzzy
 msgid "Enable email notifications"
-msgstr ""
+msgstr "Habilitar notificaciones por correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:568
+#, fuzzy
 msgid ""
-"Receive email notifications when your script executions finish, fail, or "
-"are cancelled."
+"Receive email notifications when your script executions finish, fail, or are"
+" cancelled."
 msgstr ""
+"Reciba notificaciones por correo electrónico cuando la ejecución de sus "
+"scripts finalice, falle o se cancele."
 
 #: trendsearth_ui/components/tabs.py:600
 #, fuzzy
@@ -726,8 +742,9 @@ msgid "Google Earth Engine Account"
 msgstr "Condiciones de uso de Google Earth Engine"
 
 #: trendsearth_ui/components/tabs.py:608
+#, fuzzy
 msgid "Current Credentials Status"
-msgstr ""
+msgstr "Estado actual de las credenciales"
 
 #: trendsearth_ui/components/tabs.py:622
 #, fuzzy
@@ -735,20 +752,27 @@ msgid "Setup Your GEE Account"
 msgstr "Crea tu cuenta"
 
 #: trendsearth_ui/components/tabs.py:624
+#, fuzzy
 msgid ""
 "Choose one of the options below to configure your Google Earth Engine "
 "credentials:"
 msgstr ""
+"Elige una de las siguientes opciones para configurar tus credenciales de "
+"Google Earth Engine:"
 
 #: trendsearth_ui/components/tabs.py:643
+#, fuzzy
 msgid "Option 1: Connect Your GEE Account (OAuth)"
-msgstr ""
+msgstr "Opción 1: Conecta tu cuenta GEE (OAuth)"
 
 #: trendsearth_ui/components/tabs.py:647
+#, fuzzy
 msgid ""
 "Connect your personal Google Earth Engine account using OAuth "
 "authentication."
 msgstr ""
+"Conecta tu cuenta personal de Google Earth Engine mediante la autenticación "
+"OAuth."
 
 #: trendsearth_ui/components/tabs.py:651
 #, fuzzy
@@ -756,59 +780,79 @@ msgid "Connect GEE Account"
 msgstr "Crear una cuenta"
 
 #: trendsearth_ui/components/tabs.py:683
+#, fuzzy
 msgid "Option 2: Upload Service Account Key"
-msgstr ""
+msgstr "Opción 2: Cargar la clave de la cuenta de servicio"
 
 #: trendsearth_ui/components/tabs.py:687
-msgid "Upload a Google Cloud service account JSON key with Earth Engine access."
+#, fuzzy
+msgid ""
+"Upload a Google Cloud service account JSON key with Earth Engine access."
 msgstr ""
+"Sube una clave JSON de cuenta de servicio de Google Cloud con acceso a Earth"
+" Engine."
 
 #: trendsearth_ui/components/tabs.py:697
+#, fuzzy
 msgid "Upload Service Account Key"
-msgstr ""
+msgstr "Cargar clave de cuenta de servicio"
 
 #: trendsearth_ui/components/tabs.py:727
+#, fuzzy
 msgid "Manage Credentials"
-msgstr ""
+msgstr "Administrar credenciales"
 
 #: trendsearth_ui/components/tabs.py:731
+#, fuzzy
 msgid "Test Credentials"
-msgstr ""
+msgstr "Credenciales de prueba"
 
 #: trendsearth_ui/components/tabs.py:738
+#, fuzzy
 msgid "Delete Credentials"
-msgstr ""
+msgstr "Eliminar credenciales"
 
 #: trendsearth_ui/components/tabs.py:765
+#, fuzzy
 msgid "Service Credentials"
-msgstr ""
+msgstr "Credenciales de servicio"
 
 #: trendsearth_ui/components/tabs.py:769
+#, fuzzy
 msgid ""
 "Service credentials allow external applications to authenticate with the "
 "Trends.Earth API using the OAuth2 client credentials grant. The client "
 "secret is shown only once at creation time."
 msgstr ""
+"Las credenciales de servicio permiten que las aplicaciones externas se "
+"autentiquen con la API de Trends.Earth mediante la concesión de credenciales"
+" de cliente OAuth2. El secreto del cliente se muestra solo una vez, en el "
+"momento de su creación."
 
 #: trendsearth_ui/components/tabs.py:782
+#, fuzzy
 msgid "Refresh"
-msgstr ""
+msgstr "Refrescar"
 
 #: trendsearth_ui/components/tabs.py:798
+#, fuzzy
 msgid "New Credential"
-msgstr ""
+msgstr "Nueva credencial"
 
 #: trendsearth_ui/components/tabs.py:827
+#, fuzzy
 msgid "Create Service Credential"
-msgstr ""
+msgstr "Crear credenciales de servicio"
 
 #: trendsearth_ui/components/tabs.py:842
+#, fuzzy
 msgid "e.g. My CLI Tool"
-msgstr ""
+msgstr "Por ejemplo, mi herramienta de línea de comandos"
 
 #: trendsearth_ui/components/tabs.py:845
+#, fuzzy
 msgid "A descriptive label for this credential."
-msgstr ""
+msgstr "Una etiqueta descriptiva para esta credencial."
 
 #: trendsearth_ui/utils/mobile_utils.py:63
 msgid "Script"
@@ -890,4 +934,3 @@ msgstr "Versión Entorno"
 #: trendsearth_ui/utils/mobile_utils.py:546
 msgid "Compute"
 msgstr "Cómputo"
-
