@@ -18,8 +18,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
+#, fuzzy
 #~ msgid "Please enter both email and password."
-#~ msgstr ""
+#~ msgstr "Por favor, introduzca su correo electrónico y su contraseña."
 
 #~ msgid "Government - Environment/Natural Resources"
 #~ msgstr "Gobierno - Medio ambiente/Recursos naturales"
@@ -121,12 +122,10 @@ msgstr ""
 #~ msgstr "Se te olvidó tu contraseña"
 
 #~ msgid ""
-#~ "Enter your email address and we'll "
-#~ "send you instructions to reset your "
+#~ "Enter your email address and we'll send you instructions to reset your "
 #~ "password."
 #~ msgstr ""
-#~ "Introduce tu dirección de correo "
-#~ "electrónico y te enviaremos instrucciones "
+#~ "Introduce tu dirección de correo electrónico y te enviaremos instrucciones "
 #~ "para restablecer tu contraseña."
 
 #~ msgid "Email Address"
@@ -220,13 +219,11 @@ msgstr ""
 #~ msgstr "Crea tu cuenta"
 
 #~ msgid ""
-#~ "After registration, you'll receive an "
-#~ "email to verify your address and "
-#~ "set your password."
+#~ "After registration, you'll receive an email to verify your address and set "
+#~ "your password."
 #~ msgstr ""
-#~ "Tras registrarte, recibirás un correo "
-#~ "electrónico para verificar tu dirección "
-#~ "y establecer tu contraseña."
+#~ "Tras registrarte, recibirás un correo electrónico para verificar tu "
+#~ "dirección y establecer tu contraseña."
 
 #~ msgid "Required field"
 #~ msgstr "Campo obligatorio"
@@ -283,73 +280,50 @@ msgstr ""
 #~ msgstr "Seleccione (opcional)"
 
 #~ msgid ""
-#~ "We collect gender identity information "
-#~ "to comply with donor reporting "
-#~ "requirements and to assess equitable "
-#~ "participation in capacity development and "
-#~ "tool access. Providing this information "
-#~ "is voluntary; your selection will not"
-#~ " affect your access to the tool."
+#~ "We collect gender identity information to comply with donor reporting "
+#~ "requirements and to assess equitable participation in capacity development "
+#~ "and tool access. Providing this information is voluntary; your selection "
+#~ "will not affect your access to the tool."
 #~ msgstr ""
-#~ "Recopilamos información sobre identidad de "
-#~ "género para cumplir con los requisitos"
-#~ " de presentación de informes de los"
-#~ " donantes y para evaluar la "
-#~ "participación equitativa en el desarrollo "
-#~ "de capacidades y el acceso a las"
-#~ " herramientas. Proporcionar esta información "
-#~ "es voluntario; su elección no afectará"
-#~ " su acceso a la herramienta."
+#~ "Recopilamos información sobre identidad de género para cumplir con los "
+#~ "requisitos de presentación de informes de los donantes y para evaluar la "
+#~ "participación equitativa en el desarrollo de capacidades y el acceso a las "
+#~ "herramientas. Proporcionar esta información es voluntario; su elección no "
+#~ "afectará su acceso a la herramienta."
 
 #~ msgid "Please describe"
 #~ msgstr "Por favor, describa"
 
 #~ msgid ""
-#~ "Do you acknowledge that some "
-#~ "Trends.Earth features use Google Earth "
-#~ "Engine, and, depending on your use, "
-#~ "you may be required to have in "
-#~ "place a commercial license to use "
-#~ "Google Earth Engine?"
+#~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
+#~ "and, depending on your use, you may be required to have in place a "
+#~ "commercial license to use Google Earth Engine?"
 #~ msgstr ""
-#~ "¿Reconoce usted que algunas funciones de"
-#~ " Trends.Earth utilizan Google Earth Engine"
-#~ " y que, dependiendo de su uso, "
-#~ "es posible que necesite una licencia "
-#~ "comercial para utilizar Google Earth "
-#~ "Engine?"
+#~ "¿Reconoce usted que algunas funciones de Trends.Earth utilizan Google Earth "
+#~ "Engine y que, dependiendo de su uso, es posible que necesite una licencia "
+#~ "comercial para utilizar Google Earth Engine?"
 
 #~ msgid ""
-#~ "Google Earth Engine (GEE) imposes "
-#~ "restrictions on commercial use. For more"
-#~ " details see the "
+#~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
+#~ "details see the "
 #~ msgstr ""
-#~ "Google Earth Engine (GEE) impone "
-#~ "restricciones al uso comercial. Para "
+#~ "Google Earth Engine (GEE) impone restricciones al uso comercial. Para "
 #~ "obtener más detalles, consulte la "
 
 #~ msgid "Google Earth Engine Terms of Use"
 #~ msgstr "Condiciones de uso de Google Earth Engine"
 
 #~ msgid ""
-#~ " . Conservation International does not"
-#~ " provide or manage commercial GEE "
-#~ "licenses. Users are solely responsible "
-#~ "for ensuring their use of GEE "
-#~ "complies with Google's commercial licensing"
-#~ " requirements. Access to this tool "
-#~ "does not grant or imply the "
-#~ "provision of commercial licensing."
+#~ " . Conservation International does not provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing requirements. Access to this "
+#~ "tool does not grant or imply the provision of commercial licensing."
 #~ msgstr ""
-#~ " Conservation International no proporciona "
-#~ "ni gestiona licencias comerciales de "
-#~ "GEE. Los usuarios son los únicos "
-#~ "responsables de garantizar que su uso"
-#~ " de GEE cumpla con los requisitos "
-#~ "de licencia comercial de Google. El "
-#~ "acceso a esta herramienta no otorga "
-#~ "ni implica la concesión de una "
-#~ "licencia comercial."
+#~ " Conservation International no proporciona ni gestiona licencias comerciales"
+#~ " de GEE. Los usuarios son los únicos responsables de garantizar que su uso "
+#~ "de GEE cumpla con los requisitos de licencia comercial de Google. El acceso "
+#~ "a esta herramienta no otorga ni implica la concesión de una licencia "
+#~ "comercial."
 
 #~ msgid "Yes, I acknowledge"
 #~ msgstr "Sí, lo reconozco."
@@ -357,11 +331,13 @@ msgstr ""
 #~ msgid "Create Account"
 #~ msgstr "Crear una cuenta"
 
+#, fuzzy
 #~ msgid "Update Your Profile"
-#~ msgstr ""
+#~ msgstr "Actualiza tu perfil"
 
+#, fuzzy
 #~ msgid "Email cannot be changed"
-#~ msgstr ""
+#~ msgstr "El correo electrónico no se puede cambiar."
 
 #~ msgid "Update Profile"
 #~ msgstr "Perfil"
@@ -390,14 +366,16 @@ msgstr ""
 #~ msgid "Refresh Executions"
 #~ msgstr "Ejecuciones"
 
+#, fuzzy
 #~ msgid "Auto-refresh in:"
-#~ msgstr ""
+#~ msgstr "Actualización automática en:"
 
 #~ msgid "Cancel Execution"
 #~ msgstr "Ejecuciones"
 
+#, fuzzy
 #~ msgid "Are you sure you want to cancel this execution?"
-#~ msgstr ""
+#~ msgstr "¿Está seguro de que desea cancelar esta ejecución?"
 
 #~ msgid "Execution ID:"
 #~ msgstr "Ejecuciones"
@@ -408,20 +386,24 @@ msgstr ""
 #~ msgid "Status:"
 #~ msgstr "Estado"
 
+#, fuzzy
 #~ msgid "This action cannot be undone."
-#~ msgstr ""
+#~ msgstr "Esta acción no se puede deshacer."
 
 #~ msgid "Confirm Cancel"
 #~ msgstr "confirmar Contraseña"
 
+#, fuzzy
 #~ msgid "Cancellation Result"
-#~ msgstr ""
+#~ msgstr "Resultado de la cancelación"
 
+#, fuzzy
 #~ msgid "Close"
-#~ msgstr ""
+#~ msgstr "Cerca"
 
+#, fuzzy
 #~ msgid "Refresh Users"
-#~ msgstr ""
+#~ msgstr "Actualizar usuarios"
 
 #~ msgid "Refresh Scripts"
 #~ msgstr "Guiones"
@@ -438,8 +420,9 @@ msgstr ""
 #~ msgid "Enter your email"
 #~ msgstr "Introduce tu correo electrónico"
 
+#, fuzzy
 #~ msgid "Institution"
-#~ msgstr ""
+#~ msgstr "Institución"
 
 #~ msgid "Enter your institution"
 #~ msgstr "Enviar instrucciones de reinicio"
@@ -447,93 +430,120 @@ msgstr ""
 #~ msgid "Role"
 #~ msgstr "Perfil"
 
+#, fuzzy
 #~ msgid "Email Notifications"
-#~ msgstr ""
+#~ msgstr "Notificaciones por correo electrónico"
 
+#, fuzzy
 #~ msgid "Execution Completion Notifications"
-#~ msgstr ""
+#~ msgstr "Notificaciones de finalización de ejecución"
 
+#, fuzzy
 #~ msgid "Enable email notifications"
-#~ msgstr ""
+#~ msgstr "Habilitar notificaciones por correo electrónico"
 
+#, fuzzy
 #~ msgid ""
-#~ "Receive email notifications when your "
-#~ "script executions finish, fail, or are"
+#~ "Receive email notifications when your script executions finish, fail, or are"
 #~ " cancelled."
 #~ msgstr ""
+#~ "Reciba notificaciones por correo electrónico cuando la ejecución de sus "
+#~ "scripts finalice, falle o se cancele."
 
 #~ msgid "Google Earth Engine Account"
 #~ msgstr "Condiciones de uso de Google Earth Engine"
 
+#, fuzzy
 #~ msgid "Current Credentials Status"
-#~ msgstr ""
+#~ msgstr "Estado actual de las credenciales"
 
 #~ msgid "Setup Your GEE Account"
 #~ msgstr "Crea tu cuenta"
 
+#, fuzzy
 #~ msgid ""
-#~ "Choose one of the options below to"
-#~ " configure your Google Earth Engine "
+#~ "Choose one of the options below to configure your Google Earth Engine "
 #~ "credentials:"
 #~ msgstr ""
+#~ "Elige una de las siguientes opciones para configurar tus credenciales de "
+#~ "Google Earth Engine:"
 
+#, fuzzy
 #~ msgid "Option 1: Connect Your GEE Account (OAuth)"
-#~ msgstr ""
+#~ msgstr "Opción 1: Conecta tu cuenta GEE (OAuth)"
 
+#, fuzzy
 #~ msgid ""
-#~ "Connect your personal Google Earth "
-#~ "Engine account using OAuth authentication."
+#~ "Connect your personal Google Earth Engine account using OAuth "
+#~ "authentication."
 #~ msgstr ""
+#~ "Conecta tu cuenta personal de Google Earth Engine mediante la autenticación "
+#~ "OAuth."
 
 #~ msgid "Connect GEE Account"
 #~ msgstr "Crear una cuenta"
 
+#, fuzzy
 #~ msgid "Option 2: Upload Service Account Key"
-#~ msgstr ""
+#~ msgstr "Opción 2: Cargar la clave de la cuenta de servicio"
 
+#, fuzzy
 #~ msgid ""
-#~ "Upload a Google Cloud service account"
-#~ " JSON key with Earth Engine access."
+#~ "Upload a Google Cloud service account JSON key with Earth Engine access."
 #~ msgstr ""
+#~ "Sube una clave JSON de cuenta de servicio de Google Cloud con acceso a Earth"
+#~ " Engine."
 
+#, fuzzy
 #~ msgid "Upload Service Account Key"
-#~ msgstr ""
+#~ msgstr "Cargar clave de cuenta de servicio"
 
+#, fuzzy
 #~ msgid "Manage Credentials"
-#~ msgstr ""
+#~ msgstr "Administrar credenciales"
 
+#, fuzzy
 #~ msgid "Test Credentials"
-#~ msgstr ""
+#~ msgstr "Credenciales de prueba"
 
+#, fuzzy
 #~ msgid "Delete Credentials"
-#~ msgstr ""
+#~ msgstr "Eliminar credenciales"
 
+#, fuzzy
 #~ msgid "Service Credentials"
-#~ msgstr ""
+#~ msgstr "Credenciales de servicio"
 
+#, fuzzy
 #~ msgid ""
-#~ "Service credentials allow external "
-#~ "applications to authenticate with the "
-#~ "Trends.Earth API using the OAuth2 client"
-#~ " credentials grant. The client secret "
-#~ "is shown only once at creation "
-#~ "time."
+#~ "Service credentials allow external applications to authenticate with the "
+#~ "Trends.Earth API using the OAuth2 client credentials grant. The client "
+#~ "secret is shown only once at creation time."
 #~ msgstr ""
+#~ "Las credenciales de servicio permiten que las aplicaciones externas se "
+#~ "autentiquen con la API de Trends.Earth mediante la concesión de credenciales"
+#~ " de cliente OAuth2. El secreto del cliente se muestra solo una vez, en el "
+#~ "momento de su creación."
 
+#, fuzzy
 #~ msgid "Refresh"
-#~ msgstr ""
+#~ msgstr "Refrescar"
 
+#, fuzzy
 #~ msgid "New Credential"
-#~ msgstr ""
+#~ msgstr "Nueva credencial"
 
+#, fuzzy
 #~ msgid "Create Service Credential"
-#~ msgstr ""
+#~ msgstr "Crear credenciales de servicio"
 
+#, fuzzy
 #~ msgid "e.g. My CLI Tool"
-#~ msgstr ""
+#~ msgstr "Por ejemplo, mi herramienta de línea de comandos"
 
+#, fuzzy
 #~ msgid "A descriptive label for this credential."
-#~ msgstr ""
+#~ msgstr "Una etiqueta descriptiva para esta credencial."
 
 #~ msgid "Script"
 #~ msgstr "Guion"
@@ -594,4 +604,3 @@ msgstr ""
 
 #~ msgid "Compute"
 #~ msgstr "Cómputo"
-
