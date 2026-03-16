@@ -1580,7 +1580,7 @@ def create_user_statistics_chart(
 
         # Prefer time_series data if available (more detailed from group_by)
         chart_data = time_series_data if time_series_data else trends_data
-        chart_title = f"New user registrations{suffix_label}"
+        chart_title = _("New user registrations{suffix_label}").format(suffix_label=suffix_label)
 
         registration_df = _normalize_records(chart_data)
         status_df = _derive_from_status(status_time_series)

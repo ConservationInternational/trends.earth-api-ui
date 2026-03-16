@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 10:30-0400\n"
+"POT-Creation-Date: 2026-03-16 14:40-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/callbacks/admin.py:644
@@ -63,14 +63,12 @@ msgstr "用户创建失败。服务器响应状态为{status}。"
 msgid "Request timed out. Please try again."
 msgstr "请求超时，请重试。"
 
-#: trendsearth_ui/callbacks/admin.py:789
-#: trendsearth_ui/callbacks/admin.py:1028
+#: trendsearth_ui/callbacks/admin.py:789 trendsearth_ui/callbacks/admin.py:1028
 #, fuzzy
 msgid "Cannot connect to server. Please check your connection."
 msgstr "无法连接到服务器。请检查您的网络连接。"
 
-#: trendsearth_ui/callbacks/admin.py:802
-#: trendsearth_ui/callbacks/admin.py:1036
+#: trendsearth_ui/callbacks/admin.py:802 trendsearth_ui/callbacks/admin.py:1036
 #, fuzzy, python-brace-format
 msgid "Unexpected error: {error}"
 msgstr "意外错误：{error}"
@@ -252,8 +250,8 @@ msgstr "请输入有效的电子邮件地址。"
 #: trendsearth_ui/callbacks/auth.py:774
 #, python-brace-format
 msgid ""
-"If an account exists with {email}, password recovery instructions have been "
-"sent. Please check your email."
+"If an account exists with {email}, password recovery instructions have "
+"been sent. Please check your email."
 msgstr "如果{email}已注册账号，密码找回说明已发送至您的邮箱。请查收邮件。"
 
 #: trendsearth_ui/callbacks/auth.py:785
@@ -271,8 +269,8 @@ msgstr "请求超时，请稍后再试。"
 
 #: trendsearth_ui/callbacks/auth.py:820
 msgid ""
-"Cannot connect to the server. Please check your internet connection and try "
-"again."
+"Cannot connect to the server. Please check your internet connection and "
+"try again."
 msgstr "无法连接到服务器。请检查您的网络连接并重试。"
 
 #: trendsearth_ui/callbacks/auth.py:832
@@ -399,8 +397,7 @@ msgstr "加载配置文件时出错：{error}"
 msgid "No authentication token. Please use a valid profile update link."
 msgstr "没有身份验证令牌。请使用有效的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1884
-#: trendsearth_ui/callbacks/profile.py:61
+#: trendsearth_ui/callbacks/auth.py:1884 trendsearth_ui/callbacks/profile.py:61
 msgid "Profile updated successfully!"
 msgstr "个人资料已成功更新！"
 
@@ -412,19 +409,16 @@ msgstr "会话已过期。请申请新的个人资料更新链接。"
 msgid "Invalid token. Please request a new profile update link."
 msgstr "令牌无效。请申请新的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1901
-#: trendsearth_ui/callbacks/profile.py:63
+#: trendsearth_ui/callbacks/auth.py:1901 trendsearth_ui/callbacks/profile.py:63
 msgid "Failed to update profile."
 msgstr "更新个人资料失败。"
 
-#: trendsearth_ui/callbacks/edit.py:550
-#: trendsearth_ui/callbacks/profile.py:192
+#: trendsearth_ui/callbacks/edit.py:550 trendsearth_ui/callbacks/profile.py:192
 #, fuzzy
 msgid "Password changed successfully!"
 msgstr "密码已成功更改！"
 
-#: trendsearth_ui/callbacks/edit.py:553
-#: trendsearth_ui/callbacks/profile.py:195
+#: trendsearth_ui/callbacks/edit.py:553 trendsearth_ui/callbacks/profile.py:195
 #, fuzzy
 msgid "Failed to change password."
 msgstr "密码更改失败。"
@@ -586,14 +580,13 @@ msgstr "获取凭据状态时出错。"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:164
 #, fuzzy
-msgid ""
-"OAuth window opened. Please complete the authorization and return here."
+msgid "OAuth window opened. Please complete the authorization and return here."
 msgstr "OAuth窗口已打开。请完成授权并返回此处。"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:169
 msgid ""
-"After authorization, you may need to refresh this page to see the updated "
-"status."
+"After authorization, you may need to refresh this page to see the updated"
+" status."
 msgstr "授权后，您可能需要刷新此页面才能查看更新后的状态。"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:181
@@ -793,8 +786,7 @@ msgstr "密码必须包含数字。"
 
 #: trendsearth_ui/callbacks/profile.py:164
 #, fuzzy, python-brace-format
-msgid ""
-"Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+msgid "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 msgstr "密码必须包含特殊字符（!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/）。"
 
 #: trendsearth_ui/callbacks/profile.py:259
@@ -1166,8 +1158,7 @@ msgid "Enter your email address"
 msgstr "请输入您的电子邮件地址"
 
 #: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/tabs.py:255
-#: trendsearth_ui/components/tabs.py:2204
+#: trendsearth_ui/components/tabs.py:255 trendsearth_ui/components/tabs.py:2204
 #: trendsearth_ui/components/tabs.py:2236
 msgid "Cancel"
 msgstr "取消"
@@ -1194,6 +1185,7 @@ msgstr "登录"
 #: trendsearth_ui/components/tabs.py:474
 #: trendsearth_ui/utils/mobile_utils.py:96
 #: trendsearth_ui/utils/mobile_utils.py:245
+#: trendsearth_ui/utils/mobile_utils.py:798
 #, fuzzy
 msgid "Email"
 msgstr "电子邮件"
@@ -1324,8 +1316,8 @@ msgstr "创建您的帐户"
 #: trendsearth_ui/components/layout.py:719
 #, fuzzy
 msgid ""
-"After registration, you'll receive an email to verify your address and set "
-"your password."
+"After registration, you'll receive an email to verify your address and "
+"set your password."
 msgstr "注册后，您将收到一封电子邮件，用于验证您的地址并设置您的密码。"
 
 #: trendsearth_ui/components/layout.py:732
@@ -1421,7 +1413,7 @@ msgstr "请说明您的目的"
 #: trendsearth_ui/components/layout.py:1502
 #: trendsearth_ui/components/tabs.py:2400
 #: trendsearth_ui/utils/mobile_utils.py:294
-#: trendsearth_ui/utils/stats_visualizations.py:1647
+#: trendsearth_ui/utils/stats_visualizations.py:1683
 #, fuzzy
 msgid "Country"
 msgstr "国家"
@@ -1449,11 +1441,10 @@ msgstr "选择（可选）"
 #, fuzzy
 msgid ""
 "We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity development "
-"and tool access. Providing this information is voluntary; your selection "
-"will not affect your access to the tool."
-msgstr ""
-"我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
+"requirements and to assess equitable participation in capacity "
+"development and tool access. Providing this information is voluntary; "
+"your selection will not affect your access to the tool."
+msgstr "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
 
 #: trendsearth_ui/components/layout.py:1013
 #: trendsearth_ui/components/layout.py:1021
@@ -1466,18 +1457,18 @@ msgstr "请描述"
 #: trendsearth_ui/components/layout.py:1065
 #, fuzzy
 msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-"and, depending on your use, you may be required to have in place a "
-"commercial license to use Google Earth Engine?"
+"Do you acknowledge that some Trends.Earth features use Google Earth "
+"Engine, and, depending on your use, you may be required to have in place "
+"a commercial license to use Google Earth Engine?"
 msgstr ""
-"您是否知悉 Trends.Earth 的某些功能使用了 Google Earth Engine，并且根据您的使用情况，您可能需要获得使用 Google "
-"Earth Engine 的商业许可？"
+"您是否知悉 Trends.Earth 的某些功能使用了 Google Earth Engine，并且根据您的使用情况，您可能需要获得使用 "
+"Google Earth Engine 的商业许可？"
 
 #: trendsearth_ui/components/layout.py:1078
 #, fuzzy
 msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-"details see the "
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
+"more details see the "
 msgstr "Google Earth Engine (GEE) 对商业用途有所限制。更多详情请参阅…… "
 
 #: trendsearth_ui/components/layout.py:1082
@@ -1492,8 +1483,7 @@ msgid ""
 "licenses. Users are solely responsible for ensuring their use of GEE "
 "complies with Google's commercial licensing requirements. Access to this "
 "tool does not grant or imply the provision of commercial licensing."
-msgstr ""
-" 国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
+msgstr " 国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
 
 #: trendsearth_ui/components/layout.py:1097
 #, fuzzy
@@ -1544,6 +1534,7 @@ msgstr "行政"
 #: trendsearth_ui/components/layout.py:1807
 #: trendsearth_ui/utils/mobile_utils.py:140
 #: trendsearth_ui/utils/mobile_utils.py:499
+#: trendsearth_ui/utils/mobile_utils.py:762
 #, fuzzy
 msgid "Status"
 msgstr "地位"
@@ -1640,8 +1631,7 @@ msgstr "请输入您的姓名"
 msgid "Enter your email"
 msgstr "请输入您的邮箱"
 
-#: trendsearth_ui/components/tabs.py:492
-#: trendsearth_ui/components/tabs.py:2387
+#: trendsearth_ui/components/tabs.py:492 trendsearth_ui/components/tabs.py:2387
 #: trendsearth_ui/utils/mobile_utils.py:278
 #, fuzzy
 msgid "Institution"
@@ -1654,6 +1644,8 @@ msgstr "请输入您的机构名称"
 
 #: trendsearth_ui/components/tabs.py:504
 #: trendsearth_ui/utils/mobile_utils.py:310
+#: trendsearth_ui/utils/mobile_utils.py:680
+#: trendsearth_ui/utils/mobile_utils.py:807
 #, fuzzy
 msgid "Role"
 msgstr "角色"
@@ -1676,8 +1668,8 @@ msgstr "启用电子邮件通知"
 #: trendsearth_ui/components/tabs.py:569
 #, fuzzy
 msgid ""
-"Receive email notifications when your script executions finish, fail, or are"
-" cancelled."
+"Receive email notifications when your script executions finish, fail, or "
+"are cancelled."
 msgstr "脚本执行完成、失败或取消时，您将收到电子邮件通知。"
 
 #: trendsearth_ui/components/tabs.py:602
@@ -1726,8 +1718,7 @@ msgstr "选项 2：上传服务帐户密钥"
 
 #: trendsearth_ui/components/tabs.py:698
 #, fuzzy
-msgid ""
-"Upload a Google Cloud service account JSON key with Earth Engine access."
+msgid "Upload a Google Cloud service account JSON key with Earth Engine access."
 msgstr "上传具有 Earth Engine 访问权限的 Google Cloud 服务帐户 JSON 密钥。"
 
 #: trendsearth_ui/components/tabs.py:710
@@ -1761,11 +1752,9 @@ msgid ""
 "Service credentials allow external applications to authenticate with the "
 "Trends.Earth API using the OAuth2 client credentials grant. The client "
 "secret is shown only once at creation time."
-msgstr ""
-"服务凭证允许外部应用程序使用 OAuth2 客户端凭证授权对 Trends.Earth API 进行身份验证。客户端密钥仅在创建时显示一次。"
+msgstr "服务凭证允许外部应用程序使用 OAuth2 客户端凭证授权对 Trends.Earth API 进行身份验证。客户端密钥仅在创建时显示一次。"
 
-#: trendsearth_ui/components/tabs.py:798
-#: trendsearth_ui/components/tabs.py:1771
+#: trendsearth_ui/components/tabs.py:798 trendsearth_ui/components/tabs.py:1771
 msgid "Refresh"
 msgstr "刷新"
 
@@ -1824,10 +1813,15 @@ msgstr "去年"
 msgid "All Time"
 msgstr "所有时间"
 
+#: trendsearth_ui/components/tabs.py:1524
+msgid "Countries with new user registrations"
+msgstr ""
+
 #: trendsearth_ui/components/tabs.py:1565
 #, fuzzy
 msgid ""
-"Access denied. Administrator privileges required to access admin functions."
+"Access denied. Administrator privileges required to access admin "
+"functions."
 msgstr "访问被拒绝。需要管理员权限才能访问管理功能。"
 
 #: trendsearth_ui/components/tabs.py:1582
@@ -1881,6 +1875,8 @@ msgid "Manage News Items"
 msgstr "管理新闻项目"
 
 #: trendsearth_ui/components/tabs.py:1800
+#: trendsearth_ui/utils/mobile_utils.py:445
+#: trendsearth_ui/utils/mobile_utils.py:632
 #, fuzzy
 msgid "Edit"
 msgstr "编辑"
@@ -1914,8 +1910,8 @@ msgstr "消息（支持 Markdown 格式）*"
 #: trendsearth_ui/components/tabs.py:1914
 #, fuzzy
 msgid ""
-"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
-"be converted to HTML."
+"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. "
+"Will be converted to HTML."
 msgstr "使用 Markdown 格式：**粗体**、*斜体*、[链接](网址)、列表等。将转换为 HTML。"
 
 #: trendsearth_ui/components/tabs.py:1921
@@ -1976,8 +1972,8 @@ msgstr "目标角色（可选）"
 #: trendsearth_ui/components/tabs.py:2032
 #, fuzzy
 msgid ""
-"Leave empty to show to all users including unauthenticated. Select specific "
-"roles to restrict visibility."
+"Leave empty to show to all users including unauthenticated. Select "
+"specific roles to restrict visibility."
 msgstr "留空则对所有用户（包括未经身份验证的用户）可见。选择特定角色可限制可见性。"
 
 #: trendsearth_ui/components/tabs.py:2040
@@ -2163,6 +2159,8 @@ msgid "Role *"
 msgstr "角色 *"
 
 #: trendsearth_ui/components/tabs.py:2424
+#: trendsearth_ui/utils/mobile_utils.py:80
+#: trendsearth_ui/utils/mobile_utils.py:575
 #, fuzzy
 msgid "User"
 msgstr "用户"
@@ -2192,28 +2190,27 @@ msgstr "上传新剧本"
 msgid "Upload a .tar.gz archive containing your script and a "
 msgstr "上传一个包含您的脚本和文件的 .tar.gz 压缩包 "
 
-#: trendsearth_ui/components/tabs.py:2512
+#: trendsearth_ui/components/tabs.py:2513
 #, fuzzy
-msgid ""
-" file. The script name and metadata are read from the configuration file."
+msgid " file. The script name and metadata are read from the configuration file."
 msgstr " 文件。脚本名称和元数据从配置文件中读取。"
 
-#: trendsearth_ui/components/tabs.py:2523
+#: trendsearth_ui/components/tabs.py:2525
 #, fuzzy
 msgid "Script Archive (.tar.gz) *"
 msgstr "脚本压缩包 (.tar.gz) *"
 
-#: trendsearth_ui/components/tabs.py:2531
+#: trendsearth_ui/components/tabs.py:2533
 #, fuzzy
 msgid "Drag and Drop or "
 msgstr "拖放或 "
 
-#: trendsearth_ui/components/tabs.py:2532
+#: trendsearth_ui/components/tabs.py:2534
 #, fuzzy
 msgid "Select Script Archive"
 msgstr "选择脚本存档"
 
-#: trendsearth_ui/components/tabs.py:2567
+#: trendsearth_ui/components/tabs.py:2569
 #, fuzzy
 msgid "Upload Script"
 msgstr "上传脚本"
@@ -2240,9 +2237,15 @@ msgstr "期间"
 
 #: trendsearth_ui/utils/mobile_utils.py:157
 #: trendsearth_ui/utils/mobile_utils.py:372
+#: trendsearth_ui/utils/mobile_utils.py:616
 #, fuzzy
 msgid "ID"
 msgstr "ID"
+
+#: trendsearth_ui/utils/mobile_utils.py:172
+#: trendsearth_ui/utils/mobile_utils.py:720
+msgid "User ID"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:187
 #, fuzzy
@@ -2253,6 +2256,11 @@ msgstr "参数"
 #, fuzzy
 msgid "Results"
 msgstr "结果"
+
+#: trendsearth_ui/utils/mobile_utils.py:205
+#: trendsearth_ui/utils/mobile_utils.py:624
+msgid "Logs"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:214
 #, fuzzy
@@ -2285,9 +2293,15 @@ msgid "Verified At"
 msgstr "已核实"
 
 #: trendsearth_ui/utils/mobile_utils.py:354
+#: trendsearth_ui/utils/mobile_utils.py:555
 #, fuzzy
 msgid "Created"
 msgstr "创建"
+
+#: trendsearth_ui/utils/mobile_utils.py:363
+#: trendsearth_ui/utils/mobile_utils.py:564
+msgid "Updated"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:436
 #, fuzzy
@@ -2319,143 +2333,230 @@ msgstr "环境版本"
 msgid "Compute"
 msgstr "计算"
 
+#: trendsearth_ui/utils/mobile_utils.py:591
+#: trendsearth_ui/utils/mobile_utils.py:672
+msgid "User Email"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:607
+msgid "Description"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:644
+#: trendsearth_ui/utils/mobile_utils.py:773
+msgid "Occurred"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:652
+msgid "Type"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:658
+#: trendsearth_ui/utils/mobile_utils.py:814
+msgid "Endpoint"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:666
+#: trendsearth_ui/utils/mobile_utils.py:823
+msgid "Method"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:686
+#: trendsearth_ui/utils/mobile_utils.py:858
+msgid "IP Address"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:692
+#: trendsearth_ui/utils/mobile_utils.py:830
+msgid "Limit"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:700
+msgid "Count"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:706
+#: trendsearth_ui/utils/mobile_utils.py:844
+msgid "Window"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:712
+#: trendsearth_ui/utils/mobile_utils.py:850
+msgid "Retry After"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:728
+#: trendsearth_ui/utils/mobile_utils.py:866
+msgid "Limiter Key"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:736
+msgid "User Agent"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:744
+#: trendsearth_ui/utils/mobile_utils.py:880
+msgid "Event ID"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:782
+msgid "Expires"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:789
+msgid "Identifier"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:838
+msgid "Usage"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:874
+msgid "Rate Limit Type"
+msgstr ""
+
 #: trendsearth_ui/utils/stats_visualizations.py:608
-#: trendsearth_ui/utils/stats_visualizations.py:920
-#: trendsearth_ui/utils/stats_visualizations.py:1140
-#: trendsearth_ui/utils/stats_visualizations.py:1290
+#: trendsearth_ui/utils/stats_visualizations.py:936
+#: trendsearth_ui/utils/stats_visualizations.py:1166
+#: trendsearth_ui/utils/stats_visualizations.py:1316
 #, fuzzy
 msgid "Number of Executions"
 msgstr "执行次数"
 
-#: trendsearth_ui/utils/stats_visualizations.py:630
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:631
+#, fuzzy, python-brace-format
 msgid "Running executions{suffix_label}"
 msgstr "正在执行的执行{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:642
-#: trendsearth_ui/utils/stats_visualizations.py:651
-#: trendsearth_ui/utils/stats_visualizations.py:658
+#: trendsearth_ui/utils/stats_visualizations.py:646
+#: trendsearth_ui/utils/stats_visualizations.py:657
+#: trendsearth_ui/utils/stats_visualizations.py:664
 #, fuzzy
 msgid "No in-progress execution data available."
 msgstr "暂无正在进行中的执行数据。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:644
+#: trendsearth_ui/utils/stats_visualizations.py:649
 #, fuzzy
 msgid ""
-"Status time series data did not include ready, pending, or running counts "
-"for this period."
+"Status time series data did not include ready, pending, or running counts"
+" for this period."
 msgstr "此期间的状态时间序列数据不包括就绪、待处理或运行计数。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:652
+#: trendsearth_ui/utils/stats_visualizations.py:658
 #, fuzzy
 msgid "Status timestamps could not be parsed from the API response."
 msgstr "无法从 API 响应中解析状态时间戳。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:659
+#: trendsearth_ui/utils/stats_visualizations.py:665
 #, fuzzy
 msgid "Status time series data was not provided for this period."
 msgstr "此期间未提供状态时间序列数据。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:776
-#: trendsearth_ui/utils/stats_visualizations.py:832
+#: trendsearth_ui/utils/stats_visualizations.py:782
+#: trendsearth_ui/utils/stats_visualizations.py:842
 #, fuzzy
 msgid "Cumulative Executions"
 msgstr "累计执行"
 
-#: trendsearth_ui/utils/stats_visualizations.py:797
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:804
+#, fuzzy, python-brace-format
 msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
 msgstr "累计完成任务{suffix_label}{agg_suffix}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:854
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:865
+#, fuzzy, python-brace-format
 msgid "Completed executions (cumulative){suffix_label}"
 msgstr "已完成执行次数（累计）{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:866
+#: trendsearth_ui/utils/stats_visualizations.py:880
 #, fuzzy
 msgid "No cumulative execution data available."
 msgstr "暂无累计执行数据。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:868
+#: trendsearth_ui/utils/stats_visualizations.py:883
 #, fuzzy
 msgid ""
-"The execution statistics time series did not include finished, failed, or "
-"cancelled statuses."
+"The execution statistics time series did not include finished, failed, or"
+" cancelled statuses."
 msgstr "执行统计时间序列不包括已完成、失败或已取消的状态。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:876
+#: trendsearth_ui/utils/stats_visualizations.py:892
 #, fuzzy
 msgid "No execution trend data available."
 msgstr "暂无执行趋势数据。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:877
+#: trendsearth_ui/utils/stats_visualizations.py:893
 #, fuzzy
 msgid "Execution timestamps could not be parsed from the API response."
 msgstr "无法从 API 响应中解析执行时间戳。"
 
-#: trendsearth_ui/utils/stats_visualizations.py:928
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:945
+#, fuzzy, python-brace-format
 msgid "Execution count{suffix_label}"
 msgstr "执行次数{后缀标签}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:967
+#: trendsearth_ui/utils/stats_visualizations.py:985
 #, fuzzy
 msgid "Average Duration (minutes)"
 msgstr "平均时长（分钟）"
 
-#: trendsearth_ui/utils/stats_visualizations.py:975
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:994
+#, fuzzy, python-brace-format
 msgid "Execution duration{suffix_label}"
 msgstr "执行持续时间{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1033
+#: trendsearth_ui/utils/stats_visualizations.py:1055
 #, fuzzy
 msgid "Failure Rate (%)"
 msgstr "故障率（%）"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1043
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1066
+#, fuzzy, python-brace-format
 msgid "Top scripts by failure count{suffix_label}"
 msgstr "按失败次数排名的热门脚本{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1148
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1174
+#, fuzzy, python-brace-format
 msgid "Top users by activity{suffix_label}"
 msgstr "按活动排名的用户{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1289
+#: trendsearth_ui/utils/stats_visualizations.py:1315
 #, fuzzy
 msgid "Script Version"
 msgstr "脚本版本"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1298
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1325
+#, fuzzy, python-brace-format
 msgid "{num_versions} distinct versions, {num_executions} executions"
 msgstr "{num_versions} 个不同版本，{num_executions} 次执行"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1301
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1331
+#, fuzzy, python-brace-format
 msgid "{num_executions} executions from scripts with no parseable version"
 msgstr "来自没有可解析版本的脚本的 {num_executions} 次执行"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1307
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1340
+#, fuzzy, python-brace-format
 msgid "Execution script version distribution{suffix_label}"
 msgstr "执行脚本版本分布{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1596
+#: trendsearth_ui/utils/stats_visualizations.py:1583
+#, python-brace-format
+msgid "New user registrations{suffix_label}"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:1632
 #, fuzzy
 msgid "Cumulative New Users"
 msgstr "累计新增用户"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1648
+#: trendsearth_ui/utils/stats_visualizations.py:1684
 #, fuzzy
 msgid "Number of Users"
 msgstr "用户数量"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1656
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1693
+#, fuzzy, python-brace-format
 msgid "Top countries{suffix_label}"
 msgstr "热门国家{suffix_label}"
 
@@ -2580,7 +2681,8 @@ msgstr "系统状态目前不可用。请稍后再试。"
 #~ msgstr "忘记密码"
 
 #~ msgid ""
-#~ "Enter your email address and we'll send you instructions to reset your "
+#~ "Enter your email address and we'll "
+#~ "send you instructions to reset your "
 #~ "password."
 #~ msgstr "请输入您的电子邮件地址，我们将向您发送重置密码的说明。"
 
@@ -2771,8 +2873,9 @@ msgstr "系统状态目前不可用。请稍后再试。"
 #~ msgstr "创建您的帐户"
 
 #~ msgid ""
-#~ "After registration, you'll receive an email to verify your address and set "
-#~ "your password."
+#~ "After registration, you'll receive an "
+#~ "email to verify your address and "
+#~ "set your password."
 #~ msgstr "注册后，您将收到一封电子邮件，用于验证您的地址并设置您的密码。"
 
 #~ msgid "Required field"
@@ -2830,39 +2933,51 @@ msgstr "系统状态目前不可用。请稍后再试。"
 #~ msgstr "选择（可选）"
 
 #~ msgid ""
-#~ "We collect gender identity information to comply with donor reporting "
-#~ "requirements and to assess equitable participation in capacity development "
-#~ "and tool access. Providing this information is voluntary; your selection "
-#~ "will not affect your access to the tool."
-#~ msgstr ""
-#~ "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
+#~ "We collect gender identity information "
+#~ "to comply with donor reporting "
+#~ "requirements and to assess equitable "
+#~ "participation in capacity development and "
+#~ "tool access. Providing this information "
+#~ "is voluntary; your selection will not"
+#~ " affect your access to the tool."
+#~ msgstr "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
 
 #~ msgid "Please describe"
 #~ msgstr "请描述"
 
 #~ msgid ""
-#~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-#~ "and, depending on your use, you may be required to have in place a "
-#~ "commercial license to use Google Earth Engine?"
+#~ "Do you acknowledge that some "
+#~ "Trends.Earth features use Google Earth "
+#~ "Engine, and, depending on your use, "
+#~ "you may be required to have in "
+#~ "place a commercial license to use "
+#~ "Google Earth Engine?"
 #~ msgstr ""
-#~ "您是否知悉 Trends.Earth 的某些功能使用了 Google Earth Engine，并且根据您的使用情况，您可能需要获得使用 Google "
-#~ "Earth Engine 的商业许可？"
+#~ "您是否知悉 Trends.Earth 的某些功能使用了 Google Earth "
+#~ "Engine，并且根据您的使用情况，您可能需要获得使用 Google Earth Engine "
+#~ "的商业许可？"
 
 #~ msgid ""
-#~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-#~ "details see the "
+#~ "Google Earth Engine (GEE) imposes "
+#~ "restrictions on commercial use. For more"
+#~ " details see the "
 #~ msgstr "Google Earth Engine (GEE) 对商业用途有所限制。更多详情请参阅…… "
 
 #~ msgid "Google Earth Engine Terms of Use"
 #~ msgstr "Google Earth Engine 使用条款"
 
 #~ msgid ""
-#~ " . Conservation International does not provide or manage commercial GEE "
-#~ "licenses. Users are solely responsible for ensuring their use of GEE "
-#~ "complies with Google's commercial licensing requirements. Access to this "
-#~ "tool does not grant or imply the provision of commercial licensing."
+#~ " . Conservation International does not"
+#~ " provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible "
+#~ "for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing"
+#~ " requirements. Access to this tool "
+#~ "does not grant or imply the "
+#~ "provision of commercial licensing."
 #~ msgstr ""
-#~ " 国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
+#~ " "
+#~ "国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
 
 #~ msgid "Yes, I acknowledge"
 #~ msgstr "是的，我承认"
@@ -2890,3 +3005,4 @@ msgstr "系统状态目前不可用。请稍后再试。"
 
 #~ msgid "Profile"
 #~ msgstr "轮廓"
+

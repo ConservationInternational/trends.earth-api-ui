@@ -1521,7 +1521,7 @@ def status_tab_content(is_admin, role=None):
                                     html.Div(
                                         [
                                             html.H6(
-                                                "Countries with new user registrations",
+                                                _("Countries with new user registrations"),
                                                 className="mb-3",
                                             ),
                                             dcc.Loading(

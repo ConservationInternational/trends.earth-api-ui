@@ -7,22 +7,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 10:30-0400\n"
+"POT-Creation-Date: 2026-03-16 14:40-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: sw <LL@li.org>\n"
 "Language: sw\n"
+"Language-Team: sw <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/callbacks/admin.py:644
 #, fuzzy
 msgid "Please fill in all required fields (Name, Email, Password)."
-msgstr ""
-"Tafadhali jaza sehemu zote zinazohitajika (Jina, Barua pepe, Nenosiri)."
+msgstr "Tafadhali jaza sehemu zote zinazohitajika (Jina, Barua pepe, Nenosiri)."
 
 #: trendsearth_ui/callbacks/admin.py:658
 #, fuzzy
@@ -66,14 +65,12 @@ msgstr "Imeshindwa kuunda mtumiaji. Seva ilijibu kwa kutumia hali {status}."
 msgid "Request timed out. Please try again."
 msgstr "Muda wa ombi umeisha. Tafadhali jaribu tena."
 
-#: trendsearth_ui/callbacks/admin.py:789
-#: trendsearth_ui/callbacks/admin.py:1028
+#: trendsearth_ui/callbacks/admin.py:789 trendsearth_ui/callbacks/admin.py:1028
 #, fuzzy
 msgid "Cannot connect to server. Please check your connection."
 msgstr "Haiwezi kuunganishwa na seva. Tafadhali angalia muunganisho wako."
 
-#: trendsearth_ui/callbacks/admin.py:802
-#: trendsearth_ui/callbacks/admin.py:1036
+#: trendsearth_ui/callbacks/admin.py:802 trendsearth_ui/callbacks/admin.py:1036
 #, fuzzy, python-brace-format
 msgid "Unexpected error: {error}"
 msgstr "Hitilafu isiyotarajiwa: {kosa}"
@@ -84,15 +81,15 @@ msgid ""
 "Invalid file type: {filename}. Must be a .tar.gz archive containing "
 "configuration.json."
 msgstr ""
-"Aina ya faili si sahihi: {jina la faili}. Lazima iwe kumbukumbu ya .tar.gz "
-"iliyo na configuration.json."
+"Aina ya faili si sahihi: {jina la faili}. Lazima iwe kumbukumbu ya "
+".tar.gz iliyo na configuration.json."
 
 #: trendsearth_ui/callbacks/admin.py:863
 #, fuzzy, python-brace-format
 msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
 msgstr ""
-"Faili ni kubwa mno: {jina la faili} ({size}MB). Kiwango cha juu cha MB 10 "
-"kinaruhusiwa."
+"Faili ni kubwa mno: {jina la faili} ({size}MB). Kiwango cha juu cha MB 10"
+" kinaruhusiwa."
 
 #: trendsearth_ui/callbacks/admin.py:872
 #, fuzzy, python-brace-format
@@ -115,8 +112,8 @@ msgid ""
 "Invalid file type. The API requires a .tar.gz archive containing a "
 "configuration.json file."
 msgstr ""
-"Aina ya faili si sahihi. API inahitaji kumbukumbu ya .tar.gz iliyo na faili "
-"ya configuration.json."
+"Aina ya faili si sahihi. API inahitaji kumbukumbu ya .tar.gz iliyo na "
+"faili ya configuration.json."
 
 #: trendsearth_ui/callbacks/admin.py:980
 #, fuzzy, python-brace-format
@@ -154,8 +151,8 @@ msgstr "Muda wa kupakia umeisha. Tafadhali jaribu tena na faili ndogo."
 #, fuzzy
 msgid "Rate limits have been successfully reset for all users and endpoints."
 msgstr ""
-"Vikomo vya viwango vimewekwa upya kwa ufanisi kwa watumiaji wote na sehemu "
-"za mwisho."
+"Vikomo vya viwango vimewekwa upya kwa ufanisi kwa watumiaji wote na "
+"sehemu za mwisho."
 
 #: trendsearth_ui/callbacks/admin.py:1205
 #, fuzzy, python-brace-format
@@ -181,8 +178,8 @@ msgstr "Kikomo cha kiwango cha {identifier} kimewekwa upya kwa ufanisi."
 #, fuzzy, python-brace-format
 msgid "Rate limit for {identifier} not found. It may have already expired."
 msgstr ""
-"Kikomo cha kiwango cha {identifier} hakijapatikana. Huenda tayari kimeisha "
-"muda wake."
+"Kikomo cha kiwango cha {identifier} hakijapatikana. Huenda tayari "
+"kimeisha muda wake."
 
 #: trendsearth_ui/callbacks/admin.py:1505
 #, fuzzy, python-brace-format
@@ -223,15 +220,15 @@ msgstr "Vitambulisho batili."
 #, fuzzy
 msgid "Your account is locked due to too many failed login attempts. "
 msgstr ""
-"Akaunti yako imefungwa kutokana na majaribio mengi ya kuingia yaliyoshindwa."
-" "
+"Akaunti yako imefungwa kutokana na majaribio mengi ya kuingia "
+"yaliyoshindwa. "
 
 #: trendsearth_ui/callbacks/auth.py:458
 #, fuzzy
 msgid "Please use the 'Forgot Password' link below to reset your password."
 msgstr ""
-"Tafadhali tumia kiungo cha &#39;Umesahau Nenosiri&#39; hapa chini ili kuweka"
-" upya nenosiri lako."
+"Tafadhali tumia kiungo cha &#39;Umesahau Nenosiri&#39; hapa chini ili "
+"kuweka upya nenosiri lako."
 
 #: trendsearth_ui/callbacks/auth.py:461
 #, fuzzy
@@ -275,8 +272,8 @@ msgstr "Tafadhali weka anwani halali ya barua pepe."
 #: trendsearth_ui/callbacks/auth.py:774
 #, python-brace-format
 msgid ""
-"If an account exists with {email}, password recovery instructions have been "
-"sent. Please check your email."
+"If an account exists with {email}, password recovery instructions have "
+"been sent. Please check your email."
 msgstr ""
 "Ikiwa akaunti ipo na {email}, maagizo ya kurejesha nenosiri yametumwa. "
 "Tafadhali angalia barua pepe yako."
@@ -296,8 +293,8 @@ msgstr "Ombi limepitwa na wakati. Tafadhali jaribu tena baadaye."
 
 #: trendsearth_ui/callbacks/auth.py:820
 msgid ""
-"Cannot connect to the server. Please check your internet connection and try "
-"again."
+"Cannot connect to the server. Please check your internet connection and "
+"try again."
 msgstr ""
 "Haiwezi kuunganishwa kwenye seva. Tafadhali angalia muunganisho wako wa "
 "intaneti na ujaribu tena."
@@ -310,8 +307,8 @@ msgstr "Hitilafu imetokea: {kosa}. Tafadhali jaribu tena baadaye."
 #: trendsearth_ui/callbacks/auth.py:1161
 msgid "Invalid or missing reset token. Please request a new password reset."
 msgstr ""
-"Tokeni ya kuweka upya si sahihi au haipo. Tafadhali omba urejeshaji mpya wa "
-"nenosiri."
+"Tokeni ya kuweka upya si sahihi au haipo. Tafadhali omba urejeshaji mpya "
+"wa nenosiri."
 
 #: trendsearth_ui/callbacks/auth.py:1170
 msgid "Please enter and confirm your new password."
@@ -330,16 +327,16 @@ msgstr "Nenosiri lazima liwe na urefu wa angalau herufi 12."
 #: trendsearth_ui/callbacks/auth.py:1209
 msgid "Password reset successful! You can now log in with your new password."
 msgstr ""
-"Uwekaji upya wa nenosiri umefanikiwa! Sasa unaweza kuingia ukitumia nenosiri"
-" lako jipya."
+"Uwekaji upya wa nenosiri umefanikiwa! Sasa unaweza kuingia ukitumia "
+"nenosiri lako jipya."
 
 #: trendsearth_ui/callbacks/auth.py:1219
 msgid ""
 "This reset link is invalid or has expired. Please request a new password "
 "reset."
 msgstr ""
-"Kiungo hiki cha kuweka upya si sahihi au kimeisha muda wake. Tafadhali omba "
-"urejeshe nenosiri jipya."
+"Kiungo hiki cha kuweka upya si sahihi au kimeisha muda wake. Tafadhali "
+"omba urejeshe nenosiri jipya."
 
 #: trendsearth_ui/callbacks/auth.py:1228
 msgid "Password does not meet requirements."
@@ -435,11 +432,10 @@ msgstr "Hitilafu ya kupakia wasifu: {kosa}"
 #: trendsearth_ui/callbacks/auth.py:1800
 msgid "No authentication token. Please use a valid profile update link."
 msgstr ""
-"Hakuna tokeni ya uthibitishaji. Tafadhali tumia kiungo halali cha kusasisha "
-"wasifu."
+"Hakuna tokeni ya uthibitishaji. Tafadhali tumia kiungo halali cha "
+"kusasisha wasifu."
 
-#: trendsearth_ui/callbacks/auth.py:1884
-#: trendsearth_ui/callbacks/profile.py:61
+#: trendsearth_ui/callbacks/auth.py:1884 trendsearth_ui/callbacks/profile.py:61
 msgid "Profile updated successfully!"
 msgstr "Wasifu umesasishwa kwa mafanikio!"
 
@@ -451,19 +447,16 @@ msgstr "Kipindi kimeisha. Tafadhali omba kiungo kipya cha kusasisha wasifu."
 msgid "Invalid token. Please request a new profile update link."
 msgstr "Tokeni si sahihi. Tafadhali omba kiungo kipya cha kusasisha wasifu."
 
-#: trendsearth_ui/callbacks/auth.py:1901
-#: trendsearth_ui/callbacks/profile.py:63
+#: trendsearth_ui/callbacks/auth.py:1901 trendsearth_ui/callbacks/profile.py:63
 msgid "Failed to update profile."
 msgstr "Imeshindwa kusasisha wasifu."
 
-#: trendsearth_ui/callbacks/edit.py:550
-#: trendsearth_ui/callbacks/profile.py:192
+#: trendsearth_ui/callbacks/edit.py:550 trendsearth_ui/callbacks/profile.py:192
 #, fuzzy
 msgid "Password changed successfully!"
 msgstr "Nenosiri limebadilishwa kwa mafanikio!"
 
-#: trendsearth_ui/callbacks/edit.py:553
-#: trendsearth_ui/callbacks/profile.py:195
+#: trendsearth_ui/callbacks/edit.py:553 trendsearth_ui/callbacks/profile.py:195
 #, fuzzy
 msgid "Failed to change password."
 msgstr "Imeshindwa kubadilisha nenosiri."
@@ -624,23 +617,20 @@ msgid "Error retrieving credentials status."
 msgstr "Hitilafu katika kurejesha hali ya vitambulisho."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:164
-msgid ""
-"OAuth window opened. Please complete the authorization and return here."
-msgstr ""
-"Dirisha la OAuth limefunguliwa. Tafadhali jaza idhini na urudishe hapa."
+msgid "OAuth window opened. Please complete the authorization and return here."
+msgstr "Dirisha la OAuth limefunguliwa. Tafadhali jaza idhini na urudishe hapa."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:169
 msgid ""
-"After authorization, you may need to refresh this page to see the updated "
-"status."
+"After authorization, you may need to refresh this page to see the updated"
+" status."
 msgstr ""
-"Baada ya idhini, huenda ukahitaji kuonyesha upya ukurasa huu ili kuona hali "
-"iliyosasishwa."
+"Baada ya idhini, huenda ukahitaji kuonyesha upya ukurasa huu ili kuona "
+"hali iliyosasishwa."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:181
 msgid "OAuth initiation failed - no authorization URL received."
-msgstr ""
-"Uanzishaji wa OAuth umeshindwa - hakuna URL ya uidhinishaji iliyopokelewa."
+msgstr "Uanzishaji wa OAuth umeshindwa - hakuna URL ya uidhinishaji iliyopokelewa."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:186
 msgid "Failed to initiate OAuth flow."
@@ -649,8 +639,8 @@ msgstr "Imeshindwa kuanzisha mtiririko wa OAuth."
 #: trendsearth_ui/callbacks/gee_credentials.py:226
 msgid "Invalid JSON file. Please upload a valid service account key file."
 msgstr ""
-"Faili ya JSON si sahihi. Tafadhali pakia faili halali ya ufunguo wa akaunti "
-"ya huduma."
+"Faili ya JSON si sahihi. Tafadhali pakia faili halali ya ufunguo wa "
+"akaunti ya huduma."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:234
 msgid "Invalid service account key. Missing required fields."
@@ -665,8 +655,7 @@ msgstr ""
 #: trendsearth_ui/callbacks/gee_credentials.py:258
 #, python-brace-format
 msgid "Service account key '{filename}' uploaded successfully!"
-msgstr ""
-"Ufunguo wa akaunti ya huduma &#39;{filename}&#39; umepakiwa kwa mafanikio!"
+msgstr "Ufunguo wa akaunti ya huduma &#39;{filename}&#39; umepakiwa kwa mafanikio!"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:266
 msgid "Failed to upload service account key."
@@ -840,8 +829,7 @@ msgstr "Nenosiri lazima lijumuishe nambari."
 
 #: trendsearth_ui/callbacks/profile.py:164
 #, fuzzy, python-brace-format
-msgid ""
-"Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+msgid "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 msgstr ""
 "Nenosiri lazima lijumuishe herufi maalum "
 "(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
@@ -1114,8 +1102,7 @@ msgstr "Nyingine"
 #: trendsearth_ui/components/layout.py:77
 #, fuzzy
 msgid "National/International Reporting (UNCCD, SDGs, etc.)"
-msgstr ""
-"Ripoti za Kitaifa/Kimataifa (UNCCD, Malengo ya Maendeleo Endelevu, n.k.)"
+msgstr "Ripoti za Kitaifa/Kimataifa (UNCCD, Malengo ya Maendeleo Endelevu, n.k.)"
 
 #: trendsearth_ui/components/layout.py:78
 #, fuzzy
@@ -1203,8 +1190,8 @@ msgid ""
 "Enter your email address and we'll send you instructions to reset your "
 "password."
 msgstr ""
-"Ingiza anwani yako ya barua pepe nasi tutakutumia maelekezo ya kuweka upya "
-"nenosiri lako."
+"Ingiza anwani yako ya barua pepe nasi tutakutumia maelekezo ya kuweka "
+"upya nenosiri lako."
 
 #: trendsearth_ui/components/layout.py:200
 #, fuzzy
@@ -1218,8 +1205,7 @@ msgid "Enter your email address"
 msgstr "Ingiza anwani yako ya barua pepe"
 
 #: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/tabs.py:255
-#: trendsearth_ui/components/tabs.py:2204
+#: trendsearth_ui/components/tabs.py:255 trendsearth_ui/components/tabs.py:2204
 #: trendsearth_ui/components/tabs.py:2236
 msgid "Cancel"
 msgstr "Ghairi"
@@ -1246,6 +1232,7 @@ msgstr "Ingia"
 #: trendsearth_ui/components/tabs.py:474
 #: trendsearth_ui/utils/mobile_utils.py:96
 #: trendsearth_ui/utils/mobile_utils.py:245
+#: trendsearth_ui/utils/mobile_utils.py:798
 #, fuzzy
 msgid "Email"
 msgstr "Barua pepe"
@@ -1376,11 +1363,11 @@ msgstr "Fungua Akaunti Yako"
 #: trendsearth_ui/components/layout.py:719
 #, fuzzy
 msgid ""
-"After registration, you'll receive an email to verify your address and set "
-"your password."
+"After registration, you'll receive an email to verify your address and "
+"set your password."
 msgstr ""
-"Baada ya usajili, utapokea barua pepe ili kuthibitisha anwani yako na kuweka"
-" nenosiri lako."
+"Baada ya usajili, utapokea barua pepe ili kuthibitisha anwani yako na "
+"kuweka nenosiri lako."
 
 #: trendsearth_ui/components/layout.py:732
 #: trendsearth_ui/components/layout.py:1287
@@ -1475,7 +1462,7 @@ msgstr "Tafadhali taja kusudi lako"
 #: trendsearth_ui/components/layout.py:1502
 #: trendsearth_ui/components/tabs.py:2400
 #: trendsearth_ui/utils/mobile_utils.py:294
-#: trendsearth_ui/utils/stats_visualizations.py:1647
+#: trendsearth_ui/utils/stats_visualizations.py:1683
 #, fuzzy
 msgid "Country"
 msgstr "Nchi"
@@ -1503,14 +1490,14 @@ msgstr "Chagua (hiari)"
 #, fuzzy
 msgid ""
 "We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity development "
-"and tool access. Providing this information is voluntary; your selection "
-"will not affect your access to the tool."
+"requirements and to assess equitable participation in capacity "
+"development and tool access. Providing this information is voluntary; "
+"your selection will not affect your access to the tool."
 msgstr ""
-"Tunakusanya taarifa za utambulisho wa kijinsia ili kuzingatia mahitaji ya "
-"kuripoti wafadhili na kutathmini ushiriki sawa katika ukuzaji wa uwezo na "
-"upatikanaji wa zana. Kutoa taarifa hii ni kwa hiari; uteuzi wako hautaathiri"
-" ufikiaji wako wa zana."
+"Tunakusanya taarifa za utambulisho wa kijinsia ili kuzingatia mahitaji ya"
+" kuripoti wafadhili na kutathmini ushiriki sawa katika ukuzaji wa uwezo "
+"na upatikanaji wa zana. Kutoa taarifa hii ni kwa hiari; uteuzi wako "
+"hautaathiri ufikiaji wako wa zana."
 
 #: trendsearth_ui/components/layout.py:1013
 #: trendsearth_ui/components/layout.py:1021
@@ -1523,9 +1510,9 @@ msgstr "Tafadhali eleza"
 #: trendsearth_ui/components/layout.py:1065
 #, fuzzy
 msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-"and, depending on your use, you may be required to have in place a "
-"commercial license to use Google Earth Engine?"
+"Do you acknowledge that some Trends.Earth features use Google Earth "
+"Engine, and, depending on your use, you may be required to have in place "
+"a commercial license to use Google Earth Engine?"
 msgstr ""
 "Je, unakubali kwamba baadhi ya vipengele vya Trends.Earth hutumia Google "
 "Earth Engine, na, kulingana na matumizi yako, huenda ukahitajika kuwa na "
@@ -1534,11 +1521,11 @@ msgstr ""
 #: trendsearth_ui/components/layout.py:1078
 #, fuzzy
 msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-"details see the "
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
+"more details see the "
 msgstr ""
-"Google Earth Engine (GEE) inaweka vikwazo kwenye matumizi ya kibiashara. Kwa"
-" maelezo zaidi tazama "
+"Google Earth Engine (GEE) inaweka vikwazo kwenye matumizi ya kibiashara. "
+"Kwa maelezo zaidi tazama "
 
 #: trendsearth_ui/components/layout.py:1082
 #, fuzzy
@@ -1555,8 +1542,8 @@ msgid ""
 msgstr ""
 " . Conservation International haitoi au kusimamia leseni za GEE za "
 "kibiashara. Watumiaji wanawajibika pekee kuhakikisha matumizi yao ya GEE "
-"yanafuata mahitaji ya leseni za kibiashara za Google. Ufikiaji wa zana hii "
-"hautoi au kuashiria utoaji wa leseni za kibiashara."
+"yanafuata mahitaji ya leseni za kibiashara za Google. Ufikiaji wa zana "
+"hii hautoi au kuashiria utoaji wa leseni za kibiashara."
 
 #: trendsearth_ui/components/layout.py:1097
 #, fuzzy
@@ -1607,6 +1594,7 @@ msgstr "Msimamizi"
 #: trendsearth_ui/components/layout.py:1807
 #: trendsearth_ui/utils/mobile_utils.py:140
 #: trendsearth_ui/utils/mobile_utils.py:499
+#: trendsearth_ui/utils/mobile_utils.py:762
 #, fuzzy
 msgid "Status"
 msgstr "Hali"
@@ -1703,8 +1691,7 @@ msgstr "Ingiza jina lako"
 msgid "Enter your email"
 msgstr "Ingiza barua pepe yako"
 
-#: trendsearth_ui/components/tabs.py:492
-#: trendsearth_ui/components/tabs.py:2387
+#: trendsearth_ui/components/tabs.py:492 trendsearth_ui/components/tabs.py:2387
 #: trendsearth_ui/utils/mobile_utils.py:278
 #, fuzzy
 msgid "Institution"
@@ -1717,6 +1704,8 @@ msgstr "Ingia katika taasisi yako"
 
 #: trendsearth_ui/components/tabs.py:504
 #: trendsearth_ui/utils/mobile_utils.py:310
+#: trendsearth_ui/utils/mobile_utils.py:680
+#: trendsearth_ui/utils/mobile_utils.py:807
 #, fuzzy
 msgid "Role"
 msgstr "Jukumu"
@@ -1739,8 +1728,8 @@ msgstr "Washa arifa za barua pepe"
 #: trendsearth_ui/components/tabs.py:569
 #, fuzzy
 msgid ""
-"Receive email notifications when your script executions finish, fail, or are"
-" cancelled."
+"Receive email notifications when your script executions finish, fail, or "
+"are cancelled."
 msgstr ""
 "Pokea arifa za barua pepe wakati utekelezaji wa hati yako unakamilika, "
 "unashindwa, au unaghairiwa."
@@ -1766,8 +1755,8 @@ msgid ""
 "Choose one of the options below to configure your Google Earth Engine "
 "credentials:"
 msgstr ""
-"Chagua mojawapo ya chaguo zilizo hapa chini ili kusanidi vitambulisho vyako "
-"vya Google Earth Engine:"
+"Chagua mojawapo ya chaguo zilizo hapa chini ili kusanidi vitambulisho "
+"vyako vya Google Earth Engine:"
 
 #: trendsearth_ui/components/tabs.py:648
 #, fuzzy
@@ -1795,11 +1784,10 @@ msgstr "Chaguo la 2: Ufunguo wa Akaunti ya Huduma ya Kupakia"
 
 #: trendsearth_ui/components/tabs.py:698
 #, fuzzy
-msgid ""
-"Upload a Google Cloud service account JSON key with Earth Engine access."
+msgid "Upload a Google Cloud service account JSON key with Earth Engine access."
 msgstr ""
-"Pakia akaunti ya huduma ya Wingu la Google ufunguo wa JSON ukiwa na ufikiaji"
-" wa Injini ya Dunia."
+"Pakia akaunti ya huduma ya Wingu la Google ufunguo wa JSON ukiwa na "
+"ufikiaji wa Injini ya Dunia."
 
 #: trendsearth_ui/components/tabs.py:710
 #, fuzzy
@@ -1833,12 +1821,11 @@ msgid ""
 "Trends.Earth API using the OAuth2 client credentials grant. The client "
 "secret is shown only once at creation time."
 msgstr ""
-"Vitambulisho vya huduma huruhusu programu za nje kuthibitisha kwa kutumia "
-"Trends.Earth API kwa kutumia ruzuku ya vitambulisho vya mteja wa OAuth2. "
-"Siri ya mteja huonyeshwa mara moja tu wakati wa uundaji."
+"Vitambulisho vya huduma huruhusu programu za nje kuthibitisha kwa kutumia"
+" Trends.Earth API kwa kutumia ruzuku ya vitambulisho vya mteja wa OAuth2."
+" Siri ya mteja huonyeshwa mara moja tu wakati wa uundaji."
 
-#: trendsearth_ui/components/tabs.py:798
-#: trendsearth_ui/components/tabs.py:1771
+#: trendsearth_ui/components/tabs.py:798 trendsearth_ui/components/tabs.py:1771
 msgid "Refresh"
 msgstr "Onyesha upya"
 
@@ -1897,13 +1884,18 @@ msgstr "Mwaka Jana"
 msgid "All Time"
 msgstr "Wakati Wote"
 
+#: trendsearth_ui/components/tabs.py:1524
+msgid "Countries with new user registrations"
+msgstr ""
+
 #: trendsearth_ui/components/tabs.py:1565
 #, fuzzy
 msgid ""
-"Access denied. Administrator privileges required to access admin functions."
+"Access denied. Administrator privileges required to access admin "
+"functions."
 msgstr ""
-"Ufikiaji umekataliwa. Haki za msimamizi zinahitajika ili kufikia vipengele "
-"vya msimamizi."
+"Ufikiaji umekataliwa. Haki za msimamizi zinahitajika ili kufikia "
+"vipengele vya msimamizi."
 
 #: trendsearth_ui/components/tabs.py:1582
 #, fuzzy
@@ -1943,8 +1935,7 @@ msgstr "Matukio ya kihistoria na ya vitendo"
 #: trendsearth_ui/components/tabs.py:1715
 #, fuzzy
 msgid "Highlighted rows are active and can be cancelled individually."
-msgstr ""
-"Safu mlalo zilizoangaziwa zinafanya kazi na zinaweza kufutwa moja moja."
+msgstr "Safu mlalo zilizoangaziwa zinafanya kazi na zinaweza kufutwa moja moja."
 
 #: trendsearth_ui/components/tabs.py:1751
 #, fuzzy
@@ -1957,6 +1948,8 @@ msgid "Manage News Items"
 msgstr "Dhibiti Vipengee vya Habari"
 
 #: trendsearth_ui/components/tabs.py:1800
+#: trendsearth_ui/utils/mobile_utils.py:445
+#: trendsearth_ui/utils/mobile_utils.py:632
 #, fuzzy
 msgid "Edit"
 msgstr "Hariri"
@@ -1990,8 +1983,8 @@ msgstr "Ujumbe (Usajili unaungwa mkono) *"
 #: trendsearth_ui/components/tabs.py:1914
 #, fuzzy
 msgid ""
-"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
-"be converted to HTML."
+"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. "
+"Will be converted to HTML."
 msgstr ""
 "Tumia umbizo la Markdown: **bold**, *italic*, [link](url), orodha, n.k. "
 "Itabadilishwa kuwa HTML."
@@ -2054,8 +2047,8 @@ msgstr "Majukumu Lengwa (hiari)"
 #: trendsearth_ui/components/tabs.py:2032
 #, fuzzy
 msgid ""
-"Leave empty to show to all users including unauthenticated. Select specific "
-"roles to restrict visibility."
+"Leave empty to show to all users including unauthenticated. Select "
+"specific roles to restrict visibility."
 msgstr ""
 "Acha tupu ili ionyeshwe kwa watumiaji wote ikiwa ni pamoja na "
 "isiyothibitishwa. Chagua majukumu mahususi ili kuzuia mwonekano."
@@ -2176,8 +2169,8 @@ msgid ""
 "Are you sure you want to delete this news item? This action cannot be "
 "undone."
 msgstr ""
-"Una uhakika unataka kufuta kipengee hiki cha habari? Kitendo hiki hakiwezi "
-"kutenduliwa."
+"Una uhakika unataka kufuta kipengee hiki cha habari? Kitendo hiki "
+"hakiwezi kutenduliwa."
 
 #: trendsearth_ui/components/tabs.py:2265
 #, fuzzy
@@ -2245,6 +2238,8 @@ msgid "Role *"
 msgstr "Jukumu *"
 
 #: trendsearth_ui/components/tabs.py:2424
+#: trendsearth_ui/utils/mobile_utils.py:80
+#: trendsearth_ui/utils/mobile_utils.py:575
 #, fuzzy
 msgid "User"
 msgstr "Mtumiaji"
@@ -2274,28 +2269,27 @@ msgstr "Pakia Hati Mpya"
 msgid "Upload a .tar.gz archive containing your script and a "
 msgstr "Pakia kumbukumbu ya .tar.gz iliyo na hati yako na "
 
-#: trendsearth_ui/components/tabs.py:2512
+#: trendsearth_ui/components/tabs.py:2513
 #, fuzzy
-msgid ""
-" file. The script name and metadata are read from the configuration file."
+msgid " file. The script name and metadata are read from the configuration file."
 msgstr " faili. Jina la hati na metadata husomwa kutoka kwa faili ya usanidi."
 
-#: trendsearth_ui/components/tabs.py:2523
+#: trendsearth_ui/components/tabs.py:2525
 #, fuzzy
 msgid "Script Archive (.tar.gz) *"
 msgstr "Kumbukumbu ya Hati (.tar.gz) *"
 
-#: trendsearth_ui/components/tabs.py:2531
+#: trendsearth_ui/components/tabs.py:2533
 #, fuzzy
 msgid "Drag and Drop or "
 msgstr "Buruta na Uangushe au "
 
-#: trendsearth_ui/components/tabs.py:2532
+#: trendsearth_ui/components/tabs.py:2534
 #, fuzzy
 msgid "Select Script Archive"
 msgstr "Chagua Kumbukumbu ya Hati"
 
-#: trendsearth_ui/components/tabs.py:2567
+#: trendsearth_ui/components/tabs.py:2569
 #, fuzzy
 msgid "Upload Script"
 msgstr "Pakia Hati"
@@ -2322,9 +2316,15 @@ msgstr "Muda"
 
 #: trendsearth_ui/utils/mobile_utils.py:157
 #: trendsearth_ui/utils/mobile_utils.py:372
+#: trendsearth_ui/utils/mobile_utils.py:616
 #, fuzzy
 msgid "ID"
 msgstr "Kitambulisho"
+
+#: trendsearth_ui/utils/mobile_utils.py:172
+#: trendsearth_ui/utils/mobile_utils.py:720
+msgid "User ID"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:187
 #, fuzzy
@@ -2335,6 +2335,11 @@ msgstr "Vigezo"
 #, fuzzy
 msgid "Results"
 msgstr "Matokeo"
+
+#: trendsearth_ui/utils/mobile_utils.py:205
+#: trendsearth_ui/utils/mobile_utils.py:624
+msgid "Logs"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:214
 #, fuzzy
@@ -2367,9 +2372,15 @@ msgid "Verified At"
 msgstr "Imethibitishwa Katika"
 
 #: trendsearth_ui/utils/mobile_utils.py:354
+#: trendsearth_ui/utils/mobile_utils.py:555
 #, fuzzy
 msgid "Created"
 msgstr "Imeundwa"
+
+#: trendsearth_ui/utils/mobile_utils.py:363
+#: trendsearth_ui/utils/mobile_utils.py:564
+msgid "Updated"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:436
 #, fuzzy
@@ -2401,152 +2412,238 @@ msgstr "Toleo la Env"
 msgid "Compute"
 msgstr "Hesabu"
 
+#: trendsearth_ui/utils/mobile_utils.py:591
+#: trendsearth_ui/utils/mobile_utils.py:672
+msgid "User Email"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:607
+msgid "Description"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:644
+#: trendsearth_ui/utils/mobile_utils.py:773
+msgid "Occurred"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:652
+msgid "Type"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:658
+#: trendsearth_ui/utils/mobile_utils.py:814
+msgid "Endpoint"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:666
+#: trendsearth_ui/utils/mobile_utils.py:823
+msgid "Method"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:686
+#: trendsearth_ui/utils/mobile_utils.py:858
+msgid "IP Address"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:692
+#: trendsearth_ui/utils/mobile_utils.py:830
+msgid "Limit"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:700
+msgid "Count"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:706
+#: trendsearth_ui/utils/mobile_utils.py:844
+msgid "Window"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:712
+#: trendsearth_ui/utils/mobile_utils.py:850
+msgid "Retry After"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:728
+#: trendsearth_ui/utils/mobile_utils.py:866
+msgid "Limiter Key"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:736
+msgid "User Agent"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:744
+#: trendsearth_ui/utils/mobile_utils.py:880
+msgid "Event ID"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:782
+msgid "Expires"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:789
+msgid "Identifier"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:838
+msgid "Usage"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:874
+msgid "Rate Limit Type"
+msgstr ""
+
 #: trendsearth_ui/utils/stats_visualizations.py:608
-#: trendsearth_ui/utils/stats_visualizations.py:920
-#: trendsearth_ui/utils/stats_visualizations.py:1140
-#: trendsearth_ui/utils/stats_visualizations.py:1290
+#: trendsearth_ui/utils/stats_visualizations.py:936
+#: trendsearth_ui/utils/stats_visualizations.py:1166
+#: trendsearth_ui/utils/stats_visualizations.py:1316
 #, fuzzy
 msgid "Number of Executions"
 msgstr "Idadi ya Utekelezaji"
 
-#: trendsearth_ui/utils/stats_visualizations.py:630
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:631
+#, fuzzy, python-brace-format
 msgid "Running executions{suffix_label}"
 msgstr "Kuendesha utekelezaji{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:642
-#: trendsearth_ui/utils/stats_visualizations.py:651
-#: trendsearth_ui/utils/stats_visualizations.py:658
+#: trendsearth_ui/utils/stats_visualizations.py:646
+#: trendsearth_ui/utils/stats_visualizations.py:657
+#: trendsearth_ui/utils/stats_visualizations.py:664
 #, fuzzy
 msgid "No in-progress execution data available."
 msgstr "Hakuna data ya utekelezaji inayoendelea inayopatikana."
 
-#: trendsearth_ui/utils/stats_visualizations.py:644
+#: trendsearth_ui/utils/stats_visualizations.py:649
 #, fuzzy
 msgid ""
-"Status time series data did not include ready, pending, or running counts "
-"for this period."
+"Status time series data did not include ready, pending, or running counts"
+" for this period."
 msgstr ""
 "Data ya mfululizo wa muda wa hali haikujumuisha hesabu zilizo tayari, "
 "zinazosubiri, au zinazoendelea kwa kipindi hiki."
 
-#: trendsearth_ui/utils/stats_visualizations.py:652
+#: trendsearth_ui/utils/stats_visualizations.py:658
 #, fuzzy
 msgid "Status timestamps could not be parsed from the API response."
-msgstr ""
-"Muhuri wa muda wa hali haukuweza kuchanganuliwa kutoka kwa jibu la API."
+msgstr "Muhuri wa muda wa hali haukuweza kuchanganuliwa kutoka kwa jibu la API."
 
-#: trendsearth_ui/utils/stats_visualizations.py:659
+#: trendsearth_ui/utils/stats_visualizations.py:665
 #, fuzzy
 msgid "Status time series data was not provided for this period."
 msgstr "Data ya mfululizo wa muda wa hali haikutolewa kwa kipindi hiki."
 
-#: trendsearth_ui/utils/stats_visualizations.py:776
-#: trendsearth_ui/utils/stats_visualizations.py:832
+#: trendsearth_ui/utils/stats_visualizations.py:782
+#: trendsearth_ui/utils/stats_visualizations.py:842
 #, fuzzy
 msgid "Cumulative Executions"
 msgstr "Utekelezaji wa Jumla"
 
-#: trendsearth_ui/utils/stats_visualizations.py:797
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:804
+#, fuzzy, python-brace-format
 msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
 msgstr "Jumuishi ya kazi zilizokamilishwa{suffix_label}{agg_suffix}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:854
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:865
+#, fuzzy, python-brace-format
 msgid "Completed executions (cumulative){suffix_label}"
 msgstr "Utekelezaji uliokamilika (jumla){suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:866
+#: trendsearth_ui/utils/stats_visualizations.py:880
 #, fuzzy
 msgid "No cumulative execution data available."
 msgstr "Hakuna data ya utekelezaji iliyokusanywa inayopatikana."
 
-#: trendsearth_ui/utils/stats_visualizations.py:868
+#: trendsearth_ui/utils/stats_visualizations.py:883
 #, fuzzy
 msgid ""
-"The execution statistics time series did not include finished, failed, or "
-"cancelled statuses."
+"The execution statistics time series did not include finished, failed, or"
+" cancelled statuses."
 msgstr ""
 "Mfululizo wa muda wa takwimu za utekelezaji haukujumuisha hali "
 "zilizokamilika, zilizoshindwa, au zilizoghairiwa."
 
-#: trendsearth_ui/utils/stats_visualizations.py:876
+#: trendsearth_ui/utils/stats_visualizations.py:892
 #, fuzzy
 msgid "No execution trend data available."
 msgstr "Hakuna data ya mwenendo wa utekelezaji inayopatikana."
 
-#: trendsearth_ui/utils/stats_visualizations.py:877
+#: trendsearth_ui/utils/stats_visualizations.py:893
 #, fuzzy
 msgid "Execution timestamps could not be parsed from the API response."
 msgstr ""
-"Mihuri ya muda ya utekelezaji haikuweza kuchanganuliwa kutoka kwa jibu la "
-"API."
+"Mihuri ya muda ya utekelezaji haikuweza kuchanganuliwa kutoka kwa jibu la"
+" API."
 
-#: trendsearth_ui/utils/stats_visualizations.py:928
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:945
+#, fuzzy, python-brace-format
 msgid "Execution count{suffix_label}"
 msgstr "Idadi ya utekelezaji{kiambishi_cha_utekelezaji}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:967
+#: trendsearth_ui/utils/stats_visualizations.py:985
 #, fuzzy
 msgid "Average Duration (minutes)"
 msgstr "Muda wa Wastani (dakika)"
 
-#: trendsearth_ui/utils/stats_visualizations.py:975
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:994
+#, fuzzy, python-brace-format
 msgid "Execution duration{suffix_label}"
 msgstr "Muda wa utekelezaji{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1033
+#: trendsearth_ui/utils/stats_visualizations.py:1055
 #, fuzzy
 msgid "Failure Rate (%)"
 msgstr "Kiwango cha Kushindwa (%)"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1043
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1066
+#, fuzzy, python-brace-format
 msgid "Top scripts by failure count{suffix_label}"
 msgstr "Hati za juu kwa idadi ya kushindwa{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1148
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1174
+#, fuzzy, python-brace-format
 msgid "Top users by activity{suffix_label}"
 msgstr "Watumiaji wakuu kwa shughuli{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1289
+#: trendsearth_ui/utils/stats_visualizations.py:1315
 #, fuzzy
 msgid "Script Version"
 msgstr "Toleo la Hati"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1298
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1325
+#, fuzzy, python-brace-format
 msgid "{num_versions} distinct versions, {num_executions} executions"
 msgstr "Matoleo tofauti ya {num_versions}, utekelezaji wa {num_executions}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1301
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1331
+#, fuzzy, python-brace-format
 msgid "{num_executions} executions from scripts with no parseable version"
 msgstr ""
 "Utekelezaji wa {num_executions} kutoka kwa hati bila toleo linaloweza "
 "kusomwa"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1307
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1340
+#, fuzzy, python-brace-format
 msgid "Execution script version distribution{suffix_label}"
 msgstr "Usambazaji wa toleo la hati ya utekelezaji{suffix_label}"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1596
+#: trendsearth_ui/utils/stats_visualizations.py:1583
+#, python-brace-format
+msgid "New user registrations{suffix_label}"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:1632
 #, fuzzy
 msgid "Cumulative New Users"
 msgstr "Watumiaji Wapya Waliojumlishwa"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1648
+#: trendsearth_ui/utils/stats_visualizations.py:1684
 #, fuzzy
 msgid "Number of Users"
 msgstr "Idadi ya Watumiaji"
 
-#: trendsearth_ui/utils/stats_visualizations.py:1656
-#, python-brace-format, fuzzy
+#: trendsearth_ui/utils/stats_visualizations.py:1693
+#, fuzzy, python-brace-format
 msgid "Top countries{suffix_label}"
 msgstr "Nchi bora{suffix_label}"
 
@@ -2671,11 +2768,13 @@ msgstr "Hali ya mfumo haipatikani kwa sasa. Tafadhali jaribu tena baadaye."
 #~ msgstr "Umesahau nywila"
 
 #~ msgid ""
-#~ "Enter your email address and we'll send you instructions to reset your "
+#~ "Enter your email address and we'll "
+#~ "send you instructions to reset your "
 #~ "password."
 #~ msgstr ""
-#~ "Ingiza anwani yako ya barua pepe nasi tutakutumia maelekezo ya kuweka upya "
-#~ "nenosiri lako."
+#~ "Ingiza anwani yako ya barua pepe "
+#~ "nasi tutakutumia maelekezo ya kuweka "
+#~ "upya nenosiri lako."
 
 #~ msgid "Email Address"
 #~ msgstr "Anwani ya Barua Pepe"
@@ -2814,7 +2913,8 @@ msgstr "Hali ya mfumo haipatikani kwa sasa. Tafadhali jaribu tena baadaye."
 
 #~ msgid "National/International Reporting (UNCCD, SDGs, etc.)"
 #~ msgstr ""
-#~ "Ripoti za Kitaifa/Kimataifa (UNCCD, Malengo ya Maendeleo Endelevu, n.k.)"
+#~ "Ripoti za Kitaifa/Kimataifa (UNCCD, Malengo"
+#~ " ya Maendeleo Endelevu, n.k.)"
 
 #~ msgid "Academic Research"
 #~ msgstr "Utafiti wa Kielimu"
@@ -2865,11 +2965,13 @@ msgstr "Hali ya mfumo haipatikani kwa sasa. Tafadhali jaribu tena baadaye."
 #~ msgstr "Fungua Akaunti Yako"
 
 #~ msgid ""
-#~ "After registration, you'll receive an email to verify your address and set "
-#~ "your password."
+#~ "After registration, you'll receive an "
+#~ "email to verify your address and "
+#~ "set your password."
 #~ msgstr ""
-#~ "Baada ya usajili, utapokea barua pepe ili kuthibitisha anwani yako na kuweka"
-#~ " nenosiri lako."
+#~ "Baada ya usajili, utapokea barua pepe"
+#~ " ili kuthibitisha anwani yako na "
+#~ "kuweka nenosiri lako."
 
 #~ msgid "Required field"
 #~ msgstr "Sehemu inayohitajika"
@@ -2926,48 +3028,70 @@ msgstr "Hali ya mfumo haipatikani kwa sasa. Tafadhali jaribu tena baadaye."
 #~ msgstr "Chagua (hiari)"
 
 #~ msgid ""
-#~ "We collect gender identity information to comply with donor reporting "
-#~ "requirements and to assess equitable participation in capacity development "
-#~ "and tool access. Providing this information is voluntary; your selection "
-#~ "will not affect your access to the tool."
+#~ "We collect gender identity information "
+#~ "to comply with donor reporting "
+#~ "requirements and to assess equitable "
+#~ "participation in capacity development and "
+#~ "tool access. Providing this information "
+#~ "is voluntary; your selection will not"
+#~ " affect your access to the tool."
 #~ msgstr ""
-#~ "Tunakusanya taarifa za utambulisho wa kijinsia ili kuzingatia mahitaji ya "
-#~ "kuripoti wafadhili na kutathmini ushiriki sawa katika ukuzaji wa uwezo na "
-#~ "upatikanaji wa zana. Kutoa taarifa hii ni kwa hiari; uteuzi wako hautaathiri"
-#~ " ufikiaji wako wa zana."
+#~ "Tunakusanya taarifa za utambulisho wa "
+#~ "kijinsia ili kuzingatia mahitaji ya "
+#~ "kuripoti wafadhili na kutathmini ushiriki "
+#~ "sawa katika ukuzaji wa uwezo na "
+#~ "upatikanaji wa zana. Kutoa taarifa hii"
+#~ " ni kwa hiari; uteuzi wako "
+#~ "hautaathiri ufikiaji wako wa zana."
 
 #~ msgid "Please describe"
 #~ msgstr "Tafadhali eleza"
 
 #~ msgid ""
-#~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-#~ "and, depending on your use, you may be required to have in place a "
-#~ "commercial license to use Google Earth Engine?"
+#~ "Do you acknowledge that some "
+#~ "Trends.Earth features use Google Earth "
+#~ "Engine, and, depending on your use, "
+#~ "you may be required to have in "
+#~ "place a commercial license to use "
+#~ "Google Earth Engine?"
 #~ msgstr ""
-#~ "Je, unakubali kwamba baadhi ya vipengele vya Trends.Earth hutumia Google "
-#~ "Earth Engine, na, kulingana na matumizi yako, huenda ukahitajika kuwa na "
-#~ "leseni ya kibiashara ili kutumia Google Earth Engine?"
+#~ "Je, unakubali kwamba baadhi ya vipengele"
+#~ " vya Trends.Earth hutumia Google Earth "
+#~ "Engine, na, kulingana na matumizi yako,"
+#~ " huenda ukahitajika kuwa na leseni ya"
+#~ " kibiashara ili kutumia Google Earth "
+#~ "Engine?"
 
 #~ msgid ""
-#~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-#~ "details see the "
+#~ "Google Earth Engine (GEE) imposes "
+#~ "restrictions on commercial use. For more"
+#~ " details see the "
 #~ msgstr ""
-#~ "Injini ya Google Earth (GEE) inaweka vikwazo kwa matumizi ya kibiashara. Kwa"
+#~ "Injini ya Google Earth (GEE) inaweka "
+#~ "vikwazo kwa matumizi ya kibiashara. Kwa"
 #~ " maelezo zaidi tazama "
 
 #~ msgid "Google Earth Engine Terms of Use"
 #~ msgstr "Masharti ya Matumizi ya Injini ya Google Earth"
 
 #~ msgid ""
-#~ " . Conservation International does not provide or manage commercial GEE "
-#~ "licenses. Users are solely responsible for ensuring their use of GEE "
-#~ "complies with Google's commercial licensing requirements. Access to this "
-#~ "tool does not grant or imply the provision of commercial licensing."
+#~ " . Conservation International does not"
+#~ " provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible "
+#~ "for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing"
+#~ " requirements. Access to this tool "
+#~ "does not grant or imply the "
+#~ "provision of commercial licensing."
 #~ msgstr ""
-#~ " . Conservation International haitoi au kusimamia leseni za GEE za "
-#~ "kibiashara. Watumiaji wanawajibika pekee kuhakikisha matumizi yao ya GEE "
-#~ "yanafuata mahitaji ya leseni za kibiashara za Google. Ufikiaji wa zana hii "
-#~ "hautoi au kuashiria utoaji wa leseni za kibiashara."
+#~ " . Conservation International haitoi au"
+#~ " kusimamia leseni za GEE za "
+#~ "kibiashara. Watumiaji wanawajibika pekee "
+#~ "kuhakikisha matumizi yao ya GEE "
+#~ "yanafuata mahitaji ya leseni za "
+#~ "kibiashara za Google. Ufikiaji wa zana"
+#~ " hii hautoi au kuashiria utoaji wa"
+#~ " leseni za kibiashara."
 
 #~ msgid "Yes, I acknowledge"
 #~ msgstr "Ndiyo, nakubali"
@@ -2995,3 +3119,4 @@ msgstr "Hali ya mfumo haipatikani kwa sasa. Tafadhali jaribu tena baadaye."
 
 #~ msgid "Profile"
 #~ msgstr "Wasifu"
+

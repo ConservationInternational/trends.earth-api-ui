@@ -77,7 +77,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "User",
+                    "headerName": _("User"),
                     "field": "user_name",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
@@ -169,7 +169,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "User ID",
+                    "headerName": _("User ID"),
                     "field": "user_id",
                     "width": 100,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -202,7 +202,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Logs",
+                    "headerName": _("Logs"),
                     "field": "logs",
                     "width": 100,
                     "sortable": False,
@@ -360,7 +360,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Updated",
+                    "headerName": _("Updated"),
                     "field": "updated_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -442,7 +442,7 @@ def get_mobile_column_config():
                     "sortable": True,
                 },
                 {
-                    "headerName": "Edit",
+                    "headerName": _("Edit"),
                     "field": "edit",
                     "width": 100,
                     "sortable": False,
@@ -552,7 +552,7 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
-                    "headerName": "Created",
+                    "headerName": _("Created"),
                     "field": "created_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -561,7 +561,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Updated",
+                    "headerName": _("Updated"),
                     "field": "updated_at",
                     "width": 150,
                     "filter": "agDateColumnFilter",
@@ -572,7 +572,7 @@ def get_mobile_column_config():
             ],
             "secondary_columns": [
                 {
-                    "headerName": "User",
+                    "headerName": _("User"),
                     "field": "user_name",
                     "width": 150,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -588,7 +588,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "User Email",
+                    "headerName": _("User Email"),
                     "field": "user_email",
                     "width": 200,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -604,7 +604,7 @@ def get_mobile_column_config():
                     },
                 },
                 {
-                    "headerName": "Description",
+                    "headerName": _("Description"),
                     "field": "description",
                     "width": 200,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -613,7 +613,7 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
-                    "headerName": "ID",
+                    "headerName": _("ID"),
                     "field": "id",
                     "width": 100,
                     "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "11px"},
@@ -621,7 +621,7 @@ def get_mobile_column_config():
                     "resizable": True,
                 },
                 {
-                    "headerName": "Logs",
+                    "headerName": _("Logs"),
                     "field": "logs",
                     "width": 100,
                     "sortable": False,
@@ -629,7 +629,7 @@ def get_mobile_column_config():
                     "cellStyle": {"fontSize": "11px"},
                 },
                 {
-                    "headerName": "Edit",
+                    "headerName": _("Edit"),
                     "field": "edit",
                     "width": 100,
                     "sortable": False,
@@ -641,7 +641,7 @@ def get_mobile_column_config():
         "rate_limit_events": {
             "primary_columns": [
                 {
-                    "headerName": "Occurred",
+                    "headerName": _("Occurred"),
                     "field": "occurred_at",
                     "width": 180,
                     "filter": "agDateColumnFilter",
@@ -649,13 +649,13 @@ def get_mobile_column_config():
                     "sortIndex": 0,
                 },
                 {
-                    "headerName": "Type",
+                    "headerName": _("Type"),
                     "field": "rate_limit_type",
                     "width": 120,
                     "filter": False,
                 },
                 {
-                    "headerName": "Endpoint",
+                    "headerName": _("Endpoint"),
                     "field": "endpoint",
                     "width": 220,
                     "filter": False,
@@ -663,13 +663,13 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Method",
+                    "headerName": _("Method"),
                     "field": "method",
                     "width": 90,
                     "filter": False,
                 },
                 {
-                    "headerName": "User Email",
+                    "headerName": _("User Email"),
                     "field": "user_email",
                     "width": 220,
                     "filter": False,
@@ -677,19 +677,19 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Role",
+                    "headerName": _("Role"),
                     "field": "user_role",
                     "width": 120,
                     "filter": False,
                 },
                 {
-                    "headerName": "IP Address",
+                    "headerName": _("IP Address"),
                     "field": "ip_address",
                     "width": 150,
                     "filter": False,
                 },
                 {
-                    "headerName": "Limit",
+                    "headerName": _("Limit"),
                     "field": "limit_definition",
                     "width": 200,
                     "filter": False,
@@ -697,19 +697,19 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Count",
+                    "headerName": _("Count"),
                     "field": "limit_count_display",
                     "width": 110,
                     "filter": False,
                 },
                 {
-                    "headerName": "Window",
+                    "headerName": _("Window"),
                     "field": "time_window_display",
                     "width": 110,
                     "filter": False,
                 },
                 {
-                    "headerName": "Retry After",
+                    "headerName": _("Retry After"),
                     "field": "retry_after_display",
                     "width": 130,
                     "filter": False,
@@ -717,7 +717,7 @@ def get_mobile_column_config():
             ],
             "secondary_columns": [
                 {
-                    "headerName": "User ID",
+                    "headerName": _("User ID"),
                     "field": "user_id",
                     "width": 160,
                     "filter": False,
@@ -725,7 +725,7 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Limiter Key",
+                    "headerName": _("Limiter Key"),
                     "field": "limit_key",
                     "width": 220,
                     "filter": False,
@@ -733,7 +733,7 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "User Agent",
+                    "headerName": _("User Agent"),
                     "field": "user_agent",
                     "width": 260,
                     "filter": False,
@@ -741,7 +741,7 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Event ID",
+                    "headerName": _("Event ID"),
                     "field": "id",
                     "width": 260,
                     "filter": False,
@@ -759,7 +759,7 @@ def get_mobile_column_config():
         "rate_limit_breaches": {
             "primary_columns": [
                 {
-                    "headerName": "Status",
+                    "headerName": _("Status"),
                     "field": "status_display",
                     "width": 120,
                     "sortable": True,
@@ -770,7 +770,7 @@ def get_mobile_column_config():
                     "pinned": "left",
                 },
                 {
-                    "headerName": "Occurred",
+                    "headerName": _("Occurred"),
                     "field": "occurred_at",
                     "width": 180,
                     "sortable": True,
@@ -779,14 +779,14 @@ def get_mobile_column_config():
                     "sortIndex": 0,
                 },
                 {
-                    "headerName": "Expires",
+                    "headerName": _("Expires"),
                     "field": "expires_at_display",
                     "width": 160,
                     "sortable": True,
                     "filter": False,
                 },
                 {
-                    "headerName": "Identifier",
+                    "headerName": _("Identifier"),
                     "field": "identifier_display",
                     "width": 220,
                     "sortable": True,
@@ -795,7 +795,7 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Email",
+                    "headerName": _("Email"),
                     "field": "user_email",
                     "width": 220,
                     "sortable": True,
@@ -804,14 +804,14 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Role",
+                    "headerName": _("Role"),
                     "field": "user_role",
                     "width": 120,
                     "sortable": True,
                     "filter": "agTextColumnFilter",
                 },
                 {
-                    "headerName": "Endpoint",
+                    "headerName": _("Endpoint"),
                     "field": "endpoint",
                     "width": 220,
                     "sortable": True,
@@ -820,14 +820,14 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Method",
+                    "headerName": _("Method"),
                     "field": "method",
                     "width": 90,
                     "sortable": True,
                     "filter": "agTextColumnFilter",
                 },
                 {
-                    "headerName": "Limit",
+                    "headerName": _("Limit"),
                     "field": "limit_definition",
                     "width": 200,
                     "filter": False,
@@ -835,19 +835,19 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Usage",
+                    "headerName": _("Usage"),
                     "field": "limit_count_display",
                     "width": 140,
                     "filter": False,
                 },
                 {
-                    "headerName": "Window",
+                    "headerName": _("Window"),
                     "field": "time_window_display",
                     "width": 110,
                     "filter": False,
                 },
                 {
-                    "headerName": "Retry After",
+                    "headerName": _("Retry After"),
                     "field": "retry_after_display",
                     "width": 130,
                     "filter": False,
@@ -855,7 +855,7 @@ def get_mobile_column_config():
             ],
             "secondary_columns": [
                 {
-                    "headerName": "IP Address",
+                    "headerName": _("IP Address"),
                     "field": "ip_address",
                     "width": 160,
                     "filter": False,
@@ -863,7 +863,7 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Limiter Key",
+                    "headerName": _("Limiter Key"),
                     "field": "limit_key",
                     "width": 220,
                     "filter": False,
@@ -871,13 +871,13 @@ def get_mobile_column_config():
                     "cellStyle": TRUNCATED_CELL_STYLE,
                 },
                 {
-                    "headerName": "Rate Limit Type",
+                    "headerName": _("Rate Limit Type"),
                     "field": "rate_limit_type",
                     "width": 150,
                     "filter": False,
                 },
                 {
-                    "headerName": "Event ID",
+                    "headerName": _("Event ID"),
                     "field": "id",
                     "width": 220,
                     "filter": False,

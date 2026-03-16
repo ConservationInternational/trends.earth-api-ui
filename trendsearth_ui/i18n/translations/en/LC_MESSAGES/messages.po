@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 10:30-0400\n"
+"POT-Creation-Date: 2026-03-16 14:40-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -1055,6 +1055,7 @@ msgstr ""
 #: trendsearth_ui/components/tabs.py:474
 #: trendsearth_ui/utils/mobile_utils.py:96
 #: trendsearth_ui/utils/mobile_utils.py:245
+#: trendsearth_ui/utils/mobile_utils.py:798
 msgid "Email"
 msgstr ""
 
@@ -1249,7 +1250,7 @@ msgstr ""
 #: trendsearth_ui/components/layout.py:1502
 #: trendsearth_ui/components/tabs.py:2400
 #: trendsearth_ui/utils/mobile_utils.py:294
-#: trendsearth_ui/utils/stats_visualizations.py:1647
+#: trendsearth_ui/utils/stats_visualizations.py:1683
 msgid "Country"
 msgstr ""
 
@@ -1350,6 +1351,7 @@ msgstr ""
 #: trendsearth_ui/components/layout.py:1807
 #: trendsearth_ui/utils/mobile_utils.py:140
 #: trendsearth_ui/utils/mobile_utils.py:499
+#: trendsearth_ui/utils/mobile_utils.py:762
 msgid "Status"
 msgstr ""
 
@@ -1438,6 +1440,8 @@ msgstr ""
 
 #: trendsearth_ui/components/tabs.py:504
 #: trendsearth_ui/utils/mobile_utils.py:310
+#: trendsearth_ui/utils/mobile_utils.py:680
+#: trendsearth_ui/utils/mobile_utils.py:807
 msgid "Role"
 msgstr ""
 
@@ -1574,6 +1578,10 @@ msgstr ""
 msgid "All Time"
 msgstr ""
 
+#: trendsearth_ui/components/tabs.py:1524
+msgid "Countries with new user registrations"
+msgstr ""
+
 #: trendsearth_ui/components/tabs.py:1565
 msgid ""
 "Access denied. Administrator privileges required to access admin "
@@ -1621,6 +1629,8 @@ msgid "Manage News Items"
 msgstr ""
 
 #: trendsearth_ui/components/tabs.py:1800
+#: trendsearth_ui/utils/mobile_utils.py:445
+#: trendsearth_ui/utils/mobile_utils.py:632
 msgid "Edit"
 msgstr ""
 
@@ -1848,6 +1858,8 @@ msgid "Role *"
 msgstr ""
 
 #: trendsearth_ui/components/tabs.py:2424
+#: trendsearth_ui/utils/mobile_utils.py:80
+#: trendsearth_ui/utils/mobile_utils.py:575
 msgid "User"
 msgstr ""
 
@@ -1871,23 +1883,23 @@ msgstr ""
 msgid "Upload a .tar.gz archive containing your script and a "
 msgstr ""
 
-#: trendsearth_ui/components/tabs.py:2512
+#: trendsearth_ui/components/tabs.py:2513
 msgid " file. The script name and metadata are read from the configuration file."
 msgstr ""
 
-#: trendsearth_ui/components/tabs.py:2523
+#: trendsearth_ui/components/tabs.py:2525
 msgid "Script Archive (.tar.gz) *"
 msgstr ""
 
-#: trendsearth_ui/components/tabs.py:2531
+#: trendsearth_ui/components/tabs.py:2533
 msgid "Drag and Drop or "
 msgstr ""
 
-#: trendsearth_ui/components/tabs.py:2532
+#: trendsearth_ui/components/tabs.py:2534
 msgid "Select Script Archive"
 msgstr ""
 
-#: trendsearth_ui/components/tabs.py:2567
+#: trendsearth_ui/components/tabs.py:2569
 msgid "Upload Script"
 msgstr ""
 
@@ -1909,7 +1921,13 @@ msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:157
 #: trendsearth_ui/utils/mobile_utils.py:372
+#: trendsearth_ui/utils/mobile_utils.py:616
 msgid "ID"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:172
+#: trendsearth_ui/utils/mobile_utils.py:720
+msgid "User ID"
 msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:187
@@ -1918,6 +1936,11 @@ msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:196
 msgid "Results"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:205
+#: trendsearth_ui/utils/mobile_utils.py:624
+msgid "Logs"
 msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:214
@@ -1945,7 +1968,13 @@ msgid "Verified At"
 msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:354
+#: trendsearth_ui/utils/mobile_utils.py:555
 msgid "Created"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:363
+#: trendsearth_ui/utils/mobile_utils.py:564
+msgid "Updated"
 msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:436
@@ -1972,127 +2001,214 @@ msgstr ""
 msgid "Compute"
 msgstr ""
 
+#: trendsearth_ui/utils/mobile_utils.py:591
+#: trendsearth_ui/utils/mobile_utils.py:672
+msgid "User Email"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:607
+msgid "Description"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:644
+#: trendsearth_ui/utils/mobile_utils.py:773
+msgid "Occurred"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:652
+msgid "Type"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:658
+#: trendsearth_ui/utils/mobile_utils.py:814
+msgid "Endpoint"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:666
+#: trendsearth_ui/utils/mobile_utils.py:823
+msgid "Method"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:686
+#: trendsearth_ui/utils/mobile_utils.py:858
+msgid "IP Address"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:692
+#: trendsearth_ui/utils/mobile_utils.py:830
+msgid "Limit"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:700
+msgid "Count"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:706
+#: trendsearth_ui/utils/mobile_utils.py:844
+msgid "Window"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:712
+#: trendsearth_ui/utils/mobile_utils.py:850
+msgid "Retry After"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:728
+#: trendsearth_ui/utils/mobile_utils.py:866
+msgid "Limiter Key"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:736
+msgid "User Agent"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:744
+#: trendsearth_ui/utils/mobile_utils.py:880
+msgid "Event ID"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:782
+msgid "Expires"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:789
+msgid "Identifier"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:838
+msgid "Usage"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:874
+msgid "Rate Limit Type"
+msgstr ""
+
 #: trendsearth_ui/utils/stats_visualizations.py:608
-#: trendsearth_ui/utils/stats_visualizations.py:920
-#: trendsearth_ui/utils/stats_visualizations.py:1140
-#: trendsearth_ui/utils/stats_visualizations.py:1290
+#: trendsearth_ui/utils/stats_visualizations.py:936
+#: trendsearth_ui/utils/stats_visualizations.py:1166
+#: trendsearth_ui/utils/stats_visualizations.py:1316
 msgid "Number of Executions"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:630
+#: trendsearth_ui/utils/stats_visualizations.py:631
 #, python-brace-format
 msgid "Running executions{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:642
-#: trendsearth_ui/utils/stats_visualizations.py:651
-#: trendsearth_ui/utils/stats_visualizations.py:658
+#: trendsearth_ui/utils/stats_visualizations.py:646
+#: trendsearth_ui/utils/stats_visualizations.py:657
+#: trendsearth_ui/utils/stats_visualizations.py:664
 msgid "No in-progress execution data available."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:644
+#: trendsearth_ui/utils/stats_visualizations.py:649
 msgid ""
 "Status time series data did not include ready, pending, or running counts"
 " for this period."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:652
+#: trendsearth_ui/utils/stats_visualizations.py:658
 msgid "Status timestamps could not be parsed from the API response."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:659
+#: trendsearth_ui/utils/stats_visualizations.py:665
 msgid "Status time series data was not provided for this period."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:776
-#: trendsearth_ui/utils/stats_visualizations.py:832
+#: trendsearth_ui/utils/stats_visualizations.py:782
+#: trendsearth_ui/utils/stats_visualizations.py:842
 msgid "Cumulative Executions"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:797
+#: trendsearth_ui/utils/stats_visualizations.py:804
 #, python-brace-format
 msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:854
+#: trendsearth_ui/utils/stats_visualizations.py:865
 #, python-brace-format
 msgid "Completed executions (cumulative){suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:866
+#: trendsearth_ui/utils/stats_visualizations.py:880
 msgid "No cumulative execution data available."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:868
+#: trendsearth_ui/utils/stats_visualizations.py:883
 msgid ""
 "The execution statistics time series did not include finished, failed, or"
 " cancelled statuses."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:876
+#: trendsearth_ui/utils/stats_visualizations.py:892
 msgid "No execution trend data available."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:877
+#: trendsearth_ui/utils/stats_visualizations.py:893
 msgid "Execution timestamps could not be parsed from the API response."
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:928
+#: trendsearth_ui/utils/stats_visualizations.py:945
 #, python-brace-format
 msgid "Execution count{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:967
+#: trendsearth_ui/utils/stats_visualizations.py:985
 msgid "Average Duration (minutes)"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:975
+#: trendsearth_ui/utils/stats_visualizations.py:994
 #, python-brace-format
 msgid "Execution duration{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1033
+#: trendsearth_ui/utils/stats_visualizations.py:1055
 msgid "Failure Rate (%)"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1043
+#: trendsearth_ui/utils/stats_visualizations.py:1066
 #, python-brace-format
 msgid "Top scripts by failure count{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1148
+#: trendsearth_ui/utils/stats_visualizations.py:1174
 #, python-brace-format
 msgid "Top users by activity{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1289
+#: trendsearth_ui/utils/stats_visualizations.py:1315
 msgid "Script Version"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1298
+#: trendsearth_ui/utils/stats_visualizations.py:1325
 #, python-brace-format
 msgid "{num_versions} distinct versions, {num_executions} executions"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1301
+#: trendsearth_ui/utils/stats_visualizations.py:1331
 #, python-brace-format
 msgid "{num_executions} executions from scripts with no parseable version"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1307
+#: trendsearth_ui/utils/stats_visualizations.py:1340
 #, python-brace-format
 msgid "Execution script version distribution{suffix_label}"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1596
+#: trendsearth_ui/utils/stats_visualizations.py:1583
+#, python-brace-format
+msgid "New user registrations{suffix_label}"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:1632
 msgid "Cumulative New Users"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1648
+#: trendsearth_ui/utils/stats_visualizations.py:1684
 msgid "Number of Users"
 msgstr ""
 
-#: trendsearth_ui/utils/stats_visualizations.py:1656
+#: trendsearth_ui/utils/stats_visualizations.py:1693
 #, python-brace-format
 msgid "Top countries{suffix_label}"
 msgstr ""
