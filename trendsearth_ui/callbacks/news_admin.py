@@ -6,6 +6,7 @@ from dash import ALL, Input, Output, State, dcc, html, no_update
 import dash_bootstrap_components as dbc
 
 from trendsearth_ui.config import get_api_base
+from trendsearth_ui.i18n import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def create_news_table(news_items):
     """Create a table displaying news items."""
     if not news_items:
         return html.Div(
-            "No news items found.",
+            _("No news items found."),
             className="text-muted text-center py-4",
         )
 
@@ -136,7 +137,7 @@ def register_callbacks(app):
         """Load news items for admin management."""
         # Must have a token to load news
         if not token:
-            return "Please log in to manage news.", "", "warning", True
+            return _("Please log in to manage news."), "", "warning", True
 
         try:
             # Fetch all news including inactive
@@ -148,24 +149,24 @@ def register_callbacks(app):
                 return create_news_table(news_items), no_update, no_update, no_update
             elif response.status_code == 401:
                 return (
-                    "Session expired. Please log in again.",
-                    "Session expired. Please log in again.",
+                    _("Session expired. Please log in again."),
+                    _("Session expired. Please log in again."),
                     "warning",
                     True,
                 )
             elif response.status_code == 403:
                 return (
-                    "Access denied. Admin privileges required.",
-                    "Access denied. Admin privileges required.",
+                    _("Access denied. Admin privileges required."),
+                    _("Access denied. Admin privileges required."),
                     "danger",
                     True,
                 )
             else:
-                error_msg = f"Failed to load news: {response.status_code}"
+                error_msg = _("Failed to load news: {status}").format(status=response.status_code)
                 return error_msg, error_msg, "danger", True
 
         except Exception as e:
-            error_msg = f"Error loading news: {str(e)}"
+            error_msg = _("Error loading news: {error}").format(error=str(e))
             return error_msg, error_msg, "danger", True
 
     @app.callback(
@@ -247,7 +248,7 @@ def register_callbacks(app):
         if triggered_id == "admin-create-news-btn":
             return (
                 True,  # is_open
-                "Create News Item",  # title
+                _("Create News Item"),  # title
                 "",  # title
                 "",  # message
                 "",  # link_url
@@ -271,7 +272,7 @@ def register_callbacks(app):
                     item = response.json()
                     return (
                         True,  # is_open
-                        "Edit News Item",  # title
+                        _("Edit News Item"),  # title
                         item.get("title", ""),
                         item.get("message", ""),
                         item.get("link_url", "") or "",
@@ -299,7 +300,7 @@ def register_callbacks(app):
     def update_markdown_preview(message):
         """Update the Markdown preview."""
         if not message:
-            return html.Div("Preview will appear here...", className="text-muted")
+            return html.Div(_("Preview will appear here..."), className="text-muted")
 
         try:
             # Use dcc.Markdown for rendering - it has built-in markdown support
@@ -358,7 +359,7 @@ def register_callbacks(app):
         """Save a news item (create or update)."""
         if not token:
             return (
-                "Please log in first.",
+                _("Please log in first."),
                 "warning",
                 True,
                 no_update,
@@ -369,7 +370,7 @@ def register_callbacks(app):
         # Validate required fields
         if not title or not title.strip():
             return (
-                "Title is required.",
+                _("Title is required."),
                 "danger",
                 True,
                 no_update,
@@ -379,7 +380,7 @@ def register_callbacks(app):
 
         if not message or not message.strip():
             return (
-                "Message is required.",
+                _("Message is required."),
                 "danger",
                 True,
                 no_update,
@@ -389,7 +390,7 @@ def register_callbacks(app):
 
         if not platforms:
             return (
-                "At least one target platform is required.",
+                _("At least one target platform is required."),
                 "danger",
                 True,
                 no_update,
@@ -423,7 +424,7 @@ def register_callbacks(app):
             data["end_date"] = end_date
 
         try:
-            is_edit = modal_title == "Edit News Item"
+            is_edit = modal_title == _("Edit News Item")
             if is_edit and selected_id:
                 response = make_api_request(
                     "PUT", f"/admin/news/{selected_id}", token, json_data=data
@@ -432,18 +433,18 @@ def register_callbacks(app):
                 response = make_api_request("POST", "/admin/news", token, json_data=data)
 
             if response.status_code in (200, 201):
-                action = "updated" if is_edit else "created"
+                action = _("updated") if is_edit else _("created")
                 return (
                     no_update,
                     no_update,
                     False,
-                    f"News item {action} successfully!",
+                    _("News item {action} successfully!").format(action=action),
                     "success",
                     True,
                 )
             elif response.status_code == 401:
                 return (
-                    "Session expired. Please log in again.",
+                    _("Session expired. Please log in again."),
                     "warning",
                     True,
                     no_update,
@@ -452,7 +453,7 @@ def register_callbacks(app):
                 )
             elif response.status_code == 403:
                 return (
-                    "Access denied. Admin privileges required.",
+                    _("Access denied. Admin privileges required."),
                     "danger",
                     True,
                     no_update,
@@ -461,7 +462,9 @@ def register_callbacks(app):
                 )
             else:
                 error_data = response.json() if response.content else {}
-                error_msg = error_data.get("message", f"Error: {response.status_code}")
+                error_msg = error_data.get(
+                    "message", _("Error: {status}").format(status=response.status_code)
+                )
                 return (
                     error_msg,
                     "danger",
@@ -473,7 +476,7 @@ def register_callbacks(app):
 
         except Exception as e:
             return (
-                f"Error saving news item: {str(e)}",
+                _("Error saving news item: {error}").format(error=str(e)),
                 "danger",
                 True,
                 no_update,
@@ -508,24 +511,26 @@ def register_callbacks(app):
     def delete_news_item(_n_clicks, selected_id, token):
         """Delete a news item."""
         if not token:
-            return "Please log in first.", "warning", True
+            return _("Please log in first."), "warning", True
 
         if not selected_id:
-            return "No news item selected.", "warning", True
+            return _("No news item selected."), "warning", True
 
         try:
             response = make_api_request("DELETE", f"/admin/news/{selected_id}", token)
 
             if response.status_code in (200, 204):
-                return "News item deleted successfully!", "success", True
+                return _("News item deleted successfully!"), "success", True
             elif response.status_code == 401:
-                return "Session expired. Please log in again.", "warning", True
+                return _("Session expired. Please log in again."), "warning", True
             elif response.status_code == 403:
-                return "Access denied. Admin privileges required.", "danger", True
+                return _("Access denied. Admin privileges required."), "danger", True
             else:
                 error_data = response.json() if response.content else {}
-                error_msg = error_data.get("message", f"Error: {response.status_code}")
+                error_msg = error_data.get(
+                    "message", _("Error: {status}").format(status=response.status_code)
+                )
                 return error_msg, "danger", True
 
         except Exception as e:
-            return f"Error deleting news item: {str(e)}", "danger", True
+            return _("Error deleting news item: {error}").format(error=str(e)), "danger", True

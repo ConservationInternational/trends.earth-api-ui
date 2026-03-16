@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 07:42-0400\n"
+"POT-Creation-Date: 2026-03-16 09:09-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,6 +17,1495 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: trendsearth_ui/callbacks/admin.py:644
+msgid "Please fill in all required fields (Name, Email, Password)."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:658
+msgid "Passwords do not match."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:688
+#, python-brace-format
+msgid "Password must contain {errors}."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:718
+#, python-brace-format
+msgid "User '{name}' created successfully with email '{email}'."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:733
+msgid "A user with this email already exists."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:745
+msgid "Invalid user data."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:747
+#, python-brace-format
+msgid "Error creating user: {detail}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:760
+#, python-brace-format
+msgid "Failed to create user. Server responded with status {status}."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:776 trendsearth_ui/callbacks/auth.py:1257
+#: trendsearth_ui/callbacks/auth.py:1542 trendsearth_ui/callbacks/auth.py:1899
+msgid "Request timed out. Please try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:789 trendsearth_ui/callbacks/admin.py:1028
+msgid "Cannot connect to server. Please check your connection."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:802 trendsearth_ui/callbacks/admin.py:1036
+#, python-brace-format
+msgid "Unexpected error: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:848
+#, python-brace-format
+msgid ""
+"Invalid file type: {filename}. Must be a .tar.gz archive containing "
+"configuration.json."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:863
+#, python-brace-format
+msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:872
+#, python-brace-format
+msgid "Archive ready: {filename} ({size}MB)"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:924
+msgid "Access denied. Administrator privileges required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:939
+msgid "Please select a .tar.gz script archive to upload."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:950
+msgid ""
+"Invalid file type. The API requires a .tar.gz archive containing a "
+"configuration.json file."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:980
+#, python-brace-format
+msgid "Script '{name}' uploaded successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:989 trendsearth_ui/callbacks/admin.py:991
+msgid "Invalid script archive."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:993
+#, python-brace-format
+msgid "Error uploading script: {detail}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1001
+msgid "Permission denied. Only admins and superadmins can create scripts."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1009
+#, python-brace-format
+msgid "Failed to upload script. Server responded with status {status}."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1020
+msgid "Upload timed out. Please try again with a smaller file."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1195
+msgid "Rate limits have been successfully reset for all users and endpoints."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1205
+#, python-brace-format
+msgid "Failed to reset rate limits. Status: {status}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1229
+#, python-brace-format
+msgid "Error resetting rate limits: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1435
+msgid "Error: No rate limit selected."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1476
+#, python-brace-format
+msgid "Rate limit for {identifier} has been successfully reset."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1493
+#, python-brace-format
+msgid "Rate limit for {identifier} not found. It may have already expired."
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1505
+#, python-brace-format
+msgid "Failed to reset rate limit. Status: {status}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/admin.py:1533
+#, python-brace-format
+msgid "Error resetting rate limit: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:337
+msgid "Please enter both email and password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:372
+msgid "Login failed: Invalid response format."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:418
+msgid "Login successful!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:440
+msgid "Failed to retrieve user information."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:448
+msgid "Invalid credentials."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:456
+msgid "Your account is locked due to too many failed login attempts. "
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:458
+msgid "Please use the 'Forgot Password' link below to reset your password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:461
+msgid "Your account is temporarily locked. "
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:462
+#, python-brace-format
+msgid "Please try again in {minutes} minute(s)."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:482
+msgid "Login failed: Connection timeout. Please try again later."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:494
+msgid ""
+"Login failed: Cannot connect to authentication server. Please check the "
+"server status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:506
+#, python-brace-format
+msgid "Login failed: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:725 trendsearth_ui/callbacks/auth.py:1415
+msgid "Please enter your email address."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:738 trendsearth_ui/callbacks/auth.py:1451
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:773
+#, python-brace-format
+msgid ""
+"If an account exists with {email}, password recovery instructions have "
+"been sent. Please check your email."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:783
+msgid "Failed to send password recovery email."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:792
+#, python-brace-format
+msgid "{}. Please try again later."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:806
+msgid "Request timed out. Please try again later."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:817
+msgid ""
+"Cannot connect to the server. Please check your internet connection and "
+"try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:828
+#, python-brace-format
+msgid "An error occurred: {error}. Please try again later."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1157
+msgid "Invalid or missing reset token. Please request a new password reset."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1166
+msgid "Please enter and confirm your new password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1175
+msgid "Passwords do not match. Please try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1184
+#: trendsearth_ui/callbacks/profile.py:123
+msgid "Password must be at least 12 characters long."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1205
+msgid "Password reset successful! You can now log in with your new password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1214
+msgid ""
+"This reset link is invalid or has expired. Please request a new password "
+"reset."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1222
+msgid "Password does not meet requirements."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1237
+msgid "Failed to reset password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1245 trendsearth_ui/callbacks/auth.py:1537
+#, python-brace-format
+msgid "{}. Please try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1266 trendsearth_ui/callbacks/auth.py:1546
+#: trendsearth_ui/callbacks/auth.py:1903
+msgid "Cannot connect to the server. Please check your connection."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1275 trendsearth_ui/callbacks/auth.py:1552
+#: trendsearth_ui/callbacks/auth.py:1909
+#, python-brace-format
+msgid "An error occurred: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1418 trendsearth_ui/callbacks/auth.py:1799
+msgid "Please enter your name."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1421 trendsearth_ui/callbacks/auth.py:1802
+msgid "Please enter your organization."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1424 trendsearth_ui/callbacks/auth.py:1805
+msgid "Please select your sector."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1427 trendsearth_ui/callbacks/auth.py:1808
+msgid "Please specify your sector."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1430 trendsearth_ui/callbacks/auth.py:1811
+msgid "Please select your purpose of use."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1433 trendsearth_ui/callbacks/auth.py:1814
+msgid "Please specify your purpose of use."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1436 trendsearth_ui/callbacks/auth.py:1817
+msgid "Please select your country."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1439 trendsearth_ui/callbacks/auth.py:1820
+msgid "Please describe your gender identity."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1443
+msgid "Please acknowledge the Google Earth Engine license terms."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1497
+msgid ""
+"Account created successfully! Please check your email to verify your "
+"account, then you can log in."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1503 trendsearth_ui/callbacks/auth.py:1529
+msgid "Registration failed."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1512
+msgid "Validation failed."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1523
+msgid "Too many registration attempts. Please try again later."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1701
+msgid "Invalid or expired token. Please request a new profile update link."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1743
+#, python-brace-format
+msgid "Error loading profile: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1792
+msgid "No authentication token. Please use a valid profile update link."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1876 trendsearth_ui/callbacks/profile.py:61
+msgid "Profile updated successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1878
+msgid "Session expired. Please request a new profile update link."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1880
+msgid "Invalid token. Please request a new profile update link."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1889 trendsearth_ui/callbacks/profile.py:63
+msgid "Failed to update profile."
+msgstr ""
+
+#: trendsearth_ui/callbacks/edit.py:550 trendsearth_ui/callbacks/profile.py:192
+msgid "Password changed successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/edit.py:553 trendsearth_ui/callbacks/profile.py:195
+msgid "Failed to change password."
+msgstr ""
+
+#: trendsearth_ui/callbacks/edit.py:562
+#, python-brace-format
+msgid " (Status: {status})"
+msgstr ""
+
+#: trendsearth_ui/callbacks/edit.py:567
+#: trendsearth_ui/callbacks/gee_credentials.py:185
+#: trendsearth_ui/callbacks/gee_credentials.py:348
+#: trendsearth_ui/callbacks/profile.py:72
+#: trendsearth_ui/callbacks/profile.py:210
+#: trendsearth_ui/callbacks/profile.py:277
+#: trendsearth_ui/callbacks/profile.py:448
+#, python-brace-format
+msgid "Network error: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:564
+msgid "Execution Cancelled Successfully"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:568
+#: trendsearth_ui/callbacks/executions.py:713
+msgid "Execution ID: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:569
+#: trendsearth_ui/callbacks/executions.py:576
+#: trendsearth_ui/callbacks/executions.py:584
+#: trendsearth_ui/callbacks/executions.py:593
+#: trendsearth_ui/callbacks/executions.py:661
+#: trendsearth_ui/callbacks/executions.py:664
+#: trendsearth_ui/callbacks/gee_credentials.py:42
+msgid "Unknown"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:575
+msgid "Script: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:582
+msgid "Previous Status: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:591
+msgid "New Status: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:608
+msgid "Infrastructure Cleanup"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:614
+msgid "Docker service stopped"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:616
+msgid "Docker service not found/stopped"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:625
+msgid "Docker container stopped"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:627
+msgid "Docker container not found/stopped"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:639
+#: trendsearth_ui/callbacks/executions.py:679
+msgid "Google Earth Engine Tasks"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:643
+#, python-brace-format
+msgid "Found and processed {count} GEE tasks:"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:663
+#, python-brace-format
+msgid "Status: {status}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:681
+msgid "No GEE tasks found in execution logs."
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:694
+msgid "Errors Encountered"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:704
+msgid "Cancellation Failed"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:707
+msgid "Error: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:26
+msgid "Please log in to view credentials status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:53
+msgid "OAuth"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:53
+msgid "Service Account"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:59
+#, python-brace-format
+msgid "Credentials configured using {type_label}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:61
+#, python-brace-format
+msgid "Set up on: {created_date}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:74
+msgid "No Google Earth Engine credentials configured."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:77
+msgid "Choose one of the setup options below."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:84
+msgid "Unable to retrieve credentials status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:91
+msgid "Error retrieving credentials status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:156
+msgid "OAuth window opened. Please complete the authorization and return here."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:159
+msgid ""
+"After authorization, you may need to refresh this page to see the updated"
+" status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:170
+msgid "OAuth initiation failed - no authorization URL received."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:175
+msgid "Failed to initiate OAuth flow."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:215
+msgid "Invalid JSON file. Please upload a valid service account key file."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:223
+msgid "Invalid service account key. Missing required fields."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:227
+msgid "Invalid service account key. Type field must be 'service_account'."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:247
+#, python-brace-format
+msgid "Service account key '{filename}' uploaded successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:253
+msgid "Failed to upload service account key."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:263
+#, python-brace-format
+msgid "Error processing file: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:305
+msgid "Google Earth Engine credentials are valid and working!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:311
+msgid "Credentials test failed."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:332
+msgid "Google Earth Engine credentials deleted successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:338
+msgid "Failed to delete credentials."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:40
+msgid "No news items found."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:140
+msgid "Please log in to manage news."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:152
+#: trendsearth_ui/callbacks/news_admin.py:153
+#: trendsearth_ui/callbacks/news_admin.py:447
+#: trendsearth_ui/callbacks/news_admin.py:523
+msgid "Session expired. Please log in again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:159
+#: trendsearth_ui/callbacks/news_admin.py:160
+#: trendsearth_ui/callbacks/news_admin.py:456
+#: trendsearth_ui/callbacks/news_admin.py:525
+msgid "Access denied. Admin privileges required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:165
+#, python-brace-format
+msgid "Failed to load news: {status}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:169
+#, python-brace-format
+msgid "Error loading news: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:251
+msgid "Create News Item"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:275
+#: trendsearth_ui/callbacks/news_admin.py:427
+msgid "Edit News Item"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:303
+msgid "Preview will appear here..."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:362
+#: trendsearth_ui/callbacks/news_admin.py:512
+msgid "Please log in first."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:373
+msgid "Title is required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:383
+msgid "Message is required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:393
+msgid "At least one target platform is required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:436
+msgid "updated"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:436
+msgid "created"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:441
+#, python-brace-format
+msgid "News item {action} successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:465
+#: trendsearth_ui/callbacks/news_admin.py:528
+#, python-brace-format
+msgid "Error: {status}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:477
+#, python-brace-format
+msgid "Error saving news item: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:515
+msgid "No news item selected."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:521
+msgid "News item deleted successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:532
+#, python-brace-format
+msgid "Error deleting news item: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:38
+msgid "Name is required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:45
+msgid "User ID not found in user data."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:102
+msgid "All password fields are required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:111
+msgid "New passwords do not match."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:133
+msgid "Password must include an uppercase letter."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:143
+msgid "Password must include a lowercase letter."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:153
+msgid "Password must include a number."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:164
+#, python-brace-format
+msgid "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:259
+msgid "enabled"
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:259
+msgid "disabled"
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:261
+#, python-brace-format
+msgid "Email notifications {status} successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:267
+msgid "Failed to update email notification settings."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:363
+msgid "Email confirmation does not match. Please try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:390
+msgid "Your account has been deleted."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:403
+msgid "Admin accounts cannot be deleted through self-service. "
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:404
+msgid "Please contact a system administrator."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:420
+#: trendsearth_ui/callbacks/profile.py:430
+msgid "Failed to delete account."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:429
+#: trendsearth_ui/callbacks/profile.py:431
+msgid "Please try again."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:50
+msgid "Government - Environment/Natural Resources"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:51
+msgid "Government - Agriculture"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:52
+msgid "Government - Land Management/Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:53
+msgid "Government - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:54
+msgid "International/Multilateral Organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:55
+msgid "NGO - Development/Aid"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:56
+msgid "NGO - Community-Based"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:57
+msgid "NGO - Conservation"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:58
+msgid "NGO - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:59
+msgid "Academic/Research Institution"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:60
+msgid "Consulting/Professional Services"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:61
+msgid "Private Sector - Agriculture/Forestry"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:62
+msgid "Private Sector - Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:63
+msgid "Independent Researcher"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:64
+msgid "Student"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:65
+#: trendsearth_ui/components/layout.py:88
+msgid "Other"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:77
+msgid "National/International Reporting (UNCCD, SDGs, etc.)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:78
+msgid "Academic Research"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:79
+msgid "Policy Development & Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:80
+msgid "Land Restoration/Management Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:81
+msgid "Project Monitoring & Evaluation"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:82
+msgid "Environmental Impact Assessment"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:83
+msgid "Agriculture/Forestry Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:84
+msgid "Teaching & Education"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:85
+msgid "Conservation Planning"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:86
+msgid "Commercial Services/Products"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:87
+msgid "Community/Grassroots Initiatives"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:100
+msgid "Woman"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:101
+msgid "Man"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:102
+msgid "Non-binary"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:103
+msgid "Prefer to self-describe"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:104
+msgid "Prefer not to say"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:187
+msgid "Forgot Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:197
+msgid ""
+"Enter your email address and we'll send you instructions to reset your "
+"password."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:200
+msgid "Email Address"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:204
+#: trendsearth_ui/components/layout.py:758
+msgid "Enter your email address"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:226
+#: trendsearth_ui/components/tabs.py:255
+msgid "Cancel"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:232
+msgid "Send Reset Instructions"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:244
+msgid "OK"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:279
+#: trendsearth_ui/components/layout.py:351
+msgid "Login"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:299
+#: trendsearth_ui/components/layout.py:744
+#: trendsearth_ui/components/layout.py:1296
+#: trendsearth_ui/components/tabs.py:474
+#: trendsearth_ui/utils/mobile_utils.py:96
+#: trendsearth_ui/utils/mobile_utils.py:245
+msgid "Email"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:304
+msgid "Enter email"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:313
+msgid "Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:318
+msgid "Enter password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:341
+msgid "Remember me (keep me logged in)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:359
+msgid "Register"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:370
+msgid "Forgot your password?"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:401
+#: trendsearth_ui/components/layout.py:630
+#: trendsearth_ui/components/layout.py:1154
+#: trendsearth_ui/components/layout.py:1610
+msgid "Privacy Policy"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:416
+#: trendsearth_ui/components/layout.py:645
+#: trendsearth_ui/components/layout.py:1169
+#: trendsearth_ui/components/layout.py:1625
+msgid "Terms of Use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:486
+msgid "Set Your New Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:490
+msgid "Enter your new password below."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:511
+msgid "New Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:517
+msgid "Enter new password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:528
+msgid "Confirm Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:535
+msgid "Confirm new password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:547
+msgid "Password requirements:"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:553
+msgid "At least 12 characters"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:558
+msgid "Uppercase letter (A-Z)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:563
+msgid "Lowercase letter (a-z)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:568
+msgid "Number (0-9)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:574
+#, python-brace-format
+msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:591
+msgid "Set Password"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:607
+#: trendsearth_ui/components/layout.py:1138
+msgid "Back to Login"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:714
+msgid "Create Your Account"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:719
+msgid ""
+"After registration, you'll receive an email to verify your address and "
+"set your password."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:732
+#: trendsearth_ui/components/layout.py:1287
+msgid "Required field"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:772
+#: trendsearth_ui/components/layout.py:1323
+msgid "Full Name"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:786
+#: trendsearth_ui/components/layout.py:1337
+msgid "Enter your full name"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:798
+#: trendsearth_ui/components/layout.py:1349
+#: trendsearth_ui/utils/mobile_utils.py:388
+msgid "Role/Title"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:805
+#: trendsearth_ui/components/layout.py:1356
+msgid "Your job title (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:819
+#: trendsearth_ui/components/layout.py:1370
+msgid "Organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:833
+#: trendsearth_ui/components/layout.py:1384
+msgid "Your organization"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:847
+#: trendsearth_ui/components/layout.py:1398
+#: trendsearth_ui/utils/mobile_utils.py:404
+msgid "Sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:861
+#: trendsearth_ui/components/layout.py:1412
+msgid "Select your sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:875
+#: trendsearth_ui/components/layout.py:928
+#: trendsearth_ui/components/layout.py:1426
+#: trendsearth_ui/components/layout.py:1479
+msgid "Please specify"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:882
+#: trendsearth_ui/components/layout.py:1433
+msgid "Please specify your sector"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:899
+#: trendsearth_ui/components/layout.py:1450
+#: trendsearth_ui/utils/mobile_utils.py:420
+msgid "Purpose of Use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:914
+#: trendsearth_ui/components/layout.py:1465
+msgid "Select your purpose of use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:935
+#: trendsearth_ui/components/layout.py:1486
+msgid "Please specify your purpose"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:951
+#: trendsearth_ui/components/layout.py:1502
+#: trendsearth_ui/utils/mobile_utils.py:294
+msgid "Country"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:964
+#: trendsearth_ui/components/layout.py:1515
+msgid "Select your country"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:982
+#: trendsearth_ui/components/layout.py:1530
+msgid "Gender Identity"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:990
+#: trendsearth_ui/components/layout.py:1538
+msgid "Select (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1004
+#: trendsearth_ui/components/layout.py:1552
+msgid ""
+"We collect gender identity information to comply with donor reporting "
+"requirements and to assess equitable participation in capacity "
+"development and tool access. Providing this information is voluntary; "
+"your selection will not affect your access to the tool."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1013
+#: trendsearth_ui/components/layout.py:1021
+#: trendsearth_ui/components/layout.py:1561
+#: trendsearth_ui/components/layout.py:1569
+msgid "Please describe"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1065
+msgid ""
+"Do you acknowledge that some Trends.Earth features use Google Earth "
+"Engine, and, depending on your use, you may be required to have in place "
+"a commercial license to use Google Earth Engine?"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1078
+msgid ""
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
+"more details see the "
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1082
+msgid "Google Earth Engine Terms of Use"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1088
+msgid ""
+" . Conservation International does not provide or manage commercial GEE "
+"licenses. Users are solely responsible for ensuring their use of GEE "
+"complies with Google's commercial licensing requirements. Access to this "
+"tool does not grant or imply the provision of commercial licensing."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1097
+msgid "Yes, I acknowledge"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1122
+msgid "Create Account"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1253
+msgid "Update Your Profile"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1308
+msgid "Email cannot be changed"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1593
+#: trendsearth_ui/components/tabs.py:522
+msgid "Update Profile"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1709
+msgid "Logout"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1755
+msgid "Executions"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1765
+msgid "Users"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1779
+msgid "Scripts"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1793
+msgid "Admin"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1807
+#: trendsearth_ui/utils/mobile_utils.py:140
+#: trendsearth_ui/utils/mobile_utils.py:499
+msgid "Status"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1821
+msgid "Profile"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:164
+msgid "Refresh Executions"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:176
+msgid "Auto-refresh in:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:215
+msgid "Cancel Execution"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:221
+msgid "Are you sure you want to cancel this execution?"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:226
+msgid "Execution ID:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:233
+msgid "Script:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:240
+msgid "Status:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:246
+msgid "This action cannot be undone."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:263
+msgid "Confirm Cancel"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:302
+msgid "Cancellation Result"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:305
+msgid "Close"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:327
+msgid "Refresh Users"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:401
+msgid "Refresh Scripts"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:453
+msgid "Profile Settings"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:462 trendsearth_ui/components/tabs.py:854
+#: trendsearth_ui/utils/mobile_utils.py:262
+#: trendsearth_ui/utils/mobile_utils.py:457
+msgid "Name"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:466
+msgid "Enter your name"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:478
+msgid "Enter your email"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:492
+#: trendsearth_ui/utils/mobile_utils.py:278
+msgid "Institution"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:496
+msgid "Enter your institution"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:504
+#: trendsearth_ui/utils/mobile_utils.py:310
+msgid "Role"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:547
+msgid "Email Notifications"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:554
+msgid "Execution Completion Notifications"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:559
+msgid "Enable email notifications"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:569
+msgid ""
+"Receive email notifications when your script executions finish, fail, or "
+"are cancelled."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:602
+msgid "Google Earth Engine Account"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:610
+msgid "Current Credentials Status"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:624
+msgid "Setup Your GEE Account"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:627
+msgid ""
+"Choose one of the options below to configure your Google Earth Engine "
+"credentials:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:648
+msgid "Option 1: Connect Your GEE Account (OAuth)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:654
+msgid ""
+"Connect your personal Google Earth Engine account using OAuth "
+"authentication."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:659
+msgid "Connect GEE Account"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:692
+msgid "Option 2: Upload Service Account Key"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:698
+msgid "Upload a Google Cloud service account JSON key with Earth Engine access."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:710
+msgid "Upload Service Account Key"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:741
+msgid "Manage Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:745
+msgid "Test Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:752
+msgid "Delete Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:779
+msgid "Service Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:784
+msgid ""
+"Service credentials allow external applications to authenticate with the "
+"Trends.Earth API using the OAuth2 client credentials grant. The client "
+"secret is shown only once at creation time."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:798
+msgid "Refresh"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:814
+msgid "New Credential"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:843
+msgid "Create Service Credential"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:858
+msgid "e.g. My CLI Tool"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:862
+msgid "A descriptive label for this credential."
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:63
+msgid "Script"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:112
+msgid "Start"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:121
+msgid "End"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:132
+msgid "Duration"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:157
+#: trendsearth_ui/utils/mobile_utils.py:372
+msgid "ID"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:187
+msgid "Params"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:196
+msgid "Results"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:214
+msgid "Docker Logs"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:223
+msgid "Batch Logs"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:232
+msgid "Map"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:325
+msgid "Last Activity"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:334
+msgid "Verified"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:343
+msgid "Verified At"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:354
+msgid "Created"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:436
+msgid "GEE License"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:474
+msgid "Slug"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:490
+msgid "Access"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:514
+msgid "Environment"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:530
+msgid "Env Version"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:546
+msgid "Compute"
+msgstr ""
 
 #~ msgid "Forgot Password"
 #~ msgstr "Mot de passe oublié"

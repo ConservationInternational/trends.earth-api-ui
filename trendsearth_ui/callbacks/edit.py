@@ -5,6 +5,7 @@ import logging
 from dash import Input, Output, State, no_update
 
 from ..config import get_api_base
+from ..i18n import gettext as _
 from ..utils import get_user_info
 from ..utils.helpers import make_authenticated_request
 from ._table_helpers import RowResolutionError, resolve_row_data
@@ -546,10 +547,10 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 logger.debug("Password changed successfully by admin")
                 # Clear password fields on success
-                return "Password changed successfully!", "success", True, "", ""
+                return _("Password changed successfully!"), "success", True, "", ""
             else:
                 logger.warning("Password change failed with status: %s", resp.status_code)
-                error_msg = "Failed to change password."
+                error_msg = _("Failed to change password.")
                 try:
                     error_data = resp.json()
                     # Check for both "msg" and "detail" keys as API may return either
@@ -558,12 +559,18 @@ def register_callbacks(app):
                 except Exception:
                     logger.debug("Could not parse password change response", exc_info=True)
                 # Add status code to error message for debugging
-                error_msg += f" (Status: {resp.status_code})"
+                error_msg += _(" (Status: {status})").format(status=resp.status_code)
                 return error_msg, "danger", True, no_update, no_update
 
         except Exception as e:
             logger.exception("Network error during admin password change: %s", e)
-            return f"Network error: {str(e)}", "danger", True, no_update, no_update
+            return (
+                _("Network error: {error}").format(error=str(e)),
+                "danger",
+                True,
+                no_update,
+                no_update,
+            )
 
     # Real-time password validation callback for admin password change
     @app.callback(

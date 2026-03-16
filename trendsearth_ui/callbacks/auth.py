@@ -722,7 +722,7 @@ def register_callbacks(app):
 
         if not email:
             return (
-                "Please enter your email address.",
+                _("Please enter your email address."),
                 "warning",
                 True,
                 no_update,
@@ -735,7 +735,7 @@ def register_callbacks(app):
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(email_pattern, email):
             return (
-                "Please enter a valid email address.",
+                _("Please enter a valid email address."),
                 "warning",
                 True,
                 no_update,
@@ -770,7 +770,9 @@ def register_callbacks(app):
                 # versions.
                 logger.debug("Password recovery request accepted for: %s", email)
                 return (
-                    f"If an account exists with {email}, password recovery instructions have been sent. Please check your email.",
+                    _(
+                        "If an account exists with {email}, password recovery instructions have been sent. Please check your email."
+                    ).format(email=email),
                     "success",
                     True,
                     "",  # Clear the email field
@@ -780,7 +782,7 @@ def register_callbacks(app):
                 )
             else:
                 logger.warning("Password recovery failed with status: %s", resp.status_code)
-                error_msg = "Failed to send password recovery email."
+                error_msg = _("Failed to send password recovery email.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("msg", error_msg)
@@ -789,7 +791,7 @@ def register_callbacks(app):
                     logger.debug("Could not parse API error response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
-                    error_msg = f"{error_msg} Please try again later."
+                    error_msg = _("{}. Please try again later.").format(error_msg)
                 return (
                     error_msg,
                     "danger",
@@ -803,7 +805,7 @@ def register_callbacks(app):
         except requests.exceptions.Timeout:
             logger.warning("Password recovery request timed out")
             return (
-                "Request timed out. Please try again later.",
+                _("Request timed out. Please try again later."),
                 "danger",
                 True,
                 no_update,
@@ -814,7 +816,9 @@ def register_callbacks(app):
         except requests.exceptions.ConnectionError:
             logger.warning("Connection error during password recovery")
             return (
-                "Cannot connect to the server. Please check your internet connection and try again.",
+                _(
+                    "Cannot connect to the server. Please check your internet connection and try again."
+                ),
                 "danger",
                 True,
                 no_update,
@@ -825,7 +829,7 @@ def register_callbacks(app):
         except Exception as e:
             logger.exception("Error during password recovery: %s", e)
             return (
-                f"An error occurred: {str(e)}. Please try again later.",
+                _("An error occurred: {error}. Please try again later.").format(error=str(e)),
                 "danger",
                 True,
                 no_update,
@@ -1154,7 +1158,7 @@ def register_callbacks(app):
         # Validate inputs
         if not reset_token:
             return (
-                "Invalid or missing reset token. Please request a new password reset.",
+                _("Invalid or missing reset token. Please request a new password reset."),
                 "danger",
                 True,
                 no_update,
@@ -1163,7 +1167,7 @@ def register_callbacks(app):
 
         if not new_password or not confirm_password:
             return (
-                "Please enter and confirm your new password.",
+                _("Please enter and confirm your new password."),
                 "warning",
                 True,
                 no_update,
@@ -1172,7 +1176,7 @@ def register_callbacks(app):
 
         if new_password != confirm_password:
             return (
-                "Passwords do not match. Please try again.",
+                _("Passwords do not match. Please try again."),
                 "danger",
                 True,
                 no_update,
@@ -1181,7 +1185,7 @@ def register_callbacks(app):
 
         if len(new_password) < 12:
             return (
-                "Password must be at least 12 characters long.",
+                _("Password must be at least 12 characters long."),
                 "danger",
                 True,
                 no_update,
@@ -1202,7 +1206,7 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 logger.debug("Password reset successful")
                 return (
-                    "Password reset successful! You can now log in with your new password.",
+                    _("Password reset successful! You can now log in with your new password."),
                     "success",
                     True,
                     "",  # Clear password field
@@ -1211,7 +1215,9 @@ def register_callbacks(app):
             elif resp.status_code == 404:
                 logger.debug("Invalid or expired reset token")
                 return (
-                    "This reset link is invalid or has expired. Please request a new password reset.",
+                    _(
+                        "This reset link is invalid or has expired. Please request a new password reset."
+                    ),
                     "danger",
                     True,
                     no_update,
@@ -1219,7 +1225,7 @@ def register_callbacks(app):
                 )
             elif resp.status_code == 422:
                 logger.debug("Password validation failed")
-                error_msg = "Password does not meet requirements."
+                error_msg = _("Password does not meet requirements.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data["detail"]
@@ -1234,7 +1240,7 @@ def register_callbacks(app):
                 )
             else:
                 logger.warning("Password reset failed with status: %s", resp.status_code)
-                error_msg = "Failed to reset password."
+                error_msg = _("Failed to reset password.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data["detail"]
@@ -1242,7 +1248,7 @@ def register_callbacks(app):
                     logger.debug("Could not parse password reset response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
-                    error_msg = f"{error_msg} Please try again."
+                    error_msg = _("{}. Please try again.").format(error_msg)
                 return (
                     error_msg,
                     "danger",
@@ -1254,7 +1260,7 @@ def register_callbacks(app):
         except requests.exceptions.Timeout:
             logger.warning("Password reset request timed out")
             return (
-                "Request timed out. Please try again.",
+                _("Request timed out. Please try again."),
                 "danger",
                 True,
                 no_update,
@@ -1263,7 +1269,7 @@ def register_callbacks(app):
         except requests.exceptions.ConnectionError:
             logger.warning("Connection error during password reset")
             return (
-                "Cannot connect to the server. Please check your connection.",
+                _("Cannot connect to the server. Please check your connection."),
                 "danger",
                 True,
                 no_update,
@@ -1272,7 +1278,7 @@ def register_callbacks(app):
         except Exception as e:
             logger.exception("Error during password reset: %s", e)
             return (
-                f"An error occurred: {str(e)}",
+                _("An error occurred: {error}").format(error=str(e)),
                 "danger",
                 True,
                 no_update,
@@ -1412,35 +1418,35 @@ def register_callbacks(app):
 
         # Validate required fields
         if not email:
-            return "Please enter your email address.", "warning", True
+            return _("Please enter your email address."), "warning", True
 
         if not name:
-            return "Please enter your name.", "warning", True
+            return _("Please enter your name."), "warning", True
 
         if not institution:
-            return "Please enter your organization.", "warning", True
+            return _("Please enter your organization."), "warning", True
 
         if not sector:
-            return "Please select your sector.", "warning", True
+            return _("Please select your sector."), "warning", True
 
         if sector == "other" and not sector_other:
-            return "Please specify your sector.", "warning", True
+            return _("Please specify your sector."), "warning", True
 
         if not purpose:
-            return "Please select your purpose of use.", "warning", True
+            return _("Please select your purpose of use."), "warning", True
 
         if purpose == "other" and not purpose_other:
-            return "Please specify your purpose of use.", "warning", True
+            return _("Please specify your purpose of use."), "warning", True
 
         if not country:
-            return "Please select your country.", "warning", True
+            return _("Please select your country."), "warning", True
 
         if gender == "self_describe" and not gender_description:
-            return "Please describe your gender identity.", "warning", True
+            return _("Please describe your gender identity."), "warning", True
 
         if not gee_acknowledged:
             return (
-                "Please acknowledge the Google Earth Engine license terms.",
+                _("Please acknowledge the Google Earth Engine license terms."),
                 "warning",
                 True,
             )
@@ -1448,7 +1454,7 @@ def register_callbacks(app):
         # Validate email format
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(email_pattern, email):
-            return "Please enter a valid email address.", "warning", True
+            return _("Please enter a valid email address."), "warning", True
 
         try:
             api_base = get_api_base(api_environment)
@@ -1494,13 +1500,15 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 logger.debug("User registration successful for: %s", email)
                 return (
-                    "Account created successfully! Please check your email to verify your account, "
-                    "then you can log in.",
+                    _(
+                        "Account created successfully! Please check your email to verify your account, "
+                        "then you can log in."
+                    ),
                     "success",
                     True,
                 )
             elif resp.status_code == 400:
-                error_msg = "Registration failed."
+                error_msg = _("Registration failed.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
@@ -1509,7 +1517,7 @@ def register_callbacks(app):
                 logger.warning("Registration failed (400): %s", error_msg)
                 return error_msg, "danger", True
             elif resp.status_code == 422:
-                error_msg = "Validation failed."
+                error_msg = _("Validation failed.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
@@ -1520,13 +1528,13 @@ def register_callbacks(app):
             elif resp.status_code == 429:
                 logger.warning("Registration rate limit exceeded")
                 return (
-                    "Too many registration attempts. Please try again later.",
+                    _("Too many registration attempts. Please try again later."),
                     "danger",
                     True,
                 )
             else:
                 logger.warning("Registration failed with status: %s", resp.status_code)
-                error_msg = "Registration failed."
+                error_msg = _("Registration failed.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
@@ -1534,22 +1542,22 @@ def register_callbacks(app):
                     logger.debug("Could not parse registration error response", exc_info=True)
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
-                    error_msg = f"{error_msg} Please try again."
+                    error_msg = _("{}. Please try again.").format(error_msg)
                 return error_msg, "danger", True
 
         except requests.exceptions.Timeout:
             logger.warning("Registration request timed out")
-            return "Request timed out. Please try again.", "danger", True
+            return _("Request timed out. Please try again."), "danger", True
         except requests.exceptions.ConnectionError:
             logger.warning("Connection error during registration")
             return (
-                "Cannot connect to the server. Please check your connection.",
+                _("Cannot connect to the server. Please check your connection."),
                 "danger",
                 True,
             )
         except Exception as e:
             logger.exception("Error during registration: %s", e)
-            return f"An error occurred: {str(e)}", "danger", True
+            return _("An error occurred: {error}").format(error=str(e)), "danger", True
 
     # =============================
     # Standalone Profile Update Callbacks
@@ -1698,7 +1706,7 @@ def register_callbacks(app):
                     "",
                     "",
                     hide_style,  # hide loading spinner
-                    "Invalid or expired token. Please request a new profile update link.",
+                    _("Invalid or expired token. Please request a new profile update link."),
                     True,  # show error alert
                     hide_style,  # hide form
                 )
@@ -1740,7 +1748,7 @@ def register_callbacks(app):
                 "",
                 "",
                 hide_style,  # hide loading spinner
-                f"Error loading profile: {str(e)}",
+                _("Error loading profile: {error}").format(error=str(e)),
                 True,  # show error alert
                 hide_style,  # hide form
             )
@@ -1789,35 +1797,35 @@ def register_callbacks(app):
 
         if not token:
             return (
-                "No authentication token. Please use a valid profile update link.",
+                _("No authentication token. Please use a valid profile update link."),
                 "danger",
                 True,
             )
 
         # Validate required fields
         if not name:
-            return "Please enter your name.", "warning", True
+            return _("Please enter your name."), "warning", True
 
         if not institution:
-            return "Please enter your organization.", "warning", True
+            return _("Please enter your organization."), "warning", True
 
         if not sector:
-            return "Please select your sector.", "warning", True
+            return _("Please select your sector."), "warning", True
 
         if sector == "other" and not sector_other:
-            return "Please specify your sector.", "warning", True
+            return _("Please specify your sector."), "warning", True
 
         if not purpose:
-            return "Please select your purpose of use.", "warning", True
+            return _("Please select your purpose of use."), "warning", True
 
         if purpose == "other" and not purpose_other:
-            return "Please specify your purpose of use.", "warning", True
+            return _("Please specify your purpose of use."), "warning", True
 
         if not country:
-            return "Please select your country.", "warning", True
+            return _("Please select your country."), "warning", True
 
         if gender == "self_describe" and not gender_description:
-            return "Please describe your gender identity.", "warning", True
+            return _("Please describe your gender identity."), "warning", True
 
         try:
             api_base = get_api_base(api_environment or "production")
@@ -1873,11 +1881,15 @@ def register_callbacks(app):
 
             if resp.status_code == 200:
                 logger.debug("Standalone profile update successful")
-                return "Profile updated successfully!", "success", True
+                return _("Profile updated successfully!"), "success", True
             elif resp.status_code == 401:
-                return "Session expired. Please request a new profile update link.", "danger", True
+                return (
+                    _("Session expired. Please request a new profile update link."),
+                    "danger",
+                    True,
+                )
             elif resp.status_code == 422:
-                error_msg = "Invalid token. Please request a new profile update link."
+                error_msg = _("Invalid token. Please request a new profile update link.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
@@ -1886,7 +1898,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True
             else:
                 logger.warning("Profile update failed with status: %s", resp.status_code)
-                error_msg = "Failed to update profile."
+                error_msg = _("Failed to update profile.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
@@ -1896,14 +1908,14 @@ def register_callbacks(app):
 
         except requests.exceptions.Timeout:
             logger.warning("Profile update request timed out")
-            return "Request timed out. Please try again.", "danger", True
+            return _("Request timed out. Please try again."), "danger", True
         except requests.exceptions.ConnectionError:
             logger.warning("Connection error during profile update")
             return (
-                "Cannot connect to the server. Please check your connection.",
+                _("Cannot connect to the server. Please check your connection."),
                 "danger",
                 True,
             )
         except Exception as e:
             logger.exception("Error during profile update: %s", e)
-            return f"An error occurred: {str(e)}", "danger", True
+            return _("An error occurred: {error}").format(error=str(e)), "danger", True

@@ -7,6 +7,8 @@ import logging
 from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 
+from ..i18n import gettext as _
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +23,7 @@ def register_callbacks(app):
     def update_gee_status_display(token):
         """Update the GEE credentials status display."""
         if not token:
-            return html.Div("Please log in to view credentials status.", className="text-muted")
+            return html.Div(_("Please log in to view credentials status."), className="text-muted")
 
         try:
             from ..utils.helpers import make_authenticated_request
@@ -37,7 +39,7 @@ def register_callbacks(app):
 
                 if has_credentials:
                     # Format the created date
-                    created_date = "Unknown"
+                    created_date = _("Unknown")
                     if created_at:
                         try:
                             from datetime import datetime
@@ -48,15 +50,22 @@ def register_callbacks(app):
                             logger.debug("Could not parse date: %s", created_at, exc_info=True)
                             created_date = str(created_at)
 
-                    type_label = "OAuth" if credentials_type == "oauth" else "Service Account"
+                    type_label = _("OAuth") if credentials_type == "oauth" else _("Service Account")
 
                     status_content = [
                         dbc.Alert(
                             [
                                 html.I(className="fas fa-check-circle me-2"),
-                                f"Credentials configured using {type_label}",
+                                _("Credentials configured using {type_label}").format(
+                                    type_label=type_label
+                                ),
                                 html.Br(),
-                                html.Small(f"Set up on: {created_date}", className="text-muted"),
+                                html.Small(
+                                    _("Set up on: {created_date}").format(
+                                        created_date=created_date
+                                    ),
+                                    className="text-muted",
+                                ),
                             ],
                             color="success",
                             className="mb-2",
@@ -69,24 +78,24 @@ def register_callbacks(app):
                     return dbc.Alert(
                         [
                             html.I(className="fas fa-exclamation-triangle me-2"),
-                            "No Google Earth Engine credentials configured.",
+                            _("No Google Earth Engine credentials configured."),
                             html.Br(),
                             html.Small(
-                                "Choose one of the setup options below.", className="text-muted"
+                                _("Choose one of the setup options below."), className="text-muted"
                             ),
                         ],
                         color="warning",
                     )
             else:
                 return dbc.Alert(
-                    "Unable to retrieve credentials status.",
+                    _("Unable to retrieve credentials status."),
                     color="danger",
                 )
 
         except Exception as e:
             logger.exception("Error getting GEE status: %s", e)
             return dbc.Alert(
-                "Error retrieving credentials status.",
+                _("Error retrieving credentials status."),
                 color="danger",
             )
 
@@ -151,10 +160,14 @@ def register_callbacks(app):
                             html.Div(
                                 [
                                     html.I(className="fas fa-external-link-alt me-2"),
-                                    "OAuth window opened. Please complete the authorization and return here.",
+                                    _(
+                                        "OAuth window opened. Please complete the authorization and return here."
+                                    ),
                                     html.Br(),
                                     html.Small(
-                                        "After authorization, you may need to refresh this page to see the updated status.",
+                                        _(
+                                            "After authorization, you may need to refresh this page to see the updated status."
+                                        ),
                                         className="text-muted",
                                     ),
                                 ]
@@ -165,12 +178,12 @@ def register_callbacks(app):
                     )
                 else:
                     return (
-                        "OAuth initiation failed - no authorization URL received.",
+                        _("OAuth initiation failed - no authorization URL received."),
                         "danger",
                         True,
                     )
             else:
-                error_msg = "Failed to initiate OAuth flow."
+                error_msg = _("Failed to initiate OAuth flow.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
@@ -180,7 +193,7 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error initiating OAuth: %s", e)
-            return f"Network error: {str(e)}", "danger", True
+            return _("Network error: {error}").format(error=str(e)), "danger", True
 
     @app.callback(
         [
@@ -210,7 +223,7 @@ def register_callbacks(app):
                 service_account_key = json.loads(decoded.decode("utf-8"))
             except json.JSONDecodeError:
                 return (
-                    "Invalid JSON file. Please upload a valid service account key file.",
+                    _("Invalid JSON file. Please upload a valid service account key file."),
                     "danger",
                     True,
                 )
@@ -218,11 +231,11 @@ def register_callbacks(app):
             # Validate it looks like a service account key
             required_fields = ["type", "project_id", "private_key", "client_email"]
             if not all(field in service_account_key for field in required_fields):
-                return "Invalid service account key. Missing required fields.", "danger", True
+                return _("Invalid service account key. Missing required fields."), "danger", True
 
             if service_account_key.get("type") != "service_account":
                 return (
-                    "Invalid service account key. Type field must be 'service_account'.",
+                    _("Invalid service account key. Type field must be 'service_account'."),
                     "danger",
                     True,
                 )
@@ -242,13 +255,15 @@ def register_callbacks(app):
                 return (
                     [
                         html.I(className="fas fa-check-circle me-2"),
-                        f"Service account key '{filename}' uploaded successfully!",
+                        _("Service account key '{filename}' uploaded successfully!").format(
+                            filename=filename
+                        ),
                     ],
                     "success",
                     True,
                 )
             else:
-                error_msg = "Failed to upload service account key."
+                error_msg = _("Failed to upload service account key.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
@@ -258,7 +273,7 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error uploading service account: %s", e)
-            return f"Error processing file: {str(e)}", "danger", True
+            return _("Error processing file: {error}").format(error=str(e)), "danger", True
 
     @app.callback(
         [
@@ -300,13 +315,13 @@ def register_callbacks(app):
                     return (
                         [
                             html.I(className="fas fa-check-circle me-2"),
-                            "Google Earth Engine credentials are valid and working!",
+                            _("Google Earth Engine credentials are valid and working!"),
                         ],
                         "success",
                         True,
                     )
                 else:
-                    error_msg = "Credentials test failed."
+                    error_msg = _("Credentials test failed.")
                     try:
                         error_data = resp.json()
                         error_msg = error_data.get("detail", error_msg)
@@ -327,13 +342,13 @@ def register_callbacks(app):
                     return (
                         [
                             html.I(className="fas fa-trash me-2"),
-                            "Google Earth Engine credentials deleted successfully.",
+                            _("Google Earth Engine credentials deleted successfully."),
                         ],
                         "warning",
                         True,
                     )
                 else:
-                    error_msg = "Failed to delete credentials."
+                    error_msg = _("Failed to delete credentials.")
                     try:
                         error_data = resp.json()
                         error_msg = error_data.get("detail", error_msg)
@@ -343,6 +358,6 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error with GEE management action: %s", e)
-            return f"Network error: {str(e)}", "danger", True
+            return _("Network error: {error}").format(error=str(e)), "danger", True
 
         return no_update, no_update, no_update
