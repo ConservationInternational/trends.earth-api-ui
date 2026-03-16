@@ -7,6 +7,7 @@ from cachetools import TTLCache
 from dash import Input, Output, State, callback_context, dcc, html, no_update
 
 from ..config import STATUS_REFRESH_INTERVAL
+from ..i18n import gettext as _
 from ..utils.stats_visualizations import (
     create_execution_statistics_chart,
     create_script_version_histogram,
@@ -246,9 +247,9 @@ def register_callbacks(app):
             header_label = _format_display_time(fetch_time, safe_timezone) or last_updated_label
 
             current_status_title = (
-                f"Current System Status ({header_label})"
+                _("Current System Status ({header_label})").format(header_label=header_label)
                 if header_label
-                else "Current System Status"
+                else _("Current System Status")
             )
 
             # 2. Deployment info is already formatted
@@ -258,7 +259,10 @@ def register_callbacks(app):
             cluster_info = cluster_data.get("info", html.Div("Cluster data unavailable"))
             cluster_cached_time = cluster_data.get("cached_time", "")
             cluster_title = html.H5(
-                f"Cluster Status{cluster_cached_time}", className="card-title mt-4"
+                _("Cluster Status{cluster_cached_time}").format(
+                    cluster_cached_time=cluster_cached_time
+                ),
+                className="card-title mt-4",
             )
             return (
                 current_status_title,
@@ -271,14 +275,15 @@ def register_callbacks(app):
         except Exception as e:
             logger.error(f"Error in time-independent status update: {e}")
             error_msg = html.Div(
-                f"Error loading status data: {e}", className="text-center text-danger"
+                _("Error loading status data: {error}").format(error=e),
+                className="text-center text-danger",
             )
             return (
-                "Current System Status",
+                _("Current System Status"),
                 error_msg,
                 error_msg,
                 error_msg,
-                html.H5("Error"),
+                html.H5(_("Error")),
             )
 
     @app.callback(
@@ -390,9 +395,11 @@ def register_callbacks(app):
             else:
                 error_msg = html.Div(
                     [
-                        html.P("Statistics unavailable.", className="text-muted text-center"),
+                        html.P(_("Statistics unavailable."), className="text-muted text-center"),
                         html.Small(
-                            f"Error: {stats_data.get('message', 'Unknown error')}",
+                            _("Error: {error}").format(
+                                error=stats_data.get("message", _("Unknown error"))
+                            ),
                             className="text-muted text-center d-block",
                         ),
                     ],
@@ -407,7 +414,8 @@ def register_callbacks(app):
         except Exception as e:
             logger.error(f"Error in time-dependent stats update: {e}")
             error_msg = html.Div(
-                f"Error loading statistics: {e}", className="text-center text-danger"
+                _("Error loading statistics: {error}").format(error=e),
+                className="text-center text-danger",
             )
             return (html.Div(), error_msg, [error_msg])
 
@@ -458,7 +466,7 @@ def _build_status_summary(status_data, safe_timezone):
 
     latest_status = status_data.get("latest_status", {})
     if not latest_status:
-        return html.Div("No status data available.", className="text-center text-muted"), None
+        return html.Div(_("No status data available."), className="text-center text-muted"), None
 
     # Extract execution counts
     executions_ready = latest_status.get("executions_ready", 0)
@@ -486,12 +494,12 @@ def _build_status_summary(status_data, safe_timezone):
             # === SUMMARY SECTION ===
             html.Div(
                 [
-                    html.H5("Overview", className="mb-3 border-bottom pb-2"),
+                    html.H5(_("Overview"), className="mb-3 border-bottom pb-2"),
                     html.Div(
                         [
-                            _summary_card_column("Total Executions", total_executions),
-                            _summary_card_column("Total Users", users_count),
-                            _summary_card_column("Total Scripts", scripts_count),
+                            _summary_card_column(_("Total Executions"), total_executions),
+                            _summary_card_column(_("Total Users"), users_count),
+                            _summary_card_column(_("Total Scripts"), scripts_count),
                         ],
                         className="row g-3",
                     ),
@@ -500,17 +508,17 @@ def _build_status_summary(status_data, safe_timezone):
             ),
             html.Div(
                 [
-                    html.H5("Executions", className="mb-3 border-bottom pb-2"),
+                    html.H5(_("Executions"), className="mb-3 border-bottom pb-2"),
                     html.Div(
                         [
-                            html.H6("Active", className="text-muted mb-2"),
+                            html.H6(_("Active"), className="text-muted mb-2"),
                             html.Div(
                                 [
-                                    _metric_column("Running", executions_running),
-                                    _metric_column("Ready", executions_ready),
-                                    _metric_column("Pending", executions_pending),
+                                    _metric_column(_("Running"), executions_running),
+                                    _metric_column(_("Ready"), executions_ready),
+                                    _metric_column(_("Pending"), executions_pending),
                                     _metric_column(
-                                        "Total",
+                                        _("Total"),
                                         active_total,
                                         value_class="h4 mb-0 fw-bold text-success",
                                     ),
@@ -522,18 +530,18 @@ def _build_status_summary(status_data, safe_timezone):
                     ),
                     html.Div(
                         [
-                            html.H6("Completed", className="text-muted mb-2"),
+                            html.H6(_("Completed"), className="text-muted mb-2"),
                             html.Div(
                                 [
-                                    _metric_column("Finished", executions_finished),
+                                    _metric_column(_("Finished"), executions_finished),
                                     _metric_column(
-                                        "Failed",
+                                        _("Failed"),
                                         executions_failed,
                                         value_class="h5 mb-0 text-danger",
                                     ),
-                                    _metric_column("Cancelled", executions_cancelled),
+                                    _metric_column(_("Cancelled"), executions_cancelled),
                                     _metric_column(
-                                        "Total",
+                                        _("Total"),
                                         completed_total,
                                         value_class="h4 mb-0 fw-bold",
                                     ),
@@ -564,11 +572,11 @@ def _build_stats_components(
     if not stats_data or stats_data.get("error"):
         error_component = html.Div(
             [
-                html.P("Statistics unavailable.", className="text-muted text-center"),
+                html.P(_("Statistics unavailable."), className="text-muted text-center"),
                 html.Small(
-                    f"Error: {stats_data.get('message', 'Unknown error')}"
+                    _("Error: {error}").format(error=stats_data.get("message", _("Unknown error")))
                     if stats_data
-                    else "No statistics available for the selected period.",
+                    else _("No statistics available for the selected period."),
                     className="text-muted text-center d-block",
                 ),
             ],

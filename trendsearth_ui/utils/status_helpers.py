@@ -7,6 +7,7 @@ from dash import html
 import requests
 
 from trendsearth_ui.config import get_api_base
+from trendsearth_ui.i18n import gettext as _
 from trendsearth_ui.utils.stats_visualizations import create_cluster_status_table
 from trendsearth_ui.utils.timezone_utils import format_local_time, get_safe_timezone
 
@@ -125,9 +126,11 @@ def fetch_deployment_info(api_environment, token=None):
         # Return basic environment info if no token available
         return html.Div(
             [
-                html.P(f"Environment: {api_environment.title()}", className="mb-1"),
-                html.P("API Status: Authentication required", className="mb-1 text-muted"),
-                html.P("Please log in to view deployment status", className="mb-1 text-muted"),
+                html.P(
+                    _("Environment: {env}").format(env=api_environment.title()), className="mb-1"
+                ),
+                html.P(_("API Status: Authentication required"), className="mb-1 text-muted"),
+                html.P(_("Please log in to view deployment status"), className="mb-1 text-muted"),
             ]
         )
 
@@ -155,8 +158,11 @@ def fetch_deployment_info(api_environment, token=None):
     # Combine the information
     return html.Div(
         [
-            html.P(f"Environment: {api_environment.title()}", className="mb-2 fw-bold"),
-            api_info or html.P("API status unavailable", className="mb-1 text-muted"),
+            html.P(
+                _("Environment: {env}").format(env=api_environment.title()),
+                className="mb-2 fw-bold",
+            ),
+            api_info or html.P(_("API status unavailable"), className="mb-1 text-muted"),
         ]
     )
 
@@ -167,11 +173,11 @@ def fetch_cluster_info(api_environment, token=None, user_timezone=None):
         # Return basic info if no token available
         cluster_info = html.Div(
             [
-                html.P("Authentication required", className="mb-1 text-muted"),
-                html.P("Please log in to view cluster status", className="mb-1 text-muted"),
+                html.P(_("Authentication required"), className="mb-1 text-muted"),
+                html.P(_("Please log in to view cluster status"), className="mb-1 text-muted"),
             ]
         )
-        return cluster_info, " (Auth Required)"
+        return cluster_info, _(" (Auth Required)")
 
     safe_timezone = get_safe_timezone(user_timezone)
 
@@ -192,72 +198,78 @@ def fetch_cluster_info(api_environment, token=None, user_timezone=None):
             cache_info = cluster_data.get("cache_info", {})
             cached_at_raw = cache_info.get("cached_at")
 
-            cluster_cached_time = " (Live)"
+            cluster_cached_time = _(" (Live)")
             if isinstance(cached_at_raw, str) and cached_at_raw:
                 try:
                     cached_dt = datetime.fromisoformat(cached_at_raw.replace("Z", "+00:00"))
                     formatted_time, tz_abbrev = format_local_time(cached_dt, safe_timezone)
                     if tz_abbrev and tz_abbrev != "UTC":
-                        cluster_cached_time = f" (Updated: {formatted_time} {tz_abbrev})"
+                        cluster_cached_time = _(" (Updated: {time} {tz})").format(
+                            time=formatted_time, tz=tz_abbrev
+                        )
                     else:
                         iso_timestamp = (
                             cached_at_raw[:19] if "T" in cached_at_raw else formatted_time
                         )
-                        cluster_cached_time = f" (Updated: {iso_timestamp})"
+                        cluster_cached_time = _(" (Updated: {time})").format(time=iso_timestamp)
                 except (ValueError, TypeError):
                     # Fallback to original string if parsing fails
-                    cluster_cached_time = f" (Updated: {cached_at_raw[:19]})"
+                    cluster_cached_time = _(" (Updated: {time})").format(time=cached_at_raw[:19])
             return cluster_info, cluster_cached_time
         elif resp.status_code == 401:
             # Handle authentication error
             cluster_info = html.Div(
                 [
-                    html.P("Authentication failed", className="mb-1 text-warning"),
-                    html.P("Please check your login status", className="mb-1 text-muted"),
+                    html.P(_("Authentication failed"), className="mb-1 text-warning"),
+                    html.P(_("Please check your login status"), className="mb-1 text-muted"),
                 ]
             )
-            return cluster_info, " (Auth Error)"
+            return cluster_info, _(" (Auth Error)")
         elif resp.status_code == 403:
             # Handle permission error
             cluster_info = html.Div(
                 [
-                    html.P("Access denied", className="mb-1 text-warning"),
+                    html.P(_("Access denied"), className="mb-1 text-warning"),
                     html.P(
-                        "Admin privileges required for cluster status",
+                        _("Admin privileges required for cluster status"),
                         className="mb-1 text-muted",
                     ),
                 ]
             )
-            return cluster_info, " (Access Denied)"
+            return cluster_info, _(" (Access Denied)")
         else:
             # Handle other errors
             cluster_info = html.Div(
                 [
                     html.P(
-                        f"Cluster Status: Error ({resp.status_code})",
+                        _("Cluster Status: Error ({status_code})").format(
+                            status_code=resp.status_code
+                        ),
                         className="mb-1 text-danger",
                     ),
-                    html.P("Unable to retrieve cluster information", className="mb-1 text-muted"),
+                    html.P(
+                        _("Unable to retrieve cluster information"), className="mb-1 text-muted"
+                    ),
                 ]
             )
-            return cluster_info, " (Error)"
+            return cluster_info, _(" (Error)")
     except Exception as e:
         # Handle connection errors
         logger.error(f"Error fetching cluster data: {e}")
         cluster_info = html.Div(
             [
-                html.P("Cluster Status: Connection Error", className="mb-1 text-danger"),
-                html.P("Unable to reach cluster status endpoint", className="mb-1 text-muted"),
+                html.P(_("Cluster Status: Connection Error"), className="mb-1 text-danger"),
+                html.P(_("Unable to reach cluster status endpoint"), className="mb-1 text-muted"),
             ]
         )
-        return cluster_info, " (Connection Error)"
+        return cluster_info, _(" (Connection Error)")
 
 
 def get_fallback_summary():
     """Provide a fallback summary if the main status endpoint fails."""
     return html.Div(
         [
-            "System status is currently unavailable. Please try again later.",
+            _("System status is currently unavailable. Please try again later."),
         ],
         className="text-center text-warning p-3",
     )

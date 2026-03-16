@@ -1341,7 +1341,7 @@ def status_tab_content(is_admin, role=None):
             dbc.Card(
                 [
                     dbc.CardHeader(
-                        html.H4("Current System Status", id="current-system-status-title")
+                        html.H4(_("Current System Status"), id="current-system-status-title")
                     ),
                     dbc.CardBody(
                         [
@@ -1405,7 +1405,7 @@ def status_tab_content(is_admin, role=None):
                                 color="#007bff",
                             ),
                             html.Hr(),
-                            html.H5("Deployment Information", className="card-title mt-4"),
+                            html.H5(_("Deployment Information"), className="card-title mt-4"),
                             dcc.Loading(
                                 id="loading-deployment-info",
                                 children=[html.Div(id="deployment-info-summary")],
@@ -1428,7 +1428,7 @@ def status_tab_content(is_admin, role=None):
             # Time-dependent charts and statistics (affected by time period selection)
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4("System Status Trends")),
+                    dbc.CardHeader(html.H4(_("System Status Trends"))),
                     dbc.CardBody(
                         [
                             # Time period selector tabs
@@ -1439,7 +1439,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "Last 24 Hours",
+                                                        _("Last 24 Hours"),
                                                         className="nav-link active",
                                                         id="status-tab-day",
                                                         style={"cursor": "pointer"},
@@ -1450,7 +1450,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "Last Week",
+                                                        _("Last Week"),
                                                         className="nav-link",
                                                         id="status-tab-week",
                                                         style={"cursor": "pointer"},
@@ -1461,7 +1461,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "Last Month",
+                                                        _("Last Month"),
                                                         className="nav-link",
                                                         id="status-tab-month",
                                                         style={"cursor": "pointer"},
@@ -1472,7 +1472,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "Last Year",
+                                                        _("Last Year"),
                                                         className="nav-link",
                                                         id="status-tab-year",
                                                         style={"cursor": "pointer"},
@@ -1483,7 +1483,7 @@ def status_tab_content(is_admin, role=None):
                                             html.Li(
                                                 [
                                                     html.A(
-                                                        "All Time",
+                                                        _("All Time"),
                                                         className="nav-link",
                                                         id="status-tab-all",
                                                         style={"cursor": "pointer"},
@@ -1561,7 +1561,9 @@ def admin_tab_content(role, is_admin):
         return html.Div(
             [
                 dbc.Alert(
-                    "Access denied. Administrator privileges required to access admin functions.",
+                    _(
+                        "Access denied. Administrator privileges required to access admin functions."
+                    ),
                     color="danger",
                 )
             ]
@@ -1577,7 +1579,7 @@ def admin_tab_content(role, is_admin):
                             html.H2(
                                 [
                                     html.I(className="fas fa-user-shield me-2"),
-                                    "Administration Panel",
+                                    _("Administration Panel"),
                                 ],
                                 className="mb-4",
                             )
@@ -1594,7 +1596,7 @@ def admin_tab_content(role, is_admin):
                                 html.H4(
                                     [
                                         html.I(className="fas fa-tachometer-alt me-2"),
-                                        "Rate Limiting Management",
+                                        _("Rate Limiting Management"),
                                     ]
                                 )
                             ),
@@ -1604,7 +1606,7 @@ def admin_tab_content(role, is_admin):
                                     html.Div(
                                         [
                                             html.H5(
-                                                "Current & Historical Rate Limit Breaches",
+                                                _("Current & Historical Rate Limit Breaches"),
                                                 className="mb-3",
                                             ),
                                             dbc.Row(
@@ -1615,7 +1617,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-sync-alt me-2"
                                                                 ),
-                                                                "Refresh Breaches",
+                                                                _("Refresh Breaches"),
                                                             ],
                                                             id="refresh-rate-limit-breaches-btn",
                                                             color="primary",
@@ -1629,7 +1631,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-undo me-2"
                                                                 ),
-                                                                "Cancel Selected Limit",
+                                                                _("Cancel Selected Limit"),
                                                             ],
                                                             id="reset-selected-rate-limit-btn",
                                                             color="danger",
@@ -1650,7 +1652,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-refresh me-2"
                                                                 ),
-                                                                "Reset All Rate Limits",
+                                                                _("Reset All Rate Limits"),
                                                             ],
                                                             id="admin-reset-rate-limits-btn",
                                                             color="danger",
@@ -1667,7 +1669,12 @@ def admin_tab_content(role, is_admin):
                                                                     className="text-muted fw-bold",
                                                                 ),
                                                                 html.Span(
-                                                                    " · Active and historical events",
+                                                                    [
+                                                                        " · ",
+                                                                        _(
+                                                                            "Active and historical events"
+                                                                        ),
+                                                                    ],
                                                                     className="text-muted ms-2",
                                                                 ),
                                                             ],
@@ -1704,7 +1711,9 @@ def admin_tab_content(role, is_admin):
                                                             html.I(
                                                                 className="fas fa-circle text-warning me-2",
                                                             ),
-                                                            "Highlighted rows are active and can be cancelled individually.",
+                                                            _(
+                                                                "Highlighted rows are active and can be cancelled individually."
+                                                            ),
                                                         ],
                                                         className="text-muted small",
                                                     ),
@@ -1739,7 +1748,7 @@ def admin_tab_content(role, is_admin):
                                 html.H4(
                                     [
                                         html.I(className="fas fa-newspaper me-2"),
-                                        "News Management",
+                                        _("News Management"),
                                     ]
                                 )
                             ),
@@ -1748,7 +1757,7 @@ def admin_tab_content(role, is_admin):
                                     html.Div(
                                         [
                                             html.H5(
-                                                "Manage News Items",
+                                                _("Manage News Items"),
                                                 className="mb-3",
                                             ),
                                             dbc.Row(
@@ -1759,7 +1768,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-sync-alt me-2"
                                                                 ),
-                                                                "Refresh",
+                                                                _("Refresh"),
                                                             ],
                                                             id="admin-refresh-news-btn",
                                                             color="secondary",
@@ -1774,7 +1783,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-plus me-2"
                                                                 ),
-                                                                "Create News Item",
+                                                                _("Create News Item"),
                                                             ],
                                                             id="admin-create-news-btn",
                                                             color="primary",
@@ -1788,7 +1797,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-edit me-2"
                                                                 ),
-                                                                "Edit",
+                                                                _("Edit"),
                                                             ],
                                                             id="admin-edit-news-btn",
                                                             color="secondary",
@@ -1804,7 +1813,7 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-trash me-2"
                                                                 ),
-                                                                "Delete",
+                                                                _("Delete"),
                                                             ],
                                                             id="admin-delete-news-btn",
                                                             color="secondary",
@@ -1824,7 +1833,7 @@ def admin_tab_content(role, is_admin):
                                                     dbc.Spinner(
                                                         html.Div(
                                                             id="admin-news-table",
-                                                            children="Loading news items...",
+                                                            children=_("Loading news items..."),
                                                         ),
                                                         color="primary",
                                                     ),
@@ -1859,7 +1868,7 @@ def admin_tab_content(role, is_admin):
                             dbc.ModalHeader(
                                 dbc.ModalTitle(
                                     id="admin-news-modal-title",
-                                    children="Create News Item",
+                                    children=_("Create News Item"),
                                 ),
                                 close_button=True,
                             ),
@@ -1871,11 +1880,11 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Title *"),
+                                                            dbc.Label(_("Title *")),
                                                             dbc.Input(
                                                                 id="admin-news-title",
                                                                 type="text",
-                                                                placeholder="Enter news title",
+                                                                placeholder=_("Enter news title"),
                                                                 required=True,
                                                             ),
                                                         ],
@@ -1890,7 +1899,9 @@ def admin_tab_content(role, is_admin):
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Message (Markdown supported) *",
+                                                                    _(
+                                                                        "Message (Markdown supported) *"
+                                                                    ),
                                                                     html.I(
                                                                         className="fas fa-info-circle ms-2",
                                                                         id="admin-news-markdown-tooltip",
@@ -1899,12 +1910,16 @@ def admin_tab_content(role, is_admin):
                                                                 ]
                                                             ),
                                                             dbc.Tooltip(
-                                                                "Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will be converted to HTML.",
+                                                                _(
+                                                                    "Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will be converted to HTML."
+                                                                ),
                                                                 target="admin-news-markdown-tooltip",
                                                             ),
                                                             dbc.Textarea(
                                                                 id="admin-news-message",
-                                                                placeholder="Enter news message using Markdown...",
+                                                                placeholder=_(
+                                                                    "Enter news message using Markdown..."
+                                                                ),
                                                                 style={"height": "150px"},
                                                                 required=True,
                                                             ),
@@ -1918,7 +1933,7 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Preview"),
+                                                            dbc.Label(_("Preview")),
                                                             html.Div(
                                                                 id="admin-news-preview",
                                                                 className="border rounded p-3 bg-light",
@@ -1938,7 +1953,7 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Link URL (optional)"),
+                                                            dbc.Label(_("Link URL (optional)")),
                                                             dbc.Input(
                                                                 id="admin-news-link-url",
                                                                 type="url",
@@ -1949,11 +1964,11 @@ def admin_tab_content(role, is_admin):
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Link Text (optional)"),
+                                                            dbc.Label(_("Link Text (optional)")),
                                                             dbc.Input(
                                                                 id="admin-news-link-text",
                                                                 type="text",
-                                                                placeholder="Read more...",
+                                                                placeholder=_("Read more..."),
                                                             ),
                                                         ],
                                                         width=6,
@@ -1965,25 +1980,27 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Target Platforms *"),
+                                                            dbc.Label(_("Target Platforms *")),
                                                             dcc.Dropdown(
                                                                 id="admin-news-platforms",
                                                                 options=[
                                                                     {
-                                                                        "label": "QGIS Plugin",
+                                                                        "label": _("QGIS Plugin"),
                                                                         "value": "qgis_plugin",
                                                                     },
                                                                     {
-                                                                        "label": "Web App",
+                                                                        "label": _("Web App"),
                                                                         "value": "web",
                                                                     },
                                                                     {
-                                                                        "label": "API UI",
+                                                                        "label": _("API UI"),
                                                                         "value": "api_ui",
                                                                     },
                                                                 ],
                                                                 multi=True,
-                                                                placeholder="Select target platforms...",
+                                                                placeholder=_(
+                                                                    "Select target platforms..."
+                                                                ),
                                                                 value=[
                                                                     "qgis_plugin",
                                                                     "web",
@@ -2002,7 +2019,7 @@ def admin_tab_content(role, is_admin):
                                                         [
                                                             dbc.Label(
                                                                 [
-                                                                    "Target Roles (optional)",
+                                                                    _("Target Roles (optional)"),
                                                                     html.I(
                                                                         className="fas fa-info-circle ms-2",
                                                                         id="admin-news-roles-tooltip",
@@ -2011,27 +2028,31 @@ def admin_tab_content(role, is_admin):
                                                                 ]
                                                             ),
                                                             dbc.Tooltip(
-                                                                "Leave empty to show to all users including unauthenticated. Select specific roles to restrict visibility.",
+                                                                _(
+                                                                    "Leave empty to show to all users including unauthenticated. Select specific roles to restrict visibility."
+                                                                ),
                                                                 target="admin-news-roles-tooltip",
                                                             ),
                                                             dcc.Dropdown(
                                                                 id="admin-news-roles",
                                                                 options=[
                                                                     {
-                                                                        "label": "Regular Users",
+                                                                        "label": _("Regular Users"),
                                                                         "value": "USER",
                                                                     },
                                                                     {
-                                                                        "label": "Admins",
+                                                                        "label": _("Admins"),
                                                                         "value": "ADMIN",
                                                                     },
                                                                     {
-                                                                        "label": "Super Admins",
+                                                                        "label": _("Super Admins"),
                                                                         "value": "SUPERADMIN",
                                                                     },
                                                                 ],
                                                                 multi=True,
-                                                                placeholder="All users (no restriction)",
+                                                                placeholder=_(
+                                                                    "All users (no restriction)"
+                                                                ),
                                                                 value=[],
                                                             ),
                                                         ],
@@ -2044,28 +2065,28 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("News Type"),
+                                                            dbc.Label(_("News Type")),
                                                             dbc.Select(
                                                                 id="admin-news-type",
                                                                 options=[
                                                                     {
-                                                                        "label": "Announcement",
+                                                                        "label": _("Announcement"),
                                                                         "value": "announcement",
                                                                     },
                                                                     {
-                                                                        "label": "Warning",
+                                                                        "label": _("Warning"),
                                                                         "value": "warning",
                                                                     },
                                                                     {
-                                                                        "label": "Release",
+                                                                        "label": _("Release"),
                                                                         "value": "release",
                                                                     },
                                                                     {
-                                                                        "label": "Tip",
+                                                                        "label": _("Tip"),
                                                                         "value": "tip",
                                                                     },
                                                                     {
-                                                                        "label": "Maintenance",
+                                                                        "label": _("Maintenance"),
                                                                         "value": "maintenance",
                                                                     },
                                                                 ],
@@ -2076,7 +2097,7 @@ def admin_tab_content(role, is_admin):
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Priority"),
+                                                            dbc.Label(_("Priority")),
                                                             dbc.Input(
                                                                 id="admin-news-priority",
                                                                 type="number",
@@ -2095,12 +2116,12 @@ def admin_tab_content(role, is_admin):
                                                     dbc.Col(
                                                         [
                                                             dbc.Label(
-                                                                "Min Plugin Version (optional)"
+                                                                _("Min Plugin Version (optional)")
                                                             ),
                                                             dbc.Input(
                                                                 id="admin-news-min-version",
                                                                 type="text",
-                                                                placeholder="e.g., 1.0.0",
+                                                                placeholder=_("e.g., 1.0.0"),
                                                             ),
                                                         ],
                                                         width=6,
@@ -2108,12 +2129,12 @@ def admin_tab_content(role, is_admin):
                                                     dbc.Col(
                                                         [
                                                             dbc.Label(
-                                                                "Max Plugin Version (optional)"
+                                                                _("Max Plugin Version (optional)")
                                                             ),
                                                             dbc.Input(
                                                                 id="admin-news-max-version",
                                                                 type="text",
-                                                                placeholder="e.g., 2.0.0",
+                                                                placeholder=_("e.g., 2.0.0"),
                                                             ),
                                                         ],
                                                         width=6,
@@ -2125,10 +2146,12 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Start Date (optional)"),
+                                                            dbc.Label(_("Start Date (optional)")),
                                                             dcc.DatePickerSingle(
                                                                 id="admin-news-start-date",
-                                                                placeholder="Select start date...",
+                                                                placeholder=_(
+                                                                    "Select start date..."
+                                                                ),
                                                                 display_format="YYYY-MM-DD",
                                                             ),
                                                         ],
@@ -2136,10 +2159,10 @@ def admin_tab_content(role, is_admin):
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("End Date (optional)"),
+                                                            dbc.Label(_("End Date (optional)")),
                                                             dcc.DatePickerSingle(
                                                                 id="admin-news-end-date",
-                                                                placeholder="Select end date...",
+                                                                placeholder=_("Select end date..."),
                                                                 display_format="YYYY-MM-DD",
                                                             ),
                                                         ],
@@ -2154,7 +2177,9 @@ def admin_tab_content(role, is_admin):
                                                         [
                                                             dbc.Checkbox(
                                                                 id="admin-news-is-active",
-                                                                label="Active (visible to users)",
+                                                                label=_(
+                                                                    "Active (visible to users)"
+                                                                ),
                                                                 value=True,
                                                             ),
                                                         ],
@@ -2176,13 +2201,13 @@ def admin_tab_content(role, is_admin):
                             dbc.ModalFooter(
                                 [
                                     dbc.Button(
-                                        "Cancel",
+                                        _("Cancel"),
                                         id="admin-news-cancel-btn",
                                         color="secondary",
                                         className="me-2",
                                     ),
                                     dbc.Button(
-                                        "Save",
+                                        _("Save"),
                                         id="admin-news-save-btn",
                                         color="primary",
                                     ),
@@ -2197,22 +2222,24 @@ def admin_tab_content(role, is_admin):
                     dbc.Modal(
                         [
                             dbc.ModalHeader(
-                                dbc.ModalTitle("Confirm Delete"),
+                                dbc.ModalTitle(_("Confirm Delete")),
                                 close_button=True,
                             ),
                             dbc.ModalBody(
-                                "Are you sure you want to delete this news item? This action cannot be undone."
+                                _(
+                                    "Are you sure you want to delete this news item? This action cannot be undone."
+                                )
                             ),
                             dbc.ModalFooter(
                                 [
                                     dbc.Button(
-                                        "Cancel",
+                                        _("Cancel"),
                                         id="admin-news-delete-cancel-btn",
                                         color="secondary",
                                         className="me-2",
                                     ),
                                     dbc.Button(
-                                        "Delete",
+                                        _("Delete"),
                                         id="admin-news-delete-confirm-btn",
                                         color="danger",
                                     ),
@@ -2235,7 +2262,7 @@ def admin_tab_content(role, is_admin):
                                 html.H4(
                                     [
                                         html.I(className="fas fa-user-plus me-2"),
-                                        "Create New User",
+                                        _("Create New User"),
                                     ]
                                 )
                             ),
@@ -2247,11 +2274,11 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Name *"),
+                                                            dbc.Label(_("Name *")),
                                                             dbc.Input(
                                                                 id="admin-new-user-name",
                                                                 type="text",
-                                                                placeholder="Enter full name",
+                                                                placeholder=_("Enter full name"),
                                                                 required=True,
                                                             ),
                                                         ],
@@ -2259,11 +2286,13 @@ def admin_tab_content(role, is_admin):
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Email *"),
+                                                            dbc.Label(_("Email *")),
                                                             dbc.Input(
                                                                 id="admin-new-user-email",
                                                                 type="email",
-                                                                placeholder="Enter email address",
+                                                                placeholder=_(
+                                                                    "Enter email address"
+                                                                ),
                                                                 required=True,
                                                             ),
                                                         ],
@@ -2276,11 +2305,13 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Password *"),
+                                                            dbc.Label(_("Password *")),
                                                             dbc.Input(
                                                                 id="admin-new-user-password",
                                                                 type="password",
-                                                                placeholder="Set password for user",
+                                                                placeholder=_(
+                                                                    "Set password for user"
+                                                                ),
                                                                 required=True,
                                                             ),
                                                         ],
@@ -2288,11 +2319,11 @@ def admin_tab_content(role, is_admin):
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Confirm Password *"),
+                                                            dbc.Label(_("Confirm Password *")),
                                                             dbc.Input(
                                                                 id="admin-new-user-confirm-password",
                                                                 type="password",
-                                                                placeholder="Confirm password",
+                                                                placeholder=_("Confirm password"),
                                                                 required=True,
                                                             ),
                                                         ],
@@ -2305,38 +2336,40 @@ def admin_tab_content(role, is_admin):
                                                 id="admin-new-user-password-requirements",
                                                 children=[
                                                     html.Small(
-                                                        "Password requirements:",
+                                                        _("Password requirements:"),
                                                         className="text-muted d-block mb-1",
                                                     ),
                                                     html.Ul(
                                                         [
                                                             html.Li(
-                                                                "At least 12 characters",
+                                                                _("At least 12 characters"),
                                                                 id="admin-new-user-req-length",
                                                                 className="text-muted",
                                                             ),
                                                             html.Li(
-                                                                "Uppercase letter (A-Z)",
+                                                                _("Uppercase letter (A-Z)"),
                                                                 id="admin-new-user-req-uppercase",
                                                                 className="text-muted",
                                                             ),
                                                             html.Li(
-                                                                "Lowercase letter (a-z)",
+                                                                _("Lowercase letter (a-z)"),
                                                                 id="admin-new-user-req-lowercase",
                                                                 className="text-muted",
                                                             ),
                                                             html.Li(
-                                                                "Number (0-9)",
+                                                                _("Number (0-9)"),
                                                                 id="admin-new-user-req-number",
                                                                 className="text-muted",
                                                             ),
                                                             html.Li(
-                                                                "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)",
+                                                                _(
+                                                                    "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+                                                                ),
                                                                 id="admin-new-user-req-special",
                                                                 className="text-muted",
                                                             ),
                                                             html.Li(
-                                                                "Passwords match",
+                                                                _("Passwords match"),
                                                                 id="admin-new-user-req-match",
                                                                 className="text-muted",
                                                             ),
@@ -2351,22 +2384,24 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Institution"),
+                                                            dbc.Label(_("Institution")),
                                                             dbc.Input(
                                                                 id="admin-new-user-institution",
                                                                 type="text",
-                                                                placeholder="Enter institution/organization",
+                                                                placeholder=_(
+                                                                    "Enter institution/organization"
+                                                                ),
                                                             ),
                                                         ],
                                                         width=6,
                                                     ),
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Country"),
+                                                            dbc.Label(_("Country")),
                                                             dcc.Dropdown(
                                                                 id="admin-new-user-country",
                                                                 options=[],
-                                                                placeholder="Select country...",
+                                                                placeholder=_("Select country..."),
                                                                 searchable=True,
                                                                 clearable=True,
                                                                 className="dash-dropdown",
@@ -2381,20 +2416,20 @@ def admin_tab_content(role, is_admin):
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            dbc.Label("Role *"),
+                                                            dbc.Label(_("Role *")),
                                                             dbc.Select(
                                                                 id="admin-new-user-role",
                                                                 options=[
                                                                     {
-                                                                        "label": "User",
+                                                                        "label": _("User"),
                                                                         "value": "USER",
                                                                     },
                                                                     {
-                                                                        "label": "Admin",
+                                                                        "label": _("Admin"),
                                                                         "value": "ADMIN",
                                                                     },
                                                                     {
-                                                                        "label": "Super Admin",
+                                                                        "label": _("Super Admin"),
                                                                         "value": "SUPERADMIN",
                                                                     },
                                                                 ],
@@ -2416,7 +2451,7 @@ def admin_tab_content(role, is_admin):
                                                                     html.I(
                                                                         className="fas fa-user-plus me-2"
                                                                     ),
-                                                                    "Create User",
+                                                                    _("Create User"),
                                                                 ],
                                                                 id="admin-create-user-btn",
                                                                 color="success",
@@ -2427,7 +2462,7 @@ def admin_tab_content(role, is_admin):
                                                                     html.I(
                                                                         className="fas fa-eraser me-2"
                                                                     ),
-                                                                    "Clear Form",
+                                                                    _("Clear Form"),
                                                                 ],
                                                                 id="admin-clear-user-form-btn",
                                                                 color="secondary",

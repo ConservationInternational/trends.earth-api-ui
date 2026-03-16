@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 09:09-0400\n"
+"POT-Creation-Date: 2026-03-16 09:44-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/callbacks/admin.py:644
@@ -58,9 +58,8 @@ msgstr "创建用户时出错：{detail}"
 msgid "Failed to create user. Server responded with status {status}."
 msgstr "用户创建失败。服务器响应状态为{status}。"
 
-#: trendsearth_ui/callbacks/admin.py:776 trendsearth_ui/callbacks/auth.py:1257
-#: trendsearth_ui/callbacks/auth.py:1542 trendsearth_ui/callbacks/auth.py:1899
-#, fuzzy
+#: trendsearth_ui/callbacks/admin.py:776 trendsearth_ui/callbacks/auth.py:1263
+#: trendsearth_ui/callbacks/auth.py:1550 trendsearth_ui/callbacks/auth.py:1911
 msgid "Request timed out. Please try again."
 msgstr "请求超时，请重试。"
 
@@ -242,211 +241,177 @@ msgstr "登录失败：无法连接到认证服务器。请检查服务器状态
 msgid "Login failed: {error}"
 msgstr "登录失败：{error}"
 
-#: trendsearth_ui/callbacks/auth.py:725 trendsearth_ui/callbacks/auth.py:1415
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:725 trendsearth_ui/callbacks/auth.py:1421
 msgid "Please enter your email address."
 msgstr "请输入您的电子邮件地址。"
 
-#: trendsearth_ui/callbacks/auth.py:738 trendsearth_ui/callbacks/auth.py:1451
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:738 trendsearth_ui/callbacks/auth.py:1457
 msgid "Please enter a valid email address."
 msgstr "请输入有效的电子邮件地址。"
 
-#: trendsearth_ui/callbacks/auth.py:773
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:774
+#, python-brace-format
 msgid ""
 "If an account exists with {email}, password recovery instructions have been "
 "sent. Please check your email."
 msgstr "如果{email}已注册账号，密码找回说明已发送至您的邮箱。请查收邮件。"
 
-#: trendsearth_ui/callbacks/auth.py:783
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:785
 msgid "Failed to send password recovery email."
 msgstr "密码恢复邮件发送失败。"
 
-#: trendsearth_ui/callbacks/auth.py:792
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:794
+#, python-brace-format
 msgid "{}. Please try again later."
 msgstr "请稍后再试。"
 
-#: trendsearth_ui/callbacks/auth.py:806
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:808
 msgid "Request timed out. Please try again later."
 msgstr "请求超时，请稍后再试。"
 
-#: trendsearth_ui/callbacks/auth.py:817
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:820
 msgid ""
 "Cannot connect to the server. Please check your internet connection and try "
 "again."
 msgstr "无法连接到服务器。请检查您的网络连接并重试。"
 
-#: trendsearth_ui/callbacks/auth.py:828
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:832
+#, python-brace-format
 msgid "An error occurred: {error}. Please try again later."
 msgstr "发生错误：{error}。请稍后重试。"
 
-#: trendsearth_ui/callbacks/auth.py:1157
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1161
 msgid "Invalid or missing reset token. Please request a new password reset."
 msgstr "重置令牌无效或缺失。请申请新的密码重置。"
 
-#: trendsearth_ui/callbacks/auth.py:1166
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1170
 msgid "Please enter and confirm your new password."
 msgstr "请输入并确认您的新密码。"
 
-#: trendsearth_ui/callbacks/auth.py:1175
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1179
 msgid "Passwords do not match. Please try again."
 msgstr "密码不匹配，请重试。"
 
-#: trendsearth_ui/callbacks/auth.py:1184
+#: trendsearth_ui/callbacks/auth.py:1188
 #: trendsearth_ui/callbacks/profile.py:123
 #, fuzzy
 msgid "Password must be at least 12 characters long."
 msgstr "密码长度必须至少为 12 个字符。"
 
-#: trendsearth_ui/callbacks/auth.py:1205
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1209
 msgid "Password reset successful! You can now log in with your new password."
 msgstr "密码重置成功！您现在可以使用新密码登录。"
 
-#: trendsearth_ui/callbacks/auth.py:1214
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1219
 msgid ""
 "This reset link is invalid or has expired. Please request a new password "
 "reset."
 msgstr "此重置密码链接无效或已过期。请申请新的密码重置链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1222
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1228
 msgid "Password does not meet requirements."
 msgstr "密码不符合要求。"
 
-#: trendsearth_ui/callbacks/auth.py:1237
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1243
 msgid "Failed to reset password."
 msgstr "重置密码失败。"
 
-#: trendsearth_ui/callbacks/auth.py:1245 trendsearth_ui/callbacks/auth.py:1537
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1251 trendsearth_ui/callbacks/auth.py:1545
+#, python-brace-format
 msgid "{}. Please try again."
 msgstr "请重试。"
 
-#: trendsearth_ui/callbacks/auth.py:1266 trendsearth_ui/callbacks/auth.py:1546
-#: trendsearth_ui/callbacks/auth.py:1903
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1272 trendsearth_ui/callbacks/auth.py:1554
+#: trendsearth_ui/callbacks/auth.py:1915
 msgid "Cannot connect to the server. Please check your connection."
 msgstr "无法连接到服务器。请检查您的网络连接。"
 
-#: trendsearth_ui/callbacks/auth.py:1275 trendsearth_ui/callbacks/auth.py:1552
-#: trendsearth_ui/callbacks/auth.py:1909
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1281 trendsearth_ui/callbacks/auth.py:1560
+#: trendsearth_ui/callbacks/auth.py:1921
+#, python-brace-format
 msgid "An error occurred: {error}"
 msgstr "发生错误：{error}"
 
-#: trendsearth_ui/callbacks/auth.py:1418 trendsearth_ui/callbacks/auth.py:1799
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1424 trendsearth_ui/callbacks/auth.py:1807
 msgid "Please enter your name."
 msgstr "请输入您的姓名。"
 
-#: trendsearth_ui/callbacks/auth.py:1421 trendsearth_ui/callbacks/auth.py:1802
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1427 trendsearth_ui/callbacks/auth.py:1810
 msgid "Please enter your organization."
 msgstr "请输入您的组织名称。"
 
-#: trendsearth_ui/callbacks/auth.py:1424 trendsearth_ui/callbacks/auth.py:1805
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1430 trendsearth_ui/callbacks/auth.py:1813
 msgid "Please select your sector."
 msgstr "请选择您所在的行业。"
 
-#: trendsearth_ui/callbacks/auth.py:1427 trendsearth_ui/callbacks/auth.py:1808
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1433 trendsearth_ui/callbacks/auth.py:1816
 msgid "Please specify your sector."
 msgstr "请注明您所在的行业。"
 
-#: trendsearth_ui/callbacks/auth.py:1430 trendsearth_ui/callbacks/auth.py:1811
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1436 trendsearth_ui/callbacks/auth.py:1819
 msgid "Please select your purpose of use."
 msgstr "请选择您的用途。"
 
-#: trendsearth_ui/callbacks/auth.py:1433 trendsearth_ui/callbacks/auth.py:1814
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1439 trendsearth_ui/callbacks/auth.py:1822
 msgid "Please specify your purpose of use."
 msgstr "请说明您的使用目的。"
 
-#: trendsearth_ui/callbacks/auth.py:1436 trendsearth_ui/callbacks/auth.py:1817
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1442 trendsearth_ui/callbacks/auth.py:1825
 msgid "Please select your country."
 msgstr "请选择您的国家/地区。"
 
-#: trendsearth_ui/callbacks/auth.py:1439 trendsearth_ui/callbacks/auth.py:1820
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1445 trendsearth_ui/callbacks/auth.py:1828
 msgid "Please describe your gender identity."
 msgstr "请描述一下您的性别认同。"
 
-#: trendsearth_ui/callbacks/auth.py:1443
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1449
 msgid "Please acknowledge the Google Earth Engine license terms."
 msgstr "请确认您已阅读并同意 Google Earth Engine 的许可条款。"
 
-#: trendsearth_ui/callbacks/auth.py:1497
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1504
 msgid ""
 "Account created successfully! Please check your email to verify your "
 "account, then you can log in."
 msgstr "账户创建成功！请查看您的邮箱以验证您的账户，验证通过后即可登录。"
 
-#: trendsearth_ui/callbacks/auth.py:1503 trendsearth_ui/callbacks/auth.py:1529
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1511 trendsearth_ui/callbacks/auth.py:1537
 msgid "Registration failed."
 msgstr "注册失败。"
 
-#: trendsearth_ui/callbacks/auth.py:1512
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1520
 msgid "Validation failed."
 msgstr "验证失败。"
 
-#: trendsearth_ui/callbacks/auth.py:1523
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1531
 msgid "Too many registration attempts. Please try again later."
 msgstr "注册次数过多，请稍后再试。"
 
-#: trendsearth_ui/callbacks/auth.py:1701
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1709
 msgid "Invalid or expired token. Please request a new profile update link."
 msgstr "令牌无效或已过期。请申请新的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1743
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1751
+#, python-brace-format
 msgid "Error loading profile: {error}"
 msgstr "加载配置文件时出错：{error}"
 
-#: trendsearth_ui/callbacks/auth.py:1792
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1800
 msgid "No authentication token. Please use a valid profile update link."
 msgstr "没有身份验证令牌。请使用有效的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1876
-#: trendsearth_ui/callbacks/profile.py:61
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1884 trendsearth_ui/callbacks/profile.py:61
 msgid "Profile updated successfully!"
 msgstr "个人资料已成功更新！"
 
-#: trendsearth_ui/callbacks/auth.py:1878
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1887
 msgid "Session expired. Please request a new profile update link."
 msgstr "会话已过期。请申请新的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1880
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1892
 msgid "Invalid token. Please request a new profile update link."
 msgstr "令牌无效。请申请新的个人资料更新链接。"
 
-#: trendsearth_ui/callbacks/auth.py:1889
-#: trendsearth_ui/callbacks/profile.py:63
-#, fuzzy
+#: trendsearth_ui/callbacks/auth.py:1901 trendsearth_ui/callbacks/profile.py:63
 msgid "Failed to update profile."
 msgstr "更新个人资料失败。"
 
@@ -467,9 +432,9 @@ msgstr "密码更改失败。"
 msgid " (Status: {status})"
 msgstr " （状态：{status}）"
 
-#: trendsearth_ui/callbacks/edit.py:567
-#: trendsearth_ui/callbacks/gee_credentials.py:185
-#: trendsearth_ui/callbacks/gee_credentials.py:348
+#: trendsearth_ui/callbacks/edit.py:568
+#: trendsearth_ui/callbacks/gee_credentials.py:196
+#: trendsearth_ui/callbacks/gee_credentials.py:361
 #: trendsearth_ui/callbacks/profile.py:72
 #: trendsearth_ui/callbacks/profile.py:210
 #: trendsearth_ui/callbacks/profile.py:277
@@ -596,101 +561,84 @@ msgstr "服务帐户"
 msgid "Credentials configured using {type_label}"
 msgstr "使用 {type_label} 配置的凭据"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:61
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:64
+#, python-brace-format
 msgid "Set up on: {created_date}"
 msgstr "创建日期：{created_date}"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:74
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:81
 msgid "No Google Earth Engine credentials configured."
 msgstr "未配置 Google Earth Engine 凭据。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:77
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:84
 msgid "Choose one of the setup options below."
 msgstr "请选择以下设置选项之一。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:84
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:91
 msgid "Unable to retrieve credentials status."
 msgstr "无法获取凭据状态。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:91
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:98
 msgid "Error retrieving credentials status."
 msgstr "获取凭据状态时出错。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:156
-#, fuzzy
-msgid ""
-"OAuth window opened. Please complete the authorization and return here."
-msgstr "OAuth窗口已打开。请完成授权并返回此处。"
+#: trendsearth_ui/callbacks/gee_credentials.py:164
+msgid "OAuth window opened. Please complete the authorization and return here."
+msgstr ""
 
-#: trendsearth_ui/callbacks/gee_credentials.py:159
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:169
 msgid ""
 "After authorization, you may need to refresh this page to see the updated "
 "status."
 msgstr "授权后，您可能需要刷新此页面才能查看更新后的状态。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:170
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:181
 msgid "OAuth initiation failed - no authorization URL received."
 msgstr "OAuth 发起失败 - 未收到授权 URL。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:175
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:186
 msgid "Failed to initiate OAuth flow."
 msgstr "OAuth流程启动失败。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:215
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:226
 msgid "Invalid JSON file. Please upload a valid service account key file."
 msgstr "JSON 文件无效。请上传有效的服务账号密钥文件。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:223
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:234
 msgid "Invalid service account key. Missing required fields."
 msgstr "服务账号密钥无效。缺少必填字段。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:227
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:238
 msgid "Invalid service account key. Type field must be 'service_account'."
 msgstr "服务帐户密钥无效。类型字段必须为“service_account”。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:247
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:258
+#, python-brace-format
 msgid "Service account key '{filename}' uploaded successfully!"
 msgstr "服务账号密钥“{filename}”已成功上传！"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:253
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:266
 msgid "Failed to upload service account key."
 msgstr "服务账号密钥上传失败。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:263
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:276
+#, python-brace-format
 msgid "Error processing file: {error}"
 msgstr "文件处理错误：{error}"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:305
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:318
 msgid "Google Earth Engine credentials are valid and working!"
 msgstr "Google Earth Engine 凭据有效且可用！"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:311
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:324
 msgid "Credentials test failed."
 msgstr "凭证测试失败。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:332
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:345
 msgid "Google Earth Engine credentials deleted successfully."
 msgstr "Google Earth Engine 凭据已成功删除。"
 
-#: trendsearth_ui/callbacks/gee_credentials.py:338
-#, fuzzy
+#: trendsearth_ui/callbacks/gee_credentials.py:351
 msgid "Failed to delete credentials."
 msgstr "删除凭据失败。"
 
@@ -707,16 +655,14 @@ msgstr "请登录以管理新闻。"
 #: trendsearth_ui/callbacks/news_admin.py:152
 #: trendsearth_ui/callbacks/news_admin.py:153
 #: trendsearth_ui/callbacks/news_admin.py:447
-#: trendsearth_ui/callbacks/news_admin.py:523
-#, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:525
 msgid "Session expired. Please log in again."
 msgstr "会话已过期，请重新登录。"
 
 #: trendsearth_ui/callbacks/news_admin.py:159
 #: trendsearth_ui/callbacks/news_admin.py:160
 #: trendsearth_ui/callbacks/news_admin.py:456
-#: trendsearth_ui/callbacks/news_admin.py:525
-#, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:527
 msgid "Access denied. Admin privileges required."
 msgstr "访问被拒绝。需要管理员权限。"
 
@@ -731,7 +677,8 @@ msgid "Error loading news: {error}"
 msgstr "新闻加载错误：{error}"
 
 #: trendsearth_ui/callbacks/news_admin.py:251
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:1780
+#: trendsearth_ui/components/tabs.py:1865
 msgid "Create News Item"
 msgstr "创建新闻条目"
 
@@ -747,8 +694,7 @@ msgid "Preview will appear here..."
 msgstr "预览将显示在此处……"
 
 #: trendsearth_ui/callbacks/news_admin.py:362
-#: trendsearth_ui/callbacks/news_admin.py:512
-#, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:514
 msgid "Please log in first."
 msgstr "请先登录。"
 
@@ -782,29 +728,27 @@ msgstr "创建"
 msgid "News item {action} successfully!"
 msgstr "新闻组 {action} 已成功发布！"
 
-#: trendsearth_ui/callbacks/news_admin.py:465
-#: trendsearth_ui/callbacks/news_admin.py:528
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:466
+#: trendsearth_ui/callbacks/news_admin.py:531
+#, python-brace-format
 msgid "Error: {status}"
 msgstr "错误：{status}"
 
-#: trendsearth_ui/callbacks/news_admin.py:477
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:479
+#, python-brace-format
 msgid "Error saving news item: {error}"
 msgstr "保存新闻条目时出错：{error}"
 
-#: trendsearth_ui/callbacks/news_admin.py:515
-#, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:517
 msgid "No news item selected."
 msgstr "未选择任何新闻条目。"
 
-#: trendsearth_ui/callbacks/news_admin.py:521
-#, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:523
 msgid "News item deleted successfully!"
 msgstr "新闻条目已成功删除！"
 
-#: trendsearth_ui/callbacks/news_admin.py:532
-#, python-brace-format, fuzzy
+#: trendsearth_ui/callbacks/news_admin.py:536
+#, python-brace-format
 msgid "Error deleting news item: {error}"
 msgstr "删除新闻项时出错：{error}"
 
@@ -899,7 +843,119 @@ msgstr "删除账户失败。"
 #: trendsearth_ui/callbacks/profile.py:431
 #, fuzzy
 msgid "Please try again."
-msgstr "请重试。"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:250
+#, python-brace-format
+msgid "Current System Status ({header_label})"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:252
+#: trendsearth_ui/callbacks/status.py:278
+#: trendsearth_ui/components/tabs.py:1344
+msgid "Current System Status"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:262
+#, python-brace-format
+msgid "Cluster Status{cluster_cached_time}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:275
+#, python-brace-format
+msgid "Error loading status data: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:282
+msgid "Error"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:394
+#: trendsearth_ui/callbacks/status.py:568
+msgid "Statistics unavailable."
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:396
+#: trendsearth_ui/callbacks/status.py:570
+#, python-brace-format
+msgid "Error: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:396
+#: trendsearth_ui/callbacks/status.py:570
+msgid "Unknown error"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:411
+#, python-brace-format
+msgid "Error loading statistics: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:462
+msgid "No status data available."
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:490
+msgid "Overview"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:493
+msgid "Total Executions"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:494
+msgid "Total Users"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:495
+msgid "Total Scripts"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:504
+#: trendsearth_ui/components/layout.py:1755
+msgid "Executions"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:507
+msgid "Active"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:510
+msgid "Running"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:511
+msgid "Ready"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:512
+msgid "Pending"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:514
+#: trendsearth_ui/callbacks/status.py:537
+msgid "Total"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:526
+msgid "Completed"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:529
+msgid "Finished"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:531
+msgid "Failed"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:535
+msgid "Cancelled"
+msgstr ""
+
+#: trendsearth_ui/callbacks/status.py:572
+msgid "No statistics available for the selected period."
+msgstr ""
 
 #: trendsearth_ui/components/layout.py:50
 #, fuzzy
@@ -1086,8 +1142,8 @@ msgid "Enter your email address"
 msgstr "请输入您的电子邮件地址"
 
 #: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/tabs.py:255
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:255 trendsearth_ui/components/tabs.py:2182
+#: trendsearth_ui/components/tabs.py:2212
 msgid "Cancel"
 msgstr "取消"
 
@@ -1194,32 +1250,33 @@ msgid "Confirm new password"
 msgstr "确认新密码"
 
 #: trendsearth_ui/components/layout.py:547
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2311
 msgid "Password requirements:"
 msgstr "密码要求："
 
 #: trendsearth_ui/components/layout.py:553
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2317
 msgid "At least 12 characters"
 msgstr "至少 12 个字符"
 
 #: trendsearth_ui/components/layout.py:558
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2322
 msgid "Uppercase letter (A-Z)"
 msgstr "大写字母 (AZ)"
 
 #: trendsearth_ui/components/layout.py:563
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2327
 msgid "Lowercase letter (a-z)"
 msgstr "小写字母 (az)"
 
 #: trendsearth_ui/components/layout.py:568
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2332
 msgid "Number (0-9)"
 msgstr "数字（0-9）"
 
 #: trendsearth_ui/components/layout.py:574
-#, python-brace-format, fuzzy
+#: trendsearth_ui/components/tabs.py:2337
+#, python-brace-format
 msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
 msgstr "特殊字符 (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
@@ -1337,6 +1394,7 @@ msgstr "请说明您的目的"
 
 #: trendsearth_ui/components/layout.py:951
 #: trendsearth_ui/components/layout.py:1502
+#: trendsearth_ui/components/tabs.py:2368
 #: trendsearth_ui/utils/mobile_utils.py:294
 #, fuzzy
 msgid "Country"
@@ -1440,12 +1498,7 @@ msgstr "更新个人资料"
 #: trendsearth_ui/components/layout.py:1709
 #, fuzzy
 msgid "Logout"
-msgstr "注销"
-
-#: trendsearth_ui/components/layout.py:1755
-#, fuzzy
-msgid "Executions"
-msgstr "执行"
+msgstr ""
 
 #: trendsearth_ui/components/layout.py:1765
 #, fuzzy
@@ -1458,7 +1511,7 @@ msgid "Scripts"
 msgstr "脚本"
 
 #: trendsearth_ui/components/layout.py:1793
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:2396
 msgid "Admin"
 msgstr "行政"
 
@@ -1561,7 +1614,7 @@ msgstr "请输入您的姓名"
 msgid "Enter your email"
 msgstr "请输入您的邮箱"
 
-#: trendsearth_ui/components/tabs.py:492
+#: trendsearth_ui/components/tabs.py:492 trendsearth_ui/components/tabs.py:2357
 #: trendsearth_ui/utils/mobile_utils.py:278
 #, fuzzy
 msgid "Institution"
@@ -1684,8 +1737,7 @@ msgid ""
 msgstr ""
 "服务凭证允许外部应用程序使用 OAuth2 客户端凭证授权对 Trends.Earth API 进行身份验证。客户端密钥仅在创建时显示一次。"
 
-#: trendsearth_ui/components/tabs.py:798
-#, fuzzy
+#: trendsearth_ui/components/tabs.py:798 trendsearth_ui/components/tabs.py:1765
 msgid "Refresh"
 msgstr "刷新"
 
@@ -1707,7 +1759,324 @@ msgstr "例如我的命令行工具"
 #: trendsearth_ui/components/tabs.py:862
 #, fuzzy
 msgid "A descriptive label for this credential."
-msgstr "该证书的描述性标签。"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1408
+msgid "Deployment Information"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1431
+msgid "System Status Trends"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1442
+msgid "Last 24 Hours"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1453
+msgid "Last Week"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1464
+msgid "Last Month"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1475
+msgid "Last Year"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1486
+msgid "All Time"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1564
+msgid ""
+"Access denied. Administrator privileges required to access admin "
+"functions."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1580
+msgid "Administration Panel"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1597
+msgid "Rate Limiting Management"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1607
+msgid "Current & Historical Rate Limit Breaches"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1618
+msgid "Refresh Breaches"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1632
+msgid "Cancel Selected Limit"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1653
+msgid "Reset All Rate Limits"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1672
+msgid "Active and historical events"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1710
+msgid "Highlighted rows are active and can be cancelled individually."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1745
+msgid "News Management"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1754
+msgid "Manage News Items"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1794
+msgid "Edit"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1810
+#: trendsearth_ui/components/tabs.py:2218
+msgid "Delete"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1830
+msgid "Loading news items..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1877
+msgid "Title *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1881
+msgid "Enter news title"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1896
+msgid "Message (Markdown supported) *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1905
+msgid ""
+"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. "
+"Will be converted to HTML."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1910
+msgid "Enter news message using Markdown..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1924
+msgid "Preview"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1944
+msgid "Link URL (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1955
+msgid "Link Text (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1959
+msgid "Read more..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1971
+msgid "Target Platforms *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1976
+msgid "QGIS Plugin"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1980
+msgid "Web App"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1984
+msgid "API UI"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1989
+msgid "Select target platforms..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2008
+msgid "Target Roles (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2017
+msgid ""
+"Leave empty to show to all users including unauthenticated. Select "
+"specific roles to restrict visibility."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2024
+msgid "Regular Users"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2028
+msgid "Admins"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2032
+msgid "Super Admins"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2037
+msgid "All users (no restriction)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2050
+msgid "News Type"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2055
+msgid "Announcement"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2059
+msgid "Warning"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2063
+msgid "Release"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2067
+msgid "Tip"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2071
+msgid "Maintenance"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2082
+msgid "Priority"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2101
+msgid "Min Plugin Version (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2106
+msgid "e.g., 1.0.0"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2114
+msgid "Max Plugin Version (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2119
+msgid "e.g., 2.0.0"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2131
+msgid "Start Date (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2134
+msgid "Select start date..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2142
+msgid "End Date (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2145
+msgid "Select end date..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2160
+msgid "Active (visible to users)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2188
+msgid "Save"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2203
+msgid "Confirm Delete"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2207
+msgid ""
+"Are you sure you want to delete this news item? This action cannot be "
+"undone."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2241
+msgid "Create New User"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2253
+msgid "Name *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2257
+msgid "Enter full name"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2265
+msgid "Email *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2269
+msgid "Enter email address"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2282
+msgid "Password *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2286
+msgid "Set password for user"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2294
+msgid "Confirm Password *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2298
+msgid "Confirm password"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2342
+msgid "Passwords match"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2361
+msgid "Enter institution/organization"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2372
+msgid "Select country..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2387
+msgid "Role *"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2392
+msgid "User"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2400
+msgid "Super Admin"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2422
+msgid "Create User"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2433
+msgid "Clear Form"
+msgstr ""
 
 #: trendsearth_ui/utils/mobile_utils.py:63
 #, fuzzy
@@ -1808,13 +2177,112 @@ msgstr "环境版本"
 #: trendsearth_ui/utils/mobile_utils.py:546
 #, fuzzy
 msgid "Compute"
-msgstr "计算"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:129
+#: trendsearth_ui/utils/status_helpers.py:159
+#, python-brace-format
+msgid "Environment: {env}"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:130
+msgid "API Status: Authentication required"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:131
+msgid "Please log in to view deployment status"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:160
+msgid "API status unavailable"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:171
+msgid "Authentication required"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:172
+msgid "Please log in to view cluster status"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:175
+msgid " (Auth Required)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:196
+msgid " (Live)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:202
+#, python-brace-format
+msgid " (Updated: {time} {tz})"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:207
+#: trendsearth_ui/utils/status_helpers.py:210
+#, python-brace-format
+msgid " (Updated: {time})"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:216
+msgid "Authentication failed"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:217
+msgid "Please check your login status"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:220
+msgid " (Auth Error)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:225
+msgid "Access denied"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:227
+msgid "Admin privileges required for cluster status"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:232
+msgid " (Access Denied)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:238
+#, python-brace-format
+msgid "Cluster Status: Error ({status_code})"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:241
+msgid "Unable to retrieve cluster information"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:244
+msgid " (Error)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:250
+msgid "Cluster Status: Connection Error"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:251
+msgid "Unable to reach cluster status endpoint"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:254
+msgid " (Connection Error)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:261
+msgid "System status is currently unavailable. Please try again later."
+msgstr ""
 
 #~ msgid "Forgot Password"
 #~ msgstr "忘记密码"
 
 #~ msgid ""
-#~ "Enter your email address and we'll send you instructions to reset your "
+#~ "Enter your email address and we'll "
+#~ "send you instructions to reset your "
 #~ "password."
 #~ msgstr "请输入您的电子邮件地址，我们将向您发送重置密码的说明。"
 
@@ -2005,8 +2473,9 @@ msgstr "计算"
 #~ msgstr "创建您的帐户"
 
 #~ msgid ""
-#~ "After registration, you'll receive an email to verify your address and set "
-#~ "your password."
+#~ "After registration, you'll receive an "
+#~ "email to verify your address and "
+#~ "set your password."
 #~ msgstr "注册后，您将收到一封电子邮件，用于验证您的地址并设置您的密码。"
 
 #~ msgid "Required field"
@@ -2064,39 +2533,51 @@ msgstr "计算"
 #~ msgstr "选择（可选）"
 
 #~ msgid ""
-#~ "We collect gender identity information to comply with donor reporting "
-#~ "requirements and to assess equitable participation in capacity development "
-#~ "and tool access. Providing this information is voluntary; your selection "
-#~ "will not affect your access to the tool."
-#~ msgstr ""
-#~ "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
+#~ "We collect gender identity information "
+#~ "to comply with donor reporting "
+#~ "requirements and to assess equitable "
+#~ "participation in capacity development and "
+#~ "tool access. Providing this information "
+#~ "is voluntary; your selection will not"
+#~ " affect your access to the tool."
+#~ msgstr "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
 
 #~ msgid "Please describe"
 #~ msgstr "请描述"
 
 #~ msgid ""
-#~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-#~ "and, depending on your use, you may be required to have in place a "
-#~ "commercial license to use Google Earth Engine?"
+#~ "Do you acknowledge that some "
+#~ "Trends.Earth features use Google Earth "
+#~ "Engine, and, depending on your use, "
+#~ "you may be required to have in "
+#~ "place a commercial license to use "
+#~ "Google Earth Engine?"
 #~ msgstr ""
-#~ "您是否知悉 Trends.Earth 的某些功能使用了 Google Earth Engine，并且根据您的使用情况，您可能需要获得使用 Google "
-#~ "Earth Engine 的商业许可？"
+#~ "您是否知悉 Trends.Earth 的某些功能使用了 Google Earth "
+#~ "Engine，并且根据您的使用情况，您可能需要获得使用 Google Earth Engine "
+#~ "的商业许可？"
 
 #~ msgid ""
-#~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-#~ "details see the "
+#~ "Google Earth Engine (GEE) imposes "
+#~ "restrictions on commercial use. For more"
+#~ " details see the "
 #~ msgstr "Google Earth Engine (GEE) 对商业用途有所限制。更多详情请参阅…… "
 
 #~ msgid "Google Earth Engine Terms of Use"
 #~ msgstr "Google Earth Engine 使用条款"
 
 #~ msgid ""
-#~ " . Conservation International does not provide or manage commercial GEE "
-#~ "licenses. Users are solely responsible for ensuring their use of GEE "
-#~ "complies with Google's commercial licensing requirements. Access to this "
-#~ "tool does not grant or imply the provision of commercial licensing."
+#~ " . Conservation International does not"
+#~ " provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible "
+#~ "for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing"
+#~ " requirements. Access to this tool "
+#~ "does not grant or imply the "
+#~ "provision of commercial licensing."
 #~ msgstr ""
-#~ " 国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
+#~ " "
+#~ "国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
 
 #~ msgid "Yes, I acknowledge"
 #~ msgstr "是的，我承认"
@@ -2124,3 +2605,4 @@ msgstr "计算"
 
 #~ msgid "Profile"
 #~ msgstr "轮廓"
+
