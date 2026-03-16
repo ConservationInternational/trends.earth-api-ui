@@ -10,397 +10,513 @@ msgstr ""
 "POT-Creation-Date: 2026-03-16 09:09-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: trendsearth_ui/callbacks/admin.py:644
+#, fuzzy
 msgid "Please fill in all required fields (Name, Email, Password)."
 msgstr ""
+"Por favor, rellene todos los campos obligatorios (Nombre, Correo "
+"electrónico, Contraseña)."
 
 #: trendsearth_ui/callbacks/admin.py:658
+#, fuzzy
 msgid "Passwords do not match."
-msgstr ""
+msgstr "Las contraseñas no coinciden."
 
 #: trendsearth_ui/callbacks/admin.py:688
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Password must contain {errors}."
-msgstr ""
+msgstr "La contraseña debe contener {errores}."
 
 #: trendsearth_ui/callbacks/admin.py:718
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "User '{name}' created successfully with email '{email}'."
 msgstr ""
+"El usuario &#39;{name}&#39; se creó correctamente con el correo electrónico "
+"&#39;{email}&#39;."
 
 #: trendsearth_ui/callbacks/admin.py:733
+#, fuzzy
 msgid "A user with this email already exists."
-msgstr ""
+msgstr "Ya existe un usuario con este correo electrónico."
 
 #: trendsearth_ui/callbacks/admin.py:745
+#, fuzzy
 msgid "Invalid user data."
-msgstr ""
+msgstr "Datos de usuario no válidos."
 
 #: trendsearth_ui/callbacks/admin.py:747
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error creating user: {detail}"
-msgstr ""
+msgstr "Error al crear el usuario: {detail}"
 
 #: trendsearth_ui/callbacks/admin.py:760
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Failed to create user. Server responded with status {status}."
 msgstr ""
+"No se pudo crear el usuario. El servidor respondió con el estado {status}."
 
 #: trendsearth_ui/callbacks/admin.py:776 trendsearth_ui/callbacks/auth.py:1257
 #: trendsearth_ui/callbacks/auth.py:1542 trendsearth_ui/callbacks/auth.py:1899
+#, fuzzy
 msgid "Request timed out. Please try again."
-msgstr ""
+msgstr "La solicitud ha caducado. Por favor, inténtelo de nuevo."
 
-#: trendsearth_ui/callbacks/admin.py:789 trendsearth_ui/callbacks/admin.py:1028
+#: trendsearth_ui/callbacks/admin.py:789
+#: trendsearth_ui/callbacks/admin.py:1028
+#, fuzzy
 msgid "Cannot connect to server. Please check your connection."
 msgstr ""
+"No se puede conectar con el servidor. Por favor, compruebe su conexión."
 
-#: trendsearth_ui/callbacks/admin.py:802 trendsearth_ui/callbacks/admin.py:1036
-#, python-brace-format
+#: trendsearth_ui/callbacks/admin.py:802
+#: trendsearth_ui/callbacks/admin.py:1036
+#, python-brace-format, fuzzy
 msgid "Unexpected error: {error}"
-msgstr ""
+msgstr "Error inesperado: {error}"
 
 #: trendsearth_ui/callbacks/admin.py:848
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
 "Invalid file type: {filename}. Must be a .tar.gz archive containing "
 "configuration.json."
 msgstr ""
+"Tipo de archivo no válido: {filename}. Debe ser un archivo .tar.gz que "
+"contenga configuration.json."
 
 #: trendsearth_ui/callbacks/admin.py:863
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
 msgstr ""
+"Archivo demasiado grande: {filename} ({size}MB). Máximo permitido: 10MB."
 
 #: trendsearth_ui/callbacks/admin.py:872
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Archive ready: {filename} ({size}MB)"
-msgstr ""
+msgstr "Archivo listo: {filename} ({size}MB)"
 
 #: trendsearth_ui/callbacks/admin.py:924
+#, fuzzy
 msgid "Access denied. Administrator privileges required."
-msgstr ""
+msgstr "Acceso denegado. Se requieren privilegios de administrador."
 
 #: trendsearth_ui/callbacks/admin.py:939
+#, fuzzy
 msgid "Please select a .tar.gz script archive to upload."
-msgstr ""
+msgstr "Seleccione un archivo de script .tar.gz para cargar."
 
 #: trendsearth_ui/callbacks/admin.py:950
+#, fuzzy
 msgid ""
 "Invalid file type. The API requires a .tar.gz archive containing a "
 "configuration.json file."
 msgstr ""
+"Tipo de archivo no válido. La API requiere un archivo .tar.gz que contenga "
+"un archivo configuration.json."
 
 #: trendsearth_ui/callbacks/admin.py:980
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Script '{name}' uploaded successfully."
-msgstr ""
+msgstr "El script &#39;{name}&#39; se ha subido correctamente."
 
 #: trendsearth_ui/callbacks/admin.py:989 trendsearth_ui/callbacks/admin.py:991
+#, fuzzy
 msgid "Invalid script archive."
-msgstr ""
+msgstr "Archivo de script no válido."
 
 #: trendsearth_ui/callbacks/admin.py:993
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error uploading script: {detail}"
-msgstr ""
+msgstr "Error al cargar el script: {detail}"
 
 #: trendsearth_ui/callbacks/admin.py:1001
+#, fuzzy
 msgid "Permission denied. Only admins and superadmins can create scripts."
 msgstr ""
+"Permiso denegado. Solo los administradores y superadministradores pueden "
+"crear scripts."
 
 #: trendsearth_ui/callbacks/admin.py:1009
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Failed to upload script. Server responded with status {status}."
 msgstr ""
+"Error al cargar el script. El servidor respondió con el estado {status}."
 
 #: trendsearth_ui/callbacks/admin.py:1020
+#, fuzzy
 msgid "Upload timed out. Please try again with a smaller file."
 msgstr ""
+"Se ha agotado el tiempo de espera para la carga. Inténtalo de nuevo con un "
+"archivo más pequeño."
 
 #: trendsearth_ui/callbacks/admin.py:1195
+#, fuzzy
 msgid "Rate limits have been successfully reset for all users and endpoints."
 msgstr ""
+"Los límites de uso se han restablecido correctamente para todos los usuarios"
+" y puntos finales."
 
 #: trendsearth_ui/callbacks/admin.py:1205
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Failed to reset rate limits. Status: {status}"
-msgstr ""
+msgstr "No se pudieron restablecer los límites de velocidad. Estado: {status}"
 
 #: trendsearth_ui/callbacks/admin.py:1229
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error resetting rate limits: {error}"
-msgstr ""
+msgstr "Error al restablecer los límites de velocidad: {error}"
 
 #: trendsearth_ui/callbacks/admin.py:1435
+#, fuzzy
 msgid "Error: No rate limit selected."
-msgstr ""
+msgstr "Error: No se ha seleccionado ningún límite de velocidad."
 
 #: trendsearth_ui/callbacks/admin.py:1476
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Rate limit for {identifier} has been successfully reset."
 msgstr ""
+"El límite de velocidad para {identifier} se ha restablecido correctamente."
 
 #: trendsearth_ui/callbacks/admin.py:1493
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Rate limit for {identifier} not found. It may have already expired."
 msgstr ""
+"No se ha encontrado el límite de solicitudes para {identifier}. Es posible "
+"que ya haya expirado."
 
 #: trendsearth_ui/callbacks/admin.py:1505
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Failed to reset rate limit. Status: {status}"
-msgstr ""
+msgstr "No se pudo restablecer el límite de velocidad. Estado: {status}"
 
 #: trendsearth_ui/callbacks/admin.py:1533
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error resetting rate limit: {error}"
-msgstr ""
+msgstr "Error al restablecer el límite de velocidad: {error}"
 
 #: trendsearth_ui/callbacks/auth.py:337
+#, fuzzy
 msgid "Please enter both email and password."
-msgstr ""
+msgstr "Por favor, introduzca su correo electrónico y su contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:372
+#, fuzzy
 msgid "Login failed: Invalid response format."
-msgstr ""
+msgstr "Error de inicio de sesión: Formato de respuesta no válido."
 
 #: trendsearth_ui/callbacks/auth.py:418
+#, fuzzy
 msgid "Login successful!"
-msgstr ""
+msgstr "¡Inicio de sesión exitoso!"
 
 #: trendsearth_ui/callbacks/auth.py:440
+#, fuzzy
 msgid "Failed to retrieve user information."
-msgstr ""
+msgstr "No se pudo recuperar la información del usuario."
 
 #: trendsearth_ui/callbacks/auth.py:448
+#, fuzzy
 msgid "Invalid credentials."
-msgstr ""
+msgstr "Credenciales no válidas."
 
 #: trendsearth_ui/callbacks/auth.py:456
+#, fuzzy
 msgid "Your account is locked due to too many failed login attempts. "
 msgstr ""
+"Tu cuenta está bloqueada debido a demasiados intentos fallidos de inicio de "
+"sesión. "
 
 #: trendsearth_ui/callbacks/auth.py:458
+#, fuzzy
 msgid "Please use the 'Forgot Password' link below to reset your password."
 msgstr ""
+"Utilice el enlace &quot;Olvidé mi contraseña&quot; que aparece a "
+"continuación para restablecerla."
 
 #: trendsearth_ui/callbacks/auth.py:461
+#, fuzzy
 msgid "Your account is temporarily locked. "
-msgstr ""
+msgstr "Tu cuenta está bloqueada temporalmente. "
 
 #: trendsearth_ui/callbacks/auth.py:462
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Please try again in {minutes} minute(s)."
-msgstr ""
+msgstr "Por favor, inténtelo de nuevo en {minutes} minuto(s)."
 
 #: trendsearth_ui/callbacks/auth.py:482
+#, fuzzy
 msgid "Login failed: Connection timeout. Please try again later."
 msgstr ""
+"Error de inicio de sesión: Tiempo de espera de conexión agotado. Inténtelo "
+"de nuevo más tarde."
 
 #: trendsearth_ui/callbacks/auth.py:494
+#, fuzzy
 msgid ""
 "Login failed: Cannot connect to authentication server. Please check the "
 "server status."
 msgstr ""
+"Error de inicio de sesión: No se puede conectar con el servidor de "
+"autenticación. Por favor, compruebe el estado del servidor."
 
 #: trendsearth_ui/callbacks/auth.py:506
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Login failed: {error}"
-msgstr ""
+msgstr "Error al iniciar sesión: {error}"
 
 #: trendsearth_ui/callbacks/auth.py:725 trendsearth_ui/callbacks/auth.py:1415
+#, fuzzy
 msgid "Please enter your email address."
-msgstr ""
+msgstr "Por favor, introduzca su dirección de correo electrónico."
 
 #: trendsearth_ui/callbacks/auth.py:738 trendsearth_ui/callbacks/auth.py:1451
+#, fuzzy
 msgid "Please enter a valid email address."
-msgstr ""
+msgstr "Por favor, introduce una dirección de correo electrónico válida."
 
 #: trendsearth_ui/callbacks/auth.py:773
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid ""
-"If an account exists with {email}, password recovery instructions have "
-"been sent. Please check your email."
+"If an account exists with {email}, password recovery instructions have been "
+"sent. Please check your email."
 msgstr ""
+"Si existe una cuenta con el nombre de usuario {email}, se han enviado "
+"instrucciones para recuperar la contraseña. Por favor, revise su correo "
+"electrónico."
 
 #: trendsearth_ui/callbacks/auth.py:783
+#, fuzzy
 msgid "Failed to send password recovery email."
 msgstr ""
+"No se pudo enviar el correo electrónico de recuperación de contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:792
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "{}. Please try again later."
-msgstr ""
+msgstr "{}. Inténtalo de nuevo más tarde."
 
 #: trendsearth_ui/callbacks/auth.py:806
+#, fuzzy
 msgid "Request timed out. Please try again later."
-msgstr ""
+msgstr "La solicitud ha caducado. Inténtalo de nuevo más tarde."
 
 #: trendsearth_ui/callbacks/auth.py:817
+#, fuzzy
 msgid ""
-"Cannot connect to the server. Please check your internet connection and "
-"try again."
+"Cannot connect to the server. Please check your internet connection and try "
+"again."
 msgstr ""
+"No se puede conectar con el servidor. Por favor, compruebe su conexión a "
+"internet e inténtelo de nuevo."
 
 #: trendsearth_ui/callbacks/auth.py:828
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "An error occurred: {error}. Please try again later."
-msgstr ""
+msgstr "Se ha producido un error: {error}. Inténtalo de nuevo más tarde."
 
 #: trendsearth_ui/callbacks/auth.py:1157
+#, fuzzy
 msgid "Invalid or missing reset token. Please request a new password reset."
 msgstr ""
+"Token de restablecimiento no válido o faltante. Solicite un nuevo "
+"restablecimiento de contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:1166
+#, fuzzy
 msgid "Please enter and confirm your new password."
-msgstr ""
+msgstr "Por favor, introduzca y confirme su nueva contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:1175
+#, fuzzy
 msgid "Passwords do not match. Please try again."
-msgstr ""
+msgstr "Las contraseñas no coinciden. Inténtalo de nuevo."
 
 #: trendsearth_ui/callbacks/auth.py:1184
 #: trendsearth_ui/callbacks/profile.py:123
+#, fuzzy
 msgid "Password must be at least 12 characters long."
-msgstr ""
+msgstr "La contraseña debe tener al menos 12 caracteres."
 
 #: trendsearth_ui/callbacks/auth.py:1205
+#, fuzzy
 msgid "Password reset successful! You can now log in with your new password."
 msgstr ""
+"¡Contraseña restablecida correctamente! Ya puedes iniciar sesión con tu "
+"nueva contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:1214
+#, fuzzy
 msgid ""
 "This reset link is invalid or has expired. Please request a new password "
 "reset."
 msgstr ""
+"Este enlace de restablecimiento no es válido o ha caducado. Solicite un "
+"nuevo restablecimiento de contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:1222
+#, fuzzy
 msgid "Password does not meet requirements."
-msgstr ""
+msgstr "La contraseña no cumple los requisitos."
 
 #: trendsearth_ui/callbacks/auth.py:1237
+#, fuzzy
 msgid "Failed to reset password."
-msgstr ""
+msgstr "No se pudo restablecer la contraseña."
 
 #: trendsearth_ui/callbacks/auth.py:1245 trendsearth_ui/callbacks/auth.py:1537
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "{}. Please try again."
-msgstr ""
+msgstr "{}. Por favor, inténtelo de nuevo."
 
 #: trendsearth_ui/callbacks/auth.py:1266 trendsearth_ui/callbacks/auth.py:1546
 #: trendsearth_ui/callbacks/auth.py:1903
+#, fuzzy
 msgid "Cannot connect to the server. Please check your connection."
 msgstr ""
+"No se puede conectar con el servidor. Por favor, compruebe su conexión."
 
 #: trendsearth_ui/callbacks/auth.py:1275 trendsearth_ui/callbacks/auth.py:1552
 #: trendsearth_ui/callbacks/auth.py:1909
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "An error occurred: {error}"
-msgstr ""
+msgstr "Se ha producido un error: {error}"
 
 #: trendsearth_ui/callbacks/auth.py:1418 trendsearth_ui/callbacks/auth.py:1799
+#, fuzzy
 msgid "Please enter your name."
-msgstr ""
+msgstr "Por favor, introduzca su nombre."
 
 #: trendsearth_ui/callbacks/auth.py:1421 trendsearth_ui/callbacks/auth.py:1802
+#, fuzzy
 msgid "Please enter your organization."
-msgstr ""
+msgstr "Por favor, indique su organización."
 
 #: trendsearth_ui/callbacks/auth.py:1424 trendsearth_ui/callbacks/auth.py:1805
+#, fuzzy
 msgid "Please select your sector."
-msgstr ""
+msgstr "Por favor, seleccione su sector."
 
 #: trendsearth_ui/callbacks/auth.py:1427 trendsearth_ui/callbacks/auth.py:1808
+#, fuzzy
 msgid "Please specify your sector."
-msgstr ""
+msgstr "Por favor, especifique su sector."
 
 #: trendsearth_ui/callbacks/auth.py:1430 trendsearth_ui/callbacks/auth.py:1811
+#, fuzzy
 msgid "Please select your purpose of use."
-msgstr ""
+msgstr "Seleccione su finalidad de uso."
 
 #: trendsearth_ui/callbacks/auth.py:1433 trendsearth_ui/callbacks/auth.py:1814
+#, fuzzy
 msgid "Please specify your purpose of use."
-msgstr ""
+msgstr "Por favor, especifique el propósito de su uso."
 
 #: trendsearth_ui/callbacks/auth.py:1436 trendsearth_ui/callbacks/auth.py:1817
+#, fuzzy
 msgid "Please select your country."
-msgstr ""
+msgstr "Por favor, seleccione su país."
 
 #: trendsearth_ui/callbacks/auth.py:1439 trendsearth_ui/callbacks/auth.py:1820
+#, fuzzy
 msgid "Please describe your gender identity."
-msgstr ""
+msgstr "Por favor, describa su identidad de género."
 
 #: trendsearth_ui/callbacks/auth.py:1443
+#, fuzzy
 msgid "Please acknowledge the Google Earth Engine license terms."
-msgstr ""
+msgstr "Por favor, acepte los términos de la licencia de Google Earth Engine."
 
 #: trendsearth_ui/callbacks/auth.py:1497
+#, fuzzy
 msgid ""
 "Account created successfully! Please check your email to verify your "
 "account, then you can log in."
 msgstr ""
+"¡Cuenta creada con éxito! Por favor, revisa tu correo electrónico para "
+"verificar tu cuenta y luego podrás iniciar sesión."
 
 #: trendsearth_ui/callbacks/auth.py:1503 trendsearth_ui/callbacks/auth.py:1529
+#, fuzzy
 msgid "Registration failed."
-msgstr ""
+msgstr "El registro ha fallado."
 
 #: trendsearth_ui/callbacks/auth.py:1512
+#, fuzzy
 msgid "Validation failed."
-msgstr ""
+msgstr "La validación falló."
 
 #: trendsearth_ui/callbacks/auth.py:1523
+#, fuzzy
 msgid "Too many registration attempts. Please try again later."
 msgstr ""
+"Se han realizado demasiados intentos de registro. Inténtalo de nuevo más "
+"tarde."
 
 #: trendsearth_ui/callbacks/auth.py:1701
+#, fuzzy
 msgid "Invalid or expired token. Please request a new profile update link."
 msgstr ""
+"Token no válido o caducado. Solicite un nuevo enlace para actualizar su "
+"perfil."
 
 #: trendsearth_ui/callbacks/auth.py:1743
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error loading profile: {error}"
-msgstr ""
+msgstr "Error al cargar el perfil: {error}"
 
 #: trendsearth_ui/callbacks/auth.py:1792
+#, fuzzy
 msgid "No authentication token. Please use a valid profile update link."
 msgstr ""
+"No se ha encontrado ningún token de autenticación. Utilice un enlace válido "
+"para actualizar su perfil."
 
-#: trendsearth_ui/callbacks/auth.py:1876 trendsearth_ui/callbacks/profile.py:61
+#: trendsearth_ui/callbacks/auth.py:1876
+#: trendsearth_ui/callbacks/profile.py:61
+#, fuzzy
 msgid "Profile updated successfully!"
-msgstr ""
+msgstr "¡Perfil actualizado correctamente!"
 
 #: trendsearth_ui/callbacks/auth.py:1878
+#, fuzzy
 msgid "Session expired. Please request a new profile update link."
 msgstr ""
+"La sesión ha caducado. Solicite un nuevo enlace para actualizar su perfil."
 
 #: trendsearth_ui/callbacks/auth.py:1880
+#, fuzzy
 msgid "Invalid token. Please request a new profile update link."
-msgstr ""
+msgstr "Token no válido. Solicite un nuevo enlace para actualizar su perfil."
 
-#: trendsearth_ui/callbacks/auth.py:1889 trendsearth_ui/callbacks/profile.py:63
+#: trendsearth_ui/callbacks/auth.py:1889
+#: trendsearth_ui/callbacks/profile.py:63
+#, fuzzy
 msgid "Failed to update profile."
-msgstr ""
+msgstr "No se pudo actualizar el perfil."
 
-#: trendsearth_ui/callbacks/edit.py:550 trendsearth_ui/callbacks/profile.py:192
+#: trendsearth_ui/callbacks/edit.py:550
+#: trendsearth_ui/callbacks/profile.py:192
+#, fuzzy
 msgid "Password changed successfully!"
-msgstr ""
+msgstr "¡Contraseña cambiada correctamente!"
 
-#: trendsearth_ui/callbacks/edit.py:553 trendsearth_ui/callbacks/profile.py:195
+#: trendsearth_ui/callbacks/edit.py:553
+#: trendsearth_ui/callbacks/profile.py:195
+#, fuzzy
 msgid "Failed to change password."
-msgstr ""
+msgstr "No se pudo cambiar la contraseña."
 
 #: trendsearth_ui/callbacks/edit.py:562
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid " (Status: {status})"
-msgstr ""
+msgstr " (Estado: {estado})"
 
 #: trendsearth_ui/callbacks/edit.py:567
 #: trendsearth_ui/callbacks/gee_credentials.py:185
@@ -409,18 +525,20 @@ msgstr ""
 #: trendsearth_ui/callbacks/profile.py:210
 #: trendsearth_ui/callbacks/profile.py:277
 #: trendsearth_ui/callbacks/profile.py:448
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Network error: {error}"
-msgstr ""
+msgstr "Error de red: {error}"
 
 #: trendsearth_ui/callbacks/executions.py:564
+#, fuzzy
 msgid "Execution Cancelled Successfully"
-msgstr ""
+msgstr "Ejecución cancelada con éxito."
 
 #: trendsearth_ui/callbacks/executions.py:568
 #: trendsearth_ui/callbacks/executions.py:713
+#, fuzzy
 msgid "Execution ID: "
-msgstr ""
+msgstr "ID de ejecución: "
 
 #: trendsearth_ui/callbacks/executions.py:569
 #: trendsearth_ui/callbacks/executions.py:576
@@ -429,510 +547,638 @@ msgstr ""
 #: trendsearth_ui/callbacks/executions.py:661
 #: trendsearth_ui/callbacks/executions.py:664
 #: trendsearth_ui/callbacks/gee_credentials.py:42
+#, fuzzy
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: trendsearth_ui/callbacks/executions.py:575
+#, fuzzy
 msgid "Script: "
-msgstr ""
+msgstr "Guion: "
 
 #: trendsearth_ui/callbacks/executions.py:582
+#, fuzzy
 msgid "Previous Status: "
-msgstr ""
+msgstr "Estado anterior: "
 
 #: trendsearth_ui/callbacks/executions.py:591
+#, fuzzy
 msgid "New Status: "
-msgstr ""
+msgstr "Nuevo estado: "
 
 #: trendsearth_ui/callbacks/executions.py:608
+#, fuzzy
 msgid "Infrastructure Cleanup"
-msgstr ""
+msgstr "Limpieza de infraestructura"
 
 #: trendsearth_ui/callbacks/executions.py:614
+#, fuzzy
 msgid "Docker service stopped"
-msgstr ""
+msgstr "El servicio Docker se ha detenido."
 
 #: trendsearth_ui/callbacks/executions.py:616
+#, fuzzy
 msgid "Docker service not found/stopped"
-msgstr ""
+msgstr "Servicio Docker no encontrado/detenido"
 
 #: trendsearth_ui/callbacks/executions.py:625
+#, fuzzy
 msgid "Docker container stopped"
-msgstr ""
+msgstr "Contenedor Docker detenido"
 
 #: trendsearth_ui/callbacks/executions.py:627
+#, fuzzy
 msgid "Docker container not found/stopped"
-msgstr ""
+msgstr "Contenedor Docker no encontrado/detenido"
 
 #: trendsearth_ui/callbacks/executions.py:639
 #: trendsearth_ui/callbacks/executions.py:679
+#, fuzzy
 msgid "Google Earth Engine Tasks"
-msgstr ""
+msgstr "Tareas de Google Earth Engine"
 
 #: trendsearth_ui/callbacks/executions.py:643
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Found and processed {count} GEE tasks:"
-msgstr ""
+msgstr "Se encontraron y procesaron {count} tareas GEE:"
 
 #: trendsearth_ui/callbacks/executions.py:663
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Status: {status}"
-msgstr ""
+msgstr "Estado: {estado}"
 
 #: trendsearth_ui/callbacks/executions.py:681
+#, fuzzy
 msgid "No GEE tasks found in execution logs."
-msgstr ""
+msgstr "No se encontraron tareas de GEE en los registros de ejecución."
 
 #: trendsearth_ui/callbacks/executions.py:694
+#, fuzzy
 msgid "Errors Encountered"
-msgstr ""
+msgstr "Errores encontrados"
 
 #: trendsearth_ui/callbacks/executions.py:704
+#, fuzzy
 msgid "Cancellation Failed"
-msgstr ""
+msgstr "Cancelación fallida"
 
 #: trendsearth_ui/callbacks/executions.py:707
+#, fuzzy
 msgid "Error: "
-msgstr ""
+msgstr "Error: "
 
 #: trendsearth_ui/callbacks/gee_credentials.py:26
+#, fuzzy
 msgid "Please log in to view credentials status."
-msgstr ""
+msgstr "Inicie sesión para ver el estado de sus credenciales."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:53
+#, fuzzy
 msgid "OAuth"
-msgstr ""
+msgstr "OAuth"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:53
+#, fuzzy
 msgid "Service Account"
-msgstr ""
+msgstr "Cuenta de servicio"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:59
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Credentials configured using {type_label}"
-msgstr ""
+msgstr "Credenciales configuradas usando {type_label}"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:61
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Set up on: {created_date}"
-msgstr ""
+msgstr "Configurado el: {created_date}"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:74
+#, fuzzy
 msgid "No Google Earth Engine credentials configured."
-msgstr ""
+msgstr "No se han configurado credenciales de Google Earth Engine."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:77
+#, fuzzy
 msgid "Choose one of the setup options below."
 msgstr ""
+"Elija una de las opciones de configuración que aparecen a continuación."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:84
+#, fuzzy
 msgid "Unable to retrieve credentials status."
-msgstr ""
+msgstr "No se pudo recuperar el estado de las credenciales."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:91
+#, fuzzy
 msgid "Error retrieving credentials status."
-msgstr ""
+msgstr "Error al recuperar el estado de las credenciales."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:156
-msgid "OAuth window opened. Please complete the authorization and return here."
+#, fuzzy
+msgid ""
+"OAuth window opened. Please complete the authorization and return here."
 msgstr ""
+"Se ha abierto la ventana de OAuth. Por favor, complete la autorización y "
+"vuelva aquí."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:159
+#, fuzzy
 msgid ""
-"After authorization, you may need to refresh this page to see the updated"
-" status."
+"After authorization, you may need to refresh this page to see the updated "
+"status."
 msgstr ""
+"Tras la autorización, es posible que deba actualizar esta página para ver el"
+" estado actualizado."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:170
+#, fuzzy
 msgid "OAuth initiation failed - no authorization URL received."
 msgstr ""
+"Falló la iniciación de OAuth: no se recibió ninguna URL de autorización."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:175
+#, fuzzy
 msgid "Failed to initiate OAuth flow."
-msgstr ""
+msgstr "No se pudo iniciar el flujo de OAuth."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:215
+#, fuzzy
 msgid "Invalid JSON file. Please upload a valid service account key file."
 msgstr ""
+"Archivo JSON no válido. Por favor, cargue un archivo de clave de cuenta de "
+"servicio válido."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:223
+#, fuzzy
 msgid "Invalid service account key. Missing required fields."
-msgstr ""
+msgstr "Clave de cuenta de servicio no válida. Faltan campos obligatorios."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:227
+#, fuzzy
 msgid "Invalid service account key. Type field must be 'service_account'."
 msgstr ""
+"Clave de cuenta de servicio no válida. El campo de tipo debe ser "
+"&#39;service_account&#39;."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:247
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Service account key '{filename}' uploaded successfully!"
 msgstr ""
+"¡La clave de la cuenta de servicio &#39;{filename}&#39; se ha cargado "
+"correctamente!"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:253
+#, fuzzy
 msgid "Failed to upload service account key."
-msgstr ""
+msgstr "No se pudo cargar la clave de la cuenta de servicio."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:263
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error processing file: {error}"
-msgstr ""
+msgstr "Error al procesar el archivo: {error}"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:305
+#, fuzzy
 msgid "Google Earth Engine credentials are valid and working!"
-msgstr ""
+msgstr "¡Las credenciales de Google Earth Engine son válidas y funcionan!"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:311
+#, fuzzy
 msgid "Credentials test failed."
-msgstr ""
+msgstr "La prueba de credenciales falló."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:332
+#, fuzzy
 msgid "Google Earth Engine credentials deleted successfully."
-msgstr ""
+msgstr "Las credenciales de Google Earth Engine se eliminaron correctamente."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:338
+#, fuzzy
 msgid "Failed to delete credentials."
-msgstr ""
+msgstr "No se pudieron eliminar las credenciales."
 
 #: trendsearth_ui/callbacks/news_admin.py:40
+#, fuzzy
 msgid "No news items found."
-msgstr ""
+msgstr "No se encontraron noticias."
 
 #: trendsearth_ui/callbacks/news_admin.py:140
+#, fuzzy
 msgid "Please log in to manage news."
-msgstr ""
+msgstr "Inicie sesión para gestionar las noticias."
 
 #: trendsearth_ui/callbacks/news_admin.py:152
 #: trendsearth_ui/callbacks/news_admin.py:153
 #: trendsearth_ui/callbacks/news_admin.py:447
 #: trendsearth_ui/callbacks/news_admin.py:523
+#, fuzzy
 msgid "Session expired. Please log in again."
-msgstr ""
+msgstr "La sesión ha caducado. Vuelva a iniciar sesión."
 
 #: trendsearth_ui/callbacks/news_admin.py:159
 #: trendsearth_ui/callbacks/news_admin.py:160
 #: trendsearth_ui/callbacks/news_admin.py:456
 #: trendsearth_ui/callbacks/news_admin.py:525
+#, fuzzy
 msgid "Access denied. Admin privileges required."
-msgstr ""
+msgstr "Acceso denegado. Se requieren privilegios de administrador."
 
 #: trendsearth_ui/callbacks/news_admin.py:165
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Failed to load news: {status}"
-msgstr ""
+msgstr "No se pudo cargar la noticia: {status}"
 
 #: trendsearth_ui/callbacks/news_admin.py:169
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error loading news: {error}"
-msgstr ""
+msgstr "Error al cargar las noticias: {error}"
 
 #: trendsearth_ui/callbacks/news_admin.py:251
+#, fuzzy
 msgid "Create News Item"
-msgstr ""
+msgstr "Crear noticia"
 
 #: trendsearth_ui/callbacks/news_admin.py:275
 #: trendsearth_ui/callbacks/news_admin.py:427
+#, fuzzy
 msgid "Edit News Item"
-msgstr ""
+msgstr "Editar noticia"
 
 #: trendsearth_ui/callbacks/news_admin.py:303
+#, fuzzy
 msgid "Preview will appear here..."
-msgstr ""
+msgstr "La vista previa aparecerá aquí..."
 
 #: trendsearth_ui/callbacks/news_admin.py:362
 #: trendsearth_ui/callbacks/news_admin.py:512
+#, fuzzy
 msgid "Please log in first."
-msgstr ""
+msgstr "Por favor, inicie sesión primero."
 
 #: trendsearth_ui/callbacks/news_admin.py:373
+#, fuzzy
 msgid "Title is required."
-msgstr ""
+msgstr "Se requiere título."
 
 #: trendsearth_ui/callbacks/news_admin.py:383
+#, fuzzy
 msgid "Message is required."
-msgstr ""
+msgstr "Se requiere mensaje."
 
 #: trendsearth_ui/callbacks/news_admin.py:393
+#, fuzzy
 msgid "At least one target platform is required."
-msgstr ""
+msgstr "Se requiere al menos una plataforma de destino."
 
 #: trendsearth_ui/callbacks/news_admin.py:436
+#, fuzzy
 msgid "updated"
-msgstr ""
+msgstr "actualizado"
 
 #: trendsearth_ui/callbacks/news_admin.py:436
+#, fuzzy
 msgid "created"
-msgstr ""
+msgstr "creado"
 
 #: trendsearth_ui/callbacks/news_admin.py:441
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "News item {action} successfully!"
-msgstr ""
+msgstr "¡Noticia {acción} completada con éxito!"
 
 #: trendsearth_ui/callbacks/news_admin.py:465
 #: trendsearth_ui/callbacks/news_admin.py:528
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error: {status}"
-msgstr ""
+msgstr "Error: {estado}"
 
 #: trendsearth_ui/callbacks/news_admin.py:477
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error saving news item: {error}"
-msgstr ""
+msgstr "Error al guardar la noticia: {error}"
 
 #: trendsearth_ui/callbacks/news_admin.py:515
+#, fuzzy
 msgid "No news item selected."
-msgstr ""
+msgstr "No se ha seleccionado ninguna noticia."
 
 #: trendsearth_ui/callbacks/news_admin.py:521
+#, fuzzy
 msgid "News item deleted successfully!"
-msgstr ""
+msgstr "¡Noticia eliminada con éxito!"
 
 #: trendsearth_ui/callbacks/news_admin.py:532
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Error deleting news item: {error}"
-msgstr ""
+msgstr "Error al eliminar la noticia: {error}"
 
 #: trendsearth_ui/callbacks/profile.py:38
+#, fuzzy
 msgid "Name is required."
-msgstr ""
+msgstr "Se requiere el nombre."
 
 #: trendsearth_ui/callbacks/profile.py:45
+#, fuzzy
 msgid "User ID not found in user data."
-msgstr ""
+msgstr "No se encontró el ID de usuario en los datos del usuario."
 
 #: trendsearth_ui/callbacks/profile.py:102
+#, fuzzy
 msgid "All password fields are required."
-msgstr ""
+msgstr "Todos los campos de contraseña son obligatorios."
 
 #: trendsearth_ui/callbacks/profile.py:111
+#, fuzzy
 msgid "New passwords do not match."
-msgstr ""
+msgstr "Las nuevas contraseñas no coinciden."
 
 #: trendsearth_ui/callbacks/profile.py:133
+#, fuzzy
 msgid "Password must include an uppercase letter."
-msgstr ""
+msgstr "La contraseña debe incluir una letra mayúscula."
 
 #: trendsearth_ui/callbacks/profile.py:143
+#, fuzzy
 msgid "Password must include a lowercase letter."
-msgstr ""
+msgstr "La contraseña debe incluir una letra minúscula."
 
 #: trendsearth_ui/callbacks/profile.py:153
+#, fuzzy
 msgid "Password must include a number."
-msgstr ""
+msgstr "La contraseña debe incluir un número."
 
 #: trendsearth_ui/callbacks/profile.py:164
-#, python-brace-format
-msgid "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+#, python-brace-format, fuzzy
+msgid ""
+"Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 msgstr ""
+"La contraseña debe incluir un carácter especial "
+"(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
 
 #: trendsearth_ui/callbacks/profile.py:259
+#, fuzzy
 msgid "enabled"
-msgstr ""
+msgstr "activado"
 
 #: trendsearth_ui/callbacks/profile.py:259
+#, fuzzy
 msgid "disabled"
-msgstr ""
+msgstr "desactivado"
 
 #: trendsearth_ui/callbacks/profile.py:261
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Email notifications {status} successfully!"
 msgstr ""
+"¡Notificaciones por correo electrónico {estado} recibidas correctamente!"
 
 #: trendsearth_ui/callbacks/profile.py:267
+#, fuzzy
 msgid "Failed to update email notification settings."
 msgstr ""
+"No se pudieron actualizar los ajustes de notificación por correo "
+"electrónico."
 
 #: trendsearth_ui/callbacks/profile.py:363
+#, fuzzy
 msgid "Email confirmation does not match. Please try again."
 msgstr ""
+"La confirmación por correo electrónico no coincide. Inténtelo de nuevo."
 
 #: trendsearth_ui/callbacks/profile.py:390
+#, fuzzy
 msgid "Your account has been deleted."
-msgstr ""
+msgstr "Tu cuenta ha sido eliminada."
 
 #: trendsearth_ui/callbacks/profile.py:403
+#, fuzzy
 msgid "Admin accounts cannot be deleted through self-service. "
 msgstr ""
+"Las cuentas de administrador no se pueden eliminar a través del "
+"autoservicio. "
 
 #: trendsearth_ui/callbacks/profile.py:404
+#, fuzzy
 msgid "Please contact a system administrator."
-msgstr ""
+msgstr "Póngase en contacto con un administrador del sistema."
 
 #: trendsearth_ui/callbacks/profile.py:420
 #: trendsearth_ui/callbacks/profile.py:430
+#, fuzzy
 msgid "Failed to delete account."
-msgstr ""
+msgstr "No se pudo eliminar la cuenta."
 
 #: trendsearth_ui/callbacks/profile.py:429
 #: trendsearth_ui/callbacks/profile.py:431
+#, fuzzy
 msgid "Please try again."
-msgstr ""
+msgstr "Por favor, inténtalo de nuevo."
 
 #: trendsearth_ui/components/layout.py:50
+#, fuzzy
 msgid "Government - Environment/Natural Resources"
-msgstr ""
+msgstr "Gobierno - Medio ambiente/Recursos naturales"
 
 #: trendsearth_ui/components/layout.py:51
+#, fuzzy
 msgid "Government - Agriculture"
-msgstr ""
+msgstr "Gobierno - Agricultura"
 
 #: trendsearth_ui/components/layout.py:52
+#, fuzzy
 msgid "Government - Land Management/Planning"
-msgstr ""
+msgstr "Gobierno - Gestión/Planificación del Territorio"
 
 #: trendsearth_ui/components/layout.py:53
+#, fuzzy
 msgid "Government - Other"
-msgstr ""
+msgstr "Gobierno - Otros"
 
 #: trendsearth_ui/components/layout.py:54
+#, fuzzy
 msgid "International/Multilateral Organization"
-msgstr ""
+msgstr "Organización internacional/multilateral"
 
 #: trendsearth_ui/components/layout.py:55
+#, fuzzy
 msgid "NGO - Development/Aid"
-msgstr ""
+msgstr "ONG - Desarrollo/Ayuda"
 
 #: trendsearth_ui/components/layout.py:56
+#, fuzzy
 msgid "NGO - Community-Based"
-msgstr ""
+msgstr "ONG - De base comunitaria"
 
 #: trendsearth_ui/components/layout.py:57
+#, fuzzy
 msgid "NGO - Conservation"
-msgstr ""
+msgstr "ONG - Conservación"
 
 #: trendsearth_ui/components/layout.py:58
+#, fuzzy
 msgid "NGO - Other"
-msgstr ""
+msgstr "ONG - Otros"
 
 #: trendsearth_ui/components/layout.py:59
+#, fuzzy
 msgid "Academic/Research Institution"
-msgstr ""
+msgstr "Institución académica/de investigación"
 
 #: trendsearth_ui/components/layout.py:60
+#, fuzzy
 msgid "Consulting/Professional Services"
-msgstr ""
+msgstr "Servicios de consultoría/profesionales"
 
 #: trendsearth_ui/components/layout.py:61
+#, fuzzy
 msgid "Private Sector - Agriculture/Forestry"
-msgstr ""
+msgstr "Sector privado - Agricultura/Silvicultura"
 
 #: trendsearth_ui/components/layout.py:62
+#, fuzzy
 msgid "Private Sector - Other"
-msgstr ""
+msgstr "Sector privado - Otros"
 
 #: trendsearth_ui/components/layout.py:63
+#, fuzzy
 msgid "Independent Researcher"
-msgstr ""
+msgstr "Investigador independiente"
 
 #: trendsearth_ui/components/layout.py:64
+#, fuzzy
 msgid "Student"
-msgstr ""
+msgstr "Alumno"
 
 #: trendsearth_ui/components/layout.py:65
 #: trendsearth_ui/components/layout.py:88
+#, fuzzy
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #: trendsearth_ui/components/layout.py:77
+#, fuzzy
 msgid "National/International Reporting (UNCCD, SDGs, etc.)"
-msgstr ""
+msgstr "Informes nacionales/internacionales (UNCCD, ODS, etc.)"
 
 #: trendsearth_ui/components/layout.py:78
+#, fuzzy
 msgid "Academic Research"
-msgstr ""
+msgstr "Investigación académica"
 
 #: trendsearth_ui/components/layout.py:79
+#, fuzzy
 msgid "Policy Development & Planning"
-msgstr ""
+msgstr "Desarrollo y planificación de políticas"
 
 #: trendsearth_ui/components/layout.py:80
+#, fuzzy
 msgid "Land Restoration/Management Planning"
-msgstr ""
+msgstr "Planificación de la restauración y gestión de tierras"
 
 #: trendsearth_ui/components/layout.py:81
+#, fuzzy
 msgid "Project Monitoring & Evaluation"
-msgstr ""
+msgstr "Seguimiento y evaluación de proyectos"
 
 #: trendsearth_ui/components/layout.py:82
+#, fuzzy
 msgid "Environmental Impact Assessment"
-msgstr ""
+msgstr "Evaluación de impacto ambiental"
 
 #: trendsearth_ui/components/layout.py:83
+#, fuzzy
 msgid "Agriculture/Forestry Planning"
-msgstr ""
+msgstr "Planificación agrícola/forestal"
 
 #: trendsearth_ui/components/layout.py:84
+#, fuzzy
 msgid "Teaching & Education"
-msgstr ""
+msgstr "Enseñanza y educación"
 
 #: trendsearth_ui/components/layout.py:85
+#, fuzzy
 msgid "Conservation Planning"
-msgstr ""
+msgstr "Planificación de la conservación"
 
 #: trendsearth_ui/components/layout.py:86
+#, fuzzy
 msgid "Commercial Services/Products"
-msgstr ""
+msgstr "Servicios/Productos comerciales"
 
 #: trendsearth_ui/components/layout.py:87
+#, fuzzy
 msgid "Community/Grassroots Initiatives"
-msgstr ""
+msgstr "Iniciativas comunitarias/de base"
 
 #: trendsearth_ui/components/layout.py:100
+#, fuzzy
 msgid "Woman"
-msgstr ""
+msgstr "Mujer"
 
 #: trendsearth_ui/components/layout.py:101
+#, fuzzy
 msgid "Man"
-msgstr ""
+msgstr "Hombre"
 
 #: trendsearth_ui/components/layout.py:102
+#, fuzzy
 msgid "Non-binary"
-msgstr ""
+msgstr "No binario"
 
 #: trendsearth_ui/components/layout.py:103
+#, fuzzy
 msgid "Prefer to self-describe"
-msgstr ""
+msgstr "Prefiero describirme a mí mismo"
 
 #: trendsearth_ui/components/layout.py:104
+#, fuzzy
 msgid "Prefer not to say"
-msgstr ""
+msgstr "Prefiero no decirlo"
 
 #: trendsearth_ui/components/layout.py:187
+#, fuzzy
 msgid "Forgot Password"
-msgstr ""
+msgstr "Has olvidado tu contraseña"
 
 #: trendsearth_ui/components/layout.py:197
+#, fuzzy
 msgid ""
 "Enter your email address and we'll send you instructions to reset your "
 "password."
 msgstr ""
+"Introduce tu dirección de correo electrónico y te enviaremos instrucciones "
+"para restablecer tu contraseña."
 
 #: trendsearth_ui/components/layout.py:200
+#, fuzzy
 msgid "Email Address"
-msgstr ""
+msgstr "Dirección de correo electrónico"
 
 #: trendsearth_ui/components/layout.py:204
 #: trendsearth_ui/components/layout.py:758
+#, fuzzy
 msgid "Enter your email address"
-msgstr ""
+msgstr "Introduce tu dirección de correo electrónico"
 
 #: trendsearth_ui/components/layout.py:226
 #: trendsearth_ui/components/tabs.py:255
+#, fuzzy
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: trendsearth_ui/components/layout.py:232
+#, fuzzy
 msgid "Send Reset Instructions"
-msgstr ""
+msgstr "Enviar instrucciones de reinicio"
 
 #: trendsearth_ui/components/layout.py:244
+#, fuzzy
 msgid "OK"
-msgstr ""
+msgstr "DE ACUERDO"
 
 #: trendsearth_ui/components/layout.py:279
 #: trendsearth_ui/components/layout.py:351
+#, fuzzy
 msgid "Login"
-msgstr ""
+msgstr "Acceso"
 
 #: trendsearth_ui/components/layout.py:299
 #: trendsearth_ui/components/layout.py:744
@@ -940,572 +1186,726 @@ msgstr ""
 #: trendsearth_ui/components/tabs.py:474
 #: trendsearth_ui/utils/mobile_utils.py:96
 #: trendsearth_ui/utils/mobile_utils.py:245
+#, fuzzy
 msgid "Email"
-msgstr ""
+msgstr "Correo electrónico"
 
 #: trendsearth_ui/components/layout.py:304
+#, fuzzy
 msgid "Enter email"
-msgstr ""
+msgstr "Introduce tu correo electrónico"
 
 #: trendsearth_ui/components/layout.py:313
+#, fuzzy
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 #: trendsearth_ui/components/layout.py:318
+#, fuzzy
 msgid "Enter password"
-msgstr ""
+msgstr "Introduzca la contraseña"
 
 #: trendsearth_ui/components/layout.py:341
+#, fuzzy
 msgid "Remember me (keep me logged in)"
-msgstr ""
+msgstr "Recuérdame (mantén mi sesión iniciada)"
 
 #: trendsearth_ui/components/layout.py:359
+#, fuzzy
 msgid "Register"
-msgstr ""
+msgstr "Registro"
 
 #: trendsearth_ui/components/layout.py:370
+#, fuzzy
 msgid "Forgot your password?"
-msgstr ""
+msgstr "¿Olvidaste tu contraseña?"
 
 #: trendsearth_ui/components/layout.py:401
 #: trendsearth_ui/components/layout.py:630
 #: trendsearth_ui/components/layout.py:1154
 #: trendsearth_ui/components/layout.py:1610
+#, fuzzy
 msgid "Privacy Policy"
-msgstr ""
+msgstr "política de privacidad"
 
 #: trendsearth_ui/components/layout.py:416
 #: trendsearth_ui/components/layout.py:645
 #: trendsearth_ui/components/layout.py:1169
 #: trendsearth_ui/components/layout.py:1625
+#, fuzzy
 msgid "Terms of Use"
-msgstr ""
+msgstr "Condiciones de uso"
 
 #: trendsearth_ui/components/layout.py:486
+#, fuzzy
 msgid "Set Your New Password"
-msgstr ""
+msgstr "Establece tu nueva contraseña"
 
 #: trendsearth_ui/components/layout.py:490
+#, fuzzy
 msgid "Enter your new password below."
-msgstr ""
+msgstr "Introduce tu nueva contraseña a continuación."
 
 #: trendsearth_ui/components/layout.py:511
+#, fuzzy
 msgid "New Password"
-msgstr ""
+msgstr "Nueva contraseña"
 
 #: trendsearth_ui/components/layout.py:517
+#, fuzzy
 msgid "Enter new password"
-msgstr ""
+msgstr "Introduzca la nueva contraseña"
 
 #: trendsearth_ui/components/layout.py:528
+#, fuzzy
 msgid "Confirm Password"
-msgstr ""
+msgstr "confirmar Contraseña"
 
 #: trendsearth_ui/components/layout.py:535
+#, fuzzy
 msgid "Confirm new password"
-msgstr ""
+msgstr "Confirmar nueva contraseña"
 
 #: trendsearth_ui/components/layout.py:547
+#, fuzzy
 msgid "Password requirements:"
-msgstr ""
+msgstr "Requisitos de contraseña:"
 
 #: trendsearth_ui/components/layout.py:553
+#, fuzzy
 msgid "At least 12 characters"
-msgstr ""
+msgstr "Al menos 12 caracteres"
 
 #: trendsearth_ui/components/layout.py:558
+#, fuzzy
 msgid "Uppercase letter (A-Z)"
-msgstr ""
+msgstr "Letra mayúscula (AZ)"
 
 #: trendsearth_ui/components/layout.py:563
+#, fuzzy
 msgid "Lowercase letter (a-z)"
-msgstr ""
+msgstr "letra minúscula (az)"
 
 #: trendsearth_ui/components/layout.py:568
+#, fuzzy
 msgid "Number (0-9)"
-msgstr ""
+msgstr "Número (0-9)"
 
 #: trendsearth_ui/components/layout.py:574
-#, python-brace-format
+#, python-brace-format, fuzzy
 msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr ""
+msgstr "Carácter especial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
 #: trendsearth_ui/components/layout.py:591
+#, fuzzy
 msgid "Set Password"
-msgstr ""
+msgstr "Establecer contraseña"
 
 #: trendsearth_ui/components/layout.py:607
 #: trendsearth_ui/components/layout.py:1138
+#, fuzzy
 msgid "Back to Login"
-msgstr ""
+msgstr "Volver a Iniciar sesión"
 
 #: trendsearth_ui/components/layout.py:714
+#, fuzzy
 msgid "Create Your Account"
-msgstr ""
+msgstr "Crea tu cuenta"
 
 #: trendsearth_ui/components/layout.py:719
+#, fuzzy
 msgid ""
-"After registration, you'll receive an email to verify your address and "
-"set your password."
+"After registration, you'll receive an email to verify your address and set "
+"your password."
 msgstr ""
+"Tras registrarte, recibirás un correo electrónico para verificar tu "
+"dirección y establecer tu contraseña."
 
 #: trendsearth_ui/components/layout.py:732
 #: trendsearth_ui/components/layout.py:1287
+#, fuzzy
 msgid "Required field"
-msgstr ""
+msgstr "Campo obligatorio"
 
 #: trendsearth_ui/components/layout.py:772
 #: trendsearth_ui/components/layout.py:1323
+#, fuzzy
 msgid "Full Name"
-msgstr ""
+msgstr "Nombre completo"
 
 #: trendsearth_ui/components/layout.py:786
 #: trendsearth_ui/components/layout.py:1337
+#, fuzzy
 msgid "Enter your full name"
-msgstr ""
+msgstr "Ingrese su nombre completo"
 
 #: trendsearth_ui/components/layout.py:798
 #: trendsearth_ui/components/layout.py:1349
 #: trendsearth_ui/utils/mobile_utils.py:388
+#, fuzzy
 msgid "Role/Title"
-msgstr ""
+msgstr "Cargo/Título"
 
 #: trendsearth_ui/components/layout.py:805
 #: trendsearth_ui/components/layout.py:1356
+#, fuzzy
 msgid "Your job title (optional)"
-msgstr ""
+msgstr "Su cargo (opcional)"
 
 #: trendsearth_ui/components/layout.py:819
 #: trendsearth_ui/components/layout.py:1370
+#, fuzzy
 msgid "Organization"
-msgstr ""
+msgstr "Organización"
 
 #: trendsearth_ui/components/layout.py:833
 #: trendsearth_ui/components/layout.py:1384
+#, fuzzy
 msgid "Your organization"
-msgstr ""
+msgstr "Su organización"
 
 #: trendsearth_ui/components/layout.py:847
 #: trendsearth_ui/components/layout.py:1398
 #: trendsearth_ui/utils/mobile_utils.py:404
+#, fuzzy
 msgid "Sector"
-msgstr ""
+msgstr "Sector"
 
 #: trendsearth_ui/components/layout.py:861
 #: trendsearth_ui/components/layout.py:1412
+#, fuzzy
 msgid "Select your sector"
-msgstr ""
+msgstr "Seleccione su sector"
 
 #: trendsearth_ui/components/layout.py:875
 #: trendsearth_ui/components/layout.py:928
 #: trendsearth_ui/components/layout.py:1426
 #: trendsearth_ui/components/layout.py:1479
+#, fuzzy
 msgid "Please specify"
-msgstr ""
+msgstr "Por favor, especifique"
 
 #: trendsearth_ui/components/layout.py:882
 #: trendsearth_ui/components/layout.py:1433
+#, fuzzy
 msgid "Please specify your sector"
-msgstr ""
+msgstr "Por favor, especifique su sector."
 
 #: trendsearth_ui/components/layout.py:899
 #: trendsearth_ui/components/layout.py:1450
 #: trendsearth_ui/utils/mobile_utils.py:420
+#, fuzzy
 msgid "Purpose of Use"
-msgstr ""
+msgstr "Finalidad de uso"
 
 #: trendsearth_ui/components/layout.py:914
 #: trendsearth_ui/components/layout.py:1465
+#, fuzzy
 msgid "Select your purpose of use"
-msgstr ""
+msgstr "Seleccione su propósito de uso"
 
 #: trendsearth_ui/components/layout.py:935
 #: trendsearth_ui/components/layout.py:1486
+#, fuzzy
 msgid "Please specify your purpose"
-msgstr ""
+msgstr "Por favor, especifique su propósito."
 
 #: trendsearth_ui/components/layout.py:951
 #: trendsearth_ui/components/layout.py:1502
 #: trendsearth_ui/utils/mobile_utils.py:294
+#, fuzzy
 msgid "Country"
-msgstr ""
+msgstr "País"
 
 #: trendsearth_ui/components/layout.py:964
 #: trendsearth_ui/components/layout.py:1515
+#, fuzzy
 msgid "Select your country"
-msgstr ""
+msgstr "Seleccione su país"
 
 #: trendsearth_ui/components/layout.py:982
 #: trendsearth_ui/components/layout.py:1530
+#, fuzzy
 msgid "Gender Identity"
-msgstr ""
+msgstr "Identidad de género"
 
 #: trendsearth_ui/components/layout.py:990
 #: trendsearth_ui/components/layout.py:1538
+#, fuzzy
 msgid "Select (optional)"
-msgstr ""
+msgstr "Seleccione (opcional)"
 
 #: trendsearth_ui/components/layout.py:1004
 #: trendsearth_ui/components/layout.py:1552
+#, fuzzy
 msgid ""
 "We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity "
-"development and tool access. Providing this information is voluntary; "
-"your selection will not affect your access to the tool."
+"requirements and to assess equitable participation in capacity development "
+"and tool access. Providing this information is voluntary; your selection "
+"will not affect your access to the tool."
 msgstr ""
+"Recopilamos información sobre identidad de género para cumplir con los "
+"requisitos de presentación de informes de los donantes y para evaluar la "
+"participación equitativa en el desarrollo de capacidades y el acceso a las "
+"herramientas. Proporcionar esta información es voluntario; su elección no "
+"afectará su acceso a la herramienta."
 
 #: trendsearth_ui/components/layout.py:1013
 #: trendsearth_ui/components/layout.py:1021
 #: trendsearth_ui/components/layout.py:1561
 #: trendsearth_ui/components/layout.py:1569
+#, fuzzy
 msgid "Please describe"
-msgstr ""
+msgstr "Por favor, describa"
 
 #: trendsearth_ui/components/layout.py:1065
+#, fuzzy
 msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth "
-"Engine, and, depending on your use, you may be required to have in place "
-"a commercial license to use Google Earth Engine?"
+"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
+"and, depending on your use, you may be required to have in place a "
+"commercial license to use Google Earth Engine?"
 msgstr ""
+"¿Reconoce usted que algunas funciones de Trends.Earth utilizan Google Earth "
+"Engine y que, dependiendo de su uso, es posible que necesite una licencia "
+"comercial para utilizar Google Earth Engine?"
 
 #: trendsearth_ui/components/layout.py:1078
+#, fuzzy
 msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For "
-"more details see the "
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
+"details see the "
 msgstr ""
+"Google Earth Engine (GEE) impone restricciones al uso comercial. Para "
+"obtener más detalles, consulte la "
 
 #: trendsearth_ui/components/layout.py:1082
+#, fuzzy
 msgid "Google Earth Engine Terms of Use"
-msgstr ""
+msgstr "Condiciones de uso de Google Earth Engine"
 
 #: trendsearth_ui/components/layout.py:1088
+#, fuzzy
 msgid ""
 " . Conservation International does not provide or manage commercial GEE "
 "licenses. Users are solely responsible for ensuring their use of GEE "
 "complies with Google's commercial licensing requirements. Access to this "
 "tool does not grant or imply the provision of commercial licensing."
 msgstr ""
+" Conservation International no proporciona ni gestiona licencias comerciales"
+" de GEE. Los usuarios son los únicos responsables de garantizar que su uso "
+"de GEE cumpla con los requisitos de licencia comercial de Google. El acceso "
+"a esta herramienta no otorga ni implica la concesión de una licencia "
+"comercial."
 
 #: trendsearth_ui/components/layout.py:1097
+#, fuzzy
 msgid "Yes, I acknowledge"
-msgstr ""
+msgstr "Sí, lo reconozco."
 
 #: trendsearth_ui/components/layout.py:1122
+#, fuzzy
 msgid "Create Account"
-msgstr ""
+msgstr "Crear una cuenta"
 
 #: trendsearth_ui/components/layout.py:1253
+#, fuzzy
 msgid "Update Your Profile"
-msgstr ""
+msgstr "Actualiza tu perfil"
 
 #: trendsearth_ui/components/layout.py:1308
+#, fuzzy
 msgid "Email cannot be changed"
-msgstr ""
+msgstr "El correo electrónico no se puede cambiar."
 
 #: trendsearth_ui/components/layout.py:1593
 #: trendsearth_ui/components/tabs.py:522
+#, fuzzy
 msgid "Update Profile"
-msgstr ""
+msgstr "Actualizar perfil"
 
 #: trendsearth_ui/components/layout.py:1709
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: trendsearth_ui/components/layout.py:1755
+#, fuzzy
 msgid "Executions"
-msgstr ""
+msgstr "Ejecuciones"
 
 #: trendsearth_ui/components/layout.py:1765
+#, fuzzy
 msgid "Users"
-msgstr ""
+msgstr "Usuarios"
 
 #: trendsearth_ui/components/layout.py:1779
+#, fuzzy
 msgid "Scripts"
-msgstr ""
+msgstr "Guiones"
 
 #: trendsearth_ui/components/layout.py:1793
+#, fuzzy
 msgid "Admin"
-msgstr ""
+msgstr "Administración"
 
 #: trendsearth_ui/components/layout.py:1807
 #: trendsearth_ui/utils/mobile_utils.py:140
 #: trendsearth_ui/utils/mobile_utils.py:499
+#, fuzzy
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
 #: trendsearth_ui/components/layout.py:1821
+#, fuzzy
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: trendsearth_ui/components/tabs.py:164
+#, fuzzy
 msgid "Refresh Executions"
-msgstr ""
+msgstr "Actualizar ejecuciones"
 
 #: trendsearth_ui/components/tabs.py:176
+#, fuzzy
 msgid "Auto-refresh in:"
-msgstr ""
+msgstr "Actualización automática en:"
 
 #: trendsearth_ui/components/tabs.py:215
+#, fuzzy
 msgid "Cancel Execution"
-msgstr ""
+msgstr "Cancelar ejecución"
 
 #: trendsearth_ui/components/tabs.py:221
+#, fuzzy
 msgid "Are you sure you want to cancel this execution?"
-msgstr ""
+msgstr "¿Está seguro de que desea cancelar esta ejecución?"
 
 #: trendsearth_ui/components/tabs.py:226
+#, fuzzy
 msgid "Execution ID:"
-msgstr ""
+msgstr "ID de ejecución:"
 
 #: trendsearth_ui/components/tabs.py:233
+#, fuzzy
 msgid "Script:"
-msgstr ""
+msgstr "Guion:"
 
 #: trendsearth_ui/components/tabs.py:240
+#, fuzzy
 msgid "Status:"
-msgstr ""
+msgstr "Estado:"
 
 #: trendsearth_ui/components/tabs.py:246
+#, fuzzy
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Esta acción no se puede deshacer."
 
 #: trendsearth_ui/components/tabs.py:263
+#, fuzzy
 msgid "Confirm Cancel"
-msgstr ""
+msgstr "Confirmar Cancelar"
 
 #: trendsearth_ui/components/tabs.py:302
+#, fuzzy
 msgid "Cancellation Result"
-msgstr ""
+msgstr "Resultado de la cancelación"
 
 #: trendsearth_ui/components/tabs.py:305
+#, fuzzy
 msgid "Close"
-msgstr ""
+msgstr "Cerca"
 
 #: trendsearth_ui/components/tabs.py:327
+#, fuzzy
 msgid "Refresh Users"
-msgstr ""
+msgstr "Actualizar usuarios"
 
 #: trendsearth_ui/components/tabs.py:401
+#, fuzzy
 msgid "Refresh Scripts"
-msgstr ""
+msgstr "Actualizar scripts"
 
 #: trendsearth_ui/components/tabs.py:453
+#, fuzzy
 msgid "Profile Settings"
-msgstr ""
+msgstr "Configuración del perfil"
 
 #: trendsearth_ui/components/tabs.py:462 trendsearth_ui/components/tabs.py:854
 #: trendsearth_ui/utils/mobile_utils.py:262
 #: trendsearth_ui/utils/mobile_utils.py:457
+#, fuzzy
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #: trendsearth_ui/components/tabs.py:466
+#, fuzzy
 msgid "Enter your name"
-msgstr ""
+msgstr "Introduce tu nombre"
 
 #: trendsearth_ui/components/tabs.py:478
+#, fuzzy
 msgid "Enter your email"
-msgstr ""
+msgstr "Introduce tu correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:492
 #: trendsearth_ui/utils/mobile_utils.py:278
+#, fuzzy
 msgid "Institution"
-msgstr ""
+msgstr "Institución"
 
 #: trendsearth_ui/components/tabs.py:496
+#, fuzzy
 msgid "Enter your institution"
-msgstr ""
+msgstr "Ingrese su institución"
 
 #: trendsearth_ui/components/tabs.py:504
 #: trendsearth_ui/utils/mobile_utils.py:310
+#, fuzzy
 msgid "Role"
-msgstr ""
+msgstr "Role"
 
 #: trendsearth_ui/components/tabs.py:547
+#, fuzzy
 msgid "Email Notifications"
-msgstr ""
+msgstr "Notificaciones por correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:554
+#, fuzzy
 msgid "Execution Completion Notifications"
-msgstr ""
+msgstr "Notificaciones de finalización de ejecución"
 
 #: trendsearth_ui/components/tabs.py:559
+#, fuzzy
 msgid "Enable email notifications"
-msgstr ""
+msgstr "Habilitar notificaciones por correo electrónico"
 
 #: trendsearth_ui/components/tabs.py:569
+#, fuzzy
 msgid ""
-"Receive email notifications when your script executions finish, fail, or "
-"are cancelled."
+"Receive email notifications when your script executions finish, fail, or are"
+" cancelled."
 msgstr ""
+"Reciba notificaciones por correo electrónico cuando la ejecución de sus "
+"scripts finalice, falle o se cancele."
 
 #: trendsearth_ui/components/tabs.py:602
+#, fuzzy
 msgid "Google Earth Engine Account"
-msgstr ""
+msgstr "Cuenta de Google Earth Engine"
 
 #: trendsearth_ui/components/tabs.py:610
+#, fuzzy
 msgid "Current Credentials Status"
-msgstr ""
+msgstr "Estado actual de las credenciales"
 
 #: trendsearth_ui/components/tabs.py:624
+#, fuzzy
 msgid "Setup Your GEE Account"
-msgstr ""
+msgstr "Configura tu cuenta GEE"
 
 #: trendsearth_ui/components/tabs.py:627
+#, fuzzy
 msgid ""
 "Choose one of the options below to configure your Google Earth Engine "
 "credentials:"
 msgstr ""
+"Elige una de las siguientes opciones para configurar tus credenciales de "
+"Google Earth Engine:"
 
 #: trendsearth_ui/components/tabs.py:648
+#, fuzzy
 msgid "Option 1: Connect Your GEE Account (OAuth)"
-msgstr ""
+msgstr "Opción 1: Conecta tu cuenta GEE (OAuth)"
 
 #: trendsearth_ui/components/tabs.py:654
+#, fuzzy
 msgid ""
 "Connect your personal Google Earth Engine account using OAuth "
 "authentication."
 msgstr ""
+"Conecta tu cuenta personal de Google Earth Engine mediante la autenticación "
+"OAuth."
 
 #: trendsearth_ui/components/tabs.py:659
+#, fuzzy
 msgid "Connect GEE Account"
-msgstr ""
+msgstr "Conectar cuenta GEE"
 
 #: trendsearth_ui/components/tabs.py:692
+#, fuzzy
 msgid "Option 2: Upload Service Account Key"
-msgstr ""
+msgstr "Opción 2: Cargar la clave de la cuenta de servicio"
 
 #: trendsearth_ui/components/tabs.py:698
-msgid "Upload a Google Cloud service account JSON key with Earth Engine access."
+#, fuzzy
+msgid ""
+"Upload a Google Cloud service account JSON key with Earth Engine access."
 msgstr ""
+"Sube una clave JSON de cuenta de servicio de Google Cloud con acceso a Earth"
+" Engine."
 
 #: trendsearth_ui/components/tabs.py:710
+#, fuzzy
 msgid "Upload Service Account Key"
-msgstr ""
+msgstr "Cargar clave de cuenta de servicio"
 
 #: trendsearth_ui/components/tabs.py:741
+#, fuzzy
 msgid "Manage Credentials"
-msgstr ""
+msgstr "Administrar credenciales"
 
 #: trendsearth_ui/components/tabs.py:745
+#, fuzzy
 msgid "Test Credentials"
-msgstr ""
+msgstr "Credenciales de prueba"
 
 #: trendsearth_ui/components/tabs.py:752
+#, fuzzy
 msgid "Delete Credentials"
-msgstr ""
+msgstr "Eliminar credenciales"
 
 #: trendsearth_ui/components/tabs.py:779
+#, fuzzy
 msgid "Service Credentials"
-msgstr ""
+msgstr "Credenciales de servicio"
 
 #: trendsearth_ui/components/tabs.py:784
+#, fuzzy
 msgid ""
 "Service credentials allow external applications to authenticate with the "
 "Trends.Earth API using the OAuth2 client credentials grant. The client "
 "secret is shown only once at creation time."
 msgstr ""
+"Las credenciales de servicio permiten que las aplicaciones externas se "
+"autentiquen con la API de Trends.Earth mediante la concesión de credenciales"
+" de cliente OAuth2. El secreto del cliente se muestra solo una vez, en el "
+"momento de su creación."
 
 #: trendsearth_ui/components/tabs.py:798
+#, fuzzy
 msgid "Refresh"
-msgstr ""
+msgstr "Refrescar"
 
 #: trendsearth_ui/components/tabs.py:814
+#, fuzzy
 msgid "New Credential"
-msgstr ""
+msgstr "Nueva credencial"
 
 #: trendsearth_ui/components/tabs.py:843
+#, fuzzy
 msgid "Create Service Credential"
-msgstr ""
+msgstr "Crear credenciales de servicio"
 
 #: trendsearth_ui/components/tabs.py:858
+#, fuzzy
 msgid "e.g. My CLI Tool"
-msgstr ""
+msgstr "Por ejemplo, mi herramienta de línea de comandos"
 
 #: trendsearth_ui/components/tabs.py:862
+#, fuzzy
 msgid "A descriptive label for this credential."
-msgstr ""
+msgstr "Una etiqueta descriptiva para esta credencial."
 
 #: trendsearth_ui/utils/mobile_utils.py:63
+#, fuzzy
 msgid "Script"
-msgstr ""
+msgstr "Guion"
 
 #: trendsearth_ui/utils/mobile_utils.py:112
+#, fuzzy
 msgid "Start"
-msgstr ""
+msgstr "Comenzar"
 
 #: trendsearth_ui/utils/mobile_utils.py:121
+#, fuzzy
 msgid "End"
-msgstr ""
+msgstr "Fin"
 
 #: trendsearth_ui/utils/mobile_utils.py:132
+#, fuzzy
 msgid "Duration"
-msgstr ""
+msgstr "Duración"
 
 #: trendsearth_ui/utils/mobile_utils.py:157
 #: trendsearth_ui/utils/mobile_utils.py:372
+#, fuzzy
 msgid "ID"
-msgstr ""
+msgstr "IDENTIFICACIÓN"
 
 #: trendsearth_ui/utils/mobile_utils.py:187
+#, fuzzy
 msgid "Params"
-msgstr ""
+msgstr "Parámetros"
 
 #: trendsearth_ui/utils/mobile_utils.py:196
+#, fuzzy
 msgid "Results"
-msgstr ""
+msgstr "Resultados"
 
 #: trendsearth_ui/utils/mobile_utils.py:214
+#, fuzzy
 msgid "Docker Logs"
-msgstr ""
+msgstr "Registros de Docker"
 
 #: trendsearth_ui/utils/mobile_utils.py:223
+#, fuzzy
 msgid "Batch Logs"
-msgstr ""
+msgstr "Registros de lotes"
 
 #: trendsearth_ui/utils/mobile_utils.py:232
+#, fuzzy
 msgid "Map"
-msgstr ""
+msgstr "Mapa"
 
 #: trendsearth_ui/utils/mobile_utils.py:325
+#, fuzzy
 msgid "Last Activity"
-msgstr ""
+msgstr "Última actividad"
 
 #: trendsearth_ui/utils/mobile_utils.py:334
+#, fuzzy
 msgid "Verified"
-msgstr ""
+msgstr "Verificado"
 
 #: trendsearth_ui/utils/mobile_utils.py:343
+#, fuzzy
 msgid "Verified At"
-msgstr ""
+msgstr "Verificado en"
 
 #: trendsearth_ui/utils/mobile_utils.py:354
+#, fuzzy
 msgid "Created"
-msgstr ""
+msgstr "Creado"
 
 #: trendsearth_ui/utils/mobile_utils.py:436
+#, fuzzy
 msgid "GEE License"
-msgstr ""
+msgstr "Licencia GEE"
 
 #: trendsearth_ui/utils/mobile_utils.py:474
+#, fuzzy
 msgid "Slug"
-msgstr ""
+msgstr "Babosa"
 
 #: trendsearth_ui/utils/mobile_utils.py:490
+#, fuzzy
 msgid "Access"
-msgstr ""
+msgstr "Acceso"
 
 #: trendsearth_ui/utils/mobile_utils.py:514
+#, fuzzy
 msgid "Environment"
-msgstr ""
+msgstr "Ambiente"
 
 #: trendsearth_ui/utils/mobile_utils.py:530
+#, fuzzy
 msgid "Env Version"
-msgstr ""
+msgstr "Versión del entorno"
 
 #: trendsearth_ui/utils/mobile_utils.py:546
+#, fuzzy
 msgid "Compute"
-msgstr ""
+msgstr "Calcular"
 
 #~ msgid "Please enter both email and password."
 #~ msgstr "Por favor, introduzca su correo electrónico y su contraseña."
