@@ -2498,7 +2498,7 @@ def admin_tab_content(role, is_admin):
                         html.H4(
                             [
                                 html.I(className="fas fa-file-upload me-2"),
-                                "Upload New Script",
+                                _("Upload New Script"),
                             ]
                         )
                     ),
@@ -2507,9 +2507,11 @@ def admin_tab_content(role, is_admin):
                             dbc.Alert(
                                 [
                                     html.I(className="fas fa-info-circle me-2"),
-                                    "Upload a .tar.gz archive containing your script and a ",
+                                    _("Upload a .tar.gz archive containing your script and a "),
                                     html.Code("configuration.json"),
-                                    " file. The script name and metadata are read from the configuration file.",
+                                    _(
+                                        " file. The script name and metadata are read from the configuration file."
+                                    ),
                                 ],
                                 color="info",
                                 className="mb-3",
@@ -2520,7 +2522,7 @@ def admin_tab_content(role, is_admin):
                                         [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label("Script Archive (.tar.gz) *"),
+                                                    dbc.Label(_("Script Archive (.tar.gz) *")),
                                                     dcc.Upload(
                                                         id="admin-script-upload",
                                                         children=html.Div(
@@ -2528,8 +2530,8 @@ def admin_tab_content(role, is_admin):
                                                                 html.I(
                                                                     className="fas fa-cloud-upload-alt me-2"
                                                                 ),
-                                                                "Drag and Drop or ",
-                                                                html.A("Select Script Archive"),
+                                                                _("Drag and Drop or "),
+                                                                html.A(_("Select Script Archive")),
                                                             ]
                                                         ),
                                                         style={
@@ -2564,7 +2566,7 @@ def admin_tab_content(role, is_admin):
                                                     dbc.Button(
                                                         [
                                                             html.I(className="fas fa-upload me-2"),
-                                                            "Upload Script",
+                                                            _("Upload Script"),
                                                         ],
                                                         id="admin-upload-script-btn",
                                                         color="primary",

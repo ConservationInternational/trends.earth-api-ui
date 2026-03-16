@@ -8,6 +8,8 @@ from dash import dcc, html
 import pandas as pd
 import plotly.graph_objects as go
 
+from trendsearth_ui.i18n import gettext as _
+
 from .boundaries_utils import COUNTRY_NAME_OVERRIDES, CountryIsoResolver
 
 
@@ -603,7 +605,7 @@ def create_execution_statistics_chart(
 
                     fig_in_process.update_layout(
                         xaxis_title=get_chart_axis_label(user_timezone),
-                        yaxis_title="Number of Executions",
+                        yaxis_title=_("Number of Executions"),
                         height=360,
                         hovermode="x unified",
                         legend={
@@ -625,7 +627,11 @@ def create_execution_statistics_chart(
                     execution_charts.append(
                         html.Div(
                             [
-                                html.H6(f"Running executions{suffix_label}"),
+                                html.H6(
+                                    _("Running executions{suffix_label}").format(
+                                        suffix_label=suffix_label
+                                    )
+                                ),
                                 dcc.Graph(
                                     figure=fig_in_process,
                                     config={"displayModeBar": False, "responsive": True},
@@ -637,24 +643,26 @@ def create_execution_statistics_chart(
                 else:
                     execution_charts.append(
                         _build_message_block(
-                            "No in-progress execution data available.",
+                            _("No in-progress execution data available."),
                             detail=(
-                                "Status time series data did not include ready, pending, or running counts for this period."
+                                _(
+                                    "Status time series data did not include ready, pending, or running counts for this period."
+                                )
                             ),
                         )
                     )
             else:
                 execution_charts.append(
                     _build_message_block(
-                        "No in-progress execution data available.",
-                        detail="Status timestamps could not be parsed from the API response.",
+                        _("No in-progress execution data available."),
+                        detail=_("Status timestamps could not be parsed from the API response."),
                     )
                 )
         elif not use_extended_cumulative:
             execution_charts.append(
                 _build_message_block(
-                    "No in-progress execution data available.",
-                    detail="Status time series data was not provided for this period.",
+                    _("No in-progress execution data available."),
+                    detail=_("Status time series data was not provided for this period."),
                 )
             )
 
@@ -771,7 +779,7 @@ def create_execution_statistics_chart(
 
                             figure.update_layout(
                                 xaxis_title=get_chart_axis_label(user_timezone),
-                                yaxis_title="Cumulative Executions",
+                                yaxis_title=_("Cumulative Executions"),
                                 height=360,
                                 hovermode="x unified",
                                 legend={
@@ -792,7 +800,11 @@ def create_execution_statistics_chart(
                                 html.Div(
                                     [
                                         html.H6(
-                                            f"Cumulative completed tasks{suffix_label}{agg_suffix}"
+                                            _(
+                                                "Cumulative completed tasks{suffix_label}{agg_suffix}"
+                                            ).format(
+                                                suffix_label=suffix_label, agg_suffix=agg_suffix
+                                            )
                                         ),
                                         dcc.Graph(
                                             figure=figure,
@@ -827,7 +839,7 @@ def create_execution_statistics_chart(
 
                         fig_completed.update_layout(
                             xaxis_title=get_chart_axis_label(user_timezone),
-                            yaxis_title="Cumulative Executions",
+                            yaxis_title=_("Cumulative Executions"),
                             height=360,
                             hovermode="x unified",
                             legend={
@@ -849,7 +861,11 @@ def create_execution_statistics_chart(
                         execution_charts.append(
                             html.Div(
                                 [
-                                    html.H6(f"Completed executions (cumulative){suffix_label}"),
+                                    html.H6(
+                                        _("Completed executions (cumulative){suffix_label}").format(
+                                            suffix_label=suffix_label
+                                        )
+                                    ),
                                     dcc.Graph(
                                         figure=fig_completed,
                                         config={"displayModeBar": False, "responsive": True},
@@ -861,18 +877,20 @@ def create_execution_statistics_chart(
                 else:
                     execution_charts.append(
                         _build_message_block(
-                            "No cumulative execution data available.",
+                            _("No cumulative execution data available."),
                             detail=(
-                                "The execution statistics time series did not include finished, failed, or "
-                                "cancelled statuses."
+                                _(
+                                    "The execution statistics time series did not include finished, failed, or "
+                                    "cancelled statuses."
+                                )
                             ),
                         )
                     )
             else:
                 execution_charts.append(
                     _build_message_block(
-                        "No execution trend data available.",
-                        detail="Execution timestamps could not be parsed from the API response.",
+                        _("No execution trend data available."),
+                        detail=_("Execution timestamps could not be parsed from the API response."),
                     )
                 )
 
@@ -915,7 +933,7 @@ def create_execution_statistics_chart(
                 )
 
                 fig_tasks.update_layout(
-                    xaxis_title="Number of Executions",
+                    xaxis_title=_("Number of Executions"),
                     height=max(300, len(task_names) * 30),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 )
@@ -923,7 +941,9 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6(f"Execution count{suffix_label}"),
+                            html.H6(
+                                _("Execution count{suffix_label}").format(suffix_label=suffix_label)
+                            ),
                             dcc.Graph(
                                 figure=fig_tasks,
                                 config={"displayModeBar": False, "responsive": True},
@@ -962,7 +982,7 @@ def create_execution_statistics_chart(
                 )
 
                 fig_duration.update_layout(
-                    xaxis_title="Average Duration (minutes)",
+                    xaxis_title=_("Average Duration (minutes)"),
                     height=max(300, len(task_names) * 30),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 )
@@ -970,7 +990,11 @@ def create_execution_statistics_chart(
                 charts.append(
                     html.Div(
                         [
-                            html.H6(f"Execution duration{suffix_label}"),
+                            html.H6(
+                                _("Execution duration{suffix_label}").format(
+                                    suffix_label=suffix_label
+                                )
+                            ),
                             dcc.Graph(
                                 figure=fig_duration,
                                 config={"displayModeBar": False, "responsive": True},
@@ -1028,7 +1052,7 @@ def create_execution_statistics_chart(
                     )
 
                     fig_failure.update_layout(
-                        xaxis_title="Failure Rate (%)",
+                        xaxis_title=_("Failure Rate (%)"),
                         xaxis={"range": [0, 100]},
                         height=max(300, len(top_failures) * 30),
                         margin={"l": 40, "r": 40, "t": 40, "b": 40},
@@ -1038,7 +1062,11 @@ def create_execution_statistics_chart(
                     charts.append(
                         html.Div(
                             [
-                                html.H6(f"Top scripts by failure count{suffix_label}"),
+                                html.H6(
+                                    _("Top scripts by failure count{suffix_label}").format(
+                                        suffix_label=suffix_label
+                                    )
+                                ),
                                 dcc.Graph(
                                     figure=fig_failure,
                                     config={
@@ -1135,7 +1163,7 @@ def create_top_users_chart(
         ]
     )
     fig_users.update_layout(
-        xaxis_title="Number of Executions",
+        xaxis_title=_("Number of Executions"),
         height=max(300, len(user_names) * 30),
         margin={"l": 40, "r": 40, "t": 40, "b": 40},
     )
@@ -1143,7 +1171,7 @@ def create_top_users_chart(
     return [
         html.Div(
             [
-                html.H6(f"Top users by activity{suffix_label}"),
+                html.H6(_("Top users by activity{suffix_label}").format(suffix_label=suffix_label)),
                 dcc.Graph(
                     figure=fig_users,
                     config={"displayModeBar": False, "responsive": True},
@@ -1284,8 +1312,8 @@ def create_script_version_histogram(
         )
 
         fig.update_layout(
-            xaxis_title="Script Version",
-            yaxis_title="Number of Executions",
+            xaxis_title=_("Script Version"),
+            yaxis_title=_("Number of Executions"),
             height=360,
             margin={"l": 40, "r": 40, "t": 40, "b": 40},
             template="plotly_white",
@@ -1293,16 +1321,26 @@ def create_script_version_histogram(
         )
 
         total_execs = sum(counts)
-        detail_parts = [f"{len(version_executions)} distinct versions, {total_execs:,} executions"]
+        detail_parts = [
+            _("{num_versions} distinct versions, {num_executions} executions").format(
+                num_versions=len(version_executions), num_executions=f"{total_execs:,}"
+            )
+        ]
         if unparsed_executions:
             detail_parts.append(
-                f"{unparsed_executions:,} executions from scripts with no parseable version"
+                _("{num_executions} executions from scripts with no parseable version").format(
+                    num_executions=f"{unparsed_executions:,}"
+                )
             )
 
         return [
             html.Div(
                 [
-                    html.H6(f"Execution script version distribution{suffix_label}"),
+                    html.H6(
+                        _("Execution script version distribution{suffix_label}").format(
+                            suffix_label=suffix_label
+                        )
+                    ),
                     html.P(
                         "; ".join(detail_parts) + ".",
                         className="text-muted small mb-2",
@@ -1591,7 +1629,7 @@ def create_user_statistics_chart(
 
                 fig_users.update_layout(
                     xaxis_title=get_chart_axis_label(user_timezone),
-                    yaxis_title="Cumulative New Users",
+                    yaxis_title=_("Cumulative New Users"),
                     height=300,
                     hovermode="x unified",
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
@@ -1642,8 +1680,8 @@ def create_user_statistics_chart(
                     )
 
                     fig_countries.update_layout(
-                        xaxis_title="Country",
-                        yaxis_title="Number of Users",
+                        xaxis_title=_("Country"),
+                        yaxis_title=_("Number of Users"),
                         height=300,
                         margin={"l": 40, "r": 40, "t": 40, "b": 40},
                     )
@@ -1651,7 +1689,11 @@ def create_user_statistics_chart(
                     charts.append(
                         html.Div(
                             [
-                                html.H6(f"Top countries{suffix_label}"),
+                                html.H6(
+                                    _("Top countries{suffix_label}").format(
+                                        suffix_label=suffix_label
+                                    )
+                                ),
                                 dcc.Graph(
                                     figure=fig_countries,
                                     config={"displayModeBar": False, "responsive": True},
