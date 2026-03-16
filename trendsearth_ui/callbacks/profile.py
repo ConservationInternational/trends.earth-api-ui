@@ -5,6 +5,7 @@ import logging
 from dash import Input, Output, State, no_update
 
 from ..components import login_layout
+from ..i18n import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -34,14 +35,14 @@ def register_callbacks(app):
             return no_update, no_update, no_update, no_update
 
         if not name:
-            return "Name is required.", "danger", True, no_update
+            return _("Name is required."), "danger", True, no_update
 
         update_data = {"name": name, "institution": institution or ""}
 
         try:
             user_id = user_data.get("id")
             if not user_id:
-                return "User ID not found in user data.", "danger", True, no_update
+                return _("User ID not found in user data."), "danger", True, no_update
 
             from ..utils.helpers import make_authenticated_request
 
@@ -57,9 +58,9 @@ def register_callbacks(app):
                 # Update user data in store
                 updated_user_data = user_data.copy()
                 updated_user_data.update(update_data)
-                return "Profile updated successfully!", "success", True, updated_user_data
+                return _("Profile updated successfully!"), "success", True, updated_user_data
             else:
-                error_msg = "Failed to update profile."
+                error_msg = _("Failed to update profile.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("msg", error_msg)
@@ -68,7 +69,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
-            return f"Network error: {str(e)}", "danger", True, no_update
+            return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
     @app.callback(
         [
@@ -98,7 +99,7 @@ def register_callbacks(app):
 
         if not current_password or not new_password or not confirm_password:
             return (
-                "All password fields are required.",
+                _("All password fields are required."),
                 "danger",
                 True,
                 no_update,
@@ -107,7 +108,7 @@ def register_callbacks(app):
             )
 
         if new_password != confirm_password:
-            return "New passwords do not match.", "danger", True, no_update, no_update, no_update
+            return _("New passwords do not match."), "danger", True, no_update, no_update, no_update
 
         # Validate password meets API requirements:
         # - At least 12 characters
@@ -119,7 +120,7 @@ def register_callbacks(app):
 
         if len(new_password) < 12:
             return (
-                "Password must be at least 12 characters long.",
+                _("Password must be at least 12 characters long."),
                 "danger",
                 True,
                 no_update,
@@ -129,7 +130,7 @@ def register_callbacks(app):
 
         if not re.search(r"[A-Z]", new_password):
             return (
-                "Password must include an uppercase letter.",
+                _("Password must include an uppercase letter."),
                 "danger",
                 True,
                 no_update,
@@ -139,7 +140,7 @@ def register_callbacks(app):
 
         if not re.search(r"[a-z]", new_password):
             return (
-                "Password must include a lowercase letter.",
+                _("Password must include a lowercase letter."),
                 "danger",
                 True,
                 no_update,
@@ -149,7 +150,7 @@ def register_callbacks(app):
 
         if not re.search(r"\d", new_password):
             return (
-                "Password must include a number.",
+                _("Password must include a number."),
                 "danger",
                 True,
                 no_update,
@@ -160,7 +161,7 @@ def register_callbacks(app):
         special_chars = r"!@#$%^&*()\-_=+\[\]{}|;:,.<>?/"
         if not re.search(f"[{special_chars}]", new_password):
             return (
-                "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/).",
+                _("Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."),
                 "danger",
                 True,
                 no_update,
@@ -188,10 +189,10 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 logger.debug("Password changed successfully")
                 # Clear password fields on success
-                return "Password changed successfully!", "success", True, "", "", ""
+                return _("Password changed successfully!"), "success", True, "", "", ""
             else:
                 logger.warning("Password change failed with status: %s", resp.status_code)
-                error_msg = "Failed to change password."
+                error_msg = _("Failed to change password.")
                 try:
                     error_data = resp.json()
                     # Check for both "detail" and "msg" keys as API may return either
@@ -205,7 +206,14 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Network error during password change: %s", e)
-            return f"Network error: {str(e)}", "danger", True, no_update, no_update, no_update
+            return (
+                _("Network error: {error}").format(error=str(e)),
+                "danger",
+                True,
+                no_update,
+                no_update,
+                no_update,
+            )
 
     @app.callback(
         [
@@ -248,15 +256,15 @@ def register_callbacks(app):
                 # Update the user data in store
                 updated_data = resp.json().get("data", user_data)
 
-                status_text = "enabled" if enabled else "disabled"
+                status_text = _("enabled") if enabled else _("disabled")
                 return (
-                    f"Email notifications {status_text} successfully!",
+                    _("Email notifications {status} successfully!").format(status=status_text),
                     "success",
                     True,
                     updated_data,
                 )
             else:
-                error_msg = "Failed to update email notification settings."
+                error_msg = _("Failed to update email notification settings.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_msg)
@@ -266,7 +274,7 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error updating email notifications: %s", e)
-            return f"Network error: {str(e)}", "danger", True, no_update
+            return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
     # Delete Account Callbacks
     @app.callback(
@@ -352,7 +360,7 @@ def register_callbacks(app):
         # Double-check email confirmation
         if confirm_email.strip().lower() != user_email.lower():
             return (
-                "Email confirmation does not match. Please try again.",
+                _("Email confirmation does not match. Please try again."),
                 "danger",
                 True,
                 no_update,
@@ -379,7 +387,7 @@ def register_callbacks(app):
                 logger.info("Account deletion successful for user: %s", user_email)
                 # Clear user data and token, redirect to login page
                 return (
-                    "Your account has been deleted.",
+                    _("Your account has been deleted."),
                     "success",
                     True,
                     None,  # Clear token
@@ -392,8 +400,8 @@ def register_callbacks(app):
             elif resp.status_code == 403:
                 logger.warning("Account deletion forbidden for user: %s", user_email)
                 return (
-                    "Admin accounts cannot be deleted through self-service. "
-                    "Please contact a system administrator.",
+                    _("Admin accounts cannot be deleted through self-service. ")
+                    + _("Please contact a system administrator."),
                     "warning",
                     True,
                     no_update,
@@ -409,7 +417,7 @@ def register_callbacks(app):
                     resp.status_code,
                     user_email,
                 )
-                error_msg = "Failed to delete account."
+                error_msg = _("Failed to delete account.")
                 try:
                     error_data = resp.json()
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
@@ -417,7 +425,11 @@ def register_callbacks(app):
                     logger.debug("Could not parse API error response", exc_info=True)
                 # Avoid duplicate "try again" if message already contains it
                 if "try again" not in error_msg.lower():
-                    error_msg = f"{error_msg} Please try again."
+                    error_msg = (
+                        _("Please try again.").format()
+                        if error_msg == _("Failed to delete account.")
+                        else f"{error_msg} " + _("Please try again.")
+                    )
                 return (
                     error_msg,
                     "danger",
@@ -433,7 +445,7 @@ def register_callbacks(app):
         except Exception as e:
             logger.exception("Network error during account deletion: %s", e)
             return (
-                f"Network error: {str(e)}",
+                _("Network error: {error}").format(error=str(e)),
                 "danger",
                 True,
                 no_update,

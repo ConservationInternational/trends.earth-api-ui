@@ -11,6 +11,7 @@ import dash_bootstrap_components as dbc
 import requests
 
 from ..config import DEFAULT_PAGE_SIZE
+from ..i18n import gettext as _
 from ..utils.aggrid import build_aggrid_request_params
 from ..utils.helpers import make_authenticated_request, parse_date
 
@@ -640,7 +641,7 @@ def register_callbacks(app):
             # Validate inputs
             if not name or not email or not password:
                 return (
-                    "Please fill in all required fields (Name, Email, Password).",
+                    _("Please fill in all required fields (Name, Email, Password)."),
                     "warning",
                     True,
                     no_update,
@@ -654,7 +655,7 @@ def register_callbacks(app):
 
             if password != confirm_password:
                 return (
-                    "Passwords do not match.",
+                    _("Passwords do not match."),
                     "warning",
                     True,
                     no_update,
@@ -684,7 +685,7 @@ def register_callbacks(app):
 
             if password_errors:
                 return (
-                    f"Password must contain {', '.join(password_errors)}.",
+                    _("Password must contain {errors}.").format(errors=", ".join(password_errors)),
                     "warning",
                     True,
                     no_update,
@@ -714,7 +715,9 @@ def register_callbacks(app):
                 if response.status_code in [200, 201]:
                     # Success - clear form and show success message
                     return (
-                        f"User '{name}' created successfully with email '{email}'.",
+                        _("User '{name}' created successfully with email '{email}'.").format(
+                            name=name, email=email
+                        ),
                         "success",
                         True,
                         "",
@@ -727,7 +730,7 @@ def register_callbacks(app):
                     )
                 elif response.status_code == 409:
                     return (
-                        "A user with this email already exists.",
+                        _("A user with this email already exists."),
                         "warning",
                         True,
                         no_update,
@@ -739,9 +742,9 @@ def register_callbacks(app):
                         no_update,
                     )
                 elif response.status_code == 400:
-                    error_detail = response.json().get("detail", "Invalid user data.")
+                    error_detail = response.json().get("detail", _("Invalid user data."))
                     return (
-                        f"Error creating user: {error_detail}",
+                        _("Error creating user: {detail}").format(detail=error_detail),
                         "danger",
                         True,
                         no_update,
@@ -754,7 +757,9 @@ def register_callbacks(app):
                     )
                 else:
                     return (
-                        f"Failed to create user. Server responded with status {response.status_code}.",
+                        _("Failed to create user. Server responded with status {status}.").format(
+                            status=response.status_code
+                        ),
                         "danger",
                         True,
                         no_update,
@@ -768,7 +773,7 @@ def register_callbacks(app):
 
             except requests.exceptions.Timeout:
                 return (
-                    "Request timed out. Please try again.",
+                    _("Request timed out. Please try again."),
                     "danger",
                     True,
                     no_update,
@@ -781,7 +786,7 @@ def register_callbacks(app):
                 )
             except requests.exceptions.ConnectionError:
                 return (
-                    "Cannot connect to server. Please check your connection.",
+                    _("Cannot connect to server. Please check your connection."),
                     "danger",
                     True,
                     no_update,
@@ -794,7 +799,7 @@ def register_callbacks(app):
                 )
             except Exception as e:
                 return (
-                    f"Unexpected error: {str(e)}",
+                    _("Unexpected error: {error}").format(error=str(e)),
                     "danger",
                     True,
                     no_update,
@@ -839,7 +844,9 @@ def register_callbacks(app):
                 return html.Div(
                     [
                         html.I(className="fas fa-exclamation-triangle text-warning me-2"),
-                        f"Invalid file type: {filename}. Must be a .tar.gz archive containing configuration.json.",
+                        _(
+                            "Invalid file type: {filename}. Must be a .tar.gz archive containing configuration.json."
+                        ).format(filename=filename),
                     ]
                 ), True
 
@@ -853,14 +860,18 @@ def register_callbacks(app):
                 return html.Div(
                     [
                         html.I(className="fas fa-exclamation-triangle text-warning me-2"),
-                        f"File too large: {filename} ({file_size_mb:.1f}MB). Maximum 10MB allowed.",
+                        _("File too large: {filename} ({size}MB). Maximum 10MB allowed.").format(
+                            filename=filename, size=f"{file_size_mb:.1f}"
+                        ),
                     ]
                 ), True
 
             return html.Div(
                 [
                     html.I(className="fas fa-check-circle text-success me-2"),
-                    f"Archive ready: {filename} ({file_size_mb:.2f}MB)",
+                    _("Archive ready: {filename} ({size}MB)").format(
+                        filename=filename, size=f"{file_size_mb:.2f}"
+                    ),
                 ]
             ), False
 
@@ -910,7 +921,7 @@ def register_callbacks(app):
         # Check admin permissions for script management
         if user_role not in ["ADMIN", "SUPERADMIN"]:
             return (
-                "Access denied. Administrator privileges required.",
+                _("Access denied. Administrator privileges required."),
                 "danger",
                 True,
                 no_update,
@@ -925,7 +936,7 @@ def register_callbacks(app):
             # Validate inputs - only file is required, name/description come from configuration.json in archive
             if not contents or not filename:
                 return (
-                    "Please select a .tar.gz script archive to upload.",
+                    _("Please select a .tar.gz script archive to upload."),
                     "warning",
                     True,
                     no_update,
@@ -935,7 +946,9 @@ def register_callbacks(app):
             # Validate file extension
             if not filename.endswith(".tar.gz"):
                 return (
-                    "Invalid file type. The API requires a .tar.gz archive containing a configuration.json file.",
+                    _(
+                        "Invalid file type. The API requires a .tar.gz archive containing a configuration.json file."
+                    ),
                     "warning",
                     True,
                     no_update,
@@ -964,7 +977,7 @@ def register_callbacks(app):
                         script_name = filename
                     # Clear form and show success message
                     return (
-                        f"Script '{script_name}' uploaded successfully.",
+                        _("Script '{name}' uploaded successfully.").format(name=script_name),
                         "success",
                         True,
                         None,
@@ -973,11 +986,11 @@ def register_callbacks(app):
                 elif response.status_code == 400:
                     # Handle duplicate script (ScriptDuplicated) or invalid file (InvalidFile)
                     try:
-                        error_detail = response.json().get("detail", "Invalid script archive.")
+                        error_detail = response.json().get("detail", _("Invalid script archive."))
                     except Exception:
-                        error_detail = response.text or "Invalid script archive."
+                        error_detail = response.text or _("Invalid script archive.")
                     return (
-                        f"Error uploading script: {error_detail}",
+                        _("Error uploading script: {detail}").format(detail=error_detail),
                         "danger",
                         True,
                         no_update,
@@ -985,7 +998,7 @@ def register_callbacks(app):
                     )
                 elif response.status_code == 403:
                     return (
-                        "Permission denied. Only admins and superadmins can create scripts.",
+                        _("Permission denied. Only admins and superadmins can create scripts."),
                         "danger",
                         True,
                         no_update,
@@ -993,7 +1006,9 @@ def register_callbacks(app):
                     )
                 else:
                     return (
-                        f"Failed to upload script. Server responded with status {response.status_code}.",
+                        _("Failed to upload script. Server responded with status {status}.").format(
+                            status=response.status_code
+                        ),
                         "danger",
                         True,
                         no_update,
@@ -1002,7 +1017,7 @@ def register_callbacks(app):
 
             except requests.exceptions.Timeout:
                 return (
-                    "Upload timed out. Please try again with a smaller file.",
+                    _("Upload timed out. Please try again with a smaller file."),
                     "danger",
                     True,
                     no_update,
@@ -1010,7 +1025,7 @@ def register_callbacks(app):
                 )
             except requests.exceptions.ConnectionError:
                 return (
-                    "Cannot connect to server. Please check your connection.",
+                    _("Cannot connect to server. Please check your connection."),
                     "danger",
                     True,
                     no_update,
@@ -1018,7 +1033,7 @@ def register_callbacks(app):
                 )
             except Exception as e:
                 return (
-                    f"Unexpected error: {str(e)}",
+                    _("Unexpected error: {error}").format(error=str(e)),
                     "danger",
                     True,
                     no_update,
@@ -1177,7 +1192,7 @@ def register_callbacks(app):
                 return (
                     [
                         html.I(className="fas fa-check-circle me-2"),
-                        "Rate limits have been successfully reset for all users and endpoints.",
+                        _("Rate limits have been successfully reset for all users and endpoints."),
                     ],
                     "success",
                     True,
@@ -1187,7 +1202,9 @@ def register_callbacks(app):
                     None,
                 )
 
-            error_msg = f"Failed to reset rate limits. Status: {resp.status_code}"
+            error_msg = _("Failed to reset rate limits. Status: {status}").format(
+                status=resp.status_code
+            )
             try:
                 error_data = resp.json()
                 if "detail" in error_data:
@@ -1209,7 +1226,7 @@ def register_callbacks(app):
             return (
                 [
                     html.I(className="fas fa-exclamation-triangle me-2"),
-                    f"Error resetting rate limits: {str(e)}",
+                    _("Error resetting rate limits: {error}").format(error=str(e)),
                 ],
                 "danger",
                 True,
@@ -1415,7 +1432,7 @@ def register_callbacks(app):
             return (
                 [
                     html.I(className="fas fa-exclamation-triangle me-2"),
-                    "Error: No rate limit selected.",
+                    _("Error: No rate limit selected."),
                 ],
                 "danger",
                 True,
@@ -1456,7 +1473,9 @@ def register_callbacks(app):
                 return (
                     [
                         html.I(className="fas fa-check-circle me-2"),
-                        f"Rate limit for {identifier_display} has been successfully reset.",
+                        _("Rate limit for {identifier} has been successfully reset.").format(
+                            identifier=identifier_display
+                        ),
                     ],
                     "success",
                     True,
@@ -1470,7 +1489,9 @@ def register_callbacks(app):
                 return (
                     [
                         html.I(className="fas fa-info-circle me-2"),
-                        f"Rate limit for {identifier_display} not found. It may have already expired.",
+                        _(
+                            "Rate limit for {identifier} not found. It may have already expired."
+                        ).format(identifier=identifier_display),
                     ],
                     "info",
                     True,
@@ -1481,7 +1502,9 @@ def register_callbacks(app):
                     None,
                 )
             else:
-                error_msg = f"Failed to reset rate limit. Status: {resp.status_code}"
+                error_msg = _("Failed to reset rate limit. Status: {status}").format(
+                    status=resp.status_code
+                )
                 try:
                     error_data = resp.json()
                     if "error" in error_data:
@@ -1507,7 +1530,7 @@ def register_callbacks(app):
             return (
                 [
                     html.I(className="fas fa-exclamation-triangle me-2"),
-                    f"Error resetting rate limit: {str(e)}",
+                    _("Error resetting rate limit: {error}").format(error=str(e)),
                 ],
                 "danger",
                 True,

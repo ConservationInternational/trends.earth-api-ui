@@ -6,6 +6,7 @@ from typing import Any
 from dash import Input, Output, State, html, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
+from ..i18n import gettext as _
 from ..utils import make_authenticated_request, parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
 from ..utils.mobile_utils import get_executions_columns_for_role
@@ -559,33 +560,37 @@ def register_callbacks(app):
                 # Execution info
                 result_content.extend(
                     [
-                        html.H5("Execution Cancelled Successfully", className="text-success mb-3"),
+                        html.H5(
+                            _("Execution Cancelled Successfully"), className="text-success mb-3"
+                        ),
                         html.Div(
                             [
-                                html.Strong("Execution ID: "),
-                                html.Span(execution_info.get("id", "Unknown")),
+                                html.Strong(_("Execution ID: ")),
+                                html.Span(execution_info.get("id", _("Unknown"))),
                             ],
                             className="mb-2",
                         ),
                         html.Div(
                             [
-                                html.Strong("Script: "),
-                                html.Span(execution_info.get("script_id", "Unknown")),
+                                html.Strong(_("Script: ")),
+                                html.Span(execution_info.get("script_id", _("Unknown"))),
                             ],
                             className="mb-2",
                         ),
                         html.Div(
                             [
-                                html.Strong("Previous Status: "),
-                                html.Span(cancellation_details.get("previous_status", "Unknown")),
-                            ],
-                            className="mb-2",
-                        ),
-                        html.Div(
-                            [
-                                html.Strong("New Status: "),
+                                html.Strong(_("Previous Status: ")),
                                 html.Span(
-                                    execution_info.get("status", "Unknown"),
+                                    cancellation_details.get("previous_status", _("Unknown"))
+                                ),
+                            ],
+                            className="mb-2",
+                        ),
+                        html.Div(
+                            [
+                                html.Strong(_("New Status: ")),
+                                html.Span(
+                                    execution_info.get("status", _("Unknown")),
                                     className="text-danger fw-bold",
                                 ),
                             ],
@@ -600,13 +605,15 @@ def register_callbacks(app):
 
                 result_content.extend(
                     [
-                        html.H6("Infrastructure Cleanup", className="mb-2"),
+                        html.H6(_("Infrastructure Cleanup"), className="mb-2"),
                         html.Div(
                             [
                                 html.I(
                                     className=f"fas fa-{'check text-success' if docker_stopped else 'times text-danger'} me-2"
                                 ),
-                                f"Docker service {'stopped' if docker_stopped else 'not found/stopped'}",
+                                _("Docker service stopped")
+                                if docker_stopped
+                                else _("Docker service not found/stopped"),
                             ],
                             className="mb-1",
                         ),
@@ -615,7 +622,9 @@ def register_callbacks(app):
                                 html.I(
                                     className=f"fas fa-{'check text-success' if container_stopped else 'times text-warning'} me-2"
                                 ),
-                                f"Docker container {'stopped' if container_stopped else 'not found/stopped'}",
+                                _("Docker container stopped")
+                                if container_stopped
+                                else _("Docker container not found/stopped"),
                             ],
                             className="mb-3",
                         ),
@@ -627,11 +636,13 @@ def register_callbacks(app):
                 if gee_tasks:
                     result_content.extend(
                         [
-                            html.H6("Google Earth Engine Tasks", className="mb-2"),
+                            html.H6(_("Google Earth Engine Tasks"), className="mb-2"),
                             html.Div(
                                 [
                                     html.P(
-                                        f"Found and processed {len(gee_tasks)} GEE tasks:",
+                                        _("Found and processed {count} GEE tasks:").format(
+                                            count=len(gee_tasks)
+                                        ),
                                         className="mb-2",
                                     ),
                                 ]
@@ -647,9 +658,11 @@ def register_callbacks(app):
                                     html.I(
                                         className=f"fas fa-{'check text-success' if task_success else 'times text-danger'} me-2"
                                     ),
-                                    html.Code(task.get("task_id", "Unknown"), className="me-2"),
+                                    html.Code(task.get("task_id", _("Unknown")), className="me-2"),
                                     html.Span(
-                                        f"Status: {task.get('status', 'Unknown')}",
+                                        _("Status: {status}").format(
+                                            status=task.get("status", _("Unknown"))
+                                        ),
                                         className="text-muted",
                                     ),
                                     html.Div(task.get("error", ""), className="text-danger small")
@@ -663,9 +676,10 @@ def register_callbacks(app):
                     result_content.append(
                         html.Div(
                             [
-                                html.H6("Google Earth Engine Tasks", className="mb-2"),
+                                html.H6(_("Google Earth Engine Tasks"), className="mb-2"),
                                 html.P(
-                                    "No GEE tasks found in execution logs.", className="text-muted"
+                                    _("No GEE tasks found in execution logs."),
+                                    className="text-muted",
                                 ),
                             ],
                             className="mb-3",
@@ -677,7 +691,7 @@ def register_callbacks(app):
                 if errors:
                     result_content.extend(
                         [
-                            html.H6("Errors Encountered", className="mb-2 text-warning"),
+                            html.H6(_("Errors Encountered"), className="mb-2 text-warning"),
                             html.Ul([html.Li(error, className="text-warning") for error in errors]),
                         ]
                     )
@@ -687,16 +701,17 @@ def register_callbacks(app):
                 content_type = resp.headers.get("content-type", "")
                 error_data = resp.json() if "application/json" in content_type else {}
                 result_content = [
-                    html.H5("Cancellation Failed", className="text-danger mb-3"),
+                    html.H5(_("Cancellation Failed"), className="text-danger mb-3"),
                     html.Div(
                         [
-                            html.Strong("Error: "),
+                            html.Strong(_("Error: ")),
                             html.Span(error_data.get("detail", f"HTTP {resp.status_code}")),
                         ],
                         className="mb-2",
                     ),
                     html.Div(
-                        [html.Strong("Execution ID: "), html.Span(execution_id)], className="mb-2"
+                        [html.Strong(_("Execution ID: ")), html.Span(execution_id)],
+                        className="mb-2",
                     ),
                 ]
 

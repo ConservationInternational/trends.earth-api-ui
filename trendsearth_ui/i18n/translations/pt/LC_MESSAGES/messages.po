@@ -7,548 +7,374 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-14 14:26-0400\n"
+"POT-Creation-Date: 2026-03-16 07:42-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: pt <LL@li.org>\n"
 "Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: trendsearth_ui/components/layout.py:114
-msgid "Forgot Password"
-msgstr "Esqueceu a senha"
-
-#: trendsearth_ui/components/layout.py:124
-#, fuzzy
-msgid ""
-"Enter your email address and we'll send you instructions to reset your "
-"password."
-msgstr ""
-"Insira seu endereço de e-mail e enviaremos instruções para redefinir sua "
-"senha."
-
-#: trendsearth_ui/components/layout.py:127
-#, fuzzy
-msgid "Email Address"
-msgstr "Endereço de email"
-
-#: trendsearth_ui/components/layout.py:131
-#: trendsearth_ui/components/layout.py:726
-#, fuzzy
-msgid "Enter your email address"
-msgstr "Insira seu endereço de e-mail"
-
-#: trendsearth_ui/components/layout.py:153
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: trendsearth_ui/components/layout.py:159
-#, fuzzy
-msgid "Send Reset Instructions"
-msgstr "Enviar instruções de reinicialização"
-
-#: trendsearth_ui/components/layout.py:171
-#, fuzzy
-msgid "OK"
-msgstr "OK"
-
-#: trendsearth_ui/components/layout.py:206
-#: trendsearth_ui/components/layout.py:278
-#, fuzzy
-msgid "Login"
-msgstr "Conecte-se"
-
-#: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/layout.py:712
-#, fuzzy
-msgid "Email"
-msgstr "E-mail"
-
-#: trendsearth_ui/components/layout.py:231
-#, fuzzy
-msgid "Enter email"
-msgstr "Digite o e-mail"
-
-#: trendsearth_ui/components/layout.py:240
-#, fuzzy
-msgid "Password"
-msgstr "Senha"
-
-#: trendsearth_ui/components/layout.py:245
-#, fuzzy
-msgid "Enter password"
-msgstr "Digite a senha"
-
-#: trendsearth_ui/components/layout.py:268
-#, fuzzy
-msgid "Remember me (keep me logged in)"
-msgstr "Lembrar-me (manter-me conectado)"
-
-#: trendsearth_ui/components/layout.py:286
-#, fuzzy
-msgid "Register"
-msgstr "Cadastre-se"
-
-#: trendsearth_ui/components/layout.py:297
-#, fuzzy
-msgid "Forgot your password?"
-msgstr "Esqueceu sua senha?"
-
-#: trendsearth_ui/components/layout.py:328
-#: trendsearth_ui/components/layout.py:557
-#: trendsearth_ui/components/layout.py:1122
-#, fuzzy
-msgid "Privacy Policy"
-msgstr "política de Privacidade"
-
-#: trendsearth_ui/components/layout.py:343
-#: trendsearth_ui/components/layout.py:572
-#: trendsearth_ui/components/layout.py:1137
-#, fuzzy
-msgid "Terms of Use"
-msgstr "Termos de Uso"
-
-#: trendsearth_ui/components/layout.py:413
-#, fuzzy
-msgid "Set Your New Password"
-msgstr "Defina sua nova senha"
-
-#: trendsearth_ui/components/layout.py:417
-#, fuzzy
-msgid "Enter your new password below."
-msgstr "Digite sua nova senha abaixo."
-
-#: trendsearth_ui/components/layout.py:438
-#, fuzzy
-msgid "New Password"
-msgstr "Nova Senha"
-
-#: trendsearth_ui/components/layout.py:444
-#, fuzzy
-msgid "Enter new password"
-msgstr "Digite a nova senha"
-
-#: trendsearth_ui/components/layout.py:455
-#, fuzzy
-msgid "Confirm Password"
-msgstr "Confirme sua senha"
-
-#: trendsearth_ui/components/layout.py:462
-#, fuzzy
-msgid "Confirm new password"
-msgstr "Confirme a nova senha"
-
-#: trendsearth_ui/components/layout.py:474
-#, fuzzy
-msgid "Password requirements:"
-msgstr "Requisitos de senha:"
-
-#: trendsearth_ui/components/layout.py:480
-#, fuzzy
-msgid "At least 12 characters"
-msgstr "Pelo menos 12 caracteres"
-
-#: trendsearth_ui/components/layout.py:485
-#, fuzzy
-msgid "Uppercase letter (A-Z)"
-msgstr "Letra maiúscula (AZ)"
-
-#: trendsearth_ui/components/layout.py:490
-#, fuzzy
-msgid "Lowercase letter (a-z)"
-msgstr "Letra minúscula (az)"
-
-#: trendsearth_ui/components/layout.py:495
-#, fuzzy
-msgid "Number (0-9)"
-msgstr "Número (0-9)"
-
-#: trendsearth_ui/components/layout.py:501
-#, python-brace-format, fuzzy
-msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr "Caractere especial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
-
-#: trendsearth_ui/components/layout.py:518
-#, fuzzy
-msgid "Set Password"
-msgstr "Definir senha"
-
-#: trendsearth_ui/components/layout.py:534
-#: trendsearth_ui/components/layout.py:1106
-#, fuzzy
-msgid "Back to Login"
-msgstr "Voltar ao login"
-
-#: trendsearth_ui/components/layout.py:609
-#, fuzzy
-msgid "Government - Environment/Natural Resources"
-msgstr "Governo - Meio Ambiente/Recursos Naturais"
-
-#: trendsearth_ui/components/layout.py:610
-#, fuzzy
-msgid "Government - Agriculture"
-msgstr "Governo - Agricultura"
-
-#: trendsearth_ui/components/layout.py:611
-#, fuzzy
-msgid "Government - Land Management/Planning"
-msgstr "Governo - Gestão/Planejamento Territorial"
-
-#: trendsearth_ui/components/layout.py:612
-#, fuzzy
-msgid "Government - Other"
-msgstr "Governo - Outros"
-
-#: trendsearth_ui/components/layout.py:613
-#, fuzzy
-msgid "International/Multilateral Organization"
-msgstr "Organização Internacional/Multilateral"
-
-#: trendsearth_ui/components/layout.py:614
-#, fuzzy
-msgid "NGO - Development/Aid"
-msgstr "ONG - Desenvolvimento/Ajuda"
-
-#: trendsearth_ui/components/layout.py:615
-#, fuzzy
-msgid "NGO - Community-Based"
-msgstr "ONG - Baseada na Comunidade"
-
-#: trendsearth_ui/components/layout.py:616
-#, fuzzy
-msgid "NGO - Conservation"
-msgstr "ONG - Conservação"
-
-#: trendsearth_ui/components/layout.py:617
-#, fuzzy
-msgid "NGO - Other"
-msgstr "ONG - Outros"
-
-#: trendsearth_ui/components/layout.py:618
-#, fuzzy
-msgid "Academic/Research Institution"
-msgstr "Instituição Acadêmica/de Pesquisa"
-
-#: trendsearth_ui/components/layout.py:619
-#, fuzzy
-msgid "Consulting/Professional Services"
-msgstr "Serviços de consultoria/profissionais"
-
-#: trendsearth_ui/components/layout.py:620
-#, fuzzy
-msgid "Private Sector - Agriculture/Forestry"
-msgstr "Setor Privado - Agricultura/Silvicultura"
-
-#: trendsearth_ui/components/layout.py:621
-#, fuzzy
-msgid "Private Sector - Other"
-msgstr "Setor Privado - Outros"
-
-#: trendsearth_ui/components/layout.py:622
-#, fuzzy
-msgid "Independent Researcher"
-msgstr "Pesquisador Independente"
-
-#: trendsearth_ui/components/layout.py:623
-#, fuzzy
-msgid "Student"
-msgstr "Estudante"
-
-#: trendsearth_ui/components/layout.py:624
-#: trendsearth_ui/components/layout.py:640
-#, fuzzy
-msgid "Other"
-msgstr "Outro"
-
-#: trendsearth_ui/components/layout.py:629
-#, fuzzy
-msgid "National/International Reporting (UNCCD, SDGs, etc.)"
-msgstr "Relatórios nacionais/internacionais (UNCCD, ODS, etc.)"
-
-#: trendsearth_ui/components/layout.py:630
-#, fuzzy
-msgid "Academic Research"
-msgstr "Pesquisa acadêmica"
-
-#: trendsearth_ui/components/layout.py:631
-#, fuzzy
-msgid "Policy Development & Planning"
-msgstr "Desenvolvimento e planejamento de políticas"
-
-#: trendsearth_ui/components/layout.py:632
-#, fuzzy
-msgid "Land Restoration/Management Planning"
-msgstr "Planejamento de Restauração/Gestão de Terras"
-
-#: trendsearth_ui/components/layout.py:633
-#, fuzzy
-msgid "Project Monitoring & Evaluation"
-msgstr "Monitoramento e avaliação de projetos"
-
-#: trendsearth_ui/components/layout.py:634
-#, fuzzy
-msgid "Environmental Impact Assessment"
-msgstr "Avaliação de Impacto Ambiental"
-
-#: trendsearth_ui/components/layout.py:635
-#, fuzzy
-msgid "Agriculture/Forestry Planning"
-msgstr "Planejamento Agrícola/Silvícola"
-
-#: trendsearth_ui/components/layout.py:636
-#, fuzzy
-msgid "Teaching & Education"
-msgstr "Ensino e Educação"
-
-#: trendsearth_ui/components/layout.py:637
-#, fuzzy
-msgid "Conservation Planning"
-msgstr "Planejamento de Conservação"
-
-#: trendsearth_ui/components/layout.py:638
-#, fuzzy
-msgid "Commercial Services/Products"
-msgstr "Serviços/Produtos Comerciais"
-
-#: trendsearth_ui/components/layout.py:639
-#, fuzzy
-msgid "Community/Grassroots Initiatives"
-msgstr "Iniciativas comunitárias/de base"
-
-#: trendsearth_ui/components/layout.py:645
-#, fuzzy
-msgid "Woman"
-msgstr "Mulher"
-
-#: trendsearth_ui/components/layout.py:646
-#, fuzzy
-msgid "Man"
-msgstr "Homem"
-
-#: trendsearth_ui/components/layout.py:647
-#, fuzzy
-msgid "Non-binary"
-msgstr "Não binário"
-
-#: trendsearth_ui/components/layout.py:648
-#, fuzzy
-msgid "Prefer to self-describe"
-msgstr "Prefiro me autodescrever."
-
-#: trendsearth_ui/components/layout.py:649
-#, fuzzy
-msgid "Prefer not to say"
-msgstr "Prefiro não dizer"
-
-#: trendsearth_ui/components/layout.py:682
-#, fuzzy
-msgid "Create Your Account"
-msgstr "Crie sua conta"
-
-#: trendsearth_ui/components/layout.py:687
-#, fuzzy
-msgid ""
-"After registration, you'll receive an email to verify your address and set "
-"your password."
-msgstr ""
-"Após o cadastro, você receberá um e-mail para verificar seu endereço e "
-"definir sua senha."
-
-#: trendsearth_ui/components/layout.py:700
-#, fuzzy
-msgid "Required field"
-msgstr "Campo obrigatório"
-
-#: trendsearth_ui/components/layout.py:740
-#, fuzzy
-msgid "Full Name"
-msgstr "Nome completo"
-
-#: trendsearth_ui/components/layout.py:754
-#, fuzzy
-msgid "Enter your full name"
-msgstr "Digite seu nome completo"
-
-#: trendsearth_ui/components/layout.py:766
-#, fuzzy
-msgid "Role/Title"
-msgstr "Função/Título"
-
-#: trendsearth_ui/components/layout.py:773
-#, fuzzy
-msgid "Your job title (optional)"
-msgstr "Seu cargo (opcional)"
-
-#: trendsearth_ui/components/layout.py:787
-#, fuzzy
-msgid "Organization"
-msgstr "Organização"
-
-#: trendsearth_ui/components/layout.py:801
-#, fuzzy
-msgid "Your organization"
-msgstr "Sua organização"
-
-#: trendsearth_ui/components/layout.py:815
-#, fuzzy
-msgid "Sector"
-msgstr "Setor"
-
-#: trendsearth_ui/components/layout.py:829
-#, fuzzy
-msgid "Select your sector"
-msgstr "Selecione seu setor"
-
-#: trendsearth_ui/components/layout.py:843
-#: trendsearth_ui/components/layout.py:896
-#, fuzzy
-msgid "Please specify"
-msgstr "Por favor, especifique."
-
-#: trendsearth_ui/components/layout.py:850
-#, fuzzy
-msgid "Please specify your sector"
-msgstr "Por favor, especifique seu setor."
-
-#: trendsearth_ui/components/layout.py:867
-#, fuzzy
-msgid "Purpose of Use"
-msgstr "Finalidade de uso"
-
-#: trendsearth_ui/components/layout.py:882
-#, fuzzy
-msgid "Select your purpose of use"
-msgstr "Selecione a finalidade de uso."
-
-#: trendsearth_ui/components/layout.py:903
-#, fuzzy
-msgid "Please specify your purpose"
-msgstr "Por favor, especifique sua finalidade."
-
-#: trendsearth_ui/components/layout.py:919
-#, fuzzy
-msgid "Country"
-msgstr "País"
-
-#: trendsearth_ui/components/layout.py:932
-#, fuzzy
-msgid "Select your country"
-msgstr "Selecione seu país"
-
-#: trendsearth_ui/components/layout.py:950
-#, fuzzy
-msgid "Gender Identity"
-msgstr "Identidade de gênero"
-
-#: trendsearth_ui/components/layout.py:958
-#, fuzzy
-msgid "Select (optional)"
-msgstr "Selecione (opcional)"
-
-#: trendsearth_ui/components/layout.py:972
-#, fuzzy
-msgid ""
-"We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity development "
-"and tool access. Providing this information is voluntary; your selection "
-"will not affect your access to the tool."
-msgstr ""
-"Coletamos informações sobre identidade de gênero para cumprir os requisitos "
-"de relatórios dos doadores e para avaliar a participação equitativa no "
-"desenvolvimento de capacidades e no acesso às ferramentas. O fornecimento "
-"dessas informações é voluntário; sua escolha não afetará seu acesso à "
-"ferramenta."
-
-#: trendsearth_ui/components/layout.py:981
-#: trendsearth_ui/components/layout.py:989
-#, fuzzy
-msgid "Please describe"
-msgstr "Por favor, descreva"
-
-#: trendsearth_ui/components/layout.py:1033
-#, fuzzy
-msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-"and, depending on your use, you may be required to have in place a "
-"commercial license to use Google Earth Engine?"
-msgstr ""
-"Você reconhece que alguns recursos do Trends.Earth utilizam o Google Earth "
-"Engine e que, dependendo do seu uso, pode ser necessário ter uma licença "
-"comercial para usar o Google Earth Engine?"
-
-#: trendsearth_ui/components/layout.py:1046
-#, fuzzy
-msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-"details see the "
-msgstr ""
-"O Google Earth Engine (GEE) impõe restrições ao uso comercial. Para mais "
-"detalhes, consulte o [link para a política de privacidade do Google Earth "
-"Engine]. "
-
-#: trendsearth_ui/components/layout.py:1050
-#, fuzzy
-msgid "Google Earth Engine Terms of Use"
-msgstr "Termos de Uso do Google Earth Engine"
-
-#: trendsearth_ui/components/layout.py:1056
-#, fuzzy
-msgid ""
-" . Conservation International does not provide or manage commercial GEE "
-"licenses. Users are solely responsible for ensuring their use of GEE "
-"complies with Google's commercial licensing requirements. Access to this "
-"tool does not grant or imply the provision of commercial licensing."
-msgstr ""
-" A Conservation International não fornece nem gerencia licenças comerciais "
-"do Google Earth Engine (GEE). Os usuários são os únicos responsáveis por "
-"garantir que o uso do GEE esteja em conformidade com os requisitos de "
-"licenciamento comercial do Google. O acesso a esta ferramenta não concede "
-"nem implica o fornecimento de licença comercial."
-
-#: trendsearth_ui/components/layout.py:1065
-#, fuzzy
-msgid "Yes, I acknowledge"
-msgstr "Sim, eu reconheço."
-
-#: trendsearth_ui/components/layout.py:1090
-#, fuzzy
-msgid "Create Account"
-msgstr "Criar uma conta"
-
-#: trendsearth_ui/components/layout.py:1221
-msgid "Logout"
-msgstr "Terminar Sessão"
-
-#: trendsearth_ui/components/layout.py:1267
-#, fuzzy
-msgid "Executions"
-msgstr "Execuções"
-
-#: trendsearth_ui/components/layout.py:1277
-#, fuzzy
-msgid "Users"
-msgstr "Usuários"
-
-#: trendsearth_ui/components/layout.py:1291
-#, fuzzy
-msgid "Scripts"
-msgstr "Roteiros"
-
-#: trendsearth_ui/components/layout.py:1305
-#, fuzzy
-msgid "Admin"
-msgstr "Administrador"
-
-#: trendsearth_ui/components/layout.py:1319
-#, fuzzy
-msgid "Status"
-msgstr "Status"
-
-#: trendsearth_ui/components/layout.py:1333
-#, fuzzy
-msgid "Profile"
-msgstr "Perfil"
+#~ msgid "Forgot Password"
+#~ msgstr "Esqueceu a senha"
+
+#~ msgid ""
+#~ "Enter your email address and we'll "
+#~ "send you instructions to reset your "
+#~ "password."
+#~ msgstr ""
+#~ "Insira seu endereço de e-mail e "
+#~ "enviaremos instruções para redefinir sua "
+#~ "senha."
+
+#~ msgid "Email Address"
+#~ msgstr "Endereço de email"
+
+#~ msgid "Enter your email address"
+#~ msgstr "Insira seu endereço de e-mail"
+
+#~ msgid "Cancel"
+#~ msgstr "Cancelar"
+
+#~ msgid "Send Reset Instructions"
+#~ msgstr "Enviar instruções de reinicialização"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+
+#~ msgid "Login"
+#~ msgstr "Conecte-se"
+
+#~ msgid "Email"
+#~ msgstr "E-mail"
+
+#~ msgid "Enter email"
+#~ msgstr "Digite o e-mail"
+
+#~ msgid "Password"
+#~ msgstr "Senha"
+
+#~ msgid "Enter password"
+#~ msgstr "Digite a senha"
+
+#~ msgid "Remember me (keep me logged in)"
+#~ msgstr "Lembrar-me (manter-me conectado)"
+
+#~ msgid "Register"
+#~ msgstr "Cadastre-se"
+
+#~ msgid "Forgot your password?"
+#~ msgstr "Esqueceu sua senha?"
+
+#~ msgid "Privacy Policy"
+#~ msgstr "política de Privacidade"
+
+#~ msgid "Terms of Use"
+#~ msgstr "Termos de Uso"
+
+#~ msgid "Set Your New Password"
+#~ msgstr "Defina sua nova senha"
+
+#~ msgid "Enter your new password below."
+#~ msgstr "Digite sua nova senha abaixo."
+
+#~ msgid "New Password"
+#~ msgstr "Nova Senha"
+
+#~ msgid "Enter new password"
+#~ msgstr "Digite a nova senha"
+
+#~ msgid "Confirm Password"
+#~ msgstr "Confirme sua senha"
+
+#~ msgid "Confirm new password"
+#~ msgstr "Confirme a nova senha"
+
+#~ msgid "Password requirements:"
+#~ msgstr "Requisitos de senha:"
+
+#~ msgid "At least 12 characters"
+#~ msgstr "Pelo menos 12 caracteres"
+
+#~ msgid "Uppercase letter (A-Z)"
+#~ msgstr "Letra maiúscula (AZ)"
+
+#~ msgid "Lowercase letter (a-z)"
+#~ msgstr "Letra minúscula (az)"
+
+#~ msgid "Number (0-9)"
+#~ msgstr "Número (0-9)"
+
+#~ msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+#~ msgstr "Caractere especial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+
+#~ msgid "Set Password"
+#~ msgstr "Definir senha"
+
+#~ msgid "Back to Login"
+#~ msgstr "Voltar ao login"
+
+#~ msgid "Government - Environment/Natural Resources"
+#~ msgstr "Governo - Meio Ambiente/Recursos Naturais"
+
+#~ msgid "Government - Agriculture"
+#~ msgstr "Governo - Agricultura"
+
+#~ msgid "Government - Land Management/Planning"
+#~ msgstr "Governo - Gestão/Planejamento Territorial"
+
+#~ msgid "Government - Other"
+#~ msgstr "Governo - Outros"
+
+#~ msgid "International/Multilateral Organization"
+#~ msgstr "Organização Internacional/Multilateral"
+
+#~ msgid "NGO - Development/Aid"
+#~ msgstr "ONG - Desenvolvimento/Ajuda"
+
+#~ msgid "NGO - Community-Based"
+#~ msgstr "ONG - Baseada na Comunidade"
+
+#~ msgid "NGO - Conservation"
+#~ msgstr "ONG - Conservação"
+
+#~ msgid "NGO - Other"
+#~ msgstr "ONG - Outros"
+
+#~ msgid "Academic/Research Institution"
+#~ msgstr "Instituição Acadêmica/de Pesquisa"
+
+#~ msgid "Consulting/Professional Services"
+#~ msgstr "Serviços de consultoria/profissionais"
+
+#~ msgid "Private Sector - Agriculture/Forestry"
+#~ msgstr "Setor Privado - Agricultura/Silvicultura"
+
+#~ msgid "Private Sector - Other"
+#~ msgstr "Setor Privado - Outros"
+
+#~ msgid "Independent Researcher"
+#~ msgstr "Pesquisador Independente"
+
+#~ msgid "Student"
+#~ msgstr "Estudante"
+
+#~ msgid "Other"
+#~ msgstr "Outro"
+
+#~ msgid "National/International Reporting (UNCCD, SDGs, etc.)"
+#~ msgstr "Relatórios nacionais/internacionais (UNCCD, ODS, etc.)"
+
+#~ msgid "Academic Research"
+#~ msgstr "Pesquisa acadêmica"
+
+#~ msgid "Policy Development & Planning"
+#~ msgstr "Desenvolvimento e planejamento de políticas"
+
+#~ msgid "Land Restoration/Management Planning"
+#~ msgstr "Planejamento de Restauração/Gestão de Terras"
+
+#~ msgid "Project Monitoring & Evaluation"
+#~ msgstr "Monitoramento e avaliação de projetos"
+
+#~ msgid "Environmental Impact Assessment"
+#~ msgstr "Avaliação de Impacto Ambiental"
+
+#~ msgid "Agriculture/Forestry Planning"
+#~ msgstr "Planejamento Agrícola/Silvícola"
+
+#~ msgid "Teaching & Education"
+#~ msgstr "Ensino e Educação"
+
+#~ msgid "Conservation Planning"
+#~ msgstr "Planejamento de Conservação"
+
+#~ msgid "Commercial Services/Products"
+#~ msgstr "Serviços/Produtos Comerciais"
+
+#~ msgid "Community/Grassroots Initiatives"
+#~ msgstr "Iniciativas comunitárias/de base"
+
+#~ msgid "Woman"
+#~ msgstr "Mulher"
+
+#~ msgid "Man"
+#~ msgstr "Homem"
+
+#~ msgid "Non-binary"
+#~ msgstr "Não binário"
+
+#~ msgid "Prefer to self-describe"
+#~ msgstr "Prefiro me autodescrever."
+
+#~ msgid "Prefer not to say"
+#~ msgstr "Prefiro não dizer"
+
+#~ msgid "Create Your Account"
+#~ msgstr "Crie sua conta"
+
+#~ msgid ""
+#~ "After registration, you'll receive an "
+#~ "email to verify your address and "
+#~ "set your password."
+#~ msgstr ""
+#~ "Após o cadastro, você receberá um "
+#~ "e-mail para verificar seu endereço e "
+#~ "definir sua senha."
+
+#~ msgid "Required field"
+#~ msgstr "Campo obrigatório"
+
+#~ msgid "Full Name"
+#~ msgstr "Nome completo"
+
+#~ msgid "Enter your full name"
+#~ msgstr "Digite seu nome completo"
+
+#~ msgid "Role/Title"
+#~ msgstr "Função/Título"
+
+#~ msgid "Your job title (optional)"
+#~ msgstr "Seu cargo (opcional)"
+
+#~ msgid "Organization"
+#~ msgstr "Organização"
+
+#~ msgid "Your organization"
+#~ msgstr "Sua organização"
+
+#~ msgid "Sector"
+#~ msgstr "Setor"
+
+#~ msgid "Select your sector"
+#~ msgstr "Selecione seu setor"
+
+#~ msgid "Please specify"
+#~ msgstr "Por favor, especifique."
+
+#~ msgid "Please specify your sector"
+#~ msgstr "Por favor, especifique seu setor."
+
+#~ msgid "Purpose of Use"
+#~ msgstr "Finalidade de uso"
+
+#~ msgid "Select your purpose of use"
+#~ msgstr "Selecione a finalidade de uso."
+
+#~ msgid "Please specify your purpose"
+#~ msgstr "Por favor, especifique sua finalidade."
+
+#~ msgid "Country"
+#~ msgstr "País"
+
+#~ msgid "Select your country"
+#~ msgstr "Selecione seu país"
+
+#~ msgid "Gender Identity"
+#~ msgstr "Identidade de gênero"
+
+#~ msgid "Select (optional)"
+#~ msgstr "Selecione (opcional)"
+
+#~ msgid ""
+#~ "We collect gender identity information "
+#~ "to comply with donor reporting "
+#~ "requirements and to assess equitable "
+#~ "participation in capacity development and "
+#~ "tool access. Providing this information "
+#~ "is voluntary; your selection will not"
+#~ " affect your access to the tool."
+#~ msgstr ""
+#~ "Coletamos informações sobre identidade de "
+#~ "gênero para cumprir os requisitos de "
+#~ "relatórios dos doadores e para avaliar"
+#~ " a participação equitativa no "
+#~ "desenvolvimento de capacidades e no "
+#~ "acesso às ferramentas. O fornecimento "
+#~ "dessas informações é voluntário; sua "
+#~ "escolha não afetará seu acesso à "
+#~ "ferramenta."
+
+#~ msgid "Please describe"
+#~ msgstr "Por favor, descreva"
+
+#~ msgid ""
+#~ "Do you acknowledge that some "
+#~ "Trends.Earth features use Google Earth "
+#~ "Engine, and, depending on your use, "
+#~ "you may be required to have in "
+#~ "place a commercial license to use "
+#~ "Google Earth Engine?"
+#~ msgstr ""
+#~ "Você reconhece que alguns recursos do"
+#~ " Trends.Earth utilizam o Google Earth "
+#~ "Engine e que, dependendo do seu "
+#~ "uso, pode ser necessário ter uma "
+#~ "licença comercial para usar o Google "
+#~ "Earth Engine?"
+
+#~ msgid ""
+#~ "Google Earth Engine (GEE) imposes "
+#~ "restrictions on commercial use. For more"
+#~ " details see the "
+#~ msgstr ""
+#~ "O Google Earth Engine (GEE) impõe "
+#~ "restrições ao uso comercial. Para mais"
+#~ " detalhes, consulte o [link para a"
+#~ " política de privacidade do Google "
+#~ "Earth Engine]. "
+
+#~ msgid "Google Earth Engine Terms of Use"
+#~ msgstr "Termos de Uso do Google Earth Engine"
+
+#~ msgid ""
+#~ " . Conservation International does not"
+#~ " provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible "
+#~ "for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing"
+#~ " requirements. Access to this tool "
+#~ "does not grant or imply the "
+#~ "provision of commercial licensing."
+#~ msgstr ""
+#~ " A Conservation International não "
+#~ "fornece nem gerencia licenças comerciais "
+#~ "do Google Earth Engine (GEE). Os "
+#~ "usuários são os únicos responsáveis por"
+#~ " garantir que o uso do GEE "
+#~ "esteja em conformidade com os requisitos"
+#~ " de licenciamento comercial do Google. "
+#~ "O acesso a esta ferramenta não "
+#~ "concede nem implica o fornecimento de"
+#~ " licença comercial."
+
+#~ msgid "Yes, I acknowledge"
+#~ msgstr "Sim, eu reconheço."
+
+#~ msgid "Create Account"
+#~ msgstr "Criar uma conta"
+
+#~ msgid "Logout"
+#~ msgstr "Terminar Sessão"
+
+#~ msgid "Executions"
+#~ msgstr "Execuções"
+
+#~ msgid "Users"
+#~ msgstr "Usuários"
+
+#~ msgid "Scripts"
+#~ msgstr "Roteiros"
+
+#~ msgid "Admin"
+#~ msgstr "Administrador"
+
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgid "Profile"
+#~ msgstr "Perfil"
+

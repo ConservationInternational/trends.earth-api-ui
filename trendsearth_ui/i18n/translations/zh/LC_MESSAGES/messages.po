@@ -7,532 +7,343 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-14 14:26-0400\n"
+"POT-Creation-Date: 2026-03-16 07:42-0400\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: trendsearth_ui/components/layout.py:114
-msgid "Forgot Password"
-msgstr "忘记密码"
-
-#: trendsearth_ui/components/layout.py:124
-#, fuzzy
-msgid ""
-"Enter your email address and we'll send you instructions to reset your "
-"password."
-msgstr "请输入您的电子邮件地址，我们将向您发送重置密码的说明。"
-
-#: trendsearth_ui/components/layout.py:127
-#, fuzzy
-msgid "Email Address"
-msgstr "电子邮件"
-
-#: trendsearth_ui/components/layout.py:131
-#: trendsearth_ui/components/layout.py:726
-#, fuzzy
-msgid "Enter your email address"
-msgstr "请输入您的电子邮件地址"
-
-#: trendsearth_ui/components/layout.py:153
-msgid "Cancel"
-msgstr "取消"
-
-#: trendsearth_ui/components/layout.py:159
-#, fuzzy
-msgid "Send Reset Instructions"
-msgstr "发送重置指令"
-
-#: trendsearth_ui/components/layout.py:171
-#, fuzzy
-msgid "OK"
-msgstr "好的"
-
-#: trendsearth_ui/components/layout.py:206
-#: trendsearth_ui/components/layout.py:278
-#, fuzzy
-msgid "Login"
-msgstr "登录"
-
-#: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/layout.py:712
-#, fuzzy
-msgid "Email"
-msgstr "电子邮件"
-
-#: trendsearth_ui/components/layout.py:231
-#, fuzzy
-msgid "Enter email"
-msgstr "输入邮箱"
-
-#: trendsearth_ui/components/layout.py:240
-#, fuzzy
-msgid "Password"
-msgstr "密码"
-
-#: trendsearth_ui/components/layout.py:245
-#, fuzzy
-msgid "Enter password"
-msgstr "输入密码"
-
-#: trendsearth_ui/components/layout.py:268
-#, fuzzy
-msgid "Remember me (keep me logged in)"
-msgstr "记住我（保持登录状态）"
-
-#: trendsearth_ui/components/layout.py:286
-#, fuzzy
-msgid "Register"
-msgstr "登记"
-
-#: trendsearth_ui/components/layout.py:297
-#, fuzzy
-msgid "Forgot your password?"
-msgstr "忘记密码了吗？"
-
-#: trendsearth_ui/components/layout.py:328
-#: trendsearth_ui/components/layout.py:557
-#: trendsearth_ui/components/layout.py:1122
-#, fuzzy
-msgid "Privacy Policy"
-msgstr "隐私政策"
-
-#: trendsearth_ui/components/layout.py:343
-#: trendsearth_ui/components/layout.py:572
-#: trendsearth_ui/components/layout.py:1137
-#, fuzzy
-msgid "Terms of Use"
-msgstr "使用条款"
-
-#: trendsearth_ui/components/layout.py:413
-#, fuzzy
-msgid "Set Your New Password"
-msgstr "设置新密码"
-
-#: trendsearth_ui/components/layout.py:417
-#, fuzzy
-msgid "Enter your new password below."
-msgstr "请在下方输入您的新密码。"
-
-#: trendsearth_ui/components/layout.py:438
-#, fuzzy
-msgid "New Password"
-msgstr "新密码"
-
-#: trendsearth_ui/components/layout.py:444
-#, fuzzy
-msgid "Enter new password"
-msgstr "输入新密码"
-
-#: trendsearth_ui/components/layout.py:455
-#, fuzzy
-msgid "Confirm Password"
-msgstr "确认密码"
-
-#: trendsearth_ui/components/layout.py:462
-#, fuzzy
-msgid "Confirm new password"
-msgstr "确认新密码"
-
-#: trendsearth_ui/components/layout.py:474
-#, fuzzy
-msgid "Password requirements:"
-msgstr "密码要求："
-
-#: trendsearth_ui/components/layout.py:480
-#, fuzzy
-msgid "At least 12 characters"
-msgstr "至少 12 个字符"
-
-#: trendsearth_ui/components/layout.py:485
-#, fuzzy
-msgid "Uppercase letter (A-Z)"
-msgstr "大写字母 (AZ)"
-
-#: trendsearth_ui/components/layout.py:490
-#, fuzzy
-msgid "Lowercase letter (a-z)"
-msgstr "小写字母 (az)"
-
-#: trendsearth_ui/components/layout.py:495
-#, fuzzy
-msgid "Number (0-9)"
-msgstr "数字（0-9）"
-
-#: trendsearth_ui/components/layout.py:501
-#, python-brace-format, fuzzy
-msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr "特殊字符 (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
-
-#: trendsearth_ui/components/layout.py:518
-#, fuzzy
-msgid "Set Password"
-msgstr "设置密码"
-
-#: trendsearth_ui/components/layout.py:534
-#: trendsearth_ui/components/layout.py:1106
-#, fuzzy
-msgid "Back to Login"
-msgstr "返回登录"
-
-#: trendsearth_ui/components/layout.py:609
-#, fuzzy
-msgid "Government - Environment/Natural Resources"
-msgstr "政府 - 环境/自然资源"
-
-#: trendsearth_ui/components/layout.py:610
-#, fuzzy
-msgid "Government - Agriculture"
-msgstr "政府 - 农业"
-
-#: trendsearth_ui/components/layout.py:611
-#, fuzzy
-msgid "Government - Land Management/Planning"
-msgstr "政府 - 土地管理/规划"
-
-#: trendsearth_ui/components/layout.py:612
-#, fuzzy
-msgid "Government - Other"
-msgstr "政府 - 其他"
-
-#: trendsearth_ui/components/layout.py:613
-#, fuzzy
-msgid "International/Multilateral Organization"
-msgstr "国际/多边组织"
-
-#: trendsearth_ui/components/layout.py:614
-#, fuzzy
-msgid "NGO - Development/Aid"
-msgstr "非政府组织 - 发展/援助"
-
-#: trendsearth_ui/components/layout.py:615
-#, fuzzy
-msgid "NGO - Community-Based"
-msgstr "非政府组织 - 社区组织"
-
-#: trendsearth_ui/components/layout.py:616
-#, fuzzy
-msgid "NGO - Conservation"
-msgstr "非政府组织 - 自然保护"
-
-#: trendsearth_ui/components/layout.py:617
-#, fuzzy
-msgid "NGO - Other"
-msgstr "非政府组织 - 其他"
-
-#: trendsearth_ui/components/layout.py:618
-#, fuzzy
-msgid "Academic/Research Institution"
-msgstr "学术/研究机构"
-
-#: trendsearth_ui/components/layout.py:619
-#, fuzzy
-msgid "Consulting/Professional Services"
-msgstr "咨询/专业服务"
-
-#: trendsearth_ui/components/layout.py:620
-#, fuzzy
-msgid "Private Sector - Agriculture/Forestry"
-msgstr "私营部门 - 农业/林业"
-
-#: trendsearth_ui/components/layout.py:621
-#, fuzzy
-msgid "Private Sector - Other"
-msgstr "私营部门 - 其他"
-
-#: trendsearth_ui/components/layout.py:622
-#, fuzzy
-msgid "Independent Researcher"
-msgstr "独立研究员"
-
-#: trendsearth_ui/components/layout.py:623
-#, fuzzy
-msgid "Student"
-msgstr "学生"
-
-#: trendsearth_ui/components/layout.py:624
-#: trendsearth_ui/components/layout.py:640
-#, fuzzy
-msgid "Other"
-msgstr "其他"
-
-#: trendsearth_ui/components/layout.py:629
-#, fuzzy
-msgid "National/International Reporting (UNCCD, SDGs, etc.)"
-msgstr "国家/国际报告（《联合国防治荒漠化公约》、可持续发展目标等）"
-
-#: trendsearth_ui/components/layout.py:630
-#, fuzzy
-msgid "Academic Research"
-msgstr "学术研究"
-
-#: trendsearth_ui/components/layout.py:631
-#, fuzzy
-msgid "Policy Development & Planning"
-msgstr "政策制定与规划"
-
-#: trendsearth_ui/components/layout.py:632
-#, fuzzy
-msgid "Land Restoration/Management Planning"
-msgstr "土地修复/管理规划"
-
-#: trendsearth_ui/components/layout.py:633
-#, fuzzy
-msgid "Project Monitoring & Evaluation"
-msgstr "项目监测与评估"
-
-#: trendsearth_ui/components/layout.py:634
-#, fuzzy
-msgid "Environmental Impact Assessment"
-msgstr "环境影响评估"
-
-#: trendsearth_ui/components/layout.py:635
-#, fuzzy
-msgid "Agriculture/Forestry Planning"
-msgstr "农业/林业规划"
-
-#: trendsearth_ui/components/layout.py:636
-#, fuzzy
-msgid "Teaching & Education"
-msgstr "教学与教育"
-
-#: trendsearth_ui/components/layout.py:637
-#, fuzzy
-msgid "Conservation Planning"
-msgstr "保护规划"
-
-#: trendsearth_ui/components/layout.py:638
-#, fuzzy
-msgid "Commercial Services/Products"
-msgstr "商业服务/产品"
-
-#: trendsearth_ui/components/layout.py:639
-#, fuzzy
-msgid "Community/Grassroots Initiatives"
-msgstr "社区/基层倡议"
-
-#: trendsearth_ui/components/layout.py:645
-#, fuzzy
-msgid "Woman"
-msgstr "女士"
-
-#: trendsearth_ui/components/layout.py:646
-#, fuzzy
-msgid "Man"
-msgstr "男人"
-
-#: trendsearth_ui/components/layout.py:647
-#, fuzzy
-msgid "Non-binary"
-msgstr "非二元性别"
-
-#: trendsearth_ui/components/layout.py:648
-#, fuzzy
-msgid "Prefer to self-describe"
-msgstr "更喜欢自我描述"
-
-#: trendsearth_ui/components/layout.py:649
-#, fuzzy
-msgid "Prefer not to say"
-msgstr "不愿多说"
-
-#: trendsearth_ui/components/layout.py:682
-#, fuzzy
-msgid "Create Your Account"
-msgstr "创建您的帐户"
-
-#: trendsearth_ui/components/layout.py:687
-#, fuzzy
-msgid ""
-"After registration, you'll receive an email to verify your address and set "
-"your password."
-msgstr "注册后，您将收到一封电子邮件，用于验证您的地址并设置您的密码。"
-
-#: trendsearth_ui/components/layout.py:700
-#, fuzzy
-msgid "Required field"
-msgstr "必填字段"
-
-#: trendsearth_ui/components/layout.py:740
-#, fuzzy
-msgid "Full Name"
-msgstr "姓名"
-
-#: trendsearth_ui/components/layout.py:754
-#, fuzzy
-msgid "Enter your full name"
-msgstr "请输入您的全名"
-
-#: trendsearth_ui/components/layout.py:766
-#, fuzzy
-msgid "Role/Title"
-msgstr "角色/职称"
-
-#: trendsearth_ui/components/layout.py:773
-#, fuzzy
-msgid "Your job title (optional)"
-msgstr "您的职位名称（可选）"
-
-#: trendsearth_ui/components/layout.py:787
-#, fuzzy
-msgid "Organization"
-msgstr "组织"
-
-#: trendsearth_ui/components/layout.py:801
-#, fuzzy
-msgid "Your organization"
-msgstr "贵组织"
-
-#: trendsearth_ui/components/layout.py:815
-#, fuzzy
-msgid "Sector"
-msgstr "部门"
-
-#: trendsearth_ui/components/layout.py:829
-#, fuzzy
-msgid "Select your sector"
-msgstr "选择您的行业"
-
-#: trendsearth_ui/components/layout.py:843
-#: trendsearth_ui/components/layout.py:896
-#, fuzzy
-msgid "Please specify"
-msgstr "请具体说明"
-
-#: trendsearth_ui/components/layout.py:850
-#, fuzzy
-msgid "Please specify your sector"
-msgstr "请注明您的行业"
-
-#: trendsearth_ui/components/layout.py:867
-#, fuzzy
-msgid "Purpose of Use"
-msgstr "用途"
-
-#: trendsearth_ui/components/layout.py:882
-#, fuzzy
-msgid "Select your purpose of use"
-msgstr "选择您的用途"
-
-#: trendsearth_ui/components/layout.py:903
-#, fuzzy
-msgid "Please specify your purpose"
-msgstr "请说明您的目的"
-
-#: trendsearth_ui/components/layout.py:919
-#, fuzzy
-msgid "Country"
-msgstr "国家"
-
-#: trendsearth_ui/components/layout.py:932
-#, fuzzy
-msgid "Select your country"
-msgstr "选择您的国家/地区"
-
-#: trendsearth_ui/components/layout.py:950
-#, fuzzy
-msgid "Gender Identity"
-msgstr "性别认同"
-
-#: trendsearth_ui/components/layout.py:958
-#, fuzzy
-msgid "Select (optional)"
-msgstr "选择（可选）"
-
-#: trendsearth_ui/components/layout.py:972
-#, fuzzy
-msgid ""
-"We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity development "
-"and tool access. Providing this information is voluntary; your selection "
-"will not affect your access to the tool."
-msgstr ""
-"我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
-
-#: trendsearth_ui/components/layout.py:981
-#: trendsearth_ui/components/layout.py:989
-#, fuzzy
-msgid "Please describe"
-msgstr "请描述"
-
-#: trendsearth_ui/components/layout.py:1033
-#, fuzzy
-msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-"and, depending on your use, you may be required to have in place a "
-"commercial license to use Google Earth Engine?"
-msgstr ""
-"您是否知悉 Trends.Earth 的某些功能使用了 Google Earth Engine，并且根据您的使用情况，您可能需要获得使用 Google "
-"Earth Engine 的商业许可？"
-
-#: trendsearth_ui/components/layout.py:1046
-#, fuzzy
-msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-"details see the "
-msgstr "Google Earth Engine (GEE) 对商业用途有所限制。更多详情请参阅…… "
-
-#: trendsearth_ui/components/layout.py:1050
-#, fuzzy
-msgid "Google Earth Engine Terms of Use"
-msgstr "Google Earth Engine 使用条款"
-
-#: trendsearth_ui/components/layout.py:1056
-#, fuzzy
-msgid ""
-" . Conservation International does not provide or manage commercial GEE "
-"licenses. Users are solely responsible for ensuring their use of GEE "
-"complies with Google's commercial licensing requirements. Access to this "
-"tool does not grant or imply the provision of commercial licensing."
-msgstr ""
-" 国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
-
-#: trendsearth_ui/components/layout.py:1065
-#, fuzzy
-msgid "Yes, I acknowledge"
-msgstr "是的，我承认"
-
-#: trendsearth_ui/components/layout.py:1090
-#, fuzzy
-msgid "Create Account"
-msgstr "创建账户"
-
-#: trendsearth_ui/components/layout.py:1221
-msgid "Logout"
-msgstr "登出"
-
-#: trendsearth_ui/components/layout.py:1267
-#, fuzzy
-msgid "Executions"
-msgstr "执行"
-
-#: trendsearth_ui/components/layout.py:1277
-#, fuzzy
-msgid "Users"
-msgstr "用户"
-
-#: trendsearth_ui/components/layout.py:1291
-#, fuzzy
-msgid "Scripts"
-msgstr "脚本"
-
-#: trendsearth_ui/components/layout.py:1305
-#, fuzzy
-msgid "Admin"
-msgstr "行政"
-
-#: trendsearth_ui/components/layout.py:1319
-#, fuzzy
-msgid "Status"
-msgstr "地位"
-
-#: trendsearth_ui/components/layout.py:1333
-#, fuzzy
-msgid "Profile"
-msgstr "轮廓"
+#~ msgid "Forgot Password"
+#~ msgstr "忘记密码"
+
+#~ msgid ""
+#~ "Enter your email address and we'll "
+#~ "send you instructions to reset your "
+#~ "password."
+#~ msgstr "请输入您的电子邮件地址，我们将向您发送重置密码的说明。"
+
+#~ msgid "Email Address"
+#~ msgstr "电子邮件"
+
+#~ msgid "Enter your email address"
+#~ msgstr "请输入您的电子邮件地址"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid "Send Reset Instructions"
+#~ msgstr "发送重置指令"
+
+#~ msgid "OK"
+#~ msgstr "好的"
+
+#~ msgid "Login"
+#~ msgstr "登录"
+
+#~ msgid "Email"
+#~ msgstr "电子邮件"
+
+#~ msgid "Enter email"
+#~ msgstr "输入邮箱"
+
+#~ msgid "Password"
+#~ msgstr "密码"
+
+#~ msgid "Enter password"
+#~ msgstr "输入密码"
+
+#~ msgid "Remember me (keep me logged in)"
+#~ msgstr "记住我（保持登录状态）"
+
+#~ msgid "Register"
+#~ msgstr "登记"
+
+#~ msgid "Forgot your password?"
+#~ msgstr "忘记密码了吗？"
+
+#~ msgid "Privacy Policy"
+#~ msgstr "隐私政策"
+
+#~ msgid "Terms of Use"
+#~ msgstr "使用条款"
+
+#~ msgid "Set Your New Password"
+#~ msgstr "设置新密码"
+
+#~ msgid "Enter your new password below."
+#~ msgstr "请在下方输入您的新密码。"
+
+#~ msgid "New Password"
+#~ msgstr "新密码"
+
+#~ msgid "Enter new password"
+#~ msgstr "输入新密码"
+
+#~ msgid "Confirm Password"
+#~ msgstr "确认密码"
+
+#~ msgid "Confirm new password"
+#~ msgstr "确认新密码"
+
+#~ msgid "Password requirements:"
+#~ msgstr "密码要求："
+
+#~ msgid "At least 12 characters"
+#~ msgstr "至少 12 个字符"
+
+#~ msgid "Uppercase letter (A-Z)"
+#~ msgstr "大写字母 (AZ)"
+
+#~ msgid "Lowercase letter (a-z)"
+#~ msgstr "小写字母 (az)"
+
+#~ msgid "Number (0-9)"
+#~ msgstr "数字（0-9）"
+
+#~ msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+#~ msgstr "特殊字符 (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+
+#~ msgid "Set Password"
+#~ msgstr "设置密码"
+
+#~ msgid "Back to Login"
+#~ msgstr "返回登录"
+
+#~ msgid "Government - Environment/Natural Resources"
+#~ msgstr "政府 - 环境/自然资源"
+
+#~ msgid "Government - Agriculture"
+#~ msgstr "政府 - 农业"
+
+#~ msgid "Government - Land Management/Planning"
+#~ msgstr "政府 - 土地管理/规划"
+
+#~ msgid "Government - Other"
+#~ msgstr "政府 - 其他"
+
+#~ msgid "International/Multilateral Organization"
+#~ msgstr "国际/多边组织"
+
+#~ msgid "NGO - Development/Aid"
+#~ msgstr "非政府组织 - 发展/援助"
+
+#~ msgid "NGO - Community-Based"
+#~ msgstr "非政府组织 - 社区组织"
+
+#~ msgid "NGO - Conservation"
+#~ msgstr "非政府组织 - 自然保护"
+
+#~ msgid "NGO - Other"
+#~ msgstr "非政府组织 - 其他"
+
+#~ msgid "Academic/Research Institution"
+#~ msgstr "学术/研究机构"
+
+#~ msgid "Consulting/Professional Services"
+#~ msgstr "咨询/专业服务"
+
+#~ msgid "Private Sector - Agriculture/Forestry"
+#~ msgstr "私营部门 - 农业/林业"
+
+#~ msgid "Private Sector - Other"
+#~ msgstr "私营部门 - 其他"
+
+#~ msgid "Independent Researcher"
+#~ msgstr "独立研究员"
+
+#~ msgid "Student"
+#~ msgstr "学生"
+
+#~ msgid "Other"
+#~ msgstr "其他"
+
+#~ msgid "National/International Reporting (UNCCD, SDGs, etc.)"
+#~ msgstr "国家/国际报告（《联合国防治荒漠化公约》、可持续发展目标等）"
+
+#~ msgid "Academic Research"
+#~ msgstr "学术研究"
+
+#~ msgid "Policy Development & Planning"
+#~ msgstr "政策制定与规划"
+
+#~ msgid "Land Restoration/Management Planning"
+#~ msgstr "土地修复/管理规划"
+
+#~ msgid "Project Monitoring & Evaluation"
+#~ msgstr "项目监测与评估"
+
+#~ msgid "Environmental Impact Assessment"
+#~ msgstr "环境影响评估"
+
+#~ msgid "Agriculture/Forestry Planning"
+#~ msgstr "农业/林业规划"
+
+#~ msgid "Teaching & Education"
+#~ msgstr "教学与教育"
+
+#~ msgid "Conservation Planning"
+#~ msgstr "保护规划"
+
+#~ msgid "Commercial Services/Products"
+#~ msgstr "商业服务/产品"
+
+#~ msgid "Community/Grassroots Initiatives"
+#~ msgstr "社区/基层倡议"
+
+#~ msgid "Woman"
+#~ msgstr "女士"
+
+#~ msgid "Man"
+#~ msgstr "男人"
+
+#~ msgid "Non-binary"
+#~ msgstr "非二元性别"
+
+#~ msgid "Prefer to self-describe"
+#~ msgstr "更喜欢自我描述"
+
+#~ msgid "Prefer not to say"
+#~ msgstr "不愿多说"
+
+#~ msgid "Create Your Account"
+#~ msgstr "创建您的帐户"
+
+#~ msgid ""
+#~ "After registration, you'll receive an "
+#~ "email to verify your address and "
+#~ "set your password."
+#~ msgstr "注册后，您将收到一封电子邮件，用于验证您的地址并设置您的密码。"
+
+#~ msgid "Required field"
+#~ msgstr "必填字段"
+
+#~ msgid "Full Name"
+#~ msgstr "姓名"
+
+#~ msgid "Enter your full name"
+#~ msgstr "请输入您的全名"
+
+#~ msgid "Role/Title"
+#~ msgstr "角色/职称"
+
+#~ msgid "Your job title (optional)"
+#~ msgstr "您的职位名称（可选）"
+
+#~ msgid "Organization"
+#~ msgstr "组织"
+
+#~ msgid "Your organization"
+#~ msgstr "贵组织"
+
+#~ msgid "Sector"
+#~ msgstr "部门"
+
+#~ msgid "Select your sector"
+#~ msgstr "选择您的行业"
+
+#~ msgid "Please specify"
+#~ msgstr "请具体说明"
+
+#~ msgid "Please specify your sector"
+#~ msgstr "请注明您的行业"
+
+#~ msgid "Purpose of Use"
+#~ msgstr "用途"
+
+#~ msgid "Select your purpose of use"
+#~ msgstr "选择您的用途"
+
+#~ msgid "Please specify your purpose"
+#~ msgstr "请说明您的目的"
+
+#~ msgid "Country"
+#~ msgstr "国家"
+
+#~ msgid "Select your country"
+#~ msgstr "选择您的国家/地区"
+
+#~ msgid "Gender Identity"
+#~ msgstr "性别认同"
+
+#~ msgid "Select (optional)"
+#~ msgstr "选择（可选）"
+
+#~ msgid ""
+#~ "We collect gender identity information "
+#~ "to comply with donor reporting "
+#~ "requirements and to assess equitable "
+#~ "participation in capacity development and "
+#~ "tool access. Providing this information "
+#~ "is voluntary; your selection will not"
+#~ " affect your access to the tool."
+#~ msgstr "我们收集性别认同信息，以遵守捐助方的报告要求，并评估能力建设和工具使用方面的公平参与情况。提供此信息完全出于自愿；您的选择不会影响您使用该工具。"
+
+#~ msgid "Please describe"
+#~ msgstr "请描述"
+
+#~ msgid ""
+#~ "Do you acknowledge that some "
+#~ "Trends.Earth features use Google Earth "
+#~ "Engine, and, depending on your use, "
+#~ "you may be required to have in "
+#~ "place a commercial license to use "
+#~ "Google Earth Engine?"
+#~ msgstr ""
+#~ "您是否知悉 Trends.Earth 的某些功能使用了 Google Earth "
+#~ "Engine，并且根据您的使用情况，您可能需要获得使用 Google Earth Engine "
+#~ "的商业许可？"
+
+#~ msgid ""
+#~ "Google Earth Engine (GEE) imposes "
+#~ "restrictions on commercial use. For more"
+#~ " details see the "
+#~ msgstr "Google Earth Engine (GEE) 对商业用途有所限制。更多详情请参阅…… "
+
+#~ msgid "Google Earth Engine Terms of Use"
+#~ msgstr "Google Earth Engine 使用条款"
+
+#~ msgid ""
+#~ " . Conservation International does not"
+#~ " provide or manage commercial GEE "
+#~ "licenses. Users are solely responsible "
+#~ "for ensuring their use of GEE "
+#~ "complies with Google's commercial licensing"
+#~ " requirements. Access to this tool "
+#~ "does not grant or imply the "
+#~ "provision of commercial licensing."
+#~ msgstr ""
+#~ " "
+#~ "国际自然保护协会不提供或管理商业用途的GEE许可。用户需自行负责确保其对GEE的使用符合谷歌的商业许可要求。访问此工具并不授予或暗示提供商业许可。"
+
+#~ msgid "Yes, I acknowledge"
+#~ msgstr "是的，我承认"
+
+#~ msgid "Create Account"
+#~ msgstr "创建账户"
+
+#~ msgid "Logout"
+#~ msgstr "登出"
+
+#~ msgid "Executions"
+#~ msgstr "执行"
+
+#~ msgid "Users"
+#~ msgstr "用户"
+
+#~ msgid "Scripts"
+#~ msgstr "脚本"
+
+#~ msgid "Admin"
+#~ msgstr "行政"
+
+#~ msgid "Status"
+#~ msgstr "地位"
+
+#~ msgid "Profile"
+#~ msgstr "轮廓"
+
