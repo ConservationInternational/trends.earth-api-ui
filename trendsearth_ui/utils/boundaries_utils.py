@@ -385,14 +385,14 @@ def _load_fallback_country_options() -> list[dict]:
     """Load the fallback country list from the JSON file.
 
     Returns:
-        List of dicts with 'label' (country name) and 'value' (ISO code) keys,
-        suitable for use in Dash dropdowns.
+        List of dicts with 'label' and 'value' both set to country name,
+        suitable for use in Dash dropdowns. Uses names to match QGIS plugin behavior.
     """
     try:
         with open(_FALLBACK_COUNTRIES_PATH, encoding="utf-8") as f:
             countries = json.load(f)
-        # Convert to dropdown options format
-        return [{"label": c["name"], "value": c["code"]} for c in countries]
+        # Convert to dropdown options format - use name as value to match plugin
+        return [{"label": c["name"], "value": c["name"]} for c in countries]
     except FileNotFoundError:
         logger.warning("Fallback countries file not found: %s", _FALLBACK_COUNTRIES_PATH)
         return []
@@ -484,10 +484,10 @@ def _fetch_country_options_from_api(api_environment: str, token: str | None) -> 
 
             options = []
             for country in countries:
-                iso_code = country.get("boundaryISO", "")
                 name = country.get("boundaryName", "")
-                if iso_code and name:
-                    options.append({"label": name, "value": iso_code})
+                if name:
+                    # Use country name as value to match QGIS plugin behavior
+                    options.append({"label": name, "value": name})
 
             options.sort(key=lambda x: x["label"])
             logger.debug("Fetched %d countries from boundaries API", len(options))

@@ -1994,6 +1994,8 @@ def register_callbacks(app):
                     # Clear description if gender is not "self_describe"
                     payload["gender_identity_description"] = ""
 
+            logger.debug("Standalone profile update payload: %s", payload)
+
             # Make authenticated request using the JWT token
             headers = apply_default_headers()
             headers["Authorization"] = f"Bearer {token}"
@@ -2018,18 +2020,24 @@ def register_callbacks(app):
                 error_msg = _("Invalid token. Please request a new profile update link.")
                 try:
                     error_data = resp.json()
+                    logger.warning("Profile update 422 response: %s", error_data)
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
                     pass
                 return error_msg, "danger", True
             else:
                 logger.warning("Profile update failed with status: %s", resp.status_code)
+                logger.warning("Profile update payload was: %s", payload)
                 error_msg = _("Failed to update profile.")
                 try:
                     error_data = resp.json()
+                    logger.warning("Profile update error response: %s", error_data)
                     error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
-                    logger.debug("Could not parse profile update error response", exc_info=True)
+                    logger.warning(
+                        "Could not parse profile update error response. Raw text: %s",
+                        resp.text[:500] if resp.text else "empty",
+                    )
                 return error_msg, "danger", True
 
         except requests.exceptions.Timeout:
