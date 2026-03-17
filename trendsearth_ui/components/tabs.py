@@ -1557,7 +1557,9 @@ def status_tab_content(is_admin, role=None):
 
 def admin_tab_content(role, is_admin):
     """Create the admin tab content with forms for creating users and uploading scripts."""
+    print(f"[ADMIN_TAB] admin_tab_content called: role={role}, is_admin={is_admin}")
     if not is_admin:
+        print("[ADMIN_TAB] Access denied - not admin")
         return html.Div(
             [
                 dbc.Alert(
@@ -1569,6 +1571,7 @@ def admin_tab_content(role, is_admin):
             ]
         )
 
+    print("[ADMIN_TAB] Creating admin tab content with News Management section")
     return html.Div(
         [
             # Page Header
@@ -1842,9 +1845,12 @@ def admin_tab_content(role, is_admin):
                                             # Store for selected news item
                                             dcc.Store(id="admin-selected-news-id"),
                                             # Interval to trigger initial news load
+                                            # Note: 1500ms delay ensures callback fires after
+                                            # Dash's initial callback phase completes when using
+                                            # prevent_initial_call="initial_duplicate"
                                             dcc.Interval(
                                                 id="admin-news-load-interval",
-                                                interval=500,  # 500ms delay after render
+                                                interval=1500,  # 1500ms delay after render
                                                 max_intervals=1,  # Only fire once
                                             ),
                                             dbc.Alert(

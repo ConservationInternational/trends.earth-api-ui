@@ -1652,22 +1652,24 @@ def register_callbacks(app):
             Output("standalone-profile-country", "value"),
             Output("standalone-profile-gender", "value"),
             Output("standalone-profile-gender-description", "value"),
-            # Control visibility of loading spinner, error alert, and form
+            # Control visibility of loading spinner, error alert, login form, and profile form
             Output("standalone-profile-loading", "style"),
             Output("standalone-profile-error-alert", "children"),
             Output("standalone-profile-error-alert", "is_open"),
             Output("standalone-profile-form-container", "style"),
+            Output("standalone-profile-login-container", "style"),
         ],
         [Input("standalone-profile-token", "data")],
         [State("standalone-profile-api-env", "data")],
     )
     def load_standalone_profile_user_data(token, api_environment):
-        """Load user data using the JWT token from the URL."""
+        """Load user data using the JWT token from the URL or show login form."""
         # Style constants
         hide_style = {"display": "none"}
         show_style = {"display": "block"}
 
         if not token:
+            # No token provided - show login form instead of error
             return (
                 None,  # user data
                 "",  # email
@@ -1682,9 +1684,10 @@ def register_callbacks(app):
                 "",  # gender
                 "",  # gender_description
                 hide_style,  # hide loading spinner
-                "No token provided. Please use a valid profile update link.",
-                True,  # show error alert
-                hide_style,  # hide form
+                "",  # no error message
+                False,  # hide error alert
+                hide_style,  # hide profile form
+                show_style,  # show login form
             )
 
         try:
@@ -1708,7 +1711,8 @@ def register_callbacks(app):
                     hide_style,  # hide loading spinner
                     _("Invalid or expired token. Please request a new profile update link."),
                     True,  # show error alert
-                    hide_style,  # hide form
+                    hide_style,  # hide profile form
+                    hide_style,  # hide login form
                 )
 
             logger.debug("Loaded user data for standalone profile: %s", user_data.get("email"))
@@ -1729,7 +1733,8 @@ def register_callbacks(app):
                 hide_style,  # hide loading spinner
                 "",  # no error message
                 False,  # hide error alert
-                show_style,  # show form
+                show_style,  # show profile form
+                hide_style,  # hide login form
             )
 
         except Exception as e:
@@ -1750,7 +1755,128 @@ def register_callbacks(app):
                 hide_style,  # hide loading spinner
                 _("Error loading profile: {error}").format(error=str(e)),
                 True,  # show error alert
-                hide_style,  # hide form
+                hide_style,  # hide profile form
+                hide_style,  # hide login form
+            )
+
+    @app.callback(
+        [
+            Output("standalone-profile-token", "data", allow_duplicate=True),
+            Output("standalone-profile-login-alert", "children"),
+            Output("standalone-profile-login-alert", "color"),
+            Output("standalone-profile-login-alert", "is_open"),
+        ],
+        [Input("standalone-profile-login-btn", "n_clicks")],
+        [
+            State("standalone-profile-login-email", "value"),
+            State("standalone-profile-login-password", "value"),
+            State("standalone-profile-api-env", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def standalone_profile_login(n_clicks, email, password, api_environment):
+        """Handle login authentication on the standalone profile page."""
+        if not n_clicks:
+            return no_update, no_update, no_update, no_update
+
+        if not email or not password:
+            return (
+                no_update,
+                _("Please enter both email and password."),
+                "warning",
+                True,
+            )
+
+        # Get the AUTH_URL for the selected environment
+        api_env = api_environment or "production"
+        auth_url = get_auth_url(api_env)
+
+        logger.debug("Standalone profile login attempt for: %s (environment: %s)", email, api_env)
+
+        try:
+            auth_data = {"email": email, "password": password}
+            resp = get_session().post(
+                auth_url,
+                headers=apply_default_headers(),
+                json=auth_data,
+                timeout=5,
+            )
+
+            if resp.status_code == 200:
+                try:
+                    data = resp.json()
+                except ValueError as e:
+                    logger.warning("Failed to parse auth response JSON: %s", e)
+                    return (
+                        no_update,
+                        _("Login failed: Invalid response format."),
+                        "danger",
+                        True,
+                    )
+
+                access_token = data.get("access_token")
+
+                if access_token:
+                    logger.debug(
+                        "Standalone profile login successful for: %s",
+                        email,
+                    )
+                    # Return the access token - this will trigger the user data loading callback
+                    return (
+                        access_token,
+                        _("Login successful! Loading your profile..."),
+                        "success",
+                        True,
+                    )
+                else:
+                    logger.warning("Login response missing access_token")
+                    return (
+                        no_update,
+                        _("Login failed: No access token received."),
+                        "danger",
+                        True,
+                    )
+            else:
+                logger.warning("Standalone profile login failed with status: %s", resp.status_code)
+                error_msg = _("Invalid credentials.")
+                try:
+                    error_data = resp.json()
+                    if "msg" in error_data:
+                        error_msg = error_data["msg"]
+                    elif "message" in error_data:
+                        error_msg = error_data["message"]
+                except Exception:
+                    pass
+                return (
+                    no_update,
+                    error_msg,
+                    "danger",
+                    True,
+                )
+
+        except requests.exceptions.Timeout:
+            logger.warning("Standalone profile login request timed out")
+            return (
+                no_update,
+                _("Request timed out. Please try again."),
+                "danger",
+                True,
+            )
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error during standalone profile login")
+            return (
+                no_update,
+                _("Cannot connect to the server. Please check your connection."),
+                "danger",
+                True,
+            )
+        except Exception as e:
+            logger.exception("Error during standalone profile login: %s", e)
+            return (
+                no_update,
+                _("An error occurred: {error}").format(error=str(e)),
+                "danger",
+                True,
             )
 
     @app.callback(

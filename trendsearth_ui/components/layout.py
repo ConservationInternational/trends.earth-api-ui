@@ -1202,7 +1202,8 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
     """Create the standalone profile update page layout.
 
     This page allows users to update their profile via a direct URL with JWT token,
-    without needing to log in through the normal flow.
+    without needing to log in through the normal flow. If no token is provided,
+    a login form is shown first, and on successful login, the profile form is displayed.
 
     Args:
         token: JWT token from URL query parameter
@@ -1260,10 +1261,72 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
                                                 ),
                                                 className="mb-3",
                                             ),
+                                            # Login form container (shown when no token is provided)
+                                            html.Div(
+                                                id="standalone-profile-login-container",
+                                                style={"display": "none"},
+                                                children=[
+                                                    html.P(
+                                                        _("Please log in to update your profile."),
+                                                        className="text-muted mb-3 text-center",
+                                                    ),
+                                                    dbc.Form(
+                                                        [
+                                                            dbc.Row(
+                                                                [
+                                                                    dbc.Label(_("Email"), width=4),
+                                                                    dbc.Col(
+                                                                        dbc.Input(
+                                                                            id="standalone-profile-login-email",
+                                                                            type="email",
+                                                                            placeholder=_(
+                                                                                "Enter email"
+                                                                            ),
+                                                                        ),
+                                                                        width=8,
+                                                                    ),
+                                                                ],
+                                                                className="mb-3",
+                                                            ),
+                                                            dbc.Row(
+                                                                [
+                                                                    dbc.Label(
+                                                                        _("Password"), width=4
+                                                                    ),
+                                                                    dbc.Col(
+                                                                        dbc.Input(
+                                                                            id="standalone-profile-login-password",
+                                                                            type="password",
+                                                                            placeholder=_(
+                                                                                "Enter password"
+                                                                            ),
+                                                                        ),
+                                                                        width=8,
+                                                                    ),
+                                                                ],
+                                                                className="mb-3",
+                                                            ),
+                                                            dbc.Button(
+                                                                _("Login"),
+                                                                id="standalone-profile-login-btn",
+                                                                color="primary",
+                                                                className="mt-2 w-100",
+                                                                n_clicks=0,
+                                                            ),
+                                                            dbc.Alert(
+                                                                id="standalone-profile-login-alert",
+                                                                is_open=False,
+                                                                dismissable=True,
+                                                                className="mt-3",
+                                                            ),
+                                                        ]
+                                                    ),
+                                                ],
+                                            ),
                                             # Loading indicator for initial data fetch
                                             html.Div(
                                                 dbc.Spinner(
-                                                    html.Div("Loading profile..."),
+                                                    html.Div(_("Loading profile...")),
                                                     color="primary",
                                                     size="sm",
                                                 ),

@@ -121,6 +121,8 @@ def register_callbacks(app):
     """Register news admin callbacks with the app."""
     from dash import callback_context
 
+    print("[NEWS_ADMIN] Registering news admin callbacks")
+
     @app.callback(
         Output("admin-news-table", "children"),
         Output("admin-news-alert", "children", allow_duplicate=True),
@@ -130,22 +132,27 @@ def register_callbacks(app):
         Input("admin-refresh-news-btn", "n_clicks"),
         Input("admin-news-save-btn", "n_clicks"),
         Input("admin-news-delete-confirm-btn", "n_clicks"),
-        Input("token-store", "data"),
-        prevent_initial_call="initial_duplicate",
+        State("token-store", "data"),
+        prevent_initial_call=False,
     )
     def load_admin_news_items(_n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token):
         """Load news items for admin management."""
+        print(f"[NEWS_ADMIN] load_admin_news_items called: n_intervals={_n_intervals}, refresh={_refresh_clicks}, token={'present' if token else 'None'}")
         # Must have a token to load news
         if not token:
+            print("[NEWS_ADMIN] No token available")
             return _("Please log in to manage news."), "", "warning", True
 
         try:
             # Fetch all news including inactive
+            print("[NEWS_ADMIN] Making API request to /admin/news")
             response = make_api_request("GET", "/admin/news?include_inactive=true", token)
+            print(f"[NEWS_ADMIN] API response status: {response.status_code}")
 
             if response.status_code == 200:
                 data = response.json()
                 news_items = data.get("data", [])
+                print(f"[NEWS_ADMIN] Successfully loaded {len(news_items)} news items")
                 return create_news_table(news_items), no_update, no_update, no_update
             elif response.status_code == 401:
                 return (
@@ -163,10 +170,12 @@ def register_callbacks(app):
                 )
             else:
                 error_msg = _("Failed to load news: {status}").format(status=response.status_code)
+                print(f"[NEWS_ADMIN] Unexpected status code: {response.status_code}")
                 return error_msg, error_msg, "danger", True
 
         except Exception as e:
             error_msg = _("Error loading news: {error}").format(error=str(e))
+            print(f"[NEWS_ADMIN] Exception loading news: {e}")
             return error_msg, error_msg, "danger", True
 
     @app.callback(
