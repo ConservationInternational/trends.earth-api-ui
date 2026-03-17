@@ -13,6 +13,61 @@ logger = logging.getLogger(__name__)
 def register_callbacks(app):
     """Register profile and password change callbacks."""
 
+    # Callbacks for conditional field visibility
+    @app.callback(
+        Output("profile-sector-other-col", "style"),
+        [Input("profile-sector", "value")],
+    )
+    def toggle_profile_sector_other(sector_value):
+        """Show/hide sector other field based on selection."""
+        if sector_value == "other":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("profile-purpose-other-col", "style"),
+        [Input("profile-purpose", "value")],
+    )
+    def toggle_profile_purpose_other(purpose_value):
+        """Show/hide purpose other field based on selection."""
+        if purpose_value == "other":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
+        Output("profile-gender-description-col", "style"),
+        [Input("profile-gender", "value")],
+    )
+    def toggle_profile_gender_description(gender_value):
+        """Show/hide gender description field based on selection."""
+        if gender_value == "self_describe":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    # Callback to load country options
+    @app.callback(
+        Output("profile-country", "options"),
+        [Input("profile-countries-store", "data")],
+    )
+    def update_profile_country_options(countries_data):
+        """Update country dropdown options from store."""
+        if not countries_data:
+            return []
+        return countries_data
+
+    @app.callback(
+        Output("profile-countries-store", "data"),
+        [Input("token-store", "data")],
+    )
+    def load_profile_countries(token):
+        """Load country options for the profile form."""
+        from ..utils.boundaries_utils import get_country_options
+
+        # Use production environment by default
+        api_environment = "production"
+        logger.debug("Fetching countries for profile (environment: %s)", api_environment)
+        return get_country_options(api_environment=api_environment, token=token)
+
     @app.callback(
         [
             Output("profile-update-alert", "children"),
@@ -23,21 +78,98 @@ def register_callbacks(app):
         [Input("update-profile-btn", "n_clicks")],
         [
             State("profile-name", "value"),
+            State("profile-role-title", "value"),
             State("profile-institution", "value"),
+            State("profile-country", "value"),
+            State("profile-sector", "value"),
+            State("profile-sector-other", "value"),
+            State("profile-purpose", "value"),
+            State("profile-purpose-other", "value"),
+            State("profile-gender", "value"),
+            State("profile-gender-description", "value"),
             State("token-store", "data"),
             State("user-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def update_profile(n_clicks, name, institution, token, user_data):
+    def update_profile(
+        n_clicks,
+        name,
+        role_title,
+        institution,
+        country,
+        sector,
+        sector_other,
+        purpose,
+        purpose_other,
+        gender,
+        gender_description,
+        token,
+        user_data,
+    ):
         """Update user profile information."""
         if not n_clicks or not token or not user_data:
             return no_update, no_update, no_update, no_update
 
+        # Validate required fields
         if not name:
-            return _("Name is required."), "danger", True, no_update
+            return _("Name is required."), "warning", True, no_update
 
-        update_data = {"name": name, "institution": institution or ""}
+        if not institution:
+            return _("Organization is required."), "warning", True, no_update
+
+        if not sector:
+            return _("Please select your sector."), "warning", True, no_update
+
+        if sector == "other" and not sector_other:
+            return _("Please specify your sector."), "warning", True, no_update
+
+        if not purpose:
+            return _("Please select your purpose of use."), "warning", True, no_update
+
+        if purpose == "other" and not purpose_other:
+            return _("Please specify your purpose of use."), "warning", True, no_update
+
+        if not country:
+            return _("Please select your country."), "warning", True, no_update
+
+        if gender == "self_describe" and not gender_description:
+            return _("Please describe your gender identity."), "warning", True, no_update
+
+        # Build update payload
+        update_data = {
+            "name": name,
+            "institution": institution,
+            "country": country,
+            "sector": sector,
+            "purpose_of_use": purpose,
+        }
+
+        # Add optional/conditional fields
+        if role_title:
+            update_data["role_title"] = role_title
+        else:
+            update_data["role_title"] = ""
+
+        if sector == "other" and sector_other:
+            update_data["sector_other"] = sector_other
+        else:
+            update_data["sector_other"] = ""
+
+        if purpose == "other" and purpose_other:
+            update_data["purpose_of_use_other"] = purpose_other
+        else:
+            update_data["purpose_of_use_other"] = ""
+
+        if gender:
+            update_data["gender_identity"] = gender
+            if gender == "self_describe" and gender_description:
+                update_data["gender_identity_description"] = gender_description
+            else:
+                update_data["gender_identity_description"] = ""
+        else:
+            update_data["gender_identity"] = ""
+            update_data["gender_identity_description"] = ""
 
         try:
             user_id = user_data.get("id")
@@ -45,6 +177,8 @@ def register_callbacks(app):
                 return _("User ID not found in user data."), "danger", True, no_update
 
             from ..utils.helpers import make_authenticated_request
+
+            logger.debug("Submitting profile update with payload: %s", update_data)
 
             resp = make_authenticated_request(
                 "/user/me",
@@ -60,15 +194,18 @@ def register_callbacks(app):
                 updated_user_data.update(update_data)
                 return _("Profile updated successfully!"), "success", True, updated_user_data
             else:
+                logger.warning("Profile update failed with status: %s", resp.status_code)
                 error_msg = _("Failed to update profile.")
                 try:
                     error_data = resp.json()
-                    error_msg = error_data.get("msg", error_msg)
+                    logger.warning("Profile update error response: %s", error_data)
+                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
                 except Exception:
                     logger.debug("Could not parse API error response", exc_info=True)
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
+            logger.exception("Network error during profile update: %s", e)
             return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
     @app.callback(

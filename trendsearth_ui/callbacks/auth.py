@@ -1837,16 +1837,26 @@ def register_callbacks(app):
                         True,
                     )
             else:
-                logger.warning("Standalone profile login failed with status: %s", resp.status_code)
+                logger.warning(
+                    "Standalone profile login failed with status: %s for user: %s",
+                    resp.status_code,
+                    email,
+                )
                 error_msg = _("Invalid credentials.")
                 try:
                     error_data = resp.json()
+                    logger.warning("Login error response: %s", error_data)
                     if "msg" in error_data:
                         error_msg = error_data["msg"]
                     elif "message" in error_data:
                         error_msg = error_data["message"]
+                    elif "detail" in error_data:
+                        error_msg = error_data["detail"]
                 except Exception:
-                    pass
+                    logger.warning(
+                        "Could not parse login error response. Raw text: %s",
+                        resp.text[:500] if resp.text else "empty",
+                    )
                 return (
                     no_update,
                     error_msg,

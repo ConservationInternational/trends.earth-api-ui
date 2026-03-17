@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 from ..config import EXECUTIONS_REFRESH_INTERVAL, STATUS_REFRESH_INTERVAL
 from ..i18n import gettext as _
 from ..utils.mobile_utils import get_mobile_column_config
+from .layout import get_gender_options, get_purpose_options, get_sector_options
 
 
 def get_responsive_grid_options(is_mobile=False):
@@ -434,20 +435,52 @@ def scripts_tab_content():
 
 def profile_tab_content(user_data):
     """Create the profile tab content."""
+    # Get dropdown options
+    sector_options = get_sector_options()
+    purpose_options = get_purpose_options()
+    gender_options = get_gender_options()
+
     # Get current user data for pre-populating form
     current_name = ""
     current_email = ""
     current_institution = ""
     current_role = ""
+    current_role_title = ""
+    current_sector = ""
+    current_sector_other = ""
+    current_purpose = ""
+    current_purpose_other = ""
+    current_country = ""
+    current_gender = ""
+    current_gender_description = ""
 
     if user_data and isinstance(user_data, dict):
         current_name = user_data.get("name", "")
         current_email = user_data.get("email", "")
         current_institution = user_data.get("institution", "")
         current_role = user_data.get("role", "")
+        current_role_title = user_data.get("role_title", "") or ""
+        current_sector = user_data.get("sector", "") or ""
+        current_sector_other = user_data.get("sector_other", "") or ""
+        current_purpose = user_data.get("purpose_of_use", "") or ""
+        current_purpose_other = user_data.get("purpose_of_use_other", "") or ""
+        current_country = user_data.get("country", "") or ""
+        current_gender = user_data.get("gender_identity", "") or ""
+        current_gender_description = user_data.get("gender_identity_description", "") or ""
+
+    # Determine initial visibility for conditional fields
+    sector_other_style = {"display": "block"} if current_sector == "other" else {"display": "none"}
+    purpose_other_style = (
+        {"display": "block"} if current_purpose == "other" else {"display": "none"}
+    )
+    gender_desc_style = (
+        {"display": "block"} if current_gender == "self_describe" else {"display": "none"}
+    )
 
     return html.Div(
         [
+            # Store for country options
+            dcc.Store(id="profile-countries-store"),
             dbc.Card(
                 [
                     dbc.CardHeader(html.H4(_("Profile Settings"))),
@@ -455,53 +488,24 @@ def profile_tab_content(user_data):
                         [
                             dbc.Form(
                                 [
+                                    # Row 1: Email (read-only) and System Role (read-only)
                                     dbc.Row(
                                         [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(_("Name")),
-                                                    dbc.Input(
-                                                        id="profile-name",
-                                                        type="text",
-                                                        placeholder=_("Enter your name"),
-                                                        value=current_name,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
                                             dbc.Col(
                                                 [
                                                     dbc.Label(_("Email")),
                                                     dbc.Input(
                                                         id="profile-email",
                                                         type="email",
-                                                        placeholder=_("Enter your email"),
                                                         value=current_email,
                                                         disabled=True,
                                                     ),
                                                 ],
                                                 width=6,
                                             ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
                                             dbc.Col(
                                                 [
-                                                    dbc.Label(_("Institution")),
-                                                    dbc.Input(
-                                                        id="profile-institution",
-                                                        type="text",
-                                                        placeholder=_("Enter your institution"),
-                                                        value=current_institution,
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(_("Role")),
+                                                    dbc.Label(_("System Role")),
                                                     dbc.Input(
                                                         id="profile-role",
                                                         type="text",
@@ -514,6 +518,209 @@ def profile_tab_content(user_data):
                                         ],
                                         className="mb-3",
                                     ),
+                                    # Row 2: Name (required) and Role/Title (optional)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(
+                                                        [
+                                                            _("Name"),
+                                                            html.Span(" *", style={"color": "red"}),
+                                                        ]
+                                                    ),
+                                                    dbc.Input(
+                                                        id="profile-name",
+                                                        type="text",
+                                                        placeholder=_("Enter your full name"),
+                                                        value=current_name,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Role/Title")),
+                                                    dbc.Input(
+                                                        id="profile-role-title",
+                                                        type="text",
+                                                        placeholder=_("Your job title (optional)"),
+                                                        value=current_role_title,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    # Row 3: Organization (required) and Country (required)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(
+                                                        [
+                                                            _("Organization"),
+                                                            html.Span(" *", style={"color": "red"}),
+                                                        ]
+                                                    ),
+                                                    dbc.Input(
+                                                        id="profile-institution",
+                                                        type="text",
+                                                        placeholder=_("Your organization"),
+                                                        value=current_institution,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(
+                                                        [
+                                                            _("Country"),
+                                                            html.Span(" *", style={"color": "red"}),
+                                                        ]
+                                                    ),
+                                                    dcc.Dropdown(
+                                                        id="profile-country",
+                                                        placeholder=_("Select your country"),
+                                                        clearable=True,
+                                                        value=current_country,
+                                                        style={"fontSize": "14px"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    # Row 4: Sector (required)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(
+                                                        [
+                                                            _("Sector"),
+                                                            html.Span(" *", style={"color": "red"}),
+                                                        ]
+                                                    ),
+                                                    dcc.Dropdown(
+                                                        id="profile-sector",
+                                                        options=sector_options,
+                                                        placeholder=_("Select your sector"),
+                                                        clearable=True,
+                                                        value=current_sector,
+                                                        style={"fontSize": "14px"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Please specify sector")),
+                                                    dbc.Input(
+                                                        id="profile-sector-other",
+                                                        type="text",
+                                                        placeholder=_("Please specify your sector"),
+                                                        value=current_sector_other,
+                                                    ),
+                                                ],
+                                                id="profile-sector-other-col",
+                                                width=6,
+                                                style=sector_other_style,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    # Row 5: Purpose of Use (required)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(
+                                                        [
+                                                            _("Purpose of Use"),
+                                                            html.Span(" *", style={"color": "red"}),
+                                                        ]
+                                                    ),
+                                                    dcc.Dropdown(
+                                                        id="profile-purpose",
+                                                        options=purpose_options,
+                                                        placeholder=_("Select your purpose of use"),
+                                                        clearable=True,
+                                                        value=current_purpose,
+                                                        style={"fontSize": "14px"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Please specify purpose")),
+                                                    dbc.Input(
+                                                        id="profile-purpose-other",
+                                                        type="text",
+                                                        placeholder=_(
+                                                            "Please specify your purpose"
+                                                        ),
+                                                        value=current_purpose_other,
+                                                    ),
+                                                ],
+                                                id="profile-purpose-other-col",
+                                                width=6,
+                                                style=purpose_other_style,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    # Row 6: Gender Identity (optional)
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Gender Identity")),
+                                                    dcc.Dropdown(
+                                                        id="profile-gender",
+                                                        options=gender_options,
+                                                        placeholder=_("Select (optional)"),
+                                                        clearable=True,
+                                                        value=current_gender,
+                                                        style={"fontSize": "14px"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Please describe")),
+                                                    dbc.Input(
+                                                        id="profile-gender-description",
+                                                        type="text",
+                                                        placeholder=_("Please describe"),
+                                                        value=current_gender_description,
+                                                    ),
+                                                ],
+                                                id="profile-gender-description-col",
+                                                width=6,
+                                                style=gender_desc_style,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    # Gender note
+                                    html.P(
+                                        _(
+                                            "We collect gender identity information to comply with "
+                                            "donor reporting requirements and to assess equitable "
+                                            "participation in capacity development and tool access. "
+                                            "Providing this information is voluntary; your selection "
+                                            "will not affect your access to the tool."
+                                        ),
+                                        className="text-muted mb-3",
+                                        style={"fontSize": "12px"},
+                                    ),
+                                    # Submit button and alert
                                     dbc.Row(
                                         [
                                             dbc.Col(
