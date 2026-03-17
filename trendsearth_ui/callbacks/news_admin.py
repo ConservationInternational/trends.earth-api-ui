@@ -137,7 +137,9 @@ def register_callbacks(app):
     )
     def load_admin_news_items(_n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token):
         """Load news items for admin management."""
-        print(f"[NEWS_ADMIN] load_admin_news_items called: n_intervals={_n_intervals}, refresh={_refresh_clicks}, token={'present' if token else 'None'}")
+        print(
+            f"[NEWS_ADMIN] load_admin_news_items called: n_intervals={_n_intervals}, refresh={_refresh_clicks}, token={'present' if token else 'None'}"
+        )
         # Must have a token to load news
         if not token:
             print("[NEWS_ADMIN] No token available")
