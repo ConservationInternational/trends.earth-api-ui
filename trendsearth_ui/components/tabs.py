@@ -1764,9 +1764,7 @@ def status_tab_content(is_admin, role=None):
 
 def admin_tab_content(role, is_admin):
     """Create the admin tab content with forms for creating users and uploading scripts."""
-    print(f"[ADMIN_TAB] admin_tab_content called: role={role}, is_admin={is_admin}")
     if not is_admin:
-        print("[ADMIN_TAB] Access denied - not admin")
         return html.Div(
             [
                 dbc.Alert(
@@ -1778,7 +1776,6 @@ def admin_tab_content(role, is_admin):
             ]
         )
 
-    print("[ADMIN_TAB] Creating admin tab content with News Management section")
     return html.Div(
         [
             # Page Header
@@ -2036,30 +2033,38 @@ def admin_tab_content(role, is_admin):
                                                 ],
                                                 className="align-items-center mb-3 g-2",
                                             ),
-                                            # News Items Table
-                                            html.Div(
-                                                id="admin-news-table-container",
-                                                children=[
-                                                    dbc.Spinner(
-                                                        html.Div(
-                                                            id="admin-news-table",
-                                                            children=_("Loading news items..."),
-                                                        ),
-                                                        color="primary",
-                                                    ),
+                                            # News Items Table (AG Grid)
+                                            create_responsive_table(
+                                                table_id="admin-news-table",
+                                                table_type="news",
+                                                height="400px",
+                                                style_data_conditional=[
+                                                    {
+                                                        "condition": "params.data && params.data.is_active",
+                                                        "style": {
+                                                            "backgroundColor": "#d1e7dd",
+                                                        },
+                                                    },
+                                                    {
+                                                        "condition": "params.data && !params.data.is_active",
+                                                        "style": {
+                                                            "backgroundColor": "#f8d7da",
+                                                        },
+                                                    },
+                                                    {
+                                                        "condition": "params.node && params.node.isSelected()",
+                                                        "style": {
+                                                            "boxShadow": "inset 0 0 0 2px #0d6efd",
+                                                        },
+                                                    },
                                                 ],
                                             ),
                                             # Store for selected news item
                                             dcc.Store(id="admin-selected-news-id"),
-                                            # Interval to trigger initial news load
-                                            # Note: 1500ms delay ensures callback fires after
-                                            # Dash's initial callback phase completes when using
-                                            # prevent_initial_call="initial_duplicate"
-                                            dcc.Interval(
-                                                id="admin-news-load-interval",
-                                                interval=1500,  # 1500ms delay after render
-                                                max_intervals=1,  # Only fire once
-                                            ),
+                                            # Store for news table state
+                                            dcc.Store(id="admin-news-table-state"),
+                                            # Store to trigger refresh after save/delete
+                                            dcc.Store(id="news-refresh-trigger"),
                                             dbc.Alert(
                                                 id="admin-news-alert",
                                                 is_open=False,

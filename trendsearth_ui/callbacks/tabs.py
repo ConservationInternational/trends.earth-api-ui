@@ -83,7 +83,6 @@ def register_callbacks(app):
                     ]
                 )
         elif tab == "admin":
-            print(f"[TABS] Rendering admin tab with role={role}")
             return admin_tab_content(role, role in ["ADMIN", "SUPERADMIN"])
         elif tab == "status":
             # Only allow admin users to access status tab

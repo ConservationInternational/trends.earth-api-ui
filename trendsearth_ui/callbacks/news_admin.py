@@ -1,9 +1,9 @@
 """News admin callbacks for managing news items."""
 
 import logging
+import time
 
-from dash import ALL, Input, Output, State, dcc, html, no_update
-import dash_bootstrap_components as dbc
+from dash import Input, Output, State, dcc, html, no_update
 
 from trendsearth_ui.config import get_api_base
 from trendsearth_ui.i18n import gettext as _
@@ -33,171 +33,104 @@ def make_api_request(method, endpoint, token, api_environment=None, json_data=No
     return response
 
 
-def create_news_table(news_items):
-    """Create a table displaying news items."""
-    if not news_items:
-        return html.Div(
-            _("No news items found."),
-            className="text-muted text-center py-4",
-        )
-
-    # Table header
-    header = html.Thead(
-        html.Tr(
-            [
-                html.Th("", style={"width": "40px"}),  # Selection checkbox
-                html.Th("Title"),
-                html.Th("Type"),
-                html.Th("Platforms"),
-                html.Th("Roles"),
-                html.Th("Priority"),
-                html.Th("Active"),
-                html.Th("Created"),
-            ]
-        )
-    )
-
-    # Table rows
+def _format_news_rows(news_items):
+    """Format news items for AG Grid display."""
     rows = []
     for item in news_items:
-        platforms = ", ".join(item.get("target_platforms", []))
-        roles = ", ".join(item.get("target_roles", [])) or "All"
-        is_active = item.get("is_active", False)
+        platforms = ", ".join(item.get("target_platforms", [])) or "All"
         created_at = item.get("created_at", "")[:10] if item.get("created_at") else ""
-        news_type = item.get("news_type", "announcement")
+        start_date = item.get("start_date", "")[:10] if item.get("start_date") else ""
+        end_date = item.get("end_date", "")[:10] if item.get("end_date") else ""
 
-        # Type badge color
-        type_colors = {
-            "announcement": "primary",
-            "warning": "warning",
-            "release": "success",
-            "tip": "info",
-            "maintenance": "secondary",
-        }
-
-        row = html.Tr(
-            [
-                html.Td(
-                    dbc.RadioButton(
-                        id={"type": "news-select-radio", "index": item["id"]},
-                        value=False,
-                    )
-                ),
-                html.Td(item.get("title", "Untitled")),
-                html.Td(
-                    dbc.Badge(
-                        news_type.capitalize(),
-                        color=type_colors.get(news_type, "secondary"),
-                    )
-                ),
-                html.Td(platforms or "All"),
-                html.Td(roles),
-                html.Td(str(item.get("priority", 0))),
-                html.Td(
-                    dbc.Badge(
-                        "Active" if is_active else "Inactive",
-                        color="success" if is_active else "secondary",
-                    )
-                ),
-                html.Td(created_at),
-            ],
-            id={"type": "news-row", "index": item["id"]},
-            style={"cursor": "pointer"},
-        )
-        rows.append(row)
-
-    body = html.Tbody(rows)
-
-    return dbc.Table(
-        [header, body],
-        striped=True,
-        hover=True,
-        responsive=True,
-        className="mt-3",
-    )
+        rows.append({
+            "id": item.get("id"),
+            "title": item.get("title", "Untitled"),
+            "news_type": item.get("news_type", "announcement"),
+            "platforms_display": platforms,
+            "priority": item.get("priority", 0),
+            "is_active": item.get("is_active", False),
+            "created_at": created_at,
+            "message": item.get("message", ""),
+            "start_date": start_date,
+            "end_date": end_date,
+        })
+    return rows
 
 
 def register_callbacks(app):
     """Register news admin callbacks with the app."""
     from dash import callback_context
 
-    print("[NEWS_ADMIN] Registering news admin callbacks")
-
     @app.callback(
-        Output("admin-news-table", "children"),
-        Output("admin-news-alert", "children", allow_duplicate=True),
-        Output("admin-news-alert", "color", allow_duplicate=True),
-        Output("admin-news-alert", "is_open", allow_duplicate=True),
-        Input("admin-news-load-interval", "n_intervals"),
-        Input("admin-refresh-news-btn", "n_clicks"),
-        Input("admin-news-save-btn", "n_clicks"),
-        Input("admin-news-delete-confirm-btn", "n_clicks"),
+        Output("admin-news-table", "getRowsResponse"),
+        Output("admin-news-table-state", "data"),
+        Input("admin-news-table", "getRowsRequest"),
         State("token-store", "data"),
+        State("role-store", "data"),
         prevent_initial_call=False,
     )
-    def load_admin_news_items(_n_intervals, _refresh_clicks, _save_clicks, _delete_clicks, token):
-        """Load news items for admin management."""
-        print(
-            f"[NEWS_ADMIN] load_admin_news_items called: n_intervals={_n_intervals}, refresh={_refresh_clicks}, token={'present' if token else 'None'}"
-        )
-        # Must have a token to load news
-        if not token:
-            print("[NEWS_ADMIN] No token available")
-            return _("Please log in to manage news."), "", "warning", True
+    def load_admin_news_items(_request, token, role):
+        """Load news items for AG Grid."""
+        # Must have a token and admin role to load news
+        if not token or role not in ("ADMIN", "SUPERADMIN"):
+            return {"rowData": [], "rowCount": 0}, {}
 
         try:
             # Fetch all news including inactive
-            print("[NEWS_ADMIN] Making API request to /admin/news")
             response = make_api_request("GET", "/admin/news?include_inactive=true", token)
-            print(f"[NEWS_ADMIN] API response status: {response.status_code}")
 
             if response.status_code == 200:
                 data = response.json()
                 news_items = data.get("data", [])
-                print(f"[NEWS_ADMIN] Successfully loaded {len(news_items)} news items")
-                return create_news_table(news_items), no_update, no_update, no_update
-            elif response.status_code == 401:
-                return (
-                    _("Session expired. Please log in again."),
-                    _("Session expired. Please log in again."),
-                    "warning",
-                    True,
-                )
-            elif response.status_code == 403:
-                return (
-                    _("Access denied. Admin privileges required."),
-                    _("Access denied. Admin privileges required."),
-                    "danger",
-                    True,
-                )
+                rows = _format_news_rows(news_items)
+                return {"rowData": rows, "rowCount": len(rows)}, {}
             else:
-                error_msg = _("Failed to load news: {status}").format(status=response.status_code)
-                print(f"[NEWS_ADMIN] Unexpected status code: {response.status_code}")
-                return error_msg, error_msg, "danger", True
+                return {"rowData": [], "rowCount": 0}, {}
 
-        except Exception as e:
-            error_msg = _("Error loading news: {error}").format(error=str(e))
-            print(f"[NEWS_ADMIN] Exception loading news: {e}")
-            return error_msg, error_msg, "danger", True
+        except Exception:
+            return {"rowData": [], "rowCount": 0}, {}
+
+    @app.callback(
+        Output("admin-news-table", "getRowsResponse", allow_duplicate=True),
+        Output("admin-news-table-state", "data", allow_duplicate=True),
+        Input("admin-refresh-news-btn", "n_clicks"),
+        Input("news-refresh-trigger", "data"),
+        State("token-store", "data"),
+        State("role-store", "data"),
+        prevent_initial_call=True,
+    )
+    def refresh_admin_news_items(_refresh_clicks, _trigger, token, role):
+        """Refresh news items after actions."""
+        if not token or role not in ("ADMIN", "SUPERADMIN"):
+            return no_update, no_update
+
+        try:
+            response = make_api_request("GET", "/admin/news?include_inactive=true", token)
+            if response.status_code == 200:
+                data = response.json()
+                news_items = data.get("data", [])
+                rows = _format_news_rows(news_items)
+                return {"rowData": rows, "rowCount": len(rows)}, {}
+        except Exception:
+            pass
+
+        return no_update, no_update
 
     @app.callback(
         Output("admin-selected-news-id", "data"),
         Output("admin-edit-news-btn", "disabled"),
         Output("admin-delete-news-btn", "disabled"),
-        Input({"type": "news-select-radio", "index": ALL}, "value"),
-        State({"type": "news-select-radio", "index": ALL}, "id"),
+        Input("admin-news-table", "selectedRows"),
+        prevent_initial_call=True,
     )
-    def handle_news_selection(values, ids):
-        """Handle news item selection."""
-        if not values or not ids:
+    def handle_news_selection(selected_rows):
+        """Handle news item selection from AG Grid."""
+        if not selected_rows or len(selected_rows) == 0:
             return None, True, True
 
-        # Find the selected item
-        for i, value in enumerate(values):
-            if value:
-                return ids[i]["index"], False, False
-
-        return None, True, True
+        # Get the selected item ID
+        selected_id = selected_rows[0].get("id")
+        return selected_id, False, False
 
     @app.callback(
         Output("admin-news-modal", "is_open"),
@@ -329,6 +262,7 @@ def register_callbacks(app):
         Output("admin-news-alert", "children"),
         Output("admin-news-alert", "color"),
         Output("admin-news-alert", "is_open"),
+        Output("news-refresh-trigger", "data"),
         Input("admin-news-save-btn", "n_clicks"),
         State("admin-news-modal-title", "children"),
         State("admin-news-title", "value"),
@@ -376,6 +310,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
 
         # Validate required fields
@@ -384,6 +319,7 @@ def register_callbacks(app):
                 _("Title is required."),
                 "danger",
                 True,
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -397,6 +333,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
 
         if not platforms:
@@ -404,6 +341,7 @@ def register_callbacks(app):
                 _("At least one target platform is required."),
                 "danger",
                 True,
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -452,6 +390,7 @@ def register_callbacks(app):
                     _("News item {action} successfully!").format(action=action),
                     "success",
                     True,
+                    time.time(),  # Trigger refresh
                 )
             elif response.status_code == 401:
                 return (
@@ -461,12 +400,14 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                 )
             elif response.status_code == 403:
                 return (
                     _("Access denied. Admin privileges required."),
                     "danger",
                     True,
+                    no_update,
                     no_update,
                     no_update,
                     no_update,
@@ -483,6 +424,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                 )
 
         except Exception as e:
@@ -490,6 +432,7 @@ def register_callbacks(app):
                 _("Error saving news item: {error}").format(error=str(e)),
                 "danger",
                 True,
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -514,6 +457,7 @@ def register_callbacks(app):
         Output("admin-news-alert", "children", allow_duplicate=True),
         Output("admin-news-alert", "color", allow_duplicate=True),
         Output("admin-news-alert", "is_open", allow_duplicate=True),
+        Output("news-refresh-trigger", "data", allow_duplicate=True),
         Input("admin-news-delete-confirm-btn", "n_clicks"),
         State("admin-selected-news-id", "data"),
         State("token-store", "data"),
@@ -522,26 +466,31 @@ def register_callbacks(app):
     def delete_news_item(_n_clicks, selected_id, token):
         """Delete a news item."""
         if not token:
-            return _("Please log in first."), "warning", True
+            return _("Please log in first."), "warning", True, no_update
 
         if not selected_id:
-            return _("No news item selected."), "warning", True
+            return _("No news item selected."), "warning", True, no_update
 
         try:
             response = make_api_request("DELETE", f"/admin/news/{selected_id}", token)
 
             if response.status_code in (200, 204):
-                return _("News item deleted successfully!"), "success", True
+                return _("News item deleted successfully!"), "success", True, time.time()
             elif response.status_code == 401:
-                return _("Session expired. Please log in again."), "warning", True
+                return _("Session expired. Please log in again."), "warning", True, no_update
             elif response.status_code == 403:
-                return _("Access denied. Admin privileges required."), "danger", True
+                return _("Access denied. Admin privileges required."), "danger", True, no_update
             else:
                 error_data = response.json() if response.content else {}
                 error_msg = error_data.get(
                     "message", _("Error: {status}").format(status=response.status_code)
                 )
-                return error_msg, "danger", True
+                return error_msg, "danger", True, no_update
 
         except Exception as e:
-            return _("Error deleting news item: {error}").format(error=str(e)), "danger", True
+            return (
+                _("Error deleting news item: {error}").format(error=str(e)),
+                "danger",
+                True,
+                no_update,
+            )

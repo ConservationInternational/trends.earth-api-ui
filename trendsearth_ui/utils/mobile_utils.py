@@ -895,6 +895,97 @@ def get_mobile_column_config():
                 "suppressRowClickSelection": False,
             },
         },
+        "news": {
+            "primary_columns": [
+                {
+                    "headerName": _("Title"),
+                    "field": "title",
+                    "width": 250,
+                    "sortable": True,
+                    "filter": "agTextColumnFilter",
+                    "pinned": "left",
+                },
+                {
+                    "headerName": _("Type"),
+                    "field": "news_type",
+                    "width": 120,
+                    "sortable": True,
+                    "filter": "agSetColumnFilter",
+                },
+                {
+                    "headerName": _("Platforms"),
+                    "field": "platforms_display",
+                    "width": 150,
+                    "sortable": False,
+                    "filter": False,
+                },
+                {
+                    "headerName": _("Priority"),
+                    "field": "priority",
+                    "width": 90,
+                    "sortable": True,
+                    "filter": False,
+                },
+                {
+                    "headerName": _("Active"),
+                    "field": "is_active",
+                    "width": 90,
+                    "sortable": True,
+                    "filter": "agSetColumnFilter",
+                    "cellRenderer": "CheckboxRenderer",
+                },
+                {
+                    "headerName": _("Created"),
+                    "field": "created_at",
+                    "width": 120,
+                    "sortable": True,
+                    "filter": "agDateColumnFilter",
+                    "sort": "desc",
+                    "sortIndex": 0,
+                },
+            ],
+            "secondary_columns": [
+                {
+                    "headerName": _("Message"),
+                    "field": "message",
+                    "width": 300,
+                    "sortable": False,
+                    "filter": False,
+                    "tooltipField": "message",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
+                },
+                {
+                    "headerName": _("Start Date"),
+                    "field": "start_date",
+                    "width": 120,
+                    "sortable": True,
+                    "filter": False,
+                },
+                {
+                    "headerName": _("End Date"),
+                    "field": "end_date",
+                    "width": 120,
+                    "sortable": True,
+                    "filter": False,
+                },
+                {
+                    "headerName": _("ID"),
+                    "field": "id",
+                    "width": 220,
+                    "filter": False,
+                    "tooltipField": "id",
+                    "cellStyle": TRUNCATED_CELL_STYLE,
+                },
+            ],
+            "default_col_def_overrides": {
+                "wrapText": False,
+            },
+            "grid_options_overrides": {
+                "rowHeight": 46,
+                "rowSelection": "single",
+                "suppressRowClickSelection": False,
+            },
+        },
     }
 
 
