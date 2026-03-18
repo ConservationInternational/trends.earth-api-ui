@@ -1880,6 +1880,131 @@ def status_tab_content(is_admin, role=None):
                     ),
                 ]
             ),
+            # Client Platform Statistics Card (SUPERADMIN only)
+            *(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4(_("Client Platform Statistics"), id="client-stats-title")
+                            ),
+                            dbc.CardBody(
+                                [
+                                    # Time period selector
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                _("Time Period:"),
+                                                className="me-2",
+                                            ),
+                                            dbc.Select(
+                                                id="client-stats-period-select",
+                                                options=[
+                                                    {"label": _("Last 7 days"), "value": "7"},
+                                                    {"label": _("Last 14 days"), "value": "14"},
+                                                    {"label": _("Last 30 days"), "value": "30"},
+                                                    {"label": _("Last 60 days"), "value": "60"},
+                                                    {"label": _("Last 90 days"), "value": "90"},
+                                                ],
+                                                value="30",
+                                                style={"width": "200px", "display": "inline-block"},
+                                            ),
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-sync-alt me-2"),
+                                                    _("Refresh"),
+                                                ],
+                                                id="refresh-client-stats-btn",
+                                                color="primary",
+                                                size="sm",
+                                                className="ms-3",
+                                            ),
+                                        ],
+                                        className="mb-4 d-flex align-items-center",
+                                    ),
+                                    # Loading wrapper for all client stats content
+                                    dcc.Loading(
+                                        id="loading-client-stats",
+                                        children=[
+                                            # Platform summary cards
+                                            html.Div(id="client-stats-summary"),
+                                            # Charts row 1: Platform and OS distribution
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            html.H6(
+                                                                _("Platform Distribution"),
+                                                                className="text-center mb-2",
+                                                            ),
+                                                            dcc.Graph(
+                                                                id="client-stats-platform-pie",
+                                                                config={"displayModeBar": False},
+                                                                style={"height": "300px"},
+                                                            ),
+                                                        ],
+                                                        md=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            html.H6(
+                                                                _("OS Distribution (Plugin)"),
+                                                                className="text-center mb-2",
+                                                            ),
+                                                            dcc.Graph(
+                                                                id="client-stats-os-pie",
+                                                                config={"displayModeBar": False},
+                                                                style={"height": "300px"},
+                                                            ),
+                                                        ],
+                                                        md=6,
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                            # Charts row 2: Plugin versions by QGIS version
+                                            html.Div(
+                                                [
+                                                    html.H6(
+                                                        _("Plugin Versions by QGIS Version"),
+                                                        className="text-center mb-2",
+                                                    ),
+                                                    dcc.Graph(
+                                                        id="client-stats-plugin-by-qgis",
+                                                        config={"displayModeBar": False},
+                                                        style={"height": "350px"},
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                            # Charts row 3: QGIS versions by Plugin version
+                                            html.Div(
+                                                [
+                                                    html.H6(
+                                                        _("QGIS Versions by Plugin Version"),
+                                                        className="text-center mb-2",
+                                                    ),
+                                                    dcc.Graph(
+                                                        id="client-stats-qgis-by-plugin",
+                                                        config={"displayModeBar": False},
+                                                        style={"height": "350px"},
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
+                                        ],
+                                        type="default",
+                                        color="#007bff",
+                                    ),
+                                ]
+                            ),
+                        ],
+                        className="mb-4",
+                    ),
+                ]
+                if is_admin_user
+                else []
+            ),
             # Auto-refresh intervals
             dcc.Interval(
                 id="status-auto-refresh-interval", interval=STATUS_REFRESH_INTERVAL, n_intervals=0

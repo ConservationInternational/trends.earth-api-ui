@@ -325,3 +325,69 @@ def fetch_execution_stats(
     except requests.exceptions.RequestException as e:
         log_error(logger, f"Execution stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
+
+
+def fetch_client_stats(token, api_environment="production", days=30, client_type=None):
+    """
+    Fetch client platform statistics from the API.
+
+    Args:
+        token: JWT authentication token
+        api_environment: API environment (production/staging)
+        days: Number of days to include in stats (7, 14, 30, 60, 90)
+        client_type: Optional filter by client type (qgis_plugin, api_ui, cli)
+
+    Returns:
+        dict: Client statistics data or error dict
+    """
+    logger.info(
+        f"Client stats: Fetching data for days={days}, client_type={client_type}, "
+        f"environment={api_environment}"
+    )
+    if not token:
+        logger.warning("Client stats: No token provided")
+        return {"error": True, "message": "Authentication token not provided"}
+
+    headers = apply_default_headers({"Authorization": f"Bearer {token}"})
+    params = {"days": days}
+    if client_type:
+        params["client_type"] = client_type
+
+    try:
+        resp = get_session().get(
+            f"{get_api_base(api_environment)}/admin/client-stats",
+            headers=headers,
+            params=params,
+            timeout=15,
+        )
+
+        logger.info(f"Client stats: API response status: {resp.status_code}")
+
+        if resp.status_code == 200:
+            data = resp.json()
+            logger.info(f"Client stats: Successfully fetched data for {days} days")
+            return data
+        elif resp.status_code == 401:
+            logger.warning("Client stats: Unauthorized access (401). Check token.")
+            return {"error": True, "message": "Unauthorized access", "status_code": 401}
+        elif resp.status_code == 403:
+            logger.warning("Client stats: Forbidden access (403). Check permissions.")
+            return {
+                "error": True,
+                "message": "Forbidden access - SUPERADMIN privileges required",
+                "status_code": 403,
+            }
+        else:
+            log_error(
+                logger,
+                f"Client stats: Failed to fetch data. Status: {resp.status_code}, "
+                f"Body: {resp.text}",
+            )
+            return {
+                "error": True,
+                "message": f"API error with status code {resp.status_code}",
+                "status_code": resp.status_code,
+            }
+    except requests.exceptions.RequestException as e:
+        log_error(logger, f"Client stats: Request failed: {e}")
+        return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

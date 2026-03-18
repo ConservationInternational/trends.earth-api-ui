@@ -5,6 +5,7 @@ import logging
 
 from cachetools import TTLCache
 from dash import Input, Output, State, callback_context, dcc, html, no_update
+import dash_bootstrap_components as dbc
 
 from ..config import STATUS_REFRESH_INTERVAL
 from ..i18n import gettext as _
@@ -770,6 +771,220 @@ def _register_additional_status_callbacks(app):
         if seconds_remaining == _REFRESH_INTERVAL_SECONDS:
             return f"{_REFRESH_INTERVAL_SECONDS}s"
         return f"{seconds_remaining}s"
+
+    @app.callback(
+        [
+            Output("client-stats-summary", "children"),
+            Output("client-stats-platform-pie", "figure"),
+            Output("client-stats-os-pie", "figure"),
+            Output("client-stats-plugin-by-qgis", "figure"),
+            Output("client-stats-qgis-by-plugin", "figure"),
+        ],
+        [
+            Input("refresh-client-stats-btn", "n_clicks"),
+            Input("client-stats-period-select", "value"),
+        ],
+        [
+            State("token-store", "data"),
+            State("role-store", "data"),
+            State("api-environment-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def update_client_stats(
+        _n_clicks,
+        days_str,
+        token,
+        role,
+        api_environment,
+    ):
+        """Update client platform statistics dashboard."""
+        import plotly.express as px
+        import plotly.graph_objects as go
+
+        from ..utils.stats_utils import fetch_client_stats
+
+        # Guard: Only SUPERADMIN can see client stats
+        if not token or role != "SUPERADMIN":
+            empty_fig = go.Figure()
+            empty_fig.update_layout(
+                annotations=[
+                    {
+                        "text": "Access denied or not logged in",
+                        "showarrow": False,
+                        "xref": "paper",
+                        "yref": "paper",
+                        "x": 0.5,
+                        "y": 0.5,
+                    }
+                ]
+            )
+            return (html.Div(), empty_fig, empty_fig, empty_fig, empty_fig)
+
+        days = int(days_str) if days_str else 30
+        data = fetch_client_stats(token, api_environment, days=days)
+
+        if data.get("error"):
+            error_msg = data.get("message", "Failed to load client stats")
+            empty_fig = go.Figure()
+            empty_fig.update_layout(
+                annotations=[
+                    {"text": error_msg, "showarrow": False, "xref": "paper", "yref": "paper"}
+                ]
+            )
+            return (
+                html.Div(
+                    dbc.Alert(error_msg, color="warning"),
+                    className="mb-3",
+                ),
+                empty_fig,
+                empty_fig,
+                empty_fig,
+                empty_fig,
+            )
+
+        # Extract data sections
+        platform_summary = data.get("platform_summary", {})
+        plugin_versions = data.get("plugin_versions", [])
+        qgis_versions = data.get("qgis_versions", [])
+        os_distribution = data.get("os_distribution", [])
+
+        # Build summary cards
+        summary_cards = []
+        for platform, info in platform_summary.items():
+            card = dbc.Col(
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H5(platform.replace("_", " ").title(), className="card-title"),
+                            html.P(
+                                f"Active: {info.get('active_users', 0)} / "
+                                f"Total: {info.get('total_users', 0)}",
+                                className="card-text",
+                            ),
+                        ]
+                    ),
+                    className="text-center",
+                ),
+                md=4,
+                className="mb-3",
+            )
+            summary_cards.append(card)
+
+        summary_row = dbc.Row(summary_cards) if summary_cards else html.Div()
+
+        # Platform distribution pie chart
+        if platform_summary:
+            platform_labels = [p.replace("_", " ").title() for p in platform_summary]
+            platform_values = [info.get("active_users", 0) for info in platform_summary.values()]
+            platform_fig = px.pie(
+                names=platform_labels,
+                values=platform_values,
+                title=f"Active Users by Platform (Last {days} days)",
+            )
+            platform_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
+        else:
+            platform_fig = go.Figure()
+            platform_fig.update_layout(
+                annotations=[{"text": "No platform data", "showarrow": False}]
+            )
+
+        # OS distribution pie chart
+        if os_distribution:
+            os_labels = [item.get("os", "Unknown") for item in os_distribution]
+            os_values = [item.get("count", 0) for item in os_distribution]
+            os_fig = px.pie(
+                names=os_labels,
+                values=os_values,
+                title=f"OS Distribution - Plugin Users (Last {days} days)",
+            )
+            os_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
+        else:
+            os_fig = go.Figure()
+            os_fig.update_layout(annotations=[{"text": "No OS data", "showarrow": False}])
+
+        # Plugin versions by QGIS version (stacked bar)
+        if plugin_versions:
+            # Build data for stacked bar chart
+            plugin_by_qgis_data = {}
+            for pv in plugin_versions:
+                version = pv.get("version", "Unknown")
+                for qgis_item in pv.get("by_qgis_version", []):
+                    qgis_ver = qgis_item.get("qgis_version", "Unknown")
+                    count = qgis_item.get("count", 0)
+                    if qgis_ver not in plugin_by_qgis_data:
+                        plugin_by_qgis_data[qgis_ver] = {}
+                    plugin_by_qgis_data[qgis_ver][version] = count
+
+            if plugin_by_qgis_data:
+                qgis_versions_list = sorted(plugin_by_qgis_data.keys())
+                all_plugin_versions = sorted(
+                    {v for data in plugin_by_qgis_data.values() for v in data}
+                )
+                plugin_fig = go.Figure()
+                for pv in all_plugin_versions:
+                    counts = [plugin_by_qgis_data[qv].get(pv, 0) for qv in qgis_versions_list]
+                    plugin_fig.add_trace(
+                        go.Bar(name=f"Plugin {pv}", x=qgis_versions_list, y=counts)
+                    )
+                plugin_fig.update_layout(
+                    barmode="stack",
+                    title=f"Plugin Versions by QGIS Version (Last {days} days)",
+                    xaxis_title="QGIS Version",
+                    yaxis_title="Users",
+                    margin={"t": 50, "b": 50, "l": 50, "r": 20},
+                )
+            else:
+                plugin_fig = go.Figure()
+                plugin_fig.update_layout(
+                    annotations=[{"text": "No plugin version data", "showarrow": False}]
+                )
+        else:
+            plugin_fig = go.Figure()
+            plugin_fig.update_layout(
+                annotations=[{"text": "No plugin version data", "showarrow": False}]
+            )
+
+        # QGIS versions by plugin version (stacked bar)
+        if qgis_versions:
+            qgis_by_plugin_data = {}
+            for qv in qgis_versions:
+                version = qv.get("version", "Unknown")
+                for plugin_item in qv.get("by_plugin_version", []):
+                    plugin_ver = plugin_item.get("plugin_version", "Unknown")
+                    count = plugin_item.get("count", 0)
+                    if plugin_ver not in qgis_by_plugin_data:
+                        qgis_by_plugin_data[plugin_ver] = {}
+                    qgis_by_plugin_data[plugin_ver][version] = count
+
+            if qgis_by_plugin_data:
+                plugin_versions_list = sorted(qgis_by_plugin_data.keys())
+                all_qgis_versions_in_data = sorted(
+                    {v for data in qgis_by_plugin_data.values() for v in data}
+                )
+                qgis_fig = go.Figure()
+                for qv in all_qgis_versions_in_data:
+                    counts = [qgis_by_plugin_data[pv].get(qv, 0) for pv in plugin_versions_list]
+                    qgis_fig.add_trace(go.Bar(name=f"QGIS {qv}", x=plugin_versions_list, y=counts))
+                qgis_fig.update_layout(
+                    barmode="stack",
+                    title=f"QGIS Versions by Plugin Version (Last {days} days)",
+                    xaxis_title="Plugin Version",
+                    yaxis_title="Users",
+                    margin={"t": 50, "b": 50, "l": 50, "r": 20},
+                )
+            else:
+                qgis_fig = go.Figure()
+                qgis_fig.update_layout(
+                    annotations=[{"text": "No QGIS version data", "showarrow": False}]
+                )
+        else:
+            qgis_fig = go.Figure()
+            qgis_fig.update_layout(
+                annotations=[{"text": "No QGIS version data", "showarrow": False}]
+            )
+
+        return (summary_row, platform_fig, os_fig, plugin_fig, qgis_fig)
 
 
 # Alias for backward compatibility with tests
