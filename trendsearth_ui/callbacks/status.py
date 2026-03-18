@@ -781,8 +781,8 @@ def _register_additional_status_callbacks(app):
             Output("client-stats-qgis-by-plugin", "figure"),
         ],
         [
-            Input("refresh-client-stats-btn", "n_clicks"),
-            Input("client-stats-period-select", "value"),
+            Input("status-time-tabs-store", "data"),
+            Input("refresh-status-btn", "n_clicks"),
         ],
         [
             State("token-store", "data"),
@@ -792,8 +792,8 @@ def _register_additional_status_callbacks(app):
         prevent_initial_call=False,
     )
     def update_client_stats(
-        _n_clicks,
-        days_str,
+        time_period,
+        _refresh_clicks,
         token,
         role,
         api_environment,
@@ -821,7 +821,23 @@ def _register_additional_status_callbacks(app):
             )
             return (html.Div(), empty_fig, empty_fig, empty_fig, empty_fig)
 
-        days = int(days_str) if days_str else 30
+        # Map time period tabs to days for the API
+        period_to_days = {
+            "day": 1,
+            "week": 7,
+            "month": 30,
+            "year": 365,
+            "all": 9999,  # Large number for "all time"
+        }
+        period_labels = {
+            "day": "Last 24 Hours",
+            "week": "Last Week",
+            "month": "Last Month",
+            "year": "Last Year",
+            "all": "All Time",
+        }
+        days = period_to_days.get(time_period, 30)
+        period_label = period_labels.get(time_period, "Last Month")
         data = fetch_client_stats(token, api_environment, days=days)
 
         if data.get("error"):
@@ -852,38 +868,23 @@ def _register_additional_status_callbacks(app):
         qgis_versions = plugin_stats.get("by_qgis_version", [])
         os_distribution = plugin_stats.get("by_os", [])
 
-        # Build summary cards
-        summary_cards = []
-        for platform, info in platform_summary.items():
-            card = dbc.Col(
-                dbc.Card(
-                    dbc.CardBody(
-                        [
-                            html.H5(platform.replace("_", " ").title(), className="card-title"),
-                            html.P(
-                                f"Active: {info.get('active_users', 0)} / "
-                                f"Total: {info.get('total_users', 0)}",
-                                className="card-text",
-                            ),
-                        ]
-                    ),
-                    className="text-center",
-                ),
-                md=4,
-                className="mb-3",
-            )
-            summary_cards.append(card)
-
-        summary_row = dbc.Row(summary_cards) if summary_cards else html.Div()
+        # Display name mapping for platforms
+        platform_display_names = {
+            "qgis_plugin": "QGIS Plugin",
+            "api_ui": "API UI",
+            "cli": "CLI",
+        }
 
         # Platform distribution pie chart
         if platform_summary:
-            platform_labels = [p.replace("_", " ").title() for p in platform_summary]
+            platform_labels = [
+                platform_display_names.get(p, p.replace("_", " ").title()) for p in platform_summary
+            ]
             platform_values = [info.get("active_users", 0) for info in platform_summary.values()]
             platform_fig = px.pie(
                 names=platform_labels,
                 values=platform_values,
-                title=f"Active Users by Platform (Last {days} days)",
+                title=f"Active Users by Platform ({period_label})",
             )
             platform_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
         else:
@@ -899,7 +900,7 @@ def _register_additional_status_callbacks(app):
             os_fig = px.pie(
                 names=os_labels,
                 values=os_values,
-                title=f"OS Distribution - Plugin Users (Last {days} days)",
+                title=f"OS Distribution - Plugin Users ({period_label})",
             )
             os_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
         else:
@@ -932,7 +933,7 @@ def _register_additional_status_callbacks(app):
                     )
                 plugin_fig.update_layout(
                     barmode="stack",
-                    title=f"Plugin Versions by QGIS Version (Last {days} days)",
+                    title=f"Plugin Versions by QGIS Version ({period_label})",
                     xaxis_title="QGIS Version",
                     yaxis_title="Users",
                     margin={"t": 50, "b": 50, "l": 50, "r": 20},
@@ -971,7 +972,7 @@ def _register_additional_status_callbacks(app):
                     qgis_fig.add_trace(go.Bar(name=f"QGIS {qv}", x=plugin_versions_list, y=counts))
                 qgis_fig.update_layout(
                     barmode="stack",
-                    title=f"QGIS Versions by Plugin Version (Last {days} days)",
+                    title=f"QGIS Versions by Plugin Version ({period_label})",
                     xaxis_title="Plugin Version",
                     yaxis_title="Users",
                     margin={"t": 50, "b": 50, "l": 50, "r": 20},
@@ -987,7 +988,7 @@ def _register_additional_status_callbacks(app):
                 annotations=[{"text": "No QGIS version data", "showarrow": False}]
             )
 
-        return (summary_row, platform_fig, os_fig, plugin_fig, qgis_fig)
+        return (html.Div(), platform_fig, os_fig, plugin_fig, qgis_fig)
 
 
 # Alias for backward compatibility with tests

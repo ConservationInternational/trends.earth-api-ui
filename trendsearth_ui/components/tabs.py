@@ -1872,62 +1872,14 @@ def status_tab_content(is_admin, role=None):
                                         className="mb-4",
                                     ),
                                     html.Hr(),
-                                ]
-                                if is_admin_user
-                                else []
-                            ),
-                        ]
-                    ),
-                ]
-            ),
-            # Client Platform Statistics Card (SUPERADMIN only)
-            *(
-                [
-                    dbc.Card(
-                        [
-                            dbc.CardHeader(
-                                html.H4(_("Client Platform Statistics"), id="client-stats-title")
-                            ),
-                            dbc.CardBody(
-                                [
-                                    # Time period selector
-                                    html.Div(
-                                        [
-                                            html.Label(
-                                                _("Time Period:"),
-                                                className="me-2",
-                                            ),
-                                            dbc.Select(
-                                                id="client-stats-period-select",
-                                                options=[
-                                                    {"label": _("Last 7 days"), "value": "7"},
-                                                    {"label": _("Last 14 days"), "value": "14"},
-                                                    {"label": _("Last 30 days"), "value": "30"},
-                                                    {"label": _("Last 60 days"), "value": "60"},
-                                                    {"label": _("Last 90 days"), "value": "90"},
-                                                ],
-                                                value="30",
-                                                style={"width": "200px", "display": "inline-block"},
-                                            ),
-                                            dbc.Button(
-                                                [
-                                                    html.I(className="fas fa-sync-alt me-2"),
-                                                    _("Refresh"),
-                                                ],
-                                                id="refresh-client-stats-btn",
-                                                color="primary",
-                                                size="sm",
-                                                className="ms-3",
-                                            ),
-                                        ],
-                                        className="mb-4 d-flex align-items-center",
-                                    ),
-                                    # Loading wrapper for all client stats content
+                                    # Client Platform Statistics
                                     dcc.Loading(
                                         id="loading-client-stats",
                                         children=[
-                                            # Platform summary cards
-                                            html.Div(id="client-stats-summary"),
+                                            # Hidden div for callback compatibility
+                                            html.Div(
+                                                id="client-stats-summary", style={"display": "none"}
+                                            ),
                                             # Charts row 1: Platform and OS distribution
                                             dbc.Row(
                                                 [
@@ -1997,13 +1949,12 @@ def status_tab_content(is_admin, role=None):
                                         color="#007bff",
                                     ),
                                 ]
+                                if is_admin_user
+                                else []
                             ),
-                        ],
-                        className="mb-4",
+                        ]
                     ),
                 ]
-                if is_admin_user
-                else []
             ),
             # Auto-refresh intervals
             dcc.Interval(
