@@ -86,6 +86,8 @@ export DOCKER_REGISTRY="$ECR_REGISTRY"
 export GIT_COMMIT_SHA="${GIT_COMMIT_SHA:-${DEPLOYMENT_ID:-unknown}}"
 export GIT_BRANCH="${BRANCH_NAME:-master}"
 export DEPLOYMENT_ENVIRONMENT="$ENVIRONMENT"
+export ROLLBAR_ACCESS_TOKEN="${ROLLBAR_ACCESS_TOKEN:-}"
+export GOOGLE_TRANSLATE_CREDENTIALS="${GOOGLE_TRANSLATE_CREDENTIALS:-}"
 
 # Validate compose file syntax
 echo "🧪 Validating compose file syntax..."

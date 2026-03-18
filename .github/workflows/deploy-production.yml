@@ -28,6 +28,7 @@ jobs:
     env:
       ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
+      GOOGLE_TRANSLATE_CREDENTIALS: ${{ secrets.GOOGLE_TRANSLATE_CREDENTIALS }}
     
     steps:
     - name: Checkout code
@@ -90,6 +91,9 @@ jobs:
         cp docker-compose.prod.yml deploy-bundle/
         cp docker-compose.staging.yml deploy-bundle/
         
+        # Base64 encode the Google Translate credentials (JSON) for safe embedding
+        GOOGLE_TRANSLATE_CREDS_B64=$(echo -n "${GOOGLE_TRANSLATE_CREDENTIALS}" | base64 -w0)
+        
         # Create deployment info file
         cat > deploy-bundle/deployment-info.json <<EOF
         {
@@ -99,6 +103,7 @@ jobs:
           "registry": "${{ steps.build-image.outputs.registry }}",
           "environment": "production",
           "rollbarAccessToken": "${ROLLBAR_ACCESS_TOKEN}",
+          "googleTranslateCredentialsB64": "${GOOGLE_TRANSLATE_CREDS_B64}",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         }
         EOF
