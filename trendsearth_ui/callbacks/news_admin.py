@@ -18,7 +18,7 @@ def make_api_request(method, endpoint, token, api_environment=None, json_data=No
     headers = {"Authorization": f"Bearer {token}"}
     api_base = get_api_base(api_environment or "production")
     url = f"{api_base}{endpoint}"
-    
+
     logger.info(f"[make_api_request] {method} {url}")
 
     if method == "GET":
@@ -398,9 +398,7 @@ def register_callbacks(app):
             data["expires_at"] = end_date
 
         logger.info(f"[save_news_item] Sending data to API: {data}")
-        logger.info(
-            f"[save_news_item] modal_title={modal_title!r}, selected_id={selected_id!r}"
-        )
+        logger.info(f"[save_news_item] modal_title={modal_title!r}, selected_id={selected_id!r}")
 
         try:
             # Use selected_id to determine create vs update (more reliable than title comparison)

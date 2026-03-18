@@ -87,6 +87,7 @@ def register_callbacks(app):
             State("profile-purpose-other", "value"),
             State("profile-gender", "value"),
             State("profile-gender-description", "value"),
+            State("profile-gee-acknowledged", "value"),
             State("token-store", "data"),
             State("user-store", "data"),
         ],
@@ -104,6 +105,7 @@ def register_callbacks(app):
         purpose_other,
         gender,
         gender_description,
+        gee_acknowledged,
         token,
         user_data,
     ):
@@ -136,6 +138,14 @@ def register_callbacks(app):
         if gender == "self_describe" and not gender_description:
             return _("Please describe your gender identity."), "warning", True, no_update
 
+        if not gee_acknowledged:
+            return (
+                _("Please acknowledge the Google Earth Engine license terms."),
+                "warning",
+                True,
+                no_update,
+            )
+
         # Build update payload
         update_data = {
             "name": name,
@@ -143,6 +153,7 @@ def register_callbacks(app):
             "country": country,
             "sector": sector,
             "purpose_of_use": purpose,
+            "gee_license_acknowledged": gee_acknowledged,
         }
 
         # Add optional/conditional fields

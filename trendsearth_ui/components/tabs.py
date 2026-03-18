@@ -532,6 +532,8 @@ def profile_tab_content(user_data):
     current_gender = ""
     current_gender_description = ""
 
+    current_gee_acknowledged = False
+
     if user_data and isinstance(user_data, dict):
         current_name = user_data.get("name", "")
         current_email = user_data.get("email", "")
@@ -545,6 +547,7 @@ def profile_tab_content(user_data):
         current_country = user_data.get("country", "") or ""
         current_gender = user_data.get("gender_identity", "") or ""
         current_gender_description = user_data.get("gender_identity_description", "") or ""
+        current_gee_acknowledged = user_data.get("gee_license_acknowledged", False) or False
 
     # Determine initial visibility for conditional fields
     sector_other_style = {"display": "block"} if current_sector == "other" else {"display": "none"}
@@ -797,6 +800,56 @@ def profile_tab_content(user_data):
                                         ),
                                         className="text-muted mb-3",
                                         style={"fontSize": "12px"},
+                                    ),
+                                    # GEE License Acknowledgment
+                                    html.Div(
+                                        [
+                                            html.P(
+                                                [
+                                                    html.Strong(
+                                                        _(
+                                                            "Do you acknowledge that some Trends.Earth features use Google Earth Engine, and, depending on your use, you may be required to have in place a commercial license to use Google Earth Engine?"
+                                                        )
+                                                    ),
+                                                    html.Span(
+                                                        " *",
+                                                        style={"color": "red"},
+                                                    ),
+                                                ],
+                                                className="mb-2",
+                                            ),
+                                            html.P(
+                                                [
+                                                    _(
+                                                        "Google Earth Engine (GEE) imposes restrictions on commercial use. For more details see the "
+                                                    ),
+                                                    html.A(
+                                                        _("Google Earth Engine Terms of Use"),
+                                                        href="https://earthengine.google.com/terms/",
+                                                        target="_blank",
+                                                    ),
+                                                    _(
+                                                        " . Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing."
+                                                    ),
+                                                ],
+                                                className="text-muted mb-3",
+                                                style={"fontSize": "12px"},
+                                            ),
+                                            html.Div(
+                                                dbc.Checkbox(
+                                                    id="profile-gee-acknowledged",
+                                                    label=_("Yes, I acknowledge"),
+                                                    value=current_gee_acknowledged,
+                                                ),
+                                                className="mb-3",
+                                            ),
+                                        ],
+                                        style={
+                                            "border": "1px solid #dee2e6",
+                                            "borderRadius": "5px",
+                                            "padding": "15px",
+                                            "marginBottom": "15px",
+                                        },
                                     ),
                                     # Submit button and alert
                                     dbc.Row(

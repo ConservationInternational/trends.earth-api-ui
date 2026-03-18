@@ -1640,6 +1640,58 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
                                                         className="mb-3",
                                                         style={"display": "none"},
                                                     ),
+                                                    # GEE License Acknowledgment
+                                                    html.Div(
+                                                        [
+                                                            html.P(
+                                                                [
+                                                                    html.Strong(
+                                                                        _(
+                                                                            "Do you acknowledge that some Trends.Earth features use Google Earth Engine, and, depending on your use, you may be required to have in place a commercial license to use Google Earth Engine?"
+                                                                        )
+                                                                    ),
+                                                                    html.Span(
+                                                                        " *",
+                                                                        style={"color": "red"},
+                                                                    ),
+                                                                ],
+                                                                className="mb-2",
+                                                            ),
+                                                            html.P(
+                                                                [
+                                                                    _(
+                                                                        "Google Earth Engine (GEE) imposes restrictions on commercial use. For more details see the "
+                                                                    ),
+                                                                    html.A(
+                                                                        _(
+                                                                            "Google Earth Engine Terms of Use"
+                                                                        ),
+                                                                        href="https://earthengine.google.com/terms/",
+                                                                        target="_blank",
+                                                                    ),
+                                                                    _(
+                                                                        " . Conservation International does not provide or manage commercial GEE licenses. Users are solely responsible for ensuring their use of GEE complies with Google's commercial licensing requirements. Access to this tool does not grant or imply the provision of commercial licensing."
+                                                                    ),
+                                                                ],
+                                                                className="text-muted mb-3",
+                                                                style={"fontSize": "12px"},
+                                                            ),
+                                                            html.Div(
+                                                                dbc.Checkbox(
+                                                                    id="standalone-profile-gee-acknowledged",
+                                                                    label=_("Yes, I acknowledge"),
+                                                                    value=False,
+                                                                ),
+                                                                className="mb-3 d-flex justify-content-center",
+                                                            ),
+                                                        ],
+                                                        style={
+                                                            "border": "1px solid #dee2e6",
+                                                            "borderRadius": "5px",
+                                                            "padding": "15px",
+                                                            "marginBottom": "15px",
+                                                        },
+                                                    ),
                                                     # Success/Error alert for form submission
                                                     dbc.Alert(
                                                         id="standalone-profile-submit-alert",

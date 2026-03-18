@@ -1652,6 +1652,7 @@ def register_callbacks(app):
             Output("standalone-profile-country", "value"),
             Output("standalone-profile-gender", "value"),
             Output("standalone-profile-gender-description", "value"),
+            Output("standalone-profile-gee-acknowledged", "value"),
             # Control visibility of loading spinner, error alert, login form, and profile form
             Output("standalone-profile-loading", "style"),
             Output("standalone-profile-error-alert", "children"),
@@ -1683,6 +1684,7 @@ def register_callbacks(app):
                 "",  # country
                 "",  # gender
                 "",  # gender_description
+                False,  # gee_acknowledged
                 hide_style,  # hide loading spinner
                 "",  # no error message
                 False,  # hide error alert
@@ -1708,6 +1710,7 @@ def register_callbacks(app):
                     "",
                     "",
                     "",
+                    False,  # gee_acknowledged
                     hide_style,  # hide loading spinner
                     _("Invalid or expired token. Please request a new profile update link."),
                     True,  # show error alert
@@ -1730,6 +1733,7 @@ def register_callbacks(app):
                 user_data.get("country", ""),
                 user_data.get("gender_identity", ""),
                 user_data.get("gender_identity_description", ""),
+                user_data.get("gee_license_acknowledged", False) or False,
                 hide_style,  # hide loading spinner
                 "",  # no error message
                 False,  # hide error alert
@@ -1752,6 +1756,7 @@ def register_callbacks(app):
                 "",
                 "",
                 "",
+                False,  # gee_acknowledged
                 hide_style,  # hide loading spinner
                 _("Error loading profile: {error}").format(error=str(e)),
                 True,  # show error alert
@@ -1909,6 +1914,7 @@ def register_callbacks(app):
             State("standalone-profile-country", "value"),
             State("standalone-profile-gender", "value"),
             State("standalone-profile-gender-description", "value"),
+            State("standalone-profile-gee-acknowledged", "value"),
         ],
         prevent_initial_call=True,
     )
@@ -1926,6 +1932,7 @@ def register_callbacks(app):
         country,
         gender,
         gender_description,
+        gee_acknowledged,
     ):
         """Submit profile update using JWT token from URL."""
         if not n_clicks:
@@ -1963,6 +1970,13 @@ def register_callbacks(app):
         if gender == "self_describe" and not gender_description:
             return _("Please describe your gender identity."), "warning", True
 
+        if not gee_acknowledged:
+            return (
+                _("Please acknowledge the Google Earth Engine license terms."),
+                "warning",
+                True,
+            )
+
         try:
             api_base = get_api_base(api_environment or "production")
             logger.debug(
@@ -1978,6 +1992,7 @@ def register_callbacks(app):
                 "institution": institution,
                 "sector": sector,
                 "purpose_of_use": purpose,
+                "gee_license_acknowledged": gee_acknowledged,
             }
 
             # Add optional/conditional fields
