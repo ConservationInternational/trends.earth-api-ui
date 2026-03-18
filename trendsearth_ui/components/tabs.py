@@ -77,7 +77,6 @@ def _create_translation_tab_content(lang_code: str):
                                 id=f"admin-news-trans-is-machine-{lang_code}",
                                 label=_("Machine translated (unverified)"),
                                 value=False,
-                                disabled=True,
                             ),
                         ],
                         width=12,
