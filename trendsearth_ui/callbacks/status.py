@@ -843,11 +843,14 @@ def _register_additional_status_callbacks(app):
                 empty_fig,
             )
 
-        # Extract data sections
+        # Extract data sections - API returns nested structure
         platform_summary = data.get("platform_summary", {})
-        plugin_versions = data.get("plugin_versions", [])
-        qgis_versions = data.get("qgis_versions", [])
-        os_distribution = data.get("os_distribution", [])
+
+        # Plugin stats are nested under "plugin_stats"
+        plugin_stats = data.get("plugin_stats", {})
+        plugin_versions = plugin_stats.get("by_plugin_version", [])
+        qgis_versions = plugin_stats.get("by_qgis_version", [])
+        os_distribution = plugin_stats.get("by_os", [])
 
         # Build summary cards
         summary_cards = []
@@ -892,7 +895,7 @@ def _register_additional_status_callbacks(app):
         # OS distribution pie chart
         if os_distribution:
             os_labels = [item.get("os", "Unknown") for item in os_distribution]
-            os_values = [item.get("count", 0) for item in os_distribution]
+            os_values = [item.get("user_count", 0) for item in os_distribution]
             os_fig = px.pie(
                 names=os_labels,
                 values=os_values,
@@ -949,9 +952,9 @@ def _register_additional_status_callbacks(app):
         if qgis_versions:
             qgis_by_plugin_data = {}
             for qv in qgis_versions:
-                version = qv.get("version", "Unknown")
+                version = qv.get("qgis_version", "Unknown")
                 for plugin_item in qv.get("by_plugin_version", []):
-                    plugin_ver = plugin_item.get("plugin_version", "Unknown")
+                    plugin_ver = plugin_item.get("version", "Unknown")
                     count = plugin_item.get("count", 0)
                     if plugin_ver not in qgis_by_plugin_data:
                         qgis_by_plugin_data[plugin_ver] = {}
