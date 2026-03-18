@@ -18,6 +18,8 @@ def make_api_request(method, endpoint, token, api_environment=None, json_data=No
     headers = {"Authorization": f"Bearer {token}"}
     api_base = get_api_base(api_environment or "production")
     url = f"{api_base}{endpoint}"
+    
+    logger.info(f"[make_api_request] {method} {url}")
 
     if method == "GET":
         response = requests.get(url, headers=headers, timeout=30)
@@ -150,6 +152,7 @@ def register_callbacks(app):
         Output("admin-news-start-date", "date"),
         Output("admin-news-end-date", "date"),
         Output("admin-news-is-active", "value"),
+        Output("admin-selected-news-id", "data", allow_duplicate=True),
         Input("admin-create-news-btn", "n_clicks"),
         Input("admin-edit-news-btn", "n_clicks"),
         Input("admin-news-cancel-btn", "n_clicks"),
@@ -188,6 +191,7 @@ def register_callbacks(app):
                 None,  # start_date
                 None,  # end_date
                 True,  # is_active
+                None,  # Clear selected_id
             )
 
         # Open modal for create
@@ -208,6 +212,7 @@ def register_callbacks(app):
                 None,  # start_date
                 None,  # end_date
                 True,  # is_active
+                None,  # Clear selected_id for create
             )
 
         # Open modal for edit - need to fetch news item data
@@ -244,12 +249,13 @@ def register_callbacks(app):
                         start_date,
                         end_date,
                         item.get("is_active", True),
+                        selected_id,  # Keep selected_id for edit
                     )
             except Exception as e:
                 logger.error(f"[toggle_news_modal] Error loading item: {e}")
                 pass
 
-        return (no_update,) * 15
+        return (no_update,) * 16
 
     @app.callback(
         Output("admin-news-preview", "children"),
@@ -392,10 +398,14 @@ def register_callbacks(app):
             data["expires_at"] = end_date
 
         logger.info(f"[save_news_item] Sending data to API: {data}")
+        logger.info(
+            f"[save_news_item] modal_title={modal_title!r}, selected_id={selected_id!r}"
+        )
 
         try:
-            is_edit = modal_title == _("Edit News Item")
-            if is_edit and selected_id:
+            # Use selected_id to determine create vs update (more reliable than title comparison)
+            is_edit = bool(selected_id)
+            if is_edit:
                 response = make_api_request(
                     "PUT", f"/admin/news/{selected_id}", token, json_data=data
                 )

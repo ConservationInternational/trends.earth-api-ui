@@ -2,29 +2,35 @@ import base64
 import os
 import re
 
-import dash
-import dash_bootstrap_components as dbc
-import flask
-from flask import got_request_exception, send_from_directory
+# Load environment variables from .env file (for local development)
+# Must be called before importing modules that read env vars at import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import dash  # noqa: E402
+import dash_bootstrap_components as dbc  # noqa: E402
+import flask  # noqa: E402
+from flask import got_request_exception, send_from_directory  # noqa: E402
 
 # Import and register callbacks
-from .callbacks import register_all_callbacks
+from .callbacks import register_all_callbacks  # noqa: E402
 
 # Import layout components
-from .components import create_main_layout
+from .components import create_main_layout  # noqa: E402
 
 # Import configuration
-from .config import APP_HOST, APP_PORT, APP_TITLE
+from .config import APP_HOST, APP_PORT, APP_TITLE  # noqa: E402
 
 # Import internationalization support
-from .i18n import SUPPORTED_LANGUAGES, get_current_language, init_i18n
-from .i18n.dash_i18n import register_language_callbacks
+from .i18n import SUPPORTED_LANGUAGES, get_current_language, init_i18n  # noqa: E402
+from .i18n.dash_i18n import register_language_callbacks  # noqa: E402
 
 # Import deployment utilities
-from .utils.deployment_info import get_health_response
+from .utils.deployment_info import get_health_response  # noqa: E402
 
 # Import logging configuration
-from .utils.logging_config import is_rollbar_initialized, setup_logging
+from .utils.logging_config import is_rollbar_initialized, setup_logging  # noqa: E402
 
 # Initialize logging with Rollbar if token is available
 rollbar_token = os.environ.get("ROLLBAR_ACCESS_TOKEN")

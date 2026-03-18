@@ -133,17 +133,26 @@ def translate_text(
     # Map to Google Translate language code
     google_target = LANGUAGE_CODE_MAP.get(target_lang, target_lang)
 
+    # Preserve newlines by replacing with placeholder that won't be translated
+    # Using a unique marker that Google Translate will preserve
+    NEWLINE_PLACEHOLDER = "⏎NEWLINE⏎"
+    preserved_text = text.replace("\n", NEWLINE_PLACEHOLDER)
+
     try:
         result = client.translate(
-            text,
+            preserved_text,
             source_language=source_lang,
             target_language=google_target,
+            format_="text",  # Ensure plain text handling
         )
         translated = result.get("translatedText", "")
         # Google Translate escapes HTML entities, decode them
         import html
 
-        return html.unescape(translated)
+        translated = html.unescape(translated)
+        # Restore newlines
+        translated = translated.replace(NEWLINE_PLACEHOLDER, "\n")
+        return translated
     except Exception as e:
         logger.error(f"Translation failed for '{target_lang}': {e}")
         return None

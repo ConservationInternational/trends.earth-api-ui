@@ -3,6 +3,11 @@
 *.pyc
 poetry-installer-error-*.log
 
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
 # Translation files (generated)
 *.mo
 *.pot
