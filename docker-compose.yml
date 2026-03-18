@@ -15,6 +15,7 @@ services:
       - GIT_BRANCH=${GIT_BRANCH:-development}
       - GIT_COMMIT=${GIT_COMMIT:-local}
       - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN:-}
+      - GOOGLE_TRANSLATE_CREDENTIALS=${GOOGLE_TRANSLATE_CREDENTIALS:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api-ui-health"]

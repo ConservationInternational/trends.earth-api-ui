@@ -42,18 +42,20 @@ def _format_news_rows(news_items):
         start_date = item.get("start_date", "")[:10] if item.get("start_date") else ""
         end_date = item.get("end_date", "")[:10] if item.get("end_date") else ""
 
-        rows.append({
-            "id": item.get("id"),
-            "title": item.get("title", "Untitled"),
-            "news_type": item.get("news_type", "announcement"),
-            "platforms_display": platforms,
-            "priority": item.get("priority", 0),
-            "is_active": item.get("is_active", False),
-            "created_at": created_at,
-            "message": item.get("message", ""),
-            "start_date": start_date,
-            "end_date": end_date,
-        })
+        rows.append(
+            {
+                "id": item.get("id"),
+                "title": item.get("title", "Untitled"),
+                "news_type": item.get("news_type", "announcement"),
+                "platforms_display": platforms,
+                "priority": item.get("priority", 0),
+                "is_active": item.get("is_active", False),
+                "created_at": created_at,
+                "message": item.get("message", ""),
+                "start_date": start_date,
+                "end_date": end_date,
+            }
+        )
     return rows
 
 
@@ -213,7 +215,19 @@ def register_callbacks(app):
             try:
                 response = make_api_request("GET", f"/admin/news/{selected_id}", token)
                 if response.status_code == 200:
-                    item = response.json()
+                    data = response.json()
+                    item = data.get("data", data)  # Handle both wrapped and unwrapped
+                    logger.info(
+                        f"[toggle_news_modal] Loaded item: is_active={item.get('is_active')}"
+                    )
+                    # Parse dates - API returns publish_at/expires_at as ISO strings
+                    start_date = item.get("publish_at")
+                    end_date = item.get("expires_at")
+                    # Extract just the date part if present (YYYY-MM-DD)
+                    if start_date and "T" in start_date:
+                        start_date = start_date.split("T")[0]
+                    if end_date and "T" in end_date:
+                        end_date = end_date.split("T")[0]
                     return (
                         True,  # is_open
                         _("Edit News Item"),  # title
@@ -227,11 +241,12 @@ def register_callbacks(app):
                         item.get("priority", 0),
                         item.get("min_version", "") or "",
                         item.get("max_version", "") or "",
-                        item.get("start_date"),
-                        item.get("end_date"),
+                        start_date,
+                        end_date,
                         item.get("is_active", True),
                     )
-            except Exception:
+            except Exception as e:
+                logger.error(f"[toggle_news_modal] Error loading item: {e}")
                 pass
 
         return (no_update,) * 15
@@ -302,6 +317,9 @@ def register_callbacks(app):
         token,
     ):
         """Save a news item (create or update)."""
+        logger.info(
+            f"[save_news_item] is_active value received: {is_active} (type: {type(is_active)})"
+        )
         if not token:
             return (
                 _("Please log in first."),
@@ -367,10 +385,13 @@ def register_callbacks(app):
             data["min_version"] = min_version.strip()
         if max_version:
             data["max_version"] = max_version.strip()
+        # API uses publish_at/expires_at, UI uses start_date/end_date
         if start_date:
-            data["start_date"] = start_date
+            data["publish_at"] = start_date
         if end_date:
-            data["end_date"] = end_date
+            data["expires_at"] = end_date
+
+        logger.info(f"[save_news_item] Sending data to API: {data}")
 
         try:
             is_edit = modal_title == _("Edit News Item")
@@ -380,6 +401,10 @@ def register_callbacks(app):
                 )
             else:
                 response = make_api_request("POST", "/admin/news", token, json_data=data)
+
+            logger.info(
+                f"[save_news_item] API response: {response.status_code} - {response.text[:200] if response.text else 'empty'}"
+            )
 
             if response.status_code in (200, 201):
                 action = _("updated") if is_edit else _("created")
@@ -494,3 +519,223 @@ def register_callbacks(app):
                 True,
                 no_update,
             )
+
+    # Translation languages supported
+    TRANSLATION_LANGUAGES = ["ar", "es", "fa", "fr", "pt", "ru", "sw", "zh"]
+
+    @app.callback(
+        [Output(f"admin-news-trans-title-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [Output(f"admin-news-trans-message-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [Output(f"admin-news-trans-link-text-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [
+            Output(f"admin-news-trans-is-machine-{lang}", "value") for lang in TRANSLATION_LANGUAGES
+        ],
+        Input("admin-news-modal", "is_open"),
+        State("admin-news-modal-title", "children"),
+        State("admin-selected-news-id", "data"),
+        State("token-store", "data"),
+        prevent_initial_call=True,
+    )
+    def load_translations(is_open, modal_title, selected_id, token):
+        """Load existing translations when editing a news item."""
+        # Initialize empty values for all fields
+        empty_result = [""] * (len(TRANSLATION_LANGUAGES) * 3) + [False] * len(
+            TRANSLATION_LANGUAGES
+        )
+
+        if not is_open:
+            return empty_result
+
+        # Only load translations when editing
+        if modal_title != _("Edit News Item") or not selected_id or not token:
+            return empty_result
+
+        try:
+            response = make_api_request(
+                "GET", f"/admin/news/{selected_id}?include_translations=true", token
+            )
+            if response.status_code == 200:
+                item = response.json()
+                translations = item.get("translations", {})
+
+                titles = []
+                messages = []
+                link_texts = []
+                is_machine = []
+
+                for lang in TRANSLATION_LANGUAGES:
+                    trans = translations.get(lang, {})
+                    titles.append(trans.get("title", "") or "")
+                    messages.append(trans.get("message", "") or "")
+                    link_texts.append(trans.get("link_text", "") or "")
+                    is_machine.append(trans.get("is_machine_translated", False))
+
+                return titles + messages + link_texts + is_machine
+
+        except Exception as e:
+            logger.error(f"Error loading translations: {e}")
+
+        return empty_result
+
+    @app.callback(
+        [
+            Output(f"admin-news-trans-title-{lang}", "value", allow_duplicate=True)
+            for lang in TRANSLATION_LANGUAGES
+        ]
+        + [
+            Output(f"admin-news-trans-message-{lang}", "value", allow_duplicate=True)
+            for lang in TRANSLATION_LANGUAGES
+        ]
+        + [
+            Output(f"admin-news-trans-link-text-{lang}", "value", allow_duplicate=True)
+            for lang in TRANSLATION_LANGUAGES
+        ]
+        + [
+            Output(f"admin-news-trans-is-machine-{lang}", "value", allow_duplicate=True)
+            for lang in TRANSLATION_LANGUAGES
+        ]
+        + [
+            Output("admin-news-translate-alert", "children"),
+            Output("admin-news-translate-alert", "color"),
+            Output("admin-news-translate-alert", "is_open"),
+        ],
+        Input("admin-news-translate-all-btn", "n_clicks"),
+        State("admin-news-title", "value"),
+        State("admin-news-message", "value"),
+        State("admin-news-link-text", "value"),
+        prevent_initial_call=True,
+    )
+    def machine_translate_all(_n_clicks, title, message, link_text):
+        """Machine translate English content to all languages."""
+        from trendsearth_ui.utils.translation_service import (
+            is_translation_available,
+            translate_to_all_languages,
+        )
+
+        # Check if translation service is available
+        if not is_translation_available():
+            empty_result = [no_update] * (len(TRANSLATION_LANGUAGES) * 4)
+            return empty_result + [
+                _(
+                    "Translation service not configured. Please set GOOGLE_TRANSLATE_CREDENTIALS environment variable."
+                ),
+                "warning",
+                True,
+            ]
+
+        # Check for content to translate
+        if not (title or message or link_text):
+            empty_result = [no_update] * (len(TRANSLATION_LANGUAGES) * 4)
+            return empty_result + [
+                _(
+                    "No English content to translate. Please add title, message, or link text first."
+                ),
+                "warning",
+                True,
+            ]
+
+        try:
+            # Translate to all languages
+            all_translations = translate_to_all_languages(title, message, link_text)
+
+            titles = []
+            messages = []
+            link_texts = []
+            is_machine = []
+
+            for lang in TRANSLATION_LANGUAGES:
+                trans = all_translations.get(lang, {})
+                titles.append(trans.get("title", "") or "")
+                messages.append(trans.get("message", "") or "")
+                link_texts.append(trans.get("link_text", "") or "")
+                is_machine.append(True)  # Mark all as machine translated
+
+            return (
+                titles
+                + messages
+                + link_texts
+                + is_machine
+                + [
+                    _("Successfully translated to {count} languages!").format(
+                        count=len(TRANSLATION_LANGUAGES)
+                    ),
+                    "success",
+                    True,
+                ]
+            )
+
+        except Exception as e:
+            logger.error(f"Error in machine translation: {e}")
+            empty_result = [no_update] * (len(TRANSLATION_LANGUAGES) * 4)
+            return empty_result + [
+                _("Translation error: {error}").format(error=str(e)),
+                "danger",
+                True,
+            ]
+
+    @app.callback(
+        Output("admin-news-translations-store", "data"),
+        Input("admin-news-save-btn", "n_clicks"),
+        [State(f"admin-news-trans-title-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-message-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-link-text-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-is-machine-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [
+            State("admin-selected-news-id", "data"),
+            State("token-store", "data"),
+            State("admin-news-modal-title", "children"),
+        ],
+        prevent_initial_call=True,
+    )
+    def save_translations(
+        _n_clicks,
+        *args,
+    ):
+        """Save translations after the news item is saved."""
+        # Unpack arguments
+        num_langs = len(TRANSLATION_LANGUAGES)
+        titles = args[:num_langs]
+        messages = args[num_langs : num_langs * 2]
+        link_texts = args[num_langs * 2 : num_langs * 3]
+        is_machines = args[num_langs * 3 : num_langs * 4]
+        selected_id = args[-3]
+        token = args[-2]
+        modal_title = args[-1]
+
+        if not token or not selected_id:
+            return no_update
+
+        # Only save for edit (create needs ID first, handled separately)
+        if modal_title != _("Edit News Item"):
+            return no_update
+
+        try:
+            # Build translations dict
+            translations = {}
+            for i, lang in enumerate(TRANSLATION_LANGUAGES):
+                # Only include if there's content
+                if titles[i] or messages[i] or link_texts[i]:
+                    translations[lang] = {
+                        "title": titles[i] or None,
+                        "message": messages[i] or None,
+                        "link_text": link_texts[i] or None,
+                        "is_machine_translated": bool(is_machines[i]),
+                    }
+
+            if translations:
+                response = make_api_request(
+                    "PUT",
+                    f"/admin/news/{selected_id}/translations",
+                    token,
+                    json_data={"translations": translations},
+                )
+
+                if response.status_code not in (200, 201):
+                    logger.error(
+                        f"Error saving translations: {response.status_code} - {response.text}"
+                    )
+
+        except Exception as e:
+            logger.error(f"Error saving translations: {e}")
+
+        return no_update

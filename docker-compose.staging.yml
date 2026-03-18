@@ -13,6 +13,7 @@ services:
       - GIT_BRANCH=${GIT_BRANCH:-staging}
       - GIT_COMMIT=${GIT_COMMIT_SHA:-unknown}
       - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN:-}
+      - GOOGLE_TRANSLATE_CREDENTIALS=${GOOGLE_TRANSLATE_CREDENTIALS:-}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api-ui-health"]
       interval: 30s

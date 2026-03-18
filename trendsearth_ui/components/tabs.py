@@ -10,6 +10,85 @@ from ..utils.mobile_utils import get_mobile_column_config
 from .layout import get_gender_options, get_purpose_options, get_sector_options
 
 
+def _create_translation_tab_content(lang_code: str):
+    """Create the content for a translation tab with title, message, and link_text fields.
+
+    Args:
+        lang_code: ISO language code (e.g., 'es', 'fr', 'ar')
+
+    Returns:
+        Dash component with translation input fields
+    """
+    return html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label(_("Title")),
+                            dbc.Input(
+                                type="text",
+                                id=f"admin-news-trans-title-{lang_code}",
+                                placeholder=_("Translated title..."),
+                            ),
+                        ],
+                        width=12,
+                    ),
+                ],
+                className="mb-2",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label(_("Message")),
+                            dbc.Textarea(
+                                id=f"admin-news-trans-message-{lang_code}",
+                                placeholder=_("Translated message..."),
+                                rows=3,
+                            ),
+                        ],
+                        width=12,
+                    ),
+                ],
+                className="mb-2",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label(_("Link Text")),
+                            dbc.Input(
+                                type="text",
+                                id=f"admin-news-trans-link-text-{lang_code}",
+                                placeholder=_("Translated link text..."),
+                            ),
+                        ],
+                        width=12,
+                    ),
+                ],
+                className="mb-2",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Checkbox(
+                                id=f"admin-news-trans-is-machine-{lang_code}",
+                                label=_("Machine translated (unverified)"),
+                                value=False,
+                                disabled=True,
+                            ),
+                        ],
+                        width=12,
+                    ),
+                ],
+            ),
+        ],
+        className="p-2",
+    )
+
+
 def get_responsive_grid_options(is_mobile=False):
     """Get responsive AG-Grid options based on device type."""
     base_options = {
@@ -2408,6 +2487,102 @@ def admin_tab_content(role, is_admin):
                                             ),
                                         ]
                                     ),
+                                    # Translations Section
+                                    html.Hr(className="my-3"),
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                [
+                                                    html.H5(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-language me-2"
+                                                            ),
+                                                            _("Translations"),
+                                                        ],
+                                                        className="d-inline",
+                                                    ),
+                                                    dbc.Button(
+                                                        [
+                                                            html.I(className="fas fa-magic me-2"),
+                                                            _("Machine Translate All"),
+                                                        ],
+                                                        id="admin-news-translate-all-btn",
+                                                        color="info",
+                                                        size="sm",
+                                                        className="float-end",
+                                                        title=_(
+                                                            "Auto-translate English content to all languages using Google Translate"
+                                                        ),
+                                                    ),
+                                                ],
+                                                className="d-flex justify-content-between align-items-center mb-3",
+                                            ),
+                                            dbc.Spinner(
+                                                id="admin-news-translate-spinner",
+                                                color="info",
+                                                type="border",
+                                                size="sm",
+                                                spinner_style={"display": "none"},
+                                            ),
+                                            dbc.Alert(
+                                                id="admin-news-translate-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=5000,
+                                            ),
+                                            dbc.Accordion(
+                                                [
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("ar"),
+                                                        title="العربية (Arabic)",
+                                                        item_id="trans-ar",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("es"),
+                                                        title="Español (Spanish)",
+                                                        item_id="trans-es",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("fa"),
+                                                        title="فارسی (Farsi)",
+                                                        item_id="trans-fa",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("fr"),
+                                                        title="Français (French)",
+                                                        item_id="trans-fr",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("pt"),
+                                                        title="Português (Portuguese)",
+                                                        item_id="trans-pt",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("ru"),
+                                                        title="Русский (Russian)",
+                                                        item_id="trans-ru",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("sw"),
+                                                        title="Kiswahili (Swahili)",
+                                                        item_id="trans-sw",
+                                                    ),
+                                                    dbc.AccordionItem(
+                                                        _create_translation_tab_content("zh"),
+                                                        title="中文 (Chinese)",
+                                                        item_id="trans-zh",
+                                                    ),
+                                                ],
+                                                id="admin-news-translations-accordion",
+                                                start_collapsed=True,
+                                                always_open=True,
+                                            ),
+                                            # Store for translations data
+                                            dcc.Store(id="admin-news-translations-store"),
+                                        ],
+                                        id="admin-news-translations-section",
+                                    ),
                                     dbc.Alert(
                                         id="admin-news-modal-alert",
                                         is_open=False,
@@ -2433,7 +2608,8 @@ def admin_tab_content(role, is_admin):
                             ),
                         ],
                         id="admin-news-modal",
-                        size="lg",
+                        size="xl",
+                        scrollable=True,
                         is_open=False,
                     ),
                     # Delete Confirmation Modal
