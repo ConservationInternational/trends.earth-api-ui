@@ -173,8 +173,8 @@ def register_callbacks(app):
         ctx = callback_context
         triggered_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else None
 
-        # Close modal on cancel or successful save
-        if triggered_id in ("admin-news-cancel-btn", "admin-news-save-btn"):
+        # Close modal on cancel
+        if triggered_id == "admin-news-cancel-btn":
             return (
                 False,  # is_open
                 no_update,
@@ -191,7 +191,28 @@ def register_callbacks(app):
                 None,  # start_date
                 None,  # end_date
                 True,  # is_active
-                None,  # Clear selected_id
+                None,  # Clear selected_id on cancel
+            )
+
+        # Close modal on successful save - keep selected_id so user can re-edit same item
+        if triggered_id == "admin-news-save-btn":
+            return (
+                False,  # is_open
+                no_update,
+                "",  # title
+                "",  # message
+                "",  # link_url
+                "",  # link_text
+                ["qgis_plugin", "web", "api_ui"],  # platforms
+                [],  # roles (empty = all users)
+                "announcement",  # type
+                0,  # priority
+                "",  # min_version
+                "",  # max_version
+                None,  # start_date
+                None,  # end_date
+                True,  # is_active
+                no_update,  # Keep selected_id so user can re-edit the same item
             )
 
         # Open modal for create
@@ -284,6 +305,7 @@ def register_callbacks(app):
         Output("admin-news-alert", "color"),
         Output("admin-news-alert", "is_open"),
         Output("news-refresh-trigger", "data"),
+        Output("admin-news-created-id", "data"),
         Input("admin-news-save-btn", "n_clicks"),
         State("admin-news-modal-title", "children"),
         State("admin-news-title", "value"),
@@ -335,6 +357,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                None,
             )
 
         # Validate required fields
@@ -347,6 +370,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                None,
             )
 
         if not message or not message.strip():
@@ -358,6 +382,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                None,
             )
 
         if not platforms:
@@ -369,6 +394,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                None,
             )
 
         # Build request data - store raw markdown, clients will render it
@@ -416,6 +442,14 @@ def register_callbacks(app):
 
             if response.status_code in (200, 201):
                 action = _("updated") if is_edit else _("created")
+                # For CREATE, extract new item ID to trigger translation save
+                new_item_id = None
+                if not is_edit:
+                    try:
+                        response_data = response.json()
+                        new_item_id = response_data.get("id")
+                    except Exception:
+                        pass
                 return (
                     no_update,
                     no_update,
@@ -424,6 +458,7 @@ def register_callbacks(app):
                     "success",
                     True,
                     time.time(),  # Trigger refresh
+                    new_item_id,  # Trigger translation save for new items
                 )
             elif response.status_code == 401:
                 return (
@@ -434,6 +469,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    None,
                 )
             elif response.status_code == 403:
                 return (
@@ -444,6 +480,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    None,
                 )
             else:
                 error_data = response.json() if response.content else {}
@@ -458,6 +495,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    None,
                 )
 
         except Exception as e:
@@ -469,6 +507,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                None,
             )
 
     @app.callback(
@@ -713,7 +752,7 @@ def register_callbacks(app):
         if not token or not selected_id:
             return no_update
 
-        # Only save for edit (create needs ID first, handled separately)
+        # Only save for edit (create needs ID first, handled by save_create_translations)
         if modal_title != _("Edit News Item"):
             return no_update
 
@@ -745,5 +784,64 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.error(f"Error saving translations: {e}")
+
+        return no_update
+
+    @app.callback(
+        Output("admin-news-translations-store", "data", allow_duplicate=True),
+        Input("admin-news-created-id", "data"),
+        [State(f"admin-news-trans-title-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-message-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-link-text-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State(f"admin-news-trans-is-machine-{lang}", "value") for lang in TRANSLATION_LANGUAGES]
+        + [State("token-store", "data")],
+        prevent_initial_call=True,
+    )
+    def save_create_translations(created_id, *args):
+        """Save translations for a newly created news item."""
+        if not created_id:
+            return no_update
+
+        # Unpack arguments
+        num_langs = len(TRANSLATION_LANGUAGES)
+        titles = args[:num_langs]
+        messages = args[num_langs : num_langs * 2]
+        link_texts = args[num_langs * 2 : num_langs * 3]
+        is_machines = args[num_langs * 3 : num_langs * 4]
+        token = args[-1]
+
+        if not token:
+            return no_update
+
+        try:
+            # Build translations dict
+            translations = {}
+            for i, lang in enumerate(TRANSLATION_LANGUAGES):
+                # Only include if there's content
+                if titles[i] or messages[i] or link_texts[i]:
+                    translations[lang] = {
+                        "title": titles[i] or None,
+                        "message": messages[i] or None,
+                        "link_text": link_texts[i] or None,
+                        "is_machine_translated": bool(is_machines[i]),
+                    }
+
+            if translations:
+                response = make_api_request(
+                    "PUT",
+                    f"/admin/news/{created_id}/translations",
+                    token,
+                    json_data={"translations": translations},
+                )
+
+                if response.status_code not in (200, 201):
+                    logger.error(
+                        f"Error saving translations for new item: {response.status_code} - {response.text}"
+                    )
+                else:
+                    logger.info(f"Successfully saved translations for new item {created_id}")
+
+        except Exception as e:
+            logger.error(f"Error saving translations for new item: {e}")
 
         return no_update

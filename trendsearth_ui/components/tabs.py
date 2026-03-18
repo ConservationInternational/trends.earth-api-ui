@@ -2192,6 +2192,8 @@ def admin_tab_content(role, is_admin):
                                             ),
                                             # Store for selected news item
                                             dcc.Store(id="admin-selected-news-id"),
+                                            # Store for newly created news item ID (triggers translation save)
+                                            dcc.Store(id="admin-news-created-id"),
                                             # Store for news table state
                                             dcc.Store(id="admin-news-table-state"),
                                             # Store to trigger refresh after save/delete
