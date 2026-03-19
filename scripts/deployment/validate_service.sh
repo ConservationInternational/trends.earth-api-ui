@@ -35,11 +35,14 @@ fi
 echo "✅ Node is the active swarm leader. Continuing validation."
 
 # Set health check URL based on environment
+# Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues.
+# Docker Swarm routing mesh listens on IPv4; curl resolving localhost to ::1
+# causes connections that hang indefinitely.
 if [ "$ENVIRONMENT" = "staging" ]; then
-    HEALTH_URL="http://localhost:8001/api-ui-health"
+    HEALTH_URL="http://127.0.0.1:8001/api-ui-health"
     PORT=8001
 else
-    HEALTH_URL="http://localhost:8000/api-ui-health"
+    HEALTH_URL="http://127.0.0.1:8000/api-ui-health"
     PORT=8000
 fi
 
@@ -86,7 +89,7 @@ max_attempts=12
 attempt=0
 
 while [ $attempt -lt $max_attempts ]; do
-    if curl -f -s "$HEALTH_URL" >/dev/null 2>&1; then
+    if curl -f -s --max-time 5 "$HEALTH_URL" >/dev/null 2>&1; then
         echo "✅ Health check passed"
         break
     else
@@ -118,7 +121,7 @@ done
 
 # Get health check response for verification
 echo "🩺 Health check response:"
-curl -s "$HEALTH_URL" | head -c 500 || echo "Failed to get response"
+curl -s --max-time 5 "$HEALTH_URL" | head -c 500 || echo "Failed to get response"
 
 # Show deployment summary
 echo ""

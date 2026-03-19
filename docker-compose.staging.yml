@@ -15,7 +15,7 @@ services:
       - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN:-}
       - GOOGLE_TRANSLATE_CREDENTIALS=${GOOGLE_TRANSLATE_CREDENTIALS:-}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api-ui-health"]
+      test: ["CMD", "curl", "-f", "--max-time", "3", "http://127.0.0.1:8000/api-ui-health"]
       interval: 10s
       timeout: 5s
       retries: 3
