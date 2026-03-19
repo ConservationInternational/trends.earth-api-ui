@@ -221,6 +221,44 @@
     background-color: #D3D3D4 !important;
 }
 
+/* AG-Grid Selected Row Highlight */
+.ag-theme-alpine .ag-row-selected {
+    background-color: #DEEBFF !important;
+}
+
+.ag-theme-alpine .ag-row-selected .ag-cell {
+    background-color: transparent !important;
+}
+
+/* Selected row combined with status colors - darken the status colour */
+.ag-row.ag-row-selected.row-failed,
+.ag-row.ag-row-selected.row-archived,
+.ag-row.ag-row-selected.row-fail {
+    background-color: #F0BDC2 !important;
+}
+
+.ag-row.ag-row-selected.row-finished,
+.ag-row.ag-row-selected.row-published,
+.ag-row.ag-row-selected.row-success,
+.ag-row.ag-row-selected.row-active {
+    background-color: #B5D5C6 !important;
+}
+
+.ag-row.ag-row-selected.row-running,
+.ag-row.ag-row-selected.row-building {
+    background-color: #A8CEFF !important;
+}
+
+.ag-row.ag-row-selected.row-ready,
+.ag-row.ag-row-selected.row-draft {
+    background-color: #FFE8A3 !important;
+}
+
+.ag-row.ag-row-selected.row-pending,
+.ag-row.ag-row-selected.row-inactive {
+    background-color: #C8C9CB !important;
+}
+
 /* Enhanced JSON Viewer Styles */
 .enhanced-json-viewer {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;

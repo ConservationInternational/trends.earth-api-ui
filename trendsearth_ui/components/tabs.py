@@ -107,6 +107,9 @@ def get_responsive_grid_options(is_mobile=False):
         # Tell AG-Grid the scrollbar width so it reserves space even when OS
         # reports 0-width (overlay) scrollbars
         "scrollbarWidth": 12,
+        # Highlight the full row on click
+        "rowSelection": "single",
+        "suppressRowClickSelection": False,
     }
 
     if is_mobile:
