@@ -451,6 +451,18 @@ def edit_script_modal():
                                         ],
                                         width=6,
                                     ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Uses GEE"),
+                                            dbc.Checkbox(
+                                                id="edit-script-uses-gee",
+                                                value=True,
+                                                label="Requires Google Earth Engine",
+                                            ),
+                                        ],
+                                        width=6,
+                                        className="d-flex flex-column justify-content-center",
+                                    ),
                                 ],
                                 className="mb-3",
                             ),

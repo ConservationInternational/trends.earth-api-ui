@@ -552,6 +552,16 @@ def get_mobile_column_config():
                     "filter": False,
                 },
                 {
+                    "headerName": _("GEE"),
+                    "field": "uses_gee",
+                    "width": 80,
+                    "cellStyle": {"fontSize": "11px", "textAlign": "center"},
+                    "resizable": True,
+                    "sortable": True,
+                    "filter": "agSetColumnFilter",
+                    "cellRenderer": "CheckboxRenderer",
+                },
+                {
                     "headerName": _("Created"),
                     "field": "created_at",
                     "width": 150,

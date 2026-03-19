@@ -30,6 +30,7 @@ SCRIPT_ALLOWED_SORT_COLUMNS = {
     "environment_version",
     "user_name",
     "user_email",
+    "uses_gee",
 }
 SCRIPT_ALLOWED_FILTER_COLUMNS = {
     "id",
@@ -44,6 +45,7 @@ SCRIPT_ALLOWED_FILTER_COLUMNS = {
     "environment_version",
     "user_name",
     "user_email",
+    "uses_gee",
 }
 
 

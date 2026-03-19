@@ -86,6 +86,7 @@ def register_callbacks(app):
             Output("edit-script-name", "value"),
             Output("edit-script-description", "value"),
             Output("edit-script-status", "value"),
+            Output("edit-script-uses-gee", "value"),
         ],
         [Input("scripts-table", "cellClicked")],
         [
@@ -98,9 +99,9 @@ def register_callbacks(app):
     def open_edit_script_modal(cell_clicked, role, token, table_state):
         logger.debug("Script edit callback triggered: cell_clicked=%s, role=%s", cell_clicked, role)
         if not cell_clicked or role not in ["ADMIN", "SUPERADMIN"]:
-            return False, None, "", "", "DRAFT"
+            return False, None, "", "", "DRAFT", True
         if cell_clicked.get("colId") != "edit":
-            return False, None, "", "", "DRAFT"
+            return False, None, "", "", "DRAFT", True
 
         try:
             script = resolve_row_data(
@@ -112,7 +113,7 @@ def register_callbacks(app):
             )
         except RowResolutionError as exc:
             logger.debug("Row resolution error: %s", exc)
-            return False, None, "", "", "DRAFT"
+            return False, None, "", "", "DRAFT", True
         else:
             logger.debug("Found script data: %s - %s", script.get("id"), script.get("name"))
 
@@ -122,6 +123,7 @@ def register_callbacks(app):
             script.get("name", ""),
             script.get("description", ""),
             script.get("status", "DRAFT"),
+            script.get("uses_gee", True),
         )
 
     @app.callback(
@@ -209,13 +211,14 @@ def register_callbacks(app):
             State("edit-script-name", "value"),
             State("edit-script-description", "value"),
             State("edit-script-status", "value"),
+            State("edit-script-uses-gee", "value"),
             State("token-store", "data"),
             State("refresh-scripts-btn", "n_clicks"),
         ],
         prevent_initial_call=True,
     )
     def save_script_edits(
-        n_clicks, script_data, name, description, status, token, current_refresh_clicks
+        n_clicks, script_data, name, description, _status, uses_gee, token, current_refresh_clicks
     ):
         """Save script edits to the API and trigger table refresh."""
         if not n_clicks or not script_data or not token:
@@ -228,10 +231,10 @@ def register_callbacks(app):
         update_data = {
             "name": name,
             "description": description,
-            "status": status,
+            "uses_gee": bool(uses_gee),
         }
         resp = make_authenticated_request(
-            f"/script/{script_id}",
+            f"/script/{script_id}/config",
             token,
             method="PATCH",
             json=update_data,
