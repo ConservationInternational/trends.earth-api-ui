@@ -1,5 +1,6 @@
 """Edit modal callbacks for users and scripts."""
 
+import contextlib
 import logging
 
 from dash import Input, Output, State, no_update
@@ -29,6 +30,7 @@ def register_callbacks(app):
             Output("admin-confirm-password", "value"),
             Output("edit-user-modal-user-id", "data"),
             Output("edit-user-email-notifications-switch", "value"),
+            Output("edit-user-max-concurrent-executions", "value"),
         ],
         [Input("users-table", "cellClicked")],
         [
@@ -48,14 +50,14 @@ def register_callbacks(app):
         logger.debug("User edit callback triggered: cell_clicked=%s, role=%s", cell_clicked, role)
         # Only ADMIN and SUPERADMIN can edit users
         if not cell_clicked or role not in ("ADMIN", "SUPERADMIN"):
-            return False, None, "", "", "", "", "USER", "", "", None, True
+            return False, None, "", "", "", "", "USER", "", "", None, True, None
         if cell_clicked.get("colId") != "edit":
-            return False, None, "", "", "", "", "USER", "", "", None, True
+            return False, None, "", "", "", "", "USER", "", "", None, True, None
         try:
             user = resolve_row_data(cell_clicked, token, table_state, "/user")
         except RowResolutionError as exc:
             logger.debug("Row resolution error: %s", exc)
-            return False, None, "", "", "", "", "USER", "", "", None, True
+            return False, None, "", "", "", "", "USER", "", "", None, True, None
         else:
             logger.debug("Found user data: %s - %s", user.get("id"), user.get("email"))
 
@@ -63,7 +65,7 @@ def register_callbacks(app):
         target_user_role = user.get("role", "USER")
         if role == "ADMIN" and target_user_role == "SUPERADMIN":
             logger.debug("ADMIN cannot edit SUPERADMIN users")
-            return False, None, "", "", "", "", "USER", "", "", None, True
+            return False, None, "", "", "", "", "USER", "", "", None, True, None
 
         return (
             True,
@@ -77,6 +79,7 @@ def register_callbacks(app):
             "",  # Clear admin confirm password field
             user.get("id"),  # Set user ID for admin sub-callbacks
             user.get("email_notifications_enabled", True),  # Set notification switch
+            user.get("max_concurrent_executions"),  # Per-user execution limit
         )
 
     @app.callback(
@@ -161,13 +164,23 @@ def register_callbacks(app):
             State("edit-user-institution", "value"),
             State("edit-user-country", "value"),
             State("edit-user-role", "value"),
+            State("edit-user-max-concurrent-executions", "value"),
             State("token-store", "data"),
             State("refresh-users-btn", "n_clicks"),
         ],
         prevent_initial_call=True,
     )
     def save_user_edits(
-        n_clicks, user_data, name, email, institution, country, role, token, current_refresh_clicks
+        n_clicks,
+        user_data,
+        name,
+        email,
+        institution,
+        country,
+        role,
+        max_concurrent_executions,
+        token,
+        current_refresh_clicks,
     ):
         """Save user edits to the API and trigger table refresh."""
         if not n_clicks or not user_data or not token:
@@ -184,6 +197,13 @@ def register_callbacks(app):
             "country": country,
             "role": role,
         }
+
+        # Convert empty/blank to None (use global default), otherwise int
+        if max_concurrent_executions is not None and max_concurrent_executions != "":
+            with contextlib.suppress(ValueError, TypeError):
+                update_data["max_concurrent_executions"] = int(max_concurrent_executions)
+        else:
+            update_data["max_concurrent_executions"] = None
         resp = make_authenticated_request(
             f"/user/{user_id}",
             token,

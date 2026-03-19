@@ -188,6 +188,28 @@ def edit_user_modal():
                                 ],
                                 className="mb-3",
                             ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Max Concurrent Executions"),
+                                            dbc.Input(
+                                                id="edit-user-max-concurrent-executions",
+                                                type="number",
+                                                min=1,
+                                                step=1,
+                                                placeholder="Default (3)",
+                                            ),
+                                            html.Small(
+                                                "Leave empty to use system default",
+                                                className="text-muted",
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
                             html.Hr(),
                             html.H5("Google Earth Engine Credentials", className="mb-3"),
                             dbc.Row(
