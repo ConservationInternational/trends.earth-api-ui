@@ -1947,6 +1947,21 @@ def status_tab_content(is_admin, role=None):
                                                 ],
                                                 className="mb-4",
                                             ),
+                                            # Charts row 4: Language distribution
+                                            html.Div(
+                                                [
+                                                    html.H6(
+                                                        _("Language Distribution"),
+                                                        className="text-center mb-2",
+                                                    ),
+                                                    dcc.Graph(
+                                                        id="client-stats-language-pie",
+                                                        config={"displayModeBar": False},
+                                                        style={"height": "300px"},
+                                                    ),
+                                                ],
+                                                className="mb-4",
+                                            ),
                                         ],
                                         type="default",
                                         color="#007bff",

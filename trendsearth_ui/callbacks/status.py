@@ -779,6 +779,7 @@ def _register_additional_status_callbacks(app):
             Output("client-stats-os-pie", "figure"),
             Output("client-stats-plugin-by-qgis", "figure"),
             Output("client-stats-qgis-by-plugin", "figure"),
+            Output("client-stats-language-pie", "figure"),
         ],
         [
             Input("status-time-tabs-store", "data"),
@@ -819,7 +820,7 @@ def _register_additional_status_callbacks(app):
                     }
                 ]
             )
-            return (html.Div(), empty_fig, empty_fig, empty_fig, empty_fig)
+            return (html.Div(), empty_fig, empty_fig, empty_fig, empty_fig, empty_fig)
 
         # Map time period tabs to days for the API
         period_to_days = {
@@ -853,6 +854,7 @@ def _register_additional_status_callbacks(app):
                     dbc.Alert(error_msg, color="warning"),
                     className="mb-3",
                 ),
+                empty_fig,
                 empty_fig,
                 empty_fig,
                 empty_fig,
@@ -988,7 +990,22 @@ def _register_additional_status_callbacks(app):
                 annotations=[{"text": "No QGIS version data", "showarrow": False}]
             )
 
-        return (html.Div(), platform_fig, os_fig, plugin_fig, qgis_fig)
+        # Language distribution pie chart (across all clients)
+        language_stats = data.get("language_stats", [])
+        if language_stats:
+            lang_labels = [item.get("language", "Unknown") for item in language_stats]
+            lang_values = [item.get("user_count", 0) for item in language_stats]
+            lang_fig = px.pie(
+                names=lang_labels,
+                values=lang_values,
+                title=f"Language Distribution ({period_label})",
+            )
+            lang_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
+        else:
+            lang_fig = go.Figure()
+            lang_fig.update_layout(annotations=[{"text": "No language data", "showarrow": False}])
+
+        return (html.Div(), platform_fig, os_fig, plugin_fig, qgis_fig, lang_fig)
 
 
 # Alias for backward compatibility with tests

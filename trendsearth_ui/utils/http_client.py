@@ -32,6 +32,15 @@ def get_client_header() -> str:
     # OS info
     parts.append(f"os={sys.platform}")
 
+    # User's language
+    try:
+        from trendsearth_ui.i18n import get_locale
+
+        lang = get_locale()
+    except Exception:
+        lang = "en"
+    parts.append(f"lang={lang}")
+
     # Git commit if available (set by deployment)
     commit = os.environ.get("GIT_COMMIT", "")
     if commit and commit != "unknown":
