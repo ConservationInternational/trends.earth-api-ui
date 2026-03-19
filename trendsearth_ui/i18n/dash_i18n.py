@@ -95,7 +95,15 @@ function(lang, previousLang) {
             console.log('Reloading page...');
             // Small delay to ensure localStorage write completes
             setTimeout(function() {
-                window.location.reload();
+                // If the URL has a lang= query parameter, update it to match
+                // the new language so it won't override the selection after reload
+                var url = new URL(window.location.href);
+                if (url.searchParams.has('lang')) {
+                    url.searchParams.set('lang', lang);
+                    window.location.href = url.toString();
+                } else {
+                    window.location.reload();
+                }
             }, 50);
         }
     }
