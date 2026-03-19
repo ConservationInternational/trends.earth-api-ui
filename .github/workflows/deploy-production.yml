@@ -192,12 +192,7 @@ jobs:
     - name: Verify deployment
       run: |
         echo "🔍 Verifying deployment..."
-        
-        # Wait a bit for services to be fully ready
-        sleep 30
-        
-        # Check health endpoint (this will be done by the validate script on the server)
-        echo "✅ Deployment verification will be handled by CodeDeploy validation hooks"
+        echo "✅ Deployment verification handled by CodeDeploy ValidateService hook"
 
     - name: Notify Rollbar of deployment
       if: success()

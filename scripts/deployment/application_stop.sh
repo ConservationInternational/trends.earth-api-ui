@@ -45,9 +45,18 @@ if docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
         docker service scale "$service=0"
     done
     
-    # Wait for services to scale down
+    # Wait for services to scale down (poll instead of fixed sleep)
     echo "⏳ Waiting for services to scale down..."
-    sleep 30
+    scale_wait=0
+    while [ $scale_wait -lt 60 ]; do
+        running=$(docker service ls --filter "name=${STACK_NAME}" --format "{{.Replicas}}" | awk -F'/' '{s+=$1} END{print s+0}')
+        if [ "$running" -eq 0 ]; then
+            echo "✅ All services scaled to 0"
+            break
+        fi
+        sleep 5
+        scale_wait=$((scale_wait + 5))
+    done
     
     # Remove the stack
     echo "🗑️ Removing stack: $STACK_NAME"
@@ -57,7 +66,7 @@ if docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
     echo "⏳ Waiting for stack removal to complete..."
     while docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; do
         echo "Waiting for stack removal..."
-        sleep 10
+        sleep 5
     done
     
     echo "✅ Stack removed successfully"

@@ -140,19 +140,18 @@ max_wait=180
 wait_time=0
 
 while [ $wait_time -lt $max_wait ]; do
-    # Check if all services have desired replicas running
-    pending_services=$(docker service ls --filter "name=$STACK_NAME" --format "table {{.Name}}\t{{.Replicas}}" | grep -v "1/1" | wc -l)
+    # Check if all services have desired replicas running (works with any replica count)
+    not_ready=$(docker service ls --filter "name=$STACK_NAME" --format "{{.Replicas}}" | awk -F'/' '{ if ($1 != $2) print }' | wc -l)
     
-    # Only header line should remain if all services are 1/1
-    if [ $pending_services -eq 1 ]; then
+    if [ "$not_ready" -eq 0 ]; then
         echo "✅ All services are running"
         break
     fi
     
     echo "⏳ Waiting for services to be ready... ($wait_time/$max_wait seconds)"
     docker service ls --filter "name=$STACK_NAME"
-    sleep 15
-    wait_time=$((wait_time + 15))
+    sleep 10
+    wait_time=$((wait_time + 10))
 done
 
 if [ $wait_time -ge $max_wait ]; then

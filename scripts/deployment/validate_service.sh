@@ -82,7 +82,7 @@ echo "✅ $service_count service(s) are running"
 
 # Wait for application to be ready
 echo "⏳ Waiting for application to be ready..."
-max_attempts=20
+max_attempts=12
 attempt=0
 
 while [ $attempt -lt $max_attempts ]; do
@@ -92,8 +92,8 @@ while [ $attempt -lt $max_attempts ]; do
     else
         attempt=$((attempt + 1))
         if [ $attempt -lt $max_attempts ]; then
-            echo "⏳ Health check failed, retrying in 15s (attempt $attempt/$max_attempts)..."
-            sleep 15
+            echo "⏳ Health check failed, retrying in 5s (attempt $attempt/$max_attempts)..."
+            sleep 5
         else
             echo "❌ Health check failed after $max_attempts attempts"
             echo "🔍 Debugging information:"
