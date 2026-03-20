@@ -96,11 +96,12 @@ function(lang, previousLang) {
             // Small delay to ensure localStorage write completes
             setTimeout(function() {
                 // If the URL has a lang= query parameter, update it to match
-                // the new language so it won't override the selection after reload
-                var url = new URL(window.location.href);
-                if (url.searchParams.has('lang')) {
-                    url.searchParams.set('lang', lang);
-                    window.location.href = url.toString();
+                // the new language so it won't override the selection after reload.
+                // Use string replacement instead of the URL API to avoid
+                // re-encoding other parameters (e.g. auth tokens).
+                var href = window.location.href;
+                if (/[?&]lang=/.test(href)) {
+                    window.location.href = href.replace(/([?&]lang=)[^&]*/, '$1' + encodeURIComponent(lang));
                 } else {
                     window.location.reload();
                 }
