@@ -830,15 +830,7 @@ def _register_additional_status_callbacks(app):
             "year": 365,
             "all": 9999,  # Large number for "all time"
         }
-        period_labels = {
-            "day": "Last 24 Hours",
-            "week": "Last Week",
-            "month": "Last Month",
-            "year": "Last Year",
-            "all": "All Time",
-        }
         days = period_to_days.get(time_period, 30)
-        period_label = period_labels.get(time_period, "Last Month")
         data = fetch_client_stats(token, api_environment, days=days)
 
         if data.get("error"):
