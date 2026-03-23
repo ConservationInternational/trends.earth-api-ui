@@ -1883,27 +1883,13 @@ def status_tab_content(is_admin, role=None):
                                             html.Div(
                                                 id="client-stats-summary", style={"display": "none"}
                                             ),
-                                            # Charts row 1: Platform and OS distribution
+                                            # Charts row 1: Platform, OS, and Language distribution
                                             dbc.Row(
                                                 [
                                                     dbc.Col(
                                                         [
                                                             html.H6(
-                                                                _("Platform Distribution"),
-                                                                className="text-center mb-2",
-                                                            ),
-                                                            dcc.Graph(
-                                                                id="client-stats-platform-pie",
-                                                                config={"displayModeBar": False},
-                                                                style={"height": "300px"},
-                                                            ),
-                                                        ],
-                                                        md=6,
-                                                    ),
-                                                    dbc.Col(
-                                                        [
-                                                            html.H6(
-                                                                _("OS Distribution (Plugin)"),
+                                                                _("OS distribution (plugin)"),
                                                                 className="text-center mb-2",
                                                             ),
                                                             dcc.Graph(
@@ -1912,7 +1898,35 @@ def status_tab_content(is_admin, role=None):
                                                                 style={"height": "300px"},
                                                             ),
                                                         ],
-                                                        md=6,
+                                                        md=4,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            html.H6(
+                                                                _("Language distribution"),
+                                                                className="text-center mb-2",
+                                                            ),
+                                                            dcc.Graph(
+                                                                id="client-stats-language-pie",
+                                                                config={"displayModeBar": False},
+                                                                style={"height": "300px"},
+                                                            ),
+                                                        ],
+                                                        md=4,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            html.H6(
+                                                                _("Platform distribution"),
+                                                                className="text-center mb-2",
+                                                            ),
+                                                            dcc.Graph(
+                                                                id="client-stats-platform-pie",
+                                                                config={"displayModeBar": False},
+                                                                style={"height": "300px"},
+                                                            ),
+                                                        ],
+                                                        md=4,
                                                     ),
                                                 ],
                                                 className="mb-4",
@@ -1943,21 +1957,6 @@ def status_tab_content(is_admin, role=None):
                                                         id="client-stats-qgis-by-plugin",
                                                         config={"displayModeBar": False},
                                                         style={"height": "350px"},
-                                                    ),
-                                                ],
-                                                className="mb-4",
-                                            ),
-                                            # Charts row 4: Language distribution
-                                            html.Div(
-                                                [
-                                                    html.H6(
-                                                        _("Language Distribution"),
-                                                        className="text-center mb-2",
-                                                    ),
-                                                    dcc.Graph(
-                                                        id="client-stats-language-pie",
-                                                        config={"displayModeBar": False},
-                                                        style={"height": "300px"},
                                                     ),
                                                 ],
                                                 className="mb-4",

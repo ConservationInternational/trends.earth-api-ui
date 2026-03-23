@@ -1169,6 +1169,7 @@ def create_top_users_chart(
     )
 
     return [
+        html.Hr(),
         html.Div(
             [
                 html.H6(_("Top users by activity{suffix_label}").format(suffix_label=suffix_label)),
@@ -1178,7 +1179,7 @@ def create_top_users_chart(
                 ),
             ],
             className="mb-3",
-        )
+        ),
     ]
 
 

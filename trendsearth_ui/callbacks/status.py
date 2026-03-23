@@ -886,7 +886,6 @@ def _register_additional_status_callbacks(app):
             platform_fig = px.pie(
                 names=platform_labels,
                 values=platform_values,
-                title=f"Active Users by Platform ({period_label})",
             )
             platform_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
         else:
@@ -902,7 +901,6 @@ def _register_additional_status_callbacks(app):
             os_fig = px.pie(
                 names=os_labels,
                 values=os_values,
-                title=f"OS Distribution - Plugin Users ({period_label})",
             )
             os_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
         else:
@@ -935,7 +933,6 @@ def _register_additional_status_callbacks(app):
                     )
                 plugin_fig.update_layout(
                     barmode="stack",
-                    title=f"Plugin Versions by QGIS Version ({period_label})",
                     xaxis_title="QGIS Version",
                     yaxis_title="Users",
                     margin={"t": 50, "b": 50, "l": 50, "r": 20},
@@ -974,7 +971,6 @@ def _register_additional_status_callbacks(app):
                     qgis_fig.add_trace(go.Bar(name=f"QGIS {qv}", x=plugin_versions_list, y=counts))
                 qgis_fig.update_layout(
                     barmode="stack",
-                    title=f"QGIS Versions by Plugin Version ({period_label})",
                     xaxis_title="Plugin Version",
                     yaxis_title="Users",
                     margin={"t": 50, "b": 50, "l": 50, "r": 20},
@@ -998,7 +994,6 @@ def _register_additional_status_callbacks(app):
             lang_fig = px.pie(
                 names=lang_labels,
                 values=lang_values,
-                title=f"Language Distribution ({period_label})",
             )
             lang_fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
         else:
