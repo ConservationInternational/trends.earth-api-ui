@@ -738,137 +738,136 @@ def create_execution_statistics_chart(
                         column: _coerce_series(column).cumsum() for column in completed_columns
                     }
 
-                    if use_extended_cumulative:
-                        agg_suffix = (
-                            f" ({aggregation_label} aggregation)" if aggregation_label else ""
+                    agg_suffix = ""
+                    if use_extended_cumulative and aggregation_label:
+                        agg_suffix = f" ({aggregation_label} aggregation)"
+
+                    plot_columns = [
+                        c for c in ("finished", "failed", "cancelled") if c in cumulative_series
+                    ]
+                    if not plot_columns:
+                        plot_columns = list(cumulative_series.keys())
+
+                    if not plot_columns:
+                        execution_charts.append(
+                            _build_message_block(
+                                "No completed task data available.",
+                                detail=(
+                                    "Execution statistics did not include finished, "
+                                    "failed, or cancelled status counts for this period."
+                                ),
+                            )
+                        )
+                    else:
+                        # Dual-axis when Finished dwarfs Failed/Cancelled (>=5x)
+                        finished_max = (
+                            cumulative_series["finished"].max()
+                            if "finished" in cumulative_series
+                            else 0
+                        )
+                        other_max = max(
+                            (cumulative_series[c].max() for c in plot_columns if c != "finished"),
+                            default=0,
+                        )
+                        use_secondary = (
+                            finished_max > 0 and other_max > 0 and finished_max >= 5 * other_max
                         )
 
-                        line_columns = [
-                            column
-                            for column in ("finished", "failed", "cancelled")
-                            if column in cumulative_series
-                        ]
+                        finished_color = _color_for("finished")
 
-                        if not line_columns:
-                            execution_charts.append(
-                                _build_message_block(
-                                    "No completed task data available.",
-                                    detail=(
-                                        "Execution statistics did not include finished, failed, or cancelled status counts for this period."
-                                    ),
-                                )
-                            )
-                        else:
-                            figure = go.Figure()
-                            for column in line_columns:
-                                figure.add_trace(
-                                    go.Scatter(
-                                        x=df["date"],
-                                        y=cumulative_series[column],
-                                        mode="lines",
-                                        name=_display_name(column),
-                                        line={"color": _color_for(column), "width": 3},
-                                        line_shape="hv",
-                                        hovertemplate=(
-                                            "<b>"
-                                            + _display_name(column)
-                                            + "</b><br>%{x}<br>Cumulative Count: %{y}<extra></extra>"
-                                        ),
-                                    )
-                                )
-
-                            figure.update_layout(
-                                xaxis_title=get_chart_axis_label(user_timezone),
-                                yaxis_title=_("Cumulative Executions"),
-                                height=360,
-                                hovermode="x unified",
-                                legend={
-                                    "orientation": "h",
-                                    "yanchor": "bottom",
-                                    "y": 1.02,
-                                    "xanchor": "center",
-                                    "x": 0.5,
-                                },
-                                margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                                template="plotly_white",
-                                xaxis={"showgrid": True, "type": "date"},
-                                yaxis={"showgrid": True},
-                                showlegend=True,
-                            )
-
-                            execution_charts.append(
-                                html.Div(
-                                    [
-                                        html.H6(
-                                            _(
-                                                "Cumulative completed tasks{suffix_label}{agg_suffix}"
-                                            ).format(
-                                                suffix_label=suffix_label, agg_suffix=agg_suffix
-                                            )
-                                        ),
-                                        dcc.Graph(
-                                            figure=figure,
-                                            config={
-                                                "displayModeBar": False,
-                                                "responsive": True,
-                                            },
-                                        ),
-                                    ],
-                                    className="mb-3",
-                                )
-                            )
-                    else:
-                        fig_completed = go.Figure()
-                        for column in completed_columns:
-                            cumulative_values = cumulative_series[column]
-                            fig_completed.add_trace(
+                        figure = go.Figure()
+                        for column in plot_columns:
+                            on_secondary = use_secondary and column != "finished"
+                            figure.add_trace(
                                 go.Scatter(
                                     x=df["date"],
-                                    y=cumulative_values,
+                                    y=cumulative_series[column],
                                     mode="lines",
                                     name=_display_name(column),
                                     line={"color": _color_for(column), "width": 3},
                                     line_shape="hv",
+                                    yaxis="y2" if on_secondary else "y",
                                     hovertemplate=(
                                         "<b>"
                                         + _display_name(column)
-                                        + "</b><br>%{x}<br>Cumulative Count: %{y}<extra></extra>"
+                                        + "</b><br>%{x}<br>Cumulative Count: %{y}"
+                                        + "<extra></extra>"
                                     ),
                                 )
                             )
 
-                        fig_completed.update_layout(
-                            xaxis_title=get_chart_axis_label(user_timezone),
-                            yaxis_title=_("Cumulative Executions"),
-                            height=360,
-                            hovermode="x unified",
-                            legend={
+                        yaxis_cfg = {"showgrid": True}
+                        if use_secondary:
+                            yaxis_cfg.update(
+                                {
+                                    "title": {
+                                        "text": _("Finished"),
+                                        "font": {"color": finished_color},
+                                    },
+                                    "tickfont": {"color": finished_color},
+                                }
+                            )
+
+                        layout_kwargs = {
+                            "xaxis_title": get_chart_axis_label(user_timezone),
+                            "yaxis_title": (None if use_secondary else _("Cumulative Executions")),
+                            "height": 360,
+                            "hovermode": "x unified",
+                            "legend": {
                                 "orientation": "h",
                                 "yanchor": "bottom",
                                 "y": 1.02,
                                 "xanchor": "center",
                                 "x": 0.5,
                             },
-                            margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                            template="plotly_white",
-                            xaxis={
-                                "showgrid": True,
-                                "type": "date",
-                            },  # Ensure proper date axis handling
-                            yaxis={"showgrid": True},
-                        )
+                            "margin": {
+                                "l": 40,
+                                "r": 60 if use_secondary else 40,
+                                "t": 60,
+                                "b": 40,
+                            },
+                            "template": "plotly_white",
+                            "xaxis": {"showgrid": True, "type": "date"},
+                            "yaxis": yaxis_cfg,
+                            "showlegend": True,
+                        }
+
+                        if use_secondary:
+                            # Pick a colour for the secondary y-axis that
+                            # matches the trace(s) plotted on it.
+                            secondary_cols = [c for c in plot_columns if c != "finished"]
+                            if len(secondary_cols) == 1:
+                                y2_color = _color_for(secondary_cols[0])
+                            else:
+                                y2_color = _color_for("failed")
+
+                            layout_kwargs["yaxis2"] = {
+                                "title": {
+                                    "text": _("Failed / Cancelled"),
+                                    "font": {"color": y2_color},
+                                },
+                                "tickfont": {"color": y2_color},
+                                "overlaying": "y",
+                                "side": "right",
+                                "showgrid": False,
+                            }
+
+                        figure.update_layout(**layout_kwargs)
+
+                        chart_title = _(
+                            "Cumulative completed tasks{suffix_label}{agg_suffix}"
+                        ).format(suffix_label=suffix_label, agg_suffix=agg_suffix)
 
                         execution_charts.append(
                             html.Div(
                                 [
-                                    html.H6(
-                                        _("Completed executions (cumulative){suffix_label}").format(
-                                            suffix_label=suffix_label
-                                        )
-                                    ),
+                                    html.H6(chart_title),
                                     dcc.Graph(
-                                        figure=fig_completed,
-                                        config={"displayModeBar": False, "responsive": True},
+                                        figure=figure,
+                                        config={
+                                            "displayModeBar": False,
+                                            "responsive": True,
+                                        },
                                     ),
                                 ],
                                 className="mb-3",
@@ -1959,6 +1958,148 @@ def create_system_overview(dashboard_stats_data, status_data=None):
             ],
             className="p-3",
         )
+
+
+def _format_stat(value):
+    """Format a numeric stat with thousands separators."""
+    try:
+        return f"{int(value):,}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _stat_card(label, value, *, color_class="text-primary"):
+    """Build a single stat card for the period summary row."""
+    return html.Div(
+        html.Div(
+            [
+                html.Div(label, className="text-muted small mb-1"),
+                html.Div(
+                    _format_stat(value),
+                    className=f"h4 mb-0 fw-bold {color_class}",
+                ),
+            ],
+            className="card-body text-center py-3",
+        ),
+        className="card h-100",
+    )
+
+
+def build_period_summary_cards(dashboard_stats, user_stats, *, ui_period=None):
+    """Build the 8 summary statistic cards for the selected time period.
+
+    Args:
+        dashboard_stats: Response from /stats/dashboard (contains ``data.summary``).
+        user_stats: Response from /stats/users (contains ``geographic_distribution``
+            and ``activity_stats``).
+        ui_period: The selected UI time period (day/week/month/year/all).
+            Used to choose contextual labels.
+
+    Returns:
+        html.Div with two rows of four cards each.
+    """
+    # --- extract dashboard summary -----------------------------------------
+    summary = {}
+    if isinstance(dashboard_stats, dict) and not dashboard_stats.get("error"):
+        data = dashboard_stats.get("data", dashboard_stats)
+        summary = data.get("summary", {}) if isinstance(data, dict) else {}
+
+    total_submitted = summary.get("total_executions", 0)
+    total_completed = summary.get("total_executions_finished", 0)
+    total_failed = summary.get("total_executions_failed", 0)
+    total_cancelled = summary.get("total_executions_cancelled", 0)
+    total_new_users = summary.get("total_users", 0)
+
+    # --- extract user stats ------------------------------------------------
+    user_data = {}
+    if isinstance(user_stats, dict) and not user_stats.get("error"):
+        user_data = user_stats.get("data", user_stats)
+        if not isinstance(user_data, dict):
+            user_data = {}
+
+    geo = user_data.get("geographic_distribution", {})
+    if isinstance(geo, list):
+        new_user_countries = len(geo)
+    elif isinstance(geo, dict):
+        countries = geo.get("countries", geo)
+        new_user_countries = len(countries) if isinstance(countries, dict) else 0
+    else:
+        new_user_countries = 0
+
+    activity = user_data.get("activity_stats", {})
+    active_users = activity.get("active_users_in_period", 0)
+    active_countries = activity.get("active_users_countries", 0)
+
+    # Period-aware labels: "All Time" shows totals, other periods show "New"
+    if ui_period == "all":
+        reg_label = _("Registered Users")
+        reg_countries_label = _("Countries (Registered)")
+    else:
+        reg_label = _("New Users")
+        reg_countries_label = _("Countries (New Users)")
+
+    # --- build card grid ---------------------------------------------------
+    return html.Div(
+        [
+            # Row 1: execution metrics
+            html.Div(
+                [
+                    html.Div(
+                        _stat_card(_("Submitted"), total_submitted, color_class="text-primary"),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(_("Completed"), total_completed, color_class="text-success"),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(_("Failed"), total_failed, color_class="text-danger"),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(_("Cancelled"), total_cancelled, color_class="text-warning"),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                ],
+                className="row",
+            ),
+            # Row 2: user metrics
+            html.Div(
+                [
+                    html.Div(
+                        _stat_card(reg_label, total_new_users, color_class="text-info"),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(
+                            reg_countries_label,
+                            new_user_countries,
+                            color_class="text-info",
+                        ),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(
+                            _("Active Users"),
+                            active_users,
+                            color_class="text-info",
+                        ),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                    html.Div(
+                        _stat_card(
+                            _("Countries (Active Users)"),
+                            active_countries,
+                            color_class="text-info",
+                        ),
+                        className="col-md-3 col-sm-6 mb-3",
+                    ),
+                ],
+                className="row",
+            ),
+        ],
+        className="mb-4",
+    )
 
 
 def create_dashboard_summary_cards(dashboard_stats_data, scripts_count=None):

@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 from ..config import STATUS_REFRESH_INTERVAL
 from ..i18n import gettext as _
 from ..utils.stats_visualizations import (
+    build_period_summary_cards,
     create_execution_statistics_chart,
     create_script_version_histogram,
     create_top_users_chart,
@@ -594,7 +595,8 @@ def _build_stats_components(
     latest_status = status_data.get("latest_status", {})
     latest_status["scripts_count"] = scripts_count
 
-    stats_cards = html.Div()  # Dashboard summary cards removed as duplicative
+    dashboard_stats = stats_data.get("dashboard_stats")
+    stats_cards = build_period_summary_cards(dashboard_stats, user_stats, ui_period=ui_period)
     user_map = create_user_geographic_map(user_stats, iso_resolver=iso_resolver)
     status_time_series = (
         time_series_data.get("data") if isinstance(time_series_data, dict) else time_series_data
