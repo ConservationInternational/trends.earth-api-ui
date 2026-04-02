@@ -81,7 +81,7 @@ def test_month_period_retains_running_chart(sample_execution_stats):
     titles = _extract_chart_titles(charts)
 
     assert any(title == "Running executions" for title in titles)
-    assert any("Completed executions (cumulative)" in title for title in titles)
+    assert any("Cumulative completed tasks" in title for title in titles)
 
 
 def test_all_period_uses_monthly_aggregation_label(sample_execution_stats):

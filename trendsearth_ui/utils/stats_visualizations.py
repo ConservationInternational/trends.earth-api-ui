@@ -897,46 +897,78 @@ def create_execution_statistics_chart(
             charts.extend(execution_charts)
 
         # 3. Execution Performance - handle actual data structure
-        # API returns a list of task objects, not a dict with by_status
+        # API returns a list of task objects with per-version breakdown
         task_performance_data = data.get("task_performance", [])
         logger.info(f"Task performance data: {task_performance_data}")
 
         if task_performance_data and isinstance(task_performance_data, list):
-            # Create a chart showing tasks by execution count
-            task_names = []
-            execution_counts = []
-            success_rates = []
+            # ── helpers for version-aware charts ──────────────────────
+            import plotly.colors
 
-            for task in task_performance_data[:10]:  # Top 10 tasks
-                if isinstance(task, dict):
-                    name = task.get("task", "Unknown")
-                    total_execs = task.get("total_executions", 0)
-                    success_rate = task.get("success_rate", 0)
+            _PALETTE = plotly.colors.qualitative.Set2
 
-                    task_names.append(name)
-                    execution_counts.append(total_execs)
-                    success_rates.append(success_rate)
+            def _ver_label(v: str) -> str:
+                return f"v{v}" if v else _("base")
 
-            if task_names and execution_counts:
-                # Create horizontal bar chart for task performance
-                fig_tasks = go.Figure(
-                    data=[
-                        go.Bar(
-                            x=execution_counts,
-                            y=task_names,
-                            orientation="h",
-                            hovertemplate="<b>%{y}</b><br>Executions: %{x}<br>Success Rate: %{customdata}%<extra></extra>",
-                            customdata=success_rates,
+            # Top-10 tasks (sorted by total_executions desc from API)
+            top_tasks = [t for t in task_performance_data[:10] if isinstance(t, dict)]
+            # Plotly draws the *last* y-value at the top, so reverse so
+            # the highest-count task sits at the visual top.
+            top_tasks = list(reversed(top_tasks))
+            task_names = [t.get("task", "Unknown") for t in top_tasks]
+
+            # Collect every unique version that appears in the top tasks,
+            # sorted newest-first for a consistent legend order.
+            all_versions: list[str] = []
+            seen_versions: set[str] = set()
+            for t in task_performance_data[:10]:
+                if not isinstance(t, dict):
+                    continue
+                for v in t.get("versions", []):
+                    vl = v.get("version", "")
+                    if vl not in seen_versions:
+                        seen_versions.add(vl)
+                        all_versions.append(vl)
+
+            def _ver_color(idx: int) -> str:
+                return _PALETTE[idx % len(_PALETTE)]
+
+            # ── Chart 1: Execution count (stacked) ───────────────────
+            if task_names:
+                fig_tasks = go.Figure()
+                for vi, ver in enumerate(all_versions):
+                    counts = []
+                    hovers = []
+                    for t in top_tasks:
+                        cnt = 0
+                        for vd in t.get("versions", []):
+                            if vd.get("version", "") == ver:
+                                cnt = vd.get("total_executions", 0)
+                                break
+                        counts.append(cnt)
+                        hovers.append(
+                            f"<b>{t.get('task', '')}</b><br>"
+                            f"Version: {_ver_label(ver)}<br>"
+                            f"Executions: {cnt}<extra></extra>"
                         )
-                    ]
-                )
-
+                    fig_tasks.add_trace(
+                        go.Bar(
+                            name=_ver_label(ver),
+                            y=task_names,
+                            x=counts,
+                            orientation="h",
+                            marker_color=_ver_color(vi),
+                            hovertemplate=hovers,
+                        )
+                    )
                 fig_tasks.update_layout(
+                    barmode="stack",
                     xaxis_title=_("Number of Executions"),
-                    height=max(300, len(task_names) * 30),
+                    height=max(300, len(task_names) * 40),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    legend={"traceorder": "normal"},
+                    template="plotly_white",
                 )
-
                 charts.append(
                     html.Div(
                         [
@@ -952,20 +984,15 @@ def create_execution_statistics_chart(
                     )
                 )
 
-            # Create a second chart for task duration
+            # ── Chart 2: Execution duration (weighted avg, single bar) ─
             if task_names:
                 durations = []
-                for task in task_performance_data[:10]:  # Top 10 tasks
-                    if isinstance(task, dict):
-                        duration_str = task.get("avg_duration_minutes", "0")
-                        try:
-                            if isinstance(duration_str, str):
-                                duration = float(duration_str)
-                            else:
-                                duration = float(duration_str) if duration_str else 0
-                        except (ValueError, TypeError):
-                            duration = 0
-                        durations.append(duration)
+                for t in top_tasks:
+                    dur = t.get("avg_duration_minutes", 0)
+                    try:
+                        durations.append(float(dur) if dur else 0)
+                    except (ValueError, TypeError):
+                        durations.append(0)
 
                 fig_duration = go.Figure(
                     data=[
@@ -973,19 +1000,19 @@ def create_execution_statistics_chart(
                             x=durations,
                             y=task_names,
                             orientation="h",
-                            hovertemplate="<b>%{y}</b><br>Avg Duration: %{x:.1f} minutes<br>Success Rate: %{customdata}%<extra></extra>",
-                            customdata=success_rates,
                             marker_color="#ff7043",
+                            hovertemplate=(
+                                "<b>%{y}</b><br>Avg Duration: %{x:.1f} min<extra></extra>"
+                            ),
                         )
                     ]
                 )
-
                 fig_duration.update_layout(
                     xaxis_title=_("Average Duration (minutes)"),
-                    height=max(300, len(task_names) * 30),
+                    height=max(300, len(task_names) * 40),
                     margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    template="plotly_white",
                 )
-
                 charts.append(
                     html.Div(
                         [
@@ -1003,80 +1030,118 @@ def create_execution_statistics_chart(
                     )
                 )
 
-                # Top 10 scripts by failure count with failure-rate bars
-                failure_entries: list[dict[str, Any]] = []
-                for task in task_performance_data:
-                    if not isinstance(task, dict):
-                        continue
-                    total = task.get("total_executions", 0) or 0
-                    rate = task.get("success_rate", 100)
+            # ── Chart 3: Top scripts by failure count (stacked) ──────
+            # Build per-version failure entries for each task, then
+            # rank by aggregate failure count and show stacked bars.
+            failure_by_task: dict[str, list[dict[str, Any]]] = {}
+            task_total_failures: dict[str, int] = {}
+            for t in task_performance_data:
+                if not isinstance(t, dict):
+                    continue
+                tname = t.get("task", "Unknown")
+                task_failures = 0
+                ver_entries = []
+                for vd in t.get("versions", []):
+                    v_total = vd.get("total_executions", 0) or 0
+                    v_rate = vd.get("success_rate", 100)
                     try:
-                        failure_rate = round(100 - float(rate), 1)
+                        v_fail_rate = 100 - float(v_rate)
                     except (ValueError, TypeError):
-                        failure_rate = 0.0
-                    failures = round(total * failure_rate / 100)
-                    if failures > 0:
-                        failure_entries.append(
+                        v_fail_rate = 0.0
+                    v_failures = round(v_total * v_fail_rate / 100)
+                    if v_failures > 0:
+                        ver_entries.append(
                             {
-                                "task": task.get("task", "Unknown"),
-                                "failure_rate": failure_rate,
-                                "failures": failures,
-                                "total": total,
+                                "version": vd.get("version", ""),
+                                "failures": v_failures,
+                                "total": v_total,
+                                "failure_rate": round(v_fail_rate, 1),
                             }
                         )
+                        task_failures += v_failures
+                if task_failures > 0:
+                    failure_by_task[tname] = ver_entries
+                    task_total_failures[tname] = task_failures
 
-                if failure_entries:
-                    failure_entries.sort(key=lambda e: e["failures"], reverse=True)
-                    top_failures = failure_entries[:10]
-                    # Reverse so largest is at top of horizontal bar chart
-                    top_failures.reverse()
+            if failure_by_task:
+                # Top 10 tasks by total failures, reversed so largest
+                # is at the visual top of the horizontal chart.
+                top_fail_names = sorted(
+                    failure_by_task, key=lambda n: task_total_failures[n], reverse=True
+                )[:10]
+                top_fail_names = list(reversed(top_fail_names))
 
-                    fig_failure = go.Figure(
-                        data=[
-                            go.Bar(
-                                x=[e["failure_rate"] for e in top_failures],
-                                y=[e["task"] for e in top_failures],
-                                orientation="h",
-                                marker_color="#e53935",
-                                hovertemplate=(
-                                    "<b>%{y}</b><br>"
-                                    "Failure rate: %{x:.1f}%<br>"
-                                    "Failures: %{customdata[0]}<br>"
-                                    "Total: %{customdata[1]}"
-                                    "<extra></extra>"
-                                ),
-                                customdata=[[e["failures"], e["total"]] for e in top_failures],
-                            )
-                        ]
-                    )
+                # Collect unique versions across these top-failure tasks
+                fail_versions: list[str] = []
+                fail_seen: set[str] = set()
+                for n in top_fail_names:
+                    for ve in failure_by_task[n]:
+                        vl = ve["version"]
+                        if vl not in fail_seen:
+                            fail_seen.add(vl)
+                            fail_versions.append(vl)
 
-                    fig_failure.update_layout(
-                        xaxis_title=_("Failure Rate (%)"),
-                        xaxis={"range": [0, 100]},
-                        height=max(300, len(top_failures) * 30),
-                        margin={"l": 40, "r": 40, "t": 40, "b": 40},
-                        template="plotly_white",
-                    )
-
-                    charts.append(
-                        html.Div(
-                            [
-                                html.H6(
-                                    _("Top scripts by failure count{suffix_label}").format(
-                                        suffix_label=suffix_label
-                                    )
-                                ),
-                                dcc.Graph(
-                                    figure=fig_failure,
-                                    config={
-                                        "displayModeBar": False,
-                                        "responsive": True,
-                                    },
-                                ),
-                            ],
-                            className="mb-3",
+                fig_failure = go.Figure()
+                for vi, ver in enumerate(fail_versions):
+                    counts = []
+                    hovers = []
+                    for n in top_fail_names:
+                        cnt = 0
+                        rate = 0.0
+                        total = 0
+                        for ve in failure_by_task.get(n, []):
+                            if ve["version"] == ver:
+                                cnt = ve["failures"]
+                                rate = ve["failure_rate"]
+                                total = ve["total"]
+                                break
+                        counts.append(cnt)
+                        hovers.append(
+                            f"<b>{n}</b><br>"
+                            f"Version: {_ver_label(ver)}<br>"
+                            f"Failures: {cnt}<br>"
+                            f"Failure rate: {rate:.1f}%<br>"
+                            f"Total: {total}"
+                            f"<extra></extra>"
+                        )
+                    fig_failure.add_trace(
+                        go.Bar(
+                            name=_ver_label(ver),
+                            y=top_fail_names,
+                            x=counts,
+                            orientation="h",
+                            marker_color=_ver_color(vi),
+                            hovertemplate=hovers,
                         )
                     )
+
+                fig_failure.update_layout(
+                    barmode="stack",
+                    xaxis_title=_("Failure Count"),
+                    height=max(300, len(top_fail_names) * 40),
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    legend={"traceorder": "normal"},
+                    template="plotly_white",
+                )
+                charts.append(
+                    html.Div(
+                        [
+                            html.H6(
+                                _("Top scripts by failure count{suffix_label}").format(
+                                    suffix_label=suffix_label
+                                )
+                            ),
+                            dcc.Graph(
+                                figure=fig_failure,
+                                config={
+                                    "displayModeBar": False,
+                                    "responsive": True,
+                                },
+                            ),
+                        ],
+                        className="mb-3",
+                    )
+                )
 
         return (
             charts
@@ -1270,14 +1335,24 @@ def create_script_version_histogram(
             if not isinstance(entry, dict):
                 continue
             total_tasks += 1
-            task = entry.get("task", "") or ""
-            executions = int(entry.get("total_executions", 0))
-
-            version = _parse_script_version(task)
-            if version:
-                version_executions[version] = version_executions.get(version, 0) + executions
+            versions_list = entry.get("versions", [])
+            if versions_list:
+                for v in versions_list:
+                    ver = v.get("version", "") if isinstance(v, dict) else ""
+                    execs = int(v.get("total_executions", 0)) if isinstance(v, dict) else 0
+                    if ver:
+                        version_executions[ver] = version_executions.get(ver, 0) + execs
+                    else:
+                        unparsed_executions += execs
             else:
-                unparsed_executions += executions
+                # Fallback: try parsing version from the task name
+                task = entry.get("task", "") or ""
+                executions = int(entry.get("total_executions", 0))
+                version = _parse_script_version(task)
+                if version:
+                    version_executions[version] = version_executions.get(version, 0) + executions
+                else:
+                    unparsed_executions += executions
 
         if not version_executions:
             return [
