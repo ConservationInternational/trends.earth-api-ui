@@ -112,7 +112,11 @@ while [ $attempt -lt $max_attempts ]; do
             
             # Check if port is listening
             echo "🔗 Port check:"
-            netstat -tulpn | grep ":$PORT " || echo "Port $PORT not listening"
+            ss -tlnp | grep ":$PORT " || netstat -tulpn | grep ":$PORT " || echo "Port $PORT not listening"
+            
+            # Check ingress network health
+            echo "🌐 Ingress mesh check:"
+            sudo nsenter --net=/var/run/docker/netns/ingress_sbox iptables -t nat -nvL 2>/dev/null | grep "$PORT" || echo "No ingress NAT rules for port $PORT"
             
             exit 1
         fi

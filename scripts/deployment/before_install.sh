@@ -38,11 +38,29 @@ done
 
 echo "✅ Docker is ready"
 
+# ============================================================================
+# Verify AWS CLI and ECR Access
+# ============================================================================
+
+echo "🔍 Verifying AWS CLI..."
+if ! command -v aws &> /dev/null; then
+    echo "❌ AWS CLI is not installed"
+    exit 1
+fi
+
 # Configure ECR authentication
 echo "🔐 Configuring ECR authentication..."
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 AWS_REGION=$(aws configure get region || echo "us-east-1")
 ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+# Verify EC2 instance role has access to ECR
+echo "🔐 Testing ECR access via instance role..."
+if ! aws ecr get-login-password --region "$AWS_REGION" > /dev/null 2>&1; then
+    echo "❌ Cannot authenticate to ECR. Ensure EC2 instance has proper IAM role."
+    exit 1
+fi
+echo "✅ ECR access verified"
 
 # Login to ECR
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"

@@ -23,9 +23,11 @@ services:
     deploy:
       replicas: 2
       resources:
+        limits:
+          memory: 512M
         reservations:
           cpus: "0.25"
-          memory: 100M
+          memory: 256M
       restart_policy:
         condition: on-failure
         delay: 5s

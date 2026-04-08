@@ -2,6 +2,11 @@ version: 0.0
 os: linux
 
 hooks:
+  ApplicationStop:
+    - location: scripts/deployment/application_stop.sh
+      timeout: 120
+      runas: root
+
   BeforeInstall:
     - location: scripts/deployment/before_install.sh
       timeout: 300
@@ -24,3 +29,5 @@ files:
     destination: /opt/trends-earth-ui-staging/
   - source: scripts/deployment/
     destination: /opt/trends-earth-ui/scripts/deployment/
+  - source: scripts/deployment/
+    destination: /opt/trends-earth-ui-staging/scripts/deployment/

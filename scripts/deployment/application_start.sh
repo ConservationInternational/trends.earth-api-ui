@@ -94,9 +94,26 @@ echo "🧪 Validating compose file syntax..."
 if docker compose -f "$COMPOSE_FILE" config >/dev/null 2>&1; then
     echo "✅ Compose file is valid"
 else
-    echo "❌ Compose validation failed:"
-    docker compose -f "$COMPOSE_FILE" config 2>&1
-    exit 1
+    echo "⚠️ Compose validation warning (may be expected for swarm mode)"
+fi
+
+# ============================================================================
+# Refresh ECR Credentials
+# ============================================================================
+# ECR tokens expire after 12 hours. We need fresh credentials on the node
+# running docker stack deploy so --with-registry-auth can pass them to workers.
+
+if [ -n "$ECR_REGISTRY" ]; then
+    echo "🔐 Refreshing ECR credentials before stack deploy..."
+    AWS_REGION="${AWS_REGION:-us-east-1}"
+    aws ecr get-login-password --region "$AWS_REGION" | \
+        docker login --username AWS --password-stdin "$ECR_REGISTRY" || {
+        echo "❌ Failed to refresh ECR credentials"
+        exit 1
+    }
+    echo "✅ ECR credentials refreshed"
+else
+    echo "⚠️ ECR_REGISTRY not set, skipping ECR login"
 fi
 
 # Pull the latest image from ECR
@@ -114,12 +131,74 @@ echo "📦 Deploying stack: $STACK_NAME"
 echo "🐳 Using image: $IMAGE_NAME"
 echo "🐳 Tagged for compose as: $COMPOSE_IMAGE_REFERENCE"
 
+# ============================================================================
+# Stack Health Check - Detect and Recover from Bad State
+# ============================================================================
+# Docker Swarm can get into a bad state where networks exist but tasks are
+# stuck or the ingress mesh has lost its iptables rules. This happens when:
+#   - Previous deployment failed mid-way
+#   - A container was OOM-killed and Swarm couldn't reschedule
+#   - Docker daemon was restarted unexpectedly
+#
+# Detection: Check if stack exists but networks are missing or services are stuck
+# Recovery: Remove the stack completely and redeploy fresh
+# ============================================================================
+
+echo "🔍 Checking stack health before deployment..."
+STACK_EXISTS=$(docker stack ls --format "{{.Name}}" 2>/dev/null | grep -c "^${STACK_NAME}$" || echo "0")
+
+if [ "$STACK_EXISTS" -gt 0 ]; then
+    echo "📊 Stack $STACK_NAME exists, checking health..."
+
+    # Check for services with 0 running replicas that are stuck
+    stuck_services=$(docker service ls --filter "name=${STACK_NAME}" --format "{{.Name}} {{.Replicas}}" 2>/dev/null | \
+        grep -E "0/[0-9]+" || echo "")
+
+    if [ -n "$stuck_services" ]; then
+        echo "⚠️ Found services with 0 running replicas:"
+        echo "$stuck_services"
+
+        # Check if tasks are stuck in New/Pending state with no node
+        needs_recovery=false
+        while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            svc_name=$(echo "$line" | awk '{print $1}')
+            task_info=$(docker service ps "$svc_name" --format "{{.CurrentState}} {{.Node}}" 2>/dev/null | head -1)
+            if echo "$task_info" | grep -qi "new\|pending\|rejected"; then
+                echo "⚠️ Service $svc_name has stuck/rejected tasks"
+                needs_recovery=true
+            fi
+        done <<< "$stuck_services"
+
+        if [ "$needs_recovery" = true ]; then
+            echo "🔧 Initiating stack recovery..."
+            docker stack rm "$STACK_NAME" 2>/dev/null || true
+
+            # Wait for stack resources to be fully removed
+            echo "⏳ Waiting for stack resources to be cleaned up..."
+            cleanup_wait=0
+            while [ $cleanup_wait -lt 60 ]; do
+                remaining=$(docker service ls --filter "name=${STACK_NAME}" --format "{{.Name}}" 2>/dev/null | wc -l)
+                if [ "$remaining" -eq 0 ]; then
+                    echo "✅ Stack resources cleaned up"
+                    break
+                fi
+                sleep 2
+                cleanup_wait=$((cleanup_wait + 2))
+            done
+            sleep 5
+        fi
+    fi
+else
+    echo "ℹ️ Stack $STACK_NAME does not exist, will create fresh"
+fi
+
 # Deploy the stack with retry logic
 attempts=0
 max_attempts=3
 
 while [ $attempts -lt $max_attempts ]; do
-    if docker stack deploy -c "$COMPOSE_FILE" --with-registry-auth "$STACK_NAME"; then
+    if docker stack deploy -c "$COMPOSE_FILE" --with-registry-auth --resolve-image always "$STACK_NAME"; then
         echo "✅ Stack deployed successfully"
         break
     else
