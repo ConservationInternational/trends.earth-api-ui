@@ -49,6 +49,8 @@ jobs:
       - name: Install Transifex CLI
         run: |
           curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
+          mkdir -p "$HOME/.local/bin"
+          mv tx "$HOME/.local/bin/"
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Extract translatable strings
