@@ -542,17 +542,33 @@ def register_callbacks(app):
             return no_update, no_update, no_update, no_update
 
         try:
-            from ..utils.helpers import make_authenticated_request
+            from ..utils.helpers import FAST_API_TIMEOUT, make_authenticated_request
 
             # Make the cancel request
             resp = make_authenticated_request(
-                f"/execution/{execution_id}/cancel", token, method="POST"
+                f"/execution/{execution_id}/cancel",
+                token,
+                method="POST",
+                timeout=FAST_API_TIMEOUT,
             )
 
-            if resp.status_code == 200:
+            if resp.status_code in [200, 202]:
                 result = resp.json()
                 execution_info = result.get("data", {}).get("execution", {})
                 cancellation_details = result.get("data", {}).get("cancellation_details", {})
+                new_status = execution_info.get("status", _("Unknown"))
+                cancellation_queued = cancellation_details.get("queued", False)
+
+                title_text = (
+                    _("Cancellation Requested")
+                    if new_status == "CANCELLING" or resp.status_code == 202
+                    else _("Execution Cancelled Successfully")
+                )
+                title_class = (
+                    "text-warning mb-3"
+                    if new_status == "CANCELLING" or resp.status_code == 202
+                    else "text-success mb-3"
+                )
 
                 # Format the result for display
                 result_content = []
@@ -561,7 +577,8 @@ def register_callbacks(app):
                 result_content.extend(
                     [
                         html.H5(
-                            _("Execution Cancelled Successfully"), className="text-success mb-3"
+                            title_text,
+                            className=title_class,
                         ),
                         html.Div(
                             [
@@ -591,7 +608,9 @@ def register_callbacks(app):
                                 html.Strong(_("New Status: ")),
                                 html.Span(
                                     execution_info.get("status", _("Unknown")),
-                                    className="text-danger fw-bold",
+                                    className="text-warning fw-bold"
+                                    if new_status == "CANCELLING"
+                                    else "text-danger fw-bold",
                                 ),
                             ],
                             className="mb-4",
@@ -599,41 +618,53 @@ def register_callbacks(app):
                     ]
                 )
 
+                if cancellation_queued:
+                    result_content.append(
+                        html.Div(
+                            _(
+                                "Cancellation was accepted and queued. "
+                                "Refresh in a few seconds to see final status."
+                            ),
+                            className="alert alert-warning mb-3",
+                        )
+                    )
+
                 # Docker service info
                 docker_stopped = cancellation_details.get("docker_service_stopped", False)
                 container_stopped = cancellation_details.get("docker_container_stopped", False)
 
-                result_content.extend(
-                    [
-                        html.H6(_("Infrastructure Cleanup"), className="mb-2"),
-                        html.Div(
-                            [
-                                html.I(
-                                    className=f"fas fa-{'check text-success' if docker_stopped else 'times text-danger'} me-2"
-                                ),
-                                _("Docker service stopped")
-                                if docker_stopped
-                                else _("Docker service not found/stopped"),
-                            ],
-                            className="mb-1",
-                        ),
-                        html.Div(
-                            [
-                                html.I(
-                                    className=f"fas fa-{'check text-success' if container_stopped else 'times text-warning'} me-2"
-                                ),
-                                _("Docker container stopped")
-                                if container_stopped
-                                else _("Docker container not found/stopped"),
-                            ],
-                            className="mb-3",
-                        ),
-                    ]
-                )
+                if not cancellation_queued:
+                    result_content.extend(
+                        [
+                            html.H6(_("Infrastructure Cleanup"), className="mb-2"),
+                            html.Div(
+                                [
+                                    html.I(
+                                        className=f"fas fa-{'check text-success' if docker_stopped else 'times text-danger'} me-2"
+                                    ),
+                                    _("Docker service stopped")
+                                    if docker_stopped
+                                    else _("Docker service not found/stopped"),
+                                ],
+                                className="mb-1",
+                            ),
+                            html.Div(
+                                [
+                                    html.I(
+                                        className=f"fas fa-{'check text-success' if container_stopped else 'times text-warning'} me-2"
+                                    ),
+                                    _("Docker container stopped")
+                                    if container_stopped
+                                    else _("Docker container not found/stopped"),
+                                ],
+                                className="mb-3",
+                            ),
+                        ]
+                    )
 
                 # GEE tasks info
                 gee_tasks = cancellation_details.get("gee_tasks_cancelled", [])
-                if gee_tasks:
+                if not cancellation_queued and gee_tasks:
                     result_content.extend(
                         [
                             html.H6(_("Google Earth Engine Tasks"), className="mb-2"),
@@ -672,7 +703,7 @@ def register_callbacks(app):
                                 className="mb-1",
                             )
                         )
-                else:
+                elif not cancellation_queued:
                     result_content.append(
                         html.Div(
                             [
@@ -696,6 +727,28 @@ def register_callbacks(app):
                         ]
                     )
 
+            elif resp.status_code == 409:
+                content_type = resp.headers.get("content-type", "")
+                error_data = resp.json() if "application/json" in content_type else {}
+                result_content = [
+                    html.H5(_("Cancellation Already In Progress"), className="text-warning mb-3"),
+                    html.Div(
+                        [
+                            html.Strong(_("Message: ")),
+                            html.Span(
+                                error_data.get(
+                                    "detail",
+                                    _("Cancellation has already been requested for this execution."),
+                                )
+                            ),
+                        ],
+                        className="mb-2",
+                    ),
+                    html.Div(
+                        [html.Strong(_("Execution ID: ")), html.Span(execution_id)],
+                        className="mb-2",
+                    ),
+                ]
             else:
                 # Error response
                 content_type = resp.headers.get("content-type", "")
@@ -734,7 +787,12 @@ def register_callbacks(app):
                 if table_state.get("filter_sql"):
                     params["filter"] = table_state["filter_sql"]
 
-            refresh_resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
+            refresh_resp = make_authenticated_request(
+                EXECUTION_ENDPOINT,
+                token,
+                params=params,
+                timeout=FAST_API_TIMEOUT,
+            )
             table_response = {"rowData": [], "rowCount": 0}
 
             if refresh_resp.status_code == 200:

@@ -13,6 +13,10 @@ from .timezone_utils import format_local_time, get_safe_timezone
 
 logger = logging.getLogger(__name__)
 
+# Requests timeout policy: (connect timeout, read timeout)
+DEFAULT_API_TIMEOUT = (3, 20)
+FAST_API_TIMEOUT = (3, 10)
+
 
 def parse_date(date_str, user_timezone="UTC"):
     """Parse date string and return formatted string for ag-grid with timezone conversion.
@@ -277,6 +281,7 @@ def make_authenticated_request(
     headers = apply_default_headers(kwargs.get("headers"))
     headers["Authorization"] = f"Bearer {token}"
     kwargs["headers"] = headers
+    kwargs.setdefault("timeout", DEFAULT_API_TIMEOUT)
 
     # Make the initial request
     session = get_session()
