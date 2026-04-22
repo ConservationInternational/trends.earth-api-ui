@@ -738,7 +738,9 @@ def register_callbacks(app):
                             html.Span(
                                 error_data.get(
                                     "detail",
-                                    _("Cancellation has already been requested for this execution."),
+                                    _(
+                                        "Cancellation has already been requested for this execution."
+                                    ),
                                 )
                             ),
                         ],
