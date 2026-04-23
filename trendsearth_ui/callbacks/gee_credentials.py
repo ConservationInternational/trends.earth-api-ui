@@ -124,7 +124,7 @@ def register_callbacks(app):
             Output("profile-gee-oauth-alert", "children"),
             Output("profile-gee-oauth-alert", "color"),
             Output("profile-gee-oauth-alert", "is_open"),
-            Output("url", "href"),
+            Output("gee-oauth-redirect-url", "data"),
         ],
         [Input("profile-gee-oauth-btn", "n_clicks")],
         [State("token-store", "data")],
@@ -436,3 +436,20 @@ def register_callbacks(app):
                 True,
                 idle_spinner,
             )
+
+    # Clientside callback: navigate to external OAuth URL stored by initiate_gee_oauth.
+    # dcc.Location uses history.pushState() which browsers block for cross-origin URLs,
+    # so we must do the redirect from JavaScript instead.
+    app.clientside_callback(
+        """
+        function(auth_url) {
+            if (auth_url) {
+                window.location.href = auth_url;
+            }
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("gee-oauth-redirect-url", "data", allow_duplicate=True),
+        Input("gee-oauth-redirect-url", "data"),
+        prevent_initial_call=True,
+    )
