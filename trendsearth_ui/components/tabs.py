@@ -885,6 +885,82 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
+                    dbc.CardHeader(html.H4("Change Password")),
+                    dbc.CardBody(
+                        [
+                            dbc.Form(
+                                [
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Current Password"),
+                                                    dbc.Input(
+                                                        id="current-password",
+                                                        type="password",
+                                                        placeholder="Enter current password",
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("New Password"),
+                                                    dbc.Input(
+                                                        id="new-password",
+                                                        type="password",
+                                                        placeholder="Enter new password",
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Confirm New Password"),
+                                                    dbc.Input(
+                                                        id="confirm-password",
+                                                        type="password",
+                                                        placeholder="Confirm new password",
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Button(
+                                                        "Change Password",
+                                                        id="change-password-btn",
+                                                        color="secondary",
+                                                    ),
+                                                    dbc.Alert(
+                                                        id="password-change-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ]
+                                    ),
+                                ]
+                            )
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            dbc.Card(
+                [
                     dbc.CardHeader(html.H4(_("Email Notifications"))),
                     dbc.CardBody(
                         [
@@ -1214,251 +1290,269 @@ def profile_tab_content(user_data):
                 ],
                 className="mb-4",
             ),
-            # OpenEO Credentials Section
-            dbc.Card(
+            # OpenEO Credentials Section (admin/superadmin only)
+            html.Div(
                 [
-                    dbc.CardHeader(html.H4(_("openEO Account"))),
-                    dbc.CardBody(
+                    dbc.Card(
                         [
-                            # Status display
-                            dbc.Row(
+                            dbc.CardHeader(html.H4(_("openEO Account"))),
+                            dbc.CardBody(
                                 [
-                                    dbc.Col(
+                                    # Status display
+                                    dbc.Row(
                                         [
-                                            html.H6(_("Current Credentials Status")),
-                                            html.Div(id="profile-openeo-status-display"),
-                                        ],
-                                        width=12,
-                                    ),
-                                ],
-                                className="mb-3",
-                            ),
-                            html.Hr(),
-                            # Credential type selector + form
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            html.H6(_("Configure openEO Credentials")),
-                                            html.P(
-                                                _(
-                                                    "Provide credentials for authenticating with an openEO backend. "
-                                                    "These are used when running openEO scripts."
-                                                ),
-                                                className="text-muted",
+                                            dbc.Col(
+                                                [
+                                                    html.H6(_("Current Credentials Status")),
+                                                    html.Div(id="profile-openeo-status-display"),
+                                                ],
+                                                width=12,
                                             ),
                                         ],
-                                        width=12,
+                                        className="mb-3",
                                     ),
-                                ],
-                                className="mb-3",
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(
+                                    html.Hr(),
+                                    # Credential type selector + form
+                                    dbc.Row(
                                         [
-                                            dbc.Label(_("Credential Type")),
-                                            dbc.RadioItems(
-                                                id="profile-openeo-cred-type",
-                                                options=[
-                                                    {
-                                                        "label": _("OIDC Refresh Token"),
-                                                        "value": "oidc_refresh_token",
-                                                    },
-                                                    {
-                                                        "label": _("Basic Auth"),
-                                                        "value": "basic",
-                                                    },
+                                            dbc.Col(
+                                                [
+                                                    html.H6(_("Configure openEO Credentials")),
+                                                    html.P(
+                                                        _(
+                                                            "Provide credentials for authenticating with an openEO backend. "
+                                                            "These are used when running openEO scripts."
+                                                        ),
+                                                        className="text-muted",
+                                                    ),
                                                 ],
-                                                value="oidc_refresh_token",
-                                                inline=True,
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-3",
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label(_("Credential Type")),
+                                                    dbc.RadioItems(
+                                                        id="profile-openeo-cred-type",
+                                                        options=[
+                                                            {
+                                                                "label": _("OIDC Refresh Token"),
+                                                                "value": "oidc_refresh_token",
+                                                            },
+                                                            {
+                                                                "label": _("Basic Auth"),
+                                                                "value": "basic",
+                                                            },
+                                                        ],
+                                                        value="oidc_refresh_token",
+                                                        inline=True,
+                                                        className="mb-3",
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                        className="mb-2",
+                                    ),
+                                    # OIDC fields
+                                    html.Div(
+                                        [
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    _("Client ID"),
+                                                                    html.Span(
+                                                                        " *", style={"color": "red"}
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Input(
+                                                                id="profile-openeo-oidc-client-id",
+                                                                type="text",
+                                                                placeholder=_("e.g. trends-earth"),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(_("Provider ID")),
+                                                            dbc.Input(
+                                                                id="profile-openeo-oidc-provider-id",
+                                                                type="text",
+                                                                placeholder=_(
+                                                                    "e.g. egi (optional)"
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(_("Client Secret")),
+                                                            dbc.Input(
+                                                                id="profile-openeo-oidc-client-secret",
+                                                                type="password",
+                                                                placeholder=_("Optional"),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    _("Refresh Token"),
+                                                                    html.Span(
+                                                                        " *", style={"color": "red"}
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Input(
+                                                                id="profile-openeo-oidc-refresh-token",
+                                                                type="password",
+                                                                placeholder=_(
+                                                                    "Your OIDC refresh token"
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
                                                 className="mb-3",
                                             ),
                                         ],
-                                        width=12,
+                                        id="profile-openeo-oidc-fields",
                                     ),
-                                ],
-                                className="mb-2",
-                            ),
-                            # OIDC fields
-                            html.Div(
-                                [
+                                    # Basic auth fields
+                                    html.Div(
+                                        [
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    _("Username"),
+                                                                    html.Span(
+                                                                        " *", style={"color": "red"}
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Input(
+                                                                id="profile-openeo-basic-username",
+                                                                type="text",
+                                                                placeholder=_("Username or email"),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                [
+                                                                    _("Password"),
+                                                                    html.Span(
+                                                                        " *", style={"color": "red"}
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                            dbc.Input(
+                                                                id="profile-openeo-basic-password",
+                                                                type="password",
+                                                                placeholder=_("Password"),
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                                className="mb-3",
+                                            ),
+                                        ],
+                                        id="profile-openeo-basic-fields",
+                                        style={"display": "none"},
+                                    ),
                                     dbc.Row(
                                         [
                                             dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        [
-                                                            _("Client ID"),
-                                                            html.Span(" *", style={"color": "red"}),
-                                                        ]
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-openeo-oidc-client-id",
-                                                        type="text",
-                                                        placeholder=_("e.g. trends-earth"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(_("Provider ID")),
-                                                    dbc.Input(
-                                                        id="profile-openeo-oidc-provider-id",
-                                                        type="text",
-                                                        placeholder=_("e.g. egi (optional)"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(_("Client Secret")),
-                                                    dbc.Input(
-                                                        id="profile-openeo-oidc-client-secret",
-                                                        type="password",
-                                                        placeholder=_("Optional"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        [
-                                                            _("Refresh Token"),
-                                                            html.Span(" *", style={"color": "red"}),
-                                                        ]
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-openeo-oidc-refresh-token",
-                                                        type="password",
-                                                        placeholder=_("Your OIDC refresh token"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                ],
-                                id="profile-openeo-oidc-fields",
-                            ),
-                            # Basic auth fields
-                            html.Div(
-                                [
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        [
-                                                            _("Username"),
-                                                            html.Span(" *", style={"color": "red"}),
-                                                        ]
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-openeo-basic-username",
-                                                        type="text",
-                                                        placeholder=_("Username or email"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        [
-                                                            _("Password"),
-                                                            html.Span(" *", style={"color": "red"}),
-                                                        ]
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-openeo-basic-password",
-                                                        type="password",
-                                                        placeholder=_("Password"),
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                ],
-                                id="profile-openeo-basic-fields",
-                                style={"display": "none"},
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            dbc.Button(
-                                                [
-                                                    html.I(className="fas fa-save me-2"),
-                                                    _("Save Credentials"),
-                                                ],
-                                                id="profile-openeo-save-btn",
-                                                color="primary",
-                                                className="me-2",
-                                            ),
-                                            dbc.Alert(
-                                                id="profile-openeo-save-alert",
-                                                is_open=False,
-                                                dismissable=True,
-                                                className="mt-2",
-                                            ),
-                                        ],
-                                        width=12,
-                                    ),
-                                ],
-                                className="mb-3",
-                            ),
-                            html.Hr(),
-                            # Management actions
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            html.H6(_("Manage Credentials")),
-                                            dbc.ButtonGroup(
                                                 [
                                                     dbc.Button(
-                                                        _("Check Credentials"),
-                                                        id="profile-openeo-check-btn",
-                                                        color="info",
-                                                        outline=True,
-                                                        disabled=True,
+                                                        [
+                                                            html.I(className="fas fa-save me-2"),
+                                                            _("Save Credentials"),
+                                                        ],
+                                                        id="profile-openeo-save-btn",
+                                                        color="primary",
+                                                        className="me-2",
                                                     ),
-                                                    dbc.Button(
-                                                        _("Delete Credentials"),
-                                                        id="profile-openeo-delete-btn",
-                                                        color="danger",
-                                                        outline=True,
-                                                        disabled=True,
+                                                    dbc.Alert(
+                                                        id="profile-openeo-save-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                        className="mt-2",
                                                     ),
                                                 ],
-                                                className="mb-2",
-                                            ),
-                                            dbc.Alert(
-                                                id="profile-openeo-management-alert",
-                                                is_open=False,
-                                                dismissable=True,
+                                                width=12,
                                             ),
                                         ],
-                                        width=12,
+                                        className="mb-3",
                                     ),
-                                ],
+                                    html.Hr(),
+                                    # Management actions
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    html.H6(_("Manage Credentials")),
+                                                    dbc.ButtonGroup(
+                                                        [
+                                                            dbc.Button(
+                                                                _("Check Credentials"),
+                                                                id="profile-openeo-check-btn",
+                                                                color="info",
+                                                                outline=True,
+                                                                disabled=True,
+                                                            ),
+                                                            dbc.Button(
+                                                                _("Delete Credentials"),
+                                                                id="profile-openeo-delete-btn",
+                                                                color="danger",
+                                                                outline=True,
+                                                                disabled=True,
+                                                            ),
+                                                        ],
+                                                        className="mb-2",
+                                                    ),
+                                                    dbc.Alert(
+                                                        id="profile-openeo-management-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                    ),
+                                                ],
+                                                width=12,
+                                            ),
+                                        ],
+                                    ),
+                                ]
                             ),
-                        ]
+                        ],
+                        className="mb-4",
                     ),
                 ],
-                className="mb-4",
+                id="profile-openeo-section",
+                style={"display": "none"},
             ),
             # Service Credentials Section
             dbc.Card(
@@ -1798,81 +1892,6 @@ def profile_tab_content(user_data):
             dcc.Store(id="service-creds-revoke-target", data=None),
             # Hidden store for scope mutual-exclusion (tracks previous value)
             dcc.Store(id="service-creds-scopes-prev", data=["all"]),
-            dbc.Card(
-                [
-                    dbc.CardHeader(html.H4("Change Password")),
-                    dbc.CardBody(
-                        [
-                            dbc.Form(
-                                [
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Current Password"),
-                                                    dbc.Input(
-                                                        id="current-password",
-                                                        type="password",
-                                                        placeholder="Enter current password",
-                                                    ),
-                                                ],
-                                                width=12,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("New Password"),
-                                                    dbc.Input(
-                                                        id="new-password",
-                                                        type="password",
-                                                        placeholder="Enter new password",
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Confirm New Password"),
-                                                    dbc.Input(
-                                                        id="confirm-password",
-                                                        type="password",
-                                                        placeholder="Confirm new password",
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                        className="mb-3",
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Button(
-                                                        "Change Password",
-                                                        id="change-password-btn",
-                                                        color="secondary",
-                                                    ),
-                                                    dbc.Alert(
-                                                        id="password-change-alert",
-                                                        is_open=False,
-                                                        dismissable=True,
-                                                    ),
-                                                ],
-                                                width=12,
-                                            ),
-                                        ]
-                                    ),
-                                ]
-                            )
-                        ]
-                    ),
-                ]
-            ),
             # Delete Account Section
             dbc.Card(
                 [

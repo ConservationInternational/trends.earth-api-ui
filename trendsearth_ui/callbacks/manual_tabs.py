@@ -30,6 +30,23 @@ def register_callbacks(app):
             return {"display": "none"}
 
     @app.callback(
+        Output("profile-openeo-section", "style"),
+        [
+            Input("role-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def toggle_openeo_section_visibility(role, token):
+        """Show openEO credentials section only for admin and superadmin users."""
+        if not token:
+            return {"display": "none"}
+
+        if role in ["ADMIN", "SUPERADMIN"]:
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
         Output("users-tab-li", "style"),
         [
             Input("role-store", "data"),
