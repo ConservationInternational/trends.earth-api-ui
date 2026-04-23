@@ -669,6 +669,170 @@ def reset_password_layout(token=None, api_environment="production"):
     )
 
 
+def gee_oauth_callback_layout(code=None, state=None, api_environment="production"):
+    """Create the GEE OAuth callback page layout.
+
+    This page is shown after Google redirects the user back following OAuth
+    authorization.  It auto-processes the code/state parameters and reports
+    success or failure.
+
+    Args:
+        code: The authorization code returned by Google
+        state: The CSRF state token returned by Google
+        api_environment: The API environment to use
+    """
+    has_params = bool(code and state)
+
+    return html.Div(
+        [
+            # Modal placeholder for consistent page structure
+            dbc.Modal(id="forgot-password-modal", is_open=False),
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "450px",
+                                                        "height": "auto",
+                                                    },
+                                                ),
+                                                style={
+                                                    "backgroundColor": "#495057",
+                                                    "padding": "20px 30px",
+                                                    "textAlign": "center",
+                                                    "display": "flex",
+                                                    "justifyContent": "center",
+                                                    "alignItems": "center",
+                                                },
+                                                className="mb-4",
+                                            ),
+                                            html.H4(
+                                                _("Connect Google Earth Engine"),
+                                                className="mb-4",
+                                            ),
+                                            # Hidden stores for code, state, environment
+                                            dcc.Store(
+                                                id="gee-oauth-callback-code",
+                                                data=code,
+                                            ),
+                                            dcc.Store(
+                                                id="gee-oauth-callback-state",
+                                                data=state,
+                                            ),
+                                            dcc.Store(
+                                                id="gee-oauth-callback-api-env",
+                                                data=api_environment,
+                                            ),
+                                            # Auto-process trigger: fires once after a short
+                                            # delay so token-store is populated first
+                                            dcc.Interval(
+                                                id="gee-oauth-auto-process",
+                                                interval=600,
+                                                max_intervals=1 if has_params else 0,
+                                                n_intervals=0,
+                                            ),
+                                            # Processing status area
+                                            html.Div(
+                                                id="gee-oauth-processing-container",
+                                                children=(
+                                                    html.Div(
+                                                        [
+                                                            dbc.Spinner(
+                                                                size="sm",
+                                                                color="primary",
+                                                                type="border",
+                                                                className="me-2",
+                                                            ),
+                                                            html.Span(
+                                                                _(
+                                                                    "Connecting your Google"
+                                                                    " Earth Engine account…"
+                                                                ),
+                                                                className="text-muted",
+                                                            ),
+                                                        ],
+                                                        className="d-flex align-items-center mb-3",
+                                                    )
+                                                    if has_params
+                                                    else dbc.Alert(
+                                                        _(
+                                                            "Invalid callback — missing"
+                                                            " authorization parameters."
+                                                        ),
+                                                        color="danger",
+                                                        className="mb-3",
+                                                    )
+                                                ),
+                                            ),
+                                            dbc.Alert(
+                                                id="gee-oauth-callback-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=None,
+                                                className="mb-3",
+                                            ),
+                                            html.Hr(),
+                                            dbc.Button(
+                                                _("Back to App"),
+                                                id="gee-oauth-back-btn",
+                                                color="link",
+                                                className="w-100",
+                                                href="/",
+                                            ),
+                                            html.Hr(),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        _("Privacy Policy"),
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        _("Terms of Use"),
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "450px"},
+                                width=6,
+                                className="mx-auto mt-4",
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+    )
+
+
 def registration_layout():
     """Create the user registration page layout.
 

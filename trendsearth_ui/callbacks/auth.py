@@ -13,6 +13,7 @@ import requests
 
 from ..components import (
     dashboard_layout,
+    gee_oauth_callback_layout,
     login_layout,
     registration_layout,
     reset_password_layout,
@@ -125,6 +126,47 @@ def register_callbacks(app):
         It checks for a token in the store, then falls back to checking the
         auth cookie, ensuring a single, reliable path for session initialization.
         """
+        # Check if this is a GEE OAuth callback page request
+        if _pathname and _pathname.startswith("/gee-oauth-callback"):
+            code = None
+            state = None
+            api_env = current_api_environment or "production"
+            if search:
+                params = parse_qs(search[1:] if search.startswith("?") else search)
+                code = params.get("code", [None])[0]
+                state = params.get("state", [None])[0]
+                env_param = params.get("env", [None])[0]
+                if env_param:
+                    api_env = env_param
+
+            # Re-hydrate the auth token from the cookie so the processing
+            # callback can call the API on behalf of the returning user.
+            cookie_token = None
+            try:
+                import json as _json
+
+                from flask import request as _request
+
+                auth_cookie = _request.cookies.get("auth_token")
+                if auth_cookie:
+                    cookie_data = _json.loads(auth_cookie)
+                    if isinstance(cookie_data, dict):
+                        cookie_token = cookie_data.get("access_token")
+                        cookie_env = cookie_data.get("api_environment")
+                        if cookie_env:
+                            api_env = cookie_env
+            except Exception as e:
+                log_exception(logger, f"Cookie read failed in GEE OAuth callback: {e}")
+
+            return (
+                gee_oauth_callback_layout(code=code, state=state, api_environment=api_env),
+                False,  # Don't clear token-store
+                token or cookie_token,  # Prefer existing in-store token; fall back to cookie
+                None,
+                None,
+                api_env,
+            )
+
         # Check if this is a password reset page request
         if _pathname and _pathname.startswith("/reset-password"):
             # Extract token from query parameters

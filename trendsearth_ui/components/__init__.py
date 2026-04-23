@@ -3,6 +3,7 @@
 from .layout import (
     create_main_layout,
     dashboard_layout,
+    gee_oauth_callback_layout,
     login_layout,
     registration_layout,
     reset_password_layout,
@@ -33,6 +34,7 @@ from .tabs import (
 
 __all__ = [
     "create_main_layout",
+    "gee_oauth_callback_layout",
     "login_layout",
     "registration_layout",
     "reset_password_layout",

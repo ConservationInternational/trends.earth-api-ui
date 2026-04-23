@@ -124,6 +124,7 @@ def register_callbacks(app):
             Output("profile-gee-oauth-alert", "children"),
             Output("profile-gee-oauth-alert", "color"),
             Output("profile-gee-oauth-alert", "is_open"),
+            Output("url", "href"),
         ],
         [Input("profile-gee-oauth-btn", "n_clicks")],
         [State("token-store", "data")],
@@ -132,7 +133,7 @@ def register_callbacks(app):
     def initiate_gee_oauth(n_clicks, token):
         """Initiate Google Earth Engine OAuth flow."""
         if not n_clicks or not token:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
 
         try:
             from ..utils.helpers import make_authenticated_request
@@ -150,37 +151,17 @@ def register_callbacks(app):
                 auth_url = data.get("auth_url")
 
                 if auth_url:
-                    # Open the OAuth URL in a new window
-                    import webbrowser
-
-                    webbrowser.open(auth_url)
-
-                    return (
-                        [
-                            html.Div(
-                                [
-                                    html.I(className="fas fa-external-link-alt me-2"),
-                                    _(
-                                        "OAuth window opened. Please complete the authorization and return here."
-                                    ),
-                                    html.Br(),
-                                    html.Small(
-                                        _(
-                                            "After authorization, you may need to refresh this page to see the updated status."
-                                        ),
-                                        className="text-muted",
-                                    ),
-                                ]
-                            )
-                        ],
-                        "info",
-                        True,
-                    )
+                    # Navigate the browser to Google's authorization page.
+                    # The redirect_uri registered in the API points back to
+                    # this UI's /gee-oauth-callback route, which will complete
+                    # the exchange.
+                    return no_update, no_update, no_update, auth_url
                 else:
                     return (
                         _("OAuth initiation failed - no authorization URL received."),
                         "danger",
                         True,
+                        no_update,
                     )
             else:
                 error_msg = _("Failed to initiate OAuth flow.")
@@ -189,11 +170,13 @@ def register_callbacks(app):
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
                     logger.debug("Could not parse API error response", exc_info=True)
-                return error_msg, "danger", True
+                return error_msg, "danger", True, no_update
 
         except Exception as e:
             logger.exception("Error initiating OAuth: %s", e)
-            return _("Network error: {error}").format(error=str(e)), "danger", True
+            return _(
+                "Network error: {error}"
+            ).format(error=str(e)), "danger", True, no_update
 
     @app.callback(
         [
@@ -358,6 +341,106 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error with GEE management action: %s", e)
-            return _("Network error: {error}").format(error=str(e)), "danger", True
+            return _(
+                "Network error: {error}"
+            ).format(error=str(e)), "danger", True
 
         return no_update, no_update, no_update
+
+    @app.callback(
+        [
+            Output("gee-oauth-callback-alert", "children"),
+            Output("gee-oauth-callback-alert", "color"),
+            Output("gee-oauth-callback-alert", "is_open"),
+            Output("gee-oauth-processing-container", "children"),
+        ],
+        [Input("gee-oauth-auto-process", "n_intervals")],
+        [
+            State("gee-oauth-callback-code", "data"),
+            State("gee-oauth-callback-state", "data"),
+            State("token-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def process_gee_oauth_callback(n_intervals, code, state, token):
+        """Exchange the OAuth authorization code for tokens and store them.
+
+        Triggered once by the auto-process Interval after the page loads,
+        giving token-store time to be hydrated from the auth cookie.
+        """
+        if not n_intervals:
+            return no_update, no_update, no_update, no_update
+
+        idle_spinner = html.Div()  # replace the spinner with nothing on completion
+
+        if not token:
+            return (
+                [
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    _(
+                        "You must be logged in to connect Google Earth Engine."
+                        " Please log in and try again."
+                    ),
+                    html.Br(),
+                    html.Small(
+                        html.A(_("Back to login"), href="/", className="text-muted"),
+                    ),
+                ],
+                "danger",
+                True,
+                idle_spinner,
+            )
+
+        if not code or not state:
+            return (
+                _(
+                    "Invalid callback — missing authorization code or state parameter."
+                ),
+                "danger",
+                True,
+                idle_spinner,
+            )
+
+        try:
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                "/user/me/gee-oauth/callback",
+                token,
+                method="POST",
+                json={"code": code, "state": state},
+                timeout=30,
+            )
+
+            if resp.status_code == 200:
+                return (
+                    [
+                        html.I(className="fas fa-check-circle me-2"),
+                        _(
+                            "Google Earth Engine connected successfully!"
+                            " You can close this page and return to the app."
+                        ),
+                    ],
+                    "success",
+                    True,
+                    idle_spinner,
+                )
+            else:
+                error_msg = _("Failed to complete Google Earth Engine authorization.")
+                try:
+                    error_data = resp.json()
+                    error_msg = error_data.get("detail", error_msg)
+                except Exception:
+                    logger.debug("Could not parse OAuth callback response", exc_info=True)
+                return error_msg, "danger", True, idle_spinner
+
+        except Exception as e:
+            logger.exception("Error completing GEE OAuth callback: %s", e)
+            return (
+                _(
+                    "Network error while completing authorization: {error}"
+                ).format(error=str(e)),
+                "danger",
+                True,
+                idle_spinner,
+            )
