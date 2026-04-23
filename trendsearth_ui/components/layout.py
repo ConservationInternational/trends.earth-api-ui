@@ -776,7 +776,7 @@ def gee_oauth_callback_layout(code=None, state=None, api_environment="production
                                                                 size="sm",
                                                                 color="primary",
                                                                 type="border",
-                                                                className="me-2",
+                                                                spinner_class_name="me-2",
                                                             ),
                                                             html.Span(
                                                                 _(
