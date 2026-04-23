@@ -766,6 +766,16 @@ def gee_oauth_callback_layout(code=None, state=None, api_environment="production
                                                 max_intervals=1 if has_params else 0,
                                                 n_intervals=0,
                                             ),
+                                            # Interval that triggers the GCP project fetch
+                                            # after OAuth succeeds.  Starts disabled;
+                                            # process_gee_oauth_callback enables it.
+                                            dcc.Interval(
+                                                id="gee-project-load-interval",
+                                                interval=500,
+                                                max_intervals=0,
+                                                n_intervals=0,
+                                                disabled=True,
+                                            ),
                                             # Processing status area
                                             html.Div(
                                                 id="gee-oauth-processing-container",
@@ -805,6 +815,81 @@ def gee_oauth_callback_layout(code=None, state=None, api_environment="production
                                                 dismissable=True,
                                                 duration=None,
                                                 className="mb-3",
+                                            ),
+                                            # Project selection — hidden until OAuth
+                                            # succeeds and GCP projects are fetched.
+                                            html.Div(
+                                                id="gee-project-selection-container",
+                                                style={"display": "none"},
+                                                children=[
+                                                    html.Hr(),
+                                                    html.H6(
+                                                        _("Select your GEE Cloud Project"),
+                                                        className="mb-2",
+                                                    ),
+                                                    html.P(
+                                                        _(
+                                                            "Select the Google Cloud "
+                                                            "project where Earth Engine "
+                                                            "API is enabled. API usage "
+                                                            "will be billed to this "
+                                                            "project."
+                                                        ),
+                                                        className="text-muted small mb-3",
+                                                    ),
+                                                    dcc.Dropdown(
+                                                        id="gee-project-dropdown",
+                                                        placeholder=_("Select a project…"),
+                                                        clearable=False,
+                                                        className="mb-2",
+                                                    ),
+                                                    # Manual fallback — shown when the
+                                                    # project list is empty or failed to load.
+                                                    html.Div(
+                                                        id="gee-project-manual-container",
+                                                        style={"display": "none"},
+                                                        children=[
+                                                            html.P(
+                                                                [
+                                                                    html.I(
+                                                                        className="fas fa-exclamation-triangle me-1 text-warning"
+                                                                    ),
+                                                                    _(
+                                                                        "Could not load your project list."
+                                                                        " Enter your GCP project ID manually:"
+                                                                    ),
+                                                                ],
+                                                                className="small text-muted mb-1",
+                                                            ),
+                                                            dbc.Input(
+                                                                id="gee-project-manual-input",
+                                                                placeholder="my-gcp-project-id",
+                                                                type="text",
+                                                                debounce=True,
+                                                                className="mb-2",
+                                                            ),
+                                                            html.P(
+                                                                _(
+                                                                    "Find your project ID in the"
+                                                                    " Google Cloud Console."
+                                                                ),
+                                                                className="text-muted",
+                                                                style={"fontSize": "11px"},
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    dbc.Button(
+                                                        _("Save Project"),
+                                                        id="gee-project-save-btn",
+                                                        color="primary",
+                                                        className="w-100 mb-3",
+                                                    ),
+                                                    dbc.Alert(
+                                                        id="gee-project-save-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                    ),
+                                                ],
                                             ),
                                             html.Hr(),
                                             dbc.Button(

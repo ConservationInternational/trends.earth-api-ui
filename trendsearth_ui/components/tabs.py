@@ -1109,6 +1109,106 @@ def profile_tab_content(user_data):
                                     ),
                                 ],
                             ),
+                            # Cloud Project section — shown only when OAuth credentials
+                            # are active, so the user can update their chosen project.
+                            dbc.Row(
+                                id="profile-gee-project-section",
+                                style={"display": "none"},
+                                children=[
+                                    dbc.Col(
+                                        [
+                                            html.Hr(),
+                                            html.H6(_("Cloud Project")),
+                                            html.P(
+                                                _(
+                                                    "Earth Engine API calls are billed to"
+                                                    " this Google Cloud project. It must"
+                                                    " have the Earth Engine API enabled."
+                                                ),
+                                                className="text-muted small",
+                                            ),
+                                            html.Div(
+                                                id="profile-gee-project-current-display",
+                                                className="mb-2",
+                                            ),
+                                            dbc.Button(
+                                                [
+                                                    html.I(className="fas fa-sync-alt me-2"),
+                                                    _("Change Project"),
+                                                ],
+                                                id="profile-gee-project-load-btn",
+                                                color="secondary",
+                                                outline=True,
+                                                size="sm",
+                                                className="mb-2",
+                                            ),
+                                            dbc.Alert(
+                                                id="profile-gee-project-load-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                className="mb-2",
+                                            ),
+                                            dcc.Dropdown(
+                                                id="profile-gee-project-dropdown",
+                                                placeholder=_("Select a project…"),
+                                                clearable=False,
+                                                className="mb-2",
+                                                style={"display": "none"},
+                                            ),
+                                            # Manual fallback — shown when project list
+                                            # is empty or failed to load.
+                                            html.Div(
+                                                id="profile-gee-project-manual-container",
+                                                style={"display": "none"},
+                                                children=[
+                                                    html.P(
+                                                        [
+                                                            html.I(
+                                                                className="fas fa-exclamation-triangle me-1 text-warning"
+                                                            ),
+                                                            _(
+                                                                "Could not load your project"
+                                                                " list. Enter your GCP"
+                                                                " project ID manually:"
+                                                            ),
+                                                        ],
+                                                        className="small text-muted mb-1",
+                                                    ),
+                                                    dbc.Input(
+                                                        id="profile-gee-project-manual-input",
+                                                        placeholder="my-gcp-project-id",
+                                                        type="text",
+                                                        debounce=True,
+                                                        className="mb-2",
+                                                    ),
+                                                    html.P(
+                                                        _(
+                                                            "Find your project ID in the"
+                                                            " Google Cloud Console."
+                                                        ),
+                                                        className="text-muted",
+                                                        style={"fontSize": "11px"},
+                                                    ),
+                                                ],
+                                            ),
+                                            dbc.Button(
+                                                _("Save Project"),
+                                                id="profile-gee-project-update-btn",
+                                                color="primary",
+                                                size="sm",
+                                                className="mb-2",
+                                                style={"display": "none"},
+                                            ),
+                                            dbc.Alert(
+                                                id="profile-gee-project-update-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                            ),
                         ]
                     ),
                 ],
