@@ -87,6 +87,14 @@ def _format_user_rows(
                 row["gee_license_acknowledged"] = "✗ No"
             else:
                 row["gee_license_acknowledged"] = "—"
+        # Flatten openeo_credentials nested dict to a display-friendly boolean
+        openeo_creds = row.pop("openeo_credentials", None)
+        if isinstance(openeo_creds, dict):
+            row["has_openeo_credentials"] = (
+                "✓ Yes" if openeo_creds.get("has_credentials") else "✗ No"
+            )
+        else:
+            row["has_openeo_credentials"] = "—"
         rows.append(row)
     return rows
 
@@ -99,7 +107,9 @@ def _fetch_users_page(
     user_timezone: str | None,
 ) -> tuple[list[dict[str, Any]], int]:
     """Fetch a page of users from the API and format the rows."""
-    response = make_authenticated_request(USER_ENDPOINT, token, params=params)
+    fetch_params = dict(params)
+    fetch_params["include"] = "openeo_credentials"
+    response = make_authenticated_request(USER_ENDPOINT, token, params=fetch_params)
     if response.status_code != 200:
         return [], 0
 

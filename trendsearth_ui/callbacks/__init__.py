@@ -36,6 +36,7 @@ def register_all_callbacks(app):
         "map",
         "profile",
         "gee_credentials",  # Add GEE credentials callbacks
+        "openeo_credentials",  # Add openEO credentials callbacks
         "service_credentials",  # Add service credentials callbacks
         "edit",
         "refresh",
