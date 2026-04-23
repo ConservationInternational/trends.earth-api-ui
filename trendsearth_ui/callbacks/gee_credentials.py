@@ -174,9 +174,7 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error initiating OAuth: %s", e)
-            return _(
-                "Network error: {error}"
-            ).format(error=str(e)), "danger", True, no_update
+            return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
     @app.callback(
         [
@@ -341,9 +339,7 @@ def register_callbacks(app):
 
         except Exception as e:
             logger.exception("Error with GEE management action: %s", e)
-            return _(
-                "Network error: {error}"
-            ).format(error=str(e)), "danger", True
+            return _("Network error: {error}").format(error=str(e)), "danger", True
 
         return no_update, no_update, no_update
 
@@ -393,9 +389,7 @@ def register_callbacks(app):
 
         if not code or not state:
             return (
-                _(
-                    "Invalid callback — missing authorization code or state parameter."
-                ),
+                _("Invalid callback — missing authorization code or state parameter."),
                 "danger",
                 True,
                 idle_spinner,
@@ -437,9 +431,7 @@ def register_callbacks(app):
         except Exception as e:
             logger.exception("Error completing GEE OAuth callback: %s", e)
             return (
-                _(
-                    "Network error while completing authorization: {error}"
-                ).format(error=str(e)),
+                _("Network error while completing authorization: {error}").format(error=str(e)),
                 "danger",
                 True,
                 idle_spinner,
