@@ -426,6 +426,19 @@ def login_layout():
                                                 ],
                                                 className="text-center mt-3",
                                             ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
+                                            ),
                                         ]
                                     ),
                                 ],
@@ -655,6 +668,19 @@ def reset_password_layout(token=None, api_environment="production"):
                                                 ],
                                                 className="text-center mt-3",
                                             ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
+                                            ),
                                         ]
                                     ),
                                 ],
@@ -818,6 +844,19 @@ def gee_oauth_callback_layout(code=None, state=None, api_environment="production
                                                     ),
                                                 ],
                                                 className="text-center mt-3",
+                                            ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
                                             ),
                                         ]
                                     ),
@@ -1342,6 +1381,19 @@ def registration_layout():
                                                     ),
                                                 ],
                                                 className="text-center mt-3",
+                                            ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
                                             ),
                                         ]
                                     ),
@@ -1913,6 +1965,19 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
                                                     ),
                                                 ],
                                                 className="text-center mt-3",
+                                            ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
                                             ),
                                         ]
                                     ),
