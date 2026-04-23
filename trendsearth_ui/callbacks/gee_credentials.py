@@ -1,6 +1,7 @@
 """Google Earth Engine credentials management callbacks."""
 
 import base64
+import contextlib
 import json
 import logging
 
@@ -505,11 +506,12 @@ def register_callbacks(app):
         [
             State("gee-project-dropdown", "value"),
             State("gee-project-manual-input", "value"),
+            State("gee-project-number-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_gee_project(n_clicks, project_id, manual_project_id, token):
+    def save_gee_project(n_clicks, project_id, manual_project_id, project_number, token):
         """Save the user's selected GCP project via the API.
 
         Uses the dropdown value when available; falls back to the manual
@@ -523,14 +525,31 @@ def register_callbacks(app):
         try:
             from ..utils.helpers import make_authenticated_request
 
+            payload: dict = {"cloud_project": project_id}
+            if project_number is not None:
+                with contextlib.suppress(TypeError, ValueError):
+                    payload["project_number"] = int(project_number)
+
             resp = make_authenticated_request(
                 "/user/me/gee-credentials/project",
                 token,
                 method="PATCH",
-                json={"cloud_project": project_id},
+                json=payload,
                 timeout=10,
             )
             if resp.status_code == 200:
+                resp_json = {}
+                with contextlib.suppress(Exception):
+                    resp_json = resp.json()
+                if resp_json.get("gcs_write_access") is False:
+                    detail = resp_json.get(
+                        "detail",
+                        _(
+                            "Project saved, but bucket write access could not be"
+                            " configured automatically."
+                        ),
+                    )
+                    return detail, "warning", True
                 return (
                     _(
                         "GCP project saved successfully. "
@@ -542,10 +561,8 @@ def register_callbacks(app):
                 )
             else:
                 error_msg = _("Failed to save project.")
-                try:
+                with contextlib.suppress(Exception):
                     error_msg = resp.json().get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse project save response", exc_info=True)
                 return error_msg, "danger", True
 
         except Exception as e:
@@ -705,11 +722,12 @@ def register_callbacks(app):
         [
             State("profile-gee-project-dropdown", "value"),
             State("profile-gee-project-manual-input", "value"),
+            State("profile-gee-project-number-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_profile_gee_project(n_clicks, project_id, manual_project_id, token):
+    def save_profile_gee_project(n_clicks, project_id, manual_project_id, project_number, token):
         """Save the user's updated GCP project selection.
 
         Uses the dropdown value when available; falls back to the manual
@@ -723,11 +741,16 @@ def register_callbacks(app):
         try:
             from ..utils.helpers import make_authenticated_request
 
+            payload: dict = {"cloud_project": project_id}
+            if project_number is not None:
+                with contextlib.suppress(TypeError, ValueError):
+                    payload["project_number"] = int(project_number)
+
             resp = make_authenticated_request(
                 "/user/me/gee-credentials/project",
                 token,
                 method="PATCH",
-                json={"cloud_project": project_id},
+                json=payload,
                 timeout=10,
             )
             if resp.status_code == 200:
@@ -735,6 +758,18 @@ def register_callbacks(app):
                     [_("Current project: "), html.Strong(project_id)],
                     className="small",
                 )
+                resp_json = {}
+                with contextlib.suppress(Exception):
+                    resp_json = resp.json()
+                if resp_json.get("gcs_write_access") is False:
+                    detail = resp_json.get(
+                        "detail",
+                        _(
+                            "Project saved, but bucket write access could not be"
+                            " configured automatically."
+                        ),
+                    )
+                    return detail, "warning", True, new_display
                 return (
                     _("Project updated successfully."),
                     "success",
@@ -743,10 +778,8 @@ def register_callbacks(app):
                 )
             else:
                 error_msg = _("Failed to save project.")
-                try:
+                with contextlib.suppress(Exception):
                     error_msg = resp.json().get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse project update response", exc_info=True)
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
