@@ -607,11 +607,15 @@ def register_callbacks(app):
                 return hidden, no_project
 
             cloud_project = data.get("cloud_project")
+            cloud_project_number = data.get("cloud_project_number")
             if cloud_project:
+                project_label = cloud_project
+                if cloud_project_number:
+                    project_label = f"{cloud_project} ({cloud_project_number})"
                 current_display = html.Span(
                     [
                         _("Current project: "),
-                        html.Strong(cloud_project),
+                        html.Strong(project_label),
                     ],
                     className="small",
                 )
