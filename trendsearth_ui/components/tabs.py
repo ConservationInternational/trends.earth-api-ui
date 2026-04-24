@@ -1207,66 +1207,43 @@ def profile_tab_content(user_data):
                                                 id="profile-gee-project-current-display",
                                                 className="mb-2",
                                             ),
-                                            dbc.Button(
+                                            html.Hr(className="my-3"),
+                                            html.P(
+                                                _("Enter your GCP project ID:"),
+                                                className="small mb-1",
+                                            ),
+                                            dbc.Input(
+                                                id="profile-gee-project-manual-input",
+                                                placeholder="my-gcp-project-id",
+                                                type="text",
+                                                pattern="^[a-z][a-z0-9-]{4,28}[a-z0-9]$",
+                                                debounce=True,
+                                                className="mb-2",
+                                            ),
+                                            html.P(
                                                 [
-                                                    html.I(className="fas fa-sync-alt me-2"),
-                                                    _("Change Project"),
+                                                    html.I(className="fas fa-info-circle me-1"),
+                                                    _("Find your project ID in the "),
+                                                    html.A(
+                                                        _("Google Cloud Console"),
+                                                        href="https://console.cloud.google.com",
+                                                        target="_blank",
+                                                        className="text-decoration-none",
+                                                    ),
+                                                    ".",
                                                 ],
-                                                id="profile-gee-project-load-btn",
-                                                color="secondary",
-                                                outline=True,
-                                                size="sm",
-                                                className="mb-2",
+                                                className="text-muted",
+                                                style={"fontSize": "11px"},
                                             ),
-                                            dbc.Alert(
-                                                id="profile-gee-project-load-alert",
-                                                is_open=False,
-                                                dismissable=True,
+                                            dbc.FormFeedback(
+                                                _(
+                                                    "Project ID must be 6-30 characters, "
+                                                    "start with a letter, and contain only "
+                                                    "lowercase letters, numbers, and hyphens."
+                                                ),
+                                                id="profile-gee-project-validation-feedback",
+                                                type="invalid",
                                                 className="mb-2",
-                                            ),
-                                            dcc.Dropdown(
-                                                id="profile-gee-project-dropdown",
-                                                placeholder=_("Select a project…"),
-                                                clearable=False,
-                                                className="mb-2",
-                                                style={"display": "none"},
-                                            ),
-                                            # Manual fallback — shown when project list
-                                            # is empty or failed to load.
-                                            html.Div(
-                                                id="profile-gee-project-manual-container",
-                                                style={"display": "none"},
-                                                children=[
-                                                    html.P(
-                                                        [
-                                                            html.I(
-                                                                className="fas fa-exclamation-triangle me-1 text-warning"
-                                                            ),
-                                                            _(
-                                                                "Could not load your project"
-                                                                " list. Enter your GCP"
-                                                                " project ID manually:"
-                                                            ),
-                                                        ],
-                                                        className="small text-muted mb-1",
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-gee-project-manual-input",
-                                                        placeholder="my-gcp-project-id",
-                                                        type="text",
-                                                        debounce=True,
-                                                        className="mb-2",
-                                                    ),
-                                                    html.P(
-                                                        _(
-                                                            "Find your project ID in the"
-                                                            " Google Cloud Console, or top "
-                                                            "right of the screen at code.earthengine.google.com."
-                                                        ),
-                                                        className="text-muted",
-                                                        style={"fontSize": "11px"},
-                                                    ),
-                                                ],
                                             ),
                                             dbc.Button(
                                                 _("Save Project"),
@@ -1274,7 +1251,6 @@ def profile_tab_content(user_data):
                                                 color="primary",
                                                 size="sm",
                                                 className="mb-2",
-                                                style={"display": "none"},
                                             ),
                                             dbc.Alert(
                                                 id="profile-gee-project-update-alert",

@@ -350,8 +350,7 @@ def register_callbacks(app):
             Output("gee-oauth-callback-alert", "color"),
             Output("gee-oauth-callback-alert", "is_open"),
             Output("gee-oauth-processing-container", "children"),
-            Output("gee-project-load-interval", "max_intervals"),
-            Output("gee-project-load-interval", "disabled"),
+            Output("gee-project-selection-container", "style"),
         ],
         [Input("gee-oauth-auto-process", "n_intervals")],
         [
@@ -366,11 +365,10 @@ def register_callbacks(app):
 
         Triggered once by the auto-process Interval after the page loads,
         giving token-store time to be hydrated from the auth cookie.
-        On success, enables the project-load interval so the GCP project
-        dropdown is populated automatically.
+        On success, shows the project selection form.
         """
         if not n_intervals:
-            return no_update, no_update, no_update, no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update, no_update
 
         idle_spinner = html.Div()  # replace the spinner with nothing on completion
 
@@ -390,8 +388,7 @@ def register_callbacks(app):
                 "danger",
                 True,
                 idle_spinner,
-                no_update,
-                no_update,
+                {"display": "none"},
             )
 
         if not code or not state:
@@ -400,8 +397,7 @@ def register_callbacks(app):
                 "danger",
                 True,
                 idle_spinner,
-                no_update,
-                no_update,
+                {"display": "none"},
             )
 
         try:
@@ -427,8 +423,7 @@ def register_callbacks(app):
                     "success",
                     True,
                     idle_spinner,
-                    1,  # max_intervals=1 → fire once to fetch projects
-                    False,  # disabled=False  → enable the interval
+                    {"display": "block"},
                 )
             else:
                 error_msg = _("Failed to complete Google Earth Engine authorization.")
@@ -437,7 +432,7 @@ def register_callbacks(app):
                     error_msg = error_data.get("detail", error_msg)
                 except Exception:
                     logger.debug("Could not parse OAuth callback response", exc_info=True)
-                return error_msg, "danger", True, idle_spinner, no_update, no_update
+                return error_msg, "danger", True, idle_spinner, {"display": "none"}
 
         except Exception as e:
             logger.exception("Error completing GEE OAuth callback: %s", e)
@@ -446,55 +441,8 @@ def register_callbacks(app):
                 "danger",
                 True,
                 idle_spinner,
-                no_update,
-                no_update,
+                {"display": "none"},
             )
-
-    @app.callback(
-        [
-            Output("gee-project-dropdown", "options"),
-            Output("gee-project-dropdown", "value"),
-            Output("gee-project-selection-container", "style"),
-            Output("gee-project-manual-container", "style"),
-        ],
-        [Input("gee-project-load-interval", "n_intervals")],
-        [State("token-store", "data")],
-        prevent_initial_call=True,
-    )
-    def load_gee_projects(n_intervals, token):
-        """Fetch the user's accessible GCP projects and populate the dropdown.
-
-        Fired once by the project-load interval after OAuth completes.
-        Projects are returned in ``{"value": projectId, "label": displayName}``
-        format from the API.  The currently saved project (if any) is pre-selected.
-        When the project list is empty or the API call fails, the manual-entry
-        input is shown instead.
-        """
-        if not n_intervals or not token:
-            return no_update, no_update, no_update, no_update
-
-        shown = {"display": "block"}
-        hidden = {"display": "none"}
-
-        try:
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/user/me/gee-projects", token, timeout=15)
-            if resp.status_code == 200:
-                data = resp.json()
-                options = data.get("data", [])  # [{value, label}, ...]
-                current = data.get("current")  # currently saved project ID or null
-                if options:
-                    return options, current, shown, hidden
-                # No projects — fall through to manual entry
-                return [], None, shown, shown
-            else:
-                logger.warning("Failed to load GCP projects: %s", resp.status_code)
-                return [], None, shown, shown
-
-        except Exception as e:
-            logger.exception("Error loading GCP projects: %s", e)
-            return [], None, shown, shown
 
     @app.callback(
         [
@@ -504,22 +452,34 @@ def register_callbacks(app):
         ],
         [Input("gee-project-save-btn", "n_clicks")],
         [
-            State("gee-project-dropdown", "value"),
             State("gee-project-manual-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_gee_project(n_clicks, project_id, manual_project_id, token):
-        """Save the user's selected GCP project via the API.
+    def save_gee_project_manual(n_clicks, project_id, token):
+        """Save the user's manually entered GCP project ID.
 
-        Uses the dropdown value when available; falls back to the manual
-        text input when the project list could not be loaded.
+        Validates the project ID format and saves it via the API.
         """
-        # Use manual input as fallback when dropdown has no selection
-        project_id = project_id or (manual_project_id or "").strip() or None
+        project_id = (project_id or "").strip()
         if not n_clicks or not project_id or not token:
             return no_update, no_update, no_update
+
+        # Client-side HTML5 validation will catch most format errors, but
+        # double-check on the server side as well
+        import re
+
+        if not re.match(r"^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id):
+            return (
+                _(
+                    "Invalid project ID format. Must be 6-30 characters, "
+                    "start with a letter, and contain only lowercase letters, "
+                    "numbers, and hyphens."
+                ),
+                "danger",
+                True,
+            )
 
         try:
             from ..utils.helpers import make_authenticated_request
@@ -541,8 +501,8 @@ def register_callbacks(app):
                     detail = resp_json.get(
                         "detail",
                         _(
-                            "Project saved, but bucket write access could not be"
-                            " configured automatically."
+                            "Project saved, but bucket write access could not be "
+                            "configured automatically."
                         ),
                     )
                     return detail, "warning", True
@@ -624,91 +584,6 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("profile-gee-project-dropdown", "options"),
-            Output("profile-gee-project-dropdown", "value"),
-            Output("profile-gee-project-dropdown", "style"),
-            Output("profile-gee-project-manual-container", "style"),
-            Output("profile-gee-project-update-btn", "style"),
-            Output("profile-gee-project-load-alert", "children"),
-            Output("profile-gee-project-load-alert", "color"),
-            Output("profile-gee-project-load-alert", "is_open"),
-        ],
-        [Input("profile-gee-project-load-btn", "n_clicks")],
-        [State("token-store", "data")],
-        prevent_initial_call=True,
-    )
-    def load_profile_gee_projects(n_clicks, token):
-        """Fetch the user's accessible GCP projects and populate the dropdown.
-
-        Fired when the user clicks 'Change Project'. Pre-selects the
-        currently saved project ID (if any).  When the project list is empty
-        or fails to load, the manual-entry input is shown so the user can
-        type their project ID directly.
-        """
-        if not n_clicks or not token:
-            return (
-                [],
-                None,
-                {"display": "none"},
-                {"display": "none"},
-                {"display": "none"},
-                "",
-                "",
-                False,
-            )
-
-        shown = {"display": "block"}
-        hidden = {"display": "none"}
-
-        try:
-            from ..utils.helpers import make_authenticated_request
-
-            resp = make_authenticated_request("/user/me/gee-projects", token, timeout=15)
-            if resp.status_code == 200:
-                resp_data = resp.json()
-                options = resp_data.get("data", [])
-                current = resp_data.get("current")
-                if options:
-                    # Dropdown available — hide manual input
-                    return options, current, shown, hidden, shown, "", "", False
-                # No projects returned — show manual input
-                return (
-                    [],
-                    None,
-                    hidden,
-                    shown,
-                    shown,
-                    _(
-                        "No accessible GCP projects found. Make sure your Google "
-                        "account has at least one project with Earth Engine API"
-                        " enabled, or enter the project ID manually below."
-                    ),
-                    "warning",
-                    True,
-                )
-            else:
-                error_msg = _("Failed to load projects.")
-                try:
-                    error_msg = resp.json().get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse load projects response", exc_info=True)
-                return [], None, hidden, shown, shown, error_msg, "danger", True
-
-        except Exception as e:
-            logger.exception("Error loading GCP projects for profile: %s", e)
-            return (
-                [],
-                None,
-                hidden,
-                shown,
-                shown,
-                _("Network error: {error}").format(error=str(e)),
-                "danger",
-                True,
-            )
-
-    @app.callback(
-        [
             Output("profile-gee-project-update-alert", "children"),
             Output("profile-gee-project-update-alert", "color"),
             Output("profile-gee-project-update-alert", "is_open"),
@@ -716,22 +591,35 @@ def register_callbacks(app):
         ],
         [Input("profile-gee-project-update-btn", "n_clicks")],
         [
-            State("profile-gee-project-dropdown", "value"),
             State("profile-gee-project-manual-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_profile_gee_project(n_clicks, project_id, manual_project_id, token):
-        """Save the user's updated GCP project selection.
+    def save_profile_gee_project_manual(n_clicks, project_id, token):
+        """Save the user's manually entered GCP project ID from the profile page.
 
-        Uses the dropdown value when available; falls back to the manual
-        text input when the project list could not be loaded.
+        Validates the project ID format and saves it via the API.
         """
-        # Use manual input as fallback when dropdown has no selection
-        project_id = project_id or (manual_project_id or "").strip() or None
+        project_id = (project_id or "").strip()
         if not n_clicks or not project_id or not token:
             return no_update, no_update, no_update, no_update
+
+        # Client-side HTML5 validation will catch most format errors, but
+        # double-check on the server side as well
+        import re
+
+        if not re.match(r"^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id):
+            return (
+                _(
+                    "Invalid project ID format. Must be 6-30 characters, "
+                    "start with a letter, and contain only lowercase letters, "
+                    "numbers, and hyphens."
+                ),
+                "danger",
+                True,
+                no_update,
+            )
 
         try:
             from ..utils.helpers import make_authenticated_request
@@ -757,8 +645,8 @@ def register_callbacks(app):
                     detail = resp_json.get(
                         "detail",
                         _(
-                            "Project saved, but bucket write access could not be"
-                            " configured automatically."
+                            "Project saved, but bucket write access could not be "
+                            "configured automatically."
                         ),
                     )
                     return detail, "warning", True, new_display
