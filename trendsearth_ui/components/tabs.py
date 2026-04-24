@@ -1257,25 +1257,11 @@ def profile_tab_content(user_data):
                                                         debounce=True,
                                                         className="mb-2",
                                                     ),
-                                                    html.Label(
-                                                        _(
-                                                            "Project Number"
-                                                            " (from GCP Console dashboard)"
-                                                        ),
-                                                        className="small text-muted mb-1",
-                                                    ),
-                                                    dbc.Input(
-                                                        id="profile-gee-project-number-input",
-                                                        placeholder="123456789012",
-                                                        type="number",
-                                                        debounce=True,
-                                                        className="mb-2",
-                                                    ),
                                                     html.P(
                                                         _(
-                                                            "Find your project ID and"
-                                                            " number in the"
-                                                            " Google Cloud Console."
+                                                            "Find your project ID in the"
+                                                            " Google Cloud Console, or top "
+                                                            "right of the screen at code.earthengine.google.com."
                                                         ),
                                                         className="text-muted",
                                                         style={"fontSize": "11px"},

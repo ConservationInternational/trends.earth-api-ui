@@ -506,12 +506,11 @@ def register_callbacks(app):
         [
             State("gee-project-dropdown", "value"),
             State("gee-project-manual-input", "value"),
-            State("gee-project-number-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_gee_project(n_clicks, project_id, manual_project_id, project_number, token):
+    def save_gee_project(n_clicks, project_id, manual_project_id, token):
         """Save the user's selected GCP project via the API.
 
         Uses the dropdown value when available; falls back to the manual
@@ -526,9 +525,6 @@ def register_callbacks(app):
             from ..utils.helpers import make_authenticated_request
 
             payload: dict = {"cloud_project": project_id}
-            if project_number is not None:
-                with contextlib.suppress(TypeError, ValueError):
-                    payload["project_number"] = int(project_number)
 
             resp = make_authenticated_request(
                 "/user/me/gee-credentials/project",
@@ -607,15 +603,11 @@ def register_callbacks(app):
                 return hidden, no_project
 
             cloud_project = data.get("cloud_project")
-            cloud_project_number = data.get("cloud_project_number")
             if cloud_project:
-                project_label = cloud_project
-                if cloud_project_number:
-                    project_label = f"{cloud_project} ({cloud_project_number})"
                 current_display = html.Span(
                     [
                         _("Current project: "),
-                        html.Strong(project_label),
+                        html.Strong(cloud_project),
                     ],
                     className="small",
                 )
@@ -726,12 +718,11 @@ def register_callbacks(app):
         [
             State("profile-gee-project-dropdown", "value"),
             State("profile-gee-project-manual-input", "value"),
-            State("profile-gee-project-number-input", "value"),
             State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def save_profile_gee_project(n_clicks, project_id, manual_project_id, project_number, token):
+    def save_profile_gee_project(n_clicks, project_id, manual_project_id, token):
         """Save the user's updated GCP project selection.
 
         Uses the dropdown value when available; falls back to the manual
@@ -746,9 +737,6 @@ def register_callbacks(app):
             from ..utils.helpers import make_authenticated_request
 
             payload: dict = {"cloud_project": project_id}
-            if project_number is not None:
-                with contextlib.suppress(TypeError, ValueError):
-                    payload["project_number"] = int(project_number)
 
             resp = make_authenticated_request(
                 "/user/me/gee-credentials/project",
