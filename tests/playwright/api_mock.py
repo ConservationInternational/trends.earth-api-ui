@@ -53,9 +53,14 @@ def create_mock_user_me_response(role: str = "ADMIN") -> dict[str, Any]:
 
 
 def create_mock_refresh_response() -> dict[str, Any]:
-    """Create a mock token refresh response."""
+    """Create a mock token refresh response.
+
+    The API rotates refresh tokens on every use, so the response includes
+    both a new access_token and a new refresh_token.
+    """
     return {
         "access_token": "mock_refreshed_access_token_123456789",
+        "refresh_token": "mock_refresh_token_rotated_123456789",
         "expires_in": 3600,
         "token_type": "Bearer",
     }

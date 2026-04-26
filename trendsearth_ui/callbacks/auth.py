@@ -951,13 +951,13 @@ def register_callbacks(app):
             return no_update
 
         # Try to refresh the token using the stored API environment
-        new_access_token, expires_in = refresh_access_token(
+        new_access_token, expires_in, new_refresh_token = refresh_access_token(
             refresh_token, api_environment or "production"
         )
         if new_access_token and new_access_token != current_token:
             logger.debug("Auto-refreshed access token")
 
-            # Update cookie with new access token
+            # Update cookie with new access token and rotated refresh token
             try:
                 auth_cookie = request.cookies.get("auth_token")
                 if auth_cookie:
@@ -970,7 +970,7 @@ def register_callbacks(app):
                         if hasattr(ctx, "response") and ctx.response:
                             new_cookie_data = create_auth_cookie_data(
                                 new_access_token,
-                                refresh_token,
+                                new_refresh_token or refresh_token,
                                 email,
                                 user_data,
                                 api_environment or "production",
@@ -1048,14 +1048,14 @@ def register_callbacks(app):
             return no_update, no_update
 
         # Try to refresh the token proactively
-        new_access_token, expires_in = refresh_access_token(
+        new_access_token, expires_in, new_refresh_token = refresh_access_token(
             refresh_token, api_environment or "production"
         )
         if new_access_token:
             if new_access_token != current_token:
                 logger.debug("Proactively refreshed access token")
 
-            # Always update cookie to extend session even if token didn't change
+            # Always update cookie with the rotated refresh token to extend session
             try:
                 if cookie_data:
                     email = cookie_data.get("email") or ""
@@ -1065,7 +1065,7 @@ def register_callbacks(app):
                     if hasattr(ctx, "response") and ctx.response:
                         new_cookie_data = create_auth_cookie_data(
                             new_access_token,
-                            refresh_token,
+                            new_refresh_token or refresh_token,
                             email,
                             stored_user_data,
                             api_environment or "production",

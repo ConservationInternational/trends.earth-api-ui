@@ -116,15 +116,20 @@ def get_user_info(token, api_base=None):
 
 def refresh_access_token(
     refresh_token: str, api_environment: str = None
-) -> tuple[Optional[str], Optional[int]]:
+) -> tuple[Optional[str], Optional[int], Optional[str]]:
     """Refresh access token using refresh token.
+
+    The API implements refresh token rotation: the presented refresh token is
+    revoked and a new one is returned.  Callers MUST store the new refresh
+    token and discard the old one.
 
     Args:
         refresh_token: Valid refresh token
         api_environment: API environment to use for refresh
 
     Returns:
-        Tuple of (new_access_token, expires_in) or (None, None) if refresh failed
+        Tuple of (new_access_token, expires_in, new_refresh_token) or
+        (None, None, None) if refresh failed
     """
     if not refresh_token:
         return None, None
@@ -138,7 +143,7 @@ def refresh_access_token(
     try:
         refresh_data = {"refresh_token": refresh_token}
         resp = get_session().post(
-            f"{auth_url}/refresh",
+            f"{auth_url}/refresh?legacy=false",
             headers=apply_default_headers(),
             json=refresh_data,
             timeout=10,
@@ -148,21 +153,22 @@ def refresh_access_token(
             data = resp.json()
             access_token = data.get("access_token")
             expires_in = data.get("expires_in")
+            new_refresh_token = data.get("refresh_token")
             logger.debug("Access token refreshed successfully")
-            return access_token, expires_in
+            return access_token, expires_in, new_refresh_token
         else:
             logger.debug("Token refresh failed with status: %s", resp.status_code)
-            return None, None
+            return None, None, None
 
     except requests.exceptions.Timeout:
         logger.debug("Token refresh request timed out")
-        return None, None
+        return None, None, None
     except requests.exceptions.ConnectionError:
         logger.debug("Connection error during token refresh")
-        return None, None
+        return None, None, None
     except Exception as e:
         logger.debug("Error during token refresh: %s", str(e))
-        return None, None
+        return None, None, None
 
 
 def logout_user(access_token: str, refresh_token: str = None, api_environment: str = None) -> bool:
