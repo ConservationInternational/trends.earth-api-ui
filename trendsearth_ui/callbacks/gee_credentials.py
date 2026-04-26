@@ -392,7 +392,7 @@ def register_callbacks(app):
 
             from ..config import get_current_api_base
 
-            anon_url = get_current_api_base() + "/api/v1/gee-oauth/callback"
+            anon_url = get_current_api_base() + "/gee-oauth/callback"
             resp = _requests.post(
                 anon_url,
                 json={"code": code, "state": state},
