@@ -356,11 +356,10 @@ def register_callbacks(app):
         [
             State("gee-oauth-callback-code", "data"),
             State("gee-oauth-callback-state", "data"),
-            State("token-store", "data"),
         ],
         prevent_initial_call=True,
     )
-    def process_gee_oauth_callback(n_intervals, code, state, token):
+    def process_gee_oauth_callback(n_intervals, code, state):
         """Exchange the OAuth authorization code for tokens and store them.
 
         Triggered once by the auto-process Interval after the page loads,
@@ -382,77 +381,52 @@ def register_callbacks(app):
             )
 
         try:
-            if token:
-                # Authenticated path: user is already logged into the API UI.
-                from ..utils.helpers import make_authenticated_request
+            # Always use the anonymous endpoint regardless of whether the API-UI
+            # browser session has a token.  The anonymous endpoint resolves the
+            # target user from the OAuth state reverse-mapping, so it works
+            # correctly even when the logged-in browser user is different from
+            # the user who initiated OAuth (e.g. a QGIS-plugin user while an
+            # admin is browsing the API-UI).  Using the JWT endpoint here would
+            # cause a state-mismatch 400 whenever those two users differ.
+            import requests as _requests
 
-                resp = make_authenticated_request(
-                    "/user/me/gee-oauth/callback",
-                    token,
-                    method="POST",
-                    json={"code": code, "state": state},
-                    timeout=30,
+            from ..config import get_current_api_base
+
+            anon_url = get_current_api_base() + "/api/v1/gee-oauth/callback"
+            resp = _requests.post(
+                anon_url,
+                json={"code": code, "state": state},
+                timeout=30,
+            )
+
+            if resp.status_code == 200:
+                data = resp.json().get("data", {})
+                client_type = data.get("client_type")
+                if client_type == "qgis_plugin":
+                    success_body = _(
+                        "Google Earth Engine connected successfully!"
+                        " To set your GCP project ID, open the Trends.Earth"
+                        " settings in QGIS (Advanced tab)."
+                    )
+                    show_project_selection = {"display": "none"}
+                else:
+                    success_body = _(
+                        "Google Earth Engine connected successfully!"
+                        " Please select your GCP project below to complete setup."
+                    )
+                    show_project_selection = {"display": "block"}
+                return (
+                    [html.I(className="fas fa-check-circle me-2"), success_body],
+                    "success",
+                    True,
+                    idle_spinner,
+                    show_project_selection,
                 )
 
-                if resp.status_code == 200:
-                    return (
-                        [
-                            html.I(className="fas fa-check-circle me-2"),
-                            _(
-                                "Google Earth Engine connected successfully!"
-                                " Please select your GCP project below to complete setup."
-                            ),
-                        ],
-                        "success",
-                        True,
-                        idle_spinner,
-                        {"display": "block"},
-                    )
-
-                error_msg = _("Failed to complete Google Earth Engine authorization.")
-                with contextlib.suppress(Exception):
-                    error_msg = resp.json().get("detail", error_msg)
-                return error_msg, "danger", True, idle_spinner, {"display": "none"}
-
-            else:
-                # Anonymous path: OAuth was initiated from an external client
-                # (e.g. the QGIS plugin) that has no browser session here.
-                # Use the public /api/v1/gee-oauth/callback endpoint which
-                # resolves the user from the state reverse-mapping.
-                import requests as _requests
-
-                from ..config import get_current_api_base
-
-                anon_url = get_current_api_base() + "/api/v1/gee-oauth/callback"
-                resp = _requests.post(
-                    anon_url,
-                    json={"code": code, "state": state},
-                    timeout=30,
-                )
-
-                if resp.status_code == 200:
-                    data = resp.json().get("data", {})
-                    client_type = data.get("client_type")
-                    if client_type == "qgis_plugin":
-                        success_body = _(
-                            "Google Earth Engine connected successfully!"
-                            " To set your GCP project ID, open the Trends.Earth"
-                            " settings in QGIS (Advanced tab)."
-                        )
-                    else:
-                        success_body = _("Google Earth Engine connected successfully!")
-                    return (
-                        [html.I(className="fas fa-check-circle me-2"), success_body],
-                        "success",
-                        True,
-                        idle_spinner,
-                        {"display": "none"},
-                    )
-
-                error_msg = _("Failed to complete Google Earth Engine authorization.")
-                with contextlib.suppress(Exception):
-                    error_msg = resp.json().get("detail", error_msg)
-                return error_msg, "danger", True, idle_spinner, {"display": "none"}
+            error_msg = _("Failed to complete Google Earth Engine authorization.")
+            with contextlib.suppress(Exception):
+                error_msg = resp.json().get("detail", error_msg)
+            return error_msg, "danger", True, idle_spinner, {"display": "none"}
 
         except Exception as e:
             logger.exception("Error completing GEE OAuth callback: %s", e)
