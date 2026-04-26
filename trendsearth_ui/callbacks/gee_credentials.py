@@ -372,25 +372,6 @@ def register_callbacks(app):
 
         idle_spinner = html.Div()  # replace the spinner with nothing on completion
 
-        if not token:
-            return (
-                [
-                    html.I(className="fas fa-exclamation-triangle me-2"),
-                    _(
-                        "You must be logged in to connect Google Earth Engine."
-                        " Please log in and try again."
-                    ),
-                    html.Br(),
-                    html.Small(
-                        html.A(_("Back to login"), href="/", className="text-muted"),
-                    ),
-                ],
-                "danger",
-                True,
-                idle_spinner,
-                {"display": "none"},
-            )
-
         if not code or not state:
             return (
                 _("Invalid callback — missing authorization code or state parameter."),
@@ -401,37 +382,78 @@ def register_callbacks(app):
             )
 
         try:
-            from ..utils.helpers import make_authenticated_request
+            if token:
+                # Authenticated path: user is already logged into the API UI.
+                from ..utils.helpers import make_authenticated_request
 
-            resp = make_authenticated_request(
-                "/user/me/gee-oauth/callback",
-                token,
-                method="POST",
-                json={"code": code, "state": state},
-                timeout=30,
-            )
-
-            if resp.status_code == 200:
-                return (
-                    [
-                        html.I(className="fas fa-check-circle me-2"),
-                        _(
-                            "Google Earth Engine connected successfully!"
-                            " Please select your GCP project below to complete setup."
-                        ),
-                    ],
-                    "success",
-                    True,
-                    idle_spinner,
-                    {"display": "block"},
+                resp = make_authenticated_request(
+                    "/user/me/gee-oauth/callback",
+                    token,
+                    method="POST",
+                    json={"code": code, "state": state},
+                    timeout=30,
                 )
-            else:
+
+                if resp.status_code == 200:
+                    return (
+                        [
+                            html.I(className="fas fa-check-circle me-2"),
+                            _(
+                                "Google Earth Engine connected successfully!"
+                                " Please select your GCP project below to complete setup."
+                            ),
+                        ],
+                        "success",
+                        True,
+                        idle_spinner,
+                        {"display": "block"},
+                    )
+
                 error_msg = _("Failed to complete Google Earth Engine authorization.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse OAuth callback response", exc_info=True)
+                with contextlib.suppress(Exception):
+                    error_msg = resp.json().get("detail", error_msg)
+                return error_msg, "danger", True, idle_spinner, {"display": "none"}
+
+            else:
+                # Anonymous path: OAuth was initiated from an external client
+                # (e.g. the QGIS plugin) that has no browser session here.
+                # Use the public /api/v1/gee-oauth/callback endpoint which
+                # resolves the user from the state reverse-mapping.
+                import requests as _requests
+
+                from ..config import get_current_api_base
+
+                anon_url = get_current_api_base() + "/api/v1/gee-oauth/callback"
+                resp = _requests.post(
+                    anon_url,
+                    json={"code": code, "state": state},
+                    timeout=30,
+                )
+
+                if resp.status_code == 200:
+                    data = resp.json().get("data", {})
+                    client_type = data.get("client_type")
+                    if client_type == "qgis_plugin":
+                        success_body = _(
+                            "Google Earth Engine connected successfully!"
+                            " To set your GCP project ID, open the Trends.Earth"
+                            " settings in QGIS (Advanced tab)."
+                        )
+                    else:
+                        success_body = _(
+                            "Google Earth Engine connected successfully!"
+                        )
+                    return (
+                        [html.I(className="fas fa-check-circle me-2"), success_body],
+                        "success",
+                        True,
+                        idle_spinner,
+                        {"display": "none"},
+                    )
+
+                error_msg = _("Failed to complete Google Earth Engine authorization.")
+                with contextlib.suppress(Exception):
+                    error_msg = resp.json().get("detail", error_msg)
                 return error_msg, "danger", True, idle_spinner, {"display": "none"}
 
         except Exception as e:
