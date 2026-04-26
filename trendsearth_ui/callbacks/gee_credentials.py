@@ -440,9 +440,7 @@ def register_callbacks(app):
                             " settings in QGIS (Advanced tab)."
                         )
                     else:
-                        success_body = _(
-                            "Google Earth Engine connected successfully!"
-                        )
+                        success_body = _("Google Earth Engine connected successfully!")
                     return (
                         [html.I(className="fas fa-check-circle me-2"), success_body],
                         "success",
