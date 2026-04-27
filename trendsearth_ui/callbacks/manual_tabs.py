@@ -1,4 +1,4 @@
-﻿"""Manual tab switching callbacks to replace dbc.Tabs functionality."""
+"""Manual tab switching callbacks to replace dbc.Tabs functionality."""
 
 import logging
 
