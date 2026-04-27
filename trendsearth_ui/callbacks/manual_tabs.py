@@ -1,4 +1,4 @@
-"""Manual tab switching callbacks to replace dbc.Tabs functionality."""
+﻿"""Manual tab switching callbacks to replace dbc.Tabs functionality."""
 
 import logging
 
@@ -105,6 +105,22 @@ def register_callbacks(app):
             return {"display": "none"}
 
     @app.callback(
+        Output("bulk-email-tab-li", "style"),
+        [
+            Input("role-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def toggle_bulk_email_tab_visibility(role, token):
+        """Show/hide Bulk Email tab â€” SUPERADMIN only."""
+        if not token:
+            return {"display": "none"}
+        if role == "SUPERADMIN":
+            return {"display": "block"}
+        return {"display": "none"}
+
+    @app.callback(
         [
             Output("executions-tab-btn", "className"),
             Output("users-tab-btn", "className"),
@@ -112,6 +128,7 @@ def register_callbacks(app):
             Output("admin-tab-btn", "className"),
             Output("status-tab-btn", "className"),
             Output("profile-tab-btn", "className"),
+            Output("bulk-email-tab-btn", "className"),
             Output("active-tab-store", "data"),
         ],
         [
@@ -121,6 +138,7 @@ def register_callbacks(app):
             Input("admin-tab-btn", "n_clicks"),
             Input("status-tab-btn", "n_clicks"),
             Input("profile-tab-btn", "n_clicks"),
+            Input("bulk-email-tab-btn", "n_clicks"),
         ],
         prevent_initial_call=False,  # Allow initial call to set default tab
     )
@@ -131,6 +149,7 @@ def register_callbacks(app):
             # Set default tab when no user interaction yet
             return (
                 "nav-link active",
+                "nav-link",
                 "nav-link",
                 "nav-link",
                 "nav-link",
@@ -149,6 +168,7 @@ def register_callbacks(app):
             "admin-tab-btn": "admin",
             "status-tab-btn": "status",
             "profile-tab-btn": "profile",
+            "bulk-email-tab-btn": "bulk-email",
         }
 
         # Get the active tab
@@ -163,9 +183,10 @@ def register_callbacks(app):
             "admin-tab-btn",
             "status-tab-btn",
             "profile-tab-btn",
+            "bulk-email-tab-btn",
         ]:
-            base_tab = btn_id.replace("-tab-btn", "")
-            if base_tab == active_tab:
+            tab_key = tab_map[btn_id]
+            if tab_key == active_tab:
                 nav_classes.append("nav-link active")
             else:
                 nav_classes.append("nav-link")
@@ -180,5 +201,6 @@ def register_callbacks(app):
             nav_classes[3],
             nav_classes[4],
             nav_classes[5],
+            nav_classes[6],
             active_tab,
         )

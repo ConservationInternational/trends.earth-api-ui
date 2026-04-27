@@ -6,6 +6,7 @@ from dash import Input, Output, State, html
 
 from ..components import (
     admin_tab_content,
+    bulk_email_tab_content,
     executions_tab_content,
     profile_tab_content,
     scripts_tab_content,
@@ -93,6 +94,16 @@ def register_callbacks(app):
                     [
                         html.H4("Access Denied"),
                         html.P("Administrator privileges required to access system status."),
+                    ]
+                )
+        elif tab == "bulk-email":
+            if role == "SUPERADMIN":
+                return bulk_email_tab_content(role)
+            else:
+                return html.Div(
+                    [
+                        html.H4("Access Denied"),
+                        html.P("Superadmin privileges required to access bulk email."),
                     ]
                 )
         return html.Div("Unknown tab.")

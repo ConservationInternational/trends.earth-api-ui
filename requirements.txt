@@ -2,6 +2,7 @@ dash
 dash-bootstrap-components
 requests
 dash-ag-grid
+dash-mantine-components
 plotly
 pandas
 dash-leaflet

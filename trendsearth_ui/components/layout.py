@@ -4,6 +4,7 @@ import logging
 
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 
 from ..callbacks.timezone import get_timezone_components
 from ..config import (
@@ -17,6 +18,7 @@ from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     access_control_modal,
+    bulk_email_verify_modal,
     delete_script_modal,
     delete_user_modal,
     edit_script_modal,
@@ -113,7 +115,7 @@ def create_main_layout():
     # Get mobile detection components
     mobile_components = create_mobile_detection_components()
 
-    return dbc.Container(
+    container = dbc.Container(
         [
             html.Div(id="page-content", children=login_layout()),
             html.Div(id="tab-content"),
@@ -171,9 +173,11 @@ def create_main_layout():
             delete_script_modal(),
             reset_rate_limits_modal(),
             reset_individual_rate_limit_modal(),
+            bulk_email_verify_modal(),
         ],
         fluid=True,
     )
+    return dmc.MantineProvider(container)
 
 
 def login_layout():
@@ -2231,6 +2235,20 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for admin
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        _("Bulk Email"),
+                                        id="bulk-email-tab-btn",
+                                        className="nav-link",
+                                    )
+                                ],
+                                className="nav-item",
+                                id="bulk-email-tab-li",
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for superadmin
                             ),
                             html.Li(
                                 [

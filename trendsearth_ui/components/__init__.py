@@ -1,5 +1,6 @@
 """Initialize components package."""
 
+from .bulk_email import bulk_email_tab_content
 from .layout import (
     create_main_layout,
     dashboard_layout,
@@ -10,6 +11,7 @@ from .layout import (
     update_profile_standalone_layout,
 )
 from .modals import (
+    bulk_email_verify_modal,
     delete_script_modal,
     delete_user_modal,
     edit_script_modal,
@@ -48,12 +50,14 @@ __all__ = [
     "delete_script_modal",
     "reset_rate_limits_modal",
     "reset_individual_rate_limit_modal",
+    "bulk_email_verify_modal",
     "admin_tab_content",
     "executions_tab_content",
     "users_tab_content",
     "scripts_tab_content",
     "profile_tab_content",
     "status_tab_content",
+    "bulk_email_tab_content",
     "create_news_banner",
     "create_news_item_card",
 ]

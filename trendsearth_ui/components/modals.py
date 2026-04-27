@@ -1063,3 +1063,64 @@ def reset_individual_rate_limit_modal():
         id="reset-individual-rate-limit-modal",
         is_open=False,
     )
+
+
+def bulk_email_verify_modal():
+    """Modal for 2FA-style verification when a large bulk email send is requested.
+
+    Shown when the backend returns HTTP 428 because recipient count exceeds
+    BULK_EMAIL_MAX_RECIPIENTS. The user must request and submit a 6-digit OTP.
+    """
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle(id="bulk-email-verify-modal-title")),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "A large number of recipients were detected.  "
+                        "A verification code has been (or will be) sent to your email address.",
+                        id="bulk-email-verify-modal-body",
+                    ),
+                    dbc.Label("Enter 6-digit verification code"),
+                    dbc.Input(
+                        id="bulk-email-verify-code",
+                        type="text",
+                        maxLength=6,
+                        placeholder="123456",
+                        autocomplete="one-time-code",
+                    ),
+                    dbc.Alert(
+                        id="bulk-email-verify-modal-alert",
+                        is_open=False,
+                        dismissable=True,
+                        className="mt-2",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Request Code",
+                        id="bulk-email-request-code-btn",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        "Confirm Send",
+                        id="bulk-email-verify-submit",
+                        color="primary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        "Cancel",
+                        id="bulk-email-verify-cancel",
+                        color="light",
+                    ),
+                ]
+            ),
+        ],
+        id="bulk-email-verify-modal",
+        is_open=False,
+        centered=True,
+        backdrop="static",
+    )
