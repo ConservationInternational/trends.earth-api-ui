@@ -17,6 +17,18 @@ def register_callbacks(app):
     """Register GEE credentials callbacks."""
 
     @app.callback(
+        Output("profile-gee-oauth-panel", "style"),
+        Output("profile-gee-service-account-panel", "style"),
+        Input("profile-gee-setup-method", "value"),
+        prevent_initial_call=False,
+    )
+    def toggle_gee_setup_panels(method):
+        """Show only the panel matching the selected setup method."""
+        if method == "service_account":
+            return {"display": "none"}, {}
+        return {}, {"display": "none"}
+
+    @app.callback(
         Output("profile-gee-status-display", "children"),
         [Input("token-store", "data")],
         prevent_initial_call=False,
@@ -78,14 +90,13 @@ def register_callbacks(app):
                 else:
                     return dbc.Alert(
                         [
-                            html.I(className="fas fa-exclamation-triangle me-2"),
-                            _("No Google Earth Engine credentials configured."),
-                            html.Br(),
-                            html.Small(
-                                _("Choose one of the setup options below."), className="text-muted"
+                            html.I(className="fas fa-info-circle me-2"),
+                            _(
+                                "No personal Google Earth Engine account credentials configured."
+                                " Using default Trends.Earth service account."
                             ),
                         ],
-                        color="warning",
+                        color="info",
                     )
             else:
                 return dbc.Alert(

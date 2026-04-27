@@ -1016,7 +1016,19 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4(_("Google Earth Engine Account"))),
+                    dbc.CardHeader(
+                        html.H4(
+                            [
+                                _("Google Earth Engine Account"),
+                                dbc.Badge(
+                                    _("EXPERIMENTAL"),
+                                    color="warning",
+                                    className="ms-2 align-middle",
+                                    style={"fontSize": "0.6em"},
+                                ),
+                            ]
+                        )
+                    ),
                     dbc.CardBody(
                         [
                             # Current credentials status
@@ -1039,116 +1051,105 @@ def profile_tab_content(user_data):
                                     dbc.Col(
                                         [
                                             html.H6(_("Setup Your GEE Account")),
-                                            html.P(
-                                                _(
-                                                    "Choose one of the options below to configure your Google Earth Engine credentials:"
-                                                ),
-                                                className="text-muted",
+                                            dbc.RadioItems(
+                                                id="profile-gee-setup-method",
+                                                options=[
+                                                    {
+                                                        "label": _(
+                                                            "Connect via OAuth (personal account)"
+                                                        ),
+                                                        "value": "oauth",
+                                                    },
+                                                    {
+                                                        "label": _("Upload Service Account Key"),
+                                                        "value": "service_account",
+                                                    },
+                                                ],
+                                                value="oauth",
+                                                inline=True,
+                                                className="mb-3",
                                             ),
                                         ],
                                         width=12,
                                     ),
                                 ],
-                                className="mb-3",
+                                className="mb-2",
                             ),
-                            # OAuth Setup Section
-                            dbc.Row(
-                                [
-                                    dbc.Col(
+                            # OAuth Setup Panel
+                            html.Div(
+                                id="profile-gee-oauth-panel",
+                                children=[
+                                    dbc.Row(
                                         [
-                                            dbc.Card(
+                                            dbc.Col(
                                                 [
-                                                    dbc.CardBody(
-                                                        [
-                                                            html.H6(
-                                                                _(
-                                                                    "Option 1: Connect Your GEE Account (OAuth)"
-                                                                ),
-                                                                className="mb-3",
-                                                            ),
-                                                            html.P(
-                                                                _(
-                                                                    "Connect your personal Google Earth Engine account using OAuth authentication."
-                                                                ),
-                                                                className="text-muted",
-                                                            ),
-                                                            dbc.Button(
-                                                                _("Connect GEE Account"),
-                                                                id="profile-gee-oauth-btn",
-                                                                color="primary",
-                                                                className="mb-2",
-                                                            ),
-                                                            dbc.Alert(
-                                                                id="profile-gee-oauth-alert",
-                                                                is_open=False,
-                                                                dismissable=True,
-                                                            ),
-                                                        ]
-                                                    )
+                                                    html.P(
+                                                        _(
+                                                            "Connect your personal Google Earth Engine account using OAuth authentication."
+                                                        ),
+                                                        className="text-muted",
+                                                    ),
+                                                    dbc.Button(
+                                                        _("Connect GEE Account"),
+                                                        id="profile-gee-oauth-btn",
+                                                        color="primary",
+                                                        className="mb-2",
+                                                    ),
+                                                    dbc.Alert(
+                                                        id="profile-gee-oauth-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                    ),
                                                 ],
-                                                outline=True,
-                                                color="primary",
+                                                width=12,
                                             ),
                                         ],
-                                        width=12,
                                         className="mb-3",
                                     ),
-                                ]
+                                ],
                             ),
-                            # Service Account Upload Section
-                            dbc.Row(
-                                [
-                                    dbc.Col(
+                            # Service Account Upload Panel
+                            html.Div(
+                                id="profile-gee-service-account-panel",
+                                style={"display": "none"},
+                                children=[
+                                    dbc.Row(
                                         [
-                                            dbc.Card(
+                                            dbc.Col(
                                                 [
-                                                    dbc.CardBody(
-                                                        [
-                                                            html.H6(
-                                                                _(
-                                                                    "Option 2: Upload Service Account Key"
+                                                    html.P(
+                                                        _(
+                                                            "Upload a Google Cloud service account JSON key with Earth Engine access."
+                                                        ),
+                                                        className="text-muted",
+                                                    ),
+                                                    dcc.Upload(
+                                                        id="profile-gee-service-account-upload",
+                                                        children=dbc.Button(
+                                                            [
+                                                                html.I(
+                                                                    className="fas fa-upload me-2"
                                                                 ),
-                                                                className="mb-3",
-                                                            ),
-                                                            html.P(
-                                                                _(
-                                                                    "Upload a Google Cloud service account JSON key with Earth Engine access."
-                                                                ),
-                                                                className="text-muted",
-                                                            ),
-                                                            dcc.Upload(
-                                                                id="profile-gee-service-account-upload",
-                                                                children=dbc.Button(
-                                                                    [
-                                                                        html.I(
-                                                                            className="fas fa-upload me-2"
-                                                                        ),
-                                                                        _(
-                                                                            "Upload Service Account Key"
-                                                                        ),
-                                                                    ],
-                                                                    color="secondary",
-                                                                    outline=True,
-                                                                ),
-                                                                accept=".json",
-                                                                max_size=1024 * 1024,  # 1MB max
-                                                            ),
-                                                            dbc.Alert(
-                                                                id="profile-gee-service-account-alert",
-                                                                is_open=False,
-                                                                dismissable=True,
-                                                            ),
-                                                        ]
-                                                    )
+                                                                _("Upload Service Account Key"),
+                                                            ],
+                                                            color="secondary",
+                                                            outline=True,
+                                                        ),
+                                                        accept=".json",
+                                                        max_size=1024 * 1024,  # 1MB max
+                                                    ),
+                                                    dbc.Alert(
+                                                        id="profile-gee-service-account-alert",
+                                                        is_open=False,
+                                                        dismissable=True,
+                                                    ),
                                                 ],
-                                                outline=True,
-                                                color="secondary",
+                                                width=12,
                                             ),
                                         ],
-                                        width=12,
                                         className="mb-3",
                                     ),
-                                ]
+                                ],
                             ),
                             # Credential Management Actions
                             dbc.Row(
@@ -1272,7 +1273,19 @@ def profile_tab_content(user_data):
                 [
                     dbc.Card(
                         [
-                            dbc.CardHeader(html.H4(_("openEO Account"))),
+                            dbc.CardHeader(
+                                html.H4(
+                                    [
+                                        _("openEO Account"),
+                                        dbc.Badge(
+                                            _("EXPERIMENTAL"),
+                                            color="warning",
+                                            className="ms-2 align-middle",
+                                            style={"fontSize": "0.6em"},
+                                        ),
+                                    ]
+                                )
+                            ),
                             dbc.CardBody(
                                 [
                                     # Status display
