@@ -336,7 +336,7 @@ def get_mobile_column_config():
                     "width": 100,
                     "cellStyle": {"fontSize": "12px", "textAlign": "center"},
                     "resizable": True,
-                    "sortable": False,
+                    "sortable": True,
                     "filter": False,
                 },
                 {
@@ -442,13 +442,22 @@ def get_mobile_column_config():
                     "sortable": True,
                 },
                 {
+                    "headerName": _("GEE Creds"),
+                    "field": "gee_credentials_type",
+                    "width": 140,
+                    "cellStyle": {"fontSize": "12px", "textAlign": "center"},
+                    "resizable": True,
+                    "filter": False,
+                    "sortable": True,
+                },
+                {
                     "headerName": _("OpenEO Creds"),
                     "field": "has_openeo_credentials",
                     "width": 140,
                     "cellStyle": {"fontSize": "12px", "textAlign": "center"},
                     "resizable": True,
                     "filter": False,
-                    "sortable": False,
+                    "sortable": True,
                 },
                 {
                     "headerName": _("Edit"),

@@ -40,6 +40,8 @@ USER_ALLOWED_SORT_COLUMNS = {
     "sector",
     "purpose_of_use",
     "gee_license_acknowledged",
+    "gee_credentials_type",
+    "has_openeo_credentials",
 }
 USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 
@@ -87,6 +89,18 @@ def _format_user_rows(
                 row["gee_license_acknowledged"] = "✗ No"
             else:
                 row["gee_license_acknowledged"] = "—"
+        # Flatten gee_credentials nested dict to a display-friendly type label
+        gee_creds = row.pop("gee_credentials", None)
+        if isinstance(gee_creds, dict):
+            creds_type = gee_creds.get("credentials_type")
+            if creds_type == "oauth":
+                row["gee_credentials_type"] = "OAuth"
+            elif creds_type == "service_account":
+                row["gee_credentials_type"] = "Service Account"
+            else:
+                row["gee_credentials_type"] = "None"
+        else:
+            row["gee_credentials_type"] = "—"
         # Flatten openeo_credentials nested dict to a display-friendly boolean
         openeo_creds = row.pop("openeo_credentials", None)
         if isinstance(openeo_creds, dict):
@@ -108,7 +122,7 @@ def _fetch_users_page(
 ) -> tuple[list[dict[str, Any]], int]:
     """Fetch a page of users from the API and format the rows."""
     fetch_params = dict(params)
-    fetch_params["include"] = "openeo_credentials"
+    fetch_params["include"] = "openeo_credentials,gee_credentials"
     response = make_authenticated_request(USER_ENDPOINT, token, params=fetch_params)
     if response.status_code != 200:
         return [], 0
@@ -301,7 +315,7 @@ def register_callbacks(app):
             return "Please select a user to view credentials.", True, True
 
         try:
-            resp = make_authenticated_request(f"/admin/users/{user_id}/gee-credentials", token)
+            resp = make_authenticated_request(f"/user/{user_id}/gee-credentials", token)
 
             if resp.status_code == 200:
                 data = resp.json().get("data", {})
@@ -402,7 +416,7 @@ def register_callbacks(app):
                 )
 
             resp = make_authenticated_request(
-                f"/admin/users/{user_id}/gee-service-account",
+                f"/user/{user_id}/gee-service-account",
                 token,
                 method="POST",
                 json={"service_account_key": service_account_key},
@@ -460,7 +474,7 @@ def register_callbacks(app):
         try:
             if button_id == "edit-user-gee-test-btn" and test_clicks:
                 resp = make_authenticated_request(
-                    f"/admin/users/{user_id}/gee-credentials/test",
+                    f"/user/{user_id}/gee-credentials/test",
                     token,
                     method="POST",
                     timeout=30,
@@ -485,7 +499,7 @@ def register_callbacks(app):
 
             if button_id == "edit-user-gee-delete-btn" and delete_clicks:
                 resp = make_authenticated_request(
-                    f"/admin/users/{user_id}/gee-credentials",
+                    f"/user/{user_id}/gee-credentials",
                     token,
                     method="DELETE",
                     timeout=10,

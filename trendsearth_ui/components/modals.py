@@ -288,7 +288,12 @@ def edit_user_modal():
                                     dbc.Col(
                                         [
                                             dbc.Alert(
-                                                id="edit-user-gee-alert",
+                                                id="edit-user-gee-service-account-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                            dbc.Alert(
+                                                id="edit-user-gee-management-alert",
                                                 is_open=False,
                                                 dismissable=True,
                                             ),
