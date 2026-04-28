@@ -1,5 +1,7 @@
 # Trends.Earth GEF API Viewer
 
+[![Trends.Earth](https://s3.amazonaws.com/trends.earth/sharing/trends_earth_logo_bl_600width.png)](http://trends.earth)
+
 [![Tests](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml)
 [![Code Quality](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml)
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
@@ -9,7 +11,7 @@
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
-## 🚀 Deployment
+## Deployment
 
 This application supports automatic deployment to EC2 instances using Docker Swarm and GitHub Actions.
 
@@ -255,6 +257,26 @@ Key settings:
 - Bound to 0.0.0.0:8000
 - Request logging enabled
 
+## Contributing
+
+Contributions are welcome. Please report bugs or suggest improvements via the
+[issue tracker](https://github.com/ConservationInternational/trends.earth-api-ui/issues).
+
+## Related Projects
+
+`Trends.Earth` is built from a set of interconnected repositories:
+
+- [trends.earth](https://github.com/ConservationInternational/trends.earth) — QGIS plugin for land degradation monitoring
+- [trends.earth-schemas](https://github.com/ConservationInternational/trends.earth-schemas) — Data schemas for analysis results
+- [trends.earth-algorithms](https://github.com/ConservationInternational/trends.earth-algorithms) — Core analysis algorithms
+- [trends.earth-API](https://github.com/ConservationInternational/trends.earth-API) — Backend REST API
+- [trends.earth-Environment](https://github.com/ConservationInternational/trends.earth-Environment) — Job execution environment for running scripts
+- [trends.earth-CLI](https://github.com/ConservationInternational/trends.earth-CLI) — Command-line interface for developing custom scripts
+
 ## License
 
-MIT
+MIT License — see [LICENSE](LICENSE).
+
+---
+
+[![Part of Trends.Earth](https://s3.amazonaws.com/trends.earth/sharing/trends_earth_logo_bl_600width.png)](http://trends.earth)

@@ -329,6 +329,20 @@ def bulk_email_tab_content(_role=None):
                                 id="bulk-email-html-source",
                                 html="",
                                 debounce=500,
+                                extensions=[
+                                    "StarterKit",
+                                    "Superscript",
+                                    "Subscript",
+                                    "Highlight",
+                                    "Table",
+                                    "TableCell",
+                                    "TableHeader",
+                                    "TableRow",
+                                    {"TextAlign": {"types": ["heading", "paragraph"]}},
+                                    "Color",
+                                    "TextStyle",
+                                    "Image",
+                                ],
                                 toolbar={
                                     "sticky": True,
                                     "controlsGroups": [

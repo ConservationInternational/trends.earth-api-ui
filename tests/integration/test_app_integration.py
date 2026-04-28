@@ -20,9 +20,9 @@ class TestAppIntegration:
         """Test the overall app layout structure."""
         layout = dash_app.layout
 
-        # Should have main container structure
+        # Should have main container structure (MantineProvider wraps the Container)
         assert hasattr(layout, "children")
-        assert isinstance(layout.children, list)
+        assert isinstance(layout.children.children, list)
 
         # Convert to string to check for key components
         layout_str = str(layout)

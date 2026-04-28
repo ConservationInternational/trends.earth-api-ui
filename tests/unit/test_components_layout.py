@@ -12,24 +12,26 @@ class TestCreateMainLayout:
         """Test that main layout has correct structure."""
         layout = create_main_layout()
 
-        # Should be a Container
+        # Should be a MantineProvider wrapping a Container
         assert hasattr(layout, "children")
-        assert isinstance(layout.children, list)
+        container = layout.children
+        assert isinstance(container.children, list)
 
         # Check for required components
-        children_types = [type(child).__name__ for child in layout.children]
+        children_types = [type(child).__name__ for child in container.children]
 
         # Should contain Div and multiple Store components (H1 title is now only in dashboard layout)
         assert "Div" in children_types
         assert "Store" in children_types  # Should contain modals
-        assert any("Modal" in str(type(child)) for child in layout.children)
+        assert any("Modal" in str(type(child)) for child in container.children)
 
     def test_main_layout_stores(self):
         """Test that main layout contains all required stores."""
         layout = create_main_layout()
 
         # Get all Store components by checking the class name
-        stores = [child for child in layout.children if child.__class__.__name__ == "Store"]
+        # layout is MantineProvider; layout.children is Container; layout.children.children is the list
+        stores = [child for child in layout.children.children if child.__class__.__name__ == "Store"]
 
         # Should have multiple stores for different data
         assert len(stores) >= 5  # At least token, role, user, scripts, users stores
@@ -183,8 +185,9 @@ class TestLayoutIntegration:
         assert "page-content" in layout_str
 
         # The page-content should be able to receive other layouts
+        # main is MantineProvider; main.children is Container; main.children.children is the list
         page_content = None
-        for child in main.children:
+        for child in main.children.children:
             if hasattr(child, "id") and child.id == "page-content":
                 page_content = child
                 break
