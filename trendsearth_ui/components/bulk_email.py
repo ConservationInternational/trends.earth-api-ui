@@ -9,6 +9,23 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
+_EMAIL_COLORS = [
+    "#000000",
+    "#434343",
+    "#666666",
+    "#999999",
+    "#cc0000",
+    "#e06666",
+    "#ff9900",
+    "#ffd966",
+    "#00aa00",
+    "#6aa84f",
+    "#1155cc",
+    "#6fa8dc",
+    "#674ea7",
+    "#a64d79",
+]
+
 
 def bulk_email_tab_content(_role=None):
     """Return the Bulk Email tab content."""
@@ -326,8 +343,86 @@ def bulk_email_tab_content(_role=None):
                                         ],
                                         ["H1", "H2", "H3", "H4"],
                                         ["Blockquote", "Hr", "BulletList", "OrderedList"],
+                                        ["Subscript", "Superscript"],
                                         ["Link", "Unlink"],
                                         ["AlignLeft", "AlignCenter", "AlignJustify", "AlignRight"],
+                                        [
+                                            {"ColorPicker": {"colors": _EMAIL_COLORS}},
+                                            "UnsetColor",
+                                        ],
+                                        ["Image"],
+                                        [
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Insert table",
+                                                    "title": "Insert table",
+                                                    "children": html.Span(
+                                                        "⊞", style={"fontSize": "14px"}
+                                                    ),
+                                                    "onClick": {"function": "insertTable"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Add column before",
+                                                    "title": "Add column before",
+                                                    "children": html.Span(
+                                                        "←|", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "addColumnBefore"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Add column after",
+                                                    "title": "Add column after",
+                                                    "children": html.Span(
+                                                        "|→", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "addColumnAfter"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Delete column",
+                                                    "title": "Delete column",
+                                                    "children": html.Span(
+                                                        "✕|", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "deleteColumn"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Add row after",
+                                                    "title": "Add row after",
+                                                    "children": html.Span(
+                                                        "—↓", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "addRowAfter"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Delete row",
+                                                    "title": "Delete row",
+                                                    "children": html.Span(
+                                                        "✕—", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "deleteRow"},
+                                                }
+                                            },
+                                            {
+                                                "CustomControl": {
+                                                    "aria-label": "Delete table",
+                                                    "title": "Delete table",
+                                                    "children": html.Span(
+                                                        "✕⊞", style={"fontSize": "11px"}
+                                                    ),
+                                                    "onClick": {"function": "deleteTable"},
+                                                }
+                                            },
+                                        ],
                                         ["Undo", "Redo"],
                                         ["SourceCode"],
                                     ],
