@@ -31,7 +31,9 @@ class TestCreateMainLayout:
 
         # Get all Store components by checking the class name
         # layout is MantineProvider; layout.children is Container; layout.children.children is the list
-        stores = [child for child in layout.children.children if child.__class__.__name__ == "Store"]
+        stores = [
+            child for child in layout.children.children if child.__class__.__name__ == "Store"
+        ]
 
         # Should have multiple stores for different data
         assert len(stores) >= 5  # At least token, role, user, scripts, users stores
