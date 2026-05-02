@@ -338,7 +338,9 @@ def make_authenticated_request(
             logger.debug("Error reading refresh token from cookie: %s", e)
 
         if refresh_token:
-            new_access_token, expires_in, new_refresh_token = refresh_access_token(refresh_token, api_environment)
+            new_access_token, expires_in, new_refresh_token = refresh_access_token(
+                refresh_token, api_environment
+            )
             if new_access_token:
                 logger.debug("Token refreshed successfully, retrying %s %s", method, full_url)
 
@@ -355,7 +357,11 @@ def make_authenticated_request(
 
                         # Store the updated cookie data in flask.g for later use
                         new_cookie_data = create_auth_cookie_data(
-                            new_access_token, new_refresh_token or refresh_token, email, user_data, api_environment
+                            new_access_token,
+                            new_refresh_token or refresh_token,
+                            email,
+                            user_data,
+                            api_environment,
                         )
                         g.updated_auth_cookie = json.dumps(new_cookie_data)
                         logger.debug("Prepared updated cookie data for session maintenance")
