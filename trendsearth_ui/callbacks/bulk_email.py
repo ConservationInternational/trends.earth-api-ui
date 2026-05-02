@@ -8,7 +8,9 @@ import logging
 
 from dash import Input, Output, State, html, no_update
 
+from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request
+from ..utils.aggrid import build_aggrid_request_params
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,16 @@ def _api(token: str, method: str, path: str, **kwargs):
     return make_authenticated_request(path, token, method=method, **kwargs)
 
 
+_PREVIEW_ALLOWED_SORT_COLUMNS = {
+    "email",
+    "name",
+    "role",
+    "email_verified",
+    "created_at",
+    "last_activity_at",
+}
+
+
 def _ok_rows(resp):
     """Return list of dicts from a paginated or list API response, or []."""
     try:
@@ -32,6 +44,26 @@ def _ok_rows(resp):
         return body.get("data", []) or []
     except Exception:
         return []
+
+
+def _fetch_preview_page(token, filter_criteria, params):
+    """Fetch one page of preview recipients.  ``params`` must contain at least
+    ``page`` and ``per_page``; ``sort`` is optional.
+    Follows the same pattern as ``_fetch_users_page`` in users.py.
+    """
+    try:
+        resp = _api(
+            token,
+            "POST",
+            "/bulk-email/recipient-list/preview",
+            json={"filter_criteria": filter_criteria, **params},
+        )
+        if resp.status_code == 200:
+            data = resp.json().get("data", {}) or {}
+            return data.get("sample", []) or [], data.get("total", 0)
+    except Exception:
+        logger.exception("Failed to fetch preview page")
+    return [], 0
 
 
 def register_callbacks(app):
@@ -64,12 +96,13 @@ def register_callbacks(app):
         return ""
 
     # -----------------------------------------------------------------------
-    # Preview recipient group
+    # Preview button — store filter criteria and load first page
     # -----------------------------------------------------------------------
     @app.callback(
         [
-            Output("bulk-email-preview-grid", "rowData"),
+            Output("bulk-email-preview-grid", "getRowsResponse"),
             Output("bulk-email-preview-count", "children"),
+            Output("bulk-email-preview-filter-store", "data"),
         ],
         Input("bulk-email-preview-btn", "n_clicks"),
         [
@@ -84,35 +117,41 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def preview_recipient_group(
-        _n,
-        token,
-        roles,
-        verified,
-        min_created,
-        max_created,
-        min_activity,
-        max_activity,
+        _n, token, roles, verified, min_created, max_created, min_activity, max_activity
     ):
         if not token:
-            return [], ""
+            return {"rowData": [], "rowCount": 0}, "", {}
         filter_criteria = _build_filter_criteria(
             roles, verified, min_created, max_created, min_activity, max_activity
         )
-        try:
-            resp = _api(
-                token,
-                "POST",
-                "/bulk-email/recipient-list/preview",
-                json={"filter_criteria": filter_criteria},
-            )
-            if resp.status_code == 200:
-                body = resp.json()
-                rows = body.get("data", []) or []
-                total = body.get("total", len(rows))
-                return rows, f"{total} recipients"
-        except Exception:
-            logger.exception("Failed to preview recipient group")
-        return [], ""
+        rows, total = _fetch_preview_page(
+            token, filter_criteria, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
+        )
+        return {"rowData": rows, "rowCount": total}, f"{total} recipients", filter_criteria
+
+    # -----------------------------------------------------------------------
+    # Infinite scroll — subsequent pages requested by AG Grid
+    # Uses build_aggrid_request_params to handle pagination and column sorting.
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-preview-grid", "getRowsResponse", allow_duplicate=True),
+        Input("bulk-email-preview-grid", "getRowsRequest"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-preview-filter-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def get_preview_rows(request, token, filter_criteria):
+        if not request or filter_criteria is None or not token:
+            return no_update
+        params, _ = build_aggrid_request_params(
+            request,
+            allow_filters=False,
+            allowed_sort_columns=_PREVIEW_ALLOWED_SORT_COLUMNS,
+        )
+        rows, total = _fetch_preview_page(token, filter_criteria, params)
+        return {"rowData": rows, "rowCount": total}
 
     # -----------------------------------------------------------------------
     # Save recipient group
@@ -611,13 +650,13 @@ def _build_filter_criteria(roles, verified, min_created, max_created, min_activi
     if verified and verified not in ("", "any"):
         criteria["email_verified"] = verified == "true"
     if min_created:
-        criteria["created_at_min"] = min_created
+        criteria["min_created_at"] = min_created
     if max_created:
-        criteria["created_at_max"] = max_created
+        criteria["max_created_at"] = max_created
     if min_activity:
-        criteria["last_activity_at_min"] = min_activity
+        criteria["min_last_activity_at"] = min_activity
     if max_activity:
-        criteria["last_activity_at_max"] = max_activity
+        criteria["max_last_activity_at"] = max_activity
     return criteria
 
 

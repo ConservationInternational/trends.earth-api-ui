@@ -185,15 +185,33 @@ def bulk_email_tab_content(_role=None):
                                 className="mb-3",
                             ),
                             # Preview grid
+                            dcc.Store(id="bulk-email-preview-filter-store", data=None),
                             dag.AgGrid(
                                 id="bulk-email-preview-grid",
                                 columnDefs=[
-                                    {"field": "email", "headerName": "Email"},
-                                    {"field": "name", "headerName": "Name"},
-                                    {"field": "role", "headerName": "Role"},
+                                    {"field": "email", "headerName": "Email", "flex": 2},
+                                    {"field": "name", "headerName": "Name", "flex": 1},
+                                    {"field": "role", "headerName": "Role", "flex": 1},
+                                    {
+                                        "field": "email_verified",
+                                        "headerName": "Verified",
+                                        "flex": 1,
+                                    },
+                                    {"field": "created_at", "headerName": "Created", "flex": 1},
+                                    {
+                                        "field": "last_activity_at",
+                                        "headerName": "Last Active",
+                                        "flex": 1,
+                                    },
                                 ],
-                                rowData=[],
-                                style={"height": "200px"},
+                                defaultColDef={
+                                    "sortable": True,
+                                    "filter": False,
+                                    "resizable": True,
+                                },
+                                rowModelType="infinite",
+                                dashGridOptions={"cacheBlockSize": 100},
+                                style={"height": "300px"},
                                 className="ag-theme-alpine mb-3",
                             ),
                             dbc.Alert(
