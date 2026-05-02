@@ -335,13 +335,11 @@ def bulk_email_tab_content(_role=None):
                                     "Subscript",
                                     "Highlight",
                                     "Table",
-                                    "TableCell",
-                                    "TableHeader",
                                     "TableRow",
+                                    "TableHeader",
+                                    "TableCell",
                                     {"TextAlign": {"types": ["heading", "paragraph"]}},
-                                    "Color",
                                     "TextStyle",
-                                    "Image",
                                 ],
                                 toolbar={
                                     "sticky": True,
@@ -361,18 +359,11 @@ def bulk_email_tab_content(_role=None):
                                         ["Link", "Unlink"],
                                         ["AlignLeft", "AlignCenter", "AlignJustify", "AlignRight"],
                                         [
-                                            {"ColorPicker": {"colors": _EMAIL_COLORS}},
-                                            "UnsetColor",
-                                        ],
-                                        ["Image"],
-                                        [
                                             {
                                                 "CustomControl": {
                                                     "aria-label": "Insert table",
                                                     "title": "Insert table",
-                                                    "children": html.Span(
-                                                        "⊞", style={"fontSize": "14px"}
-                                                    ),
+                                                    "children": "⊞",
                                                     "onClick": {"function": "insertTable"},
                                                 }
                                             },
@@ -380,9 +371,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Add column before",
                                                     "title": "Add column before",
-                                                    "children": html.Span(
-                                                        "←|", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "←|",
                                                     "onClick": {"function": "addColumnBefore"},
                                                 }
                                             },
@@ -390,9 +379,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Add column after",
                                                     "title": "Add column after",
-                                                    "children": html.Span(
-                                                        "|→", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "|→",
                                                     "onClick": {"function": "addColumnAfter"},
                                                 }
                                             },
@@ -400,9 +387,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Delete column",
                                                     "title": "Delete column",
-                                                    "children": html.Span(
-                                                        "✕|", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "✕|",
                                                     "onClick": {"function": "deleteColumn"},
                                                 }
                                             },
@@ -410,9 +395,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Add row after",
                                                     "title": "Add row after",
-                                                    "children": html.Span(
-                                                        "—↓", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "—↓",
                                                     "onClick": {"function": "addRowAfter"},
                                                 }
                                             },
@@ -420,9 +403,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Delete row",
                                                     "title": "Delete row",
-                                                    "children": html.Span(
-                                                        "✕—", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "✕—",
                                                     "onClick": {"function": "deleteRow"},
                                                 }
                                             },
@@ -430,9 +411,7 @@ def bulk_email_tab_content(_role=None):
                                                 "CustomControl": {
                                                     "aria-label": "Delete table",
                                                     "title": "Delete table",
-                                                    "children": html.Span(
-                                                        "✕⊞", style={"fontSize": "11px"}
-                                                    ),
+                                                    "children": "✕⊞",
                                                     "onClick": {"function": "deleteTable"},
                                                 }
                                             },
