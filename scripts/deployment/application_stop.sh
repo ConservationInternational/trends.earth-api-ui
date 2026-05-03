@@ -35,44 +35,9 @@ fi
 
 echo "✅ Node is the active swarm leader. Continuing stop sequence."
 
-# Check if stack exists and stop it gracefully
-if docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; then
-    echo "📦 Stopping existing stack: $STACK_NAME"
-    
-    # Scale down services before removing stack for graceful shutdown
-    for service in $(docker service ls --filter "name=${STACK_NAME}" --format "{{.Name}}"); do
-        echo "🔽 Scaling down service: $service"
-        docker service scale "$service=0"
-    done
-    
-    # Wait for services to scale down (poll instead of fixed sleep)
-    echo "⏳ Waiting for services to scale down..."
-    scale_wait=0
-    while [ $scale_wait -lt 60 ]; do
-        running=$(docker service ls --filter "name=${STACK_NAME}" --format "{{.Replicas}}" | awk -F'/' '{s+=$1} END{print s+0}')
-        if [ "$running" -eq 0 ]; then
-            echo "✅ All services scaled to 0"
-            break
-        fi
-        sleep 5
-        scale_wait=$((scale_wait + 5))
-    done
-    
-    # Remove the stack
-    echo "🗑️ Removing stack: $STACK_NAME"
-    docker stack rm "$STACK_NAME"
-    
-    # Wait for stack to be completely removed
-    echo "⏳ Waiting for stack removal to complete..."
-    while docker stack ls --format "{{.Name}}" | grep -q "^${STACK_NAME}$"; do
-        echo "Waiting for stack removal..."
-        sleep 5
-    done
-    
-    echo "✅ Stack removed successfully"
-else
-    echo "ℹ️ No existing stack found: $STACK_NAME"
-fi
+
+echo "ℹ️ Leaving stack $STACK_NAME running for zero-downtime rolling update."
+echo "ℹ️ The new version will be deployed via 'docker stack deploy' in ApplicationStart."
 
 # Clean up old images to save space (keep last 3 versions)
 echo "🧹 Cleaning up old Docker images..."
