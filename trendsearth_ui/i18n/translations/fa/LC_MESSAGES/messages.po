@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-16 14:40-0400\n"
+"POT-Creation-Date: 2026-05-03 15:53+0000\n"
 "PO-Revision-Date: 2026-03-14 14:01-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fa <LL@li.org>\n"
@@ -17,2776 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
-
-#: trendsearth_ui/callbacks/admin.py:644
-#, fuzzy
-msgid "Please fill in all required fields (Name, Email, Password)."
-msgstr "لطفا تمام فیلدهای مورد نیاز (نام، ایمیل، رمز عبور) را پر کنید."
-
-#: trendsearth_ui/callbacks/admin.py:658
-#, fuzzy
-msgid "Passwords do not match."
-msgstr "رمزهای عبور مطابقت ندارند."
-
-#: trendsearth_ui/callbacks/admin.py:688
-#, fuzzy, python-brace-format
-msgid "Password must contain {errors}."
-msgstr "رمز عبور باید شامل {errors} باشد."
-
-#: trendsearth_ui/callbacks/admin.py:718
-#, fuzzy, python-brace-format
-msgid "User '{name}' created successfully with email '{email}'."
-msgstr "کاربر &#39;{name}&#39; با ایمیل &#39;{email}&#39; با موفقیت ایجاد شد."
-
-#: trendsearth_ui/callbacks/admin.py:733
-#, fuzzy
-msgid "A user with this email already exists."
-msgstr "کاربری با این ایمیل از قبل وجود دارد."
-
-#: trendsearth_ui/callbacks/admin.py:745
-#, fuzzy
-msgid "Invalid user data."
-msgstr "داده‌های کاربر نامعتبر است."
-
-#: trendsearth_ui/callbacks/admin.py:747
-#, fuzzy, python-brace-format
-msgid "Error creating user: {detail}"
-msgstr "خطا در ایجاد کاربر: {detail}"
-
-#: trendsearth_ui/callbacks/admin.py:760
-#, fuzzy, python-brace-format
-msgid "Failed to create user. Server responded with status {status}."
-msgstr "ایجاد کاربر ناموفق بود. سرور با وضعیت {status} پاسخ داد."
-
-#: trendsearth_ui/callbacks/admin.py:776 trendsearth_ui/callbacks/auth.py:1263
-#: trendsearth_ui/callbacks/auth.py:1550 trendsearth_ui/callbacks/auth.py:1911
-msgid "Request timed out. Please try again."
-msgstr "مهلت درخواست به پایان رسیده است. لطفا دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/admin.py:789
-#: trendsearth_ui/callbacks/admin.py:1028
-#, fuzzy
-msgid "Cannot connect to server. Please check your connection."
-msgstr "اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال خود را بررسی کنید."
-
-#: trendsearth_ui/callbacks/admin.py:802
-#: trendsearth_ui/callbacks/admin.py:1036
-#, fuzzy, python-brace-format
-msgid "Unexpected error: {error}"
-msgstr "خطای غیرمنتظره: {error}"
-
-#: trendsearth_ui/callbacks/admin.py:848
-#, fuzzy, python-brace-format
-msgid ""
-"Invalid file type: {filename}. Must be a .tar.gz archive containing "
-"configuration.json."
-msgstr ""
-"نوع فایل نامعتبر: {filename}. باید یک فایل آرشیو .tar.gz حاوی "
-"configuration.json باشد."
-
-#: trendsearth_ui/callbacks/admin.py:863
-#, fuzzy, python-brace-format
-msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
-msgstr ""
-"فایل خیلی بزرگ است: {filename} ({size}MB). حداکثر ۱۰ مگابایت مجاز است."
-
-#: trendsearth_ui/callbacks/admin.py:872
-#, fuzzy, python-brace-format
-msgid "Archive ready: {filename} ({size}MB)"
-msgstr "آماده بایگانی: {filename} ({size}MB)"
-
-#: trendsearth_ui/callbacks/admin.py:924
-#, fuzzy
-msgid "Access denied. Administrator privileges required."
-msgstr "دسترسی رد شد. دسترسی مدیر لازم است."
-
-#: trendsearth_ui/callbacks/admin.py:939
-#, fuzzy
-msgid "Please select a .tar.gz script archive to upload."
-msgstr "لطفاً یک فایل فشرده با پسوند .tar.gz برای آپلود انتخاب کنید."
-
-#: trendsearth_ui/callbacks/admin.py:950
-#, fuzzy
-msgid ""
-"Invalid file type. The API requires a .tar.gz archive containing a "
-"configuration.json file."
-msgstr ""
-"نوع فایل نامعتبر است. API به یک فایل فشرده .tar.gz نیاز دارد که حاوی فایل "
-"configuration.json باشد."
-
-#: trendsearth_ui/callbacks/admin.py:980
-#, fuzzy, python-brace-format
-msgid "Script '{name}' uploaded successfully."
-msgstr "اسکریپت &#39;{name}&#39; با موفقیت آپلود شد."
-
-#: trendsearth_ui/callbacks/admin.py:989 trendsearth_ui/callbacks/admin.py:991
-#, fuzzy
-msgid "Invalid script archive."
-msgstr "بایگانی اسکریپت نامعتبر است."
-
-#: trendsearth_ui/callbacks/admin.py:993
-#, fuzzy, python-brace-format
-msgid "Error uploading script: {detail}"
-msgstr "خطا در آپلود اسکریپت: {detail}"
-
-#: trendsearth_ui/callbacks/admin.py:1001
-#, fuzzy
-msgid "Permission denied. Only admins and superadmins can create scripts."
-msgstr "اجازه رد شد. فقط مدیران و سرپرستان می‌توانند اسکریپت ایجاد کنند."
-
-#: trendsearth_ui/callbacks/admin.py:1009
-#, fuzzy, python-brace-format
-msgid "Failed to upload script. Server responded with status {status}."
-msgstr "آپلود اسکریپت ناموفق بود. سرور با وضعیت {status} پاسخ داد."
-
-#: trendsearth_ui/callbacks/admin.py:1020
-#, fuzzy
-msgid "Upload timed out. Please try again with a smaller file."
-msgstr "زمان آپلود تمام شد. لطفاً با یک فایل کوچکتر دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/admin.py:1195
-#, fuzzy
-msgid "Rate limits have been successfully reset for all users and endpoints."
-msgstr ""
-"محدودیت‌های نرخ برای همه کاربران و نقاط پایانی با موفقیت تنظیم مجدد شدند."
-
-#: trendsearth_ui/callbacks/admin.py:1205
-#, fuzzy, python-brace-format
-msgid "Failed to reset rate limits. Status: {status}"
-msgstr "تنظیم مجدد محدودیت‌های نرخ ناموفق بود. وضعیت: {status}"
-
-#: trendsearth_ui/callbacks/admin.py:1229
-#, fuzzy, python-brace-format
-msgid "Error resetting rate limits: {error}"
-msgstr "خطا در تنظیم مجدد محدودیت‌های سرعت: {error}"
-
-#: trendsearth_ui/callbacks/admin.py:1435
-#, fuzzy
-msgid "Error: No rate limit selected."
-msgstr "خطا: هیچ محدودیت نرخی انتخاب نشده است."
-
-#: trendsearth_ui/callbacks/admin.py:1476
-#, fuzzy, python-brace-format
-msgid "Rate limit for {identifier} has been successfully reset."
-msgstr "محدودیت نرخ برای {identifier} با موفقیت تنظیم مجدد شد."
-
-#: trendsearth_ui/callbacks/admin.py:1493
-#, fuzzy, python-brace-format
-msgid "Rate limit for {identifier} not found. It may have already expired."
-msgstr ""
-"محدودیت نرخ برای {identifier} یافت نشد. ممکن است قبلاً منقضی شده باشد."
-
-#: trendsearth_ui/callbacks/admin.py:1505
-#, fuzzy, python-brace-format
-msgid "Failed to reset rate limit. Status: {status}"
-msgstr "تنظیم مجدد محدودیت سرعت ناموفق بود. وضعیت: {status}"
-
-#: trendsearth_ui/callbacks/admin.py:1533
-#, fuzzy, python-brace-format
-msgid "Error resetting rate limit: {error}"
-msgstr "خطا در تنظیم مجدد محدودیت سرعت: {error}"
-
-#: trendsearth_ui/callbacks/auth.py:337
-#, fuzzy
-msgid "Please enter both email and password."
-msgstr "لطفا هم ایمیل و هم رمز عبور را وارد کنید."
-
-#: trendsearth_ui/callbacks/auth.py:372
-#, fuzzy
-msgid "Login failed: Invalid response format."
-msgstr "ورود ناموفق بود: قالب پاسخ نامعتبر است."
-
-#: trendsearth_ui/callbacks/auth.py:418
-#, fuzzy
-msgid "Login successful!"
-msgstr "ورود با موفقیت انجام شد!"
-
-#: trendsearth_ui/callbacks/auth.py:440
-#, fuzzy
-msgid "Failed to retrieve user information."
-msgstr "بازیابی اطلاعات کاربر ناموفق بود."
-
-#: trendsearth_ui/callbacks/auth.py:448
-#, fuzzy
-msgid "Invalid credentials."
-msgstr "مدارک شناسایی نامعتبر."
-
-#: trendsearth_ui/callbacks/auth.py:456
-#, fuzzy
-msgid "Your account is locked due to too many failed login attempts. "
-msgstr ""
-"حساب کاربری شما به دلیل تلاش‌های ناموفق زیاد برای ورود به سیستم قفل شده است."
-" "
-
-#: trendsearth_ui/callbacks/auth.py:458
-#, fuzzy
-msgid "Please use the 'Forgot Password' link below to reset your password."
-msgstr ""
-"لطفا برای بازیابی رمز عبور خود از لینک «رمز عبور خود را فراموش کرده‌ام» در "
-"زیر استفاده کنید."
-
-#: trendsearth_ui/callbacks/auth.py:461
-#, fuzzy
-msgid "Your account is temporarily locked. "
-msgstr "حساب شما موقتاً قفل شده است. "
-
-#: trendsearth_ui/callbacks/auth.py:462
-#, fuzzy, python-brace-format
-msgid "Please try again in {minutes} minute(s)."
-msgstr "لطفا دوباره در {دقیقه} دقیقه امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:482
-#, fuzzy
-msgid "Login failed: Connection timeout. Please try again later."
-msgstr ""
-"ورود ناموفق بود: زمان اتصال به پایان رسیده است. لطفاً بعداً دوباره امتحان "
-"کنید."
-
-#: trendsearth_ui/callbacks/auth.py:494
-#, fuzzy
-msgid ""
-"Login failed: Cannot connect to authentication server. Please check the "
-"server status."
-msgstr ""
-"ورود ناموفق بود: اتصال به سرور احراز هویت امکان‌پذیر نیست. لطفاً وضعیت سرور "
-"را بررسی کنید."
-
-#: trendsearth_ui/callbacks/auth.py:506
-#, fuzzy, python-brace-format
-msgid "Login failed: {error}"
-msgstr "ورود ناموفق بود: {error}"
-
-#: trendsearth_ui/callbacks/auth.py:725 trendsearth_ui/callbacks/auth.py:1421
-msgid "Please enter your email address."
-msgstr "لطفا آدرس ایمیل خود را وارد کنید."
-
-#: trendsearth_ui/callbacks/auth.py:738 trendsearth_ui/callbacks/auth.py:1457
-msgid "Please enter a valid email address."
-msgstr "لطفا یک آدرس ایمیل معتبر وارد کنید."
-
-#: trendsearth_ui/callbacks/auth.py:774
-#, python-brace-format
-msgid ""
-"If an account exists with {email}, password recovery instructions have been "
-"sent. Please check your email."
-msgstr ""
-"اگر حسابی با {email} وجود دارد، دستورالعمل‌های بازیابی رمز عبور ارسال شده "
-"است. لطفاً ایمیل خود را بررسی کنید."
-
-#: trendsearth_ui/callbacks/auth.py:785
-msgid "Failed to send password recovery email."
-msgstr "ارسال ایمیل بازیابی رمز عبور ناموفق بود."
-
-#: trendsearth_ui/callbacks/auth.py:794
-#, python-brace-format
-msgid "{}. Please try again later."
-msgstr "{}. لطفا بعدا دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:808
-msgid "Request timed out. Please try again later."
-msgstr "زمان درخواست به پایان رسیده است. لطفاً بعداً دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:820
-msgid ""
-"Cannot connect to the server. Please check your internet connection and try "
-"again."
-msgstr ""
-"اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال اینترنت خود را بررسی کرده و "
-"دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:832
-#, python-brace-format
-msgid "An error occurred: {error}. Please try again later."
-msgstr "خطایی رخ داد: {error}. لطفاً بعداً دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1161
-msgid "Invalid or missing reset token. Please request a new password reset."
-msgstr ""
-"رمز عبور نامعتبر است یا وجود ندارد. لطفاً درخواست تنظیم مجدد رمز عبور جدید "
-"بدهید."
-
-#: trendsearth_ui/callbacks/auth.py:1170
-msgid "Please enter and confirm your new password."
-msgstr "لطفا رمز عبور جدید خود را وارد و تأیید کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1179
-msgid "Passwords do not match. Please try again."
-msgstr "رمزهای عبور مطابقت ندارند. لطفاً دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1188
-#: trendsearth_ui/callbacks/profile.py:123
-#, fuzzy
-msgid "Password must be at least 12 characters long."
-msgstr "رمز عبور باید حداقل ۱۲ کاراکتر داشته باشد."
-
-#: trendsearth_ui/callbacks/auth.py:1209
-msgid "Password reset successful! You can now log in with your new password."
-msgstr ""
-"رمز عبور با موفقیت بازیابی شد! اکنون می‌توانید با رمز عبور جدید خود وارد "
-"شوید."
-
-#: trendsearth_ui/callbacks/auth.py:1219
-msgid ""
-"This reset link is invalid or has expired. Please request a new password "
-"reset."
-msgstr ""
-"این لینک بازنشانی نامعتبر است یا منقضی شده است. لطفاً درخواست بازنشانی رمز "
-"عبور جدید بدهید."
-
-#: trendsearth_ui/callbacks/auth.py:1228
-msgid "Password does not meet requirements."
-msgstr "رمز عبور الزامات را برآورده نمی‌کند."
-
-#: trendsearth_ui/callbacks/auth.py:1243
-msgid "Failed to reset password."
-msgstr "بازنشانی رمز عبور ناموفق بود."
-
-#: trendsearth_ui/callbacks/auth.py:1251 trendsearth_ui/callbacks/auth.py:1545
-#, python-brace-format
-msgid "{}. Please try again."
-msgstr "{}. لطفا دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1272 trendsearth_ui/callbacks/auth.py:1554
-#: trendsearth_ui/callbacks/auth.py:1915
-msgid "Cannot connect to the server. Please check your connection."
-msgstr "اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال خود را بررسی کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1281 trendsearth_ui/callbacks/auth.py:1560
-#: trendsearth_ui/callbacks/auth.py:1921
-#, python-brace-format
-msgid "An error occurred: {error}"
-msgstr "خطایی رخ داده است: {error}"
-
-#: trendsearth_ui/callbacks/auth.py:1424 trendsearth_ui/callbacks/auth.py:1807
-msgid "Please enter your name."
-msgstr "لطفا نام خود را وارد کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1427 trendsearth_ui/callbacks/auth.py:1810
-msgid "Please enter your organization."
-msgstr "لطفا سازمان خود را وارد کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1430 trendsearth_ui/callbacks/auth.py:1813
-msgid "Please select your sector."
-msgstr "لطفا بخش خود را انتخاب کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1433 trendsearth_ui/callbacks/auth.py:1816
-msgid "Please specify your sector."
-msgstr "لطفا حوزه فعالیت خود را مشخص کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1436 trendsearth_ui/callbacks/auth.py:1819
-msgid "Please select your purpose of use."
-msgstr "لطفا هدف استفاده خود را انتخاب کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1439 trendsearth_ui/callbacks/auth.py:1822
-msgid "Please specify your purpose of use."
-msgstr "لطفا هدف استفاده خود را مشخص کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1442 trendsearth_ui/callbacks/auth.py:1825
-msgid "Please select your country."
-msgstr "لطفا کشور خود را انتخاب کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1445 trendsearth_ui/callbacks/auth.py:1828
-msgid "Please describe your gender identity."
-msgstr "لطفا هویت جنسیتی خود را شرح دهید."
-
-#: trendsearth_ui/callbacks/auth.py:1449
-msgid "Please acknowledge the Google Earth Engine license terms."
-msgstr "لطفاً شرایط مجوز موتور گوگل ارث را تأیید کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1504
-msgid ""
-"Account created successfully! Please check your email to verify your "
-"account, then you can log in."
-msgstr ""
-"حساب کاربری با موفقیت ایجاد شد! لطفاً ایمیل خود را برای تأیید حساب کاربری "
-"خود بررسی کنید، سپس می‌توانید وارد شوید."
-
-#: trendsearth_ui/callbacks/auth.py:1511 trendsearth_ui/callbacks/auth.py:1537
-msgid "Registration failed."
-msgstr "ثبت نام ناموفق بود."
-
-#: trendsearth_ui/callbacks/auth.py:1520
-msgid "Validation failed."
-msgstr "اعتبارسنجی ناموفق بود."
-
-#: trendsearth_ui/callbacks/auth.py:1531
-msgid "Too many registration attempts. Please try again later."
-msgstr "تعداد دفعات ثبت نام خیلی زیاد است. لطفاً بعداً دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1709
-msgid "Invalid or expired token. Please request a new profile update link."
-msgstr ""
-"توکن نامعتبر یا منقضی شده است. لطفاً لینک به‌روزرسانی پروفایل جدید درخواست "
-"کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1751
-#, python-brace-format
-msgid "Error loading profile: {error}"
-msgstr "خطا در بارگیری نمایه: {error}"
-
-#: trendsearth_ui/callbacks/auth.py:1800
-msgid "No authentication token. Please use a valid profile update link."
-msgstr ""
-"بدون توکن احراز هویت. لطفاً از یک لینک معتبر برای به‌روزرسانی پروفایل "
-"استفاده کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1884
-#: trendsearth_ui/callbacks/profile.py:61
-msgid "Profile updated successfully!"
-msgstr "پروفایل با موفقیت به‌روزرسانی شد!"
-
-#: trendsearth_ui/callbacks/auth.py:1887
-msgid "Session expired. Please request a new profile update link."
-msgstr ""
-"زمان اعتبار اعتبار منقضی شده است. لطفاً درخواست لینک به‌روزرسانی جدید "
-"پروفایل را بدهید."
-
-#: trendsearth_ui/callbacks/auth.py:1892
-msgid "Invalid token. Please request a new profile update link."
-msgstr "توکن نامعتبر است. لطفاً لینک به‌روزرسانی پروفایل جدید درخواست کنید."
-
-#: trendsearth_ui/callbacks/auth.py:1901
-#: trendsearth_ui/callbacks/profile.py:63
-msgid "Failed to update profile."
-msgstr "به‌روزرسانی نمایه انجام نشد."
-
-#: trendsearth_ui/callbacks/edit.py:550
-#: trendsearth_ui/callbacks/profile.py:192
-#, fuzzy
-msgid "Password changed successfully!"
-msgstr "رمز عبور با موفقیت تغییر کرد!"
-
-#: trendsearth_ui/callbacks/edit.py:553
-#: trendsearth_ui/callbacks/profile.py:195
-#, fuzzy
-msgid "Failed to change password."
-msgstr "تغییر رمز عبور ناموفق بود."
-
-#: trendsearth_ui/callbacks/edit.py:562
-#, fuzzy, python-brace-format
-msgid " (Status: {status})"
-msgstr " (وضعیت: {وضعیت})"
-
-#: trendsearth_ui/callbacks/edit.py:568
-#: trendsearth_ui/callbacks/gee_credentials.py:196
-#: trendsearth_ui/callbacks/gee_credentials.py:361
-#: trendsearth_ui/callbacks/profile.py:72
-#: trendsearth_ui/callbacks/profile.py:210
-#: trendsearth_ui/callbacks/profile.py:277
-#: trendsearth_ui/callbacks/profile.py:448
-#, fuzzy, python-brace-format
-msgid "Network error: {error}"
-msgstr "خطای شبکه: {error}"
-
-#: trendsearth_ui/callbacks/executions.py:564
-#, fuzzy
-msgid "Execution Cancelled Successfully"
-msgstr "اجرا با موفقیت لغو شد"
-
-#: trendsearth_ui/callbacks/executions.py:568
-#: trendsearth_ui/callbacks/executions.py:713
-#, fuzzy
-msgid "Execution ID: "
-msgstr "شناسه اجرا: "
-
-#: trendsearth_ui/callbacks/executions.py:569
-#: trendsearth_ui/callbacks/executions.py:576
-#: trendsearth_ui/callbacks/executions.py:584
-#: trendsearth_ui/callbacks/executions.py:593
-#: trendsearth_ui/callbacks/executions.py:661
-#: trendsearth_ui/callbacks/executions.py:664
-#: trendsearth_ui/callbacks/gee_credentials.py:42
-#, fuzzy
-msgid "Unknown"
-msgstr "ناشناخته"
-
-#: trendsearth_ui/callbacks/executions.py:575
-#, fuzzy
-msgid "Script: "
-msgstr "اسکریپت: "
-
-#: trendsearth_ui/callbacks/executions.py:582
-#, fuzzy
-msgid "Previous Status: "
-msgstr "وضعیت قبلی: "
-
-#: trendsearth_ui/callbacks/executions.py:591
-#, fuzzy
-msgid "New Status: "
-msgstr "وضعیت جدید: "
-
-#: trendsearth_ui/callbacks/executions.py:608
-#, fuzzy
-msgid "Infrastructure Cleanup"
-msgstr "پاکسازی زیرساخت‌ها"
-
-#: trendsearth_ui/callbacks/executions.py:614
-#, fuzzy
-msgid "Docker service stopped"
-msgstr "سرویس داکر متوقف شد"
-
-#: trendsearth_ui/callbacks/executions.py:616
-#, fuzzy
-msgid "Docker service not found/stopped"
-msgstr "سرویس داکر یافت نشد/متوقف شد"
-
-#: trendsearth_ui/callbacks/executions.py:625
-#, fuzzy
-msgid "Docker container stopped"
-msgstr "کانتینر داکر متوقف شد"
-
-#: trendsearth_ui/callbacks/executions.py:627
-#, fuzzy
-msgid "Docker container not found/stopped"
-msgstr "کانتینر داکر پیدا نشد/متوقف شد"
-
-#: trendsearth_ui/callbacks/executions.py:639
-#: trendsearth_ui/callbacks/executions.py:679
-#, fuzzy
-msgid "Google Earth Engine Tasks"
-msgstr "وظایف موتور گوگل ارث"
-
-#: trendsearth_ui/callbacks/executions.py:643
-#, fuzzy, python-brace-format
-msgid "Found and processed {count} GEE tasks:"
-msgstr "وظایف {count} GEE یافت و پردازش شدند:"
-
-#: trendsearth_ui/callbacks/executions.py:663
-#, fuzzy, python-brace-format
-msgid "Status: {status}"
-msgstr "وضعیت: {وضعیت}"
-
-#: trendsearth_ui/callbacks/executions.py:681
-#, fuzzy
-msgid "No GEE tasks found in execution logs."
-msgstr "هیچ وظیفه GEE در گزارش‌های اجرا یافت نشد."
-
-#: trendsearth_ui/callbacks/executions.py:694
-#, fuzzy
-msgid "Errors Encountered"
-msgstr "خطاهای رخ داده"
-
-#: trendsearth_ui/callbacks/executions.py:704
-#, fuzzy
-msgid "Cancellation Failed"
-msgstr "لغو ناموفق بود"
-
-#: trendsearth_ui/callbacks/executions.py:707
-#, fuzzy
-msgid "Error: "
-msgstr "خطا: "
-
-#: trendsearth_ui/callbacks/gee_credentials.py:26
-#, fuzzy
-msgid "Please log in to view credentials status."
-msgstr "برای مشاهده وضعیت اعتبارنامه‌ها، لطفاً وارد شوید."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:53
-#, fuzzy
-msgid "OAuth"
-msgstr "اواوت"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:53
-#, fuzzy
-msgid "Service Account"
-msgstr "حساب کاربری خدمات"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:59
-#, fuzzy, python-brace-format
-msgid "Credentials configured using {type_label}"
-msgstr "اعتبارنامه‌ها با استفاده از {type_label} پیکربندی شده‌اند"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:64
-#, python-brace-format
-msgid "Set up on: {created_date}"
-msgstr "تنظیم در: {created_date}"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:81
-msgid "No Google Earth Engine credentials configured."
-msgstr "هیچ اعتبارنامه‌ای برای موتور گوگل ارث پیکربندی نشده است."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:84
-msgid "Choose one of the setup options below."
-msgstr "یکی از گزینه‌های تنظیم زیر را انتخاب کنید."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:91
-msgid "Unable to retrieve credentials status."
-msgstr "بازیابی وضعیت اعتبارنامه‌ها امکان‌پذیر نیست."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:98
-msgid "Error retrieving credentials status."
-msgstr "خطا در بازیابی وضعیت اعتبارنامه‌ها."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:164
-#, fuzzy
-msgid ""
-"OAuth window opened. Please complete the authorization and return here."
-msgstr "پنجره OAuth باز شد. لطفاً مجوز را تکمیل کرده و اینجا برگردانید."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:169
-msgid ""
-"After authorization, you may need to refresh this page to see the updated "
-"status."
-msgstr ""
-"پس از تأیید، ممکن است لازم باشد این صفحه را رفرش کنید تا وضعیت "
-"به‌روزرسانی‌شده را ببینید."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:181
-msgid "OAuth initiation failed - no authorization URL received."
-msgstr "شروع OAuth ناموفق بود - هیچ URL مجوزی دریافت نشد."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:186
-msgid "Failed to initiate OAuth flow."
-msgstr "شروع جریان OAuth ناموفق بود."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:226
-msgid "Invalid JSON file. Please upload a valid service account key file."
-msgstr ""
-"فایل JSON نامعتبر است. لطفاً یک فایل کلید حساب سرویس معتبر بارگذاری کنید."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:234
-msgid "Invalid service account key. Missing required fields."
-msgstr "کلید حساب سرویس نامعتبر است. فیلدهای الزامی وجود ندارد."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:238
-msgid "Invalid service account key. Type field must be 'service_account'."
-msgstr ""
-"کلید حساب سرویس نامعتبر است. فیلد نوع باید &#39;service_account&#39; باشد."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:258
-#, python-brace-format
-msgid "Service account key '{filename}' uploaded successfully!"
-msgstr "کلید حساب سرویس &#39;{filename}&#39; با موفقیت آپلود شد!"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:266
-msgid "Failed to upload service account key."
-msgstr "آپلود کلید حساب سرویس ناموفق بود."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:276
-#, python-brace-format
-msgid "Error processing file: {error}"
-msgstr "خطا در پردازش فایل: {error}"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:318
-msgid "Google Earth Engine credentials are valid and working!"
-msgstr "اعتبارنامه‌های موتور جستجوی گوگل ارث معتبر و در حال کار هستند!"
-
-#: trendsearth_ui/callbacks/gee_credentials.py:324
-msgid "Credentials test failed."
-msgstr "آزمون اعتبارنامه‌ها با شکست مواجه شد."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:345
-msgid "Google Earth Engine credentials deleted successfully."
-msgstr "اطلاعات کاربری Google Earth Engine با موفقیت حذف شد."
-
-#: trendsearth_ui/callbacks/gee_credentials.py:351
-msgid "Failed to delete credentials."
-msgstr "حذف اعتبارنامه‌ها ناموفق بود."
-
-#: trendsearth_ui/callbacks/news_admin.py:40
-#, fuzzy
-msgid "No news items found."
-msgstr "هیچ مورد خبری یافت نشد."
-
-#: trendsearth_ui/callbacks/news_admin.py:140
-#, fuzzy
-msgid "Please log in to manage news."
-msgstr "برای مدیریت اخبار، لطفاً وارد شوید."
-
-#: trendsearth_ui/callbacks/news_admin.py:152
-#: trendsearth_ui/callbacks/news_admin.py:153
-#: trendsearth_ui/callbacks/news_admin.py:447
-#: trendsearth_ui/callbacks/news_admin.py:525
-msgid "Session expired. Please log in again."
-msgstr "زمان اعتبار اعتبار منقضی شده است. لطفا دوباره وارد شوید."
-
-#: trendsearth_ui/callbacks/news_admin.py:159
-#: trendsearth_ui/callbacks/news_admin.py:160
-#: trendsearth_ui/callbacks/news_admin.py:456
-#: trendsearth_ui/callbacks/news_admin.py:527
-msgid "Access denied. Admin privileges required."
-msgstr "دسترسی رد شد. دسترسی مدیر لازم است."
-
-#: trendsearth_ui/callbacks/news_admin.py:165
-#, fuzzy, python-brace-format
-msgid "Failed to load news: {status}"
-msgstr "بارگیری اخبار ناموفق بود: {status}"
-
-#: trendsearth_ui/callbacks/news_admin.py:169
-#, fuzzy, python-brace-format
-msgid "Error loading news: {error}"
-msgstr "خطا در بارگیری اخبار: {error}"
-
-#: trendsearth_ui/callbacks/news_admin.py:251
-#: trendsearth_ui/components/tabs.py:1786
-#: trendsearth_ui/components/tabs.py:1871
-msgid "Create News Item"
-msgstr "ایجاد آیتم خبری"
-
-#: trendsearth_ui/callbacks/news_admin.py:275
-#: trendsearth_ui/callbacks/news_admin.py:427
-#, fuzzy
-msgid "Edit News Item"
-msgstr "ویرایش خبر"
-
-#: trendsearth_ui/callbacks/news_admin.py:303
-#, fuzzy
-msgid "Preview will appear here..."
-msgstr "پیش‌نمایش اینجا نمایش داده می‌شود..."
-
-#: trendsearth_ui/callbacks/news_admin.py:362
-#: trendsearth_ui/callbacks/news_admin.py:514
-msgid "Please log in first."
-msgstr "لطفا ابتدا وارد شوید."
-
-#: trendsearth_ui/callbacks/news_admin.py:373
-#, fuzzy
-msgid "Title is required."
-msgstr "عنوان الزامی است."
-
-#: trendsearth_ui/callbacks/news_admin.py:383
-#, fuzzy
-msgid "Message is required."
-msgstr "پیام الزامی است."
-
-#: trendsearth_ui/callbacks/news_admin.py:393
-#, fuzzy
-msgid "At least one target platform is required."
-msgstr "حداقل یک پلتفرم هدف مورد نیاز است."
-
-#: trendsearth_ui/callbacks/news_admin.py:436
-#, fuzzy
-msgid "updated"
-msgstr "به‌روزرسانی‌شده"
-
-#: trendsearth_ui/callbacks/news_admin.py:436
-#, fuzzy
-msgid "created"
-msgstr "ایجاد شده"
-
-#: trendsearth_ui/callbacks/news_admin.py:441
-#, fuzzy, python-brace-format
-msgid "News item {action} successfully!"
-msgstr "خبر {action} با موفقیت انجام شد!"
-
-#: trendsearth_ui/callbacks/news_admin.py:466
-#: trendsearth_ui/callbacks/news_admin.py:531
-#, python-brace-format
-msgid "Error: {status}"
-msgstr "خطا: {وضعیت}"
-
-#: trendsearth_ui/callbacks/news_admin.py:479
-#, python-brace-format
-msgid "Error saving news item: {error}"
-msgstr "خطا در ذخیره خبر: {error}"
-
-#: trendsearth_ui/callbacks/news_admin.py:517
-msgid "No news item selected."
-msgstr "هیچ خبری انتخاب نشده است."
-
-#: trendsearth_ui/callbacks/news_admin.py:523
-msgid "News item deleted successfully!"
-msgstr "خبر با موفقیت حذف شد!"
-
-#: trendsearth_ui/callbacks/news_admin.py:536
-#, python-brace-format
-msgid "Error deleting news item: {error}"
-msgstr "خطا در حذف خبر: {error}"
-
-#: trendsearth_ui/callbacks/profile.py:38
-#, fuzzy
-msgid "Name is required."
-msgstr "نام الزامی است."
-
-#: trendsearth_ui/callbacks/profile.py:45
-#, fuzzy
-msgid "User ID not found in user data."
-msgstr "شناسه کاربری در داده‌های کاربر یافت نشد."
-
-#: trendsearth_ui/callbacks/profile.py:102
-#, fuzzy
-msgid "All password fields are required."
-msgstr "تمام فیلدهای رمز عبور الزامی هستند."
-
-#: trendsearth_ui/callbacks/profile.py:111
-#, fuzzy
-msgid "New passwords do not match."
-msgstr "رمزهای عبور جدید مطابقت ندارند."
-
-#: trendsearth_ui/callbacks/profile.py:133
-#, fuzzy
-msgid "Password must include an uppercase letter."
-msgstr "رمز عبور باید شامل یک حرف بزرگ باشد."
-
-#: trendsearth_ui/callbacks/profile.py:143
-#, fuzzy
-msgid "Password must include a lowercase letter."
-msgstr "رمز عبور باید شامل حروف کوچک باشد."
-
-#: trendsearth_ui/callbacks/profile.py:153
-#, fuzzy
-msgid "Password must include a number."
-msgstr "رمز عبور باید شامل عدد باشد."
-
-#: trendsearth_ui/callbacks/profile.py:164
-#, fuzzy, python-brace-format
-msgid ""
-"Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
-msgstr ""
-"رمز عبور باید شامل یک کاراکتر ویژه (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/) "
-"باشد."
-
-#: trendsearth_ui/callbacks/profile.py:259
-#, fuzzy
-msgid "enabled"
-msgstr "فعال شده"
-
-#: trendsearth_ui/callbacks/profile.py:259
-#, fuzzy
-msgid "disabled"
-msgstr "معلول"
-
-#: trendsearth_ui/callbacks/profile.py:261
-#, fuzzy, python-brace-format
-msgid "Email notifications {status} successfully!"
-msgstr "اعلان‌های ایمیل {status} با موفقیت ارسال شدند!"
-
-#: trendsearth_ui/callbacks/profile.py:267
-#, fuzzy
-msgid "Failed to update email notification settings."
-msgstr "به‌روزرسانی تنظیمات اعلان ایمیل ناموفق بود."
-
-#: trendsearth_ui/callbacks/profile.py:363
-#, fuzzy
-msgid "Email confirmation does not match. Please try again."
-msgstr "ایمیل تایید مطابقت ندارد. لطفا دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/profile.py:390
-#, fuzzy
-msgid "Your account has been deleted."
-msgstr "حساب کاربری شما حذف شده است."
-
-#: trendsearth_ui/callbacks/profile.py:403
-#, fuzzy
-msgid "Admin accounts cannot be deleted through self-service. "
-msgstr "حساب‌های کاربری ادمین را نمی‌توان از طریق سلف سرویس حذف کرد. "
-
-#: trendsearth_ui/callbacks/profile.py:404
-#, fuzzy
-msgid "Please contact a system administrator."
-msgstr "لطفا با یک مدیر سیستم تماس بگیرید."
-
-#: trendsearth_ui/callbacks/profile.py:420
-#: trendsearth_ui/callbacks/profile.py:430
-#, fuzzy
-msgid "Failed to delete account."
-msgstr "حذف حساب کاربری ناموفق بود."
-
-#: trendsearth_ui/callbacks/profile.py:429
-#: trendsearth_ui/callbacks/profile.py:431
-#, fuzzy
-msgid "Please try again."
-msgstr "لطفا دوباره امتحان کنید."
-
-#: trendsearth_ui/callbacks/status.py:250
-#, fuzzy, python-brace-format
-msgid "Current System Status ({header_label})"
-msgstr "وضعیت فعلی سیستم ({header_label})"
-
-#: trendsearth_ui/callbacks/status.py:252
-#: trendsearth_ui/callbacks/status.py:282
-#: trendsearth_ui/components/tabs.py:1344
-#, fuzzy
-msgid "Current System Status"
-msgstr "وضعیت فعلی سیستم"
-
-#: trendsearth_ui/callbacks/status.py:262
-#, fuzzy, python-brace-format
-msgid "Cluster Status{cluster_cached_time}"
-msgstr "وضعیت خوشه {cluster_cached_time}"
-
-#: trendsearth_ui/callbacks/status.py:278
-#, fuzzy, python-brace-format
-msgid "Error loading status data: {error}"
-msgstr "خطا در بارگیری داده‌های وضعیت: {error}"
-
-#: trendsearth_ui/callbacks/status.py:286
-#, fuzzy
-msgid "Error"
-msgstr "خطا"
-
-#: trendsearth_ui/callbacks/status.py:398
-#: trendsearth_ui/callbacks/status.py:575
-#, fuzzy
-msgid "Statistics unavailable."
-msgstr "آمار در دسترس نیست."
-
-#: trendsearth_ui/callbacks/status.py:400
-#: trendsearth_ui/callbacks/status.py:577
-#, fuzzy, python-brace-format
-msgid "Error: {error}"
-msgstr "خطا: {خطا}"
-
-#: trendsearth_ui/callbacks/status.py:401
-#: trendsearth_ui/callbacks/status.py:577
-#, fuzzy
-msgid "Unknown error"
-msgstr "خطای ناشناخته"
-
-#: trendsearth_ui/callbacks/status.py:417
-#, fuzzy, python-brace-format
-msgid "Error loading statistics: {error}"
-msgstr "خطا در بارگیری آمار: {error}"
-
-#: trendsearth_ui/callbacks/status.py:469
-#, fuzzy
-msgid "No status data available."
-msgstr "هیچ داده‌ای از وضعیت موجود نیست."
-
-#: trendsearth_ui/callbacks/status.py:497
-#, fuzzy
-msgid "Overview"
-msgstr "نمای کلی"
-
-#: trendsearth_ui/callbacks/status.py:500
-#, fuzzy
-msgid "Total Executions"
-msgstr "کل اعدام‌ها"
-
-#: trendsearth_ui/callbacks/status.py:501
-#, fuzzy
-msgid "Total Users"
-msgstr "کل کاربران"
-
-#: trendsearth_ui/callbacks/status.py:502
-#, fuzzy
-msgid "Total Scripts"
-msgstr "اسکریپت‌های کامل"
-
-#: trendsearth_ui/callbacks/status.py:511
-#: trendsearth_ui/components/layout.py:1755
-#, fuzzy
-msgid "Executions"
-msgstr "اعدام‌ها"
-
-#: trendsearth_ui/callbacks/status.py:514
-#, fuzzy
-msgid "Active"
-msgstr "فعال"
-
-#: trendsearth_ui/callbacks/status.py:517
-#, fuzzy
-msgid "Running"
-msgstr "دویدن"
-
-#: trendsearth_ui/callbacks/status.py:518
-#, fuzzy
-msgid "Ready"
-msgstr "آماده"
-
-#: trendsearth_ui/callbacks/status.py:519
-#, fuzzy
-msgid "Pending"
-msgstr "در حال بررسی"
-
-#: trendsearth_ui/callbacks/status.py:521
-#: trendsearth_ui/callbacks/status.py:544
-#, fuzzy
-msgid "Total"
-msgstr "مجموع"
-
-#: trendsearth_ui/callbacks/status.py:533
-#, fuzzy
-msgid "Completed"
-msgstr "تکمیل شده"
-
-#: trendsearth_ui/callbacks/status.py:536
-#, fuzzy
-msgid "Finished"
-msgstr "تمام شده"
-
-#: trendsearth_ui/callbacks/status.py:538
-#, fuzzy
-msgid "Failed"
-msgstr "شکست خورده"
-
-#: trendsearth_ui/callbacks/status.py:542
-#, fuzzy
-msgid "Cancelled"
-msgstr "لغو شد"
-
-#: trendsearth_ui/callbacks/status.py:579
-#, fuzzy
-msgid "No statistics available for the selected period."
-msgstr "آماری برای دوره انتخاب شده موجود نیست."
-
-#: trendsearth_ui/components/layout.py:50
-#, fuzzy
-msgid "Government - Environment/Natural Resources"
-msgstr "دولت - محیط زیست/منابع طبیعی"
-
-#: trendsearth_ui/components/layout.py:51
-#, fuzzy
-msgid "Government - Agriculture"
-msgstr "دولت - کشاورزی"
-
-#: trendsearth_ui/components/layout.py:52
-#, fuzzy
-msgid "Government - Land Management/Planning"
-msgstr "دولت - مدیریت/برنامه‌ریزی زمین"
-
-#: trendsearth_ui/components/layout.py:53
-#, fuzzy
-msgid "Government - Other"
-msgstr "دولت - سایر"
-
-#: trendsearth_ui/components/layout.py:54
-#, fuzzy
-msgid "International/Multilateral Organization"
-msgstr "سازمان بین‌المللی/چندجانبه"
-
-#: trendsearth_ui/components/layout.py:55
-#, fuzzy
-msgid "NGO - Development/Aid"
-msgstr "سازمان مردم نهاد - توسعه/کمک"
-
-#: trendsearth_ui/components/layout.py:56
-#, fuzzy
-msgid "NGO - Community-Based"
-msgstr "سازمان مردم نهاد - مبتنی بر جامعه"
-
-#: trendsearth_ui/components/layout.py:57
-#, fuzzy
-msgid "NGO - Conservation"
-msgstr "سازمان مردم نهاد - حفاظت از محیط زیست"
-
-#: trendsearth_ui/components/layout.py:58
-#, fuzzy
-msgid "NGO - Other"
-msgstr "سازمان مردم نهاد - سایر"
-
-#: trendsearth_ui/components/layout.py:59
-#, fuzzy
-msgid "Academic/Research Institution"
-msgstr "موسسه علمی/تحقیقاتی"
-
-#: trendsearth_ui/components/layout.py:60
-#, fuzzy
-msgid "Consulting/Professional Services"
-msgstr "خدمات مشاوره‌ای/حرفه‌ای"
-
-#: trendsearth_ui/components/layout.py:61
-#, fuzzy
-msgid "Private Sector - Agriculture/Forestry"
-msgstr "بخش خصوصی - کشاورزی/جنگلداری"
-
-#: trendsearth_ui/components/layout.py:62
-#, fuzzy
-msgid "Private Sector - Other"
-msgstr "بخش خصوصی - سایر"
-
-#: trendsearth_ui/components/layout.py:63
-#, fuzzy
-msgid "Independent Researcher"
-msgstr "محقق مستقل"
-
-#: trendsearth_ui/components/layout.py:64
-#, fuzzy
-msgid "Student"
-msgstr "دانشجو"
-
-#: trendsearth_ui/components/layout.py:65
-#: trendsearth_ui/components/layout.py:88
-#, fuzzy
-msgid "Other"
-msgstr "دیگر"
-
-#: trendsearth_ui/components/layout.py:77
-#, fuzzy
-msgid "National/International Reporting (UNCCD, SDGs, etc.)"
-msgstr ""
-"گزارش‌دهی ملی/بین‌المللی (کنوانسیون ملل متحد برای بیابان‌زایی، اهداف توسعه "
-"پایدار و غیره)"
-
-#: trendsearth_ui/components/layout.py:78
-#, fuzzy
-msgid "Academic Research"
-msgstr "تحقیقات دانشگاهی"
-
-#: trendsearth_ui/components/layout.py:79
-#, fuzzy
-msgid "Policy Development & Planning"
-msgstr "توسعه و برنامه‌ریزی سیاست"
-
-#: trendsearth_ui/components/layout.py:80
-#, fuzzy
-msgid "Land Restoration/Management Planning"
-msgstr "برنامه ریزی احیای زمین/مدیریت زمین"
-
-#: trendsearth_ui/components/layout.py:81
-#, fuzzy
-msgid "Project Monitoring & Evaluation"
-msgstr "نظارت و ارزیابی پروژه"
-
-#: trendsearth_ui/components/layout.py:82
-#, fuzzy
-msgid "Environmental Impact Assessment"
-msgstr "ارزیابی اثرات زیست‌محیطی"
-
-#: trendsearth_ui/components/layout.py:83
-#, fuzzy
-msgid "Agriculture/Forestry Planning"
-msgstr "برنامه‌ریزی کشاورزی/جنگلداری"
-
-#: trendsearth_ui/components/layout.py:84
-#, fuzzy
-msgid "Teaching & Education"
-msgstr "آموزش و پرورش"
-
-#: trendsearth_ui/components/layout.py:85
-#, fuzzy
-msgid "Conservation Planning"
-msgstr "برنامه‌ریزی حفاظت"
-
-#: trendsearth_ui/components/layout.py:86
-#, fuzzy
-msgid "Commercial Services/Products"
-msgstr "خدمات/محصولات تجاری"
-
-#: trendsearth_ui/components/layout.py:87
-#, fuzzy
-msgid "Community/Grassroots Initiatives"
-msgstr "ابتکارات اجتماعی/مردمی"
-
-#: trendsearth_ui/components/layout.py:100
-#, fuzzy
-msgid "Woman"
-msgstr "زن"
-
-#: trendsearth_ui/components/layout.py:101
-#, fuzzy
-msgid "Man"
-msgstr "مرد"
-
-#: trendsearth_ui/components/layout.py:102
-#, fuzzy
-msgid "Non-binary"
-msgstr "غیر دودویی"
-
-#: trendsearth_ui/components/layout.py:103
-#, fuzzy
-msgid "Prefer to self-describe"
-msgstr "ترجیح می‌دهند خودشان را توصیف کنند"
-
-#: trendsearth_ui/components/layout.py:104
-#, fuzzy
-msgid "Prefer not to say"
-msgstr "ترجیح میدم نگم"
-
-#: trendsearth_ui/components/layout.py:187
-#, fuzzy
-msgid "Forgot Password"
-msgstr "رمز عبور را فراموش کرده‌ام"
-
-#: trendsearth_ui/components/layout.py:197
-#, fuzzy
-msgid ""
-"Enter your email address and we'll send you instructions to reset your "
-"password."
-msgstr ""
-"آدرس ایمیل خود را وارد کنید و ما دستورالعمل‌های بازنشانی رمز عبور را برای "
-"شما ارسال خواهیم کرد."
-
-#: trendsearth_ui/components/layout.py:200
-#, fuzzy
-msgid "Email Address"
-msgstr "آدرس ایمیل"
-
-#: trendsearth_ui/components/layout.py:204
-#: trendsearth_ui/components/layout.py:758
-#, fuzzy
-msgid "Enter your email address"
-msgstr "آدرس ایمیل خود را وارد کنید"
-
-#: trendsearth_ui/components/layout.py:226
-#: trendsearth_ui/components/tabs.py:255
-#: trendsearth_ui/components/tabs.py:2204
-#: trendsearth_ui/components/tabs.py:2236
-msgid "Cancel"
-msgstr "لغو"
-
-#: trendsearth_ui/components/layout.py:232
-#, fuzzy
-msgid "Send Reset Instructions"
-msgstr "ارسال دستورالعمل‌های بازنشانی"
-
-#: trendsearth_ui/components/layout.py:244
-#, fuzzy
-msgid "OK"
-msgstr "باشه"
-
-#: trendsearth_ui/components/layout.py:279
-#: trendsearth_ui/components/layout.py:351
-#, fuzzy
-msgid "Login"
-msgstr "ورود"
-
-#: trendsearth_ui/components/layout.py:299
-#: trendsearth_ui/components/layout.py:744
-#: trendsearth_ui/components/layout.py:1296
-#: trendsearth_ui/components/tabs.py:474
-#: trendsearth_ui/utils/mobile_utils.py:96
-#: trendsearth_ui/utils/mobile_utils.py:245
-#: trendsearth_ui/utils/mobile_utils.py:798
-#, fuzzy
-msgid "Email"
-msgstr "ایمیل"
-
-#: trendsearth_ui/components/layout.py:304
-#, fuzzy
-msgid "Enter email"
-msgstr "ایمیل را وارد کنید"
-
-#: trendsearth_ui/components/layout.py:313
-#, fuzzy
-msgid "Password"
-msgstr "رمز عبور"
-
-#: trendsearth_ui/components/layout.py:318
-#, fuzzy
-msgid "Enter password"
-msgstr "رمز عبور را وارد کنید"
-
-#: trendsearth_ui/components/layout.py:341
-#, fuzzy
-msgid "Remember me (keep me logged in)"
-msgstr "مرا به خاطر بسپار (مرا به خاطر بسپار)"
-
-#: trendsearth_ui/components/layout.py:359
-#, fuzzy
-msgid "Register"
-msgstr "ثبت نام"
-
-#: trendsearth_ui/components/layout.py:370
-#, fuzzy
-msgid "Forgot your password?"
-msgstr "رمز عبور خود را فراموش کرده‌اید؟"
-
-#: trendsearth_ui/components/layout.py:401
-#: trendsearth_ui/components/layout.py:630
-#: trendsearth_ui/components/layout.py:1154
-#: trendsearth_ui/components/layout.py:1610
-#, fuzzy
-msgid "Privacy Policy"
-msgstr "سیاست حفظ حریم خصوصی"
-
-#: trendsearth_ui/components/layout.py:416
-#: trendsearth_ui/components/layout.py:645
-#: trendsearth_ui/components/layout.py:1169
-#: trendsearth_ui/components/layout.py:1625
-#, fuzzy
-msgid "Terms of Use"
-msgstr "شرایط استفاده"
-
-#: trendsearth_ui/components/layout.py:486
-#, fuzzy
-msgid "Set Your New Password"
-msgstr "رمز عبور جدید خود را تنظیم کنید"
-
-#: trendsearth_ui/components/layout.py:490
-#, fuzzy
-msgid "Enter your new password below."
-msgstr "رمز عبور جدید خود را در زیر وارد کنید."
-
-#: trendsearth_ui/components/layout.py:511
-#, fuzzy
-msgid "New Password"
-msgstr "رمز عبور جدید"
-
-#: trendsearth_ui/components/layout.py:517
-#, fuzzy
-msgid "Enter new password"
-msgstr "رمز عبور جدید را وارد کنید"
-
-#: trendsearth_ui/components/layout.py:528
-#, fuzzy
-msgid "Confirm Password"
-msgstr "تأیید رمز عبور"
-
-#: trendsearth_ui/components/layout.py:535
-#, fuzzy
-msgid "Confirm new password"
-msgstr "رمز عبور جدید را تأیید کنید"
-
-#: trendsearth_ui/components/layout.py:547
-#: trendsearth_ui/components/tabs.py:2339
-msgid "Password requirements:"
-msgstr "الزامات رمز عبور:"
-
-#: trendsearth_ui/components/layout.py:553
-#: trendsearth_ui/components/tabs.py:2345
-msgid "At least 12 characters"
-msgstr "حداقل ۱۲ کاراکتر"
-
-#: trendsearth_ui/components/layout.py:558
-#: trendsearth_ui/components/tabs.py:2350
-msgid "Uppercase letter (A-Z)"
-msgstr "حرف بزرگ (AZ)"
-
-#: trendsearth_ui/components/layout.py:563
-#: trendsearth_ui/components/tabs.py:2355
-msgid "Lowercase letter (a-z)"
-msgstr "حرف کوچک (az)"
-
-#: trendsearth_ui/components/layout.py:568
-#: trendsearth_ui/components/tabs.py:2360
-msgid "Number (0-9)"
-msgstr "شماره (0-9)"
-
-#: trendsearth_ui/components/layout.py:574
-#: trendsearth_ui/components/tabs.py:2366
-#, python-brace-format
-msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr "کاراکتر ویژه (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
-
-#: trendsearth_ui/components/layout.py:591
-#, fuzzy
-msgid "Set Password"
-msgstr "تنظیم رمز عبور"
-
-#: trendsearth_ui/components/layout.py:607
-#: trendsearth_ui/components/layout.py:1138
-#, fuzzy
-msgid "Back to Login"
-msgstr "بازگشت به ورود"
-
-#: trendsearth_ui/components/layout.py:714
-#, fuzzy
-msgid "Create Your Account"
-msgstr "حساب کاربری خود را ایجاد کنید"
-
-#: trendsearth_ui/components/layout.py:719
-#, fuzzy
-msgid ""
-"After registration, you'll receive an email to verify your address and set "
-"your password."
-msgstr ""
-"پس از ثبت نام، ایمیلی برای تأیید آدرس و تنظیم رمز عبور دریافت خواهید کرد."
-
-#: trendsearth_ui/components/layout.py:732
-#: trendsearth_ui/components/layout.py:1287
-#, fuzzy
-msgid "Required field"
-msgstr "فیلد مورد نیاز"
-
-#: trendsearth_ui/components/layout.py:772
-#: trendsearth_ui/components/layout.py:1323
-#, fuzzy
-msgid "Full Name"
-msgstr "نام و نام خانوادگی"
-
-#: trendsearth_ui/components/layout.py:786
-#: trendsearth_ui/components/layout.py:1337
-#, fuzzy
-msgid "Enter your full name"
-msgstr "نام کامل خود را وارد کنید"
-
-#: trendsearth_ui/components/layout.py:798
-#: trendsearth_ui/components/layout.py:1349
-#: trendsearth_ui/utils/mobile_utils.py:388
-#, fuzzy
-msgid "Role/Title"
-msgstr "نقش/عنوان"
-
-#: trendsearth_ui/components/layout.py:805
-#: trendsearth_ui/components/layout.py:1356
-#, fuzzy
-msgid "Your job title (optional)"
-msgstr "عنوان شغلی شما (اختیاری)"
-
-#: trendsearth_ui/components/layout.py:819
-#: trendsearth_ui/components/layout.py:1370
-#, fuzzy
-msgid "Organization"
-msgstr "سازمان"
-
-#: trendsearth_ui/components/layout.py:833
-#: trendsearth_ui/components/layout.py:1384
-#, fuzzy
-msgid "Your organization"
-msgstr "سازمان شما"
-
-#: trendsearth_ui/components/layout.py:847
-#: trendsearth_ui/components/layout.py:1398
-#: trendsearth_ui/utils/mobile_utils.py:404
-#, fuzzy
-msgid "Sector"
-msgstr "بخش"
-
-#: trendsearth_ui/components/layout.py:861
-#: trendsearth_ui/components/layout.py:1412
-#, fuzzy
-msgid "Select your sector"
-msgstr "بخش خود را انتخاب کنید"
-
-#: trendsearth_ui/components/layout.py:875
-#: trendsearth_ui/components/layout.py:928
-#: trendsearth_ui/components/layout.py:1426
-#: trendsearth_ui/components/layout.py:1479
-#, fuzzy
-msgid "Please specify"
-msgstr "لطفا مشخص کنید"
-
-#: trendsearth_ui/components/layout.py:882
-#: trendsearth_ui/components/layout.py:1433
-#, fuzzy
-msgid "Please specify your sector"
-msgstr "لطفا حوزه فعالیت خود را مشخص کنید"
-
-#: trendsearth_ui/components/layout.py:899
-#: trendsearth_ui/components/layout.py:1450
-#: trendsearth_ui/utils/mobile_utils.py:420
-#, fuzzy
-msgid "Purpose of Use"
-msgstr "هدف از استفاده"
-
-#: trendsearth_ui/components/layout.py:914
-#: trendsearth_ui/components/layout.py:1465
-#, fuzzy
-msgid "Select your purpose of use"
-msgstr "هدف استفاده خود را انتخاب کنید"
-
-#: trendsearth_ui/components/layout.py:935
-#: trendsearth_ui/components/layout.py:1486
-#, fuzzy
-msgid "Please specify your purpose"
-msgstr "لطفا هدف خود را مشخص کنید"
-
-#: trendsearth_ui/components/layout.py:951
-#: trendsearth_ui/components/layout.py:1502
-#: trendsearth_ui/components/tabs.py:2400
-#: trendsearth_ui/utils/mobile_utils.py:294
-#: trendsearth_ui/utils/stats_visualizations.py:1683
-#, fuzzy
-msgid "Country"
-msgstr "کشور"
-
-#: trendsearth_ui/components/layout.py:964
-#: trendsearth_ui/components/layout.py:1515
-#, fuzzy
-msgid "Select your country"
-msgstr "کشور خود را انتخاب کنید"
-
-#: trendsearth_ui/components/layout.py:982
-#: trendsearth_ui/components/layout.py:1530
-#, fuzzy
-msgid "Gender Identity"
-msgstr "هویت جنسیتی"
-
-#: trendsearth_ui/components/layout.py:990
-#: trendsearth_ui/components/layout.py:1538
-#, fuzzy
-msgid "Select (optional)"
-msgstr "انتخاب کنید (اختیاری)"
-
-#: trendsearth_ui/components/layout.py:1004
-#: trendsearth_ui/components/layout.py:1552
-#, fuzzy
-msgid ""
-"We collect gender identity information to comply with donor reporting "
-"requirements and to assess equitable participation in capacity development "
-"and tool access. Providing this information is voluntary; your selection "
-"will not affect your access to the tool."
-msgstr ""
-"ما اطلاعات هویت جنسیتی را برای رعایت الزامات گزارش‌دهی اهداکنندگان و ارزیابی"
-" مشارکت عادلانه در توسعه ظرفیت و دسترسی به ابزار جمع‌آوری می‌کنیم. ارائه این"
-" اطلاعات داوطلبانه است؛ انتخاب شما تاثیری بر دسترسی شما به ابزار نخواهد "
-"داشت."
-
-#: trendsearth_ui/components/layout.py:1013
-#: trendsearth_ui/components/layout.py:1021
-#: trendsearth_ui/components/layout.py:1561
-#: trendsearth_ui/components/layout.py:1569
-#, fuzzy
-msgid "Please describe"
-msgstr "لطفا شرح دهید"
-
-#: trendsearth_ui/components/layout.py:1065
-#, fuzzy
-msgid ""
-"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
-"and, depending on your use, you may be required to have in place a "
-"commercial license to use Google Earth Engine?"
-msgstr ""
-"آیا تصدیق می‌کنید که برخی از ویژگی‌های Trends.Earth از موتور گوگل ارث "
-"استفاده می‌کنند و بسته به نوع استفاده شما، ممکن است لازم باشد مجوز تجاری "
-"برای استفاده از موتور گوگل ارث داشته باشید؟"
-
-#: trendsearth_ui/components/layout.py:1078
-#, fuzzy
-msgid ""
-"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
-"details see the "
-msgstr ""
-"موتور گوگل ارث (GEE) محدودیت‌هایی را برای استفاده تجاری اعمال می‌کند. برای "
-"جزئیات بیشتر به ... مراجعه کنید. "
-
-#: trendsearth_ui/components/layout.py:1082
-#, fuzzy
-msgid "Google Earth Engine Terms of Use"
-msgstr "شرایط استفاده از موتور گوگل ارث"
-
-#: trendsearth_ui/components/layout.py:1088
-#, fuzzy
-msgid ""
-" . Conservation International does not provide or manage commercial GEE "
-"licenses. Users are solely responsible for ensuring their use of GEE "
-"complies with Google's commercial licensing requirements. Access to this "
-"tool does not grant or imply the provision of commercial licensing."
-msgstr ""
-" . شرکت Conservation International مجوزهای تجاری GEE را ارائه یا مدیریت "
-"نمی‌کند. کاربران صرفاً مسئول حصول اطمینان از مطابقت استفاده خود از GEE با "
-"الزامات مجوز تجاری گوگل هستند. دسترسی به این ابزار به معنای اعطای مجوز تجاری"
-" یا ارائه آن نیست."
-
-#: trendsearth_ui/components/layout.py:1097
-#, fuzzy
-msgid "Yes, I acknowledge"
-msgstr "بله، تصدیق می‌کنم."
-
-#: trendsearth_ui/components/layout.py:1122
-#, fuzzy
-msgid "Create Account"
-msgstr "ایجاد حساب کاربری"
-
-#: trendsearth_ui/components/layout.py:1253
-#, fuzzy
-msgid "Update Your Profile"
-msgstr "پروفایل خود را به‌روزرسانی کنید"
-
-#: trendsearth_ui/components/layout.py:1308
-#, fuzzy
-msgid "Email cannot be changed"
-msgstr "ایمیل قابل تغییر نیست"
-
-#: trendsearth_ui/components/layout.py:1593
-#: trendsearth_ui/components/tabs.py:522
-#, fuzzy
-msgid "Update Profile"
-msgstr "به‌روزرسانی پروفایل"
-
-#: trendsearth_ui/components/layout.py:1709
-#, fuzzy
-msgid "Logout"
-msgstr "خروج"
-
-#: trendsearth_ui/components/layout.py:1765
-#, fuzzy
-msgid "Users"
-msgstr "کاربران"
-
-#: trendsearth_ui/components/layout.py:1779
-#, fuzzy
-msgid "Scripts"
-msgstr "اسکریپت‌ها"
-
-#: trendsearth_ui/components/layout.py:1793
-#: trendsearth_ui/components/tabs.py:2428
-msgid "Admin"
-msgstr "مدیر"
-
-#: trendsearth_ui/components/layout.py:1807
-#: trendsearth_ui/utils/mobile_utils.py:140
-#: trendsearth_ui/utils/mobile_utils.py:499
-#: trendsearth_ui/utils/mobile_utils.py:762
-#, fuzzy
-msgid "Status"
-msgstr "وضعیت"
-
-#: trendsearth_ui/components/layout.py:1821
-#, fuzzy
-msgid "Profile"
-msgstr "پروفایل"
-
-#: trendsearth_ui/components/tabs.py:164
-#, fuzzy
-msgid "Refresh Executions"
-msgstr "تازه کردن اجراها"
-
-#: trendsearth_ui/components/tabs.py:176
-#, fuzzy
-msgid "Auto-refresh in:"
-msgstr "تازه‌سازی خودکار در:"
-
-#: trendsearth_ui/components/tabs.py:215
-#, fuzzy
-msgid "Cancel Execution"
-msgstr "لغو اجرا"
-
-#: trendsearth_ui/components/tabs.py:221
-#, fuzzy
-msgid "Are you sure you want to cancel this execution?"
-msgstr "آیا مطمئن هستید که می‌خواهید این اجرا را لغو کنید؟"
-
-#: trendsearth_ui/components/tabs.py:226
-#, fuzzy
-msgid "Execution ID:"
-msgstr "شناسه اجرا:"
-
-#: trendsearth_ui/components/tabs.py:233
-#, fuzzy
-msgid "Script:"
-msgstr "اسکریپت:"
-
-#: trendsearth_ui/components/tabs.py:240
-#, fuzzy
-msgid "Status:"
-msgstr "وضعیت:"
-
-#: trendsearth_ui/components/tabs.py:246
-#, fuzzy
-msgid "This action cannot be undone."
-msgstr "این اقدام قابل لغو نیست."
-
-#: trendsearth_ui/components/tabs.py:263
-#, fuzzy
-msgid "Confirm Cancel"
-msgstr "تایید لغو"
-
-#: trendsearth_ui/components/tabs.py:302
-#, fuzzy
-msgid "Cancellation Result"
-msgstr "نتیجه لغو"
-
-#: trendsearth_ui/components/tabs.py:305
-#, fuzzy
-msgid "Close"
-msgstr "بستن"
-
-#: trendsearth_ui/components/tabs.py:327
-#, fuzzy
-msgid "Refresh Users"
-msgstr "به‌روزرسانی کاربران"
-
-#: trendsearth_ui/components/tabs.py:401
-#, fuzzy
-msgid "Refresh Scripts"
-msgstr "اسکریپت‌های تازه‌سازی"
-
-#: trendsearth_ui/components/tabs.py:453
-#, fuzzy
-msgid "Profile Settings"
-msgstr "تنظیمات پروفایل"
-
-#: trendsearth_ui/components/tabs.py:462 trendsearth_ui/components/tabs.py:854
-#: trendsearth_ui/utils/mobile_utils.py:262
-#: trendsearth_ui/utils/mobile_utils.py:457
-#, fuzzy
-msgid "Name"
-msgstr "نام"
-
-#: trendsearth_ui/components/tabs.py:466
-#, fuzzy
-msgid "Enter your name"
-msgstr "نام خود را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:478
-#, fuzzy
-msgid "Enter your email"
-msgstr "ایمیل خود را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:492
-#: trendsearth_ui/components/tabs.py:2387
-#: trendsearth_ui/utils/mobile_utils.py:278
-#, fuzzy
-msgid "Institution"
-msgstr "موسسه"
-
-#: trendsearth_ui/components/tabs.py:496
-#, fuzzy
-msgid "Enter your institution"
-msgstr "موسسه خود را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:504
-#: trendsearth_ui/utils/mobile_utils.py:310
-#: trendsearth_ui/utils/mobile_utils.py:680
-#: trendsearth_ui/utils/mobile_utils.py:807
-#, fuzzy
-msgid "Role"
-msgstr "نقش"
-
-#: trendsearth_ui/components/tabs.py:547
-#, fuzzy
-msgid "Email Notifications"
-msgstr "اعلان‌های ایمیلی"
-
-#: trendsearth_ui/components/tabs.py:554
-#, fuzzy
-msgid "Execution Completion Notifications"
-msgstr "اعلان‌های تکمیل اجرا"
-
-#: trendsearth_ui/components/tabs.py:559
-#, fuzzy
-msgid "Enable email notifications"
-msgstr "فعال کردن اعلان‌های ایمیلی"
-
-#: trendsearth_ui/components/tabs.py:569
-#, fuzzy
-msgid ""
-"Receive email notifications when your script executions finish, fail, or are"
-" cancelled."
-msgstr ""
-"وقتی اجرای اسکریپت شما تمام شد، شکست خورد یا لغو شد، اعلان‌های ایمیل دریافت "
-"کنید."
-
-#: trendsearth_ui/components/tabs.py:602
-#, fuzzy
-msgid "Google Earth Engine Account"
-msgstr "حساب کاربری موتور گوگل ارث"
-
-#: trendsearth_ui/components/tabs.py:610
-#, fuzzy
-msgid "Current Credentials Status"
-msgstr "وضعیت فعلی مدارک تحصیلی"
-
-#: trendsearth_ui/components/tabs.py:624
-#, fuzzy
-msgid "Setup Your GEE Account"
-msgstr "حساب GEE خود را تنظیم کنید"
-
-#: trendsearth_ui/components/tabs.py:627
-#, fuzzy
-msgid ""
-"Choose one of the options below to configure your Google Earth Engine "
-"credentials:"
-msgstr ""
-"برای پیکربندی اعتبارنامه‌های Google Earth Engine خود، یکی از گزینه‌های زیر "
-"را انتخاب کنید:"
-
-#: trendsearth_ui/components/tabs.py:648
-#, fuzzy
-msgid "Option 1: Connect Your GEE Account (OAuth)"
-msgstr "گزینه ۱: اتصال حساب GEE (OAuth)"
-
-#: trendsearth_ui/components/tabs.py:654
-#, fuzzy
-msgid ""
-"Connect your personal Google Earth Engine account using OAuth "
-"authentication."
-msgstr ""
-"حساب شخصی Google Earth Engine خود را با استفاده از احراز هویت OAuth متصل "
-"کنید."
-
-#: trendsearth_ui/components/tabs.py:659
-#, fuzzy
-msgid "Connect GEE Account"
-msgstr "اتصال حساب GEE"
-
-#: trendsearth_ui/components/tabs.py:692
-#, fuzzy
-msgid "Option 2: Upload Service Account Key"
-msgstr "گزینه ۲: آپلود کلید حساب سرویس"
-
-#: trendsearth_ui/components/tabs.py:698
-#, fuzzy
-msgid ""
-"Upload a Google Cloud service account JSON key with Earth Engine access."
-msgstr ""
-"یک کلید JSON از حساب سرویس Google Cloud با دسترسی به Earth Engine آپلود "
-"کنید."
-
-#: trendsearth_ui/components/tabs.py:710
-#, fuzzy
-msgid "Upload Service Account Key"
-msgstr "کلید حساب سرویس را بارگذاری کنید"
-
-#: trendsearth_ui/components/tabs.py:741
-#, fuzzy
-msgid "Manage Credentials"
-msgstr "مدیریت اعتبارنامه‌ها"
-
-#: trendsearth_ui/components/tabs.py:745
-#, fuzzy
-msgid "Test Credentials"
-msgstr "مدارک آزمون"
-
-#: trendsearth_ui/components/tabs.py:752
-#, fuzzy
-msgid "Delete Credentials"
-msgstr "حذف اعتبارنامه‌ها"
-
-#: trendsearth_ui/components/tabs.py:779
-#, fuzzy
-msgid "Service Credentials"
-msgstr "مدارک خدمات"
-
-#: trendsearth_ui/components/tabs.py:784
-#, fuzzy
-msgid ""
-"Service credentials allow external applications to authenticate with the "
-"Trends.Earth API using the OAuth2 client credentials grant. The client "
-"secret is shown only once at creation time."
-msgstr ""
-"اعتبارنامه‌های سرویس به برنامه‌های خارجی اجازه می‌دهند تا با استفاده از "
-"اعطای اعتبارنامه‌های کلاینت OAuth2، با API Trends.Earth احراز هویت شوند. رمز"
-" کلاینت فقط یک بار در زمان ایجاد نمایش داده می‌شود."
-
-#: trendsearth_ui/components/tabs.py:798
-#: trendsearth_ui/components/tabs.py:1771
-msgid "Refresh"
-msgstr "تازه کردن"
-
-#: trendsearth_ui/components/tabs.py:814
-#, fuzzy
-msgid "New Credential"
-msgstr "اعتبارنامه جدید"
-
-#: trendsearth_ui/components/tabs.py:843
-#, fuzzy
-msgid "Create Service Credential"
-msgstr "ایجاد اعتبارنامه سرویس"
-
-#: trendsearth_ui/components/tabs.py:858
-#, fuzzy
-msgid "e.g. My CLI Tool"
-msgstr "به عنوان مثال ابزار CLI من"
-
-#: trendsearth_ui/components/tabs.py:862
-#, fuzzy
-msgid "A descriptive label for this credential."
-msgstr "یک برچسب توصیفی برای این اعتبارنامه."
-
-#: trendsearth_ui/components/tabs.py:1408
-#, fuzzy
-msgid "Deployment Information"
-msgstr "اطلاعات استقرار"
-
-#: trendsearth_ui/components/tabs.py:1431
-#, fuzzy
-msgid "System Status Trends"
-msgstr "روندهای وضعیت سیستم"
-
-#: trendsearth_ui/components/tabs.py:1442
-#, fuzzy
-msgid "Last 24 Hours"
-msgstr "۲۴ ساعت گذشته"
-
-#: trendsearth_ui/components/tabs.py:1453
-#, fuzzy
-msgid "Last Week"
-msgstr "هفته گذشته"
-
-#: trendsearth_ui/components/tabs.py:1464
-#, fuzzy
-msgid "Last Month"
-msgstr "ماه گذشته"
-
-#: trendsearth_ui/components/tabs.py:1475
-#, fuzzy
-msgid "Last Year"
-msgstr "سال گذشته"
-
-#: trendsearth_ui/components/tabs.py:1486
-#, fuzzy
-msgid "All Time"
-msgstr "تمام وقت"
-
-#: trendsearth_ui/components/tabs.py:1524
-#, fuzzy
-msgid "Countries with new user registrations"
-msgstr "کشورهایی که کاربران جدید ثبت نام کرده‌اند"
-
-#: trendsearth_ui/components/tabs.py:1565
-#, fuzzy
-msgid ""
-"Access denied. Administrator privileges required to access admin functions."
-msgstr "دسترسی رد شد. برای دسترسی به توابع مدیریتی، امتیازات مدیر لازم است."
-
-#: trendsearth_ui/components/tabs.py:1582
-#, fuzzy
-msgid "Administration Panel"
-msgstr "پنل مدیریت"
-
-#: trendsearth_ui/components/tabs.py:1599
-#, fuzzy
-msgid "Rate Limiting Management"
-msgstr "مدیریت محدودکننده نرخ"
-
-#: trendsearth_ui/components/tabs.py:1609
-#, fuzzy
-msgid "Current & Historical Rate Limit Breaches"
-msgstr "نقض سقف نرخ فعلی و تاریخی"
-
-#: trendsearth_ui/components/tabs.py:1620
-#, fuzzy
-msgid "Refresh Breaches"
-msgstr "تازه کردن نقض‌ها"
-
-#: trendsearth_ui/components/tabs.py:1634
-#, fuzzy
-msgid "Cancel Selected Limit"
-msgstr "لغو محدودیت انتخاب شده"
-
-#: trendsearth_ui/components/tabs.py:1655
-#, fuzzy
-msgid "Reset All Rate Limits"
-msgstr "تنظیم مجدد همه محدودیت‌های نرخ"
-
-#: trendsearth_ui/components/tabs.py:1675
-#, fuzzy
-msgid "Active and historical events"
-msgstr "رویدادهای فعال و تاریخی"
-
-#: trendsearth_ui/components/tabs.py:1715
-#, fuzzy
-msgid "Highlighted rows are active and can be cancelled individually."
-msgstr ""
-"ردیف‌های هایلایت شده فعال هستند و می‌توان آن‌ها را به صورت جداگانه لغو کرد."
-
-#: trendsearth_ui/components/tabs.py:1751
-#, fuzzy
-msgid "News Management"
-msgstr "مدیریت اخبار"
-
-#: trendsearth_ui/components/tabs.py:1760
-#, fuzzy
-msgid "Manage News Items"
-msgstr "مدیریت آیتم‌های خبری"
-
-#: trendsearth_ui/components/tabs.py:1800
-#: trendsearth_ui/utils/mobile_utils.py:445
-#: trendsearth_ui/utils/mobile_utils.py:632
-#, fuzzy
-msgid "Edit"
-msgstr "ویرایش"
-
-#: trendsearth_ui/components/tabs.py:1816
-#: trendsearth_ui/components/tabs.py:2242
-#, fuzzy
-msgid "Delete"
-msgstr "حذف"
-
-#: trendsearth_ui/components/tabs.py:1836
-#, fuzzy
-msgid "Loading news items..."
-msgstr "در حال بارگذاری اخبار ..."
-
-#: trendsearth_ui/components/tabs.py:1883
-#, fuzzy
-msgid "Title *"
-msgstr "عنوان *"
-
-#: trendsearth_ui/components/tabs.py:1887
-#, fuzzy
-msgid "Enter news title"
-msgstr "عنوان خبر را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:1903
-#, fuzzy
-msgid "Message (Markdown supported) *"
-msgstr "پیام (پشتیبانی از Markdown) *"
-
-#: trendsearth_ui/components/tabs.py:1914
-#, fuzzy
-msgid ""
-"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
-"be converted to HTML."
-msgstr ""
-"از قالب‌بندی Markdown استفاده کنید: **bold**، *italic*، [link](url)، لیست‌ها"
-" و غیره. به HTML تبدیل خواهد شد."
-
-#: trendsearth_ui/components/tabs.py:1921
-#, fuzzy
-msgid "Enter news message using Markdown..."
-msgstr "پیام خبری را با استفاده از Markdown وارد کنید..."
-
-#: trendsearth_ui/components/tabs.py:1936
-#, fuzzy
-msgid "Preview"
-msgstr "پیش‌نمایش"
-
-#: trendsearth_ui/components/tabs.py:1956
-#, fuzzy
-msgid "Link URL (optional)"
-msgstr "آدرس لینک (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:1967
-#, fuzzy
-msgid "Link Text (optional)"
-msgstr "متن لینک (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:1971
-#, fuzzy
-msgid "Read more..."
-msgstr "ادامه مطلب ..."
-
-#: trendsearth_ui/components/tabs.py:1983
-#, fuzzy
-msgid "Target Platforms *"
-msgstr "پلتفرم‌های هدف *"
-
-#: trendsearth_ui/components/tabs.py:1988
-#, fuzzy
-msgid "QGIS Plugin"
-msgstr "افزونه QGIS"
-
-#: trendsearth_ui/components/tabs.py:1992
-#, fuzzy
-msgid "Web App"
-msgstr "برنامه وب"
-
-#: trendsearth_ui/components/tabs.py:1996
-#, fuzzy
-msgid "API UI"
-msgstr "رابط کاربری API"
-
-#: trendsearth_ui/components/tabs.py:2002
-#, fuzzy
-msgid "Select target platforms..."
-msgstr "پلتفرم‌های هدف را انتخاب کنید..."
-
-#: trendsearth_ui/components/tabs.py:2022
-#, fuzzy
-msgid "Target Roles (optional)"
-msgstr "نقش‌های هدف (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:2032
-#, fuzzy
-msgid ""
-"Leave empty to show to all users including unauthenticated. Select specific "
-"roles to restrict visibility."
-msgstr ""
-"برای نمایش به همه کاربران، از جمله کاربران احراز هویت نشده، این قسمت را خالی"
-" بگذارید. برای محدود کردن نمایش، نقش‌های خاصی را انتخاب کنید."
-
-#: trendsearth_ui/components/tabs.py:2040
-#, fuzzy
-msgid "Regular Users"
-msgstr "کاربران عادی"
-
-#: trendsearth_ui/components/tabs.py:2044
-#, fuzzy
-msgid "Admins"
-msgstr "مدیران"
-
-#: trendsearth_ui/components/tabs.py:2048
-#, fuzzy
-msgid "Super Admins"
-msgstr "مدیران فوق‌العاده"
-
-#: trendsearth_ui/components/tabs.py:2054
-#, fuzzy
-msgid "All users (no restriction)"
-msgstr "همه کاربران (بدون محدودیت)"
-
-#: trendsearth_ui/components/tabs.py:2068
-#, fuzzy
-msgid "News Type"
-msgstr "نوع خبر"
-
-#: trendsearth_ui/components/tabs.py:2073
-#, fuzzy
-msgid "Announcement"
-msgstr "اطلاعیه"
-
-#: trendsearth_ui/components/tabs.py:2077
-#, fuzzy
-msgid "Warning"
-msgstr "هشدار"
-
-#: trendsearth_ui/components/tabs.py:2081
-#, fuzzy
-msgid "Release"
-msgstr "انتشار"
-
-#: trendsearth_ui/components/tabs.py:2085
-#, fuzzy
-msgid "Tip"
-msgstr "نکته"
-
-#: trendsearth_ui/components/tabs.py:2089
-#, fuzzy
-msgid "Maintenance"
-msgstr "تعمیر و نگهداری"
-
-#: trendsearth_ui/components/tabs.py:2100
-#, fuzzy
-msgid "Priority"
-msgstr "اولویت"
-
-#: trendsearth_ui/components/tabs.py:2119
-#, fuzzy
-msgid "Min Plugin Version (optional)"
-msgstr "حداقل نسخه افزونه (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:2124
-#, fuzzy
-msgid "e.g., 1.0.0"
-msgstr "مثلاً ۱.۰.۰"
-
-#: trendsearth_ui/components/tabs.py:2132
-#, fuzzy
-msgid "Max Plugin Version (optional)"
-msgstr "نسخه افزونه حداکثر (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:2137
-#, fuzzy
-msgid "e.g., 2.0.0"
-msgstr "مثلاً ۲.۰.۰"
-
-#: trendsearth_ui/components/tabs.py:2149
-#, fuzzy
-msgid "Start Date (optional)"
-msgstr "تاریخ شروع (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:2153
-#, fuzzy
-msgid "Select start date..."
-msgstr "انتخاب تاریخ شروع ..."
-
-#: trendsearth_ui/components/tabs.py:2162
-#, fuzzy
-msgid "End Date (optional)"
-msgstr "تاریخ پایان (اختیاری)"
-
-#: trendsearth_ui/components/tabs.py:2165
-#, fuzzy
-msgid "Select end date..."
-msgstr "انتخاب تاریخ پایان ..."
-
-#: trendsearth_ui/components/tabs.py:2181
-#, fuzzy
-msgid "Active (visible to users)"
-msgstr "فعال (قابل مشاهده برای کاربران)"
-
-#: trendsearth_ui/components/tabs.py:2210
-#, fuzzy
-msgid "Save"
-msgstr "ذخیره"
-
-#: trendsearth_ui/components/tabs.py:2225
-#, fuzzy
-msgid "Confirm Delete"
-msgstr "تأیید حذف"
-
-#: trendsearth_ui/components/tabs.py:2230
-#, fuzzy
-msgid ""
-"Are you sure you want to delete this news item? This action cannot be "
-"undone."
-msgstr ""
-"آیا مطمئن هستید که می‌خواهید این خبر را حذف کنید؟ این اقدام قابل بازگشت "
-"نیست."
-
-#: trendsearth_ui/components/tabs.py:2265
-#, fuzzy
-msgid "Create New User"
-msgstr "ایجاد کاربر جدید"
-
-#: trendsearth_ui/components/tabs.py:2277
-#, fuzzy
-msgid "Name *"
-msgstr "نام *"
-
-#: trendsearth_ui/components/tabs.py:2281
-#, fuzzy
-msgid "Enter full name"
-msgstr "نام کامل را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:2289
-#, fuzzy
-msgid "Email *"
-msgstr "ایمیل *"
-
-#: trendsearth_ui/components/tabs.py:2294
-#, fuzzy
-msgid "Enter email address"
-msgstr "آدرس ایمیل را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:2308
-#, fuzzy
-msgid "Password *"
-msgstr "رمز عبور *"
-
-#: trendsearth_ui/components/tabs.py:2313
-#, fuzzy
-msgid "Set password for user"
-msgstr "تنظیم رمز عبور برای کاربر"
-
-#: trendsearth_ui/components/tabs.py:2322
-#, fuzzy
-msgid "Confirm Password *"
-msgstr "تایید رمز عبور *"
-
-#: trendsearth_ui/components/tabs.py:2326
-#, fuzzy
-msgid "Confirm password"
-msgstr "تأیید رمز عبور"
-
-#: trendsearth_ui/components/tabs.py:2372
-#, fuzzy
-msgid "Passwords match"
-msgstr "تطابق رمزهای عبور"
-
-#: trendsearth_ui/components/tabs.py:2392
-#, fuzzy
-msgid "Enter institution/organization"
-msgstr "موسسه/سازمان را وارد کنید"
-
-#: trendsearth_ui/components/tabs.py:2404
-#, fuzzy
-msgid "Select country..."
-msgstr "انتخاب کشور ..."
-
-#: trendsearth_ui/components/tabs.py:2419
-#, fuzzy
-msgid "Role *"
-msgstr "نقش *"
-
-#: trendsearth_ui/components/tabs.py:2424
-#: trendsearth_ui/utils/mobile_utils.py:80
-#: trendsearth_ui/utils/mobile_utils.py:575
-#, fuzzy
-msgid "User"
-msgstr "کاربر"
-
-#: trendsearth_ui/components/tabs.py:2432
-#, fuzzy
-msgid "Super Admin"
-msgstr "مدیر ارشد"
-
-#: trendsearth_ui/components/tabs.py:2454
-#, fuzzy
-msgid "Create User"
-msgstr "ایجاد کاربر"
-
-#: trendsearth_ui/components/tabs.py:2465
-#, fuzzy
-msgid "Clear Form"
-msgstr "فرم پاک کردن"
-
-#: trendsearth_ui/components/tabs.py:2501
-#, fuzzy
-msgid "Upload New Script"
-msgstr "اسکریپت جدید را آپلود کنید"
-
-#: trendsearth_ui/components/tabs.py:2510
-#, fuzzy
-msgid "Upload a .tar.gz archive containing your script and a "
-msgstr ""
-"یک فایل فشرده با پسوند .tar.gz که شامل اسکریپت شما و ... است را آپلود کنید. "
-
-#: trendsearth_ui/components/tabs.py:2513
-#, fuzzy
-msgid ""
-" file. The script name and metadata are read from the configuration file."
-msgstr " نام اسکریپت و فراداده از فایل پیکربندی خوانده می‌شوند."
-
-#: trendsearth_ui/components/tabs.py:2525
-#, fuzzy
-msgid "Script Archive (.tar.gz) *"
-msgstr "آرشیو اسکریپت (.tar.gz) *"
-
-#: trendsearth_ui/components/tabs.py:2533
-#, fuzzy
-msgid "Drag and Drop or "
-msgstr "کشیدن و رها کردن یا "
-
-#: trendsearth_ui/components/tabs.py:2534
-#, fuzzy
-msgid "Select Script Archive"
-msgstr "بایگانی اسکریپت را انتخاب کنید"
-
-#: trendsearth_ui/components/tabs.py:2569
-#, fuzzy
-msgid "Upload Script"
-msgstr "اسکریپت آپلود"
-
-#: trendsearth_ui/utils/mobile_utils.py:63
-#, fuzzy
-msgid "Script"
-msgstr "اسکریپت"
-
-#: trendsearth_ui/utils/mobile_utils.py:112
-#, fuzzy
-msgid "Start"
-msgstr "شروع"
-
-#: trendsearth_ui/utils/mobile_utils.py:121
-#, fuzzy
-msgid "End"
-msgstr "پایان"
-
-#: trendsearth_ui/utils/mobile_utils.py:132
-#, fuzzy
-msgid "Duration"
-msgstr "مدت زمان"
-
-#: trendsearth_ui/utils/mobile_utils.py:157
-#: trendsearth_ui/utils/mobile_utils.py:372
-#: trendsearth_ui/utils/mobile_utils.py:616
-#, fuzzy
-msgid "ID"
-msgstr "شناسه"
-
-#: trendsearth_ui/utils/mobile_utils.py:172
-#: trendsearth_ui/utils/mobile_utils.py:720
-#, fuzzy
-msgid "User ID"
-msgstr "شناسه کاربری"
-
-#: trendsearth_ui/utils/mobile_utils.py:187
-#, fuzzy
-msgid "Params"
-msgstr "پارامز"
-
-#: trendsearth_ui/utils/mobile_utils.py:196
-#, fuzzy
-msgid "Results"
-msgstr "نتایج"
-
-#: trendsearth_ui/utils/mobile_utils.py:205
-#: trendsearth_ui/utils/mobile_utils.py:624
-#, fuzzy
-msgid "Logs"
-msgstr "سیاههها"
-
-#: trendsearth_ui/utils/mobile_utils.py:214
-#, fuzzy
-msgid "Docker Logs"
-msgstr "لاگ‌های داکر"
-
-#: trendsearth_ui/utils/mobile_utils.py:223
-#, fuzzy
-msgid "Batch Logs"
-msgstr "گزارش‌های دسته‌ای"
-
-#: trendsearth_ui/utils/mobile_utils.py:232
-#, fuzzy
-msgid "Map"
-msgstr "نقشه"
-
-#: trendsearth_ui/utils/mobile_utils.py:325
-#, fuzzy
-msgid "Last Activity"
-msgstr "آخرین فعالیت"
-
-#: trendsearth_ui/utils/mobile_utils.py:334
-#, fuzzy
-msgid "Verified"
-msgstr "تأیید شده"
-
-#: trendsearth_ui/utils/mobile_utils.py:343
-#, fuzzy
-msgid "Verified At"
-msgstr "تأیید شده در"
-
-#: trendsearth_ui/utils/mobile_utils.py:354
-#: trendsearth_ui/utils/mobile_utils.py:555
-#, fuzzy
-msgid "Created"
-msgstr "ایجاد شده"
-
-#: trendsearth_ui/utils/mobile_utils.py:363
-#: trendsearth_ui/utils/mobile_utils.py:564
-#, fuzzy
-msgid "Updated"
-msgstr "به‌روزرسانی‌شده"
-
-#: trendsearth_ui/utils/mobile_utils.py:436
-#, fuzzy
-msgid "GEE License"
-msgstr "مجوز GEE"
-
-#: trendsearth_ui/utils/mobile_utils.py:474
-#, fuzzy
-msgid "Slug"
-msgstr "حلزون"
-
-#: trendsearth_ui/utils/mobile_utils.py:490
-#, fuzzy
-msgid "Access"
-msgstr "دسترسی"
-
-#: trendsearth_ui/utils/mobile_utils.py:514
-#, fuzzy
-msgid "Environment"
-msgstr "محیط زیست"
-
-#: trendsearth_ui/utils/mobile_utils.py:530
-#, fuzzy
-msgid "Env Version"
-msgstr "نسخه پاکت"
-
-#: trendsearth_ui/utils/mobile_utils.py:546
-#, fuzzy
-msgid "Compute"
-msgstr "محاسبه"
-
-#: trendsearth_ui/utils/mobile_utils.py:591
-#: trendsearth_ui/utils/mobile_utils.py:672
-#, fuzzy
-msgid "User Email"
-msgstr "ایمیل کاربر"
-
-#: trendsearth_ui/utils/mobile_utils.py:607
-#, fuzzy
-msgid "Description"
-msgstr "توضیحات"
-
-#: trendsearth_ui/utils/mobile_utils.py:644
-#: trendsearth_ui/utils/mobile_utils.py:773
-#, fuzzy
-msgid "Occurred"
-msgstr "رخ داده است"
-
-#: trendsearth_ui/utils/mobile_utils.py:652
-#, fuzzy
-msgid "Type"
-msgstr "نوع"
-
-#: trendsearth_ui/utils/mobile_utils.py:658
-#: trendsearth_ui/utils/mobile_utils.py:814
-#, fuzzy
-msgid "Endpoint"
-msgstr "نقطه پایانی"
-
-#: trendsearth_ui/utils/mobile_utils.py:666
-#: trendsearth_ui/utils/mobile_utils.py:823
-#, fuzzy
-msgid "Method"
-msgstr "روش"
-
-#: trendsearth_ui/utils/mobile_utils.py:686
-#: trendsearth_ui/utils/mobile_utils.py:858
-#, fuzzy
-msgid "IP Address"
-msgstr "آدرس آی‌پی"
-
-#: trendsearth_ui/utils/mobile_utils.py:692
-#: trendsearth_ui/utils/mobile_utils.py:830
-#, fuzzy
-msgid "Limit"
-msgstr "حد"
-
-#: trendsearth_ui/utils/mobile_utils.py:700
-#, fuzzy
-msgid "Count"
-msgstr "تعداد"
-
-#: trendsearth_ui/utils/mobile_utils.py:706
-#: trendsearth_ui/utils/mobile_utils.py:844
-#, fuzzy
-msgid "Window"
-msgstr "پنجره"
-
-#: trendsearth_ui/utils/mobile_utils.py:712
-#: trendsearth_ui/utils/mobile_utils.py:850
-#, fuzzy
-msgid "Retry After"
-msgstr "دوباره امتحان کنید بعد از"
-
-#: trendsearth_ui/utils/mobile_utils.py:728
-#: trendsearth_ui/utils/mobile_utils.py:866
-#, fuzzy
-msgid "Limiter Key"
-msgstr "کلید محدودکننده"
-
-#: trendsearth_ui/utils/mobile_utils.py:736
-#, fuzzy
-msgid "User Agent"
-msgstr "عامل کاربر"
-
-#: trendsearth_ui/utils/mobile_utils.py:744
-#: trendsearth_ui/utils/mobile_utils.py:880
-#, fuzzy
-msgid "Event ID"
-msgstr "شناسه رویداد"
-
-#: trendsearth_ui/utils/mobile_utils.py:782
-#, fuzzy
-msgid "Expires"
-msgstr "منقضی می‌شود"
-
-#: trendsearth_ui/utils/mobile_utils.py:789
-#, fuzzy
-msgid "Identifier"
-msgstr "شناسه"
-
-#: trendsearth_ui/utils/mobile_utils.py:838
-#, fuzzy
-msgid "Usage"
-msgstr "کاربرد"
-
-#: trendsearth_ui/utils/mobile_utils.py:874
-#, fuzzy
-msgid "Rate Limit Type"
-msgstr "نوع محدودیت نرخ"
-
-#: trendsearth_ui/utils/stats_visualizations.py:608
-#: trendsearth_ui/utils/stats_visualizations.py:936
-#: trendsearth_ui/utils/stats_visualizations.py:1166
-#: trendsearth_ui/utils/stats_visualizations.py:1316
-#, fuzzy
-msgid "Number of Executions"
-msgstr "تعداد اعدام‌ها"
-
-#: trendsearth_ui/utils/stats_visualizations.py:631
-#, fuzzy, python-brace-format
-msgid "Running executions{suffix_label}"
-msgstr "اجرای اعدام‌ها{suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:646
-#: trendsearth_ui/utils/stats_visualizations.py:657
-#: trendsearth_ui/utils/stats_visualizations.py:664
-#, fuzzy
-msgid "No in-progress execution data available."
-msgstr "هیچ داده‌ای از اجرای در حال انجام در دسترس نیست."
-
-#: trendsearth_ui/utils/stats_visualizations.py:649
-#, fuzzy
-msgid ""
-"Status time series data did not include ready, pending, or running counts "
-"for this period."
-msgstr ""
-"داده‌های سری زمانی وضعیت شامل تعداد موارد آماده، در انتظار یا در حال اجرا "
-"برای این دوره نبود."
-
-#: trendsearth_ui/utils/stats_visualizations.py:658
-#, fuzzy
-msgid "Status timestamps could not be parsed from the API response."
-msgstr "مهرهای زمانی وضعیت از پاسخ API قابل تجزیه نبودند."
-
-#: trendsearth_ui/utils/stats_visualizations.py:665
-#, fuzzy
-msgid "Status time series data was not provided for this period."
-msgstr "داده‌های سری زمانی وضعیت برای این دوره ارائه نشده است."
-
-#: trendsearth_ui/utils/stats_visualizations.py:782
-#: trendsearth_ui/utils/stats_visualizations.py:842
-#, fuzzy
-msgid "Cumulative Executions"
-msgstr "اعدام‌های تجمعی"
-
-#: trendsearth_ui/utils/stats_visualizations.py:804
-#, fuzzy, python-brace-format
-msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
-msgstr "وظایف تکمیل‌شده تجمعی {suffix_label}{agg_suffix}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:865
-#, fuzzy, python-brace-format
-msgid "Completed executions (cumulative){suffix_label}"
-msgstr "اجراهای تکمیل‌شده (تجمعی){suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:880
-#, fuzzy
-msgid "No cumulative execution data available."
-msgstr "هیچ داده اجرایی تجمعی در دسترس نیست."
-
-#: trendsearth_ui/utils/stats_visualizations.py:883
-#, fuzzy
-msgid ""
-"The execution statistics time series did not include finished, failed, or "
-"cancelled statuses."
-msgstr "سری زمانی آمار اجرا شامل وضعیت‌های تکمیل‌شده، ناموفق یا لغوشده نبود."
-
-#: trendsearth_ui/utils/stats_visualizations.py:892
-#, fuzzy
-msgid "No execution trend data available."
-msgstr "هیچ داده‌ای از روند اجرا در دسترس نیست."
-
-#: trendsearth_ui/utils/stats_visualizations.py:893
-#, fuzzy
-msgid "Execution timestamps could not be parsed from the API response."
-msgstr "مهرهای زمانی اجرا از پاسخ API قابل تجزیه نبودند."
-
-#: trendsearth_ui/utils/stats_visualizations.py:945
-#, fuzzy, python-brace-format
-msgid "Execution count{suffix_label}"
-msgstr "تعداد اجرا{suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:985
-#, fuzzy
-msgid "Average Duration (minutes)"
-msgstr "میانگین مدت زمان (دقیقه)"
-
-#: trendsearth_ui/utils/stats_visualizations.py:994
-#, fuzzy, python-brace-format
-msgid "Execution duration{suffix_label}"
-msgstr "مدت زمان اجرا{suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1055
-#, fuzzy
-msgid "Failure Rate (%)"
-msgstr "نرخ شکست (%)"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1066
-#, fuzzy, python-brace-format
-msgid "Top scripts by failure count{suffix_label}"
-msgstr "اسکریپت‌های برتر بر اساس تعداد شکست{suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1174
-#, fuzzy, python-brace-format
-msgid "Top users by activity{suffix_label}"
-msgstr "برترین کاربران بر اساس فعالیت{suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1315
-#, fuzzy
-msgid "Script Version"
-msgstr "نسخه اسکریپت"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1325
-#, fuzzy, python-brace-format
-msgid "{num_versions} distinct versions, {num_executions} executions"
-msgstr "{num_versions} نسخه‌های متمایز، {num_executions} اجراها"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1331
-#, fuzzy, python-brace-format
-msgid "{num_executions} executions from scripts with no parseable version"
-msgstr "اجراهای {num_executions} از اسکریپت‌هایی که نسخه قابل تجزیه ندارند"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1340
-#, fuzzy, python-brace-format
-msgid "Execution script version distribution{suffix_label}"
-msgstr "توزیع نسخه اسکریپت اجرایی {suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1583
-#, python-brace-format, fuzzy
-msgid "New user registrations{suffix_label}"
-msgstr "ثبت نام کاربر جدید {suffix_label}"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1632
-#, fuzzy
-msgid "Cumulative New Users"
-msgstr "کاربران جدید تجمعی"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1684
-#, fuzzy
-msgid "Number of Users"
-msgstr "تعداد کاربران"
-
-#: trendsearth_ui/utils/stats_visualizations.py:1693
-#, fuzzy, python-brace-format
-msgid "Top countries{suffix_label}"
-msgstr "کشورهای برتر{suffix_label}"
-
-#: trendsearth_ui/utils/status_helpers.py:130
-#: trendsearth_ui/utils/status_helpers.py:162
-#, fuzzy, python-brace-format
-msgid "Environment: {env}"
-msgstr "محیط: {env}"
-
-#: trendsearth_ui/utils/status_helpers.py:132
-#, fuzzy
-msgid "API Status: Authentication required"
-msgstr "وضعیت API: احراز هویت لازم است"
-
-#: trendsearth_ui/utils/status_helpers.py:133
-#, fuzzy
-msgid "Please log in to view deployment status"
-msgstr "برای مشاهده وضعیت استقرار، لطفا وارد شوید"
-
-#: trendsearth_ui/utils/status_helpers.py:165
-#, fuzzy
-msgid "API status unavailable"
-msgstr "وضعیت API در دسترس نیست"
-
-#: trendsearth_ui/utils/status_helpers.py:176
-#, fuzzy
-msgid "Authentication required"
-msgstr "احراز هویت لازم است"
-
-#: trendsearth_ui/utils/status_helpers.py:177
-#, fuzzy
-msgid "Please log in to view cluster status"
-msgstr "برای مشاهده وضعیت خوشه، لطفاً وارد شوید"
-
-#: trendsearth_ui/utils/status_helpers.py:180
-#, fuzzy
-msgid " (Auth Required)"
-msgstr " (تاییدیه لازم است)"
-
-#: trendsearth_ui/utils/status_helpers.py:201
-#, fuzzy
-msgid " (Live)"
-msgstr " (زنده)"
-
-#: trendsearth_ui/utils/status_helpers.py:207
-#, fuzzy, python-brace-format
-msgid " (Updated: {time} {tz})"
-msgstr " (به‌روزرسانی: {time} {tz})"
-
-#: trendsearth_ui/utils/status_helpers.py:214
-#: trendsearth_ui/utils/status_helpers.py:217
-#, fuzzy, python-brace-format
-msgid " (Updated: {time})"
-msgstr " (به‌روزرسانی: {time})"
-
-#: trendsearth_ui/utils/status_helpers.py:223
-#, fuzzy
-msgid "Authentication failed"
-msgstr "احراز هویت ناموفق بود"
-
-#: trendsearth_ui/utils/status_helpers.py:224
-#, fuzzy
-msgid "Please check your login status"
-msgstr "لطفا وضعیت ورود خود را بررسی کنید"
-
-#: trendsearth_ui/utils/status_helpers.py:227
-#, fuzzy
-msgid " (Auth Error)"
-msgstr " (خطای تأیید)"
-
-#: trendsearth_ui/utils/status_helpers.py:232
-#, fuzzy
-msgid "Access denied"
-msgstr "دسترسی رد شد"
-
-#: trendsearth_ui/utils/status_helpers.py:234
-#, fuzzy
-msgid "Admin privileges required for cluster status"
-msgstr "امتیازات مدیریتی مورد نیاز برای وضعیت خوشه"
-
-#: trendsearth_ui/utils/status_helpers.py:239
-#, fuzzy
-msgid " (Access Denied)"
-msgstr " (دسترسی رد شد)"
-
-#: trendsearth_ui/utils/status_helpers.py:245
-#, fuzzy, python-brace-format
-msgid "Cluster Status: Error ({status_code})"
-msgstr "وضعیت خوشه: خطا ({status_code})"
-
-#: trendsearth_ui/utils/status_helpers.py:251
-#, fuzzy
-msgid "Unable to retrieve cluster information"
-msgstr "بازیابی اطلاعات خوشه امکان‌پذیر نیست"
-
-#: trendsearth_ui/utils/status_helpers.py:255
-#, fuzzy
-msgid " (Error)"
-msgstr " (خطا)"
-
-#: trendsearth_ui/utils/status_helpers.py:261
-#, fuzzy
-msgid "Cluster Status: Connection Error"
-msgstr "وضعیت خوشه: خطای اتصال"
-
-#: trendsearth_ui/utils/status_helpers.py:262
-#, fuzzy
-msgid "Unable to reach cluster status endpoint"
-msgstr "دسترسی به نقطه پایانی وضعیت خوشه امکان‌پذیر نیست"
-
-#: trendsearth_ui/utils/status_helpers.py:265
-#, fuzzy
-msgid " (Connection Error)"
-msgstr " (خطای اتصال)"
-
-#: trendsearth_ui/utils/status_helpers.py:272
-#, fuzzy
-msgid "System status is currently unavailable. Please try again later."
-msgstr ""
-"وضعیت سیستم در حال حاضر در دسترس نیست. لطفاً بعداً دوباره امتحان کنید."
 
 #~ msgid "Forgot Password"
 #~ msgstr "رمز عبور را فراموش کرده‌ام"
@@ -3116,3 +346,1343 @@ msgstr ""
 
 #~ msgid "Profile"
 #~ msgstr "پروفایل"
+
+#~ msgid "Please fill in all required fields (Name, Email, Password)."
+#~ msgstr "لطفا تمام فیلدهای مورد نیاز (نام، ایمیل، رمز عبور) را پر کنید."
+
+#~ msgid "Passwords do not match."
+#~ msgstr "رمزهای عبور مطابقت ندارند."
+
+#~ msgid "Password must contain {errors}."
+#~ msgstr "رمز عبور باید شامل {errors} باشد."
+
+#~ msgid "User '{name}' created successfully with email '{email}'."
+#~ msgstr "کاربر &#39;{name}&#39; با ایمیل &#39;{email}&#39; با موفقیت ایجاد شد."
+
+#~ msgid "A user with this email already exists."
+#~ msgstr "کاربری با این ایمیل از قبل وجود دارد."
+
+#~ msgid "Invalid user data."
+#~ msgstr "داده‌های کاربر نامعتبر است."
+
+#~ msgid "Error creating user: {detail}"
+#~ msgstr "خطا در ایجاد کاربر: {detail}"
+
+#~ msgid "Failed to create user. Server responded with status {status}."
+#~ msgstr "ایجاد کاربر ناموفق بود. سرور با وضعیت {status} پاسخ داد."
+
+#~ msgid "Request timed out. Please try again."
+#~ msgstr "مهلت درخواست به پایان رسیده است. لطفا دوباره امتحان کنید."
+
+#~ msgid "Cannot connect to server. Please check your connection."
+#~ msgstr "اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال خود را بررسی کنید."
+
+#~ msgid "Unexpected error: {error}"
+#~ msgstr "خطای غیرمنتظره: {error}"
+
+#~ msgid ""
+#~ "Invalid file type: {filename}. Must be a .tar.gz archive containing "
+#~ "configuration.json."
+#~ msgstr ""
+#~ "نوع فایل نامعتبر: {filename}. باید یک فایل آرشیو .tar.gz حاوی "
+#~ "configuration.json باشد."
+
+#~ msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
+#~ msgstr ""
+#~ "فایل خیلی بزرگ است: {filename} ({size}MB). حداکثر ۱۰ مگابایت مجاز است."
+
+#~ msgid "Archive ready: {filename} ({size}MB)"
+#~ msgstr "آماده بایگانی: {filename} ({size}MB)"
+
+#~ msgid "Access denied. Administrator privileges required."
+#~ msgstr "دسترسی رد شد. دسترسی مدیر لازم است."
+
+#~ msgid "Please select a .tar.gz script archive to upload."
+#~ msgstr "لطفاً یک فایل فشرده با پسوند .tar.gz برای آپلود انتخاب کنید."
+
+#~ msgid ""
+#~ "Invalid file type. The API requires a .tar.gz archive containing a "
+#~ "configuration.json file."
+#~ msgstr ""
+#~ "نوع فایل نامعتبر است. API به یک فایل فشرده .tar.gz نیاز دارد که حاوی فایل "
+#~ "configuration.json باشد."
+
+#~ msgid "Script '{name}' uploaded successfully."
+#~ msgstr "اسکریپت &#39;{name}&#39; با موفقیت آپلود شد."
+
+#~ msgid "Invalid script archive."
+#~ msgstr "بایگانی اسکریپت نامعتبر است."
+
+#~ msgid "Error uploading script: {detail}"
+#~ msgstr "خطا در آپلود اسکریپت: {detail}"
+
+#~ msgid "Permission denied. Only admins and superadmins can create scripts."
+#~ msgstr "اجازه رد شد. فقط مدیران و سرپرستان می‌توانند اسکریپت ایجاد کنند."
+
+#~ msgid "Failed to upload script. Server responded with status {status}."
+#~ msgstr "آپلود اسکریپت ناموفق بود. سرور با وضعیت {status} پاسخ داد."
+
+#~ msgid "Upload timed out. Please try again with a smaller file."
+#~ msgstr "زمان آپلود تمام شد. لطفاً با یک فایل کوچکتر دوباره امتحان کنید."
+
+#~ msgid "Rate limits have been successfully reset for all users and endpoints."
+#~ msgstr ""
+#~ "محدودیت‌های نرخ برای همه کاربران و نقاط پایانی با موفقیت تنظیم مجدد شدند."
+
+#~ msgid "Failed to reset rate limits. Status: {status}"
+#~ msgstr "تنظیم مجدد محدودیت‌های نرخ ناموفق بود. وضعیت: {status}"
+
+#~ msgid "Error resetting rate limits: {error}"
+#~ msgstr "خطا در تنظیم مجدد محدودیت‌های سرعت: {error}"
+
+#~ msgid "Error: No rate limit selected."
+#~ msgstr "خطا: هیچ محدودیت نرخی انتخاب نشده است."
+
+#~ msgid "Rate limit for {identifier} has been successfully reset."
+#~ msgstr "محدودیت نرخ برای {identifier} با موفقیت تنظیم مجدد شد."
+
+#~ msgid "Rate limit for {identifier} not found. It may have already expired."
+#~ msgstr ""
+#~ "محدودیت نرخ برای {identifier} یافت نشد. ممکن است قبلاً منقضی شده باشد."
+
+#~ msgid "Failed to reset rate limit. Status: {status}"
+#~ msgstr "تنظیم مجدد محدودیت سرعت ناموفق بود. وضعیت: {status}"
+
+#~ msgid "Error resetting rate limit: {error}"
+#~ msgstr "خطا در تنظیم مجدد محدودیت سرعت: {error}"
+
+#~ msgid "Please enter both email and password."
+#~ msgstr "لطفا هم ایمیل و هم رمز عبور را وارد کنید."
+
+#~ msgid "Login failed: Invalid response format."
+#~ msgstr "ورود ناموفق بود: قالب پاسخ نامعتبر است."
+
+#~ msgid "Login successful!"
+#~ msgstr "ورود با موفقیت انجام شد!"
+
+#~ msgid "Failed to retrieve user information."
+#~ msgstr "بازیابی اطلاعات کاربر ناموفق بود."
+
+#~ msgid "Invalid credentials."
+#~ msgstr "مدارک شناسایی نامعتبر."
+
+#~ msgid "Your account is locked due to too many failed login attempts. "
+#~ msgstr ""
+#~ "حساب کاربری شما به دلیل تلاش‌های ناموفق زیاد برای ورود به سیستم قفل شده است."
+#~ " "
+
+#~ msgid "Please use the 'Forgot Password' link below to reset your password."
+#~ msgstr ""
+#~ "لطفا برای بازیابی رمز عبور خود از لینک «رمز عبور خود را فراموش کرده‌ام» در "
+#~ "زیر استفاده کنید."
+
+#~ msgid "Your account is temporarily locked. "
+#~ msgstr "حساب شما موقتاً قفل شده است. "
+
+#~ msgid "Please try again in {minutes} minute(s)."
+#~ msgstr "لطفا دوباره در {دقیقه} دقیقه امتحان کنید."
+
+#~ msgid "Login failed: Connection timeout. Please try again later."
+#~ msgstr ""
+#~ "ورود ناموفق بود: زمان اتصال به پایان رسیده است. لطفاً بعداً دوباره امتحان "
+#~ "کنید."
+
+#~ msgid ""
+#~ "Login failed: Cannot connect to authentication server. Please check the "
+#~ "server status."
+#~ msgstr ""
+#~ "ورود ناموفق بود: اتصال به سرور احراز هویت امکان‌پذیر نیست. لطفاً وضعیت سرور "
+#~ "را بررسی کنید."
+
+#~ msgid "Login failed: {error}"
+#~ msgstr "ورود ناموفق بود: {error}"
+
+#~ msgid "Please enter your email address."
+#~ msgstr "لطفا آدرس ایمیل خود را وارد کنید."
+
+#~ msgid "Please enter a valid email address."
+#~ msgstr "لطفا یک آدرس ایمیل معتبر وارد کنید."
+
+#~ msgid ""
+#~ "If an account exists with {email}, password recovery instructions have been "
+#~ "sent. Please check your email."
+#~ msgstr ""
+#~ "اگر حسابی با {email} وجود دارد، دستورالعمل‌های بازیابی رمز عبور ارسال شده "
+#~ "است. لطفاً ایمیل خود را بررسی کنید."
+
+#~ msgid "Failed to send password recovery email."
+#~ msgstr "ارسال ایمیل بازیابی رمز عبور ناموفق بود."
+
+#~ msgid "{}. Please try again later."
+#~ msgstr "{}. لطفا بعدا دوباره امتحان کنید."
+
+#~ msgid "Request timed out. Please try again later."
+#~ msgstr "زمان درخواست به پایان رسیده است. لطفاً بعداً دوباره امتحان کنید."
+
+#~ msgid ""
+#~ "Cannot connect to the server. Please check your internet connection and try "
+#~ "again."
+#~ msgstr ""
+#~ "اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال اینترنت خود را بررسی کرده و "
+#~ "دوباره امتحان کنید."
+
+#~ msgid "An error occurred: {error}. Please try again later."
+#~ msgstr "خطایی رخ داد: {error}. لطفاً بعداً دوباره امتحان کنید."
+
+#~ msgid "Invalid or missing reset token. Please request a new password reset."
+#~ msgstr ""
+#~ "رمز عبور نامعتبر است یا وجود ندارد. لطفاً درخواست تنظیم مجدد رمز عبور جدید "
+#~ "بدهید."
+
+#~ msgid "Please enter and confirm your new password."
+#~ msgstr "لطفا رمز عبور جدید خود را وارد و تأیید کنید."
+
+#~ msgid "Passwords do not match. Please try again."
+#~ msgstr "رمزهای عبور مطابقت ندارند. لطفاً دوباره امتحان کنید."
+
+#~ msgid "Password must be at least 12 characters long."
+#~ msgstr "رمز عبور باید حداقل ۱۲ کاراکتر داشته باشد."
+
+#~ msgid "Password reset successful! You can now log in with your new password."
+#~ msgstr ""
+#~ "رمز عبور با موفقیت بازیابی شد! اکنون می‌توانید با رمز عبور جدید خود وارد "
+#~ "شوید."
+
+#~ msgid ""
+#~ "This reset link is invalid or has expired. Please request a new password "
+#~ "reset."
+#~ msgstr ""
+#~ "این لینک بازنشانی نامعتبر است یا منقضی شده است. لطفاً درخواست بازنشانی رمز "
+#~ "عبور جدید بدهید."
+
+#~ msgid "Password does not meet requirements."
+#~ msgstr "رمز عبور الزامات را برآورده نمی‌کند."
+
+#~ msgid "Failed to reset password."
+#~ msgstr "بازنشانی رمز عبور ناموفق بود."
+
+#~ msgid "{}. Please try again."
+#~ msgstr "{}. لطفا دوباره امتحان کنید."
+
+#~ msgid "Cannot connect to the server. Please check your connection."
+#~ msgstr "اتصال به سرور امکان‌پذیر نیست. لطفاً اتصال خود را بررسی کنید."
+
+#~ msgid "An error occurred: {error}"
+#~ msgstr "خطایی رخ داده است: {error}"
+
+#~ msgid "Please enter your name."
+#~ msgstr "لطفا نام خود را وارد کنید."
+
+#~ msgid "Please enter your organization."
+#~ msgstr "لطفا سازمان خود را وارد کنید."
+
+#~ msgid "Please select your sector."
+#~ msgstr "لطفا بخش خود را انتخاب کنید."
+
+#~ msgid "Please specify your sector."
+#~ msgstr "لطفا حوزه فعالیت خود را مشخص کنید."
+
+#~ msgid "Please select your purpose of use."
+#~ msgstr "لطفا هدف استفاده خود را انتخاب کنید."
+
+#~ msgid "Please specify your purpose of use."
+#~ msgstr "لطفا هدف استفاده خود را مشخص کنید."
+
+#~ msgid "Please select your country."
+#~ msgstr "لطفا کشور خود را انتخاب کنید."
+
+#~ msgid "Please describe your gender identity."
+#~ msgstr "لطفا هویت جنسیتی خود را شرح دهید."
+
+#~ msgid "Please acknowledge the Google Earth Engine license terms."
+#~ msgstr "لطفاً شرایط مجوز موتور گوگل ارث را تأیید کنید."
+
+#~ msgid ""
+#~ "Account created successfully! Please check your email to verify your "
+#~ "account, then you can log in."
+#~ msgstr ""
+#~ "حساب کاربری با موفقیت ایجاد شد! لطفاً ایمیل خود را برای تأیید حساب کاربری "
+#~ "خود بررسی کنید، سپس می‌توانید وارد شوید."
+
+#~ msgid "Registration failed."
+#~ msgstr "ثبت نام ناموفق بود."
+
+#~ msgid "Validation failed."
+#~ msgstr "اعتبارسنجی ناموفق بود."
+
+#~ msgid "Too many registration attempts. Please try again later."
+#~ msgstr "تعداد دفعات ثبت نام خیلی زیاد است. لطفاً بعداً دوباره امتحان کنید."
+
+#~ msgid "Invalid or expired token. Please request a new profile update link."
+#~ msgstr ""
+#~ "توکن نامعتبر یا منقضی شده است. لطفاً لینک به‌روزرسانی پروفایل جدید درخواست "
+#~ "کنید."
+
+#~ msgid "Error loading profile: {error}"
+#~ msgstr "خطا در بارگیری نمایه: {error}"
+
+#~ msgid "No authentication token. Please use a valid profile update link."
+#~ msgstr ""
+#~ "بدون توکن احراز هویت. لطفاً از یک لینک معتبر برای به‌روزرسانی پروفایل "
+#~ "استفاده کنید."
+
+#~ msgid "Profile updated successfully!"
+#~ msgstr "پروفایل با موفقیت به‌روزرسانی شد!"
+
+#~ msgid "Session expired. Please request a new profile update link."
+#~ msgstr ""
+#~ "زمان اعتبار اعتبار منقضی شده است. لطفاً درخواست لینک به‌روزرسانی جدید "
+#~ "پروفایل را بدهید."
+
+#~ msgid "Invalid token. Please request a new profile update link."
+#~ msgstr "توکن نامعتبر است. لطفاً لینک به‌روزرسانی پروفایل جدید درخواست کنید."
+
+#~ msgid "Failed to update profile."
+#~ msgstr "به‌روزرسانی نمایه انجام نشد."
+
+#~ msgid "Password changed successfully!"
+#~ msgstr "رمز عبور با موفقیت تغییر کرد!"
+
+#~ msgid "Failed to change password."
+#~ msgstr "تغییر رمز عبور ناموفق بود."
+
+#~ msgid " (Status: {status})"
+#~ msgstr " (وضعیت: {وضعیت})"
+
+#~ msgid "Network error: {error}"
+#~ msgstr "خطای شبکه: {error}"
+
+#~ msgid "Execution Cancelled Successfully"
+#~ msgstr "اجرا با موفقیت لغو شد"
+
+#~ msgid "Execution ID: "
+#~ msgstr "شناسه اجرا: "
+
+#~ msgid "Unknown"
+#~ msgstr "ناشناخته"
+
+#~ msgid "Script: "
+#~ msgstr "اسکریپت: "
+
+#~ msgid "Previous Status: "
+#~ msgstr "وضعیت قبلی: "
+
+#~ msgid "New Status: "
+#~ msgstr "وضعیت جدید: "
+
+#~ msgid "Infrastructure Cleanup"
+#~ msgstr "پاکسازی زیرساخت‌ها"
+
+#~ msgid "Docker service stopped"
+#~ msgstr "سرویس داکر متوقف شد"
+
+#~ msgid "Docker service not found/stopped"
+#~ msgstr "سرویس داکر یافت نشد/متوقف شد"
+
+#~ msgid "Docker container stopped"
+#~ msgstr "کانتینر داکر متوقف شد"
+
+#~ msgid "Docker container not found/stopped"
+#~ msgstr "کانتینر داکر پیدا نشد/متوقف شد"
+
+#~ msgid "Google Earth Engine Tasks"
+#~ msgstr "وظایف موتور گوگل ارث"
+
+#~ msgid "Found and processed {count} GEE tasks:"
+#~ msgstr "وظایف {count} GEE یافت و پردازش شدند:"
+
+#~ msgid "Status: {status}"
+#~ msgstr "وضعیت: {وضعیت}"
+
+#~ msgid "No GEE tasks found in execution logs."
+#~ msgstr "هیچ وظیفه GEE در گزارش‌های اجرا یافت نشد."
+
+#~ msgid "Errors Encountered"
+#~ msgstr "خطاهای رخ داده"
+
+#~ msgid "Cancellation Failed"
+#~ msgstr "لغو ناموفق بود"
+
+#~ msgid "Error: "
+#~ msgstr "خطا: "
+
+#~ msgid "Please log in to view credentials status."
+#~ msgstr "برای مشاهده وضعیت اعتبارنامه‌ها، لطفاً وارد شوید."
+
+#~ msgid "OAuth"
+#~ msgstr "اواوت"
+
+#~ msgid "Service Account"
+#~ msgstr "حساب کاربری خدمات"
+
+#~ msgid "Credentials configured using {type_label}"
+#~ msgstr "اعتبارنامه‌ها با استفاده از {type_label} پیکربندی شده‌اند"
+
+#~ msgid "Set up on: {created_date}"
+#~ msgstr "تنظیم در: {created_date}"
+
+#~ msgid "No Google Earth Engine credentials configured."
+#~ msgstr "هیچ اعتبارنامه‌ای برای موتور گوگل ارث پیکربندی نشده است."
+
+#~ msgid "Choose one of the setup options below."
+#~ msgstr "یکی از گزینه‌های تنظیم زیر را انتخاب کنید."
+
+#~ msgid "Unable to retrieve credentials status."
+#~ msgstr "بازیابی وضعیت اعتبارنامه‌ها امکان‌پذیر نیست."
+
+#~ msgid "Error retrieving credentials status."
+#~ msgstr "خطا در بازیابی وضعیت اعتبارنامه‌ها."
+
+#~ msgid ""
+#~ "OAuth window opened. Please complete the authorization and return here."
+#~ msgstr "پنجره OAuth باز شد. لطفاً مجوز را تکمیل کرده و اینجا برگردانید."
+
+#~ msgid ""
+#~ "After authorization, you may need to refresh this page to see the updated "
+#~ "status."
+#~ msgstr ""
+#~ "پس از تأیید، ممکن است لازم باشد این صفحه را رفرش کنید تا وضعیت "
+#~ "به‌روزرسانی‌شده را ببینید."
+
+#~ msgid "OAuth initiation failed - no authorization URL received."
+#~ msgstr "شروع OAuth ناموفق بود - هیچ URL مجوزی دریافت نشد."
+
+#~ msgid "Failed to initiate OAuth flow."
+#~ msgstr "شروع جریان OAuth ناموفق بود."
+
+#~ msgid "Invalid JSON file. Please upload a valid service account key file."
+#~ msgstr ""
+#~ "فایل JSON نامعتبر است. لطفاً یک فایل کلید حساب سرویس معتبر بارگذاری کنید."
+
+#~ msgid "Invalid service account key. Missing required fields."
+#~ msgstr "کلید حساب سرویس نامعتبر است. فیلدهای الزامی وجود ندارد."
+
+#~ msgid "Invalid service account key. Type field must be 'service_account'."
+#~ msgstr ""
+#~ "کلید حساب سرویس نامعتبر است. فیلد نوع باید &#39;service_account&#39; باشد."
+
+#~ msgid "Service account key '{filename}' uploaded successfully!"
+#~ msgstr "کلید حساب سرویس &#39;{filename}&#39; با موفقیت آپلود شد!"
+
+#~ msgid "Failed to upload service account key."
+#~ msgstr "آپلود کلید حساب سرویس ناموفق بود."
+
+#~ msgid "Error processing file: {error}"
+#~ msgstr "خطا در پردازش فایل: {error}"
+
+#~ msgid "Google Earth Engine credentials are valid and working!"
+#~ msgstr "اعتبارنامه‌های موتور جستجوی گوگل ارث معتبر و در حال کار هستند!"
+
+#~ msgid "Credentials test failed."
+#~ msgstr "آزمون اعتبارنامه‌ها با شکست مواجه شد."
+
+#~ msgid "Google Earth Engine credentials deleted successfully."
+#~ msgstr "اطلاعات کاربری Google Earth Engine با موفقیت حذف شد."
+
+#~ msgid "Failed to delete credentials."
+#~ msgstr "حذف اعتبارنامه‌ها ناموفق بود."
+
+#~ msgid "No news items found."
+#~ msgstr "هیچ مورد خبری یافت نشد."
+
+#~ msgid "Please log in to manage news."
+#~ msgstr "برای مدیریت اخبار، لطفاً وارد شوید."
+
+#~ msgid "Session expired. Please log in again."
+#~ msgstr "زمان اعتبار اعتبار منقضی شده است. لطفا دوباره وارد شوید."
+
+#~ msgid "Access denied. Admin privileges required."
+#~ msgstr "دسترسی رد شد. دسترسی مدیر لازم است."
+
+#~ msgid "Failed to load news: {status}"
+#~ msgstr "بارگیری اخبار ناموفق بود: {status}"
+
+#~ msgid "Error loading news: {error}"
+#~ msgstr "خطا در بارگیری اخبار: {error}"
+
+#~ msgid "Create News Item"
+#~ msgstr "ایجاد آیتم خبری"
+
+#~ msgid "Edit News Item"
+#~ msgstr "ویرایش خبر"
+
+#~ msgid "Preview will appear here..."
+#~ msgstr "پیش‌نمایش اینجا نمایش داده می‌شود..."
+
+#~ msgid "Please log in first."
+#~ msgstr "لطفا ابتدا وارد شوید."
+
+#~ msgid "Title is required."
+#~ msgstr "عنوان الزامی است."
+
+#~ msgid "Message is required."
+#~ msgstr "پیام الزامی است."
+
+#~ msgid "At least one target platform is required."
+#~ msgstr "حداقل یک پلتفرم هدف مورد نیاز است."
+
+#~ msgid "updated"
+#~ msgstr "به‌روزرسانی‌شده"
+
+#~ msgid "created"
+#~ msgstr "ایجاد شده"
+
+#~ msgid "News item {action} successfully!"
+#~ msgstr "خبر {action} با موفقیت انجام شد!"
+
+#~ msgid "Error: {status}"
+#~ msgstr "خطا: {وضعیت}"
+
+#~ msgid "Error saving news item: {error}"
+#~ msgstr "خطا در ذخیره خبر: {error}"
+
+#~ msgid "No news item selected."
+#~ msgstr "هیچ خبری انتخاب نشده است."
+
+#~ msgid "News item deleted successfully!"
+#~ msgstr "خبر با موفقیت حذف شد!"
+
+#~ msgid "Error deleting news item: {error}"
+#~ msgstr "خطا در حذف خبر: {error}"
+
+#~ msgid "Name is required."
+#~ msgstr "نام الزامی است."
+
+#~ msgid "User ID not found in user data."
+#~ msgstr "شناسه کاربری در داده‌های کاربر یافت نشد."
+
+#~ msgid "All password fields are required."
+#~ msgstr "تمام فیلدهای رمز عبور الزامی هستند."
+
+#~ msgid "New passwords do not match."
+#~ msgstr "رمزهای عبور جدید مطابقت ندارند."
+
+#~ msgid "Password must include an uppercase letter."
+#~ msgstr "رمز عبور باید شامل یک حرف بزرگ باشد."
+
+#~ msgid "Password must include a lowercase letter."
+#~ msgstr "رمز عبور باید شامل حروف کوچک باشد."
+
+#~ msgid "Password must include a number."
+#~ msgstr "رمز عبور باید شامل عدد باشد."
+
+#~ msgid ""
+#~ "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+#~ msgstr ""
+#~ "رمز عبور باید شامل یک کاراکتر ویژه (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/) "
+#~ "باشد."
+
+#~ msgid "enabled"
+#~ msgstr "فعال شده"
+
+#~ msgid "disabled"
+#~ msgstr "معلول"
+
+#~ msgid "Email notifications {status} successfully!"
+#~ msgstr "اعلان‌های ایمیل {status} با موفقیت ارسال شدند!"
+
+#~ msgid "Failed to update email notification settings."
+#~ msgstr "به‌روزرسانی تنظیمات اعلان ایمیل ناموفق بود."
+
+#~ msgid "Email confirmation does not match. Please try again."
+#~ msgstr "ایمیل تایید مطابقت ندارد. لطفا دوباره امتحان کنید."
+
+#~ msgid "Your account has been deleted."
+#~ msgstr "حساب کاربری شما حذف شده است."
+
+#~ msgid "Admin accounts cannot be deleted through self-service. "
+#~ msgstr "حساب‌های کاربری ادمین را نمی‌توان از طریق سلف سرویس حذف کرد. "
+
+#~ msgid "Please contact a system administrator."
+#~ msgstr "لطفا با یک مدیر سیستم تماس بگیرید."
+
+#~ msgid "Failed to delete account."
+#~ msgstr "حذف حساب کاربری ناموفق بود."
+
+#~ msgid "Please try again."
+#~ msgstr "لطفا دوباره امتحان کنید."
+
+#~ msgid "Current System Status ({header_label})"
+#~ msgstr "وضعیت فعلی سیستم ({header_label})"
+
+#~ msgid "Current System Status"
+#~ msgstr "وضعیت فعلی سیستم"
+
+#~ msgid "Cluster Status{cluster_cached_time}"
+#~ msgstr "وضعیت خوشه {cluster_cached_time}"
+
+#~ msgid "Error loading status data: {error}"
+#~ msgstr "خطا در بارگیری داده‌های وضعیت: {error}"
+
+#~ msgid "Error"
+#~ msgstr "خطا"
+
+#~ msgid "Statistics unavailable."
+#~ msgstr "آمار در دسترس نیست."
+
+#~ msgid "Error: {error}"
+#~ msgstr "خطا: {خطا}"
+
+#~ msgid "Unknown error"
+#~ msgstr "خطای ناشناخته"
+
+#~ msgid "Error loading statistics: {error}"
+#~ msgstr "خطا در بارگیری آمار: {error}"
+
+#~ msgid "No status data available."
+#~ msgstr "هیچ داده‌ای از وضعیت موجود نیست."
+
+#~ msgid "Overview"
+#~ msgstr "نمای کلی"
+
+#~ msgid "Total Executions"
+#~ msgstr "کل اعدام‌ها"
+
+#~ msgid "Total Users"
+#~ msgstr "کل کاربران"
+
+#~ msgid "Total Scripts"
+#~ msgstr "اسکریپت‌های کامل"
+
+#~ msgid "Active"
+#~ msgstr "فعال"
+
+#~ msgid "Running"
+#~ msgstr "دویدن"
+
+#~ msgid "Ready"
+#~ msgstr "آماده"
+
+#~ msgid "Pending"
+#~ msgstr "در حال بررسی"
+
+#~ msgid "Total"
+#~ msgstr "مجموع"
+
+#~ msgid "Completed"
+#~ msgstr "تکمیل شده"
+
+#~ msgid "Finished"
+#~ msgstr "تمام شده"
+
+#~ msgid "Failed"
+#~ msgstr "شکست خورده"
+
+#~ msgid "Cancelled"
+#~ msgstr "لغو شد"
+
+#~ msgid "No statistics available for the selected period."
+#~ msgstr "آماری برای دوره انتخاب شده موجود نیست."
+
+#~ msgid "Update Your Profile"
+#~ msgstr "پروفایل خود را به‌روزرسانی کنید"
+
+#~ msgid "Email cannot be changed"
+#~ msgstr "ایمیل قابل تغییر نیست"
+
+#~ msgid "Update Profile"
+#~ msgstr "به‌روزرسانی پروفایل"
+
+#~ msgid "Refresh Executions"
+#~ msgstr "تازه کردن اجراها"
+
+#~ msgid "Auto-refresh in:"
+#~ msgstr "تازه‌سازی خودکار در:"
+
+#~ msgid "Cancel Execution"
+#~ msgstr "لغو اجرا"
+
+#~ msgid "Are you sure you want to cancel this execution?"
+#~ msgstr "آیا مطمئن هستید که می‌خواهید این اجرا را لغو کنید؟"
+
+#~ msgid "Execution ID:"
+#~ msgstr "شناسه اجرا:"
+
+#~ msgid "Script:"
+#~ msgstr "اسکریپت:"
+
+#~ msgid "Status:"
+#~ msgstr "وضعیت:"
+
+#~ msgid "This action cannot be undone."
+#~ msgstr "این اقدام قابل لغو نیست."
+
+#~ msgid "Confirm Cancel"
+#~ msgstr "تایید لغو"
+
+#~ msgid "Cancellation Result"
+#~ msgstr "نتیجه لغو"
+
+#~ msgid "Close"
+#~ msgstr "بستن"
+
+#~ msgid "Refresh Users"
+#~ msgstr "به‌روزرسانی کاربران"
+
+#~ msgid "Refresh Scripts"
+#~ msgstr "اسکریپت‌های تازه‌سازی"
+
+#~ msgid "Profile Settings"
+#~ msgstr "تنظیمات پروفایل"
+
+#~ msgid "Name"
+#~ msgstr "نام"
+
+#~ msgid "Enter your name"
+#~ msgstr "نام خود را وارد کنید"
+
+#~ msgid "Enter your email"
+#~ msgstr "ایمیل خود را وارد کنید"
+
+#~ msgid "Institution"
+#~ msgstr "موسسه"
+
+#~ msgid "Enter your institution"
+#~ msgstr "موسسه خود را وارد کنید"
+
+#~ msgid "Role"
+#~ msgstr "نقش"
+
+#~ msgid "Email Notifications"
+#~ msgstr "اعلان‌های ایمیلی"
+
+#~ msgid "Execution Completion Notifications"
+#~ msgstr "اعلان‌های تکمیل اجرا"
+
+#~ msgid "Enable email notifications"
+#~ msgstr "فعال کردن اعلان‌های ایمیلی"
+
+#~ msgid ""
+#~ "Receive email notifications when your script executions finish, fail, or are"
+#~ " cancelled."
+#~ msgstr ""
+#~ "وقتی اجرای اسکریپت شما تمام شد، شکست خورد یا لغو شد، اعلان‌های ایمیل دریافت "
+#~ "کنید."
+
+#~ msgid "Google Earth Engine Account"
+#~ msgstr "حساب کاربری موتور گوگل ارث"
+
+#~ msgid "Current Credentials Status"
+#~ msgstr "وضعیت فعلی مدارک تحصیلی"
+
+#~ msgid "Setup Your GEE Account"
+#~ msgstr "حساب GEE خود را تنظیم کنید"
+
+#~ msgid ""
+#~ "Choose one of the options below to configure your Google Earth Engine "
+#~ "credentials:"
+#~ msgstr ""
+#~ "برای پیکربندی اعتبارنامه‌های Google Earth Engine خود، یکی از گزینه‌های زیر "
+#~ "را انتخاب کنید:"
+
+#~ msgid "Option 1: Connect Your GEE Account (OAuth)"
+#~ msgstr "گزینه ۱: اتصال حساب GEE (OAuth)"
+
+#~ msgid ""
+#~ "Connect your personal Google Earth Engine account using OAuth "
+#~ "authentication."
+#~ msgstr ""
+#~ "حساب شخصی Google Earth Engine خود را با استفاده از احراز هویت OAuth متصل "
+#~ "کنید."
+
+#~ msgid "Connect GEE Account"
+#~ msgstr "اتصال حساب GEE"
+
+#~ msgid "Option 2: Upload Service Account Key"
+#~ msgstr "گزینه ۲: آپلود کلید حساب سرویس"
+
+#~ msgid ""
+#~ "Upload a Google Cloud service account JSON key with Earth Engine access."
+#~ msgstr ""
+#~ "یک کلید JSON از حساب سرویس Google Cloud با دسترسی به Earth Engine آپلود "
+#~ "کنید."
+
+#~ msgid "Upload Service Account Key"
+#~ msgstr "کلید حساب سرویس را بارگذاری کنید"
+
+#~ msgid "Manage Credentials"
+#~ msgstr "مدیریت اعتبارنامه‌ها"
+
+#~ msgid "Test Credentials"
+#~ msgstr "مدارک آزمون"
+
+#~ msgid "Delete Credentials"
+#~ msgstr "حذف اعتبارنامه‌ها"
+
+#~ msgid "Service Credentials"
+#~ msgstr "مدارک خدمات"
+
+#~ msgid ""
+#~ "Service credentials allow external applications to authenticate with the "
+#~ "Trends.Earth API using the OAuth2 client credentials grant. The client "
+#~ "secret is shown only once at creation time."
+#~ msgstr ""
+#~ "اعتبارنامه‌های سرویس به برنامه‌های خارجی اجازه می‌دهند تا با استفاده از "
+#~ "اعطای اعتبارنامه‌های کلاینت OAuth2، با API Trends.Earth احراز هویت شوند. رمز"
+#~ " کلاینت فقط یک بار در زمان ایجاد نمایش داده می‌شود."
+
+#~ msgid "Refresh"
+#~ msgstr "تازه کردن"
+
+#~ msgid "New Credential"
+#~ msgstr "اعتبارنامه جدید"
+
+#~ msgid "Create Service Credential"
+#~ msgstr "ایجاد اعتبارنامه سرویس"
+
+#~ msgid "e.g. My CLI Tool"
+#~ msgstr "به عنوان مثال ابزار CLI من"
+
+#~ msgid "A descriptive label for this credential."
+#~ msgstr "یک برچسب توصیفی برای این اعتبارنامه."
+
+#~ msgid "Deployment Information"
+#~ msgstr "اطلاعات استقرار"
+
+#~ msgid "System Status Trends"
+#~ msgstr "روندهای وضعیت سیستم"
+
+#~ msgid "Last 24 Hours"
+#~ msgstr "۲۴ ساعت گذشته"
+
+#~ msgid "Last Week"
+#~ msgstr "هفته گذشته"
+
+#~ msgid "Last Month"
+#~ msgstr "ماه گذشته"
+
+#~ msgid "Last Year"
+#~ msgstr "سال گذشته"
+
+#~ msgid "All Time"
+#~ msgstr "تمام وقت"
+
+#~ msgid "Countries with new user registrations"
+#~ msgstr "کشورهایی که کاربران جدید ثبت نام کرده‌اند"
+
+#~ msgid ""
+#~ "Access denied. Administrator privileges required to access admin functions."
+#~ msgstr "دسترسی رد شد. برای دسترسی به توابع مدیریتی، امتیازات مدیر لازم است."
+
+#~ msgid "Administration Panel"
+#~ msgstr "پنل مدیریت"
+
+#~ msgid "Rate Limiting Management"
+#~ msgstr "مدیریت محدودکننده نرخ"
+
+#~ msgid "Current & Historical Rate Limit Breaches"
+#~ msgstr "نقض سقف نرخ فعلی و تاریخی"
+
+#~ msgid "Refresh Breaches"
+#~ msgstr "تازه کردن نقض‌ها"
+
+#~ msgid "Cancel Selected Limit"
+#~ msgstr "لغو محدودیت انتخاب شده"
+
+#~ msgid "Reset All Rate Limits"
+#~ msgstr "تنظیم مجدد همه محدودیت‌های نرخ"
+
+#~ msgid "Active and historical events"
+#~ msgstr "رویدادهای فعال و تاریخی"
+
+#~ msgid "Highlighted rows are active and can be cancelled individually."
+#~ msgstr ""
+#~ "ردیف‌های هایلایت شده فعال هستند و می‌توان آن‌ها را به صورت جداگانه لغو کرد."
+
+#~ msgid "News Management"
+#~ msgstr "مدیریت اخبار"
+
+#~ msgid "Manage News Items"
+#~ msgstr "مدیریت آیتم‌های خبری"
+
+#~ msgid "Edit"
+#~ msgstr "ویرایش"
+
+#~ msgid "Delete"
+#~ msgstr "حذف"
+
+#~ msgid "Loading news items..."
+#~ msgstr "در حال بارگذاری اخبار ..."
+
+#~ msgid "Title *"
+#~ msgstr "عنوان *"
+
+#~ msgid "Enter news title"
+#~ msgstr "عنوان خبر را وارد کنید"
+
+#~ msgid "Message (Markdown supported) *"
+#~ msgstr "پیام (پشتیبانی از Markdown) *"
+
+#~ msgid ""
+#~ "Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
+#~ "be converted to HTML."
+#~ msgstr ""
+#~ "از قالب‌بندی Markdown استفاده کنید: **bold**، *italic*، [link](url)، لیست‌ها"
+#~ " و غیره. به HTML تبدیل خواهد شد."
+
+#~ msgid "Enter news message using Markdown..."
+#~ msgstr "پیام خبری را با استفاده از Markdown وارد کنید..."
+
+#~ msgid "Preview"
+#~ msgstr "پیش‌نمایش"
+
+#~ msgid "Link URL (optional)"
+#~ msgstr "آدرس لینک (اختیاری)"
+
+#~ msgid "Link Text (optional)"
+#~ msgstr "متن لینک (اختیاری)"
+
+#~ msgid "Read more..."
+#~ msgstr "ادامه مطلب ..."
+
+#~ msgid "Target Platforms *"
+#~ msgstr "پلتفرم‌های هدف *"
+
+#~ msgid "QGIS Plugin"
+#~ msgstr "افزونه QGIS"
+
+#~ msgid "Web App"
+#~ msgstr "برنامه وب"
+
+#~ msgid "API UI"
+#~ msgstr "رابط کاربری API"
+
+#~ msgid "Select target platforms..."
+#~ msgstr "پلتفرم‌های هدف را انتخاب کنید..."
+
+#~ msgid "Target Roles (optional)"
+#~ msgstr "نقش‌های هدف (اختیاری)"
+
+#~ msgid ""
+#~ "Leave empty to show to all users including unauthenticated. Select specific "
+#~ "roles to restrict visibility."
+#~ msgstr ""
+#~ "برای نمایش به همه کاربران، از جمله کاربران احراز هویت نشده، این قسمت را خالی"
+#~ " بگذارید. برای محدود کردن نمایش، نقش‌های خاصی را انتخاب کنید."
+
+#~ msgid "Regular Users"
+#~ msgstr "کاربران عادی"
+
+#~ msgid "Admins"
+#~ msgstr "مدیران"
+
+#~ msgid "Super Admins"
+#~ msgstr "مدیران فوق‌العاده"
+
+#~ msgid "All users (no restriction)"
+#~ msgstr "همه کاربران (بدون محدودیت)"
+
+#~ msgid "News Type"
+#~ msgstr "نوع خبر"
+
+#~ msgid "Announcement"
+#~ msgstr "اطلاعیه"
+
+#~ msgid "Warning"
+#~ msgstr "هشدار"
+
+#~ msgid "Release"
+#~ msgstr "انتشار"
+
+#~ msgid "Tip"
+#~ msgstr "نکته"
+
+#~ msgid "Maintenance"
+#~ msgstr "تعمیر و نگهداری"
+
+#~ msgid "Priority"
+#~ msgstr "اولویت"
+
+#~ msgid "Min Plugin Version (optional)"
+#~ msgstr "حداقل نسخه افزونه (اختیاری)"
+
+#~ msgid "e.g., 1.0.0"
+#~ msgstr "مثلاً ۱.۰.۰"
+
+#~ msgid "Max Plugin Version (optional)"
+#~ msgstr "نسخه افزونه حداکثر (اختیاری)"
+
+#~ msgid "e.g., 2.0.0"
+#~ msgstr "مثلاً ۲.۰.۰"
+
+#~ msgid "Start Date (optional)"
+#~ msgstr "تاریخ شروع (اختیاری)"
+
+#~ msgid "Select start date..."
+#~ msgstr "انتخاب تاریخ شروع ..."
+
+#~ msgid "End Date (optional)"
+#~ msgstr "تاریخ پایان (اختیاری)"
+
+#~ msgid "Select end date..."
+#~ msgstr "انتخاب تاریخ پایان ..."
+
+#~ msgid "Active (visible to users)"
+#~ msgstr "فعال (قابل مشاهده برای کاربران)"
+
+#~ msgid "Save"
+#~ msgstr "ذخیره"
+
+#~ msgid "Confirm Delete"
+#~ msgstr "تأیید حذف"
+
+#~ msgid ""
+#~ "Are you sure you want to delete this news item? This action cannot be "
+#~ "undone."
+#~ msgstr ""
+#~ "آیا مطمئن هستید که می‌خواهید این خبر را حذف کنید؟ این اقدام قابل بازگشت "
+#~ "نیست."
+
+#~ msgid "Create New User"
+#~ msgstr "ایجاد کاربر جدید"
+
+#~ msgid "Name *"
+#~ msgstr "نام *"
+
+#~ msgid "Enter full name"
+#~ msgstr "نام کامل را وارد کنید"
+
+#~ msgid "Email *"
+#~ msgstr "ایمیل *"
+
+#~ msgid "Enter email address"
+#~ msgstr "آدرس ایمیل را وارد کنید"
+
+#~ msgid "Password *"
+#~ msgstr "رمز عبور *"
+
+#~ msgid "Set password for user"
+#~ msgstr "تنظیم رمز عبور برای کاربر"
+
+#~ msgid "Confirm Password *"
+#~ msgstr "تایید رمز عبور *"
+
+#~ msgid "Confirm password"
+#~ msgstr "تأیید رمز عبور"
+
+#~ msgid "Passwords match"
+#~ msgstr "تطابق رمزهای عبور"
+
+#~ msgid "Enter institution/organization"
+#~ msgstr "موسسه/سازمان را وارد کنید"
+
+#~ msgid "Select country..."
+#~ msgstr "انتخاب کشور ..."
+
+#~ msgid "Role *"
+#~ msgstr "نقش *"
+
+#~ msgid "User"
+#~ msgstr "کاربر"
+
+#~ msgid "Super Admin"
+#~ msgstr "مدیر ارشد"
+
+#~ msgid "Create User"
+#~ msgstr "ایجاد کاربر"
+
+#~ msgid "Clear Form"
+#~ msgstr "فرم پاک کردن"
+
+#~ msgid "Upload New Script"
+#~ msgstr "اسکریپت جدید را آپلود کنید"
+
+#~ msgid "Upload a .tar.gz archive containing your script and a "
+#~ msgstr ""
+#~ "یک فایل فشرده با پسوند .tar.gz که شامل اسکریپت شما و ... است را آپلود کنید. "
+
+#~ msgid ""
+#~ " file. The script name and metadata are read from the configuration file."
+#~ msgstr " نام اسکریپت و فراداده از فایل پیکربندی خوانده می‌شوند."
+
+#~ msgid "Script Archive (.tar.gz) *"
+#~ msgstr "آرشیو اسکریپت (.tar.gz) *"
+
+#~ msgid "Drag and Drop or "
+#~ msgstr "کشیدن و رها کردن یا "
+
+#~ msgid "Select Script Archive"
+#~ msgstr "بایگانی اسکریپت را انتخاب کنید"
+
+#~ msgid "Upload Script"
+#~ msgstr "اسکریپت آپلود"
+
+#~ msgid "Script"
+#~ msgstr "اسکریپت"
+
+#~ msgid "Start"
+#~ msgstr "شروع"
+
+#~ msgid "End"
+#~ msgstr "پایان"
+
+#~ msgid "Duration"
+#~ msgstr "مدت زمان"
+
+#~ msgid "ID"
+#~ msgstr "شناسه"
+
+#~ msgid "User ID"
+#~ msgstr "شناسه کاربری"
+
+#~ msgid "Params"
+#~ msgstr "پارامز"
+
+#~ msgid "Results"
+#~ msgstr "نتایج"
+
+#~ msgid "Logs"
+#~ msgstr "سیاههها"
+
+#~ msgid "Docker Logs"
+#~ msgstr "لاگ‌های داکر"
+
+#~ msgid "Batch Logs"
+#~ msgstr "گزارش‌های دسته‌ای"
+
+#~ msgid "Map"
+#~ msgstr "نقشه"
+
+#~ msgid "Last Activity"
+#~ msgstr "آخرین فعالیت"
+
+#~ msgid "Verified"
+#~ msgstr "تأیید شده"
+
+#~ msgid "Verified At"
+#~ msgstr "تأیید شده در"
+
+#~ msgid "Created"
+#~ msgstr "ایجاد شده"
+
+#~ msgid "Updated"
+#~ msgstr "به‌روزرسانی‌شده"
+
+#~ msgid "GEE License"
+#~ msgstr "مجوز GEE"
+
+#~ msgid "Slug"
+#~ msgstr "حلزون"
+
+#~ msgid "Access"
+#~ msgstr "دسترسی"
+
+#~ msgid "Environment"
+#~ msgstr "محیط زیست"
+
+#~ msgid "Env Version"
+#~ msgstr "نسخه پاکت"
+
+#~ msgid "Compute"
+#~ msgstr "محاسبه"
+
+#~ msgid "User Email"
+#~ msgstr "ایمیل کاربر"
+
+#~ msgid "Description"
+#~ msgstr "توضیحات"
+
+#~ msgid "Occurred"
+#~ msgstr "رخ داده است"
+
+#~ msgid "Type"
+#~ msgstr "نوع"
+
+#~ msgid "Endpoint"
+#~ msgstr "نقطه پایانی"
+
+#~ msgid "Method"
+#~ msgstr "روش"
+
+#~ msgid "IP Address"
+#~ msgstr "آدرس آی‌پی"
+
+#~ msgid "Limit"
+#~ msgstr "حد"
+
+#~ msgid "Count"
+#~ msgstr "تعداد"
+
+#~ msgid "Window"
+#~ msgstr "پنجره"
+
+#~ msgid "Retry After"
+#~ msgstr "دوباره امتحان کنید بعد از"
+
+#~ msgid "Limiter Key"
+#~ msgstr "کلید محدودکننده"
+
+#~ msgid "User Agent"
+#~ msgstr "عامل کاربر"
+
+#~ msgid "Event ID"
+#~ msgstr "شناسه رویداد"
+
+#~ msgid "Expires"
+#~ msgstr "منقضی می‌شود"
+
+#~ msgid "Identifier"
+#~ msgstr "شناسه"
+
+#~ msgid "Usage"
+#~ msgstr "کاربرد"
+
+#~ msgid "Rate Limit Type"
+#~ msgstr "نوع محدودیت نرخ"
+
+#~ msgid "Number of Executions"
+#~ msgstr "تعداد اعدام‌ها"
+
+#~ msgid "Running executions{suffix_label}"
+#~ msgstr "اجرای اعدام‌ها{suffix_label}"
+
+#~ msgid "No in-progress execution data available."
+#~ msgstr "هیچ داده‌ای از اجرای در حال انجام در دسترس نیست."
+
+#~ msgid ""
+#~ "Status time series data did not include ready, pending, or running counts "
+#~ "for this period."
+#~ msgstr ""
+#~ "داده‌های سری زمانی وضعیت شامل تعداد موارد آماده، در انتظار یا در حال اجرا "
+#~ "برای این دوره نبود."
+
+#~ msgid "Status timestamps could not be parsed from the API response."
+#~ msgstr "مهرهای زمانی وضعیت از پاسخ API قابل تجزیه نبودند."
+
+#~ msgid "Status time series data was not provided for this period."
+#~ msgstr "داده‌های سری زمانی وضعیت برای این دوره ارائه نشده است."
+
+#~ msgid "Cumulative Executions"
+#~ msgstr "اعدام‌های تجمعی"
+
+#~ msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
+#~ msgstr "وظایف تکمیل‌شده تجمعی {suffix_label}{agg_suffix}"
+
+#~ msgid "Completed executions (cumulative){suffix_label}"
+#~ msgstr "اجراهای تکمیل‌شده (تجمعی){suffix_label}"
+
+#~ msgid "No cumulative execution data available."
+#~ msgstr "هیچ داده اجرایی تجمعی در دسترس نیست."
+
+#~ msgid ""
+#~ "The execution statistics time series did not include finished, failed, or "
+#~ "cancelled statuses."
+#~ msgstr "سری زمانی آمار اجرا شامل وضعیت‌های تکمیل‌شده، ناموفق یا لغوشده نبود."
+
+#~ msgid "No execution trend data available."
+#~ msgstr "هیچ داده‌ای از روند اجرا در دسترس نیست."
+
+#~ msgid "Execution timestamps could not be parsed from the API response."
+#~ msgstr "مهرهای زمانی اجرا از پاسخ API قابل تجزیه نبودند."
+
+#~ msgid "Execution count{suffix_label}"
+#~ msgstr "تعداد اجرا{suffix_label}"
+
+#~ msgid "Average Duration (minutes)"
+#~ msgstr "میانگین مدت زمان (دقیقه)"
+
+#~ msgid "Execution duration{suffix_label}"
+#~ msgstr "مدت زمان اجرا{suffix_label}"
+
+#~ msgid "Failure Rate (%)"
+#~ msgstr "نرخ شکست (%)"
+
+#~ msgid "Top scripts by failure count{suffix_label}"
+#~ msgstr "اسکریپت‌های برتر بر اساس تعداد شکست{suffix_label}"
+
+#~ msgid "Top users by activity{suffix_label}"
+#~ msgstr "برترین کاربران بر اساس فعالیت{suffix_label}"
+
+#~ msgid "Script Version"
+#~ msgstr "نسخه اسکریپت"
+
+#~ msgid "{num_versions} distinct versions, {num_executions} executions"
+#~ msgstr "{num_versions} نسخه‌های متمایز، {num_executions} اجراها"
+
+#~ msgid "{num_executions} executions from scripts with no parseable version"
+#~ msgstr "اجراهای {num_executions} از اسکریپت‌هایی که نسخه قابل تجزیه ندارند"
+
+#~ msgid "Execution script version distribution{suffix_label}"
+#~ msgstr "توزیع نسخه اسکریپت اجرایی {suffix_label}"
+
+#~ msgid "New user registrations{suffix_label}"
+#~ msgstr "ثبت نام کاربر جدید {suffix_label}"
+
+#~ msgid "Cumulative New Users"
+#~ msgstr "کاربران جدید تجمعی"
+
+#~ msgid "Number of Users"
+#~ msgstr "تعداد کاربران"
+
+#~ msgid "Top countries{suffix_label}"
+#~ msgstr "کشورهای برتر{suffix_label}"
+
+#~ msgid "Environment: {env}"
+#~ msgstr "محیط: {env}"
+
+#~ msgid "API Status: Authentication required"
+#~ msgstr "وضعیت API: احراز هویت لازم است"
+
+#~ msgid "Please log in to view deployment status"
+#~ msgstr "برای مشاهده وضعیت استقرار، لطفا وارد شوید"
+
+#~ msgid "API status unavailable"
+#~ msgstr "وضعیت API در دسترس نیست"
+
+#~ msgid "Authentication required"
+#~ msgstr "احراز هویت لازم است"
+
+#~ msgid "Please log in to view cluster status"
+#~ msgstr "برای مشاهده وضعیت خوشه، لطفاً وارد شوید"
+
+#~ msgid " (Auth Required)"
+#~ msgstr " (تاییدیه لازم است)"
+
+#~ msgid " (Live)"
+#~ msgstr " (زنده)"
+
+#~ msgid " (Updated: {time} {tz})"
+#~ msgstr " (به‌روزرسانی: {time} {tz})"
+
+#~ msgid " (Updated: {time})"
+#~ msgstr " (به‌روزرسانی: {time})"
+
+#~ msgid "Authentication failed"
+#~ msgstr "احراز هویت ناموفق بود"
+
+#~ msgid "Please check your login status"
+#~ msgstr "لطفا وضعیت ورود خود را بررسی کنید"
+
+#~ msgid " (Auth Error)"
+#~ msgstr " (خطای تأیید)"
+
+#~ msgid "Access denied"
+#~ msgstr "دسترسی رد شد"
+
+#~ msgid "Admin privileges required for cluster status"
+#~ msgstr "امتیازات مدیریتی مورد نیاز برای وضعیت خوشه"
+
+#~ msgid " (Access Denied)"
+#~ msgstr " (دسترسی رد شد)"
+
+#~ msgid "Cluster Status: Error ({status_code})"
+#~ msgstr "وضعیت خوشه: خطا ({status_code})"
+
+#~ msgid "Unable to retrieve cluster information"
+#~ msgstr "بازیابی اطلاعات خوشه امکان‌پذیر نیست"
+
+#~ msgid " (Error)"
+#~ msgstr " (خطا)"
+
+#~ msgid "Cluster Status: Connection Error"
+#~ msgstr "وضعیت خوشه: خطای اتصال"
+
+#~ msgid "Unable to reach cluster status endpoint"
+#~ msgstr "دسترسی به نقطه پایانی وضعیت خوشه امکان‌پذیر نیست"
+
+#~ msgid " (Connection Error)"
+#~ msgstr " (خطای اتصال)"
+
+#~ msgid "System status is currently unavailable. Please try again later."
+#~ msgstr ""
+#~ "وضعیت سیستم در حال حاضر در دسترس نیست. لطفاً بعداً دوباره امتحان کنید."
