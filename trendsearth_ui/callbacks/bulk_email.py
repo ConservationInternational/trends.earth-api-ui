@@ -162,6 +162,7 @@ def register_callbacks(app):
             Output("bulk-email-rlist-alert", "is_open"),
             Output("bulk-email-rlist-alert", "color"),
             Output("bulk-email-rlist-grid", "rowData"),
+            Output("bulk-email-send-rlist-select", "options"),
         ],
         Input("bulk-email-save-rlist-btn", "n_clicks"),
         [
@@ -190,7 +191,7 @@ def register_callbacks(app):
         max_activity,
     ):
         if not token or not name:
-            return "Please enter a group name.", True, "warning", no_update
+            return "Please enter a group name.", True, "warning", no_update, no_update
         filter_criteria = _build_filter_criteria(
             roles, verified, min_created, max_created, min_activity, max_activity
         )
@@ -203,12 +204,13 @@ def register_callbacks(app):
             )
             if resp.status_code in (200, 201):
                 rows = _load_recipient_lists(token)
-                return f"Group '{name}' saved.", True, "success", rows
+                options = [{"label": r["name"], "value": r["id"]} for r in rows if "id" in r]
+                return f"Group '{name}' saved.", True, "success", rows, options
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update
+            return f"Error: {msg}", True, "danger", no_update, no_update
         except Exception:
             logger.exception("Failed to save recipient list")
-            return "An unexpected error occurred.", True, "danger", no_update
+            return "An unexpected error occurred.", True, "danger", no_update, no_update
 
     # -----------------------------------------------------------------------
     # Load recipient lists on tab open
@@ -238,6 +240,7 @@ def register_callbacks(app):
             Output("bulk-email-rlist-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-rlist-alert", "color", allow_duplicate=True),
             Output("bulk-email-rlist-grid", "rowData", allow_duplicate=True),
+            Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
         ],
         Input("bulk-email-delete-rlist-btn", "n_clicks"),
         [
@@ -248,21 +251,28 @@ def register_callbacks(app):
     )
     def delete_recipient_list(_n, token, selected_rows):
         if not token or not selected_rows:
-            return "Select a group to delete.", True, "warning", no_update
+            return "Select a group to delete.", True, "warning", no_update, no_update
         row = selected_rows[0]
         list_id = row.get("id")
         if not list_id:
-            return "Invalid selection.", True, "warning", no_update
+            return "Invalid selection.", True, "warning", no_update, no_update
         try:
             resp = _api(token, "DELETE", f"/bulk-email/recipient-list/{list_id}")
             if resp.status_code in (200, 204):
                 rows = _load_recipient_lists(token)
-                return f"Group '{row.get('name', list_id)}' deleted.", True, "success", rows
+                options = [{"label": r["name"], "value": r["id"]} for r in rows if "id" in r]
+                return (
+                    f"Group '{row.get('name', list_id)}' deleted.",
+                    True,
+                    "success",
+                    rows,
+                    options,
+                )
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update
+            return f"Error: {msg}", True, "danger", no_update, no_update
         except Exception:
             logger.exception("Failed to delete recipient list")
-            return "An unexpected error occurred.", True, "danger", no_update
+            return "An unexpected error occurred.", True, "danger", no_update, no_update
 
     # -----------------------------------------------------------------------
     # Live HTML preview (sample substitutions)
@@ -605,6 +615,38 @@ def register_callbacks(app):
     )
     def cancel_verify_modal(_n):
         return False
+
+    # -----------------------------------------------------------------------
+    # Send test to self
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-send-alert", "children", allow_duplicate=True),
+            Output("bulk-email-send-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-send-alert", "color", allow_duplicate=True),
+        ],
+        Input("bulk-email-send-test-self-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-send-select", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def send_test_to_self(_n, token, bulk_email_id):
+        if not token:
+            return "Not authenticated.", True, "danger"
+        if not bulk_email_id:
+            return "Select a bulk email first.", True, "warning"
+        try:
+            resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send-test-self")
+            if resp.status_code == 200:
+                sent_to = resp.json().get("data", {}).get("sent_to", "you")
+                return f"Test email sent to {sent_to}.", True, "success"
+            msg = _extract_error(resp)
+            return f"Error: {msg}", True, "danger"
+        except Exception:
+            logger.exception("Failed to send test bulk email to self")
+            return "An unexpected error occurred.", True, "danger"
 
     # -----------------------------------------------------------------------
     # Send test to superadmins

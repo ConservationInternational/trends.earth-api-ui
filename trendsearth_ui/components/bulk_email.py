@@ -522,6 +522,11 @@ def bulk_email_tab_content(_role=None):
                             dbc.ButtonGroup(
                                 [
                                     dbc.Button(
+                                        "Send Test to Self",
+                                        id="bulk-email-send-test-self-btn",
+                                        color="outline-secondary",
+                                    ),
+                                    dbc.Button(
                                         "Send Test to Superadmins",
                                         id="bulk-email-send-test-btn",
                                         color="secondary",
