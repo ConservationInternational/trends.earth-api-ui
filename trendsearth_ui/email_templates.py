@@ -15,7 +15,7 @@ _LOGO_URL = (
     "https://s3.dualstack.us-east-1.amazonaws.com/trends.earth/sharing/logos/"
     "trends_earth_logo_print_colored.png"
 )
-_PRIMARY_GREEN = "#3a7d44"
+_PRIMARY_RED = "#c8272a"
 _HEADER_BG = "#495057"
 _WEBSITE_URL = "https://trends.earth"
 _PRIVACY_URL = "https://www.conservation.org/policies/privacy"
@@ -46,15 +46,13 @@ _FOOTER_HTML = f"""
       <td align="center" style="padding:16px; font-family:Arial,sans-serif;
           font-size:12px; color:#6c757d; line-height:1.6;">
         <a href="{_WEBSITE_URL}" target="_blank"
-           style="color:{_PRIMARY_GREEN}; text-decoration:none;">trends.earth</a>
+           style="color:{_PRIMARY_RED}; text-decoration:none;">trends.earth</a>
         &nbsp;&bull;&nbsp;
         <a href="{_PRIVACY_URL}" target="_blank"
-           style="color:{_PRIMARY_GREEN}; text-decoration:none;">Privacy Policy</a>
+           style="color:{_PRIMARY_RED}; text-decoration:none;">Privacy Policy</a>
         &nbsp;&bull;&nbsp;
         <a href="{_TERMS_URL}" target="_blank"
-           style="color:{_PRIMARY_GREEN}; text-decoration:none;">Terms of Use</a>
-        <br><br>
-        {{{{unsubscribe_footer}}}}
+           style="color:{_PRIMARY_RED}; text-decoration:none;">Terms of Use</a>
       </td>
     </tr>
   </table>
@@ -102,7 +100,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
 
               <!-- Section: Highlight -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background-color:{_PRIMARY_GREEN}; border-radius:4px;
+                     style="background-color:{_PRIMARY_RED}; border-radius:4px;
                             margin-bottom:24px;">
                 <tr>
                   <td style="padding:20px 24px;">
@@ -120,7 +118,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
 
               <!-- Section: News items -->
               <h2 style="font-family:Arial,sans-serif; font-size:17px; color:#212529;
-                          font-weight:700; margin:0 0 12px 0; border-bottom:2px solid {_PRIMARY_GREEN};
+                          font-weight:700; margin:0 0 12px 0; border-bottom:2px solid {_PRIMARY_RED};
                           padding-bottom:8px;">
                 Latest News
               </h2>
@@ -139,7 +137,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
                     </p>
                     <a href="{_WEBSITE_URL}" target="_blank"
                        style="font-family:Arial,sans-serif; font-size:14px;
-                              color:{_PRIMARY_GREEN}; text-decoration:none; font-weight:600;">
+                              color:{_PRIMARY_RED}; text-decoration:none; font-weight:600;">
                       Read more &rarr;
                     </a>
                   </td>
@@ -152,7 +150,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
                 <tr>
                   <td align="center">
                     <a href="{_WEBSITE_URL}" target="_blank"
-                       style="display:inline-block; background-color:{_PRIMARY_GREEN};
+                       style="display:inline-block; background-color:{_PRIMARY_RED};
                               color:#ffffff; font-family:Arial,sans-serif; font-size:15px;
                               font-weight:700; text-decoration:none; padding:12px 28px;
                               border-radius:4px;">
@@ -214,7 +212,7 @@ _ENGAGEMENT_HTML = f"""<!DOCTYPE html>
 
               <!-- Engagement block -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background-color:#f0f7f1; border-left:4px solid {_PRIMARY_GREEN};
+                     style="background-color:#fde8e8; border-left:4px solid {_PRIMARY_RED};
                             border-radius:0 4px 4px 0; margin-bottom:24px;">
                 <tr>
                   <td style="padding:20px 24px;">
@@ -228,7 +226,7 @@ _ENGAGEMENT_HTML = f"""<!DOCTYPE html>
                        and actionable.]
                     </p>
                     <a href="#" target="_blank"
-                       style="display:inline-block; background-color:{_PRIMARY_GREEN};
+                       style="display:inline-block; background-color:{_PRIMARY_RED};
                               color:#ffffff; font-family:Arial,sans-serif; font-size:14px;
                               font-weight:700; text-decoration:none; padding:10px 22px;
                               border-radius:4px;">
@@ -352,7 +350,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
 
               <!-- Details -->
               <h2 style="font-family:Arial,sans-serif; font-size:17px; color:#212529;
-                          font-weight:700; margin:0 0 12px 0; border-bottom:2px solid {_PRIMARY_GREEN};
+                          font-weight:700; margin:0 0 12px 0; border-bottom:2px solid {_PRIMARY_RED};
                           padding-bottom:8px;">
                 What to Expect
               </h2>
@@ -368,7 +366,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
                 We apologize for any inconvenience. If you have questions, please
                 contact us at
                 <a href="mailto:trends.earth@conservation.org"
-                   style="color:{_PRIMARY_GREEN};">trends.earth@conservation.org</a>.
+                   style="color:{_PRIMARY_RED};">trends.earth@conservation.org</a>.
               </p>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;

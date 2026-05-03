@@ -38,7 +38,7 @@ def register_callbacks(app):
         ],
         [Input("unsubscribe-token-store", "data")],
         [State("unsubscribe-api-env", "data")],
-        prevent_initial_call=True,
+        prevent_initial_call=False,
     )
     def load_unsubscribe_prefs(token, api_environment):
         """Fetch the user's current subscription preferences from the API."""

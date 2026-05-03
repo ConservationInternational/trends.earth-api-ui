@@ -1,0 +1,35 @@
+/* Bulk Email Composer — Editor Styles
+   Makes table borders visible inside the Tiptap/ProseMirror editor while
+   editing, so authors can see table structure during composition.  These
+   styles only affect the editor viewport — not the preview iframe or the
+   actual sent HTML.
+
+   The editor content lives inside a .ProseMirror element (Tiptap's class).
+   Mantine v7 class names include hash suffixes so we target ProseMirror
+   directly rather than any Mantine-specific class.
+*/
+
+.ProseMirror table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+    border: 1px solid #adb5bd !important;
+    padding: 6px 10px;
+    min-width: 40px;
+    position: relative;
+}
+
+.ProseMirror table th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+}
+
+/* Highlight the selected cell (set by Tiptap's TableCell extension) */
+.ProseMirror table td.selectedCell,
+.ProseMirror table th.selectedCell {
+    background-color: #e7f5ff;
+}
