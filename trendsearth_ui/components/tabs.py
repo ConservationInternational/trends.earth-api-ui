@@ -961,68 +961,24 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H4(_("Email Notifications"))),
+                    dbc.CardHeader(html.H4(_("Email Preferences"))),
                     dbc.CardBody(
                         [
                             dbc.Row(
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label(_("Execution Completion Notifications")),
-                                            html.Div(
-                                                [
-                                                    dbc.Switch(
-                                                        id="profile-email-notifications-switch",
-                                                        label=_("Enable email notifications"),
-                                                        value=user_data.get(
-                                                            "email_notifications_enabled", True
-                                                        )
-                                                        if user_data
-                                                        else True,
-                                                        className="mb-2",
-                                                    ),
-                                                    html.Small(
-                                                        _(
-                                                            "Receive email notifications when your script executions finish, fail, or are cancelled."
-                                                        ),
-                                                        className="text-muted",
-                                                    ),
-                                                ],
+                                            dbc.Switch(
+                                                id="profile-email-notifications-switch",
+                                                label=_("Automated updates (job status, etc.)"),
+                                                value=user_data.get(
+                                                    "email_notifications_enabled", True
+                                                )
+                                                if user_data
+                                                else True,
+                                                className="mb-2",
                                             ),
-                                        ],
-                                        width=12,
-                                    ),
-                                ],
-                                className="mb-3",
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            dbc.Alert(
-                                                id="profile-email-notifications-alert",
-                                                is_open=False,
-                                                dismissable=True,
-                                            ),
-                                        ],
-                                        width=12,
-                                    ),
-                                ]
-                            ),
-                        ]
-                    ),
-                ],
-                className="mb-4",
-            ),
-            dbc.Card(
-                [
-                    dbc.CardHeader(html.H4(_("Email Subscription Preferences"))),
-                    dbc.CardBody(
-                        [
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
+                                            html.Hr(className="my-3"),
                                             html.P(
                                                 _(
                                                     "Choose which types of bulk emails you'd like to receive:"
@@ -1039,7 +995,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Switch(
                                                 id="profile-sub-engagement",
-                                                label=_("Community & Engagement"),
+                                                label=_("Engagement opportunities"),
                                                 value=user_data.get(
                                                     "email_subscription_engagement", True
                                                 )
@@ -1058,7 +1014,7 @@ def profile_tab_content(user_data):
                                                 className="mb-2",
                                             ),
                                             dbc.Button(
-                                                _("Save Subscription Preferences"),
+                                                _("Save Email Preferences"),
                                                 id="profile-save-subscriptions-btn",
                                                 color="primary",
                                                 className="mt-3",

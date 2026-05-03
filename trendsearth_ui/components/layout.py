@@ -2151,6 +2151,15 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                         dbc.CardBody(
                                                             [
                                                                 dbc.Switch(
+                                                                    id="unsubscribe-sub-automated",
+                                                                    label=_(
+                                                                        "Automated updates (job status, etc.)"
+                                                                    ),
+                                                                    value=True,
+                                                                    className="mb-2",
+                                                                ),
+                                                                html.Hr(className="my-2"),
+                                                                dbc.Switch(
                                                                     id="unsubscribe-sub-news",
                                                                     label=_("News & Updates"),
                                                                     value=True,
@@ -2159,7 +2168,7 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-engagement",
                                                                     label=_(
-                                                                        "Community & Engagement"
+                                                                        "Engagement opportunities"
                                                                     ),
                                                                     value=True,
                                                                     className="mb-2",
@@ -2184,6 +2193,13 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                 _("Save Preferences"),
                                                 id="unsubscribe-save-btn",
                                                 color="primary",
+                                                className="w-100 mb-2",
+                                            ),
+                                            dbc.Button(
+                                                _("Unsubscribe from All"),
+                                                id="unsubscribe-all-btn",
+                                                color="danger",
+                                                outline=True,
                                                 className="w-100 mb-3",
                                             ),
                                             dbc.Alert(

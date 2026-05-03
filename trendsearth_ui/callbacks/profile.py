@@ -365,67 +365,6 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("profile-email-notifications-alert", "children"),
-            Output("profile-email-notifications-alert", "color"),
-            Output("profile-email-notifications-alert", "is_open"),
-            Output("user-store", "data", allow_duplicate=True),
-        ],
-        [Input("profile-email-notifications-switch", "value")],
-        [
-            State("token-store", "data"),
-            State("user-store", "data"),
-        ],
-        prevent_initial_call=True,
-    )
-    def update_email_notifications(enabled, token, user_data):
-        """Update user email notification preferences."""
-        if token is None or user_data is None:
-            return no_update, no_update, no_update, no_update
-
-        # Check if the value actually changed from what's stored
-        # This prevents showing success message on initial page load
-        current_value = user_data.get("email_notifications_enabled", True)
-        if enabled == current_value:
-            return no_update, no_update, no_update, no_update
-
-        try:
-            from ..utils.helpers import make_authenticated_request
-
-            # Update email notifications setting
-            resp = make_authenticated_request(
-                "/user/me",
-                token,
-                method="PATCH",
-                json={"email_notifications_enabled": enabled},
-                timeout=10,
-            )
-
-            if resp.status_code == 200:
-                # Update the user data in store
-                updated_data = resp.json().get("data", user_data)
-
-                status_text = _("enabled") if enabled else _("disabled")
-                return (
-                    _("Email notifications {status} successfully!").format(status=status_text),
-                    "success",
-                    True,
-                    updated_data,
-                )
-            else:
-                error_msg = _("Failed to update email notification settings.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
-                return error_msg, "danger", True, no_update
-
-        except Exception as e:
-            logger.exception("Error updating email notifications: %s", e)
-            return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
-
-    @app.callback(
-        [
             Output("profile-subscriptions-alert", "children"),
             Output("profile-subscriptions-alert", "color"),
             Output("profile-subscriptions-alert", "is_open"),
@@ -434,6 +373,7 @@ def register_callbacks(app):
         [Input("profile-save-subscriptions-btn", "n_clicks")],
         [
             State("token-store", "data"),
+            State("profile-email-notifications-switch", "value"),
             State("profile-sub-news", "value"),
             State("profile-sub-engagement", "value"),
             State("profile-sub-system-updates", "value"),
@@ -441,8 +381,12 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def save_subscription_prefs(_n_clicks, token, news, engagement, system_updates, user_data):
-        """Save bulk email subscription preferences."""
+    def save_subscription_prefs(
+        _n_clicks, token, automated, news, engagement, system_updates, user_data
+    ):
+        """Save email preferences (automated notifications + bulk subscriptions)."""
+        if not _n_clicks:
+            return no_update, no_update, no_update, no_update
         if token is None:
             return no_update, no_update, no_update, no_update
         try:
@@ -453,6 +397,7 @@ def register_callbacks(app):
                 token,
                 method="PATCH",
                 json={
+                    "email_notifications_enabled": bool(automated),
                     "email_subscription_news": bool(news),
                     "email_subscription_engagement": bool(engagement),
                     "email_subscription_system_updates": bool(system_updates),
@@ -463,13 +408,13 @@ def register_callbacks(app):
             if resp.status_code == 200:
                 updated_data = resp.json().get("data", user_data)
                 return (
-                    _("Subscription preferences saved successfully!"),
+                    _("Email preferences saved successfully!"),
                     "success",
                     True,
                     updated_data,
                 )
             else:
-                error_msg = _("Failed to save subscription preferences.")
+                error_msg = _("Failed to save email preferences.")
                 import contextlib
 
                 with contextlib.suppress(Exception):
@@ -477,7 +422,7 @@ def register_callbacks(app):
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
-            logger.exception("Error saving subscription preferences: %s", e)
+            logger.exception("Error saving email preferences: %s", e)
             return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
     # Delete Account Callbacks

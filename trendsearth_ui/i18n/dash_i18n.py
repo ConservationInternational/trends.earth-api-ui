@@ -216,8 +216,15 @@ def register_language_callbacks(app):  # noqa: ARG001
         prevent_initial_call=True,
     )
 
-    # ID prefixes for language selectors (dashboard, login, register, reset password, standalone profile pages)
-    id_prefixes = ["lang", "login-lang", "register-lang", "reset-lang", "standalone-profile-lang"]
+    # ID prefixes for language selectors (dashboard, login, register, reset password, standalone profile pages, unsubscribe)
+    id_prefixes = [
+        "lang",
+        "login-lang",
+        "register-lang",
+        "reset-lang",
+        "standalone-profile-lang",
+        "unsubscribe-lang",
+    ]
 
     # Client-side callbacks to update each dropdown's label with the selected language
     for prefix in id_prefixes:
