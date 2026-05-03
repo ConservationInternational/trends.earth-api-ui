@@ -115,6 +115,10 @@ def process_po_file(
     skipped = 0
 
     for entry in po:
+        # Skip obsolete entries (those starting with #~ in PO files)
+        if entry.obsolete:
+            continue
+
         # Skip if msgid is empty
         if not entry.msgid or not entry.msgid.strip():
             continue
