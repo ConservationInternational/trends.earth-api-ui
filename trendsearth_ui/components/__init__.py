@@ -8,6 +8,7 @@ from .layout import (
     login_layout,
     registration_layout,
     reset_password_layout,
+    unsubscribe_layout,
     update_profile_standalone_layout,
 )
 from .modals import (

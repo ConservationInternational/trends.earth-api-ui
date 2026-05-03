@@ -424,6 +424,62 @@ def register_callbacks(app):
             logger.exception("Error updating email notifications: %s", e)
             return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
 
+    @app.callback(
+        [
+            Output("profile-subscriptions-alert", "children"),
+            Output("profile-subscriptions-alert", "color"),
+            Output("profile-subscriptions-alert", "is_open"),
+            Output("user-store", "data", allow_duplicate=True),
+        ],
+        [Input("profile-save-subscriptions-btn", "n_clicks")],
+        [
+            State("token-store", "data"),
+            State("profile-sub-news", "value"),
+            State("profile-sub-engagement", "value"),
+            State("profile-sub-system-updates", "value"),
+            State("user-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def save_subscription_prefs(_n_clicks, token, news, engagement, system_updates, user_data):
+        """Save bulk email subscription preferences."""
+        if token is None:
+            return no_update, no_update, no_update, no_update
+        try:
+            from ..utils.helpers import make_authenticated_request
+
+            resp = make_authenticated_request(
+                "/user/me",
+                token,
+                method="PATCH",
+                json={
+                    "email_subscription_news": bool(news),
+                    "email_subscription_engagement": bool(engagement),
+                    "email_subscription_system_updates": bool(system_updates),
+                },
+                timeout=10,
+            )
+
+            if resp.status_code == 200:
+                updated_data = resp.json().get("data", user_data)
+                return (
+                    _("Subscription preferences saved successfully!"),
+                    "success",
+                    True,
+                    updated_data,
+                )
+            else:
+                error_msg = _("Failed to save subscription preferences.")
+                import contextlib
+
+                with contextlib.suppress(Exception):
+                    error_msg = resp.json().get("detail", error_msg)
+                return error_msg, "danger", True, no_update
+
+        except Exception as e:
+            logger.exception("Error saving subscription preferences: %s", e)
+            return _("Network error: {error}").format(error=str(e)), "danger", True, no_update
+
     # Delete Account Callbacks
     @app.callback(
         Output("delete-account-modal", "is_open"),

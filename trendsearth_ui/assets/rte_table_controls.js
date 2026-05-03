@@ -36,10 +36,20 @@ window.dashMantineFunctions.deleteTable = function(ctx) {
 };
 
 // Pretty-print HTML when the SourceCode toolbar button is toggled on.
-// Mantine RTE renders a <textarea> inside the editor container when source
-// mode is active. We watch for that textarea being added and format its content.
+// Mantine's RTE does NOT render a real <textarea> element in the DOM.  When
+// source-code mode is activated it calls Tiptap's setContent('<textarea>HTML
+// </textarea>'), which causes Tiptap/ProseMirror to store the HTML as plain
+// text inside the .ProseMirror contenteditable div.
+//
+// We intercept the button click in capture phase (before React/Mantine):
+//  - Switching TO source: after Mantine sets content, pretty-print the HTML
+//    text and constrain the editor height so it scrolls instead of resizing.
+//  - Switching FROM source: minify the HTML text (strip our pretty-print
+//    whitespace) before Mantine reads it via getText(), which prevents the
+//    whitespace from leaking into the rendered document.
 (function () {
     const VOID_TAGS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+    const SOURCE_LABEL = 'Switch between text/source code';
 
     function prettyPrintHtml(html) {
         const tab = '  ';
@@ -79,35 +89,84 @@ window.dashMantineFunctions.deleteTable = function(ctx) {
         return out.join('\n');
     }
 
-    function formatTextarea(textarea) {
-        if (!textarea || !textarea.value.trim()) return;
-        const formatted = prettyPrintHtml(textarea.value);
-        if (formatted === textarea.value) return;
-
-        // Update value in a way that React's synthetic event system picks up
-        const nativeSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLTextAreaElement.prototype, 'value'
-        ).set;
-        nativeSetter.call(textarea, formatted);
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    // Collapse pretty-print whitespace to produce minified HTML on one line.
+    function minifyHtml(html) {
+        return html
+            .replace(/[ \t]*\n[ \t]*/g, '')  // strip newlines and their indentation
+            .replace(/>\s+</g, '><')           // collapse remaining whitespace between tags
+            .trim();
     }
 
-    new MutationObserver(function (mutations) {
-        for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-                if (node.nodeType !== 1) continue;
-
-                const candidates = node.tagName === 'TEXTAREA'
-                    ? [node]
-                    : Array.from(node.querySelectorAll ? node.querySelectorAll('textarea') : []);
-
-                for (const ta of candidates) {
-                    if (ta.closest('[class*="RichTextEditor"]')) {
-                        // Small delay to let Mantine finish populating the textarea
-                        setTimeout(() => formatTextarea(ta), 0);
-                    }
-                }
-            }
+    // Walk up from an element to find the nearest ancestor that contains a
+    // .ProseMirror child (i.e. the RTE root wrapper).
+    function findRteRoot(startEl) {
+        let el = startEl;
+        while (el && el !== document.body) {
+            if (el.querySelector('.ProseMirror')) return el;
+            el = el.parentElement;
         }
-    }).observe(document.body, { childList: true, subtree: true });
+        return null;
+    }
+
+    // Replace the ProseMirror editor's text content with the given string.
+    // ProseMirror monitors input events on the contenteditable div, so
+    // selectAll + execCommand('insertText') is the safest way to update it
+    // from outside React/Tiptap.
+    function setEditorText(pmEl, text) {
+        pmEl.focus();
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(pmEl);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('insertText', false, text);
+    }
+
+    // Use event delegation at the document level (capture phase) so we see
+    // the click before Mantine's React handler runs.  At the moment the click
+    // fires, the button's data-active attribute reflects the CURRENT state:
+    //   no data-active  → switching INTO source mode
+    //   data-active     → switching OUT OF source mode
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('button[aria-label="' + SOURCE_LABEL + '"]');
+        if (!btn) return;
+
+        const rteRoot = findRteRoot(btn);
+        if (!rteRoot) return;
+        const pmEl = rteRoot.querySelector('.ProseMirror');
+        if (!pmEl) return;
+
+        if (!btn.hasAttribute('data-active')) {
+            // Switching TO source mode.
+            // Capture current height before Mantine changes content so we can
+            // constrain the editor to that size (scrollbar instead of resize).
+            const capturedHeight = pmEl.offsetHeight;
+            setTimeout(function () {
+                const raw = pmEl.textContent;
+                if (!raw.trim()) return;
+                const formatted = prettyPrintHtml(raw.trim());
+                if (formatted === raw.trim()) return;
+
+                // Lock the editor height before inserting the taller content.
+                pmEl.style.maxHeight = Math.max(100, capturedHeight) + 'px';
+                pmEl.style.overflowY = 'auto';
+
+                setEditorText(pmEl, formatted);
+            }, 30);
+        } else {
+            // Switching FROM source mode.
+            // Minify the HTML text BEFORE Mantine reads it via getText(), so
+            // that the pretty-print whitespace does not leak into the rendered
+            // document as extra newlines / blank lines.
+            const raw = pmEl.textContent;
+            const minified = minifyHtml(raw);
+            if (minified !== raw.trim()) {
+                setEditorText(pmEl, minified);
+            }
+
+            // Remove the scroll/height constraint.
+            pmEl.style.maxHeight = '';
+            pmEl.style.overflowY = '';
+        }
+    }, true /* capture */);
 }());

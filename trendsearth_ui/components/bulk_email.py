@@ -353,6 +353,42 @@ def bulk_email_tab_content(_role=None):
                                 className="mb-3",
                             ),
                             dcc.Store(id="bulk-email-loaded-draft-id"),
+                            # Load template
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Select(
+                                            id="bulk-email-template-select",
+                                            options=[
+                                                {"label": "(no template)", "value": ""},
+                                                {"label": "News & Updates", "value": "news"},
+                                                {
+                                                    "label": "User Engagement",
+                                                    "value": "engagement",
+                                                },
+                                                {
+                                                    "label": "System Update / Maintenance",
+                                                    "value": "system_update",
+                                                },
+                                            ],
+                                            value="",
+                                            placeholder="Load a template...",
+                                        ),
+                                        width=6,
+                                    ),
+                                    dbc.Col(
+                                        dbc.Button(
+                                            "Load Template",
+                                            id="bulk-email-load-template-btn",
+                                            color="outline-primary",
+                                            size="sm",
+                                        ),
+                                        width="auto",
+                                        className="d-flex align-items-center",
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
                             dbc.Row(
                                 [
                                     dbc.Col(
@@ -373,6 +409,38 @@ def bulk_email_tab_content(_role=None):
                                                 id="bulk-email-subject",
                                                 type="text",
                                                 placeholder="Email subject",
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Label("Email Category"),
+                                            dbc.Select(
+                                                id="bulk-email-category-select",
+                                                options=[
+                                                    {"label": "(none — send to all)", "value": ""},
+                                                    {"label": "News & Updates", "value": "news"},
+                                                    {
+                                                        "label": "User Engagement",
+                                                        "value": "engagement",
+                                                    },
+                                                    {
+                                                        "label": "System Updates",
+                                                        "value": "system_updates",
+                                                    },
+                                                ],
+                                                value="",
+                                            ),
+                                            html.Small(
+                                                "Only send to users subscribed to this category. "
+                                                "Set to '(none)' to send to all users.",
+                                                className="text-muted",
                                             ),
                                         ],
                                         width=6,

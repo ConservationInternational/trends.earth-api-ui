@@ -2078,6 +2078,179 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
     )
 
 
+def unsubscribe_layout(token=None, api_environment="production"):
+    """Create the unsubscribe / email preferences page layout.
+
+    This page is loaded directly from the unsubscribe link embedded in bulk
+    emails.  No login is required — the JWT token in the URL authenticates the
+    request.
+
+    Args:
+        token: The signed JWT unsubscribe token from the URL
+        api_environment: The API environment to use
+    """
+    return html.Div(
+        [
+            dbc.Modal(id="forgot-password-modal", is_open=False),
+            dbc.Container(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Div(
+                                                html.Img(
+                                                    src=LOGO_URL,
+                                                    style={
+                                                        "maxWidth": "100%",
+                                                        "width": "450px",
+                                                        "height": "auto",
+                                                    },
+                                                ),
+                                                style={
+                                                    "backgroundColor": "#495057",
+                                                    "padding": "20px 30px",
+                                                    "textAlign": "center",
+                                                    "display": "flex",
+                                                    "justifyContent": "center",
+                                                    "alignItems": "center",
+                                                },
+                                                className="mb-4",
+                                            ),
+                                            html.H4(
+                                                _("Email Subscription Preferences"),
+                                                className="mb-2",
+                                            ),
+                                            html.P(
+                                                _(
+                                                    "Choose which types of emails you'd like to receive from Trends.Earth."
+                                                ),
+                                                className="text-muted mb-4",
+                                            ),
+                                            # Language selector
+                                            html.Div(
+                                                create_language_selector(
+                                                    id_prefix="unsubscribe-lang"
+                                                ),
+                                                className="mb-3",
+                                            ),
+                                            # Hidden stores
+                                            dcc.Store(
+                                                id="unsubscribe-token-store",
+                                                data=token,
+                                            ),
+                                            dcc.Store(
+                                                id="unsubscribe-api-env",
+                                                data=api_environment,
+                                            ),
+                                            dcc.Loading(
+                                                [
+                                                    dbc.Card(
+                                                        dbc.CardBody(
+                                                            [
+                                                                dbc.Switch(
+                                                                    id="unsubscribe-sub-news",
+                                                                    label=_("News & Updates"),
+                                                                    value=True,
+                                                                    className="mb-2",
+                                                                ),
+                                                                dbc.Switch(
+                                                                    id="unsubscribe-sub-engagement",
+                                                                    label=_(
+                                                                        "Community & Engagement"
+                                                                    ),
+                                                                    value=True,
+                                                                    className="mb-2",
+                                                                ),
+                                                                dbc.Switch(
+                                                                    id="unsubscribe-sub-system-updates",
+                                                                    label=_(
+                                                                        "System Updates & Maintenance"
+                                                                    ),
+                                                                    value=True,
+                                                                    className="mb-2",
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        className="mb-3",
+                                                    ),
+                                                ],
+                                                id="unsubscribe-loading",
+                                                type="default",
+                                            ),
+                                            dbc.Button(
+                                                _("Save Preferences"),
+                                                id="unsubscribe-save-btn",
+                                                color="primary",
+                                                className="w-100 mb-3",
+                                            ),
+                                            dbc.Alert(
+                                                id="unsubscribe-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                                duration=None,
+                                            ),
+                                            html.Hr(),
+                                            html.Div(
+                                                [
+                                                    html.A(
+                                                        _("Privacy Policy"),
+                                                        href="https://www.conservation.org/policies/privacy",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                    html.Span(
+                                                        " | ",
+                                                        className="text-muted",
+                                                        style={"fontSize": "12px"},
+                                                    ),
+                                                    html.A(
+                                                        _("Terms of Use"),
+                                                        href="https://www.conservation.org/policies/terms-of-use",
+                                                        target="_blank",
+                                                        className="text-muted",
+                                                        style={
+                                                            "textDecoration": "none",
+                                                            "fontSize": "12px",
+                                                        },
+                                                    ),
+                                                ],
+                                                className="text-center mt-3",
+                                            ),
+                                            html.Div(
+                                                html.A(
+                                                    "trends.earth",
+                                                    href="https://trends.earth",
+                                                    target="_blank",
+                                                    className="text-muted",
+                                                    style={
+                                                        "textDecoration": "none",
+                                                        "fontSize": "12px",
+                                                    },
+                                                ),
+                                                className="text-center mt-1",
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                style={"maxWidth": "450px"},
+                                width=6,
+                                className="mx-auto mt-4",
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+    )
+
+
 def dashboard_layout():
     """Create the main dashboard layout."""
     layout = [

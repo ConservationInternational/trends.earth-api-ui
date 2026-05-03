@@ -17,6 +17,7 @@ from ..components import (
     login_layout,
     registration_layout,
     reset_password_layout,
+    unsubscribe_layout,
     update_profile_standalone_layout,
 )
 from ..config import detect_api_environment_from_host, get_api_base, get_auth_url
@@ -223,6 +224,26 @@ def register_callbacks(app):
                     token=profile_token, api_environment=api_env, lang=lang
                 ),
                 True,  # Clear auth stores for this standalone page
+                None,
+                None,
+                None,
+                api_env,
+            )
+
+        # Check if this is an unsubscribe / email preferences page request
+        if _pathname and _pathname.startswith("/unsubscribe"):
+            unsub_token = None
+            api_env = current_api_environment or "production"
+            if search:
+                params = parse_qs(search[1:] if search.startswith("?") else search)
+                unsub_token = params.get("token", [None])[0]
+                env_param = params.get("env", [None])[0]
+                if env_param:
+                    api_env = env_param
+
+            return (
+                unsubscribe_layout(token=unsub_token, api_environment=api_env),
+                True,  # Clear auth stores for this public page
                 None,
                 None,
                 None,

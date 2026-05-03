@@ -552,6 +552,36 @@ def register_callbacks(app):
             return ("An unexpected error occurred.", True, "danger") + _no
 
     # -----------------------------------------------------------------------
+    # Load a template into the composer
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-subject", "value", allow_duplicate=True),
+            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-category-select", "value", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+        ],
+        Input("bulk-email-load-template-btn", "n_clicks"),
+        State("bulk-email-template-select", "value"),
+        prevent_initial_call=True,
+    )
+    def load_template_into_composer(_n, template_key):
+        from ..email_templates import TEMPLATES
+
+        if not template_key or template_key not in TEMPLATES:
+            return no_update, no_update, no_update, "Select a template first.", True, "warning"
+        tmpl = TEMPLATES[template_key]
+        return (
+            tmpl["subject"],
+            tmpl["html"],
+            tmpl.get("subscription_type", ""),
+            f"Template '{tmpl['label']}' loaded.",
+            True,
+            "success",
+        )
+
     # Save draft bulk email
     # -----------------------------------------------------------------------
     @app.callback(
@@ -571,10 +601,13 @@ def register_callbacks(app):
             State("bulk-email-subject", "value"),
             State("bulk-email-html-source", "html"),
             State("bulk-email-loaded-draft-id", "data"),
+            State("bulk-email-category-select", "value"),
         ],
         prevent_initial_call=True,
     )
-    def save_draft_bulk_email(_n, token, name, subject, html_content, loaded_draft_id):
+    def save_draft_bulk_email(
+        _n, token, name, subject, html_content, loaded_draft_id, subscription_type
+    ):
         if not token or not name or not subject:
             return (
                 "Name and subject are required.",
@@ -585,7 +618,12 @@ def register_callbacks(app):
                 no_update,
                 no_update,
             )
-        payload = {"name": name, "subject": subject, "html_content": html_content or ""}
+        payload = {
+            "name": name,
+            "subject": subject,
+            "html_content": html_content or "",
+            "subscription_type": subscription_type or None,
+        }
         try:
             if loaded_draft_id:
                 resp = _api(token, "PATCH", f"/bulk-email/{loaded_draft_id}", json=payload)
@@ -662,6 +700,7 @@ def register_callbacks(app):
             Output("bulk-email-html-source", "html"),
             Output("bulk-email-loaded-draft-id", "data"),
             Output("bulk-email-draft-mode-label", "children"),
+            Output("bulk-email-category-select", "value"),
             Output("bulk-email-composer-alert", "children", allow_duplicate=True),
             Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
@@ -681,6 +720,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
                 "Select a draft to load.",
                 True,
                 "warning",
@@ -692,10 +732,22 @@ def register_callbacks(app):
                 name = data.get("name", "")
                 subject = data.get("subject", "")
                 html_content = data.get("html_content", "")
+                subscription_type = data.get("subscription_type") or ""
                 label = f"Editing: {name}"
-                return name, subject, html_content, draft_id, label, "", False, "success"
+                return (
+                    name,
+                    subject,
+                    html_content,
+                    draft_id,
+                    label,
+                    subscription_type,
+                    "",
+                    False,
+                    "success",
+                )
             msg = _extract_error(resp)
             return (
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -708,6 +760,7 @@ def register_callbacks(app):
         except Exception:
             logger.exception("Failed to load draft")
             return (
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -728,6 +781,7 @@ def register_callbacks(app):
             Output("bulk-email-html-source", "html", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-category-select", "value", allow_duplicate=True),
             Output("bulk-email-composer-alert", "children", allow_duplicate=True),
             Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
@@ -749,6 +803,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
                 "Select a draft to copy.",
                 True,
                 "warning",
@@ -765,6 +820,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
+                    no_update,
                     f"Error loading draft: {msg}",
                     True,
                     "danger",
@@ -775,15 +831,22 @@ def register_callbacks(app):
             copy_name = f"Copy of {data.get('name', 'Draft')}"
             copy_subject = data.get("subject", "")
             copy_html = data.get("html_content", "")
+            copy_subscription_type = data.get("subscription_type") or None
             create_resp = _api(
                 token,
                 "POST",
                 "/bulk-email",
-                json={"name": copy_name, "subject": copy_subject, "html_content": copy_html},
+                json={
+                    "name": copy_name,
+                    "subject": copy_subject,
+                    "html_content": copy_html,
+                    "subscription_type": copy_subscription_type,
+                },
             )
             if create_resp.status_code not in (200, 201):
                 msg = _extract_error(create_resp)
                 return (
+                    no_update,
                     no_update,
                     no_update,
                     no_update,
@@ -804,6 +867,7 @@ def register_callbacks(app):
                 copy_html,
                 new_id,
                 label,
+                copy_subscription_type or "",
                 f"Created copy '{copy_name}'.",
                 True,
                 "success",
@@ -813,6 +877,7 @@ def register_callbacks(app):
         except Exception:
             logger.exception("Failed to copy draft")
             return (
+                no_update,
                 no_update,
                 no_update,
                 no_update,
@@ -835,12 +900,14 @@ def register_callbacks(app):
             Output("bulk-email-html-source", "html", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-category-select", "value", allow_duplicate=True),
+            Output("bulk-email-template-select", "value", allow_duplicate=True),
         ],
         Input("bulk-email-clear-draft-btn", "n_clicks"),
         prevent_initial_call=True,
     )
     def clear_composer(_n):
-        return "", "", "", None, ""
+        return "", "", "", None, "", "", ""
 
     # -----------------------------------------------------------------------
     # Delete draft bulk email
@@ -855,6 +922,7 @@ def register_callbacks(app):
             Output("bulk-email-html-source", "html", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-category-select", "value", allow_duplicate=True),
             Output("bulk-email-send-select", "options", allow_duplicate=True),
             Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
             Output("bulk-email-load-draft-select", "value", allow_duplicate=True),
@@ -882,6 +950,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
         try:
             resp = _api(token, "DELETE", f"/bulk-email/{draft_id}")
@@ -895,6 +964,7 @@ def register_callbacks(app):
                     "",
                     "",
                     None,
+                    "",
                     "",
                     options,
                     options,
@@ -913,6 +983,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
+                no_update,
             )
         except Exception:
             logger.exception("Failed to delete draft")
@@ -920,6 +991,7 @@ def register_callbacks(app):
                 "An unexpected error occurred.",
                 True,
                 "danger",
+                no_update,
                 no_update,
                 no_update,
                 no_update,

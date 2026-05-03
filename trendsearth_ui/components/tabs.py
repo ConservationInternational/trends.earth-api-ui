@@ -1016,6 +1016,80 @@ def profile_tab_content(user_data):
             ),
             dbc.Card(
                 [
+                    dbc.CardHeader(html.H4(_("Email Subscription Preferences"))),
+                    dbc.CardBody(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.P(
+                                                _(
+                                                    "Choose which types of bulk emails you'd like to receive:"
+                                                ),
+                                                className="text-muted mb-3",
+                                            ),
+                                            dbc.Switch(
+                                                id="profile-sub-news",
+                                                label=_("News & Updates"),
+                                                value=user_data.get("email_subscription_news", True)
+                                                if user_data
+                                                else True,
+                                                className="mb-2",
+                                            ),
+                                            dbc.Switch(
+                                                id="profile-sub-engagement",
+                                                label=_("Community & Engagement"),
+                                                value=user_data.get(
+                                                    "email_subscription_engagement", True
+                                                )
+                                                if user_data
+                                                else True,
+                                                className="mb-2",
+                                            ),
+                                            dbc.Switch(
+                                                id="profile-sub-system-updates",
+                                                label=_("System Updates & Maintenance"),
+                                                value=user_data.get(
+                                                    "email_subscription_system_updates", True
+                                                )
+                                                if user_data
+                                                else True,
+                                                className="mb-2",
+                                            ),
+                                            dbc.Button(
+                                                _("Save Subscription Preferences"),
+                                                id="profile-save-subscriptions-btn",
+                                                color="primary",
+                                                className="mt-3",
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Alert(
+                                                id="profile-subscriptions-alert",
+                                                is_open=False,
+                                                dismissable=True,
+                                            ),
+                                        ],
+                                        width=12,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ),
+                ],
+                className="mb-4",
+            ),
+            dbc.Card(
+                [
                     dbc.CardHeader(
                         html.H4(
                             [
