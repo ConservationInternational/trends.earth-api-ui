@@ -9,6 +9,8 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
+from ..i18n import gettext as _
+
 _EMAIL_COLORS = [
     "#000000",
     "#434343",
@@ -31,13 +33,13 @@ def bulk_email_tab_content(_role=None):
     """Return the Bulk Email tab content."""
     return html.Div(
         [
-            html.H3("Bulk Email", className="mb-4"),
+            html.H3(_("Bulk Email"), className="mb-4"),
             # -------------------------------------------------------
             # Section 1 - Recipient Groups
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Recipient Groups", className="mb-0")),
+                    dbc.CardHeader(html.H5(_("Recipient Groups"), className="mb-0")),
                     dbc.CardBody(
                         [
                             # Status alert -- always at top
@@ -54,7 +56,7 @@ def bulk_email_tab_content(_role=None):
                                         dbc.Select(
                                             id="bulk-email-load-rlist-select",
                                             options=[],
-                                            placeholder="Select a saved group to load...",
+                                            placeholder=_("Select a saved group to load..."),
                                         ),
                                         width=6,
                                     ),
@@ -62,25 +64,25 @@ def bulk_email_tab_content(_role=None):
                                         dbc.ButtonGroup(
                                             [
                                                 dbc.Button(
-                                                    "Load",
+                                                    _("Load"),
                                                     id="bulk-email-load-rlist-btn",
                                                     color="secondary",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "Copy",
+                                                    _("Copy"),
                                                     id="bulk-email-copy-rlist-btn",
                                                     color="outline-secondary",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "Delete",
+                                                    _("Delete"),
                                                     id="bulk-email-delete-rlist-btn",
                                                     color="outline-danger",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "New / Clear",
+                                                    _("New / Clear"),
                                                     id="bulk-email-clear-rlist-btn",
                                                     color="outline-secondary",
                                                     size="sm",
@@ -105,22 +107,22 @@ def bulk_email_tab_content(_role=None):
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Group Name"),
+                                            dbc.Label(_("Group Name")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-name",
                                                 type="text",
-                                                placeholder="e.g. All active users",
+                                                placeholder=_("e.g. All active users"),
                                             ),
                                         ],
                                         width=6,
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Description (optional)"),
+                                            dbc.Label(_("Description (optional)")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-desc",
                                                 type="text",
-                                                placeholder="Short description",
+                                                placeholder=_("Short description"),
                                             ),
                                         ],
                                         width=6,
@@ -132,7 +134,7 @@ def bulk_email_tab_content(_role=None):
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Roles"),
+                                            dbc.Label(_("Roles")),
                                             dbc.Checklist(
                                                 id="bulk-email-rlist-roles",
                                                 options=[
@@ -151,13 +153,13 @@ def bulk_email_tab_content(_role=None):
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Email Verified"),
+                                            dbc.Label(_("Email Verified")),
                                             dbc.Select(
                                                 id="bulk-email-rlist-verified",
                                                 options=[
-                                                    {"label": "Any", "value": "any"},
-                                                    {"label": "Yes", "value": "true"},
-                                                    {"label": "No", "value": "false"},
+                                                    {"label": _("Any"), "value": "any"},
+                                                    {"label": _("Yes"), "value": "true"},
+                                                    {"label": _("No"), "value": "false"},
                                                 ],
                                                 value="any",
                                             ),
@@ -166,7 +168,7 @@ def bulk_email_tab_content(_role=None):
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Created After"),
+                                            dbc.Label(_("Created After")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-min-created",
                                                 type="date",
@@ -176,7 +178,7 @@ def bulk_email_tab_content(_role=None):
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Created Before"),
+                                            dbc.Label(_("Created Before")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-max-created",
                                                 type="date",
@@ -191,7 +193,7 @@ def bulk_email_tab_content(_role=None):
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Last Active After"),
+                                            dbc.Label(_("Last Active After")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-min-activity",
                                                 type="date",
@@ -201,7 +203,7 @@ def bulk_email_tab_content(_role=None):
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Last Active Before"),
+                                            dbc.Label(_("Last Active Before")),
                                             dbc.Input(
                                                 id="bulk-email-rlist-max-activity",
                                                 type="date",
@@ -217,13 +219,13 @@ def bulk_email_tab_content(_role=None):
                                     dbc.Col(
                                         [
                                             dbc.Button(
-                                                "Preview",
+                                                _("Preview"),
                                                 id="bulk-email-preview-btn",
                                                 color="secondary",
                                                 className="me-2",
                                             ),
                                             dbc.Button(
-                                                "Save Group",
+                                                _("Save Group"),
                                                 id="bulk-email-save-rlist-btn",
                                                 color="primary",
                                             ),
@@ -253,18 +255,18 @@ def bulk_email_tab_content(_role=None):
                             dag.AgGrid(
                                 id="bulk-email-preview-grid",
                                 columnDefs=[
-                                    {"field": "email", "headerName": "Email", "flex": 2},
-                                    {"field": "name", "headerName": "Name", "flex": 1},
-                                    {"field": "role", "headerName": "Role", "flex": 1},
+                                    {"field": "email", "headerName": _("Email"), "flex": 2},
+                                    {"field": "name", "headerName": _("Name"), "flex": 1},
+                                    {"field": "role", "headerName": _("Role"), "flex": 1},
                                     {
                                         "field": "email_verified",
-                                        "headerName": "Verified",
+                                        "headerName": _("Verified"),
                                         "flex": 1,
                                     },
-                                    {"field": "created_at", "headerName": "Created", "flex": 1},
+                                    {"field": "created_at", "headerName": _("Created"), "flex": 1},
                                     {
                                         "field": "last_activity_at",
-                                        "headerName": "Last Active",
+                                        "headerName": _("Last Active"),
                                         "flex": 1,
                                     },
                                 ],
@@ -288,7 +290,7 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Email Composer", className="mb-0")),
+                    dbc.CardHeader(html.H5(_("Email Composer"), className="mb-0")),
                     dbc.CardBody(
                         [
                             # Status alert — shown at the top so it's always visible
@@ -305,7 +307,7 @@ def bulk_email_tab_content(_role=None):
                                         dbc.Select(
                                             id="bulk-email-load-draft-select",
                                             options=[],
-                                            placeholder="Select a draft to load...",
+                                            placeholder=_("Select a draft to load..."),
                                         ),
                                         width=6,
                                     ),
@@ -313,25 +315,25 @@ def bulk_email_tab_content(_role=None):
                                         dbc.ButtonGroup(
                                             [
                                                 dbc.Button(
-                                                    "Load",
+                                                    _("Load"),
                                                     id="bulk-email-load-draft-btn",
                                                     color="secondary",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "Copy",
+                                                    _("Copy"),
                                                     id="bulk-email-copy-draft-btn",
                                                     color="outline-secondary",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "Delete",
+                                                    _("Delete"),
                                                     id="bulk-email-delete-draft-btn",
                                                     color="outline-danger",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
-                                                    "New / Clear",
+                                                    _("New / Clear"),
                                                     id="bulk-email-clear-draft-btn",
                                                     color="outline-secondary",
                                                     size="sm",
@@ -360,19 +362,19 @@ def bulk_email_tab_content(_role=None):
                                         dbc.Select(
                                             id="bulk-email-template-select",
                                             options=[
-                                                {"label": "(no template)", "value": ""},
-                                                {"label": "News and updates", "value": "news"},
+                                                {"label": _("(no template)"), "value": ""},
+                                                {"label": _("News and updates"), "value": "news"},
                                                 {
-                                                    "label": "User Engagement",
+                                                    "label": _("User Engagement"),
                                                     "value": "engagement",
                                                 },
                                                 {
-                                                    "label": "System Update / Maintenance",
+                                                    "label": _("System Update / Maintenance"),
                                                     "value": "system_update",
                                                 },
                                             ],
                                             value="",
-                                            placeholder="Load a template...",
+                                            placeholder=_("Load a template..."),
                                         ),
                                         width=6,
                                     ),
@@ -393,22 +395,22 @@ def bulk_email_tab_content(_role=None):
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Draft Name"),
+                                            dbc.Label(_("Draft Name")),
                                             dbc.Input(
                                                 id="bulk-email-name",
                                                 type="text",
-                                                placeholder="e.g. Q2 Newsletter",
+                                                placeholder=_("e.g. Q2 Newsletter"),
                                             ),
                                         ],
                                         width=6,
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Subject Line"),
+                                            dbc.Label(_("Subject Line")),
                                             dbc.Input(
                                                 id="bulk-email-subject",
                                                 type="text",
-                                                placeholder="Email subject",
+                                                placeholder=_("Email subject"),
                                             ),
                                         ],
                                         width=6,
@@ -420,26 +422,34 @@ def bulk_email_tab_content(_role=None):
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Email Category"),
+                                            dbc.Label(_("Email Category")),
                                             dbc.Select(
                                                 id="bulk-email-category-select",
                                                 options=[
-                                                    {"label": "(none — send to all)", "value": ""},
-                                                    {"label": "News and updates", "value": "news"},
                                                     {
-                                                        "label": "User Engagement",
+                                                        "label": _("(none — send to all)"),
+                                                        "value": "",
+                                                    },
+                                                    {
+                                                        "label": _("News and updates"),
+                                                        "value": "news",
+                                                    },
+                                                    {
+                                                        "label": _("User Engagement"),
                                                         "value": "engagement",
                                                     },
                                                     {
-                                                        "label": "System Updates",
+                                                        "label": _("System Updates"),
                                                         "value": "system_updates",
                                                     },
                                                 ],
                                                 value="",
                                             ),
                                             html.Small(
-                                                "Only send to users subscribed to this category. "
-                                                "Set to '(none)' to send to all users.",
+                                                _(
+                                                    "Only send to users subscribed to this category. "
+                                                    "Set to '(none)' to send to all users."
+                                                ),
                                                 className="text-muted",
                                             ),
                                         ],
@@ -449,7 +459,7 @@ def bulk_email_tab_content(_role=None):
                                 className="mb-3",
                             ),
                             # HTML email body
-                            dbc.Label("Email Body"),
+                            dbc.Label(_("Email Body")),
                             dmc.RichTextEditor(
                                 id="bulk-email-html-source",
                                 html="",
@@ -548,7 +558,7 @@ def bulk_email_tab_content(_role=None):
                                 style={"minHeight": "750px"},
                             ),
                             dbc.Button(
-                                "Save Draft",
+                                _("Save Draft"),
                                 id="bulk-email-save-draft-btn",
                                 color="success",
                             ),
@@ -562,29 +572,29 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Send Bulk Email", className="mb-0")),
+                    dbc.CardHeader(html.H5(_("Send Bulk Email"), className="mb-0")),
                     dbc.CardBody(
                         [
                             dbc.Row(
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Select Draft"),
+                                            dbc.Label(_("Select Draft")),
                                             dbc.Select(
                                                 id="bulk-email-send-select",
                                                 options=[],
-                                                placeholder="Choose a draft...",
+                                                placeholder=_("Choose a draft..."),
                                             ),
                                         ],
                                         width=6,
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Select Recipient Group"),
+                                            dbc.Label(_("Select Recipient Group")),
                                             dbc.Select(
                                                 id="bulk-email-send-rlist-select",
                                                 options=[],
-                                                placeholder="Choose a recipient group...",
+                                                placeholder=_("Choose a recipient group..."),
                                             ),
                                         ],
                                         width=6,
@@ -601,17 +611,17 @@ def bulk_email_tab_content(_role=None):
                             dbc.ButtonGroup(
                                 [
                                     dbc.Button(
-                                        "Send Test to Self",
+                                        _("Send Test to Self"),
                                         id="bulk-email-send-test-self-btn",
                                         color="outline-secondary",
                                     ),
                                     dbc.Button(
-                                        "Send Test to Superadmins",
+                                        _("Send Test to Superadmins"),
                                         id="bulk-email-send-test-btn",
                                         color="secondary",
                                     ),
                                     dbc.Button(
-                                        "Send Bulk Email",
+                                        _("Send Bulk Email"),
                                         id="bulk-email-send-btn",
                                         color="danger",
                                     ),
@@ -635,11 +645,11 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Bulk Email History", className="mb-0")),
+                    dbc.CardHeader(html.H5(_("Bulk Email History"), className="mb-0")),
                     dbc.CardBody(
                         [
                             dbc.Button(
-                                "Refresh",
+                                _("Refresh"),
                                 id="bulk-email-history-refresh-btn",
                                 color="outline-secondary",
                                 size="sm",
@@ -648,30 +658,30 @@ def bulk_email_tab_content(_role=None):
                             dag.AgGrid(
                                 id="bulk-email-history-grid",
                                 columnDefs=[
-                                    {"field": "name", "headerName": "Name", "flex": 2},
+                                    {"field": "name", "headerName": _("Name"), "flex": 2},
                                     {
                                         "field": "subject",
-                                        "headerName": "Subject",
+                                        "headerName": _("Subject"),
                                         "flex": 3,
                                     },
                                     {
                                         "field": "status",
-                                        "headerName": "Status",
+                                        "headerName": _("Status"),
                                         "flex": 1,
                                     },
                                     {
                                         "field": "recipient_count",
-                                        "headerName": "Recipients",
+                                        "headerName": _("Recipients"),
                                         "flex": 1,
                                     },
                                     {
                                         "field": "sent_by",
-                                        "headerName": "Sent By",
+                                        "headerName": _("Sent By"),
                                         "flex": 1,
                                     },
                                     {
                                         "field": "sent_at",
-                                        "headerName": "Sent At",
+                                        "headerName": _("Sent At"),
                                         "flex": 1,
                                     },
                                 ],

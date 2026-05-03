@@ -9,6 +9,7 @@ import logging
 from dash import Input, Output, State, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
+from ..i18n import gettext as _
 from ..utils import make_authenticated_request
 from ..utils.aggrid import build_aggrid_request_params
 
@@ -87,10 +88,10 @@ def register_callbacks(app):
                 cfg = resp.json()
                 max_r = cfg.get("max_recipients", "?")
                 from_email = cfg.get("from_email", "")
-                return (
-                    f"Bulk emails with more than {max_r} recipients require a verification code. "
-                    f"Emails sent from: {from_email}"
-                )
+                return _(
+                    "Bulk emails with more than {max_r} recipients require a verification code. "
+                    "Emails sent from: {from_email}"
+                ).format(max_r=max_r, from_email=from_email)
         except Exception:
             logger.exception("Failed to load bulk email config")
         return ""
@@ -128,7 +129,12 @@ def register_callbacks(app):
         rows, total = _fetch_preview_page(
             token, filter_criteria, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
         )
-        return {"rowData": rows, "rowCount": total}, f"{total} recipients", filter_criteria, ""
+        return (
+            {"rowData": rows, "rowCount": total},
+            _("\u007btotal\u007d recipients").format(total=total),
+            filter_criteria,
+            "",
+        )
 
     # -----------------------------------------------------------------------
     # Load saved recipient groups into dropdown on tab open
@@ -197,11 +203,11 @@ def register_callbacks(app):
             no_update,
         )
         if not token or not rlist_id:
-            return _empty + ("Select a group to load.", True, "warning")
+            return _empty + (_("Select a group to load."), True, "warning")
         rows = _load_recipient_lists(token)
         row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
         if not row:
-            return _empty + ("Group not found.", True, "danger")
+            return _empty + (_("Group not found."), True, "danger")
         fc = row.get("filter_criteria") or {}
         roles = fc.get("roles") or ["USER"]
         verified_val = (
@@ -214,7 +220,7 @@ def register_callbacks(app):
         preview_rows, total = _fetch_preview_page(
             token, fc, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
         )
-        label = f"Editing: {row.get('name', '')}"
+        label = _("Editing: {name}").format(name=row.get("name", ""))
         source_label = f"\u2014 Saved group: {row.get('name', '')}"
         return (
             row.get("name", ""),
@@ -228,7 +234,7 @@ def register_callbacks(app):
             rlist_id,
             label,
             {"rowData": preview_rows, "rowCount": total},
-            f"{total} recipients",
+            _("{total} recipients").format(total=total),
             fc,
             source_label,
             "",
@@ -278,11 +284,11 @@ def register_callbacks(app):
             no_update,
         )
         if not token or not rlist_id:
-            return _no + ("Select a group to copy.", True, "warning", no_update, no_update)
+            return _no + (_("Select a group to copy."), True, "warning", no_update, no_update)
         rows = _load_recipient_lists(token)
         row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
         if not row:
-            return _no + ("Group not found.", True, "danger", no_update, no_update)
+            return _no + (_("Group not found."), True, "danger", no_update, no_update)
         copy_name = f"Copy of {row.get('name', 'Group')}"
         fc = row.get("filter_criteria") or {}
         try:
@@ -298,7 +304,13 @@ def register_callbacks(app):
             )
             if resp.status_code not in (200, 201):
                 msg = _extract_error(resp)
-                return _no + (f"Error: {msg}", True, "danger", no_update, no_update)
+                return _no + (
+                    _("Error: {msg}").format(msg=msg),
+                    True,
+                    "danger",
+                    no_update,
+                    no_update,
+                )
             new_id = resp.json().get("data", {}).get("id")
             new_rows = _load_recipient_lists(token)
             options = [{"label": _rlist_label(r), "value": r["id"]} for r in new_rows if "id" in r]
@@ -320,8 +332,8 @@ def register_callbacks(app):
                 fc.get("min_last_activity_at", ""),
                 fc.get("max_last_activity_at", ""),
                 new_id,
-                f"Editing: {copy_name}",
-                f"Created copy '{copy_name}'.",
+                _("Editing: {name}").format(name=copy_name),
+                _("Created copy '{name}'.").format(name=copy_name),
                 True,
                 "success",
                 options,
@@ -329,7 +341,7 @@ def register_callbacks(app):
             )
         except Exception:
             logger.exception("Failed to copy recipient list")
-            return _no + ("An unexpected error occurred.", True, "danger", no_update, no_update)
+            return _no + (_("An unexpected error occurred."), True, "danger", no_update, no_update)
 
     # -----------------------------------------------------------------------
     # Clear the group editor (new group)
@@ -401,7 +413,7 @@ def register_callbacks(app):
             no_update,
         )
         if not token or not rlist_id:
-            return ("Select a group to delete.", True, "warning") + _no_change
+            return (_("Select a group to delete."), True, "warning") + _no_change
         try:
             rows = _load_recipient_lists(token)
             row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
@@ -413,7 +425,7 @@ def register_callbacks(app):
                     {"label": _rlist_label(r), "value": r["id"]} for r in new_rows if "id" in r
                 ]
                 return (
-                    f"Group '{name}' deleted.",
+                    _("Group '{name}' deleted.").format(name=name),
                     True,
                     "success",
                     "",
@@ -431,10 +443,10 @@ def register_callbacks(app):
                     options,
                 )
             msg = _extract_error(resp)
-            return (f"Error: {msg}", True, "danger") + _no_change
+            return (_("Error: {msg}").format(msg=msg), True, "danger") + _no_change
         except Exception:
             logger.exception("Failed to delete recipient list")
-            return ("An unexpected error occurred.", True, "danger") + _no_change
+            return (_("An unexpected error occurred."), True, "danger") + _no_change
 
     # -----------------------------------------------------------------------
     # Infinite scroll — subsequent pages requested by AG Grid
@@ -503,7 +515,7 @@ def register_callbacks(app):
     ):
         _no = (no_update, no_update, no_update, no_update)
         if not token or not name:
-            return ("Please enter a group name.", True, "warning") + _no
+            return (_("Please enter a group name."), True, "warning") + _no
         filter_criteria = _build_filter_criteria(
             roles, verified, min_created, max_created, min_activity, max_activity
         )
@@ -537,19 +549,19 @@ def register_callbacks(app):
                 rows = _load_recipient_lists(token)
                 options = [{"label": _rlist_label(r), "value": r["id"]} for r in rows if "id" in r]
                 return (
-                    f"Group '{name}' {action}.",
+                    _("Group '{name}' {action}.").format(name=name, action=action),
                     True,
                     "success",
                     saved_id,
-                    f"Editing: {name}",
+                    _("Editing: {name}").format(name=name),
                     options,
                     options,
                 )
             msg = _extract_error(resp)
-            return (f"Error: {msg}", True, "danger") + _no
+            return (_("Error: {msg}").format(msg=msg), True, "danger") + _no
         except Exception:
             logger.exception("Failed to save recipient list")
-            return ("An unexpected error occurred.", True, "danger") + _no
+            return (_("An unexpected error occurred."), True, "danger") + _no
 
     # -----------------------------------------------------------------------
     # Load a template into the composer
@@ -571,13 +583,13 @@ def register_callbacks(app):
         from ..email_templates import TEMPLATES
 
         if not template_key or template_key not in TEMPLATES:
-            return no_update, no_update, no_update, "Select a template first.", True, "warning"
+            return no_update, no_update, no_update, _("Select a template first."), True, "warning"
         tmpl = TEMPLATES[template_key]
         return (
             tmpl["subject"],
             tmpl["html"],
             tmpl.get("subscription_type", ""),
-            f"Template '{tmpl['label']}' loaded.",
+            _("Template '{label}' loaded.").format(label=tmpl["label"]),
             True,
             "success",
         )
@@ -610,7 +622,7 @@ def register_callbacks(app):
     ):
         if not token or not name or not subject:
             return (
-                "Name and subject are required.",
+                _("Name and subject are required."),
                 True,
                 "warning",
                 no_update,
@@ -634,9 +646,9 @@ def register_callbacks(app):
             if resp.status_code in (200, 201):
                 saved_id = resp.json().get("data", {}).get("id") or loaded_draft_id
                 options = _load_draft_options(token)
-                label = f"Editing: {name}"
+                label = _("Editing: {name}").format(name=name)
                 return (
-                    f"Draft '{name}' {action}.",
+                    _("Draft '{name}' {action}.").format(name=name, action=action),
                     True,
                     "success",
                     options,
@@ -645,11 +657,19 @@ def register_callbacks(app):
                     label,
                 )
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update, no_update, no_update, no_update
+            return (
+                _("Error: {msg}").format(msg=msg),
+                True,
+                "danger",
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+            )
         except Exception:
             logger.exception("Failed to save draft bulk email")
             return (
-                "An unexpected error occurred.",
+                _("An unexpected error occurred."),
                 True,
                 "danger",
                 no_update,
@@ -721,7 +741,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                "Select a draft to load.",
+                _("Select a draft to load."),
                 True,
                 "warning",
             )
@@ -733,7 +753,7 @@ def register_callbacks(app):
                 subject = data.get("subject", "")
                 html_content = data.get("html_content", "")
                 subscription_type = data.get("subscription_type") or ""
-                label = f"Editing: {name}"
+                label = _("Editing: {name}").format(name=name)
                 return (
                     name,
                     subject,
@@ -753,7 +773,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                f"Error loading draft: {msg}",
+                _("Error loading draft: {msg}").format(msg=msg),
                 True,
                 "danger",
             )
@@ -766,7 +786,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                "An unexpected error occurred.",
+                _("An unexpected error occurred."),
                 True,
                 "danger",
             )
@@ -804,7 +824,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                "Select a draft to copy.",
+                _("Select a draft to copy."),
                 True,
                 "warning",
                 no_update,
@@ -821,7 +841,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
-                    f"Error loading draft: {msg}",
+                    _("Error loading draft: {msg}").format(msg=msg),
                     True,
                     "danger",
                     no_update,
@@ -852,7 +872,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                     no_update,
-                    f"Error creating copy: {msg}",
+                    _("Error creating copy: {msg}").format(msg=msg),
                     True,
                     "danger",
                     no_update,
@@ -860,7 +880,7 @@ def register_callbacks(app):
                 )
             new_id = create_resp.json().get("data", {}).get("id")
             options = _load_draft_options(token)
-            label = f"Editing: {copy_name}"
+            label = _("Editing: {name}").format(name=copy_name)
             return (
                 copy_name,
                 copy_subject,
@@ -868,7 +888,7 @@ def register_callbacks(app):
                 new_id,
                 label,
                 copy_subscription_type or "",
-                f"Created copy '{copy_name}'.",
+                _("Created copy '{name}'.").format(name=copy_name),
                 True,
                 "success",
                 options,
@@ -883,7 +903,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
                 no_update,
-                "An unexpected error occurred.",
+                _("An unexpected error occurred."),
                 True,
                 "danger",
                 no_update,
@@ -939,7 +959,7 @@ def register_callbacks(app):
         draft_id = selected_id or loaded_id
         if not token or not draft_id:
             return (
-                "Select a draft to delete.",
+                _("Select a draft to delete."),
                 True,
                 "warning",
                 no_update,
@@ -957,7 +977,7 @@ def register_callbacks(app):
             if resp.status_code in (200, 204):
                 options = _load_draft_options(token)
                 return (
-                    "Draft deleted.",
+                    _("Draft deleted."),
                     True,
                     "success",
                     "",
@@ -972,7 +992,7 @@ def register_callbacks(app):
                 )
             msg = _extract_error(resp)
             return (
-                f"Error deleting draft: {msg}",
+                _("Error deleting draft: {msg}").format(msg=msg),
                 True,
                 "danger",
                 no_update,
@@ -988,7 +1008,7 @@ def register_callbacks(app):
         except Exception:
             logger.exception("Failed to delete draft")
             return (
-                "An unexpected error occurred.",
+                _("An unexpected error occurred."),
                 True,
                 "danger",
                 no_update,
@@ -1025,31 +1045,31 @@ def register_callbacks(app):
     )
     def initiate_send(_n, token, bulk_email_id, recipient_list_id):
         if not token:
-            return "Not authenticated.", True, "danger", False, "", "", None
+            return _("Not authenticated."), True, "danger", False, "", "", None
         if not bulk_email_id:
-            return "Select a bulk email.", True, "warning", False, "", "", None
+            return _("Select a bulk email."), True, "warning", False, "", "", None
         payload = {}
         if recipient_list_id:
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
             if resp.status_code == 200:
-                return "Bulk email sent successfully!", True, "success", False, "", "", None
+                return _("Bulk email sent successfully!"), True, "success", False, "", "", None
             if resp.status_code == 428:
                 body = resp.json()
                 count = body.get("recipient_count", "?")
-                title = "Verification Required"
-                msg = (
-                    f"This bulk email targets {count} recipients, which exceeds the threshold. "
+                title = _("Verification Required")
+                msg = _(
+                    "This bulk email targets {count} recipients, which exceeds the threshold. "
                     "A verification code will be sent to your email. "
                     "Click 'Request Code' to receive it, then enter it below and click 'Confirm Send'."
-                )
+                ).format(count=count)
                 return no_update, False, no_update, True, title, msg, bulk_email_id
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", False, "", "", None
+            return _("Error: {msg}").format(msg=msg), True, "danger", False, "", "", None
         except Exception:
             logger.exception("Failed to initiate bulk email send")
-            return "An unexpected error occurred.", True, "danger", False, "", "", None
+            return _("An unexpected error occurred."), True, "danger", False, "", "", None
 
     # -----------------------------------------------------------------------
     # Request verification code
@@ -1069,16 +1089,16 @@ def register_callbacks(app):
     )
     def request_verification_code(_n, token, bulk_email_id):
         if not token or not bulk_email_id:
-            return "No bulk email selected.", True, "warning"
+            return _("No bulk email selected."), True, "warning"
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send-verification")
             if resp.status_code == 200:
-                return "Verification code sent to your email address.", True, "success"
+                return _("Verification code sent to your email address."), True, "success"
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger"
+            return _("Error: {msg}").format(msg=msg), True, "danger"
         except Exception:
             logger.exception("Failed to request verification code")
-            return "An unexpected error occurred.", True, "danger"
+            return _("An unexpected error occurred."), True, "danger"
 
     # -----------------------------------------------------------------------
     # Confirm send with OTP
@@ -1104,18 +1124,42 @@ def register_callbacks(app):
     )
     def confirm_send(_n, token, bulk_email_id, code, recipient_list_id):
         if not token or not bulk_email_id:
-            return True, no_update, False, no_update, "No bulk email selected.", True, "warning"
+            return True, no_update, False, no_update, _("No bulk email selected."), True, "warning"
         if not code or len(code.strip()) != 6:
-            return True, no_update, False, no_update, "Enter a valid 6-digit code.", True, "warning"
+            return (
+                True,
+                no_update,
+                False,
+                no_update,
+                _("Enter a valid 6-digit code."),
+                True,
+                "warning",
+            )
         payload = {"code": code.strip()}
         if recipient_list_id:
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
             if resp.status_code == 200:
-                return False, "Bulk email sent successfully!", True, "success", "", False, "success"
+                return (
+                    False,
+                    _("Bulk email sent successfully!"),
+                    True,
+                    "success",
+                    "",
+                    False,
+                    "success",
+                )
             msg = _extract_error(resp)
-            return True, no_update, False, no_update, f"Error: {msg}", True, "danger"
+            return (
+                True,
+                no_update,
+                False,
+                no_update,
+                _("Error: {msg}").format(msg=msg),
+                True,
+                "danger",
+            )
         except Exception:
             logger.exception("Failed to confirm bulk email send")
             return (
@@ -1123,7 +1167,7 @@ def register_callbacks(app):
                 no_update,
                 False,
                 no_update,
-                "An unexpected error occurred.",
+                _("An unexpected error occurred."),
                 True,
                 "danger",
             )
@@ -1157,19 +1201,19 @@ def register_callbacks(app):
     )
     def send_test_to_self(_n, token, bulk_email_id):
         if not token:
-            return "Not authenticated.", True, "danger"
+            return _("Not authenticated."), True, "danger"
         if not bulk_email_id:
-            return "Select a bulk email first.", True, "warning"
+            return _("Select a bulk email first."), True, "warning"
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send-test-self")
             if resp.status_code == 200:
                 sent_to = resp.json().get("data", {}).get("sent_to", "you")
-                return f"Test email sent to {sent_to}.", True, "success"
+                return _("Test email sent to {sent_to}.").format(sent_to=sent_to), True, "success"
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger"
+            return _("Error: {msg}").format(msg=msg), True, "danger"
         except Exception:
             logger.exception("Failed to send test bulk email to self")
-            return "An unexpected error occurred.", True, "danger"
+            return _("An unexpected error occurred."), True, "danger"
 
     # -----------------------------------------------------------------------
     # Send test to superadmins
@@ -1189,18 +1233,18 @@ def register_callbacks(app):
     )
     def send_test_bulk_email(_n, token, bulk_email_id):
         if not token:
-            return "Not authenticated.", True, "danger"
+            return _("Not authenticated."), True, "danger"
         if not bulk_email_id:
-            return "Select a bulk email first.", True, "warning"
+            return _("Select a bulk email first."), True, "warning"
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send-test")
             if resp.status_code == 200:
-                return "Test email sent to all superadmins.", True, "success"
+                return _("Test email sent to all superadmins."), True, "success"
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger"
+            return _("Error: {msg}").format(msg=msg), True, "danger"
         except Exception:
             logger.exception("Failed to send test bulk email")
-            return "An unexpected error occurred.", True, "danger"
+            return _("An unexpected error occurred."), True, "danger"
 
 
 # ---------------------------------------------------------------------------
