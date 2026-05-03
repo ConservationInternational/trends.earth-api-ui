@@ -70,9 +70,11 @@ jobs:
       - name: Update PO files from POT
         run: |
           for lang in $(echo "${{ steps.languages.outputs.languages }}" | tr ',' ' '); do
-            pybabel update -i trendsearth_ui/i18n/translations/messages.pot \
+            if ! pybabel update -i trendsearth_ui/i18n/translations/messages.pot \
               -d trendsearth_ui/i18n/translations \
-              -l $lang --no-fuzzy-matching || true
+              -l $lang --no-fuzzy-matching; then
+              echo "Warning: pybabel update failed for language: $lang"
+            fi
           done
 
       - name: Run machine translation
