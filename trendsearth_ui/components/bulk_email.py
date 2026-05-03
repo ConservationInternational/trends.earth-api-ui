@@ -361,7 +361,7 @@ def bulk_email_tab_content(_role=None):
                                             id="bulk-email-template-select",
                                             options=[
                                                 {"label": "(no template)", "value": ""},
-                                                {"label": "News & Updates", "value": "news"},
+                                                {"label": "News and updates", "value": "news"},
                                                 {
                                                     "label": "User Engagement",
                                                     "value": "engagement",
@@ -425,7 +425,7 @@ def bulk_email_tab_content(_role=None):
                                                 id="bulk-email-category-select",
                                                 options=[
                                                     {"label": "(none — send to all)", "value": ""},
-                                                    {"label": "News & Updates", "value": "news"},
+                                                    {"label": "News and updates", "value": "news"},
                                                     {
                                                         "label": "User Engagement",
                                                         "value": "engagement",

@@ -987,7 +987,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Switch(
                                                 id="profile-sub-news",
-                                                label=_("News & Updates"),
+                                                label=_("News and updates"),
                                                 value=user_data.get("email_subscription_news", True)
                                                 if user_data
                                                 else True,
@@ -1005,7 +1005,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Switch(
                                                 id="profile-sub-system-updates",
-                                                label=_("System Updates & Maintenance"),
+                                                label=_("System updates and announcements"),
                                                 value=user_data.get(
                                                     "email_subscription_system_updates", True
                                                 )

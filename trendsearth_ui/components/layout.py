@@ -2161,7 +2161,7 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                                 html.Hr(className="my-2"),
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-news",
-                                                                    label=_("News & Updates"),
+                                                                    label=_("News and updates"),
                                                                     value=True,
                                                                     className="mb-2",
                                                                 ),
@@ -2176,7 +2176,7 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-system-updates",
                                                                     label=_(
-                                                                        "System Updates & Maintenance"
+                                                                        "System updates and announcements"
                                                                     ),
                                                                     value=True,
                                                                     className="mb-2",

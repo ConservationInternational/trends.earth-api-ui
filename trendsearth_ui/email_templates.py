@@ -61,7 +61,7 @@ _FOOTER_HTML = f"""
 """
 
 # ---------------------------------------------------------------------------
-# Template: News & Updates
+# Template: News and updates
 # ---------------------------------------------------------------------------
 
 _NEWS_HTML = f"""<!DOCTYPE html>
@@ -394,8 +394,8 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
 
 TEMPLATES = {
     "news": {
-        "label": "News & Updates",
-        "subject": "[Trends.Earth] News & Updates – [Month Year]",
+        "label": "News and updates",
+        "subject": "[Trends.Earth] News and updates – [Month Year]",
         "html": _NEWS_HTML,
         "subscription_type": "news",
     },
