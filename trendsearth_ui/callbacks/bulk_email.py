@@ -162,7 +162,7 @@ def register_callbacks(app):
             Output("bulk-email-rlist-alert", "is_open"),
             Output("bulk-email-rlist-alert", "color"),
             Output("bulk-email-rlist-grid", "rowData"),
-            Output("bulk-email-send-rlist-select", "options"),
+            Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
         ],
         Input("bulk-email-save-rlist-btn", "n_clicks"),
         [
@@ -369,8 +369,8 @@ def register_callbacks(app):
     # -----------------------------------------------------------------------
     @app.callback(
         [
-            Output("bulk-email-send-select", "options", allow_duplicate=True),
-            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
+            Output("bulk-email-send-select", "options"),
+            Output("bulk-email-load-draft-select", "options"),
             Output("bulk-email-history-grid", "rowData"),
         ],
         [
@@ -382,7 +382,7 @@ def register_callbacks(app):
     )
     def load_bulk_emails(active_tab, _refresh, token):
         if active_tab != "bulk-email" or not token:
-            return no_update, no_update
+            return no_update, no_update, no_update
         try:
             resp = _api(token, "GET", "/bulk-email")
             bulk_emails = _ok_rows(resp)
