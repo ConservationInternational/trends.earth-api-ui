@@ -29,7 +29,6 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("unsubscribe-sub-automated", "value"),
             Output("unsubscribe-sub-news", "value"),
             Output("unsubscribe-sub-engagement", "value"),
             Output("unsubscribe-sub-system-updates", "value"),
@@ -48,19 +47,17 @@ def register_callbacks(app):
                 True,
                 True,
                 True,
-                True,
                 _("No unsubscribe token found. Please use the link from your email."),
                 "warning",
                 True,
             )
 
-        url = f"{_api_base(api_environment)}/api/v1/unsubscribe?token={token}"
+        url = f"{_api_base(api_environment)}/unsubscribe?token={token}"
         try:
             resp = requests.get(url, timeout=_DEFAULT_TIMEOUT)
         except Exception as exc:
             logger.exception("Error fetching unsubscribe prefs: %s", exc)
             return (
-                True,
                 True,
                 True,
                 True,
@@ -72,7 +69,6 @@ def register_callbacks(app):
         if resp.status_code == 200:
             data = resp.json().get("data", {})
             return (
-                data.get("automated", True),
                 data.get("news", True),
                 data.get("engagement", True),
                 data.get("system_updates", True),
@@ -90,7 +86,6 @@ def register_callbacks(app):
                 True,
                 True,
                 True,
-                True,
                 error_msg,
                 "danger",
                 True,
@@ -105,7 +100,6 @@ def register_callbacks(app):
         [Input("unsubscribe-save-btn", "n_clicks")],
         [
             State("unsubscribe-token-store", "data"),
-            State("unsubscribe-sub-automated", "value"),
             State("unsubscribe-sub-news", "value"),
             State("unsubscribe-sub-engagement", "value"),
             State("unsubscribe-sub-system-updates", "value"),
@@ -113,9 +107,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=True,
     )
-    def save_unsubscribe_prefs(
-        n_clicks, token, automated, news, engagement, system_updates, api_environment
-    ):
+    def save_unsubscribe_prefs(n_clicks, token, news, engagement, system_updates, api_environment):
         """Save the user's subscription preferences via the public API endpoint."""
         if not n_clicks:
             raise PreventUpdate
@@ -127,9 +119,8 @@ def register_callbacks(app):
                 True,
             )
 
-        url = f"{_api_base(api_environment)}/api/v1/unsubscribe?token={token}"
+        url = f"{_api_base(api_environment)}/unsubscribe?token={token}"
         payload = {
-            "automated": bool(automated),
             "news": bool(news),
             "engagement": bool(engagement),
             "system_updates": bool(system_updates),
@@ -153,62 +144,3 @@ def register_callbacks(app):
             with contextlib.suppress(Exception):
                 error_msg = resp.json().get("detail", error_msg)
             return error_msg, "danger", True
-
-    @app.callback(
-        [
-            Output("unsubscribe-sub-automated", "value", allow_duplicate=True),
-            Output("unsubscribe-sub-news", "value", allow_duplicate=True),
-            Output("unsubscribe-sub-engagement", "value", allow_duplicate=True),
-            Output("unsubscribe-sub-system-updates", "value", allow_duplicate=True),
-            Output("unsubscribe-alert", "children", allow_duplicate=True),
-            Output("unsubscribe-alert", "color", allow_duplicate=True),
-            Output("unsubscribe-alert", "is_open", allow_duplicate=True),
-        ],
-        [Input("unsubscribe-all-btn", "n_clicks")],
-        [
-            State("unsubscribe-token-store", "data"),
-            State("unsubscribe-api-env", "data"),
-        ],
-        prevent_initial_call=True,
-    )
-    def unsubscribe_from_all(n_clicks, token, api_environment):
-        """Unsubscribe from all email types in one click."""
-        if not n_clicks:
-            raise PreventUpdate
-
-        if not token:
-            return (
-                True,
-                True,
-                True,
-                True,
-                _("No unsubscribe token found. Please use the link from your email."),
-                "warning",
-                True,
-            )
-
-        url = f"{_api_base(api_environment)}/api/v1/unsubscribe?token={token}"
-        payload = {"automated": False, "news": False, "engagement": False, "system_updates": False}
-        try:
-            resp = requests.patch(url, json=payload, timeout=_DEFAULT_TIMEOUT)
-        except Exception as exc:
-            logger.exception("Error saving unsubscribe prefs: %s", exc)
-            return True, True, True, _("Network error. Please try again."), "danger", True
-
-        if resp.status_code == 200:
-            return (
-                False,
-                False,
-                False,
-                False,
-                _("You have been unsubscribed from all emails."),
-                "success",
-                True,
-            )
-        else:
-            error_msg = _("Failed to save preferences.")
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                error_msg = resp.json().get("detail", error_msg)
-            return True, True, True, True, error_msg, "danger", True
