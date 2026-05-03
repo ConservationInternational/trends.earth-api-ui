@@ -152,6 +152,9 @@ def create_main_layout():
                 id="rate-limit-breaches-total-count-store", data=0
             ),  # Store total count for rate limit breaches
             dcc.Store(id="active-tab-store", data="executions"),
+            dcc.Store(
+                id="bulk-email-tab-rendered", data=None
+            ),  # Bumped after bulk-email tab is fully rendered
             dcc.Store(id="user-store-cookie-sync"),  # Hidden sink for cookie sync callback
             dcc.Store(id="gee-oauth-redirect-url"),  # Holds external OAuth URL for JS redirect
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted

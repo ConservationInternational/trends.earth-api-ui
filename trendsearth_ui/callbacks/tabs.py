@@ -1,6 +1,7 @@
 """Tab rendering callbacks."""
 
 import logging
+import time
 
 from dash import Input, Output, State, html
 
@@ -21,7 +22,10 @@ def register_callbacks(app):
     """Register tab rendering callbacks."""
 
     @app.callback(
-        Output("tab-content-dynamic", "children"),
+        [
+            Output("tab-content-dynamic", "children"),
+            Output("bulk-email-tab-rendered", "data"),
+        ],
         [Input("active-tab-store", "data")],
         [
             State("user-store", "data"),
@@ -35,7 +39,7 @@ def register_callbacks(app):
 
         # Guard: Skip if not logged in (prevents execution after logout)
         if not token:
-            return no_update
+            return no_update, no_update
 
         # Check if tab-content exists in the layout
         # This is a workaround: if the callback is triggered before dashboard is loaded, just return no_update
@@ -43,14 +47,14 @@ def register_callbacks(app):
             # Dash 2.x: callback_context.states contains all State values, but we can't directly check layout
             # Instead, check if the tab-content is present in the DOM by checking the trigger and token
             if not token:
-                return no_update
+                return no_update, no_update
         except Exception:
             logger.debug("Tab render guard encountered error", exc_info=True)
-            return no_update
+            return no_update, no_update
 
         # Handle initial load when stores might not be populated yet
         if not token:
-            return html.Div("Please login to view content.")
+            return html.Div("Please login to view content."), no_update
 
         # Set default tab if none provided
         if not tab:
@@ -58,55 +62,56 @@ def register_callbacks(app):
 
         # Profile tab: always re-render with latest user_data
         if tab == "profile":
-            return profile_tab_content(user_data or {})
+            return profile_tab_content(user_data or {}), no_update
         elif tab == "scripts":
             # Only allow admin users to access scripts tab
             if role in ["ADMIN", "SUPERADMIN"]:
-                return scripts_tab_content()
+                return scripts_tab_content(), no_update
             else:
                 return html.Div(
                     [
                         html.H4("Access Denied"),
                         html.P("Administrator privileges required to access script management."),
                     ]
-                )
+                ), no_update
         elif tab == "executions":
-            return executions_tab_content()
+            return executions_tab_content(), no_update
         elif tab == "users":
             # Only allow admin users to access users tab
             if role in ["ADMIN", "SUPERADMIN"]:
-                return users_tab_content()
+                return users_tab_content(), no_update
             else:
                 return html.Div(
                     [
                         html.H4("Access Denied"),
                         html.P("Administrator privileges required to access user management."),
                     ]
-                )
+                ), no_update
         elif tab == "admin":
-            return admin_tab_content(role, role in ["ADMIN", "SUPERADMIN"])
+            return admin_tab_content(role, role in ["ADMIN", "SUPERADMIN"]), no_update
         elif tab == "status":
             # Only allow admin users to access status tab
             if role in ["ADMIN", "SUPERADMIN"]:
-                return status_tab_content(role in ["ADMIN", "SUPERADMIN"], role)
+                return status_tab_content(role in ["ADMIN", "SUPERADMIN"], role), no_update
             else:
                 return html.Div(
                     [
                         html.H4("Access Denied"),
                         html.P("Administrator privileges required to access system status."),
                     ]
-                )
+                ), no_update
         elif tab == "bulk-email":
             if role == "SUPERADMIN":
-                return bulk_email_tab_content(role)
+                # Return a timestamp so downstream load callbacks fire AFTER components exist
+                return bulk_email_tab_content(role), time.time()
             else:
                 return html.Div(
                     [
                         html.H4("Access Denied"),
                         html.P("Superadmin privileges required to access bulk email."),
                     ]
-                )
-        return html.Div("Unknown tab.")
+                ), no_update
+        return html.Div("Unknown tab."), no_update
 
     # Remove the now-unnecessary update_profile_tab_on_user_change callback
 

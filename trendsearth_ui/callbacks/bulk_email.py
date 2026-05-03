@@ -6,7 +6,7 @@ when role == "SUPERADMIN" and simply forwards the JWT for every request.
 
 import logging
 
-from dash import Input, Output, State, html, no_update
+from dash import Input, Output, State, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import make_authenticated_request
@@ -74,12 +74,12 @@ def register_callbacks(app):
     # -----------------------------------------------------------------------
     @app.callback(
         Output("bulk-email-threshold-info", "children"),
-        Input("active-tab-store", "data"),
+        Input("bulk-email-tab-rendered", "data"),
         State("token-store", "data"),
         prevent_initial_call=True,
     )
-    def load_bulk_email_config(active_tab, token):
-        if active_tab != "bulk-email" or not token:
+    def load_bulk_email_config(_rendered, token):
+        if not token:
             return no_update
         try:
             resp = _api(token, "GET", "/bulk-email/config")
@@ -103,6 +103,7 @@ def register_callbacks(app):
             Output("bulk-email-preview-grid", "getRowsResponse"),
             Output("bulk-email-preview-count", "children"),
             Output("bulk-email-preview-filter-store", "data"),
+            Output("bulk-email-preview-source-label", "children"),
         ],
         Input("bulk-email-preview-btn", "n_clicks"),
         [
@@ -120,14 +121,320 @@ def register_callbacks(app):
         _n, token, roles, verified, min_created, max_created, min_activity, max_activity
     ):
         if not token:
-            return {"rowData": [], "rowCount": 0}, "", {}
+            return {"rowData": [], "rowCount": 0}, "", {}, ""
         filter_criteria = _build_filter_criteria(
             roles, verified, min_created, max_created, min_activity, max_activity
         )
         rows, total = _fetch_preview_page(
             token, filter_criteria, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
         )
-        return {"rowData": rows, "rowCount": total}, f"{total} recipients", filter_criteria
+        return {"rowData": rows, "rowCount": total}, f"{total} recipients", filter_criteria, ""
+
+    # -----------------------------------------------------------------------
+    # Load saved recipient groups into dropdown on tab open
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-load-rlist-select", "options"),
+            Output("bulk-email-send-rlist-select", "options"),
+        ],
+        Input("bulk-email-tab-rendered", "data"),
+        State("token-store", "data"),
+        prevent_initial_call=True,
+    )
+    def load_recipient_lists(_rendered, token):
+        if not token:
+            return no_update, no_update
+        rows = _load_recipient_lists(token)
+        options = [{"label": _rlist_label(r), "value": r["id"]} for r in rows if "id" in r]
+        return options, options
+
+    # -----------------------------------------------------------------------
+    # Load a saved group into the filter editor + auto-preview
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-rlist-name", "value"),
+            Output("bulk-email-rlist-desc", "value"),
+            Output("bulk-email-rlist-roles", "value"),
+            Output("bulk-email-rlist-verified", "value"),
+            Output("bulk-email-rlist-min-created", "value"),
+            Output("bulk-email-rlist-max-created", "value"),
+            Output("bulk-email-rlist-min-activity", "value"),
+            Output("bulk-email-rlist-max-activity", "value"),
+            Output("bulk-email-loaded-rlist-id", "data"),
+            Output("bulk-email-rlist-mode-label", "children"),
+            Output("bulk-email-preview-grid", "getRowsResponse", allow_duplicate=True),
+            Output("bulk-email-preview-count", "children", allow_duplicate=True),
+            Output("bulk-email-preview-filter-store", "data", allow_duplicate=True),
+            Output("bulk-email-preview-source-label", "children", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "children", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "color", allow_duplicate=True),
+        ],
+        Input("bulk-email-load-rlist-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-load-rlist-select", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def load_rlist_into_editor(_n, token, rlist_id):
+        _empty = (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+        )
+        if not token or not rlist_id:
+            return _empty + ("Select a group to load.", True, "warning")
+        rows = _load_recipient_lists(token)
+        row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
+        if not row:
+            return _empty + ("Group not found.", True, "danger")
+        fc = row.get("filter_criteria") or {}
+        roles = fc.get("roles") or ["USER"]
+        verified_val = (
+            "true"
+            if fc.get("email_verified") is True
+            else "false"
+            if fc.get("email_verified") is False
+            else "any"
+        )
+        preview_rows, total = _fetch_preview_page(
+            token, fc, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
+        )
+        label = f"Editing: {row.get('name', '')}"
+        source_label = f"\u2014 Saved group: {row.get('name', '')}"
+        return (
+            row.get("name", ""),
+            row.get("description", ""),
+            roles,
+            verified_val,
+            fc.get("min_created_at", ""),
+            fc.get("max_created_at", ""),
+            fc.get("min_last_activity_at", ""),
+            fc.get("max_last_activity_at", ""),
+            rlist_id,
+            label,
+            {"rowData": preview_rows, "rowCount": total},
+            f"{total} recipients",
+            fc,
+            source_label,
+            "",
+            False,
+            "success",
+        )
+
+    # -----------------------------------------------------------------------
+    # Copy a saved group (create new group based on selected one)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-rlist-name", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-desc", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-roles", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-verified", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-activity", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-activity", "value", allow_duplicate=True),
+            Output("bulk-email-loaded-rlist-id", "data", allow_duplicate=True),
+            Output("bulk-email-rlist-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "children", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "color", allow_duplicate=True),
+            Output("bulk-email-load-rlist-select", "options", allow_duplicate=True),
+            Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
+        ],
+        Input("bulk-email-copy-rlist-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-load-rlist-select", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def copy_recipient_list(_n, token, rlist_id):
+        _no = (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+        )
+        if not token or not rlist_id:
+            return _no + ("Select a group to copy.", True, "warning", no_update, no_update)
+        rows = _load_recipient_lists(token)
+        row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
+        if not row:
+            return _no + ("Group not found.", True, "danger", no_update, no_update)
+        copy_name = f"Copy of {row.get('name', 'Group')}"
+        fc = row.get("filter_criteria") or {}
+        try:
+            resp = _api(
+                token,
+                "POST",
+                "/bulk-email/recipient-list",
+                json={
+                    "name": copy_name,
+                    "description": row.get("description", ""),
+                    "filter_criteria": fc,
+                },
+            )
+            if resp.status_code not in (200, 201):
+                msg = _extract_error(resp)
+                return _no + (f"Error: {msg}", True, "danger", no_update, no_update)
+            new_id = resp.json().get("data", {}).get("id")
+            new_rows = _load_recipient_lists(token)
+            options = [{"label": _rlist_label(r), "value": r["id"]} for r in new_rows if "id" in r]
+            roles = fc.get("roles") or ["USER"]
+            verified_val = (
+                "true"
+                if fc.get("email_verified") is True
+                else "false"
+                if fc.get("email_verified") is False
+                else "any"
+            )
+            return (
+                copy_name,
+                row.get("description", ""),
+                roles,
+                verified_val,
+                fc.get("min_created_at", ""),
+                fc.get("max_created_at", ""),
+                fc.get("min_last_activity_at", ""),
+                fc.get("max_last_activity_at", ""),
+                new_id,
+                f"Editing: {copy_name}",
+                f"Created copy '{copy_name}'.",
+                True,
+                "success",
+                options,
+                options,
+            )
+        except Exception:
+            logger.exception("Failed to copy recipient list")
+            return _no + ("An unexpected error occurred.", True, "danger", no_update, no_update)
+
+    # -----------------------------------------------------------------------
+    # Clear the group editor (new group)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-rlist-name", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-desc", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-roles", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-verified", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-activity", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-activity", "value", allow_duplicate=True),
+            Output("bulk-email-loaded-rlist-id", "data", allow_duplicate=True),
+            Output("bulk-email-rlist-mode-label", "children", allow_duplicate=True),
+        ],
+        Input("bulk-email-clear-rlist-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def clear_group_editor(_n):
+        return "", "", ["USER"], "any", "", "", "", "", None, ""
+
+    # -----------------------------------------------------------------------
+    # Delete saved recipient group (dropdown-based)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-rlist-alert", "children", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-rlist-alert", "color", allow_duplicate=True),
+            Output("bulk-email-rlist-name", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-desc", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-roles", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-verified", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-created", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-min-activity", "value", allow_duplicate=True),
+            Output("bulk-email-rlist-max-activity", "value", allow_duplicate=True),
+            Output("bulk-email-loaded-rlist-id", "data", allow_duplicate=True),
+            Output("bulk-email-rlist-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-load-rlist-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-rlist-select", "value", allow_duplicate=True),
+            Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
+        ],
+        Input("bulk-email-delete-rlist-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-load-rlist-select", "value"),
+            State("bulk-email-loaded-rlist-id", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def delete_recipient_list(_n, token, selected_id, loaded_id):
+        rlist_id = selected_id or loaded_id
+        _no_change = (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+        )
+        if not token or not rlist_id:
+            return ("Select a group to delete.", True, "warning") + _no_change
+        try:
+            rows = _load_recipient_lists(token)
+            row = next((r for r in rows if str(r.get("id")) == str(rlist_id)), None)
+            name = row.get("name", rlist_id) if row else rlist_id
+            resp = _api(token, "DELETE", f"/bulk-email/recipient-list/{rlist_id}")
+            if resp.status_code in (200, 204):
+                new_rows = _load_recipient_lists(token)
+                options = [
+                    {"label": _rlist_label(r), "value": r["id"]} for r in new_rows if "id" in r
+                ]
+                return (
+                    f"Group '{name}' deleted.",
+                    True,
+                    "success",
+                    "",
+                    "",
+                    ["USER"],
+                    "any",
+                    "",
+                    "",
+                    "",
+                    "",
+                    None,
+                    "",
+                    options,
+                    None,
+                    options,
+                )
+            msg = _extract_error(resp)
+            return (f"Error: {msg}", True, "danger") + _no_change
+        except Exception:
+            logger.exception("Failed to delete recipient list")
+            return ("An unexpected error occurred.", True, "danger") + _no_change
 
     # -----------------------------------------------------------------------
     # Infinite scroll — subsequent pages requested by AG Grid
@@ -161,7 +468,9 @@ def register_callbacks(app):
             Output("bulk-email-rlist-alert", "children"),
             Output("bulk-email-rlist-alert", "is_open"),
             Output("bulk-email-rlist-alert", "color"),
-            Output("bulk-email-rlist-grid", "rowData"),
+            Output("bulk-email-loaded-rlist-id", "data", allow_duplicate=True),
+            Output("bulk-email-rlist-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-load-rlist-select", "options", allow_duplicate=True),
             Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
         ],
         Input("bulk-email-save-rlist-btn", "n_clicks"),
@@ -175,6 +484,7 @@ def register_callbacks(app):
             State("bulk-email-rlist-max-created", "value"),
             State("bulk-email-rlist-min-activity", "value"),
             State("bulk-email-rlist-max-activity", "value"),
+            State("bulk-email-loaded-rlist-id", "data"),
         ],
         prevent_initial_call=True,
     )
@@ -189,111 +499,57 @@ def register_callbacks(app):
         max_created,
         min_activity,
         max_activity,
+        loaded_rlist_id,
     ):
+        _no = (no_update, no_update, no_update, no_update)
         if not token or not name:
-            return "Please enter a group name.", True, "warning", no_update, no_update
+            return ("Please enter a group name.", True, "warning") + _no
         filter_criteria = _build_filter_criteria(
             roles, verified, min_created, max_created, min_activity, max_activity
         )
         try:
-            resp = _api(
-                token,
-                "POST",
-                "/bulk-email/recipient-list",
-                json={"name": name, "description": desc or "", "filter_criteria": filter_criteria},
-            )
+            if loaded_rlist_id:
+                resp = _api(
+                    token,
+                    "PATCH",
+                    f"/bulk-email/recipient-list/{loaded_rlist_id}",
+                    json={
+                        "name": name,
+                        "description": desc or "",
+                        "filter_criteria": filter_criteria,
+                    },
+                )
+                action = "updated"
+            else:
+                resp = _api(
+                    token,
+                    "POST",
+                    "/bulk-email/recipient-list",
+                    json={
+                        "name": name,
+                        "description": desc or "",
+                        "filter_criteria": filter_criteria,
+                    },
+                )
+                action = "saved"
             if resp.status_code in (200, 201):
+                saved_id = resp.json().get("data", {}).get("id") or loaded_rlist_id
                 rows = _load_recipient_lists(token)
-                options = [{"label": r["name"], "value": r["id"]} for r in rows if "id" in r]
-                return f"Group '{name}' saved.", True, "success", rows, options
-            msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update, no_update
-        except Exception:
-            logger.exception("Failed to save recipient list")
-            return "An unexpected error occurred.", True, "danger", no_update, no_update
-
-    # -----------------------------------------------------------------------
-    # Load recipient lists on tab open
-    # -----------------------------------------------------------------------
-    @app.callback(
-        [
-            Output("bulk-email-rlist-grid", "rowData", allow_duplicate=True),
-            Output("bulk-email-send-rlist-select", "options"),
-        ],
-        Input("active-tab-store", "data"),
-        State("token-store", "data"),
-        prevent_initial_call=True,
-    )
-    def load_recipient_lists(active_tab, token):
-        if active_tab != "bulk-email" or not token:
-            return no_update, no_update
-        rows = _load_recipient_lists(token)
-        options = [{"label": r["name"], "value": r["id"]} for r in rows if "id" in r]
-        return rows, options
-
-    # -----------------------------------------------------------------------
-    # Delete selected recipient list
-    # -----------------------------------------------------------------------
-    @app.callback(
-        [
-            Output("bulk-email-rlist-alert", "children", allow_duplicate=True),
-            Output("bulk-email-rlist-alert", "is_open", allow_duplicate=True),
-            Output("bulk-email-rlist-alert", "color", allow_duplicate=True),
-            Output("bulk-email-rlist-grid", "rowData", allow_duplicate=True),
-            Output("bulk-email-send-rlist-select", "options", allow_duplicate=True),
-        ],
-        Input("bulk-email-delete-rlist-btn", "n_clicks"),
-        [
-            State("token-store", "data"),
-            State("bulk-email-rlist-grid", "selectedRows"),
-        ],
-        prevent_initial_call=True,
-    )
-    def delete_recipient_list(_n, token, selected_rows):
-        if not token or not selected_rows:
-            return "Select a group to delete.", True, "warning", no_update, no_update
-        row = selected_rows[0]
-        list_id = row.get("id")
-        if not list_id:
-            return "Invalid selection.", True, "warning", no_update, no_update
-        try:
-            resp = _api(token, "DELETE", f"/bulk-email/recipient-list/{list_id}")
-            if resp.status_code in (200, 204):
-                rows = _load_recipient_lists(token)
-                options = [{"label": r["name"], "value": r["id"]} for r in rows if "id" in r]
+                options = [{"label": _rlist_label(r), "value": r["id"]} for r in rows if "id" in r]
                 return (
-                    f"Group '{row.get('name', list_id)}' deleted.",
+                    f"Group '{name}' {action}.",
                     True,
                     "success",
-                    rows,
+                    saved_id,
+                    f"Editing: {name}",
+                    options,
                     options,
                 )
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update, no_update
+            return (f"Error: {msg}", True, "danger") + _no
         except Exception:
-            logger.exception("Failed to delete recipient list")
-            return "An unexpected error occurred.", True, "danger", no_update, no_update
-
-    # -----------------------------------------------------------------------
-    # Live HTML preview (sample substitutions)
-    # -----------------------------------------------------------------------
-    @app.callback(
-        Output("bulk-email-preview-html", "children"),
-        Input("bulk-email-html-source", "html"),
-        prevent_initial_call=True,
-    )
-    def render_email_preview(html_content):
-        if not html_content:
-            return html.Em("No content to preview.")
-        preview = (
-            (html_content or "")
-            .replace("{{name}}", "Jane Smith")
-            .replace("{{email}}", "jane@example.com")
-        )
-        return html.Iframe(
-            srcDoc=preview,
-            style={"width": "100%", "minHeight": "200px", "border": "none"},
-        )
+            logger.exception("Failed to save recipient list")
+            return ("An unexpected error occurred.", True, "danger") + _no
 
     # -----------------------------------------------------------------------
     # Save draft bulk email
@@ -374,14 +630,14 @@ def register_callbacks(app):
             Output("bulk-email-history-grid", "rowData"),
         ],
         [
-            Input("active-tab-store", "data"),
+            Input("bulk-email-tab-rendered", "data"),
             Input("bulk-email-history-refresh-btn", "n_clicks"),
         ],
         State("token-store", "data"),
         prevent_initial_call=True,
     )
-    def load_bulk_emails(active_tab, _refresh, token):
-        if active_tab != "bulk-email" or not token:
+    def load_bulk_emails(_rendered, _refresh, token):
+        if not token:
             return no_update, no_update, no_update
         try:
             resp = _api(token, "GET", "/bulk-email")
@@ -463,6 +719,113 @@ def register_callbacks(app):
             )
 
     # -----------------------------------------------------------------------
+    # Copy a draft (create new draft based on selected one)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-name", "value", allow_duplicate=True),
+            Output("bulk-email-subject", "value", allow_duplicate=True),
+            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
+            Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
+        ],
+        Input("bulk-email-copy-draft-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-load-draft-select", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def copy_draft(_n, token, draft_id):
+        if not token or not draft_id:
+            return (
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                "Select a draft to copy.",
+                True,
+                "warning",
+                no_update,
+                no_update,
+            )
+        try:
+            resp = _api(token, "GET", f"/bulk-email/{draft_id}")
+            if resp.status_code != 200:
+                msg = _extract_error(resp)
+                return (
+                    no_update,
+                    no_update,
+                    no_update,
+                    no_update,
+                    no_update,
+                    f"Error loading draft: {msg}",
+                    True,
+                    "danger",
+                    no_update,
+                    no_update,
+                )
+            data = resp.json().get("data", {})
+            copy_name = f"Copy of {data.get('name', 'Draft')}"
+            copy_subject = data.get("subject", "")
+            copy_html = data.get("html_content", "")
+            create_resp = _api(
+                token,
+                "POST",
+                "/bulk-email",
+                json={"name": copy_name, "subject": copy_subject, "html_content": copy_html},
+            )
+            if create_resp.status_code not in (200, 201):
+                msg = _extract_error(create_resp)
+                return (
+                    no_update,
+                    no_update,
+                    no_update,
+                    no_update,
+                    no_update,
+                    f"Error creating copy: {msg}",
+                    True,
+                    "danger",
+                    no_update,
+                    no_update,
+                )
+            new_id = create_resp.json().get("data", {}).get("id")
+            options = _load_draft_options(token)
+            label = f"Editing: {copy_name}"
+            return (
+                copy_name,
+                copy_subject,
+                copy_html,
+                new_id,
+                label,
+                f"Created copy '{copy_name}'.",
+                True,
+                "success",
+                options,
+                options,
+            )
+        except Exception:
+            logger.exception("Failed to copy draft")
+            return (
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                "An unexpected error occurred.",
+                True,
+                "danger",
+                no_update,
+                no_update,
+            )
+
+    # -----------------------------------------------------------------------
     # Clear the composer (new draft)
     # -----------------------------------------------------------------------
     @app.callback(
@@ -478,6 +841,94 @@ def register_callbacks(app):
     )
     def clear_composer(_n):
         return "", "", "", None, ""
+
+    # -----------------------------------------------------------------------
+    # Delete draft bulk email
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+            Output("bulk-email-name", "value", allow_duplicate=True),
+            Output("bulk-email-subject", "value", allow_duplicate=True),
+            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
+            Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "value", allow_duplicate=True),
+        ],
+        Input("bulk-email-delete-draft-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-load-draft-select", "value"),
+            State("bulk-email-loaded-draft-id", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def delete_draft(_n, token, selected_id, loaded_id):
+        draft_id = selected_id or loaded_id
+        if not token or not draft_id:
+            return (
+                "Select a draft to delete.",
+                True,
+                "warning",
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+            )
+        try:
+            resp = _api(token, "DELETE", f"/bulk-email/{draft_id}")
+            if resp.status_code in (200, 204):
+                options = _load_draft_options(token)
+                return (
+                    "Draft deleted.",
+                    True,
+                    "success",
+                    "",
+                    "",
+                    "",
+                    None,
+                    "",
+                    options,
+                    options,
+                    None,
+                )
+            msg = _extract_error(resp)
+            return (
+                f"Error deleting draft: {msg}",
+                True,
+                "danger",
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+            )
+        except Exception:
+            logger.exception("Failed to delete draft")
+            return (
+                "An unexpected error occurred.",
+                True,
+                "danger",
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+            )
 
     # -----------------------------------------------------------------------
     # Initiate send — opens verify modal on 428, shows success/error otherwise
@@ -702,6 +1153,11 @@ def _build_filter_criteria(roles, verified, min_created, max_created, min_activi
     return criteria
 
 
+def _rlist_label(r):
+    desc = (r.get("description") or "").strip()
+    return f"{r['name']} — {desc}" if desc else r["name"]
+
+
 def _load_recipient_lists(token):
     try:
         resp = make_authenticated_request("/bulk-email/recipient-list", token)
@@ -711,12 +1167,17 @@ def _load_recipient_lists(token):
         return []
 
 
+def _draft_label(c):
+    subject = (c.get("subject") or "").strip()
+    return f"{c['name']} — {subject}" if subject else c["name"]
+
+
 def _load_draft_options(token):
     try:
         resp = make_authenticated_request("/bulk-email", token)
         bulk_emails = _ok_rows(resp)
         return [
-            {"label": c["name"], "value": c["id"]}
+            {"label": _draft_label(c), "value": c["id"]}
             for c in bulk_emails
             if c.get("status") == "DRAFT"
         ]

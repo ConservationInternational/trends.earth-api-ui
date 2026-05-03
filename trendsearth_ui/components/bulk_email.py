@@ -33,14 +33,74 @@ def bulk_email_tab_content(_role=None):
         [
             html.H3("Bulk Email", className="mb-4"),
             # -------------------------------------------------------
-            # Section 1 â€” Recipient Groups
+            # Section 1 - Recipient Groups
             # -------------------------------------------------------
             dbc.Card(
                 [
                     dbc.CardHeader(html.H5("Recipient Groups", className="mb-0")),
                     dbc.CardBody(
                         [
-                            # New group form
+                            # Status alert -- always at top
+                            dbc.Alert(
+                                id="bulk-email-rlist-alert",
+                                is_open=False,
+                                dismissable=True,
+                                className="mb-3",
+                            ),
+                            # Saved-group selector row (mirrors draft selector)
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Select(
+                                            id="bulk-email-load-rlist-select",
+                                            options=[],
+                                            placeholder="Select a saved group to load...",
+                                        ),
+                                        width=6,
+                                    ),
+                                    dbc.Col(
+                                        dbc.ButtonGroup(
+                                            [
+                                                dbc.Button(
+                                                    "Load",
+                                                    id="bulk-email-load-rlist-btn",
+                                                    color="secondary",
+                                                    size="sm",
+                                                ),
+                                                dbc.Button(
+                                                    "Copy",
+                                                    id="bulk-email-copy-rlist-btn",
+                                                    color="outline-secondary",
+                                                    size="sm",
+                                                ),
+                                                dbc.Button(
+                                                    "Delete",
+                                                    id="bulk-email-delete-rlist-btn",
+                                                    color="outline-danger",
+                                                    size="sm",
+                                                ),
+                                                dbc.Button(
+                                                    "New / Clear",
+                                                    id="bulk-email-clear-rlist-btn",
+                                                    color="outline-secondary",
+                                                    size="sm",
+                                                ),
+                                            ]
+                                        ),
+                                        width="auto",
+                                    ),
+                                    dbc.Col(
+                                        html.Small(
+                                            id="bulk-email-rlist-mode-label",
+                                            className="text-muted",
+                                        ),
+                                        className="d-flex align-items-center",
+                                    ),
+                                ],
+                                className="mb-3",
+                            ),
+                            dcc.Store(id="bulk-email-loaded-rlist-id"),
+                            # Filter form
                             dbc.Row(
                                 [
                                     dbc.Col(
@@ -176,7 +236,11 @@ def bulk_email_tab_content(_role=None):
                                                 id="bulk-email-preview-count",
                                                 className="badge bg-info ms-3",
                                                 style={"fontSize": "1em"},
-                                            )
+                                            ),
+                                            html.Small(
+                                                id="bulk-email-preview-source-label",
+                                                className="text-muted ms-2",
+                                            ),
                                         ],
                                         width="auto",
                                         className="d-flex align-items-center",
@@ -212,51 +276,7 @@ def bulk_email_tab_content(_role=None):
                                 rowModelType="infinite",
                                 dashGridOptions={"cacheBlockSize": 100},
                                 style={"height": "300px"},
-                                className="ag-theme-alpine mb-3",
-                            ),
-                            dbc.Alert(
-                                id="bulk-email-rlist-alert",
-                                is_open=False,
-                                dismissable=True,
-                            ),
-                            html.Hr(),
-                            html.H6("Saved Groups"),
-                            # Saved groups grid
-                            dag.AgGrid(
-                                id="bulk-email-rlist-grid",
-                                columnDefs=[
-                                    {
-                                        "field": "name",
-                                        "headerName": "Name",
-                                        "flex": 2,
-                                    },
-                                    {
-                                        "field": "estimated_count",
-                                        "headerName": "Est. Recipients",
-                                        "flex": 1,
-                                    },
-                                    {
-                                        "field": "created_by",
-                                        "headerName": "Created By",
-                                        "flex": 1,
-                                    },
-                                    {
-                                        "field": "created_at",
-                                        "headerName": "Created",
-                                        "flex": 1,
-                                    },
-                                ],
-                                rowData=[],
-                                style={"height": "200px"},
                                 className="ag-theme-alpine",
-                                dashGridOptions={"animateRows": True, "rowSelection": "single"},
-                            ),
-                            dbc.Button(
-                                "Delete Selected Group",
-                                id="bulk-email-delete-rlist-btn",
-                                color="danger",
-                                size="sm",
-                                className="mt-2",
                             ),
                         ]
                     ),
@@ -271,6 +291,13 @@ def bulk_email_tab_content(_role=None):
                     dbc.CardHeader(html.H5("Email Composer", className="mb-0")),
                     dbc.CardBody(
                         [
+                            # Status alert — shown at the top so it's always visible
+                            dbc.Alert(
+                                id="bulk-email-composer-alert",
+                                is_open=False,
+                                dismissable=True,
+                                className="mb-3",
+                            ),
                             # Load existing draft
                             dbc.Row(
                                 [
@@ -289,6 +316,18 @@ def bulk_email_tab_content(_role=None):
                                                     "Load",
                                                     id="bulk-email-load-draft-btn",
                                                     color="secondary",
+                                                    size="sm",
+                                                ),
+                                                dbc.Button(
+                                                    "Copy",
+                                                    id="bulk-email-copy-draft-btn",
+                                                    color="outline-secondary",
+                                                    size="sm",
+                                                ),
+                                                dbc.Button(
+                                                    "Delete",
+                                                    id="bulk-email-delete-draft-btn",
+                                                    color="outline-danger",
                                                     size="sm",
                                                 ),
                                                 dbc.Button(
@@ -438,40 +477,12 @@ def bulk_email_tab_content(_role=None):
                                         ["SourceCode"],
                                     ],
                                 },
-                                style={"minHeight": "300px"},
-                            ),
-                            # Live preview
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            html.Strong("Preview (sample substitutions):"),
-                                            html.Div(
-                                                id="bulk-email-preview-html",
-                                                style={
-                                                    "border": "1px solid #dee2e6",
-                                                    "borderRadius": "4px",
-                                                    "padding": "12px",
-                                                    "minHeight": "100px",
-                                                    "background": "#fff",
-                                                },
-                                            ),
-                                        ],
-                                        width=12,
-                                    )
-                                ],
-                                className="mb-3",
+                                style={"minHeight": "750px"},
                             ),
                             dbc.Button(
                                 "Save Draft",
                                 id="bulk-email-save-draft-btn",
                                 color="success",
-                            ),
-                            dbc.Alert(
-                                id="bulk-email-composer-alert",
-                                is_open=False,
-                                dismissable=True,
-                                className="mt-2",
                             ),
                         ]
                     ),
