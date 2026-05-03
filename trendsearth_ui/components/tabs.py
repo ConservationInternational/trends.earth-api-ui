@@ -995,7 +995,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Switch(
                                                 id="profile-sub-engagement",
-                                                label=_("Engagement opportunities"),
+                                                label=_("Engagement Opportunities"),
                                                 value=user_data.get(
                                                     "email_subscription_engagement", True
                                                 )

@@ -2168,7 +2168,7 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-engagement",
                                                                     label=_(
-                                                                        "Engagement opportunities"
+                                                                        "Engagement Opportunities"
                                                                     ),
                                                                     value=True,
                                                                     className="mb-2",
