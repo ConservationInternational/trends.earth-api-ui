@@ -7,8 +7,12 @@ from dash import Input, Output, State
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
-from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
-from ..utils.helpers import is_admin, make_authenticated_request
+from ..utils.aggrid import (
+    build_aggrid_request_params,
+    build_refresh_request_params,
+    fetch_aggrid_page,
+)
+from ..utils.helpers import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -89,17 +93,13 @@ def _fetch_scripts_page(
     *,
     is_admin: bool,
     user_timezone: str | None,
-):
-    response = make_authenticated_request(SCRIPT_ENDPOINT, token, params=params)
-    if response.status_code != 200:
-        logger.error("Scripts API error: %s - %s", response.status_code, response.text)
-        return [], 0
-
-    payload = response.json()
-    scripts = payload.get("data", [])
-    total_rows = payload.get("total", 0)
-    tabledata = _format_scripts_rows(scripts, is_admin, user_timezone)
-    return tabledata, total_rows
+) -> tuple[list[dict[str, Any]], int]:
+    return fetch_aggrid_page(
+        SCRIPT_ENDPOINT,
+        token,
+        params,
+        lambda data: _format_scripts_rows(data, is_admin, user_timezone),
+    )
 
 
 def register_callbacks(app):

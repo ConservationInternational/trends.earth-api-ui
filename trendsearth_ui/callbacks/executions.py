@@ -8,7 +8,11 @@ from dash import Input, Output, State, html, no_update
 from ..config import DEFAULT_PAGE_SIZE
 from ..i18n import gettext as _
 from ..utils import format_duration, is_admin, make_authenticated_request, parse_date
-from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+from ..utils.aggrid import (
+    build_aggrid_request_params,
+    build_refresh_request_params,
+    fetch_aggrid_page,
+)
 from ..utils.mobile_utils import get_executions_columns_for_role
 
 logger = logging.getLogger(__name__)
@@ -106,6 +110,22 @@ def process_execution_data(executions, role, user_timezone):
     return tabledata
 
 
+def _fetch_execution_page(
+    token: str,
+    params: dict[str, Any],
+    *,
+    role: str | None,
+    user_timezone: str | None,
+) -> tuple[list[dict[str, Any]], int]:
+    """Fetch one page of executions from the API and format the rows."""
+    return fetch_aggrid_page(
+        EXECUTION_ENDPOINT,
+        token,
+        params,
+        lambda data: process_execution_data(data, role, user_timezone),
+    )
+
+
 def register_callbacks(app):
     """Register executions table callbacks."""
 
@@ -155,17 +175,9 @@ def register_callbacks(app):
                 filter_model_overrides=filter_overrides,
             )
 
-            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
-
-            if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, {}, 0
-
-            result = resp.json()
-            executions = result.get("data", [])
-            total_rows = result.get("total", 0)
-
-            # Process execution data consistently
-            tabledata = process_execution_data(executions, role, user_timezone)
+            tabledata, total_rows = _fetch_execution_page(
+                token, params, role=role, user_timezone=user_timezone
+            )
 
             return {"rowData": tabledata, "rowCount": total_rows}, table_state, total_rows
 
@@ -206,17 +218,9 @@ def register_callbacks(app):
                 allowed_filter_columns=EXECUTION_ALLOWED_FILTER_COLUMNS,
             )
 
-            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
-
-            if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, table_state or {}, 0, 0
-
-            result = resp.json()
-            executions = result.get("data", [])
-            total_rows = result.get("total", 0)
-
-            # Process execution data consistently
-            tabledata = process_execution_data(executions, role, user_timezone)
+            tabledata, total_rows = _fetch_execution_page(
+                token, params, role=role, user_timezone=user_timezone
+            )
 
             # Reset countdown timer to 0 when manually refreshed
             # Return data with preserved table state
@@ -272,17 +276,9 @@ def register_callbacks(app):
                 allowed_filter_columns=EXECUTION_ALLOWED_FILTER_COLUMNS,
             )
 
-            resp = make_authenticated_request(EXECUTION_ENDPOINT, token, params=params)
-
-            if resp.status_code != 200:
-                return {"rowData": [], "rowCount": 0}, table_state or {}, 0
-
-            result = resp.json()
-            executions = result.get("data", [])
-            total_rows = result.get("total", 0)
-
-            # Process execution data consistently
-            tabledata = process_execution_data(executions, role, user_timezone)
+            tabledata, total_rows = _fetch_execution_page(
+                token, params, role=role, user_timezone=user_timezone
+            )
 
             # Preserve table state from current state
             return {"rowData": tabledata, "rowCount": total_rows}, table_state or {}, total_rows

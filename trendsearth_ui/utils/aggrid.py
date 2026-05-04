@@ -7,6 +7,7 @@ import copy
 from typing import Any, Callable
 
 from ..config import DEFAULT_PAGE_SIZE
+from .helpers import make_authenticated_request
 
 FilterModel = Mapping[str, Any]
 RequestData = Mapping[str, Any]
@@ -377,6 +378,28 @@ def build_refresh_request_params(
     return params
 
 
+def fetch_aggrid_page(
+    endpoint: str,
+    token: str,
+    params: Mapping[str, Any],
+    format_rows: Callable[[list[dict[str, Any]]], list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], int]:
+    """Fetch one AG-Grid server-side row model page from the API.
+
+    Makes a GET request to *endpoint* with the given *params*, extracts the
+    ``data`` list and ``total`` count from the JSON payload, and applies
+    *format_rows* to the raw row list.
+
+    Returns:
+        ``(formatted_rows, total_count)`` — returns ``([], 0)`` on non-200 responses.
+    """
+    resp = make_authenticated_request(endpoint, token, params=dict(params))
+    if resp.status_code != 200:
+        return [], 0
+    payload = resp.json()
+    return format_rows(payload.get("data", [])), payload.get("total", 0)
+
+
 __all__ = [
     "compute_pagination",
     "build_sort_clause",
@@ -384,4 +407,5 @@ __all__ = [
     "build_table_state",
     "build_aggrid_request_params",
     "build_refresh_request_params",
+    "fetch_aggrid_page",
 ]

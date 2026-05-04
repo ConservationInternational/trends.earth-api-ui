@@ -8,7 +8,11 @@ import dash_bootstrap_components as dbc
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
-from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
+from ..utils.aggrid import (
+    build_aggrid_request_params,
+    build_refresh_request_params,
+    fetch_aggrid_page,
+)
 from ..utils.helpers import extract_api_error, is_admin, make_authenticated_request
 
 logger = logging.getLogger(__name__)
@@ -121,17 +125,13 @@ def _fetch_users_page(
     user_timezone: str | None,
 ) -> tuple[list[dict[str, Any]], int]:
     """Fetch a page of users from the API and format the rows."""
-    fetch_params = dict(params)
-    fetch_params["include"] = "openeo_credentials,gee_credentials"
-    response = make_authenticated_request(USER_ENDPOINT, token, params=fetch_params)
-    if response.status_code != 200:
-        return [], 0
-
-    payload = response.json()
-    users = payload.get("data", [])
-    total_rows = payload.get("total", 0)
-    tabledata = _format_user_rows(users, current_user_role, user_timezone)
-    return tabledata, total_rows
+    fetch_params = {**params, "include": "openeo_credentials,gee_credentials"}
+    return fetch_aggrid_page(
+        USER_ENDPOINT,
+        token,
+        fetch_params,
+        lambda data: _format_user_rows(data, current_user_role, user_timezone),
+    )
 
 
 def register_callbacks(app):
@@ -168,7 +168,7 @@ def register_callbacks(app):
 
             params, table_state = build_aggrid_request_params(
                 request,
-                allow_filters=is_admin,
+                allow_filters=is_admin_user,
                 allowed_sort_columns=USER_ALLOWED_SORT_COLUMNS,
                 allowed_filter_columns=USER_ALLOWED_FILTER_COLUMNS,
                 filter_model_overrides=filter_overrides,
