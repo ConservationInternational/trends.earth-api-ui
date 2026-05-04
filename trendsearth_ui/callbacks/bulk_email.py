@@ -1427,6 +1427,9 @@ def register_callbacks(app):
             Output("bulk-email-verify-modal-title", "children"),
             Output("bulk-email-verify-modal-body", "children"),
             Output("bulk-email-pending-id", "data"),
+            Output("bulk-email-history-grid", "rowData", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
         ],
         Input("bulk-email-send-btn", "n_clicks"),
         [
@@ -1437,16 +1440,23 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def initiate_send(_n, token, bulk_email_id, recipient_list_id):
+        _nu3 = no_update, no_update, no_update  # history grid + 2 selects
         if not token:
-            return "Not authenticated.", True, "danger", False, "", "", None
+            return "Not authenticated.", True, "danger", False, "", "", None, *_nu3
         if not bulk_email_id:
-            return "Select a bulk email.", True, "warning", False, "", "", None
+            return "Select a bulk email.", True, "warning", False, "", "", None, *_nu3
         payload = {}
         if recipient_list_id:
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
             if resp.status_code in (200, 202):
+                bulk_emails = _ok_rows(_api(token, "GET", "/bulk-email"))
+                draft_options = [
+                    {"label": c["name"], "value": c["id"]}
+                    for c in bulk_emails
+                    if c.get("status") == "DRAFT"
+                ]
                 return (
                     "Bulk email queued for sending! It will be delivered shortly.",
                     True,
@@ -1455,6 +1465,9 @@ def register_callbacks(app):
                     "",
                     "",
                     None,
+                    bulk_emails,
+                    draft_options,
+                    draft_options,
                 )
             if resp.status_code == 428:
                 body = resp.json()
@@ -1465,12 +1478,12 @@ def register_callbacks(app):
                     "A verification code will be sent to your email. "
                     "Click 'Request Code' to receive it, then enter it below and click 'Confirm Send'."
                 )
-                return no_update, False, no_update, True, title, msg, bulk_email_id
+                return no_update, False, no_update, True, title, msg, bulk_email_id, *_nu3
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", False, "", "", None
+            return f"Error: {msg}", True, "danger", False, "", "", None, *_nu3
         except Exception:
             logger.exception("Failed to initiate bulk email send")
-            return "An unexpected error occurred.", True, "danger", False, "", "", None
+            return "An unexpected error occurred.", True, "danger", False, "", "", None, *_nu3
 
     # -----------------------------------------------------------------------
     # Request verification code
@@ -1513,6 +1526,9 @@ def register_callbacks(app):
             Output("bulk-email-verify-modal-alert", "children", allow_duplicate=True),
             Output("bulk-email-verify-modal-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-verify-modal-alert", "color", allow_duplicate=True),
+            Output("bulk-email-history-grid", "rowData", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
         ],
         Input("bulk-email-verify-submit", "n_clicks"),
         [
@@ -1524,16 +1540,41 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def confirm_send(_n, token, bulk_email_id, code, recipient_list_id):
+        _nu3 = no_update, no_update, no_update  # history grid + 2 selects
         if not token or not bulk_email_id:
-            return True, no_update, False, no_update, "No bulk email selected.", True, "warning"
+            return (
+                True,
+                no_update,
+                False,
+                no_update,
+                "No bulk email selected.",
+                True,
+                "warning",
+                *_nu3,
+            )
         if not code or len(code.strip()) != 6:
-            return True, no_update, False, no_update, "Enter a valid 6-digit code.", True, "warning"
+            return (
+                True,
+                no_update,
+                False,
+                no_update,
+                "Enter a valid 6-digit code.",
+                True,
+                "warning",
+                *_nu3,
+            )
         payload = {"code": code.strip()}
         if recipient_list_id:
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
             if resp.status_code in (200, 202):
+                bulk_emails = _ok_rows(_api(token, "GET", "/bulk-email"))
+                draft_options = [
+                    {"label": c["name"], "value": c["id"]}
+                    for c in bulk_emails
+                    if c.get("status") == "DRAFT"
+                ]
                 return (
                     False,
                     "Bulk email queued for sending! It will be delivered shortly.",
@@ -1542,9 +1583,12 @@ def register_callbacks(app):
                     "",
                     False,
                     "success",
+                    bulk_emails,
+                    draft_options,
+                    draft_options,
                 )
             msg = _extract_error(resp)
-            return True, no_update, False, no_update, f"Error: {msg}", True, "danger"
+            return True, no_update, False, no_update, f"Error: {msg}", True, "danger", *_nu3
         except Exception:
             logger.exception("Failed to confirm bulk email send")
             return (
@@ -1555,6 +1599,7 @@ def register_callbacks(app):
                 "An unexpected error occurred.",
                 True,
                 "danger",
+                *_nu3,
             )
 
     # -----------------------------------------------------------------------
