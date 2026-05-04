@@ -76,6 +76,15 @@ def _should_enforce_hsts() -> bool:
 # Configure assets directory
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 
+# Monaco Editor's loader.js is NOT loaded here as an external_script.
+# Loading it at startup would install a global AMD `define()` that causes
+# dash-mantine-components and react-leaflet (both UMD bundles) to attempt
+# anonymous AMD registration, which Monaco's loader rejects with:
+#   "Can only have one anonymous define call per script file"
+# Instead, loader.js is injected dynamically inside bulk_email_editor.js
+# only when the Raw HTML editor tab is first opened, by which time all Dash
+# component suites have already run and the AMD conflict cannot occur.
+
 app = dash.Dash(
     __name__,
     server=server,
@@ -101,6 +110,7 @@ app.index_string = """
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         {%metas%}
         <title>{%title%}</title>
         <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -258,6 +268,8 @@ _CSP_STATIC_SUFFIX = (
     f"img-src {' '.join(_CSP_IMG_SOURCES)}; "
     f"font-src {' '.join(_CSP_FONT_SOURCES)}; "
     f"connect-src {' '.join(_CSP_CONNECT_SOURCES)}; "
+    # Monaco Editor HTML language worker is created as a blob: URL
+    "worker-src blob: 'self'; "
     "frame-ancestors 'none';"
 )
 

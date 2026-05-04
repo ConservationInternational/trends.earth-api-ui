@@ -1124,3 +1124,78 @@ def bulk_email_verify_modal():
         centered=True,
         backdrop="static",
     )
+
+
+def bulk_email_switch_html_modal():
+    """
+    Warning modal shown when the user tries to switch from Template Fields
+    to Raw HTML.  Switching is one-way: once the user confirms, the Fields
+    tab is locked for the current session.
+
+    On confirmation, two drafts are auto-saved via the server callback:
+    * "<name> (templated)" — structured fields version preserved for reference
+    * "<name> (html)"       — rendered HTML version the user continues editing
+    """
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("⚠️ Switch to Raw HTML?")),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "Once you switch to Raw HTML, the Template Fields tab will be "
+                        "locked for this session. Edits made in the HTML editor cannot "
+                        "be read back into structured fields."
+                    ),
+                    html.P("Two drafts will be saved automatically:", className="mb-1"),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("(templated)"),
+                                    " — the current Template Fields version, preserved for reference.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("(html)"),
+                                    " — the rendered HTML version you will continue editing.",
+                                ]
+                            ),
+                        ],
+                        className="mb-2",
+                    ),
+                    html.P(
+                        "If no template is active, only the (html) draft will be saved.",
+                        className="text-muted small",
+                    ),
+                    dbc.Alert(
+                        id="bulk-email-switch-modal-alert",
+                        is_open=False,
+                        color="danger",
+                        className="mt-2 mb-0",
+                        dismissable=True,
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Switch & Save",
+                        id="bulk-email-confirm-html-mode-btn",
+                        color="primary",
+                    ),
+                    dbc.Button(
+                        "Cancel",
+                        id="bulk-email-cancel-html-mode-btn",
+                        color="secondary",
+                        className="ms-2",
+                        n_clicks=0,
+                    ),
+                ]
+            ),
+        ],
+        id="bulk-email-switch-html-modal",
+        is_open=False,
+        centered=True,
+        backdrop="static",
+    )

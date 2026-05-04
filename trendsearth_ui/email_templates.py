@@ -5,6 +5,15 @@ layout for maximum email client compatibility.  The HTML contains the
 SparkPost substitution variables ``{{name}}``, ``{{email}}``, and the
 raw-HTML variable ``{{{unsubscribe_footer}}}`` which is automatically
 injected by the API at send time.
+
+Public API
+----------
+render_news(...)          â€” render the news & updates template
+render_engagement(...)    â€” render the user engagement template
+render_system_update(...) â€” render the system update / maintenance template
+
+TEMPLATES        â€” dict of template metadata (subject, default html, subscription_type)
+TEMPLATE_OPTIONS â€” list of (value, label) pairs for dropdowns
 """
 
 # ---------------------------------------------------------------------------
@@ -59,10 +68,111 @@ _FOOTER_HTML = f"""
 """
 
 # ---------------------------------------------------------------------------
+# Default structured content
+# ---------------------------------------------------------------------------
+
+_DEFAULT_NEWS_ITEMS = [
+    {
+        "title": "[News Item Title]",
+        "summary": "[Summary of news item. Replace with your content.]",
+        "url": _WEBSITE_URL,
+        "image_url": "",
+        "image_alt": "",
+    }
+]
+
+_DEFAULT_IMPACT_ITEMS = [
+    "[Impact item 1]",
+    "[Impact item 2]",
+    "All data will remain intact.",
+]
+
+# ---------------------------------------------------------------------------
+# Internal helpers
+# ---------------------------------------------------------------------------
+
+
+def _news_item_html(item: dict) -> str:
+    """Render a single news item row for the HTML table."""
+    title = item.get("title") or "[News Item Title]"
+    summary = item.get("summary") or "[Summary of news item.]"
+    url = item.get("url") or _WEBSITE_URL
+    image_url = (item.get("image_url") or "").strip()
+    image_alt = (item.get("image_alt") or "").strip()
+
+    img_html = ""
+    if image_url:
+        img_html = (
+            f'<img src="{image_url}" alt="{image_alt}" width="100%"'
+            ' style="display:block;max-width:100%;height:auto;margin-bottom:12px;">'
+        )
+
+    return (
+        "<tr>"
+        '<td style="padding:12px 0; border-bottom:1px solid #dee2e6;">'
+        + img_html
+        + f'<h3 style="font-family:Arial,sans-serif; font-size:15px; color:#212529;'
+        f' font-weight:700; margin:0 0 6px 0;">{title}</h3>'
+        f'<p style="font-family:Arial,sans-serif; font-size:14px; color:#495057;'
+        f' line-height:1.6; margin:0 0 8px 0;">{summary}</p>'
+        f'<a href="{url}" target="_blank"'
+        f' style="font-family:Arial,sans-serif; font-size:14px; color:{_PRIMARY_RED};'
+        f' text-decoration:none; font-weight:600;">Read more &rarr;</a>'
+        "</td>"
+        "</tr>"
+    )
+
+
+def _impact_item_html(text: str) -> str:
+    return f"<li>{text or '[Impact item]'}</li>"
+
+
+# ---------------------------------------------------------------------------
 # Template: News and updates
 # ---------------------------------------------------------------------------
 
-_NEWS_HTML = f"""<!DOCTYPE html>
+
+def render_news(
+    issue_date: str = "[Month Year]",
+    intro: str = "Here is the latest news from the Trends.Earth community.",
+    highlight_title: str = "Highlight",
+    highlight_body: str = "[Add your main highlight here.]",
+    highlight_image_url: str | None = None,
+    news_items: list | None = None,
+    cta_url: str | None = None,
+    cta_label: str = "Visit Trends.Earth",
+) -> str:
+    """Render the News & Updates HTML email template.
+
+    Parameters
+    ----------
+    issue_date:          e.g. "January 2025"
+    intro:               Opening paragraph after "Dear {{name}}"
+    highlight_title:     Title inside the red highlight box
+    highlight_body:      Body text inside the red highlight box
+    highlight_image_url: Optional image URL shown above the highlight text
+    news_items:          List of dicts with keys title, summary, url, image_url, image_alt
+    cta_url:             Call-to-action button URL
+    cta_label:           Call-to-action button label
+    """
+    if news_items is None:
+        news_items = _DEFAULT_NEWS_ITEMS
+    if not cta_url:
+        cta_url = _WEBSITE_URL
+
+    news_items_html = "\n".join(_news_item_html(item) for item in news_items)
+
+    _highlight_image_html = ""
+    if highlight_image_url:
+        _highlight_image_html = f"""
+                <tr>
+                  <td style="padding:0 24px 12px; text-align:center;">
+                    <img src="{highlight_image_url}" alt=""
+                         style="max-width:100%; height:auto; border-radius:4px; display:block; margin:0 auto;">
+                  </td>
+                </tr>"""
+
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trends.Earth News &amp; Updates</title></head>
@@ -85,7 +195,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
               </h1>
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#6c757d;
                          margin:0 0 24px 0;">
-                [Month Year]
+                {issue_date}
               </p>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
@@ -95,22 +205,22 @@ _NEWS_HTML = f"""<!DOCTYPE html>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
                          line-height:1.6; margin:0 0 24px 0;">
-                Here is the latest news from the Trends.Earth community.
+                {intro}
               </p>
 
               <!-- Section: Highlight -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
                      style="background-color:{_PRIMARY_RED}; border-radius:4px;
-                            margin-bottom:24px;">
+                            margin-bottom:24px;">{_highlight_image_html}
                 <tr>
                   <td style="padding:20px 24px;">
                     <h2 style="font-family:Arial,sans-serif; font-size:17px;
                                 color:#ffffff; font-weight:700; margin:0 0 8px 0;">
-                      Highlight
+                      {highlight_title}
                     </h2>
                     <p style="font-family:Arial,sans-serif; font-size:14px;
                                color:#f8f9fa; line-height:1.6; margin:0;">
-                      [Add your main highlight here.]
+                      {highlight_body}
                     </p>
                   </td>
                 </tr>
@@ -125,23 +235,7 @@ _NEWS_HTML = f"""<!DOCTYPE html>
 
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
                      style="margin-bottom:20px;">
-                <tr>
-                  <td style="padding:12px 0; border-bottom:1px solid #dee2e6;">
-                    <h3 style="font-family:Arial,sans-serif; font-size:15px; color:#212529;
-                                font-weight:700; margin:0 0 6px 0;">
-                      [News Item Title]
-                    </h3>
-                    <p style="font-family:Arial,sans-serif; font-size:14px; color:#495057;
-                               line-height:1.6; margin:0 0 8px 0;">
-                      [Summary of news item. Replace with your content.]
-                    </p>
-                    <a href="{_WEBSITE_URL}" target="_blank"
-                       style="font-family:Arial,sans-serif; font-size:14px;
-                              color:{_PRIMARY_RED}; text-decoration:none; font-weight:600;">
-                      Read more &rarr;
-                    </a>
-                  </td>
-                </tr>
+                {news_items_html}
               </table>
 
               <!-- Call to action -->
@@ -149,12 +243,12 @@ _NEWS_HTML = f"""<!DOCTYPE html>
                      style="margin-top:24px; margin-bottom:8px;">
                 <tr>
                   <td align="center">
-                    <a href="{_WEBSITE_URL}" target="_blank"
+                    <a href="{cta_url}" target="_blank"
                        style="display:inline-block; background-color:{_PRIMARY_RED};
                               color:#ffffff; font-family:Arial,sans-serif; font-size:15px;
                               font-weight:700; text-decoration:none; padding:12px 28px;
                               border-radius:4px;">
-                      Visit Trends.Earth
+                      {cta_label}
                     </a>
                   </td>
                 </tr>
@@ -172,11 +266,27 @@ _NEWS_HTML = f"""<!DOCTYPE html>
 </body>
 </html>"""
 
+
 # ---------------------------------------------------------------------------
 # Template: User Engagement
 # ---------------------------------------------------------------------------
 
-_ENGAGEMENT_HTML = f"""<!DOCTYPE html>
+
+def render_engagement(
+    intro: str = (
+        "As a valued member of the Trends.Earth community, your feedback helps "
+        "us improve the tools and resources we provide to land degradation "
+        "researchers and practitioners worldwide."
+    ),
+    topic: str = "[Survey / Feedback Topic]",
+    description: str = (
+        "[Describe what you want users to do or share. Keep it brief and actionable.]"
+    ),
+    button_label: str = "[Action Button Label]",
+    button_url: str = "#",
+) -> str:
+    """Render the User Engagement HTML email template."""
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trends.Earth Community</title></head>
@@ -205,9 +315,7 @@ _ENGAGEMENT_HTML = f"""<!DOCTYPE html>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
                          line-height:1.6; margin:0 0 24px 0;">
-                As a valued member of the Trends.Earth community, your feedback helps
-                us improve the tools and resources we provide to land degradation
-                researchers and practitioners worldwide.
+                {intro}
               </p>
 
               <!-- Engagement block -->
@@ -218,19 +326,18 @@ _ENGAGEMENT_HTML = f"""<!DOCTYPE html>
                   <td style="padding:20px 24px;">
                     <h2 style="font-family:Arial,sans-serif; font-size:16px;
                                 color:#212529; font-weight:700; margin:0 0 8px 0;">
-                      [Survey / Feedback Topic]
+                      {topic}
                     </h2>
                     <p style="font-family:Arial,sans-serif; font-size:14px;
                                color:#495057; line-height:1.6; margin:0 0 16px 0;">
-                      [Describe what you want users to do or share. Keep it brief
-                       and actionable.]
+                      {description}
                     </p>
-                    <a href="#" target="_blank"
+                    <a href="{button_url}" target="_blank"
                        style="display:inline-block; background-color:{_PRIMARY_RED};
                               color:#ffffff; font-family:Arial,sans-serif; font-size:14px;
                               font-weight:700; text-decoration:none; padding:10px 22px;
                               border-radius:4px;">
-                      [Action Button Label]
+                      {button_label}
                     </a>
                   </td>
                 </tr>
@@ -258,11 +365,27 @@ _ENGAGEMENT_HTML = f"""<!DOCTYPE html>
 </body>
 </html>"""
 
+
 # ---------------------------------------------------------------------------
 # Template: System Update / Maintenance
 # ---------------------------------------------------------------------------
 
-_SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
+
+def render_system_update(
+    date_time: str = "[Date &amp; Time]",
+    intro: str = ("We want to let you know about an upcoming change to the Trends.Earth platform."),
+    datetime_utc: str = "[YYYY-MM-DD HH:MM UTC]",
+    duration: str = "[Estimated duration]",
+    impact: str = "[Services affected]",
+    impact_items: list | None = None,
+) -> str:
+    """Render the System Update / Maintenance HTML email template."""
+    if impact_items is None:
+        impact_items = _DEFAULT_IMPACT_ITEMS
+
+    impact_items_html = "\n".join(_impact_item_html(item) for item in impact_items)
+
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trends.Earth System Update</title></head>
@@ -285,7 +408,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
               </h1>
               <p style="font-family:Arial,sans-serif; font-size:14px; color:#6c757d;
                          margin:0 0 24px 0;">
-                [Date &amp; Time]
+                {date_time}
               </p>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
@@ -295,8 +418,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
                          line-height:1.6; margin:0 0 24px 0;">
-                We want to let you know about an upcoming change to the Trends.Earth
-                platform.
+                {intro}
               </p>
 
               <!-- Alert box -->
@@ -318,7 +440,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
                         </td>
                         <td style="font-family:Arial,sans-serif; font-size:14px;
                                    color:#664d03; padding:2px 0;">
-                          [YYYY-MM-DD HH:MM UTC]
+                          {datetime_utc}
                         </td>
                       </tr>
                       <tr>
@@ -329,7 +451,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
                         </td>
                         <td style="font-family:Arial,sans-serif; font-size:14px;
                                    color:#664d03; padding:2px 0;">
-                          [Estimated duration]
+                          {duration}
                         </td>
                       </tr>
                       <tr>
@@ -340,7 +462,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
                         </td>
                         <td style="font-family:Arial,sans-serif; font-size:14px;
                                    color:#664d03; padding:2px 0;">
-                          [Services affected]
+                          {impact}
                         </td>
                       </tr>
                     </table>
@@ -356,9 +478,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
               </h2>
               <ul style="font-family:Arial,sans-serif; font-size:14px; color:#495057;
                           line-height:1.8; margin:0 0 24px 0; padding-left:20px;">
-                <li>[Impact item 1]</li>
-                <li>[Impact item 2]</li>
-                <li>All data will remain intact.</li>
+                {impact_items_html}
               </ul>
 
               <p style="font-family:Arial,sans-serif; font-size:15px; color:#495057;
@@ -386,6 +506,7 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
 </body>
 </html>"""
 
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -393,20 +514,20 @@ _SYSTEM_UPDATE_HTML = f"""<!DOCTYPE html>
 TEMPLATES = {
     "news": {
         "label": "News and updates",
-        "subject": "[Trends.Earth] News and updates – [Month Year]",
-        "html": _NEWS_HTML,
+        "subject": "[Trends.Earth] News and updates — [Month Year]",
+        "html": render_news(),
         "subscription_type": "news",
     },
     "engagement": {
         "label": "User Engagement",
-        "subject": "We'd love your input — Trends.Earth Community",
-        "html": _ENGAGEMENT_HTML,
+        "subject": "We'd love your input - Trends.Earth Community",
+        "html": render_engagement(),
         "subscription_type": "engagement",
     },
     "system_update": {
         "label": "System Update / Maintenance",
         "subject": "[Trends.Earth] Scheduled Maintenance Notice",
-        "html": _SYSTEM_UPDATE_HTML,
+        "html": render_system_update(),
         "subscription_type": "system_updates",
     },
 }

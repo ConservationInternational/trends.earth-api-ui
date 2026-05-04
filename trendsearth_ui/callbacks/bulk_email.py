@@ -4,12 +4,20 @@ All endpoints are SUPERADMIN-only on the backend; the UI shows the tab only
 when role == "SUPERADMIN" and simply forwards the JWT for every request.
 """
 
+import base64
 import logging
+import xml.dom.minidom
 
-from dash import Input, Output, State, no_update
-from dash.exceptions import PreventUpdate
+from dash import ALL, Input, Output, State, callback_context, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
+from ..email_templates import (
+    _DEFAULT_IMPACT_ITEMS,
+    _DEFAULT_NEWS_ITEMS,
+    render_engagement,
+    render_news,
+    render_system_update,
+)
 from ..utils import make_authenticated_request
 from ..utils.aggrid import build_aggrid_request_params
 
@@ -48,10 +56,7 @@ def _ok_rows(resp):
 
 
 def _fetch_preview_page(token, filter_criteria, params):
-    """Fetch one page of preview recipients.  ``params`` must contain at least
-    ``page`` and ``per_page``; ``sort`` is optional.
-    Follows the same pattern as ``_fetch_users_page`` in users.py.
-    """
+    """Fetch one page of preview recipients."""
     try:
         resp = _api(
             token,
@@ -65,6 +70,87 @@ def _fetch_preview_page(token, filter_criteria, params):
     except Exception:
         logger.exception("Failed to fetch preview page")
     return [], 0
+
+
+def _prettify_html(raw: str) -> str:
+    """Return a pretty-printed version of *raw* HTML, falling back to raw."""
+    try:
+        pretty = xml.dom.minidom.parseString(raw).toprettyxml(indent="  ")
+        # toprettyxml adds an XML declaration; strip it
+        lines = pretty.splitlines()
+        if lines and lines[0].startswith("<?xml"):
+            lines = lines[1:]
+        return "\n".join(lines)
+    except Exception:
+        return raw
+
+
+def _build_html_from_fields(
+    template: str,
+    *,
+    news_issue_date: str = "",
+    news_intro: str = "",
+    news_highlight_title: str = "",
+    news_highlight_body: str = "",
+    news_highlight_image_url: str = "",
+    news_items: list | None = None,
+    news_cta_url: str = "",
+    news_cta_label: str = "",
+    engagement_intro: str = "",
+    engagement_topic: str = "",
+    engagement_description: str = "",
+    engagement_btn_label: str = "",
+    engagement_btn_url: str = "",
+    sysupdate_date_time: str = "",
+    sysupdate_intro: str = "",
+    sysupdate_datetime_utc: str = "",
+    sysupdate_duration: str = "",
+    sysupdate_impact: str = "",
+    impact_items: list | None = None,
+) -> str:
+    """Render the HTML email from structured field values."""
+    if template == "news":
+        return render_news(
+            issue_date=news_issue_date or "[Month Year]",
+            intro=news_intro or "",
+            highlight_title=news_highlight_title or "Highlight",
+            highlight_body=news_highlight_body or "",
+            highlight_image_url=news_highlight_image_url or None,
+            news_items=news_items or _DEFAULT_NEWS_ITEMS,
+            cta_url=news_cta_url or None,
+            cta_label=news_cta_label or "Visit Trends.Earth",
+        )
+    if template == "engagement":
+        return render_engagement(
+            intro=engagement_intro or "",
+            topic=engagement_topic or "[Survey / Feedback Topic]",
+            description=engagement_description or "",
+            button_label=engagement_btn_label or "[Action Button Label]",
+            button_url=engagement_btn_url or "#",
+        )
+    if template == "system_update":
+        return render_system_update(
+            date_time=sysupdate_date_time or "[Date & Time]",
+            intro=sysupdate_intro or "",
+            datetime_utc=sysupdate_datetime_utc or "[YYYY-MM-DD HH:MM UTC]",
+            duration=sysupdate_duration or "[Estimated duration]",
+            impact=sysupdate_impact or "[Services affected]",
+            impact_items=impact_items or _DEFAULT_IMPACT_ITEMS,
+        )
+    return ""
+
+
+# Number of static field values returned alongside each call that touches them
+_N_NEWS_FIELDS = (
+    7  # issue_date, intro, highlight_title, highlight_body, highlight_image_url, cta_url, cta_label
+)
+_N_ENG_FIELDS = 5  # intro, topic, description, btn_label, btn_url
+_N_SYS_FIELDS = 5  # date_time, intro, datetime_utc, duration, impact
+
+# Sentinel values (None means "don't touch")
+_NO_UPDATE_NEWS = (no_update,) * _N_NEWS_FIELDS
+_NO_UPDATE_ENG = (no_update,) * _N_ENG_FIELDS
+_NO_UPDATE_SYS = (no_update,) * _N_SYS_FIELDS
 
 
 def register_callbacks(app):
@@ -558,13 +644,38 @@ def register_callbacks(app):
     @app.callback(
         [
             Output("bulk-email-subject", "value", allow_duplicate=True),
-            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
             Output("bulk-email-category-select", "value", allow_duplicate=True),
             Output("bulk-email-preview-html", "data", allow_duplicate=True),
             Output("bulk-email-preview-frame", "srcDoc", allow_duplicate=True),
             Output("bulk-email-composer-alert", "children", allow_duplicate=True),
             Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+            Output("bulk-email-editor-tabs", "value", allow_duplicate=True),
+            Output("bulk-email-active-template", "data", allow_duplicate=True),
+            # News fields
+            Output("bulk-email-field-news-issue-date", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-title", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-body", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-label", "value", allow_duplicate=True),
+            # Engagement fields
+            Output("bulk-email-field-engagement-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-topic", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-description", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-label", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-url", "value", allow_duplicate=True),
+            # System update fields
+            Output("bulk-email-field-sysupdate-date-time", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-datetime-utc", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-duration", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-impact", "value", allow_duplicate=True),
+            # Dynamic stores
+            Output("bulk-email-news-items-store", "data", allow_duplicate=True),
+            Output("bulk-email-impact-items-store", "data", allow_duplicate=True),
         ],
         Input("bulk-email-load-template-btn", "n_clicks"),
         State("bulk-email-template-select", "value"),
@@ -572,6 +683,10 @@ def register_callbacks(app):
     )
     def load_template_into_composer(_n, template_key):
         from ..email_templates import TEMPLATES
+
+        # 29 outputs total; early return fills all 29 explicitly:
+        #  5 no_update + 3 alert values + 21 no_updates for items 9-29
+        _nu21 = (no_update,) * 21
 
         if not template_key or template_key not in TEMPLATES:
             return (
@@ -583,11 +698,61 @@ def register_callbacks(app):
                 "Select a template first.",
                 True,
                 "warning",
+                *_nu21,
             )
         tmpl = TEMPLATES[template_key]
         raw_html = tmpl["html"]
+        subject = tmpl["subject"]
+
+        # Default field values per template.
+        # news_f = 7 items  (matches 7 news outputs)
+        # eng_f  = 5 items  (matches 5 engagement outputs)
+        # sys_f  = 5 items  (matches 5 sysupdate outputs)
+        news_f = ("",) * 7
+        eng_f = ("",) * 5
+        sys_f = ("",) * 5
+        news_items = _DEFAULT_NEWS_ITEMS
+        impact_items = _DEFAULT_IMPACT_ITEMS
+
+        if template_key == "news":
+            from datetime import date
+
+            month_year = date.today().strftime("%B %Y")  # e.g. "May 2026"
+            subject = subject.replace("[Month Year]", month_year)
+            news_f = (
+                month_year,
+                "Here is the latest news from the Trends.Earth community.",
+                "Highlight",
+                "[Add your main highlight here.]",
+                "",  # highlight_image_url — blank by default
+                "",
+                "Visit Trends.Earth",
+            )
+        elif template_key == "engagement":
+            eng_f = (
+                (
+                    "As a valued member of the Trends.Earth community, your feedback "
+                    "helps us improve the tools and resources we provide."
+                ),
+                "[Survey / Feedback Topic]",
+                "[Describe what you want users to do or share.]",
+                "[Action Button Label]",
+                "#",
+            )
+            news_items = []
+            impact_items = []
+        elif template_key == "system_update":
+            sys_f = (
+                "[Date & Time]",
+                "We want to let you know about an upcoming change to the Trends.Earth platform.",
+                "[YYYY-MM-DD HH:MM UTC]",
+                "[Estimated duration]",
+                "[Services affected]",
+            )
+            news_items = []
+
         return (
-            tmpl["subject"],
+            subject,
             raw_html,
             tmpl.get("subscription_type", ""),
             raw_html,
@@ -595,24 +760,14 @@ def register_callbacks(app):
             f"Template '{tmpl['label']}' loaded.",
             True,
             "success",
+            "fields",
+            template_key,
+            *news_f,
+            *eng_f,
+            *sys_f,
+            news_items,
+            impact_items,
         )
-
-    # Refresh preview pane from editor HTML
-    # -----------------------------------------------------------------------
-    @app.callback(
-        Output("bulk-email-preview-frame", "srcDoc", allow_duplicate=True),
-        Input("bulk-email-refresh-preview-btn", "n_clicks"),
-        State("bulk-email-preview-html", "data"),
-        prevent_initial_call=True,
-    )
-    def refresh_preview(_n, stored_html):
-        # Read from the stored raw HTML (set when a template/draft is loaded)
-        # rather than from the editor's Tiptap output, which strips inline styles
-        # and table attributes from the email template HTML.
-        # If the store is empty (no template loaded yet), leave the iframe as-is.
-        if not stored_html:
-            raise PreventUpdate
-        return stored_html
 
     # Save draft bulk email
     # -----------------------------------------------------------------------
@@ -625,36 +780,141 @@ def register_callbacks(app):
             Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-preview-html", "data", allow_duplicate=True),
+            Output("bulk-email-preview-frame", "srcDoc", allow_duplicate=True),
         ],
         Input("bulk-email-save-draft-btn", "n_clicks"),
         [
             State("token-store", "data"),
             State("bulk-email-name", "value"),
             State("bulk-email-subject", "value"),
-            State("bulk-email-html-source", "html"),
+            State("bulk-email-html-source", "value"),
             State("bulk-email-loaded-draft-id", "data"),
             State("bulk-email-category-select", "value"),
+            State("bulk-email-editor-tabs", "value"),
+            State("bulk-email-active-template", "data"),
+            # News fields
+            State("bulk-email-field-news-issue-date", "value"),
+            State("bulk-email-field-news-intro", "value"),
+            State("bulk-email-field-news-highlight-title", "value"),
+            State("bulk-email-field-news-highlight-body", "value"),
+            State("bulk-email-field-news-highlight-image-url", "value"),
+            State("bulk-email-field-news-cta-url", "value"),
+            State("bulk-email-field-news-cta-label", "value"),
+            # Engagement fields
+            State("bulk-email-field-engagement-intro", "value"),
+            State("bulk-email-field-engagement-topic", "value"),
+            State("bulk-email-field-engagement-description", "value"),
+            State("bulk-email-field-engagement-btn-label", "value"),
+            State("bulk-email-field-engagement-btn-url", "value"),
+            # System update fields
+            State("bulk-email-field-sysupdate-date-time", "value"),
+            State("bulk-email-field-sysupdate-intro", "value"),
+            State("bulk-email-field-sysupdate-datetime-utc", "value"),
+            State("bulk-email-field-sysupdate-duration", "value"),
+            State("bulk-email-field-sysupdate-impact", "value"),
+            # Dynamic stores
+            State("bulk-email-news-items-store", "data"),
+            State("bulk-email-impact-items-store", "data"),
         ],
         prevent_initial_call=True,
     )
     def save_draft_bulk_email(
-        _n, token, name, subject, html_content, loaded_draft_id, subscription_type
+        _n,
+        token,
+        name,
+        subject,
+        raw_html,
+        loaded_draft_id,
+        subscription_type,
+        active_tab,
+        active_template,
+        news_issue_date,
+        news_intro,
+        news_highlight_title,
+        news_highlight_body,
+        news_highlight_image_url,
+        news_cta_url,
+        news_cta_label,
+        engagement_intro,
+        engagement_topic,
+        engagement_description,
+        engagement_btn_label,
+        engagement_btn_url,
+        sysupdate_date_time,
+        sysupdate_intro,
+        sysupdate_datetime_utc,
+        sysupdate_duration,
+        sysupdate_impact,
+        news_items,
+        impact_items,
     ):
+        _nu9 = (no_update,) * 6  # 6 outputs after the first 3 (alert)
+
         if not token or not name or not subject:
             return (
                 "Name and subject are required.",
                 True,
                 "warning",
-                no_update,
-                no_update,
-                no_update,
-                no_update,
+                *_nu9,
             )
+
+        # Determine content based on active tab
+        fields_data = None
+        if active_tab == "fields" and active_template:
+            html_content = _build_html_from_fields(
+                active_template,
+                news_issue_date=news_issue_date or "",
+                news_intro=news_intro or "",
+                news_highlight_title=news_highlight_title or "",
+                news_highlight_body=news_highlight_body or "",
+                news_highlight_image_url=news_highlight_image_url or "",
+                news_items=news_items or [],
+                news_cta_url=news_cta_url or "",
+                news_cta_label=news_cta_label or "",
+                engagement_intro=engagement_intro or "",
+                engagement_topic=engagement_topic or "",
+                engagement_description=engagement_description or "",
+                engagement_btn_label=engagement_btn_label or "",
+                engagement_btn_url=engagement_btn_url or "",
+                sysupdate_date_time=sysupdate_date_time or "",
+                sysupdate_intro=sysupdate_intro or "",
+                sysupdate_datetime_utc=sysupdate_datetime_utc or "",
+                sysupdate_duration=sysupdate_duration or "",
+                sysupdate_impact=sysupdate_impact or "",
+                impact_items=impact_items or [],
+            )
+            fields_data = {
+                "template": active_template,
+                "news_issue_date": news_issue_date,
+                "news_intro": news_intro,
+                "news_highlight_title": news_highlight_title,
+                "news_highlight_body": news_highlight_body,
+                "news_highlight_image_url": news_highlight_image_url,
+                "news_cta_url": news_cta_url,
+                "news_cta_label": news_cta_label,
+                "engagement_intro": engagement_intro,
+                "engagement_topic": engagement_topic,
+                "engagement_description": engagement_description,
+                "engagement_btn_label": engagement_btn_label,
+                "engagement_btn_url": engagement_btn_url,
+                "sysupdate_date_time": sysupdate_date_time,
+                "sysupdate_intro": sysupdate_intro,
+                "sysupdate_datetime_utc": sysupdate_datetime_utc,
+                "sysupdate_duration": sysupdate_duration,
+                "sysupdate_impact": sysupdate_impact,
+                "news_items": news_items or [],
+                "impact_items": impact_items or [],
+            }
+        else:
+            html_content = raw_html or ""
+
         payload = {
             "name": name,
             "subject": subject,
-            "html_content": html_content or "",
+            "html_content": html_content,
             "subscription_type": subscription_type or None,
+            "fields_data": fields_data,
         }
         try:
             if loaded_draft_id:
@@ -667,6 +927,7 @@ def register_callbacks(app):
                 saved_id = resp.json().get("data", {}).get("id") or loaded_draft_id
                 options = _load_draft_options(token)
                 label = f"Editing: {name}"
+                preview = html_content or ""
                 return (
                     f"Draft '{name}' {action}.",
                     True,
@@ -675,20 +936,14 @@ def register_callbacks(app):
                     options,
                     saved_id,
                     label,
+                    preview,
+                    preview,
                 )
             msg = _extract_error(resp)
-            return f"Error: {msg}", True, "danger", no_update, no_update, no_update, no_update
+            return (f"Error: {msg}", True, "danger", *_nu9)
         except Exception:
             logger.exception("Failed to save draft bulk email")
-            return (
-                "An unexpected error occurred.",
-                True,
-                "danger",
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return ("An unexpected error occurred.", True, "danger", *_nu9)
 
     # -----------------------------------------------------------------------
     # Load draft bulk emails on tab open
@@ -729,7 +984,7 @@ def register_callbacks(app):
         [
             Output("bulk-email-name", "value"),
             Output("bulk-email-subject", "value"),
-            Output("bulk-email-html-source", "html"),
+            Output("bulk-email-html-source", "value"),
             Output("bulk-email-loaded-draft-id", "data"),
             Output("bulk-email-draft-mode-label", "children"),
             Output("bulk-email-category-select", "value"),
@@ -738,6 +993,32 @@ def register_callbacks(app):
             Output("bulk-email-composer-alert", "children", allow_duplicate=True),
             Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+            Output("bulk-email-editor-tabs", "value"),
+            Output("bulk-email-active-template", "data"),
+            # News fields
+            Output("bulk-email-field-news-issue-date", "value"),
+            Output("bulk-email-field-news-intro", "value"),
+            Output("bulk-email-field-news-highlight-title", "value"),
+            Output("bulk-email-field-news-highlight-body", "value"),
+            Output("bulk-email-field-news-highlight-image-url", "value"),
+            Output("bulk-email-field-news-cta-url", "value"),
+            Output("bulk-email-field-news-cta-label", "value"),
+            # Engagement fields
+            Output("bulk-email-field-engagement-intro", "value"),
+            Output("bulk-email-field-engagement-topic", "value"),
+            Output("bulk-email-field-engagement-description", "value"),
+            Output("bulk-email-field-engagement-btn-label", "value"),
+            Output("bulk-email-field-engagement-btn-url", "value"),
+            # System update fields
+            Output("bulk-email-field-sysupdate-date-time", "value"),
+            Output("bulk-email-field-sysupdate-intro", "value"),
+            Output("bulk-email-field-sysupdate-datetime-utc", "value"),
+            Output("bulk-email-field-sysupdate-duration", "value"),
+            Output("bulk-email-field-sysupdate-impact", "value"),
+            # Dynamic stores
+            Output("bulk-email-news-items-store", "data"),
+            Output("bulk-email-impact-items-store", "data"),
+            Output("bulk-email-in-html-mode", "data", allow_duplicate=True),
         ],
         Input("bulk-email-load-draft-btn", "n_clicks"),
         [
@@ -747,6 +1028,29 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def load_draft_into_composer(_n, token, draft_id):
+        _nu_fields = ("",) * 17  # 17 field outputs
+        _nu_stores = ([], [])  # 2 store outputs
+
+        def _error(msg):
+            return (
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                msg,
+                True,
+                "danger",
+                no_update,
+                no_update,
+                *_nu_fields,
+                *_nu_stores,
+                no_update,  # in-html-mode
+            )
+
         if not token or not draft_id:
             return (
                 no_update,
@@ -760,6 +1064,11 @@ def register_callbacks(app):
                 "Select a draft to load.",
                 True,
                 "warning",
+                no_update,
+                no_update,
+                *_nu_fields,
+                *_nu_stores,
+                no_update,  # in-html-mode
             )
         try:
             resp = _api(token, "GET", f"/bulk-email/{draft_id}")
@@ -770,48 +1079,73 @@ def register_callbacks(app):
                 html_content = data.get("html_content", "")
                 subscription_type = data.get("subscription_type") or ""
                 label = f"Editing: {name}"
-                return (
-                    name,
-                    subject,
-                    html_content,
-                    draft_id,
-                    label,
-                    subscription_type,
-                    html_content,
-                    html_content,
-                    "",
-                    False,
-                    "success",
-                )
+                fields_data = data.get("fields_data")
+
+                if isinstance(fields_data, dict):
+                    template = fields_data.get("template", "")
+                    news_items = fields_data.get("news_items") or _DEFAULT_NEWS_ITEMS
+                    impact_items = fields_data.get("impact_items") or _DEFAULT_IMPACT_ITEMS
+                    return (
+                        name,
+                        subject,
+                        html_content,
+                        draft_id,
+                        label,
+                        subscription_type,
+                        html_content,
+                        html_content,
+                        "",
+                        False,
+                        "success",
+                        "fields",
+                        template,
+                        fields_data.get("news_issue_date", ""),
+                        fields_data.get("news_intro", ""),
+                        fields_data.get("news_highlight_title", ""),
+                        fields_data.get("news_highlight_body", ""),
+                        fields_data.get("news_highlight_image_url", ""),
+                        fields_data.get("news_cta_url", ""),
+                        fields_data.get("news_cta_label", ""),
+                        fields_data.get("engagement_intro", ""),
+                        fields_data.get("engagement_topic", ""),
+                        fields_data.get("engagement_description", ""),
+                        fields_data.get("engagement_btn_label", ""),
+                        fields_data.get("engagement_btn_url", ""),
+                        fields_data.get("sysupdate_date_time", ""),
+                        fields_data.get("sysupdate_intro", ""),
+                        fields_data.get("sysupdate_datetime_utc", ""),
+                        fields_data.get("sysupdate_duration", ""),
+                        fields_data.get("sysupdate_impact", ""),
+                        news_items,
+                        impact_items,
+                        False,  # in-html-mode: reset for templated drafts
+                    )
+                else:
+                    # Raw HTML draft — show in raw tab, lock fields
+                    pretty = _prettify_html(html_content)
+                    return (
+                        name,
+                        subject,
+                        pretty,
+                        draft_id,
+                        label,
+                        subscription_type,
+                        html_content,
+                        html_content,
+                        "",
+                        False,
+                        "success",
+                        "raw",
+                        "",
+                        *_nu_fields,
+                        *_nu_stores,
+                        True,  # in-html-mode: lock fields for raw HTML drafts
+                    )
             msg = _extract_error(resp)
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                f"Error loading draft: {msg}",
-                True,
-                "danger",
-            )
+            return _error(f"Error loading draft: {msg}")
         except Exception:
             logger.exception("Failed to load draft")
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                "An unexpected error occurred.",
-                True,
-                "danger",
-            )
+            return _error("An unexpected error occurred.")
 
     # -----------------------------------------------------------------------
     # Copy a draft (create new draft based on selected one)
@@ -820,7 +1154,7 @@ def register_callbacks(app):
         [
             Output("bulk-email-name", "value", allow_duplicate=True),
             Output("bulk-email-subject", "value", allow_duplicate=True),
-            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
             Output("bulk-email-category-select", "value", allow_duplicate=True),
@@ -838,6 +1172,8 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def copy_draft(_n, token, draft_id):
+        _nu11 = (no_update,) * 11
+
         if not token or not draft_id:
             return (
                 no_update,
@@ -874,6 +1210,7 @@ def register_callbacks(app):
             copy_subject = data.get("subject", "")
             copy_html = data.get("html_content", "")
             copy_subscription_type = data.get("subscription_type") or None
+            copy_fields_data = data.get("fields_data")
             create_resp = _api(
                 token,
                 "POST",
@@ -883,6 +1220,7 @@ def register_callbacks(app):
                     "subject": copy_subject,
                     "html_content": copy_html,
                     "subscription_type": copy_subscription_type,
+                    "fields_data": copy_fields_data,
                 },
             )
             if create_resp.status_code not in (200, 201):
@@ -939,17 +1277,56 @@ def register_callbacks(app):
         [
             Output("bulk-email-name", "value", allow_duplicate=True),
             Output("bulk-email-subject", "value", allow_duplicate=True),
-            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
             Output("bulk-email-category-select", "value", allow_duplicate=True),
             Output("bulk-email-template-select", "value", allow_duplicate=True),
+            Output("bulk-email-active-template", "data", allow_duplicate=True),
+            Output("bulk-email-news-items-store", "data", allow_duplicate=True),
+            Output("bulk-email-impact-items-store", "data", allow_duplicate=True),
+            Output("bulk-email-editor-tabs", "value", allow_duplicate=True),
+            Output("bulk-email-in-html-mode", "data", allow_duplicate=True),
+            # News fields
+            Output("bulk-email-field-news-issue-date", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-title", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-body", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-label", "value", allow_duplicate=True),
+            # Engagement fields
+            Output("bulk-email-field-engagement-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-topic", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-description", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-label", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-url", "value", allow_duplicate=True),
+            # System update fields
+            Output("bulk-email-field-sysupdate-date-time", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-datetime-utc", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-duration", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-impact", "value", allow_duplicate=True),
         ],
         Input("bulk-email-clear-draft-btn", "n_clicks"),
         prevent_initial_call=True,
     )
     def clear_composer(_n):
-        return "", "", "", None, "", "", ""
+        return (
+            "",
+            "",
+            "",
+            None,
+            "",
+            "",
+            "",  # name, subject, html, loaded_id, label, cat, tmpl-sel
+            "",  # active-template
+            [],  # news-items-store
+            [],  # impact-items-store
+            "fields",  # editor-tabs
+            False,  # in-html-mode: reset on clear
+            *("",) * 17,  # all 17 field values
+        )
 
     # -----------------------------------------------------------------------
     # Delete draft bulk email
@@ -961,13 +1338,38 @@ def register_callbacks(app):
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
             Output("bulk-email-name", "value", allow_duplicate=True),
             Output("bulk-email-subject", "value", allow_duplicate=True),
-            Output("bulk-email-html-source", "html", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
             Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
             Output("bulk-email-category-select", "value", allow_duplicate=True),
             Output("bulk-email-send-select", "options", allow_duplicate=True),
             Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
             Output("bulk-email-load-draft-select", "value", allow_duplicate=True),
+            Output("bulk-email-active-template", "data", allow_duplicate=True),
+            Output("bulk-email-news-items-store", "data", allow_duplicate=True),
+            Output("bulk-email-impact-items-store", "data", allow_duplicate=True),
+            Output("bulk-email-editor-tabs", "value", allow_duplicate=True),
+            Output("bulk-email-in-html-mode", "data", allow_duplicate=True),
+            # News fields
+            Output("bulk-email-field-news-issue-date", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-title", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-body", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-url", "value", allow_duplicate=True),
+            Output("bulk-email-field-news-cta-label", "value", allow_duplicate=True),
+            # Engagement fields
+            Output("bulk-email-field-engagement-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-topic", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-description", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-label", "value", allow_duplicate=True),
+            Output("bulk-email-field-engagement-btn-url", "value", allow_duplicate=True),
+            # System update fields
+            Output("bulk-email-field-sysupdate-date-time", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-intro", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-datetime-utc", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-duration", "value", allow_duplicate=True),
+            Output("bulk-email-field-sysupdate-impact", "value", allow_duplicate=True),
         ],
         Input("bulk-email-delete-draft-btn", "n_clicks"),
         [
@@ -978,22 +1380,11 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def delete_draft(_n, token, selected_id, loaded_id):
+        _nu_post_alert = (no_update,) * 31  # all outputs after the 3 alert ones
+
         draft_id = selected_id or loaded_id
         if not token or not draft_id:
-            return (
-                "Select a draft to delete.",
-                True,
-                "warning",
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return ("Select a draft to delete.", True, "warning", *_nu_post_alert)
         try:
             resp = _api(token, "DELETE", f"/bulk-email/{draft_id}")
             if resp.status_code in (200, 204):
@@ -1007,42 +1398,22 @@ def register_callbacks(app):
                     "",
                     None,
                     "",
-                    "",
+                    "",  # name, subject, html, loaded_id, label, cat
                     options,
                     options,
-                    None,
+                    None,  # send-select, load-draft-select, load-draft-value
+                    "",  # active-template
+                    [],  # news-items-store
+                    [],  # impact-items-store
+                    "fields",  # editor-tabs
+                    False,  # in-html-mode: reset on delete
+                    *("",) * 17,  # all 17 field values
                 )
             msg = _extract_error(resp)
-            return (
-                f"Error deleting draft: {msg}",
-                True,
-                "danger",
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return (f"Error deleting draft: {msg}", True, "danger", *_nu_post_alert)
         except Exception:
             logger.exception("Failed to delete draft")
-            return (
-                "An unexpected error occurred.",
-                True,
-                "danger",
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
+            return ("An unexpected error occurred.", True, "danger", *_nu_post_alert)
 
     # -----------------------------------------------------------------------
     # Initiate send — opens verify modal on 428, shows success/error otherwise
@@ -1075,8 +1446,16 @@ def register_callbacks(app):
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
-            if resp.status_code == 200:
-                return "Bulk email sent successfully!", True, "success", False, "", "", None
+            if resp.status_code in (200, 202):
+                return (
+                    "Bulk email queued for sending! It will be delivered shortly.",
+                    True,
+                    "success",
+                    False,
+                    "",
+                    "",
+                    None,
+                )
             if resp.status_code == 428:
                 body = resp.json()
                 count = body.get("recipient_count", "?")
@@ -1154,8 +1533,16 @@ def register_callbacks(app):
             payload["recipient_list_id"] = recipient_list_id
         try:
             resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/send", json=payload)
-            if resp.status_code == 200:
-                return False, "Bulk email sent successfully!", True, "success", "", False, "success"
+            if resp.status_code in (200, 202):
+                return (
+                    False,
+                    "Bulk email queued for sending! It will be delivered shortly.",
+                    True,
+                    "success",
+                    "",
+                    False,
+                    "success",
+                )
             msg = _extract_error(resp)
             return True, no_update, False, no_update, f"Error: {msg}", True, "danger"
         except Exception:
@@ -1243,6 +1630,643 @@ def register_callbacks(app):
         except Exception:
             logger.exception("Failed to send test bulk email")
             return "An unexpected error occurred.", True, "danger"
+
+    # -----------------------------------------------------------------------
+    # Toggle template field panels
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-no-template-panel", "is_open"),
+            Output("bulk-email-news-fields-panel", "is_open"),
+            Output("bulk-email-engagement-fields-panel", "is_open"),
+            Output("bulk-email-sysupdate-fields-panel", "is_open"),
+        ],
+        Input("bulk-email-active-template", "data"),
+    )
+    def toggle_field_panels(active_template):
+        t = active_template or ""
+        return (
+            t == "",
+            t == "news",
+            t == "engagement",
+            t == "system_update",
+        )
+
+    # -----------------------------------------------------------------------
+    # Render news items container from store
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-news-items-container", "children"),
+        Input("bulk-email-news-items-store", "data"),
+    )
+    def render_news_items_container(news_items):
+        from ..components.bulk_email import _news_item_row
+
+        items = news_items or []
+        children = []
+        for i, item in enumerate(items):
+            row = _news_item_row(i, item=item)
+            children.append(row)
+        return children
+
+    # -----------------------------------------------------------------------
+    # Manage news items store (add / delete / field edits)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-news-items-store", "data", allow_duplicate=True),
+        [
+            Input("bulk-email-add-news-item-btn", "n_clicks"),
+            Input({"type": "news-item-delete", "index": ALL}, "n_clicks"),
+            Input({"type": "news-title", "index": ALL}, "value"),
+            Input({"type": "news-summary", "index": ALL}, "value"),
+            Input({"type": "news-url", "index": ALL}, "value"),
+            Input({"type": "news-image-url", "index": ALL}, "value"),
+            Input({"type": "news-image-alt", "index": ALL}, "value"),
+        ],
+        State("bulk-email-news-items-store", "data"),
+        prevent_initial_call=True,
+    )
+    def manage_news_items_store(
+        _add,
+        _delete_clicks,
+        titles,
+        summaries,
+        urls,
+        image_urls,
+        image_alts,
+        current_store,
+    ):
+        items = list(current_store or [])
+        triggered = callback_context.triggered_id
+
+        if triggered == "bulk-email-add-news-item-btn":
+            from ..email_templates import _DEFAULT_NEWS_ITEMS
+
+            template_item = _DEFAULT_NEWS_ITEMS[0] if _DEFAULT_NEWS_ITEMS else {}
+            items.append(dict(template_item))
+            return items
+
+        if isinstance(triggered, dict) and triggered.get("type") == "news-item-delete":
+            idx = triggered["index"]
+            if 0 <= idx < len(items):
+                items.pop(idx)
+            return items
+
+        # Field edits — sync store with current field values
+        n = len(titles)
+        if n == 0:
+            return no_update
+        new_items = []
+        for i in range(n):
+            new_items.append(
+                {
+                    "title": (titles[i] or "") if i < len(titles) else "",
+                    "summary": (summaries[i] or "") if i < len(summaries) else "",
+                    "url": (urls[i] or "") if i < len(urls) else "",
+                    "image_url": (image_urls[i] or "") if i < len(image_urls) else "",
+                    "image_alt": (image_alts[i] or "") if i < len(image_alts) else "",
+                }
+            )
+        if new_items == items:
+            return no_update
+        return new_items
+
+    # -----------------------------------------------------------------------
+    # Upload news item image to S3
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output({"type": "news-image-url", "index": ALL}, "value", allow_duplicate=True),
+        Input({"type": "news-image-upload", "index": ALL}, "contents"),
+        [
+            State({"type": "news-image-upload", "index": ALL}, "filename"),
+            State("token-store", "data"),
+            State("bulk-email-news-items-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def upload_news_images(contents_list, filenames_list, _token, current_store):
+        from ..utils.s3_upload import upload_image_to_s3
+
+        items = list(current_store or [])
+        n = max(len(contents_list), len(items))
+        result_urls = [items[i].get("image_url", "") if i < len(items) else "" for i in range(n)]
+
+        for i, (contents, filename) in enumerate(zip(contents_list or [], filenames_list or [])):
+            if not contents:
+                continue
+            try:
+                content_type_prefix, b64data = contents.split(",", 1)
+                content_type = content_type_prefix.split(":")[1].split(";")[0]
+                file_bytes = base64.b64decode(b64data)
+                url = upload_image_to_s3(file_bytes, filename, content_type)
+                if i < len(result_urls):
+                    result_urls[i] = url
+                else:
+                    result_urls.append(url)
+            except Exception:
+                logger.exception("Failed to upload news image %s", filename)
+
+        return result_urls
+
+    # -----------------------------------------------------------------------
+    # Upload single highlight image for the News template
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+        Input("bulk-email-highlight-image-upload", "contents"),
+        State("bulk-email-highlight-image-upload", "filename"),
+        prevent_initial_call=True,
+    )
+    def upload_highlight_image(contents, filename):
+        from ..utils.s3_upload import upload_image_to_s3
+
+        if not contents:
+            return no_update
+        try:
+            content_type_prefix, b64data = contents.split(",", 1)
+            content_type = content_type_prefix.split(":")[1].split(";")[0]
+            file_bytes = base64.b64decode(b64data)
+            return upload_image_to_s3(file_bytes, filename, content_type)
+        except Exception:
+            logger.exception("Failed to upload highlight image %s", filename)
+            return no_update
+
+    # -----------------------------------------------------------------------
+    # Render impact items container from store
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-impact-items-container", "children"),
+        Input("bulk-email-impact-items-store", "data"),
+    )
+    def render_impact_items_container(impact_items):
+        from ..components.bulk_email import _impact_item_row
+
+        items = impact_items or []
+        return [_impact_item_row(i, text=item) for i, item in enumerate(items)]
+
+    # -----------------------------------------------------------------------
+    # Manage impact items store (add / delete / field edits)
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-impact-items-store", "data", allow_duplicate=True),
+        [
+            Input("bulk-email-add-impact-item-btn", "n_clicks"),
+            Input({"type": "impact-item-delete", "index": ALL}, "n_clicks"),
+            Input({"type": "impact-item", "index": ALL}, "value"),
+        ],
+        State("bulk-email-impact-items-store", "data"),
+        prevent_initial_call=True,
+    )
+    def manage_impact_items_store(_add, _delete_clicks, values, current_store):
+        items = list(current_store or [])
+        triggered = callback_context.triggered_id
+
+        if triggered == "bulk-email-add-impact-item-btn":
+            items.append("[New impact item]")
+            return items
+
+        if isinstance(triggered, dict) and triggered.get("type") == "impact-item-delete":
+            idx = triggered["index"]
+            if 0 <= idx < len(items):
+                items.pop(idx)
+            return items
+
+        # Field edits
+        if not values:
+            return no_update
+        new_items = [v or "" for v in values]
+        if new_items == items:
+            return no_update
+        return new_items
+
+    # -----------------------------------------------------------------------
+    # Live preview from fields tab
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-preview-frame", "srcDoc", allow_duplicate=True),
+            Output("bulk-email-preview-html", "data", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
+        ],
+        [
+            Input("bulk-email-active-template", "data"),
+            Input("bulk-email-news-items-store", "data"),
+            Input("bulk-email-impact-items-store", "data"),
+            # News fields
+            Input("bulk-email-field-news-issue-date", "value"),
+            Input("bulk-email-field-news-intro", "value"),
+            Input("bulk-email-field-news-highlight-title", "value"),
+            Input("bulk-email-field-news-highlight-body", "value"),
+            Input("bulk-email-field-news-highlight-image-url", "value"),
+            Input("bulk-email-field-news-cta-url", "value"),
+            Input("bulk-email-field-news-cta-label", "value"),
+            # Engagement fields
+            Input("bulk-email-field-engagement-intro", "value"),
+            Input("bulk-email-field-engagement-topic", "value"),
+            Input("bulk-email-field-engagement-description", "value"),
+            Input("bulk-email-field-engagement-btn-label", "value"),
+            Input("bulk-email-field-engagement-btn-url", "value"),
+            # System update fields
+            Input("bulk-email-field-sysupdate-date-time", "value"),
+            Input("bulk-email-field-sysupdate-intro", "value"),
+            Input("bulk-email-field-sysupdate-datetime-utc", "value"),
+            Input("bulk-email-field-sysupdate-duration", "value"),
+            Input("bulk-email-field-sysupdate-impact", "value"),
+            # Tab selector
+            Input("bulk-email-editor-tabs", "value"),
+        ],
+        prevent_initial_call=True,
+    )
+    def live_preview_from_fields(
+        active_template,
+        news_items,
+        impact_items,
+        news_issue_date,
+        news_intro,
+        news_highlight_title,
+        news_highlight_body,
+        news_highlight_image_url,
+        news_cta_url,
+        news_cta_label,
+        engagement_intro,
+        engagement_topic,
+        engagement_description,
+        engagement_btn_label,
+        engagement_btn_url,
+        sysupdate_date_time,
+        sysupdate_intro,
+        sysupdate_datetime_utc,
+        sysupdate_duration,
+        sysupdate_impact,
+        editor_tab,
+    ):
+        if editor_tab == "raw":
+            # Switching to the raw tab: render fields → HTML so Monaco has content.
+            if not active_template:
+                return no_update, no_update, no_update
+            html_content = _build_html_from_fields(
+                active_template,
+                news_issue_date=news_issue_date or "",
+                news_intro=news_intro or "",
+                news_highlight_title=news_highlight_title or "",
+                news_highlight_body=news_highlight_body or "",
+                news_highlight_image_url=news_highlight_image_url or "",
+                news_items=news_items or [],
+                news_cta_url=news_cta_url or "",
+                news_cta_label=news_cta_label or "",
+                engagement_intro=engagement_intro or "",
+                engagement_topic=engagement_topic or "",
+                engagement_description=engagement_description or "",
+                engagement_btn_label=engagement_btn_label or "",
+                engagement_btn_url=engagement_btn_url or "",
+                sysupdate_date_time=sysupdate_date_time or "",
+                sysupdate_intro=sysupdate_intro or "",
+                sysupdate_datetime_utc=sysupdate_datetime_utc or "",
+                sysupdate_duration=sysupdate_duration or "",
+                sysupdate_impact=sysupdate_impact or "",
+                impact_items=impact_items or [],
+            )
+            return html_content, html_content, html_content
+
+        if editor_tab != "fields" or not active_template:
+            return no_update, no_update, no_update
+
+        html_content = _build_html_from_fields(
+            active_template,
+            news_issue_date=news_issue_date or "",
+            news_intro=news_intro or "",
+            news_highlight_title=news_highlight_title or "",
+            news_highlight_body=news_highlight_body or "",
+            news_highlight_image_url=news_highlight_image_url or "",
+            news_items=news_items or [],
+            news_cta_url=news_cta_url or "",
+            news_cta_label=news_cta_label or "",
+            engagement_intro=engagement_intro or "",
+            engagement_topic=engagement_topic or "",
+            engagement_description=engagement_description or "",
+            engagement_btn_label=engagement_btn_label or "",
+            engagement_btn_url=engagement_btn_url or "",
+            sysupdate_date_time=sysupdate_date_time or "",
+            sysupdate_intro=sysupdate_intro or "",
+            sysupdate_datetime_utc=sysupdate_datetime_utc or "",
+            sysupdate_duration=sysupdate_duration or "",
+            sysupdate_impact=sysupdate_impact or "",
+            impact_items=impact_items or [],
+        )
+        return html_content, html_content, no_update
+
+    # -----------------------------------------------------------------------
+    # "Enable HTML Editing…" button in the raw panel → open confirmation modal.
+    # The banner is hidden once HTML mode is active (handled by
+    # update_html_mode_banner below).
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-switch-html-modal", "is_open", allow_duplicate=True),
+        Input("bulk-email-enable-html-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def open_html_mode_modal(_n):
+        return True
+
+    # -----------------------------------------------------------------------
+    # Hide the warning banner once HTML mode is active; show it otherwise
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-html-mode-banner", "is_open"),
+        Input("bulk-email-in-html-mode", "data"),
+    )
+    def update_html_mode_banner(in_html_mode):
+        return not bool(in_html_mode)
+
+    # -----------------------------------------------------------------------
+    # Confirm switch to HTML mode — save both drafts, lock Fields tab
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-switch-html-modal", "is_open"),
+            Output("bulk-email-editor-tabs", "value", allow_duplicate=True),
+            Output("bulk-email-in-html-mode", "data", allow_duplicate=True),
+            Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
+            Output("bulk-email-name", "value", allow_duplicate=True),
+            Output("bulk-email-draft-mode-label", "children", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+            Output("bulk-email-switch-modal-alert", "children"),
+            Output("bulk-email-switch-modal-alert", "is_open"),
+        ],
+        Input("bulk-email-confirm-html-mode-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-name", "value"),
+            State("bulk-email-subject", "value"),
+            State("bulk-email-category-select", "value"),
+            State("bulk-email-active-template", "data"),
+            State("bulk-email-html-source", "value"),
+            # News fields
+            State("bulk-email-field-news-issue-date", "value"),
+            State("bulk-email-field-news-intro", "value"),
+            State("bulk-email-field-news-highlight-title", "value"),
+            State("bulk-email-field-news-highlight-body", "value"),
+            State("bulk-email-field-news-highlight-image-url", "value"),
+            State("bulk-email-field-news-cta-url", "value"),
+            State("bulk-email-field-news-cta-label", "value"),
+            # Engagement fields
+            State("bulk-email-field-engagement-intro", "value"),
+            State("bulk-email-field-engagement-topic", "value"),
+            State("bulk-email-field-engagement-description", "value"),
+            State("bulk-email-field-engagement-btn-label", "value"),
+            State("bulk-email-field-engagement-btn-url", "value"),
+            # System update fields
+            State("bulk-email-field-sysupdate-date-time", "value"),
+            State("bulk-email-field-sysupdate-intro", "value"),
+            State("bulk-email-field-sysupdate-datetime-utc", "value"),
+            State("bulk-email-field-sysupdate-duration", "value"),
+            State("bulk-email-field-sysupdate-impact", "value"),
+            # Dynamic stores
+            State("bulk-email-news-items-store", "data"),
+            State("bulk-email-impact-items-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def confirm_switch_to_html_mode(
+        _n,
+        token,
+        name,
+        subject,
+        subscription_type,
+        active_template,
+        raw_html,
+        news_issue_date,
+        news_intro,
+        news_highlight_title,
+        news_highlight_body,
+        news_highlight_image_url,
+        news_cta_url,
+        news_cta_label,
+        engagement_intro,
+        engagement_topic,
+        engagement_description,
+        engagement_btn_label,
+        engagement_btn_url,
+        sysupdate_date_time,
+        sysupdate_intro,
+        sysupdate_datetime_utc,
+        sysupdate_duration,
+        sysupdate_impact,
+        news_items,
+        impact_items,
+    ):
+        import re
+
+        def _modal_error(msg):
+            """Keep modal open, surface the error in the modal's own alert."""
+            return (
+                True,  # modal stays open
+                no_update,  # editor-tabs
+                no_update,  # in-html-mode
+                no_update,  # loaded-draft-id
+                no_update,  # name
+                no_update,  # draft-mode-label
+                no_update,  # send-select options
+                no_update,  # load-draft-select options
+                no_update,  # composer-alert children
+                False,  # composer-alert is_open (hide so modal is readable)
+                no_update,  # composer-alert color
+                msg,  # modal-alert children
+                True,  # modal-alert is_open
+            )
+
+        if not token:
+            return _modal_error("Not authenticated.")
+        if not name:
+            return _modal_error("A draft name is required before switching. Enter a name above.")
+        if not subject:
+            return _modal_error(
+                "A subject line is required before switching. Enter a subject above."
+            )
+
+        base_name = (
+            re.sub(
+                r"\s*\((?:templated|html)\)\s*$",
+                "",
+                (name or "Draft").strip(),
+                flags=re.IGNORECASE,
+            ).strip()
+            or "Draft"
+        )
+        html_draft_name = f"{base_name} (html)"
+        templated_draft_name = f"{base_name} (templated)"
+
+        try:
+            html_content = ""
+            saved_templated = False
+
+            if active_template:
+                html_content = _build_html_from_fields(
+                    active_template,
+                    news_issue_date=news_issue_date or "",
+                    news_intro=news_intro or "",
+                    news_highlight_title=news_highlight_title or "",
+                    news_highlight_body=news_highlight_body or "",
+                    news_highlight_image_url=news_highlight_image_url or "",
+                    news_items=news_items or [],
+                    news_cta_url=news_cta_url or "",
+                    news_cta_label=news_cta_label or "",
+                    engagement_intro=engagement_intro or "",
+                    engagement_topic=engagement_topic or "",
+                    engagement_description=engagement_description or "",
+                    engagement_btn_label=engagement_btn_label or "",
+                    engagement_btn_url=engagement_btn_url or "",
+                    sysupdate_date_time=sysupdate_date_time or "",
+                    sysupdate_intro=sysupdate_intro or "",
+                    sysupdate_datetime_utc=sysupdate_datetime_utc or "",
+                    sysupdate_duration=sysupdate_duration or "",
+                    sysupdate_impact=sysupdate_impact or "",
+                    impact_items=impact_items or [],
+                )
+                fields_data = {
+                    "template": active_template,
+                    "news_issue_date": news_issue_date,
+                    "news_intro": news_intro,
+                    "news_highlight_title": news_highlight_title,
+                    "news_highlight_body": news_highlight_body,
+                    "news_highlight_image_url": news_highlight_image_url,
+                    "news_cta_url": news_cta_url,
+                    "news_cta_label": news_cta_label,
+                    "engagement_intro": engagement_intro,
+                    "engagement_topic": engagement_topic,
+                    "engagement_description": engagement_description,
+                    "engagement_btn_label": engagement_btn_label,
+                    "engagement_btn_url": engagement_btn_url,
+                    "sysupdate_date_time": sysupdate_date_time,
+                    "sysupdate_intro": sysupdate_intro,
+                    "sysupdate_datetime_utc": sysupdate_datetime_utc,
+                    "sysupdate_duration": sysupdate_duration,
+                    "sysupdate_impact": sysupdate_impact,
+                    "news_items": news_items or [],
+                    "impact_items": impact_items or [],
+                }
+                _api(
+                    token,
+                    "POST",
+                    "/bulk-email",
+                    json={
+                        "name": templated_draft_name,
+                        "subject": subject,
+                        "html_content": html_content,
+                        "subscription_type": subscription_type or None,
+                        "fields_data": fields_data,
+                    },
+                )
+                saved_templated = True
+            else:
+                html_content = raw_html or ""
+
+            # Save the (html) draft — no fields_data
+            html_resp = _api(
+                token,
+                "POST",
+                "/bulk-email",
+                json={
+                    "name": html_draft_name,
+                    "subject": subject,
+                    "html_content": html_content,
+                    "subscription_type": subscription_type or None,
+                    "fields_data": None,
+                },
+            )
+            if html_resp.status_code not in (200, 201):
+                return _modal_error(f"Error saving HTML draft: {_extract_error(html_resp)}")
+
+            html_draft_id = html_resp.json().get("data", {}).get("id")
+            options = _load_draft_options(token)
+            if saved_templated:
+                saved_msg = (
+                    f"Saved '{templated_draft_name}' and '{html_draft_name}'. "
+                    "Now editing the (html) version."
+                )
+            else:
+                saved_msg = f"Saved '{html_draft_name}'."
+
+            return (
+                False,  # close modal
+                "raw",  # switch to raw tab
+                True,  # set in-html-mode = True
+                html_draft_id,  # now editing the (html) draft
+                html_draft_name,  # update name field
+                f"Editing: {html_draft_name}",  # draft-mode-label
+                options,  # send-select options
+                options,  # load-draft-select options
+                saved_msg,  # composer-alert
+                True,
+                "success",
+                "",  # clear modal-alert
+                False,
+            )
+        except Exception:
+            logger.exception("Failed to save drafts during HTML mode switch")
+            return _modal_error("An unexpected error occurred.")
+
+    # -----------------------------------------------------------------------
+    # Cancel HTML-mode switch — close the modal
+    # -----------------------------------------------------------------------
+    app.clientside_callback(
+        "function(n) { return false; }",
+        Output("bulk-email-switch-html-modal", "is_open", allow_duplicate=True),
+        Input("bulk-email-cancel-html-mode-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+
+    # -----------------------------------------------------------------------
+    # Disable the Template Fields tab once in HTML mode
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-fields-tab", "disabled"),
+        Input("bulk-email-in-html-mode", "data"),
+    )
+    def update_fields_tab_disabled(in_html_mode):
+        return bool(in_html_mode)
+
+    # -----------------------------------------------------------------------
+    # Dash → Monaco: push value into the editor when Python sets it
+    # (fires whenever a server callback writes to bulk-email-html-source.value)
+    # -----------------------------------------------------------------------
+    app.clientside_callback(
+        """
+        function(value) {
+            var editor = window._bulkEmailEditor;
+            if (editor && value !== undefined && editor.getValue() !== (value || '')) {
+                editor.setValue(value || '');
+            }
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("bulk-email-cm-sync-trigger", "data"),
+        Input("bulk-email-html-source", "value"),
+        prevent_initial_call=True,
+    )
+
+    # -----------------------------------------------------------------------
+    # Format HTML button — triggers Monaco's built-in HTML formatter
+    # -----------------------------------------------------------------------
+    app.clientside_callback(
+        """
+        function(n_clicks) {
+            var editor = window._bulkEmailEditor;
+            if (n_clicks && editor) {
+                var action = editor.getAction('editor.action.formatDocument');
+                if (action) { action.run(); }
+            }
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("bulk-email-cm-sync-trigger", "data", allow_duplicate=True),
+        Input("bulk-email-format-html-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
 
 
 # ---------------------------------------------------------------------------

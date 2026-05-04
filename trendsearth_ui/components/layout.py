@@ -18,6 +18,7 @@ from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     access_control_modal,
+    bulk_email_switch_html_modal,
     bulk_email_verify_modal,
     delete_script_modal,
     delete_user_modal,
@@ -176,6 +177,7 @@ def create_main_layout():
             delete_script_modal(),
             reset_rate_limits_modal(),
             reset_individual_rate_limit_modal(),
+            bulk_email_switch_html_modal(),
             bulk_email_verify_modal(),
         ],
         fluid=True,

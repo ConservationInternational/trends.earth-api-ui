@@ -9,22 +9,503 @@ import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
-_EMAIL_COLORS = [
-    "#000000",
-    "#434343",
-    "#666666",
-    "#999999",
-    "#cc0000",
-    "#e06666",
-    "#ff9900",
-    "#ffd966",
-    "#00aa00",
-    "#6aa84f",
-    "#1155cc",
-    "#6fa8dc",
-    "#674ea7",
-    "#a64d79",
-]
+# ---------------------------------------------------------------------------
+# Template Fields Panel helpers
+# ---------------------------------------------------------------------------
+
+
+def _news_item_row(index: int, item: dict | None = None) -> dbc.Card:
+    """Return a card containing the fields for a single news item."""
+    item = item or {}
+    return dbc.Card(
+        dbc.CardBody(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label("Title", html_for={"type": "news-title", "index": index}),
+                                dbc.Input(
+                                    id={"type": "news-title", "index": index},
+                                    type="text",
+                                    placeholder="News item title",
+                                    value=item.get("title", ""),
+                                ),
+                            ],
+                            width=12,
+                            className="mb-2",
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label(
+                                    "Summary",
+                                    html_for={"type": "news-summary", "index": index},
+                                ),
+                                dbc.Textarea(
+                                    id={"type": "news-summary", "index": index},
+                                    placeholder="Brief summary of the news item",
+                                    rows=2,
+                                    value=item.get("summary", ""),
+                                ),
+                            ],
+                            width=12,
+                            className="mb-2",
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label("URL", html_for={"type": "news-url", "index": index}),
+                                dbc.Input(
+                                    id={"type": "news-url", "index": index},
+                                    type="url",
+                                    placeholder="https://...",
+                                    value=item.get("url", ""),
+                                ),
+                            ],
+                            width=6,
+                            className="mb-2",
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label(
+                                    "Image Alt Text",
+                                    html_for={"type": "news-image-alt", "index": index},
+                                ),
+                                dbc.Input(
+                                    id={"type": "news-image-alt", "index": index},
+                                    type="text",
+                                    placeholder="Describe the image (for accessibility)",
+                                    value=item.get("image_alt", ""),
+                                ),
+                            ],
+                            width=6,
+                            className="mb-2",
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label("Image URL (auto-filled after upload)"),
+                                dcc.Loading(
+                                    dbc.Input(
+                                        id={"type": "news-image-url", "index": index},
+                                        type="url",
+                                        placeholder="Uploaded image URL will appear here",
+                                        disabled=False,
+                                        style={"backgroundColor": "#f8f9fa"},
+                                        value=item.get("image_url", ""),
+                                    ),
+                                    type="circle",
+                                    delay_show=100,
+                                ),
+                            ],
+                            width=8,
+                            className="mb-2",
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Upload Image"),
+                                dcc.Upload(
+                                    id={"type": "news-image-upload", "index": index},
+                                    children=dbc.Button(
+                                        "Choose file",
+                                        color="outline-secondary",
+                                        size="sm",
+                                        style={"width": "100%"},
+                                    ),
+                                    accept="image/*",
+                                ),
+                            ],
+                            width=4,
+                            className="mb-2 d-flex flex-column justify-content-end",
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    dbc.Col(
+                        dbc.Button(
+                            "Remove news item",
+                            id={"type": "news-item-delete", "index": index},
+                            color="outline-danger",
+                            size="sm",
+                        ),
+                        width="auto",
+                    )
+                ),
+            ]
+        ),
+        className="mb-2",
+    )
+
+
+def _impact_item_row(index: int, text: str = "") -> dbc.Row:
+    """Return a row containing the input + delete button for one impact item."""
+    return dbc.Row(
+        [
+            dbc.Col(
+                dbc.Input(
+                    id={"type": "impact-item", "index": index},
+                    type="text",
+                    placeholder="e.g. All running analyses will be paused",
+                    value=text,
+                ),
+                width=10,
+            ),
+            dbc.Col(
+                dbc.Button(
+                    "✕",
+                    id={"type": "impact-item-delete", "index": index},
+                    color="outline-danger",
+                    size="sm",
+                ),
+                width=2,
+            ),
+        ],
+        className="mb-2",
+    )
+
+
+def _template_fields_panel() -> html.Div:
+    """Build the three collapsible template-field panels plus a placeholder."""
+    return html.Div(
+        [
+            # --- No template selected ---
+            dbc.Collapse(
+                dbc.Alert(
+                    "Select a template above and click 'Load Template' to fill in "
+                    "structured fields, or switch to the Raw HTML tab to edit directly.",
+                    color="light",
+                    className="mb-0",
+                ),
+                id="bulk-email-no-template-panel",
+                is_open=True,
+            ),
+            # --- News & Updates ---
+            dbc.Collapse(
+                html.Div(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Issue Date"),
+                                        dbc.Input(
+                                            id="bulk-email-field-news-issue-date",
+                                            type="text",
+                                            placeholder="e.g. January 2025",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                        dbc.Row(
+                            dbc.Col(
+                                [
+                                    dbc.Label("Intro Paragraph"),
+                                    dbc.Textarea(
+                                        id="bulk-email-field-news-intro",
+                                        placeholder="Opening paragraph after greeting",
+                                        rows=2,
+                                    ),
+                                ],
+                                width=12,
+                                className="mb-3",
+                            )
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Highlight Title"),
+                                        dbc.Input(
+                                            id="bulk-email-field-news-highlight-title",
+                                            type="text",
+                                            placeholder="Title inside the red highlight box",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Highlight Body"),
+                                        dbc.Textarea(
+                                            id="bulk-email-field-news-highlight-body",
+                                            placeholder="Body text inside the red highlight box",
+                                            rows=2,
+                                        ),
+                                    ],
+                                    width=8,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Highlight Image URL (auto-filled after upload)"),
+                                        dcc.Loading(
+                                            dbc.Input(
+                                                id="bulk-email-field-news-highlight-image-url",
+                                                type="url",
+                                                placeholder="Uploaded image URL will appear here",
+                                                style={"backgroundColor": "#f8f9fa"},
+                                            ),
+                                            type="circle",
+                                            delay_show=100,
+                                        ),
+                                        html.Small(
+                                            "Optional — shown above highlight text. Leave blank to omit.",
+                                            className="text-muted",
+                                        ),
+                                    ],
+                                    width=8,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Upload Highlight Image"),
+                                        dcc.Upload(
+                                            id="bulk-email-highlight-image-upload",
+                                            children=dbc.Button(
+                                                "Choose file",
+                                                color="outline-secondary",
+                                                size="sm",
+                                                style={"width": "100%"},
+                                            ),
+                                            accept="image/*",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3 d-flex flex-column justify-content-end",
+                                ),
+                            ]
+                        ),
+                        html.H6("News Items", className="mt-2 mb-2"),
+                        html.Div(id="bulk-email-news-items-container"),
+                        dbc.Button(
+                            "+ Add news item",
+                            id="bulk-email-add-news-item-btn",
+                            color="outline-secondary",
+                            size="sm",
+                            className="mt-1 mb-3",
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Call to Action Button URL"),
+                                        dbc.Input(
+                                            id="bulk-email-field-news-cta-url",
+                                            type="url",
+                                            placeholder="https://trends.earth",
+                                        ),
+                                    ],
+                                    width=6,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Call to Action Button Label"),
+                                        dbc.Input(
+                                            id="bulk-email-field-news-cta-label",
+                                            type="text",
+                                            placeholder="Visit Trends.Earth",
+                                        ),
+                                    ],
+                                    width=6,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                id="bulk-email-news-fields-panel",
+                is_open=False,
+            ),
+            # --- Engagement ---
+            dbc.Collapse(
+                html.Div(
+                    [
+                        dbc.Row(
+                            dbc.Col(
+                                [
+                                    dbc.Label("Intro Paragraph"),
+                                    dbc.Textarea(
+                                        id="bulk-email-field-engagement-intro",
+                                        placeholder="Opening paragraph after greeting",
+                                        rows=3,
+                                    ),
+                                ],
+                                width=12,
+                                className="mb-3",
+                            )
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Topic / Survey Title"),
+                                        dbc.Input(
+                                            id="bulk-email-field-engagement-topic",
+                                            type="text",
+                                            placeholder="e.g. User Satisfaction Survey",
+                                        ),
+                                    ],
+                                    width=12,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                        dbc.Row(
+                            dbc.Col(
+                                [
+                                    dbc.Label("Description"),
+                                    dbc.Textarea(
+                                        id="bulk-email-field-engagement-description",
+                                        placeholder="Describe what you want users to do",
+                                        rows=3,
+                                    ),
+                                ],
+                                width=12,
+                                className="mb-3",
+                            )
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Button Label"),
+                                        dbc.Input(
+                                            id="bulk-email-field-engagement-btn-label",
+                                            type="text",
+                                            placeholder="e.g. Take the Survey",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Button URL"),
+                                        dbc.Input(
+                                            id="bulk-email-field-engagement-btn-url",
+                                            type="url",
+                                            placeholder="https://...",
+                                        ),
+                                    ],
+                                    width=8,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                id="bulk-email-engagement-fields-panel",
+                is_open=False,
+            ),
+            # --- System Update ---
+            dbc.Collapse(
+                html.Div(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Date & Time Header"),
+                                        dbc.Input(
+                                            id="bulk-email-field-sysupdate-date-time",
+                                            type="text",
+                                            placeholder="e.g. Saturday, 15 February 2025",
+                                        ),
+                                    ],
+                                    width=6,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                        dbc.Row(
+                            dbc.Col(
+                                [
+                                    dbc.Label("Intro Paragraph"),
+                                    dbc.Textarea(
+                                        id="bulk-email-field-sysupdate-intro",
+                                        placeholder="Opening sentence about the maintenance",
+                                        rows=2,
+                                    ),
+                                ],
+                                width=12,
+                                className="mb-3",
+                            )
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Date & Time (UTC)"),
+                                        dbc.Input(
+                                            id="bulk-email-field-sysupdate-datetime-utc",
+                                            type="text",
+                                            placeholder="e.g. 2025-02-15 02:00 UTC",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Duration"),
+                                        dbc.Input(
+                                            id="bulk-email-field-sysupdate-duration",
+                                            type="text",
+                                            placeholder="e.g. approximately 2 hours",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Label("Impact Summary"),
+                                        dbc.Input(
+                                            id="bulk-email-field-sysupdate-impact",
+                                            type="text",
+                                            placeholder="e.g. API and web interface",
+                                        ),
+                                    ],
+                                    width=4,
+                                    className="mb-3",
+                                ),
+                            ]
+                        ),
+                        html.H6("What to Expect (impact items)", className="mt-2 mb-2"),
+                        html.Div(id="bulk-email-impact-items-container"),
+                        dbc.Button(
+                            "+ Add impact item",
+                            id="bulk-email-add-impact-item-btn",
+                            color="outline-secondary",
+                            size="sm",
+                            className="mt-1 mb-3",
+                        ),
+                    ]
+                ),
+                id="bulk-email-sysupdate-fields-panel",
+                is_open=False,
+            ),
+        ]
+    )
 
 
 def bulk_email_tab_content(_role=None):
@@ -291,104 +772,150 @@ def bulk_email_tab_content(_role=None):
                     dbc.CardHeader(html.H5("Email Composer", className="mb-0")),
                     dbc.CardBody(
                         [
-                            # Status alert — shown at the top so it's always visible
-                            dbc.Alert(
-                                id="bulk-email-composer-alert",
-                                is_open=False,
-                                dismissable=True,
-                                className="mb-3",
+                            # Stores for structured editor state
+                            dcc.Store(id="bulk-email-active-template", data=""),
+                            dcc.Store(id="bulk-email-news-items-store", data=[]),
+                            dcc.Store(id="bulk-email-impact-items-store", data=[]),
+                            dcc.Store(id="bulk-email-cm-sync-trigger", data=0),
+                            # Tracks whether the user has switched to Raw HTML mode.
+                            # Once True the Template Fields tab is locked.
+                            dcc.Store(id="bulk-email-in-html-mode", data=False),
+                            # Hidden textarea — backing store for the Monaco editor.
+                            # Kept OUTSIDE the Raw-HTML tab panel so it is always
+                            # in the DOM and has the current value when Monaco reads
+                            # it on first mount.
+                            dcc.Textarea(
+                                id="bulk-email-html-source",
+                                value="",
+                                style={"display": "none"},
                             ),
-                            # Load existing draft
+                            # Open existing draft  ──OR──  Start from a template
                             dbc.Row(
                                 [
+                                    # ── Left: open an existing draft ──────────────────
                                     dbc.Col(
-                                        dbc.Select(
-                                            id="bulk-email-load-draft-select",
-                                            options=[],
-                                            placeholder="Select a draft to load...",
-                                        ),
-                                        width=6,
+                                        [
+                                            html.Small(
+                                                "Open existing draft",
+                                                className="text-muted fw-semibold d-block mb-1",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.Select(
+                                                            id="bulk-email-load-draft-select",
+                                                            options=[],
+                                                            placeholder="Select a draft...",
+                                                        ),
+                                                        width=True,
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.ButtonGroup(
+                                                            [
+                                                                dbc.Button(
+                                                                    "Load",
+                                                                    id="bulk-email-load-draft-btn",
+                                                                    color="secondary",
+                                                                    size="sm",
+                                                                ),
+                                                                dbc.Button(
+                                                                    "Copy",
+                                                                    id="bulk-email-copy-draft-btn",
+                                                                    color="outline-secondary",
+                                                                    size="sm",
+                                                                ),
+                                                                dbc.Button(
+                                                                    "Delete",
+                                                                    id="bulk-email-delete-draft-btn",
+                                                                    color="outline-danger",
+                                                                    size="sm",
+                                                                ),
+                                                                dbc.Button(
+                                                                    "New / Clear",
+                                                                    id="bulk-email-clear-draft-btn",
+                                                                    color="outline-secondary",
+                                                                    size="sm",
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                ],
+                                                className="g-2 align-items-center",
+                                            ),
+                                            html.Small(
+                                                id="bulk-email-draft-mode-label",
+                                                className="text-muted fst-italic mt-1 d-block",
+                                            ),
+                                        ],
+                                        width=7,
                                     ),
+                                    # ── Divider ───────────────────────────────────────
                                     dbc.Col(
-                                        dbc.ButtonGroup(
-                                            [
-                                                dbc.Button(
-                                                    "Load",
-                                                    id="bulk-email-load-draft-btn",
-                                                    color="secondary",
-                                                    size="sm",
-                                                ),
-                                                dbc.Button(
-                                                    "Copy",
-                                                    id="bulk-email-copy-draft-btn",
-                                                    color="outline-secondary",
-                                                    size="sm",
-                                                ),
-                                                dbc.Button(
-                                                    "Delete",
-                                                    id="bulk-email-delete-draft-btn",
-                                                    color="outline-danger",
-                                                    size="sm",
-                                                ),
-                                                dbc.Button(
-                                                    "New / Clear",
-                                                    id="bulk-email-clear-draft-btn",
-                                                    color="outline-secondary",
-                                                    size="sm",
-                                                ),
-                                            ]
+                                        html.Div(
+                                            "or",
+                                            className=(
+                                                "text-muted fw-semibold text-center "
+                                                "border-start h-100 ps-3"
+                                            ),
+                                            style={"paddingTop": "1.6rem"},
                                         ),
-                                        width="auto",
-                                        className="d-flex align-items-center",
+                                        width=1,
                                     ),
+                                    # ── Right: start from a template ──────────────────
                                     dbc.Col(
-                                        html.Small(
-                                            id="bulk-email-draft-mode-label",
-                                            className="text-muted fst-italic",
-                                        ),
-                                        width="auto",
-                                        className="d-flex align-items-center",
+                                        [
+                                            html.Small(
+                                                "Start from a template",
+                                                className="text-muted fw-semibold d-block mb-1",
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.Select(
+                                                            id="bulk-email-template-select",
+                                                            options=[
+                                                                {
+                                                                    "label": "(no template)",
+                                                                    "value": "",
+                                                                },
+                                                                {
+                                                                    "label": "News & Updates",
+                                                                    "value": "news",
+                                                                },
+                                                                {
+                                                                    "label": "User Engagement",
+                                                                    "value": "engagement",
+                                                                },
+                                                                {
+                                                                    "label": "System Update / Maintenance",
+                                                                    "value": "system_update",
+                                                                },
+                                                            ],
+                                                            value="",
+                                                            placeholder="Choose a template...",
+                                                        ),
+                                                        width=True,
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            "Load Template",
+                                                            id="bulk-email-load-template-btn",
+                                                            color="outline-primary",
+                                                            size="sm",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                ],
+                                                className="g-2 align-items-center",
+                                            ),
+                                        ],
+                                        width=4,
                                     ),
                                 ],
-                                className="mb-3",
+                                className="mb-3 align-items-start",
                             ),
                             dcc.Store(id="bulk-email-loaded-draft-id"),
-                            # Load template
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        dbc.Select(
-                                            id="bulk-email-template-select",
-                                            options=[
-                                                {"label": "(no template)", "value": ""},
-                                                {"label": "News & Updates", "value": "news"},
-                                                {
-                                                    "label": "User Engagement",
-                                                    "value": "engagement",
-                                                },
-                                                {
-                                                    "label": "System Update / Maintenance",
-                                                    "value": "system_update",
-                                                },
-                                            ],
-                                            value="",
-                                            placeholder="Load a template...",
-                                        ),
-                                        width=6,
-                                    ),
-                                    dbc.Col(
-                                        dbc.Button(
-                                            "Load Template",
-                                            id="bulk-email-load-template-btn",
-                                            color="outline-primary",
-                                            size="sm",
-                                        ),
-                                        width="auto",
-                                        className="d-flex align-items-center",
-                                    ),
-                                ],
-                                className="mb-3",
-                            ),
                             dbc.Row(
                                 [
                                     dbc.Col(
@@ -448,104 +975,81 @@ def bulk_email_tab_content(_role=None):
                                 ],
                                 className="mb-3",
                             ),
-                            # HTML email body
+                            # Editor tabs: Template Fields | Raw HTML
                             dbc.Label("Email Body"),
-                            dmc.RichTextEditor(
-                                id="bulk-email-html-source",
-                                html="",
-                                debounce=500,
-                                extensions=[
-                                    "StarterKit",
-                                    "Superscript",
-                                    "Subscript",
-                                    "Highlight",
-                                    "Table",
-                                    "TableRow",
-                                    "TableHeader",
-                                    "TableCell",
-                                    {"TextAlign": {"types": ["heading", "paragraph"]}},
-                                    "TextStyle",
+                            dmc.Tabs(
+                                id="bulk-email-editor-tabs",
+                                value="fields",
+                                children=[
+                                    dmc.TabsList(
+                                        [
+                                            dmc.TabsTab(
+                                                "Template Fields",
+                                                id="bulk-email-fields-tab",
+                                                value="fields",
+                                            ),
+                                            dmc.TabsTab("Raw HTML", value="raw"),
+                                        ]
+                                    ),
+                                    dmc.TabsPanel(
+                                        _template_fields_panel(),
+                                        value="fields",
+                                        pt="md",
+                                    ),
+                                    dmc.TabsPanel(
+                                        html.Div(
+                                            [
+                                                # Warning banner — only visible before HTML mode
+                                                # is activated. Hidden once the user commits.
+                                                dbc.Alert(
+                                                    [
+                                                        html.Strong("Read-only preview. "),
+                                                        "This is the rendered HTML from your "
+                                                        "template fields. To edit the HTML "
+                                                        "directly, click the button below — "
+                                                        "this will save both a "
+                                                        "\u201c(templated)\u201d and an "
+                                                        "\u201c(html)\u201d draft and lock "
+                                                        "the Template Fields tab.",
+                                                        dbc.Button(
+                                                            "Enable HTML Editing\u2026",
+                                                            id="bulk-email-enable-html-btn",
+                                                            color="warning",
+                                                            size="sm",
+                                                            className="ms-3",
+                                                        ),
+                                                    ],
+                                                    id="bulk-email-html-mode-banner",
+                                                    color="warning",
+                                                    className="mb-2 d-flex align-items-center",
+                                                    is_open=True,
+                                                ),
+                                                html.Div(
+                                                    [
+                                                        dbc.Button(
+                                                            "Format HTML",
+                                                            id="bulk-email-format-html-btn",
+                                                            color="outline-secondary",
+                                                            size="sm",
+                                                        ),
+                                                    ],
+                                                    className="d-flex align-items-center mb-2",
+                                                ),
+                                                # CodeMirror mounts into this div
+                                                html.Div(
+                                                    id="bulk-email-cm-container",
+                                                    style={
+                                                        "height": "700px",
+                                                        "border": "1px solid #ced4da",
+                                                        "borderRadius": "4px",
+                                                    },
+                                                ),
+                                            ]
+                                        ),
+                                        value="raw",
+                                        pt="md",
+                                    ),
                                 ],
-                                toolbar={
-                                    "sticky": True,
-                                    "controlsGroups": [
-                                        [
-                                            "Bold",
-                                            "Italic",
-                                            "Underline",
-                                            "Strikethrough",
-                                            "ClearFormatting",
-                                            "Highlight",
-                                            "Code",
-                                        ],
-                                        ["H1", "H2", "H3", "H4"],
-                                        ["Blockquote", "Hr", "BulletList", "OrderedList"],
-                                        ["Subscript", "Superscript"],
-                                        ["Link", "Unlink"],
-                                        ["AlignLeft", "AlignCenter", "AlignJustify", "AlignRight"],
-                                        [
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Insert table",
-                                                    "title": "Insert table",
-                                                    "children": "⊞",
-                                                    "onClick": {"function": "insertTable"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Add column before",
-                                                    "title": "Add column before",
-                                                    "children": "←|",
-                                                    "onClick": {"function": "addColumnBefore"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Add column after",
-                                                    "title": "Add column after",
-                                                    "children": "|→",
-                                                    "onClick": {"function": "addColumnAfter"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Delete column",
-                                                    "title": "Delete column",
-                                                    "children": "✕|",
-                                                    "onClick": {"function": "deleteColumn"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Add row after",
-                                                    "title": "Add row after",
-                                                    "children": "—↓",
-                                                    "onClick": {"function": "addRowAfter"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Delete row",
-                                                    "title": "Delete row",
-                                                    "children": "✕—",
-                                                    "onClick": {"function": "deleteRow"},
-                                                }
-                                            },
-                                            {
-                                                "CustomControl": {
-                                                    "aria-label": "Delete table",
-                                                    "title": "Delete table",
-                                                    "children": "✕⊞",
-                                                    "onClick": {"function": "deleteTable"},
-                                                }
-                                            },
-                                        ],
-                                        ["Undo", "Redo"],
-                                        ["SourceCode"],
-                                    ],
-                                },
-                                style={"minHeight": "750px"},
                             ),
                             dbc.Row(
                                 [
@@ -557,19 +1061,15 @@ def bulk_email_tab_content(_role=None):
                                         ),
                                         width="auto",
                                     ),
-                                    dbc.Col(
-                                        dbc.Button(
-                                            [
-                                                html.I(className="fas fa-eye me-2"),
-                                                "Refresh Preview",
-                                            ],
-                                            id="bulk-email-refresh-preview-btn",
-                                            color="outline-secondary",
-                                        ),
-                                        width="auto",
-                                    ),
                                 ],
-                                className="mt-2 mb-3 g-2",
+                                className="mt-2 mb-1 g-2",
+                            ),
+                            # Status alert — shown below Save button so it's near the action
+                            dbc.Alert(
+                                id="bulk-email-composer-alert",
+                                is_open=False,
+                                dismissable=True,
+                                className="mt-2 mb-3",
                             ),
                             dcc.Store(id="bulk-email-preview-html"),
                             html.Hr(),
@@ -579,15 +1079,13 @@ def bulk_email_tab_content(_role=None):
                             ),
                             html.Small(
                                 "This preview renders the actual HTML that will be sent. "
-                                "The editor above may not show images or colors faithfully "
-                                "— always verify here before sending.",
+                                "Always verify here before sending.",
                                 className="text-muted d-block mb-2",
                             ),
                             html.Iframe(
                                 id="bulk-email-preview-frame",
                                 srcDoc="<p style='color:#6c757d;padding:16px;'>"
-                                "Load a template or draft, then click "
-                                "<strong>Refresh Preview</strong> to see the rendered email."
+                                "Load a template or draft to see a live preview here."
                                 "</p>",
                                 style={
                                     "width": "100%",
