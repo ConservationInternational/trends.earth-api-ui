@@ -47,13 +47,13 @@ def _fetch_health_status(url, headers=None, timeout=10):
             return True, resp.json(), resp.status_code, None
         return False, None, resp.status_code, f"HTTP {resp.status_code}"
     except requests.exceptions.Timeout:
-        logger.warning(f"Health check timed out for {url}")
+        logger.warning("Health check timed out for %s", url)
         return False, None, 0, "Timeout"
     except requests.exceptions.ConnectionError:
-        logger.warning(f"Connection failed for {url}")
+        logger.warning("Connection failed for %s", url)
         return False, None, 0, "Connection Error"
     except Exception as e:
-        logger.warning(f"Could not fetch health status from {url}: {e}")
+        logger.warning("Could not fetch health status from %s: %s", url, e)
         return False, None, 0, "Connection Error"
 
     return False, None, 0, "Connection Error"

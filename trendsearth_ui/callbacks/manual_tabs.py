@@ -4,123 +4,45 @@ import logging
 
 from dash import Input, Output, callback_context
 
+from ..utils.helpers import ADMIN_ROLES
+
 logger = logging.getLogger(__name__)
+
+# (output_id, allowed_roles) pairs
+_TAB_CONFIGS = [
+    ("admin-tab-li", ADMIN_ROLES),
+    ("profile-openeo-section", ADMIN_ROLES),
+    ("users-tab-li", ADMIN_ROLES),
+    ("status-tab-li", ADMIN_ROLES),
+    ("scripts-tab-li", ADMIN_ROLES),
+    ("bulk-email-tab-li", ("SUPERADMIN",)),
+]
+
+
+def _make_tab_toggle(allowed_roles):
+    def toggle(role, token):
+        if not token:
+            return {"display": "none"}
+        return {"display": "block"} if role in allowed_roles else {"display": "none"}
+
+    return toggle
 
 
 def register_callbacks(app):
     """Register manual tab switching callbacks."""
 
-    @app.callback(
-        Output("admin-tab-li", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,  # Allow initial call to show admin tab on dashboard load
-    )
-    def toggle_admin_tab_visibility(role, token):
-        """Show/hide admin tab based on user role."""
-        # Guard: Skip if not logged in (prevents execution after logout)
-        if not token:
-            return {"display": "none"}
-
-        if role in ["ADMIN", "SUPERADMIN"]:
-            return {"display": "block"}
-        else:
-            return {"display": "none"}
+    for output_id, allowed_roles in _TAB_CONFIGS:
+        app.callback(
+            Output(output_id, "style"),
+            [
+                Input("role-store", "data"),
+                Input("token-store", "data"),
+            ],
+            prevent_initial_call=False,
+        )(_make_tab_toggle(allowed_roles))
 
     @app.callback(
-        Output("profile-openeo-section", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,
-    )
-    def toggle_openeo_section_visibility(role, token):
-        """Show openEO credentials section only for admin and superadmin users."""
-        if not token:
-            return {"display": "none"}
 
-        if role in ["ADMIN", "SUPERADMIN"]:
-            return {"display": "block"}
-        return {"display": "none"}
-
-    @app.callback(
-        Output("users-tab-li", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,  # Allow initial call to show users tab on dashboard load
-    )
-    def toggle_users_tab_visibility(role, token):
-        """Show/hide users tab based on user role."""
-        # Guard: Skip if not logged in (prevents execution after logout)
-        if not token:
-            return {"display": "none"}
-
-        # Allow both ADMIN and SUPERADMIN to access Users tab (aligns with README/tests)
-        if role in ["ADMIN", "SUPERADMIN"]:
-            return {"display": "block"}
-        else:
-            return {"display": "none"}
-
-    @app.callback(
-        Output("status-tab-li", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,  # Allow initial call to show status tab on dashboard load
-    )
-    def toggle_status_tab_visibility(role, token):
-        """Show/hide status tab based on user role."""
-        # Guard: Skip if not logged in (prevents execution after logout)
-        if not token:
-            return {"display": "none"}
-
-        if role in ["ADMIN", "SUPERADMIN"]:
-            return {"display": "block"}
-        else:
-            return {"display": "none"}
-
-    @app.callback(
-        Output("scripts-tab-li", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,  # Allow initial call to show scripts tab on dashboard load
-    )
-    def toggle_scripts_tab_visibility(role, token):
-        """Show/hide scripts tab based on user role."""
-        # Guard: Skip if not logged in (prevents execution after logout)
-        if not token:
-            return {"display": "none"}
-
-        if role in ["ADMIN", "SUPERADMIN"]:
-            return {"display": "block"}
-        else:
-            return {"display": "none"}
-
-    @app.callback(
-        Output("bulk-email-tab-li", "style"),
-        [
-            Input("role-store", "data"),
-            Input("token-store", "data"),
-        ],
-        prevent_initial_call=False,
-    )
-    def toggle_bulk_email_tab_visibility(role, token):
-        """Show/hide Bulk Email tab â€” SUPERADMIN only."""
-        if not token:
-            return {"display": "none"}
-        if role == "SUPERADMIN":
-            return {"display": "block"}
-        return {"display": "none"}
-
-    @app.callback(
         [
             Output("executions-tab-btn", "className"),
             Output("users-tab-btn", "className"),

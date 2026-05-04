@@ -14,6 +14,7 @@ from ..components import (
     status_tab_content,
     users_tab_content,
 )
+from ..utils.helpers import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ def register_callbacks(app):
             return profile_tab_content(user_data or {}), no_update
         elif tab == "scripts":
             # Only allow admin users to access scripts tab
-            if role in ["ADMIN", "SUPERADMIN"]:
+            if is_admin(role):
                 return scripts_tab_content(), no_update
             else:
                 return html.Div(
@@ -78,7 +79,7 @@ def register_callbacks(app):
             return executions_tab_content(), no_update
         elif tab == "users":
             # Only allow admin users to access users tab
-            if role in ["ADMIN", "SUPERADMIN"]:
+            if is_admin(role):
                 return users_tab_content(), no_update
             else:
                 return html.Div(
@@ -88,11 +89,11 @@ def register_callbacks(app):
                     ]
                 ), no_update
         elif tab == "admin":
-            return admin_tab_content(role, role in ["ADMIN", "SUPERADMIN"]), no_update
+            return admin_tab_content(role, is_admin(role)), no_update
         elif tab == "status":
             # Only allow admin users to access status tab
-            if role in ["ADMIN", "SUPERADMIN"]:
-                return status_tab_content(role in ["ADMIN", "SUPERADMIN"], role), no_update
+            if is_admin(role):
+                return status_tab_content(is_admin(role), role), no_update
             else:
                 return html.Div(
                     [

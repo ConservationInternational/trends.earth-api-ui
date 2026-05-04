@@ -29,6 +29,7 @@ from ..utils import (
     refresh_access_token,
     should_refresh_token,
 )
+from ..utils.helpers import extract_api_error, is_admin
 from ..utils.http_client import apply_default_headers, get_session
 from ..utils.logging_config import get_logger, log_exception
 
@@ -695,7 +696,7 @@ def register_callbacks(app):
         Only visible to ADMIN and SUPERADMIN users.
         """
         # Hide environment indicator for non-admin users
-        if role not in ["ADMIN", "SUPERADMIN"]:
+        if not is_admin(role):
             return ""
 
         if not api_environment:
@@ -1571,21 +1572,11 @@ def register_callbacks(app):
                     True,
                 )
             elif resp.status_code == 400:
-                error_msg = _("Registration failed.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    logger.debug("Could not parse registration error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Registration failed."))
                 logger.warning("Registration failed (400): %s", error_msg)
                 return error_msg, "danger", True
             elif resp.status_code == 422:
-                error_msg = _("Validation failed.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse validation error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Validation failed."))
                 logger.warning("Registration validation failed (422): %s", error_msg)
                 return error_msg, "danger", True
             elif resp.status_code == 429:
@@ -1597,12 +1588,7 @@ def register_callbacks(app):
                 )
             else:
                 logger.warning("Registration failed with status: %s", resp.status_code)
-                error_msg = _("Registration failed.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    logger.debug("Could not parse registration error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Registration failed."))
                 # Avoid duplicate "Please try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = _("{}. Please try again.").format(error_msg)
@@ -2105,27 +2091,14 @@ def register_callbacks(app):
                     True,
                 )
             elif resp.status_code == 422:
-                error_msg = _("Invalid token. Please request a new profile update link.")
-                try:
-                    error_data = resp.json()
-                    logger.warning("Profile update 422 response: %s", error_data)
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    pass
+                error_msg = extract_api_error(resp, _("Invalid token. Please request a new profile update link."))
+                logger.warning("Profile update 422 response: %s", error_msg)
                 return error_msg, "danger", True
             else:
                 logger.warning("Profile update failed with status: %s", resp.status_code)
                 logger.warning("Profile update payload was: %s", payload)
-                error_msg = _("Failed to update profile.")
-                try:
-                    error_data = resp.json()
-                    logger.warning("Profile update error response: %s", error_data)
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    logger.warning(
-                        "Could not parse profile update error response. Raw text: %s",
-                        resp.text[:500] if resp.text else "empty",
-                    )
+                error_msg = extract_api_error(resp, _("Failed to update profile."))
+                logger.warning("Profile update error: %s", error_msg)
                 return error_msg, "danger", True
 
         except requests.exceptions.Timeout:

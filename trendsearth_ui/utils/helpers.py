@@ -17,6 +17,44 @@ logger = logging.getLogger(__name__)
 DEFAULT_API_TIMEOUT = (3, 20)
 FAST_API_TIMEOUT = (3, 10)
 
+# Role constants
+ADMIN_ROLES = ("ADMIN", "SUPERADMIN")
+
+
+def is_admin(role: Optional[str]) -> bool:
+    """Return True if the given role has admin privileges."""
+    return role in ADMIN_ROLES
+
+
+def extract_api_error(response, default: str = "An error occurred.") -> str:
+    """Extract a human-readable error message from an API response.
+
+    Tries the 'detail', 'msg', and 'message' keys in order, falling back to
+    *default* if the response cannot be parsed or none of the keys are present.
+    """
+    try:
+        error_data = response.json()
+        return error_data.get("detail", error_data.get("msg", error_data.get("message", default)))
+    except Exception:
+        return default
+
+
+def format_duration(duration_seconds) -> str:
+    """Format a duration in seconds to H:MM:SS clock format.
+
+    Returns '-' for missing or zero values.
+    """
+    if not duration_seconds:
+        return "-"
+    try:
+        total = int(float(duration_seconds))
+        hours = total // 3600
+        minutes = (total % 3600) // 60
+        seconds = total % 60
+        return f"{hours}:{minutes:02d}:{seconds:02d}"
+    except (ValueError, TypeError):
+        return "-"
+
 
 def parse_date(date_str, user_timezone="UTC"):
     """Parse date string and return formatted string for ag-grid with timezone conversion.

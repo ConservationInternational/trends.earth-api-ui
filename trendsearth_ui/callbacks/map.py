@@ -5,6 +5,7 @@ import logging
 from dash import MATCH, Input, Output, State, html, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
+from ..utils.helpers import make_authenticated_request
 
 logger = logging.getLogger(__name__)
 
@@ -64,9 +65,6 @@ def register_callbacks(app):
                     if table_state.get("filter_sql"):
                         params["filter"] = table_state["filter_sql"]
 
-                # Get execution data using the authenticated helper
-                from ..utils.helpers import make_authenticated_request
-
                 resp = make_authenticated_request("/execution", token, params=params)
                 if resp.status_code != 200:
                     return (
@@ -97,8 +95,6 @@ def register_callbacks(app):
 
         logger.debug("Fetching execution details for ID: %s", execution_id)
         try:
-            from ..utils.helpers import make_authenticated_request
-
             # First try with include=params
             resp = make_authenticated_request(
                 f"/execution/{execution_id}",

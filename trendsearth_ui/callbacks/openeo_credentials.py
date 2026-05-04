@@ -6,6 +6,7 @@ from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
 
 from ..i18n import gettext as _
+from ..utils.helpers import extract_api_error, make_authenticated_request
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,6 @@ def register_callbacks(app):
             return html.Div(_("Please log in to view credentials status."), className="text-muted")
 
         try:
-            from ..utils.helpers import make_authenticated_request
 
             resp = make_authenticated_request(_OPENEO_ENDPOINT, token)
 
@@ -197,7 +197,6 @@ def register_callbacks(app):
             }
 
         try:
-            from ..utils.helpers import make_authenticated_request
 
             resp = make_authenticated_request(
                 _OPENEO_ENDPOINT,
@@ -236,12 +235,7 @@ def register_callbacks(app):
                     new_status,
                 )
             else:
-                error_msg = _("Failed to save openEO credentials.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Failed to save openEO credentials."))
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -275,7 +269,6 @@ def register_callbacks(app):
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         try:
-            from ..utils.helpers import make_authenticated_request
 
             if button_id == "profile-openeo-check-btn" and check_clicks:
                 resp = make_authenticated_request(
@@ -312,12 +305,7 @@ def register_callbacks(app):
                             no_update,
                         )
                 else:
-                    error_msg = _("Credentials check failed.")
-                    try:
-                        error_data = resp.json()
-                        error_msg = error_data.get("detail", error_msg)
-                    except Exception:
-                        logger.debug("Could not parse API error response", exc_info=True)
+                    error_msg = extract_api_error(resp, _("Credentials check failed."))
                     return error_msg, "danger", True, no_update
 
             elif button_id == "profile-openeo-delete-btn" and delete_clicks:
@@ -350,12 +338,7 @@ def register_callbacks(app):
                         deleted_status,
                     )
                 else:
-                    error_msg = _("Failed to delete credentials.")
-                    try:
-                        error_data = resp.json()
-                        error_msg = error_data.get("detail", error_msg)
-                    except Exception:
-                        logger.debug("Could not parse API error response", exc_info=True)
+                    error_msg = extract_api_error(resp, _("Failed to delete credentials."))
                     return error_msg, "danger", True, no_update
 
         except Exception as e:

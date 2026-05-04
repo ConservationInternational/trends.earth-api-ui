@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
-from ..utils.helpers import make_authenticated_request
+from ..utils.helpers import extract_api_error, is_admin, make_authenticated_request
 
 logger = logging.getLogger(__name__)
 
@@ -161,9 +161,9 @@ def register_callbacks(app):
             if not request:
                 return {"rowData": [], "rowCount": None}, {}, 0
 
-            is_admin = role in ("ADMIN", "SUPERADMIN")
+            is_admin_user = is_admin(role)
             filter_overrides = None
-            if role_filter_selected and is_admin:
+            if role_filter_selected and is_admin_user:
                 filter_overrides = {"role": {"filterType": "set", "values": role_filter_selected}}
 
             params, table_state = build_aggrid_request_params(
@@ -217,7 +217,7 @@ def register_callbacks(app):
             params = build_refresh_request_params(
                 base_params=base_params,
                 table_state=table_state,
-                allow_filters=role in ("ADMIN", "SUPERADMIN"),
+                allow_filters=is_admin(role),
                 allowed_filter_columns=USER_ALLOWED_FILTER_COLUMNS,
             )
 
@@ -287,12 +287,7 @@ def register_callbacks(app):
                     True,
                 )
 
-            error_msg = "Failed to update email notification settings."
-            try:
-                error_data = resp.json()
-                error_msg = error_data.get("detail", error_msg)
-            except Exception:
-                logger.debug("Could not parse API error response", exc_info=True)
+            error_msg = extract_api_error(resp, "Failed to update email notification settings.")
             return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard
@@ -432,12 +427,7 @@ def register_callbacks(app):
                     True,
                 )
 
-            error_msg = "Failed to upload service account key."
-            try:
-                error_data = resp.json()
-                error_msg = error_data.get("detail", error_msg)
-            except Exception:
-                logger.debug("Could not parse API error response", exc_info=True)
+            error_msg = extract_api_error(resp, "Failed to upload service account key.")
             return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard
@@ -489,12 +479,7 @@ def register_callbacks(app):
                         True,
                     )
 
-                error_msg = "User's credentials test failed."
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
+                error_msg = extract_api_error(resp, "User's credentials test failed.")
                 return error_msg, "danger", True
 
             if button_id == "edit-user-gee-delete-btn" and delete_clicks:
@@ -514,12 +499,7 @@ def register_callbacks(app):
                         True,
                     )
 
-                error_msg = "Failed to delete user's credentials."
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_msg)
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
+                error_msg = extract_api_error(resp, "Failed to delete user's credentials.")
                 return error_msg, "danger", True
 
         except Exception as exc:  # pragma: no cover - defensive guard

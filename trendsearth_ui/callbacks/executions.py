@@ -7,7 +7,7 @@ from dash import Input, Output, State, html, no_update
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..i18n import gettext as _
-from ..utils import make_authenticated_request, parse_date
+from ..utils import format_duration, is_admin, make_authenticated_request, parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
 from ..utils.mobile_utils import get_executions_columns_for_role
 
@@ -48,7 +48,7 @@ EXECUTION_ALLOWED_FILTER_COLUMNS = {
 def _build_base_params(role: str | None, *, include_paging: bool = False) -> dict[str, Any]:
     """Generate base params for execution API requests."""
     include_fields = EXECUTION_BASE_INCLUDE
-    if role in ["ADMIN", "SUPERADMIN"]:
+    if is_admin(role):
         include_fields += ADMIN_INCLUDE_SUFFIX
 
     params: dict[str, Any] = {
@@ -71,23 +71,7 @@ def _build_status_filter_override(
     return None
 
 
-def format_duration(duration_seconds):
-    """Format duration from seconds to Hours:Minutes:Seconds format."""
-    if duration_seconds is None or duration_seconds == 0:
-        return "-"
 
-    try:
-        # Convert to int if it's a float/string
-        duration_seconds = int(float(duration_seconds))
-
-        hours = duration_seconds // 3600
-        remaining_seconds = duration_seconds % 3600
-        minutes = remaining_seconds // 60
-        seconds = remaining_seconds % 60
-
-        return f"{hours}:{minutes:02d}:{seconds:02d}"
-    except (ValueError, TypeError):
-        return "-"
 
 
 def process_execution_data(executions, role, user_timezone):
@@ -108,7 +92,7 @@ def process_execution_data(executions, role, user_timezone):
         row["results"] = "Show Results"
         row["logs"] = "Show Logs"
         # Add docker/batch logs columns for admin/superadmin users only
-        if role in ["ADMIN", "SUPERADMIN"]:
+        if is_admin(role):
             row["docker_logs"] = "Show Docker Logs"
             row["batch_logs"] = "Show Batch Logs"
         row["map"] = "Show Map"
@@ -481,9 +465,9 @@ def register_callbacks(app):
 
         # Check permissions: user can cancel their own tasks OR user is admin/superadmin
         current_user_id = user_data.get("id") if user_data else None
-        is_admin = role in ["ADMIN", "SUPERADMIN"] if role else False
+        user_is_admin = is_admin(role)
 
-        if not is_admin and execution_user_id != current_user_id:
+        if not user_is_admin and execution_user_id != current_user_id:
             logger.debug(
                 "Permission denied: user %s cannot cancel execution by user %s",
                 current_user_id,
@@ -779,7 +763,7 @@ def register_callbacks(app):
             }
 
             # Add admin-only fields if user is admin or superadmin
-            if role in ["ADMIN", "SUPERADMIN"]:
+            if is_admin(role):
                 params["include"] += ",user_name,user_email"
 
             # Preserve existing sort and filter settings if available

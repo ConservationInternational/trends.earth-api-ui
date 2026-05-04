@@ -8,7 +8,7 @@ from dash import Input, Output, State
 from ..config import DEFAULT_PAGE_SIZE
 from ..utils import parse_date
 from ..utils.aggrid import build_aggrid_request_params, build_refresh_request_params
-from ..utils.helpers import make_authenticated_request
+from ..utils.helpers import is_admin, make_authenticated_request
 
 logger = logging.getLogger(__name__)
 
@@ -135,11 +135,11 @@ def register_callbacks(app):
                 allowed_filter_columns=SCRIPT_ALLOWED_FILTER_COLUMNS,
             )
 
-            is_admin = role in ["ADMIN", "SUPERADMIN"]
+            is_admin_user = is_admin(role)
             tabledata, total_rows = _fetch_scripts_page(
                 token,
                 params,
-                is_admin=is_admin,
+                is_admin=is_admin_user,
                 user_timezone=user_timezone,
             )
 
@@ -182,11 +182,11 @@ def register_callbacks(app):
                 allowed_filter_columns=SCRIPT_ALLOWED_FILTER_COLUMNS,
             )
 
-            is_admin = role in ["ADMIN", "SUPERADMIN"]
+            is_admin_user = is_admin(role)
             tabledata, total_rows = _fetch_scripts_page(
                 token,
                 params,
-                is_admin=is_admin,
+                is_admin=is_admin_user,
                 user_timezone=user_timezone,
             )
 

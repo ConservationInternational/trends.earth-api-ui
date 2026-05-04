@@ -5,19 +5,12 @@ import logging
 from dash import ALL, Input, Output, State, ctx, html, no_update
 import dash_bootstrap_components as dbc
 
+from ..utils.helpers import extract_api_error
+
 logger = logging.getLogger(__name__)
 
 SERVICE_CREDS_ENDPOINT = "/oauth/clients"
 _API_TIMEOUT = 15  # seconds for service credentials API calls
-
-
-def _extract_error_msg(resp, default="An unexpected error occurred."):
-    """Extract a human-readable error message from an API response."""
-    try:
-        error_data = resp.json()
-        return error_data.get("detail", error_data.get("msg", default))
-    except Exception:
-        return default
 
 
 def _build_credentials_table(clients):
@@ -306,7 +299,7 @@ def register_callbacks(app):
                     ["all"],
                 )
             else:
-                error_msg = _extract_error_msg(resp, "Failed to create credential.")
+                error_msg = extract_api_error(resp, "Failed to create credential.")
                 return (
                     no_update,
                     no_update,
@@ -435,7 +428,7 @@ def register_callbacks(app):
 
                 return False, "Credential revoked successfully.", "success", True, table
             else:
-                error_msg = _extract_error_msg(resp, "Failed to revoke credential.")
+                error_msg = extract_api_error(resp, "Failed to revoke credential.")
                 return False, error_msg, "danger", True, no_update
         except Exception as e:
             logger.exception("Error revoking service credential: %s", e)

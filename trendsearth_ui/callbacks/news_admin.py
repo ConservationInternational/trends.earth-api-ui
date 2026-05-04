@@ -5,34 +5,10 @@ import time
 
 from dash import Input, Output, State, dcc, html, no_update
 
-from trendsearth_ui.config import get_api_base
-from trendsearth_ui.i18n import gettext as _
+from ..i18n import gettext as _
+from ..utils.helpers import extract_api_error, is_admin, make_authenticated_request
 
 logger = logging.getLogger(__name__)
-
-
-def make_api_request(method, endpoint, token, api_environment=None, json_data=None):
-    """Make an API request with authentication."""
-    import requests
-
-    headers = {"Authorization": f"Bearer {token}"}
-    api_base = get_api_base(api_environment or "production")
-    url = f"{api_base}{endpoint}"
-
-    logger.info(f"[make_api_request] {method} {url}")
-
-    if method == "GET":
-        response = requests.get(url, headers=headers, timeout=30)
-    elif method == "POST":
-        response = requests.post(url, headers=headers, json=json_data, timeout=30)
-    elif method == "PUT":
-        response = requests.put(url, headers=headers, json=json_data, timeout=30)
-    elif method == "DELETE":
-        response = requests.delete(url, headers=headers, timeout=30)
-    else:
-        raise ValueError(f"Unsupported HTTP method: {method}")
-
-    return response
 
 
 def _format_news_rows(news_items):
@@ -76,12 +52,12 @@ def register_callbacks(app):
     def load_admin_news_items(_request, token, role):
         """Load news items for AG Grid."""
         # Must have a token and admin role to load news
-        if not token or role not in ("ADMIN", "SUPERADMIN"):
+        if not token or not is_admin(role):
             return {"rowData": [], "rowCount": 0}, {}
 
         try:
             # Fetch all news including inactive
-            response = make_api_request("GET", "/admin/news?include_inactive=true", token)
+            response = make_authenticated_request("/admin/news", token, params={"include_inactive": "true"})
 
             if response.status_code == 200:
                 data = response.json()
@@ -105,11 +81,11 @@ def register_callbacks(app):
     )
     def refresh_admin_news_items(_refresh_clicks, _trigger, token, role):
         """Refresh news items after actions."""
-        if not token or role not in ("ADMIN", "SUPERADMIN"):
+        if not token or not is_admin(role):
             return no_update, no_update
 
         try:
-            response = make_api_request("GET", "/admin/news?include_inactive=true", token)
+            response = make_authenticated_request("/admin/news", token, params={"include_inactive": "true"})
             if response.status_code == 200:
                 data = response.json()
                 news_items = data.get("data", [])
@@ -239,13 +215,11 @@ def register_callbacks(app):
         # Open modal for edit - need to fetch news item data
         if triggered_id == "admin-edit-news-btn" and selected_id and token:
             try:
-                response = make_api_request("GET", f"/admin/news/{selected_id}", token)
+                response = make_authenticated_request(f"/admin/news/{selected_id}", token)
                 if response.status_code == 200:
                     data = response.json()
                     item = data.get("data", data)  # Handle both wrapped and unwrapped
-                    logger.info(
-                        f"[toggle_news_modal] Loaded item: is_active={item.get('is_active')}"
-                    )
+                    logger.info("[toggle_news_modal] Loaded item: is_active=%s", item.get("is_active"))
                     # Parse dates - API returns publish_at/expires_at as ISO strings
                     start_date = item.get("publish_at")
                     end_date = item.get("expires_at")
@@ -273,7 +247,7 @@ def register_callbacks(app):
                         selected_id,  # Keep selected_id for edit
                     )
             except Exception as e:
-                logger.error(f"[toggle_news_modal] Error loading item: {e}")
+                logger.error("[toggle_news_modal] Error loading item: %s", e)
                 pass
 
         return (no_update,) * 16
@@ -346,7 +320,7 @@ def register_callbacks(app):
     ):
         """Save a news item (create or update)."""
         logger.info(
-            f"[save_news_item] is_active value received: {is_active} (type: {type(is_active)})"
+            "[save_news_item] is_active value received: %s (type: %s)", is_active, type(is_active)
         )
         if not token:
             return (
@@ -423,21 +397,23 @@ def register_callbacks(app):
         if end_date:
             data["expires_at"] = end_date
 
-        logger.info(f"[save_news_item] Sending data to API: {data}")
-        logger.info(f"[save_news_item] modal_title={modal_title!r}, selected_id={selected_id!r}")
+        logger.info("[save_news_item] Sending data to API: %s", data)
+        logger.info("[save_news_item] modal_title=%r, selected_id=%r", modal_title, selected_id)
 
         try:
             # Use selected_id to determine create vs update (more reliable than title comparison)
             is_edit = bool(selected_id)
             if is_edit:
-                response = make_api_request(
-                    "PUT", f"/admin/news/{selected_id}", token, json_data=data
+                response = make_authenticated_request(
+                    f"/admin/news/{selected_id}", token, method="PUT", json=data
                 )
             else:
-                response = make_api_request("POST", "/admin/news", token, json_data=data)
+                response = make_authenticated_request("/admin/news", token, method="POST", json=data)
 
             logger.info(
-                f"[save_news_item] API response: {response.status_code} - {response.text[:200] if response.text else 'empty'}"
+                "[save_news_item] API response: %s - %s",
+                response.status_code,
+                response.text[:200] if response.text else "empty",
             )
 
             if response.status_code in (200, 201):
@@ -483,10 +459,7 @@ def register_callbacks(app):
                     None,
                 )
             else:
-                error_data = response.json() if response.content else {}
-                error_msg = error_data.get(
-                    "message", _("Error: {status}").format(status=response.status_code)
-                )
+                error_msg = extract_api_error(response, _("Error: {status}").format(status=response.status_code))
                 return (
                     error_msg,
                     "danger",
@@ -544,7 +517,7 @@ def register_callbacks(app):
             return _("No news item selected."), "warning", True, no_update
 
         try:
-            response = make_api_request("DELETE", f"/admin/news/{selected_id}", token)
+            response = make_authenticated_request(f"/admin/news/{selected_id}", token, method="DELETE")
 
             if response.status_code in (200, 204):
                 return _("News item deleted successfully!"), "success", True, time.time()
@@ -553,10 +526,7 @@ def register_callbacks(app):
             elif response.status_code == 403:
                 return _("Access denied. Admin privileges required."), "danger", True, no_update
             else:
-                error_data = response.json() if response.content else {}
-                error_msg = error_data.get(
-                    "message", _("Error: {status}").format(status=response.status_code)
-                )
+                error_msg = extract_api_error(response, _("Error: {status}").format(status=response.status_code))
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -598,8 +568,8 @@ def register_callbacks(app):
             return empty_result
 
         try:
-            response = make_api_request(
-                "GET", f"/admin/news/{selected_id}?include_translations=true", token
+            response = make_authenticated_request(
+                f"/admin/news/{selected_id}?include_translations=true", token
             )
             if response.status_code == 200:
                 item = response.json()
@@ -620,7 +590,7 @@ def register_callbacks(app):
                 return titles + messages + link_texts + is_machine
 
         except Exception as e:
-            logger.error(f"Error loading translations: {e}")
+            logger.error("Error loading translations: %s", e)
 
         return empty_result
 
@@ -712,7 +682,7 @@ def register_callbacks(app):
             )
 
         except Exception as e:
-            logger.error(f"Error in machine translation: {e}")
+            logger.error("Error in machine translation: %s", e)
             empty_result = [no_update] * (len(TRANSLATION_LANGUAGES) * 4)
             return empty_result + [
                 _("Translation error: {error}").format(error=str(e)),
@@ -770,20 +740,20 @@ def register_callbacks(app):
                     }
 
             if translations:
-                response = make_api_request(
-                    "PUT",
+                response = make_authenticated_request(
                     f"/admin/news/{selected_id}/translations",
                     token,
-                    json_data={"translations": translations},
+                    method="PUT",
+                    json={"translations": translations},
                 )
 
                 if response.status_code not in (200, 201):
                     logger.error(
-                        f"Error saving translations: {response.status_code} - {response.text}"
+                        "Error saving translations: %s - %s", response.status_code, response.text
                     )
 
         except Exception as e:
-            logger.error(f"Error saving translations: {e}")
+            logger.error("Error saving translations: %s", e)
 
         return no_update
 
@@ -827,21 +797,23 @@ def register_callbacks(app):
                     }
 
             if translations:
-                response = make_api_request(
-                    "PUT",
+                response = make_authenticated_request(
                     f"/admin/news/{created_id}/translations",
                     token,
-                    json_data={"translations": translations},
+                    method="PUT",
+                    json={"translations": translations},
                 )
 
                 if response.status_code not in (200, 201):
                     logger.error(
-                        f"Error saving translations for new item: {response.status_code} - {response.text}"
+                        "Error saving translations for new item: %s - %s",
+                        response.status_code,
+                        response.text,
                     )
                 else:
-                    logger.info(f"Successfully saved translations for new item {created_id}")
+                    logger.info("Successfully saved translations for new item %s", created_id)
 
         except Exception as e:
-            logger.error(f"Error saving translations for new item: {e}")
+            logger.error("Error saving translations for new item: %s", e)
 
         return no_update

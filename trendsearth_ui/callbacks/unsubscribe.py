@@ -7,10 +7,9 @@ signed JWT in the URL authenticates the request to the API.
 
 import logging
 
-import requests
-
 from ..config import get_api_base
 from ..i18n import gettext as _
+from ..utils.http_client import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,7 @@ def register_callbacks(app):
 
         url = f"{_api_base(api_environment)}/unsubscribe?token={token}"
         try:
-            resp = requests.get(url, timeout=_DEFAULT_TIMEOUT)
+            resp = get_session().get(url, timeout=_DEFAULT_TIMEOUT)
         except Exception as exc:
             logger.exception("Error fetching unsubscribe prefs: %s", exc)
             return (
@@ -126,7 +125,7 @@ def register_callbacks(app):
             "system_updates": bool(system_updates),
         }
         try:
-            resp = requests.patch(url, json=payload, timeout=_DEFAULT_TIMEOUT)
+            resp = get_session().patch(url, json=payload, timeout=_DEFAULT_TIMEOUT)
         except Exception as exc:
             logger.exception("Error saving unsubscribe prefs: %s", exc)
             return _("Network error. Please try again."), "danger", True

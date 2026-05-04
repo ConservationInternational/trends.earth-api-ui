@@ -1983,7 +1983,7 @@ def register_callbacks(app):
     # -----------------------------------------------------------------------
     @app.callback(
         [
-            Output("bulk-email-switch-html-modal", "is_open"),
+            Output("bulk-email-switch-html-modal", "is_open", allow_duplicate=True),
             Output("bulk-email-editor-tabs", "value", allow_duplicate=True),
             Output("bulk-email-in-html-mode", "data", allow_duplicate=True),
             Output("bulk-email-loaded-draft-id", "data", allow_duplicate=True),
@@ -1994,8 +1994,8 @@ def register_callbacks(app):
             Output("bulk-email-composer-alert", "children", allow_duplicate=True),
             Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
-            Output("bulk-email-switch-modal-alert", "children"),
-            Output("bulk-email-switch-modal-alert", "is_open"),
+            Output("bulk-email-switch-modal-alert", "children", allow_duplicate=True),
+            Output("bulk-email-switch-modal-alert", "is_open", allow_duplicate=True),
         ],
         Input("bulk-email-confirm-html-mode-btn", "n_clicks"),
         [
@@ -2078,6 +2078,9 @@ def register_callbacks(app):
                 msg,  # modal-alert children
                 True,  # modal-alert is_open
             )
+
+        if not _n:
+            return (no_update,) * 13
 
         if not token:
             return _modal_error("Not authenticated.")

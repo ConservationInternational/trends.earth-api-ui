@@ -6,6 +6,7 @@ from dash import Input, Output, State, no_update
 
 from ..components import login_layout
 from ..i18n import gettext as _
+from ..utils.helpers import extract_api_error, make_authenticated_request
 
 logger = logging.getLogger(__name__)
 
@@ -187,8 +188,6 @@ def register_callbacks(app):
             if not user_id:
                 return _("User ID not found in user data."), "danger", True, no_update
 
-            from ..utils.helpers import make_authenticated_request
-
             logger.debug("Submitting profile update with payload: %s", update_data)
 
             resp = make_authenticated_request(
@@ -206,13 +205,8 @@ def register_callbacks(app):
                 return _("Profile updated successfully!"), "success", True, updated_user_data
             else:
                 logger.warning("Profile update failed with status: %s", resp.status_code)
-                error_msg = _("Failed to update profile.")
-                try:
-                    error_data = resp.json()
-                    logger.warning("Profile update error response: %s", error_data)
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Failed to update profile."))
+                logger.warning("Profile update error: %s", error_msg)
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -324,8 +318,6 @@ def register_callbacks(app):
                 "Attempting password change for user: %s", user_data.get("email", "unknown")
             )
 
-            from ..utils.helpers import make_authenticated_request
-
             resp = make_authenticated_request(
                 "/user/me/change-password",
                 token,
@@ -340,14 +332,7 @@ def register_callbacks(app):
                 return _("Password changed successfully!"), "success", True, "", "", ""
             else:
                 logger.warning("Password change failed with status: %s", resp.status_code)
-                error_msg = _("Failed to change password.")
-                try:
-                    error_data = resp.json()
-                    # Check for both "detail" and "msg" keys as API may return either
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                    logger.debug("API error response: %s", error_data)
-                except Exception:
-                    logger.debug("Could not parse password change response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Failed to change password."))
                 # Add status code to error message for debugging
                 error_msg += f" (Status: {resp.status_code})"
                 return error_msg, "danger", True, no_update, no_update, no_update
@@ -390,8 +375,6 @@ def register_callbacks(app):
         if token is None:
             return no_update, no_update, no_update, no_update
         try:
-            from ..utils.helpers import make_authenticated_request
-
             resp = make_authenticated_request(
                 "/user/me",
                 token,
@@ -414,11 +397,7 @@ def register_callbacks(app):
                     updated_data,
                 )
             else:
-                error_msg = _("Failed to save email preferences.")
-                import contextlib
-
-                with contextlib.suppress(Exception):
-                    error_msg = resp.json().get("detail", error_msg)
+                error_msg = extract_api_error(resp, _("Failed to save email preferences."))
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
@@ -521,8 +500,6 @@ def register_callbacks(app):
             )
 
         try:
-            from ..utils.helpers import make_authenticated_request
-
             logger.info("User %s requested account deletion", user_email)
 
             resp = make_authenticated_request(
@@ -566,12 +543,7 @@ def register_callbacks(app):
                     resp.status_code,
                     user_email,
                 )
-                error_msg = _("Failed to delete account.")
-                try:
-                    error_data = resp.json()
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                except Exception:
-                    logger.debug("Could not parse API error response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Failed to delete account."))
                 # Avoid duplicate "try again" if message already contains it
                 if "try again" not in error_msg.lower():
                     error_msg = (

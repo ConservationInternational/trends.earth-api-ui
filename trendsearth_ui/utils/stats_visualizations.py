@@ -12,6 +12,7 @@ from trendsearth_ui.i18n import gettext as _
 
 from .boundaries_utils import COUNTRY_NAME_OVERRIDES, CountryIsoResolver
 
+logger = logging.getLogger(__name__)
 
 def _build_message_block(
     message: str,
@@ -178,9 +179,7 @@ def create_user_geographic_map(
 ):
     """Render a choropleth map of user registrations by country."""
 
-    import logging
 
-    logger = logging.getLogger(__name__)
 
     empty_response = _build_message_block(
         "No geographic data available.", detail="No data provided."
@@ -401,13 +400,11 @@ def create_execution_statistics_chart(
     Returns:
         list: List of chart components
     """
-    import logging
 
     from .timezone_utils import convert_timestamp_series_to_local, get_chart_axis_label
 
     suffix_label = f" ({title_suffix})" if title_suffix else ""
 
-    logger = logging.getLogger(__name__)
     normalized_period = (ui_period or "").lower()
     use_extended_cumulative = normalized_period in {"year", "all"}
     if normalized_period == "year":
@@ -1300,7 +1297,6 @@ def create_script_version_histogram(
     Returns:
         list: Dash component(s) containing the histogram chart.
     """
-    _logger = logging.getLogger(__name__)
 
     suffix_label = f" ({title_suffix})" if title_suffix else ""
 
@@ -1430,7 +1426,7 @@ def create_script_version_histogram(
         ]
 
     except Exception as e:
-        _logger.error(f"Error creating script version histogram: {e}")
+        logger.error("Error creating script version histogram: %s", e)
         return [
             html.Div(
                 [
@@ -1475,7 +1471,6 @@ def create_user_statistics_chart(
         "month": "1D",
     }.get(ui_period or "")
 
-    logger = logging.getLogger(__name__)
 
     try:
         # Handle error response structure
@@ -1824,9 +1819,7 @@ def create_system_overview(dashboard_stats_data, status_data=None):
     Returns:
         html.Div: System overview content
     """
-    import logging
 
-    logger = logging.getLogger(__name__)
 
     try:
         # Debug logging - show what we actually received
@@ -2188,9 +2181,7 @@ def create_dashboard_summary_cards(dashboard_stats_data, scripts_count=None):
     Returns:
         html.Div: Dashboard summary cards layout
     """
-    import logging
 
-    logger = logging.getLogger(__name__)
 
     try:
         # Debug logging - show what we actually received
@@ -2381,12 +2372,10 @@ def create_deployment_information(api_environment="production"):
     Returns:
         html.Div: Deployment information cards
     """
-    import logging
 
     from trendsearth_ui.config import get_api_base
     from trendsearth_ui.utils.http_client import apply_default_headers, get_session
 
-    logger = logging.getLogger(__name__)
 
     try:
         # Get API deployment information
@@ -2500,9 +2489,7 @@ def create_cluster_status_table(swarm_data):
     Returns:
         html.Div: Table showing cluster node details
     """
-    import logging
 
-    logger = logging.getLogger(__name__)
 
     try:
         if not swarm_data or not isinstance(swarm_data, dict):

@@ -8,7 +8,7 @@ from dash import Input, Output, State, no_update
 from ..config import get_api_base
 from ..i18n import gettext as _
 from ..utils import get_user_info
-from ..utils.helpers import make_authenticated_request
+from ..utils.helpers import extract_api_error, make_authenticated_request
 from ._table_helpers import RowResolutionError, resolve_row_data
 
 logger = logging.getLogger(__name__)
@@ -573,14 +573,7 @@ def register_callbacks(app):
                 return _("Password changed successfully!"), "success", True, "", ""
             else:
                 logger.warning("Password change failed with status: %s", resp.status_code)
-                error_msg = _("Failed to change password.")
-                try:
-                    error_data = resp.json()
-                    # Check for both "msg" and "detail" keys as API may return either
-                    error_msg = error_data.get("detail", error_data.get("msg", error_msg))
-                    logger.debug("API error response: %s", error_data)
-                except Exception:
-                    logger.debug("Could not parse password change response", exc_info=True)
+                error_msg = extract_api_error(resp, _("Failed to change password."))
                 # Add status code to error message for debugging
                 error_msg += _(" (Status: {status})").format(status=resp.status_code)
                 return error_msg, "danger", True, no_update, no_update

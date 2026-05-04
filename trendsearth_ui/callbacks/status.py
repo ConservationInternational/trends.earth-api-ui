@@ -9,6 +9,7 @@ import dash_bootstrap_components as dbc
 
 from ..config import STATUS_REFRESH_INTERVAL
 from ..i18n import gettext as _
+from ..utils.helpers import is_admin
 from ..utils.stats_visualizations import (
     build_period_summary_cards,
     create_execution_statistics_chart,
@@ -197,7 +198,7 @@ def register_callbacks(app):
             These elements are only refreshed by auto-refresh or manual refresh button, not by time period changes.
         """
         # Guard: Skip if not logged in
-        if not token or role not in ["ADMIN", "SUPERADMIN"]:
+        if not token or not is_admin(role):
             return (no_update, no_update, no_update, no_update, no_update)
 
         # Only update when status tab is active

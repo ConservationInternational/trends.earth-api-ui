@@ -13,7 +13,7 @@ import requests
 from ..config import DEFAULT_PAGE_SIZE
 from ..i18n import gettext as _
 from ..utils.aggrid import build_aggrid_request_params
-from ..utils.helpers import make_authenticated_request, parse_date
+from ..utils.helpers import is_admin, make_authenticated_request, parse_date
 
 logger = logging.getLogger(__name__)
 
@@ -435,7 +435,7 @@ def _query_rate_limit_breaches(
     users, and scripts tables to avoid code duplication.
     """
 
-    if not token or role not in ("ADMIN", "SUPERADMIN"):
+    if not token or not is_admin(role):
         return {"rowData": [], "rowCount": 0}, stored_state or {}, 0
 
     request_data = dict(request_data or {})
@@ -919,7 +919,7 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Check admin permissions for script management
-        if user_role not in ["ADMIN", "SUPERADMIN"]:
+        if not is_admin(user_role):
             return (
                 _("Access denied. Administrator privileges required."),
                 "danger",
