@@ -2325,6 +2325,103 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
 
+    # -----------------------------------------------------------------------
+    # History grid row selection — enable/disable "Restore to Draft" button
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-restore-draft-btn", "disabled"),
+            Output("bulk-email-history-selected-id", "data"),
+        ],
+        Input("bulk-email-history-grid", "selectedRows"),
+        prevent_initial_call=True,
+    )
+    def history_row_selected(selected_rows):
+        if not selected_rows:
+            return True, None
+        row = selected_rows[0]
+        status = row.get("status", "")
+        restoreable = status in ("SENT", "FAILED")
+        return not restoreable, row.get("id")
+
+    # -----------------------------------------------------------------------
+    # Open restore-to-draft confirmation modal
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-restore-draft-modal", "is_open"),
+        Input("bulk-email-restore-draft-btn", "n_clicks"),
+        State("bulk-email-history-selected-id", "data"),
+        prevent_initial_call=True,
+    )
+    def open_restore_draft_modal(_n, selected_id):
+        if not _n or not selected_id:
+            return no_update
+        return True
+
+    # -----------------------------------------------------------------------
+    # Cancel restore-to-draft modal
+    # -----------------------------------------------------------------------
+    app.clientside_callback(
+        "function(n) { return false; }",
+        Output("bulk-email-restore-draft-modal", "is_open", allow_duplicate=True),
+        Input("bulk-email-restore-draft-cancel-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+
+    # -----------------------------------------------------------------------
+    # Confirm restore-to-draft
+    # -----------------------------------------------------------------------
+    @app.callback(
+        [
+            Output("bulk-email-restore-draft-modal", "is_open", allow_duplicate=True),
+            Output("bulk-email-restore-draft-alert", "children"),
+            Output("bulk-email-restore-draft-alert", "is_open"),
+            Output("bulk-email-restore-draft-alert", "color"),
+            Output("bulk-email-history-grid", "rowData", allow_duplicate=True),
+            Output("bulk-email-send-select", "options", allow_duplicate=True),
+            Output("bulk-email-load-draft-select", "options", allow_duplicate=True),
+            Output("bulk-email-restore-draft-btn", "disabled", allow_duplicate=True),
+            Output("bulk-email-history-selected-id", "data", allow_duplicate=True),
+        ],
+        Input("bulk-email-restore-draft-confirm-btn", "n_clicks"),
+        [
+            State("token-store", "data"),
+            State("bulk-email-history-selected-id", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def confirm_restore_to_draft(_n, token, bulk_email_id):
+        _nu5 = no_update, no_update, no_update, no_update, no_update
+        if not token:
+            return False, "Not authenticated.", True, "danger", *_nu5
+        if not bulk_email_id:
+            return False, "No email selected.", True, "warning", *_nu5
+        try:
+            resp = _api(token, "POST", f"/bulk-email/{bulk_email_id}/restore-draft")
+            if resp.status_code == 200:
+                bulk_emails = _ok_rows(_api(token, "GET", "/bulk-email"))
+                draft_options = [
+                    {"label": c["name"], "value": c["id"]}
+                    for c in bulk_emails
+                    if c.get("status") == "DRAFT"
+                ]
+                return (
+                    False,
+                    "A new draft copy has been created. The sent email history is unchanged.",
+                    True,
+                    "success",
+                    bulk_emails,
+                    draft_options,
+                    draft_options,
+                    True,  # disable the button (selection cleared)
+                    None,  # clear selected id
+                )
+            msg = _extract_error(resp)
+            return False, f"Error: {msg}", True, "danger", *_nu5
+        except Exception:
+            logger.exception("Failed to restore bulk email to draft")
+            return False, "An unexpected error occurred.", True, "danger", *_nu5
+
 
 # ---------------------------------------------------------------------------
 # Private helpers (module-level to keep callbacks concise)

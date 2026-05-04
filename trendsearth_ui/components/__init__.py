@@ -12,6 +12,7 @@ from .layout import (
     update_profile_standalone_layout,
 )
 from .modals import (
+    bulk_email_restore_draft_modal,
     bulk_email_verify_modal,
     delete_script_modal,
     delete_user_modal,
@@ -52,6 +53,7 @@ __all__ = [
     "reset_rate_limits_modal",
     "reset_individual_rate_limit_modal",
     "bulk_email_verify_modal",
+    "bulk_email_restore_draft_modal",
     "admin_tab_content",
     "executions_tab_content",
     "users_tab_content",
