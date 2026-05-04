@@ -1966,6 +1966,8 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def open_html_mode_modal(_n):
+        if not _n:
+            return no_update
         return True
 
     # -----------------------------------------------------------------------
@@ -1974,6 +1976,7 @@ def register_callbacks(app):
     @app.callback(
         Output("bulk-email-html-mode-banner", "is_open"),
         Input("bulk-email-in-html-mode", "data"),
+        prevent_initial_call=True,
     )
     def update_html_mode_banner(in_html_mode):
         return not bool(in_html_mode)
@@ -1996,6 +1999,8 @@ def register_callbacks(app):
             Output("bulk-email-composer-alert", "color", allow_duplicate=True),
             Output("bulk-email-switch-modal-alert", "children", allow_duplicate=True),
             Output("bulk-email-switch-modal-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-html-source", "value", allow_duplicate=True),
+            Output("bulk-email-preview-html", "data", allow_duplicate=True),
         ],
         Input("bulk-email-confirm-html-mode-btn", "n_clicks"),
         [
@@ -2077,10 +2082,12 @@ def register_callbacks(app):
                 no_update,  # composer-alert color
                 msg,  # modal-alert children
                 True,  # modal-alert is_open
+                no_update,  # html-source
+                no_update,  # preview-html
             )
 
         if not _n:
-            return (no_update,) * 13
+            return (no_update,) * 15
 
         if not token:
             return _modal_error("Not authenticated.")
@@ -2208,6 +2215,8 @@ def register_callbacks(app):
                 "success",
                 "",  # clear modal-alert
                 False,
+                html_content,  # populate Monaco editor
+                html_content,  # populate preview
             )
         except Exception:
             logger.exception("Failed to save drafts during HTML mode switch")
