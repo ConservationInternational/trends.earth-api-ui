@@ -1,7 +1,6 @@
 """Google Earth Engine credentials management callbacks."""
 
 import base64
-import contextlib
 import json
 import logging
 
@@ -40,7 +39,6 @@ def register_callbacks(app):
             return html.Div(_("Please log in to view credentials status."), className="text-muted")
 
         try:
-
             # Get current credentials status
             resp = make_authenticated_request("/user/me/gee-credentials", token)
 
@@ -148,7 +146,6 @@ def register_callbacks(app):
             return no_update, no_update, no_update, no_update
 
         try:
-
             # Initiate OAuth flow
             resp = make_authenticated_request(
                 "/user/me/gee-oauth/initiate",
@@ -227,7 +224,6 @@ def register_callbacks(app):
                     True,
                 )
 
-
             # Upload to API
             resp = make_authenticated_request(
                 "/user/me/gee-service-account",
@@ -281,7 +277,6 @@ def register_callbacks(app):
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         try:
-
             if button_id == "profile-gee-test-btn" and test_clicks:
                 # Test credentials
                 resp = make_authenticated_request(
@@ -411,7 +406,9 @@ def register_callbacks(app):
                     show_project_selection,
                 )
 
-            error_msg = extract_api_error(resp, _("Failed to complete Google Earth Engine authorization."))
+            error_msg = extract_api_error(
+                resp, _("Failed to complete Google Earth Engine authorization.")
+            )
             return error_msg, "danger", True, idle_spinner, {"display": "none"}
 
         except Exception as e:
@@ -462,7 +459,6 @@ def register_callbacks(app):
             )
 
         try:
-
             payload: dict = {"cloud_project": project_id}
 
             resp = make_authenticated_request(
@@ -474,8 +470,10 @@ def register_callbacks(app):
             )
             if resp.status_code == 200:
                 resp_json = {}
-                with contextlib.suppress(Exception):
+                try:
                     resp_json = resp.json()
+                except ValueError:
+                    logger.debug("save_gee_project_manual: could not parse JSON response")
                 if resp_json.get("gcs_write_access") is False:
                     detail = resp_json.get(
                         "detail",
@@ -529,7 +527,6 @@ def register_callbacks(app):
             return hidden, no_project
 
         try:
-
             resp = make_authenticated_request("/user/me/gee-credentials", token)
             if resp.status_code != 200:
                 return hidden, no_project
@@ -598,7 +595,6 @@ def register_callbacks(app):
             )
 
         try:
-
             payload: dict = {"cloud_project": project_id}
 
             resp = make_authenticated_request(
@@ -614,8 +610,10 @@ def register_callbacks(app):
                     className="small",
                 )
                 resp_json = {}
-                with contextlib.suppress(Exception):
+                try:
                     resp_json = resp.json()
+                except ValueError:
+                    logger.debug("save_gee_project_from_profile: could not parse JSON response")
                 if resp_json.get("gcs_write_access") is False:
                     detail = resp_json.get(
                         "detail",

@@ -3,7 +3,7 @@
 from datetime import datetime
 import json
 import logging
-from typing import Optional
+from typing import Any, Optional, Union
 
 import requests
 
@@ -22,11 +22,16 @@ ADMIN_ROLES = ("ADMIN", "SUPERADMIN")
 
 
 def is_admin(role: Optional[str]) -> bool:
-    """Return True if the given role has admin privileges."""
+    """Return True if the given role has admin privileges (ADMIN or SUPERADMIN)."""
     return role in ADMIN_ROLES
 
 
-def extract_api_error(response, default: str = "An error occurred.") -> str:
+def is_superadmin(role: Optional[str]) -> bool:
+    """Return True if the given role is SUPERADMIN."""
+    return role == "SUPERADMIN"
+
+
+def extract_api_error(response: "requests.Response", default: str = "An error occurred.") -> str:
     """Extract a human-readable error message from an API response.
 
     Tries the 'detail', 'msg', and 'message' keys in order, falling back to
@@ -39,7 +44,7 @@ def extract_api_error(response, default: str = "An error occurred.") -> str:
         return default
 
 
-def format_duration(duration_seconds) -> str:
+def format_duration(duration_seconds: Optional[Union[int, float, str]]) -> str:
     """Format a duration in seconds to H:MM:SS clock format.
 
     Returns '-' for missing or zero values.
@@ -56,7 +61,7 @@ def format_duration(duration_seconds) -> str:
         return "-"
 
 
-def parse_date(date_str, user_timezone="UTC"):
+def parse_date(date_str: Optional[str], user_timezone: str = "UTC") -> Optional[str]:
     """Parse date string and return formatted string for ag-grid with timezone conversion.
 
     Args:
@@ -84,7 +89,9 @@ def parse_date(date_str, user_timezone="UTC"):
         return date_str  # Return original if parsing fails
 
 
-def safe_table_data(data, column_ids=None):
+def safe_table_data(
+    data: Optional[list[dict]], column_ids: Optional[list[str]] = None
+) -> list[dict]:
     """Safely process table data for display."""
     if not data:
         return []
@@ -104,7 +111,7 @@ def safe_table_data(data, column_ids=None):
     return newdata
 
 
-def get_user_info(token, api_base=None):
+def get_user_info(token: str, api_base: Optional[str] = None) -> Optional[dict[str, Any]]:
     """Get user information from API with improved error handling."""
     if not token:
         logger.debug("get_user_info: No token provided")

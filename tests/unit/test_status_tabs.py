@@ -414,75 +414,52 @@ class TestStatusTabsErrorHandling:
         summary_func = callback_functions.get("update_time_independent_status_data")
         assert summary_func is not None, "Summary function should exist"
 
-        # Mock a successful response with test data
-        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
-            mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "data": [
-                    {
-                        "timestamp": "2023-01-01T12:00:00Z",
-                        "executions_active": 5,
-                        "executions_ready": 3,
-                        "executions_running": 2,
-                        "executions_finished": 10,
-                        "users_count": 15,
-                        "scripts_count": 8,
-                        "memory_available_percent": 75.0,
-                        "cpu_usage_percent": 25.0,
-                    }
-                ]
-            }
-            mock_get.return_value = mock_response
-
-            # Mock the availability check and helper functions
-            with (
-                patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
-                    return_value={
-                        "status_data": {
-                            "summary": "SUCCESS",
-                            "latest_status": {
-                                "executions_ready": 5,
-                                "executions_running": 3,
-                                "executions_finished": 100,
-                                "executions_failed": 2,
-                                "executions_cancelled": 1,
-                                "executions_pending": 0,
-                                "executions_count": 111,
-                                "users_count": 25,
-                                "timestamp": "2023-01-01T12:00:00Z",
-                            },
-                        },
-                        "meta": {
-                            "total_api_calls": 1,
-                            "cache_hit": False,
-                            "optimizations_applied": [],
-                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+        # Mock the availability check and helper functions
+        with (
+            patch(
+                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
+                return_value={
+                    "status_data": {
+                        "summary": "SUCCESS",
+                        "latest_status": {
+                            "executions_ready": 5,
+                            "executions_running": 3,
+                            "executions_finished": 100,
+                            "executions_failed": 2,
+                            "executions_cancelled": 1,
+                            "executions_pending": 0,
+                            "executions_count": 111,
+                            "users_count": 25,
+                            "timestamp": "2023-01-01T12:00:00Z",
                         },
                     },
-                ),
-                patch(
-                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
-                ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
-            ):
-                # Mock the helper function returns
-                mock_deployment.return_value = "mock deployment info"
-                mock_cluster.return_value = ("mock cluster info", " (Live)")
+                    "meta": {
+                        "total_api_calls": 1,
+                        "cache_hit": False,
+                        "optimizations_applied": [],
+                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+                    },
+                },
+            ),
+            patch("trendsearth_ui.utils.status_helpers.fetch_deployment_info") as mock_deployment,
+            patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
+        ):
+            # Mock the helper function returns
+            mock_deployment.return_value = "mock deployment info"
+            mock_cluster.return_value = ("mock cluster info", " (Live)")
 
-                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
-                # We want to check the first output (summary)
-                summary_result = (
-                    result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
-                )
-                result_str = str(summary_result)
+            # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+            result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+            # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
+            # We want to check the first output (summary)
+            summary_result = (
+                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+            )
+            result_str = str(summary_result)
 
-                # Should contain execution status section content (labels have been simplified)
-                assert "H6(children='Active'" in result_str
-                assert "H6(children='Completed'" in result_str
+            # Should contain execution status section content (labels have been simplified)
+            assert "H6(children='Active'" in result_str
+            assert "H6(children='Completed'" in result_str
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_summary_totals_section(self, mock_ctx):
@@ -522,77 +499,56 @@ class TestStatusTabsErrorHandling:
         assert summary_func is not None, (
             "Summary function should exist"
         )  # Mock a successful response with test data
-        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
-            mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "data": [
-                    {
-                        "timestamp": "2023-01-01T12:00:00Z",
-                        "executions_active": 5,
-                        "executions_ready": 3,
-                        "executions_running": 2,
-                        "executions_finished": 10,
-                        "users_count": 15,
-                        "scripts_count": 8,
-                        "memory_available_percent": 75.0,
-                        "cpu_usage_percent": 25.0,
-                    }
-                ]
-            }
-            mock_get.return_value = mock_response
 
-            # Mock the availability check and helper functions
-            with (
-                patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
-                    return_value={
-                        "status_data": {
-                            "summary": "SUCCESS",
-                            "latest_status": {
-                                "executions_ready": 5,
-                                "executions_running": 3,
-                                "executions_finished": 100,
-                                "executions_failed": 2,
-                                "executions_cancelled": 1,
-                                "executions_pending": 0,
-                                "executions_count": 111,
-                                "users_count": 25,
-                                "timestamp": "2023-01-01T12:00:00Z",
-                            },
-                        },
-                        "meta": {
-                            "total_api_calls": 1,
-                            "cache_hit": False,
-                            "optimizations_applied": [],
-                            "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+        # Mock the availability check and helper functions
+        with (
+            patch(
+                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
+                return_value={
+                    "status_data": {
+                        "summary": "SUCCESS",
+                        "latest_status": {
+                            "executions_ready": 5,
+                            "executions_running": 3,
+                            "executions_finished": 100,
+                            "executions_failed": 2,
+                            "executions_cancelled": 1,
+                            "executions_pending": 0,
+                            "executions_count": 111,
+                            "users_count": 25,
+                            "timestamp": "2023-01-01T12:00:00Z",
                         },
                     },
-                ),
-                patch(
-                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
-                ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
-            ):
-                # Mock the helper function returns
-                mock_deployment.return_value = "mock deployment info"
-                mock_cluster.return_value = ("mock cluster info", " (Live)")
+                    "meta": {
+                        "total_api_calls": 1,
+                        "cache_hit": False,
+                        "optimizations_applied": [],
+                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+                    },
+                },
+            ),
+            patch("trendsearth_ui.utils.status_helpers.fetch_deployment_info") as mock_deployment,
+            patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
+        ):
+            # Mock the helper function returns
+            mock_deployment.return_value = "mock deployment info"
+            mock_cluster.return_value = ("mock cluster info", " (Live)")
 
-                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                assert isinstance(result, (tuple, list))
-                status_title = result[0]
-                summary_result = result[1]
-                result_str = str(summary_result)
+            # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+            result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+            assert isinstance(result, (tuple, list))
+            status_title = result[0]
+            summary_result = result[1]
+            result_str = str(summary_result)
 
-                # Should contain total sections (labels have been simplified to just "Total")
-                assert "Div(children='Total'" in result_str
-                assert "Total Executions" in result_str
+            # Should contain total sections (labels have been simplified to just "Total")
+            assert "Div(children='Total'" in result_str
+            assert "Total Executions" in result_str
 
-                # Current status title should include the timestamp information
-                assert status_title.startswith("Current System Status")
-                assert status_title != "Current System Status"
-                assert "2023-01-01 12:30:00 UTC" in status_title
+            # Current status title should include the timestamp information
+            assert status_title.startswith("Current System Status")
+            assert status_title != "Current System Status"
+            assert "2023-01-01 12:30:00 UTC" in status_title
 
     @patch("trendsearth_ui.callbacks.status.callback_context")
     def test_status_tab_section_headers(self, mock_ctx):
@@ -631,80 +587,57 @@ class TestStatusTabsErrorHandling:
         summary_func = callback_functions.get("update_time_independent_status_data")
         assert summary_func is not None, "Summary function should exist"
 
-        # Mock a successful response with test data
-        with patch("trendsearth_ui.utils.status_data_manager.requests.get") as mock_get:
-            mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "data": [
-                    {
-                        "timestamp": "2023-01-01T12:00:00Z",
-                        "executions_active": 5,
-                        "executions_ready": 3,
-                        "executions_running": 2,
-                        "executions_finished": 10,
-                        "users_count": 15,
-                        "scripts_count": 8,
-                        "memory_available_percent": 75.0,
-                        "cpu_usage_percent": 25.0,
-                    }
-                ]
-            }
-            mock_get.return_value = mock_response
-
-            # Mock the availability check and helper functions
-            with (
-                patch(
-                    "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
-                    return_value={
-                        "status_data": {
-                            "summary": "SUCCESS",
-                            "latest_status": {
-                                "executions_ready": 5,
-                                "executions_running": 3,
-                                "executions_finished": 100,
-                                "executions_failed": 2,
-                                "executions_cancelled": 1,
-                                "executions_pending": 0,
-                                "executions_count": 111,
-                                "users_count": 25,
-                                "timestamp": "2023-01-01T12:00:00Z",
-                            },
-                        },
-                        "meta": {
-                            "total_api_calls": 1,
-                            "cache_hit": False,
-                            "optimizations_applied": [],
+        # Mock the availability check and helper functions
+        with (
+            patch(
+                "trendsearth_ui.callbacks.status.StatusDataManager.fetch_comprehensive_status_page_data",
+                return_value={
+                    "status_data": {
+                        "summary": "SUCCESS",
+                        "latest_status": {
+                            "executions_ready": 5,
+                            "executions_running": 3,
+                            "executions_finished": 100,
+                            "executions_failed": 2,
+                            "executions_cancelled": 1,
+                            "executions_pending": 0,
+                            "executions_count": 111,
+                            "users_count": 25,
+                            "timestamp": "2023-01-01T12:00:00Z",
                         },
                     },
-                ),
-                patch(
-                    "trendsearth_ui.utils.status_helpers.fetch_deployment_info"
-                ) as mock_deployment,
-                patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
-            ):
-                # Mock the helper function returns
-                mock_deployment.return_value = "mock deployment info"
-                mock_cluster.return_value = ("mock cluster info", " (Live)")
+                    "meta": {
+                        "total_api_calls": 1,
+                        "cache_hit": False,
+                        "optimizations_applied": [],
+                    },
+                },
+            ),
+            patch("trendsearth_ui.utils.status_helpers.fetch_deployment_info") as mock_deployment,
+            patch("trendsearth_ui.utils.status_helpers.fetch_cluster_info") as mock_cluster,
+        ):
+            # Mock the helper function returns
+            mock_deployment.return_value = "mock deployment info"
+            mock_cluster.return_value = ("mock cluster info", " (Live)")
 
-                # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
-                result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-                # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
-                # We want to check the first output (summary)
-                summary_result = (
-                    result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
-                )
-                result_str = str(summary_result)
+            # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
+            result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
+            # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
+            # We want to check the first output (summary)
+            summary_result = (
+                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+            )
+            result_str = str(summary_result)
 
-                # Should contain section headers (labels have been simplified)
-                assert "H6(children='Active'" in result_str
-                assert "H6(children='Completed'" in result_str
-                assert "Div(children='Total'" in result_str
-                assert "Total Executions" in result_str
+            # Should contain section headers (labels have been simplified)
+            assert "H6(children='Active'" in result_str
+            assert "H6(children='Completed'" in result_str
+            assert "Div(children='Total'" in result_str
+            assert "Total Executions" in result_str
 
-                # Should contain proper styling classes for headers
-                assert "text-muted mb-2" in result_str  # Active/Completed headers use this
-                assert "mb-3 border-bottom pb-2" in result_str  # Main section headers use this
+            # Should contain proper styling classes for headers
+            assert "text-muted mb-2" in result_str  # Active/Completed headers use this
+            assert "mb-3 border-bottom pb-2" in result_str  # Main section headers use this
 
 
 if __name__ == "__main__":

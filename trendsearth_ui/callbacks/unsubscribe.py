@@ -9,6 +9,7 @@ import logging
 
 from ..config import get_api_base
 from ..i18n import gettext as _
+from ..utils.helpers import extract_api_error
 from ..utils.http_client import get_session
 
 logger = logging.getLogger(__name__)
@@ -76,11 +77,7 @@ def register_callbacks(app):
                 False,
             )
         else:
-            error_msg = _("Failed to load preferences.")
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                error_msg = resp.json().get("detail", error_msg)
+            error_msg = extract_api_error(resp, _("Failed to load preferences."))
             return (
                 True,
                 True,
@@ -137,9 +134,5 @@ def register_callbacks(app):
                 True,
             )
         else:
-            error_msg = _("Failed to save preferences.")
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                error_msg = resp.json().get("detail", error_msg)
+            error_msg = extract_api_error(resp, _("Failed to save preferences."))
             return error_msg, "danger", True

@@ -6,10 +6,11 @@ import math
 from typing import Any, Optional
 
 from cachetools import TTLCache
-import requests
+from requests.exceptions import RequestException
 
 from ..config import get_api_base
 from .boundaries_utils import clear_country_iso_cache, get_country_iso_resolver
+from .helpers import is_superadmin
 from .http_client import apply_default_headers, get_session
 from .stats_utils import (
     fetch_dashboard_stats,
@@ -159,7 +160,7 @@ class StatusDataManager:
                 result["error"] = f"Status API error: {resp.status_code}"
                 result["summary"] = "API_ERROR"
 
-        except requests.exceptions.RequestException as e:
+        except RequestException as e:
             logger.error(f"Error fetching consolidated status data: {e}")
             result["error"] = str(e)
             result["summary"] = "REQUEST_ERROR"
@@ -182,7 +183,7 @@ class StatusDataManager:
         Returns:
             dict: Contains dashboard stats, user stats, execution stats, and scripts count
         """
-        if role != "SUPERADMIN":
+        if not is_superadmin(role):
             return {"error": "Insufficient permissions", "requires_superadmin": True}
 
         # Map UI time period to API period
@@ -448,7 +449,7 @@ class StatusDataManager:
                     f"Successfully fetched {len(result['data'])} time series records for period {time_period}"
                 )
 
-        except requests.exceptions.RequestException as e:
+        except RequestException as e:
             logger.error(f"Error fetching time series status data: {e}")
             result["error"] = str(e)
 
@@ -667,7 +668,7 @@ class StatusDataManager:
                 result["meta"]["api_calls_made"].append("cluster_info")
 
             # 3. Fetch stats data (only for SUPERADMIN)
-            if role == "SUPERADMIN":
+            if is_superadmin(role):
                 stats_result = StatusDataManager.fetch_consolidated_stats_data(
                     token, api_environment, time_period, role, force_refresh=force_refresh
                 )

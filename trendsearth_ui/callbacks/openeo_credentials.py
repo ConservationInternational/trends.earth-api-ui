@@ -28,7 +28,6 @@ def register_callbacks(app):
             return html.Div(_("Please log in to view credentials status."), className="text-muted")
 
         try:
-
             resp = make_authenticated_request(_OPENEO_ENDPOINT, token)
 
             if resp.status_code == 200:
@@ -197,7 +196,6 @@ def register_callbacks(app):
             }
 
         try:
-
             resp = make_authenticated_request(
                 _OPENEO_ENDPOINT,
                 token,
@@ -269,7 +267,6 @@ def register_callbacks(app):
         button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         try:
-
             if button_id == "profile-openeo-check-btn" and check_clicks:
                 resp = make_authenticated_request(
                     _OPENEO_CHECK_ENDPOINT,

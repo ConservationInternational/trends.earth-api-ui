@@ -71,9 +71,6 @@ def _build_status_filter_override(
     return None
 
 
-
-
-
 def process_execution_data(executions, role, user_timezone):
     """Process execution data consistently across all callbacks.
 

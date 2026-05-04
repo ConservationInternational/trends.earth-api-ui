@@ -17,7 +17,9 @@ import re
 from threading import Lock
 
 from cachetools import TTLCache
-import requests
+from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import RequestException
+from requests.exceptions import Timeout as RequestsTimeout
 
 from ..config import get_api_base
 from .http_client import apply_default_headers, get_session
@@ -328,7 +330,7 @@ def _fetch_resolver(
 
     try:
         response = get_session().get(url, headers=headers, params=params, timeout=20)
-    except requests.exceptions.RequestException as exc:
+    except RequestException as exc:
         logger.error("Failed to fetch boundaries list: %s", exc)
         return None
 
@@ -499,10 +501,10 @@ def _fetch_country_options_from_api(api_environment: str, token: str | None) -> 
             )
             return None
 
-    except requests.exceptions.Timeout:
+    except RequestsTimeout:
         logger.warning("Boundaries API request timed out")
         return None
-    except requests.exceptions.ConnectionError:
+    except RequestsConnectionError:
         logger.warning("Cannot connect to boundaries API")
         return None
     except Exception as e:

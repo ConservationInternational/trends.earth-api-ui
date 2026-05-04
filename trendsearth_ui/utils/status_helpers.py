@@ -4,7 +4,9 @@ from datetime import datetime
 import logging
 
 from dash import html
-import requests
+from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import RequestException
+from requests.exceptions import Timeout as RequestsTimeout
 
 from trendsearth_ui.config import get_api_base
 from trendsearth_ui.i18n import gettext as _
@@ -46,10 +48,10 @@ def _fetch_health_status(url, headers=None, timeout=10):
         if resp.status_code == 200:
             return True, resp.json(), resp.status_code, None
         return False, None, resp.status_code, f"HTTP {resp.status_code}"
-    except requests.exceptions.Timeout:
+    except RequestsTimeout:
         logger.warning("Health check timed out for %s", url)
         return False, None, 0, "Timeout"
-    except requests.exceptions.ConnectionError:
+    except RequestsConnectionError:
         logger.warning("Connection failed for %s", url)
         return False, None, 0, "Connection Error"
     except Exception as e:
@@ -286,5 +288,5 @@ def is_status_endpoint_available(token, api_environment):
             timeout=3,
         )
         return resp.status_code == 200 and resp.json().get("data")
-    except requests.exceptions.RequestException:
+    except RequestException:
         return False

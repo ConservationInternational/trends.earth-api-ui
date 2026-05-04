@@ -8,12 +8,13 @@ from urllib.parse import quote as url_quote
 
 from dash import Input, Output, State, callback_context, html, no_update
 import dash_bootstrap_components as dbc
-import requests
+from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import Timeout as RequestsTimeout
 
 from ..config import DEFAULT_PAGE_SIZE
 from ..i18n import gettext as _
 from ..utils.aggrid import build_aggrid_request_params
-from ..utils.helpers import is_admin, make_authenticated_request, parse_date
+from ..utils.helpers import is_admin, is_superadmin, make_authenticated_request, parse_date
 
 logger = logging.getLogger(__name__)
 
@@ -619,7 +620,7 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Check superadmin permissions for user creation
-        if user_role != "SUPERADMIN":
+        if not is_superadmin(user_role):
             return (
                 "Access denied. Super administrator privileges required.",
                 "danger",
@@ -771,7 +772,7 @@ def register_callbacks(app):
                         no_update,
                     )
 
-            except requests.exceptions.Timeout:
+            except RequestsTimeout:
                 return (
                     _("Request timed out. Please try again."),
                     "danger",
@@ -784,7 +785,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                 )
-            except requests.exceptions.ConnectionError:
+            except RequestsConnectionError:
                 return (
                     _("Cannot connect to server. Please check your connection."),
                     "danger",
@@ -1015,7 +1016,7 @@ def register_callbacks(app):
                         no_update,
                     )
 
-            except requests.exceptions.Timeout:
+            except RequestsTimeout:
                 return (
                     _("Upload timed out. Please try again with a smaller file."),
                     "danger",
@@ -1023,7 +1024,7 @@ def register_callbacks(app):
                     no_update,
                     no_update,
                 )
-            except requests.exceptions.ConnectionError:
+            except RequestsConnectionError:
                 return (
                     _("Cannot connect to server. Please check your connection."),
                     "danger",
@@ -1076,7 +1077,9 @@ def register_callbacks(app):
 
         try:
             # Get user count
-            user_response = make_authenticated_request("/user?per_page=1", token, timeout=5)
+            user_response = make_authenticated_request(
+                "/user", token, params={"per_page": 1}, timeout=5
+            )
             total_users = (
                 user_response.json().get("total", 0)
                 if user_response.status_code == 200
@@ -1084,7 +1087,9 @@ def register_callbacks(app):
             )
 
             # Get script count
-            script_response = make_authenticated_request("/script?per_page=1", token, timeout=5)
+            script_response = make_authenticated_request(
+                "/script", token, params={"per_page": 1}, timeout=5
+            )
             total_scripts = (
                 script_response.json().get("total", 0)
                 if script_response.status_code == 200
@@ -1164,7 +1169,7 @@ def register_callbacks(app):
         confirm_clicks, token, role, _api_environment, table_state, user_timezone
     ):
         """Reset all rate limits via API call."""
-        if not confirm_clicks or not token or role != "SUPERADMIN":
+        if not confirm_clicks or not token or not is_superadmin(role):
             return no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
         try:
@@ -1318,7 +1323,7 @@ def register_callbacks(app):
     def update_selected_rate_limit(selected_rows, role):
         """Persist selected row data and enable reset when appropriate."""
 
-        if role != "SUPERADMIN":
+        if not is_superadmin(role):
             return None, True
 
         if not selected_rows:
@@ -1354,7 +1359,7 @@ def register_callbacks(app):
 
         trigger = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        if trigger == "cancel-reset-individual-rate-limit" or role != "SUPERADMIN":
+        if trigger == "cancel-reset-individual-rate-limit" or not is_superadmin(role):
             return False, no_update
 
         if trigger != "reset-selected-rate-limit-btn" or not reset_clicks:
@@ -1422,7 +1427,7 @@ def register_callbacks(app):
         user_timezone,
     ):
         """Reset a specific rate limit via API call."""
-        if not confirm_clicks or not token or role != "SUPERADMIN" or not rate_limit_data:
+        if not confirm_clicks or not token or not is_superadmin(role) or not rate_limit_data:
             return (no_update,) * 8
 
         limit_key = rate_limit_data.get("limit_key")

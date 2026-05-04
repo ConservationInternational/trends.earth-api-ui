@@ -3,7 +3,7 @@
 NOTE: Caching is handled by StatusDataManager. These functions are pure API fetch utilities.
 """
 
-import requests
+from requests.exceptions import RequestException
 
 from ..config import get_api_base
 from .http_client import apply_default_headers, get_session
@@ -123,7 +123,7 @@ def fetch_dashboard_stats(
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
-    except requests.exceptions.RequestException as e:
+    except RequestException as e:
         log_error(logger, f"Dashboard stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
@@ -168,7 +168,7 @@ def fetch_scripts_count(token, api_environment="production"):
         else:
             logger.warning(f"Scripts count: Failed to fetch. Status: {resp.status_code}")
             return 0
-    except requests.exceptions.RequestException as e:
+    except RequestException as e:
         log_error(logger, f"Scripts count: Request failed: {e}")
         return 0
 
@@ -241,7 +241,7 @@ def fetch_user_stats(
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
-    except requests.exceptions.RequestException as e:
+    except RequestException as e:
         log_error(logger, f"User stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
@@ -322,7 +322,7 @@ def fetch_execution_stats(
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
-    except requests.exceptions.RequestException as e:
+    except RequestException as e:
         log_error(logger, f"Execution stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}
 
@@ -388,6 +388,6 @@ def fetch_client_stats(token, api_environment="production", days=30, client_type
                 "message": f"API error with status code {resp.status_code}",
                 "status_code": resp.status_code,
             }
-    except requests.exceptions.RequestException as e:
+    except RequestException as e:
         log_error(logger, f"Client stats: Request failed: {e}")
         return {"error": True, "message": f"Request failed: {e}", "status_code": "network_error"}

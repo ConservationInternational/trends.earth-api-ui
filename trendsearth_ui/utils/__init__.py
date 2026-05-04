@@ -19,6 +19,7 @@ from .helpers import (
     format_duration,
     get_user_info,
     is_admin,
+    is_superadmin,
     logout_all_devices,
     logout_user,
     make_authenticated_request,
@@ -38,6 +39,7 @@ from .jwt_helpers import (
 __all__ = [
     "ADMIN_ROLES",
     "is_admin",
+    "is_superadmin",
     "extract_api_error",
     "format_duration",
     "parse_date",

@@ -9,7 +9,8 @@ from urllib.parse import parse_qs
 
 from dash import Input, Output, State, callback_context, html, no_update
 from flask import request
-import requests
+from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import Timeout as RequestsTimeout
 
 from ..components import (
     dashboard_layout,
@@ -536,7 +537,7 @@ def register_callbacks(app):
 
                 return (None, None, None, None, error_msg, "danger", True)
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Login request timed out")
             return (
                 None,
@@ -547,7 +548,7 @@ def register_callbacks(app):
                 "danger",
                 True,
             )
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during login attempt")
             return (
                 None,
@@ -866,7 +867,7 @@ def register_callbacks(app):
                     {"display": "none"},  # Keep success buttons hidden
                 )
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Password recovery request timed out")
             return (
                 _("Request timed out. Please try again later."),
@@ -877,7 +878,7 @@ def register_callbacks(app):
                 {"display": "block"},  # Keep initial buttons visible
                 {"display": "none"},  # Keep success buttons hidden
             )
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during password recovery")
             return (
                 _(
@@ -1321,7 +1322,7 @@ def register_callbacks(app):
                     no_update,
                 )
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Password reset request timed out")
             return (
                 _("Request timed out. Please try again."),
@@ -1330,7 +1331,7 @@ def register_callbacks(app):
                 no_update,
                 no_update,
             )
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during password reset")
             return (
                 _("Cannot connect to the server. Please check your connection."),
@@ -1594,10 +1595,10 @@ def register_callbacks(app):
                     error_msg = _("{}. Please try again.").format(error_msg)
                 return error_msg, "danger", True
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Registration request timed out")
             return _("Request timed out. Please try again."), "danger", True
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during registration")
             return (
                 _("Cannot connect to the server. Please check your connection."),
@@ -1918,7 +1919,7 @@ def register_callbacks(app):
                     True,
                 )
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Standalone profile login request timed out")
             return (
                 no_update,
@@ -1926,7 +1927,7 @@ def register_callbacks(app):
                 "danger",
                 True,
             )
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during standalone profile login")
             return (
                 no_update,
@@ -2091,7 +2092,9 @@ def register_callbacks(app):
                     True,
                 )
             elif resp.status_code == 422:
-                error_msg = extract_api_error(resp, _("Invalid token. Please request a new profile update link."))
+                error_msg = extract_api_error(
+                    resp, _("Invalid token. Please request a new profile update link.")
+                )
                 logger.warning("Profile update 422 response: %s", error_msg)
                 return error_msg, "danger", True
             else:
@@ -2101,10 +2104,10 @@ def register_callbacks(app):
                 logger.warning("Profile update error: %s", error_msg)
                 return error_msg, "danger", True
 
-        except requests.exceptions.Timeout:
+        except RequestsTimeout:
             logger.warning("Profile update request timed out")
             return _("Request timed out. Please try again."), "danger", True
-        except requests.exceptions.ConnectionError:
+        except RequestsConnectionError:
             logger.warning("Connection error during profile update")
             return (
                 _("Cannot connect to the server. Please check your connection."),

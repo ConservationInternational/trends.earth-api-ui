@@ -14,6 +14,7 @@ from .boundaries_utils import COUNTRY_NAME_OVERRIDES, CountryIsoResolver
 
 logger = logging.getLogger(__name__)
 
+
 def _build_message_block(
     message: str,
     *,
@@ -178,8 +179,6 @@ def create_user_geographic_map(
     iso_resolver: Optional[CountryIsoResolver] = None,
 ):
     """Render a choropleth map of user registrations by country."""
-
-
 
     empty_response = _build_message_block(
         "No geographic data available.", detail="No data provided."
@@ -1471,7 +1470,6 @@ def create_user_statistics_chart(
         "month": "1D",
     }.get(ui_period or "")
 
-
     try:
         # Handle error response structure
         if not user_stats_data:
@@ -1819,7 +1817,6 @@ def create_system_overview(dashboard_stats_data, status_data=None):
     Returns:
         html.Div: System overview content
     """
-
 
     try:
         # Debug logging - show what we actually received
@@ -2182,7 +2179,6 @@ def create_dashboard_summary_cards(dashboard_stats_data, scripts_count=None):
         html.Div: Dashboard summary cards layout
     """
 
-
     try:
         # Debug logging - show what we actually received
         logger.info(f"Dashboard summary cards: Received data type: {type(dashboard_stats_data)}")
@@ -2376,7 +2372,6 @@ def create_deployment_information(api_environment="production"):
     from trendsearth_ui.config import get_api_base
     from trendsearth_ui.utils.http_client import apply_default_headers, get_session
 
-
     try:
         # Get API deployment information
         api_info = {"environment": "Unknown", "branch": "Unknown", "commit_sha": "Unknown"}
@@ -2489,7 +2484,6 @@ def create_cluster_status_table(swarm_data):
     Returns:
         html.Div: Table showing cluster node details
     """
-
 
     try:
         if not swarm_data or not isinstance(swarm_data, dict):

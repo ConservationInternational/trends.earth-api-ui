@@ -42,7 +42,6 @@ def register_callbacks(app):
         )(_make_tab_toggle(allowed_roles))
 
     @app.callback(
-
         [
             Output("executions-tab-btn", "className"),
             Output("users-tab-btn", "className"),

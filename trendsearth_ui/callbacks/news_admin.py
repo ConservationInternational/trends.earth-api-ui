@@ -57,7 +57,9 @@ def register_callbacks(app):
 
         try:
             # Fetch all news including inactive
-            response = make_authenticated_request("/admin/news", token, params={"include_inactive": "true"})
+            response = make_authenticated_request(
+                "/admin/news", token, params={"include_inactive": "true"}
+            )
 
             if response.status_code == 200:
                 data = response.json()
@@ -85,7 +87,9 @@ def register_callbacks(app):
             return no_update, no_update
 
         try:
-            response = make_authenticated_request("/admin/news", token, params={"include_inactive": "true"})
+            response = make_authenticated_request(
+                "/admin/news", token, params={"include_inactive": "true"}
+            )
             if response.status_code == 200:
                 data = response.json()
                 news_items = data.get("data", [])
@@ -219,7 +223,9 @@ def register_callbacks(app):
                 if response.status_code == 200:
                     data = response.json()
                     item = data.get("data", data)  # Handle both wrapped and unwrapped
-                    logger.info("[toggle_news_modal] Loaded item: is_active=%s", item.get("is_active"))
+                    logger.info(
+                        "[toggle_news_modal] Loaded item: is_active=%s", item.get("is_active")
+                    )
                     # Parse dates - API returns publish_at/expires_at as ISO strings
                     start_date = item.get("publish_at")
                     end_date = item.get("expires_at")
@@ -408,7 +414,9 @@ def register_callbacks(app):
                     f"/admin/news/{selected_id}", token, method="PUT", json=data
                 )
             else:
-                response = make_authenticated_request("/admin/news", token, method="POST", json=data)
+                response = make_authenticated_request(
+                    "/admin/news", token, method="POST", json=data
+                )
 
             logger.info(
                 "[save_news_item] API response: %s - %s",
@@ -459,7 +467,9 @@ def register_callbacks(app):
                     None,
                 )
             else:
-                error_msg = extract_api_error(response, _("Error: {status}").format(status=response.status_code))
+                error_msg = extract_api_error(
+                    response, _("Error: {status}").format(status=response.status_code)
+                )
                 return (
                     error_msg,
                     "danger",
@@ -517,7 +527,9 @@ def register_callbacks(app):
             return _("No news item selected."), "warning", True, no_update
 
         try:
-            response = make_authenticated_request(f"/admin/news/{selected_id}", token, method="DELETE")
+            response = make_authenticated_request(
+                f"/admin/news/{selected_id}", token, method="DELETE"
+            )
 
             if response.status_code in (200, 204):
                 return _("News item deleted successfully!"), "success", True, time.time()
@@ -526,7 +538,9 @@ def register_callbacks(app):
             elif response.status_code == 403:
                 return _("Access denied. Admin privileges required."), "danger", True, no_update
             else:
-                error_msg = extract_api_error(response, _("Error: {status}").format(status=response.status_code))
+                error_msg = extract_api_error(
+                    response, _("Error: {status}").format(status=response.status_code)
+                )
                 return error_msg, "danger", True, no_update
 
         except Exception as e:
