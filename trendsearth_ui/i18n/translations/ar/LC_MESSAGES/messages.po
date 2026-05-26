@@ -3,12 +3,14 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
+# Translations merged from git history on 2026-05-26
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-03 16:47+0000\n"
-"PO-Revision-Date: 2026-03-14 14:01-0400\n"
+"POT-Creation-Date: 2026-05-26 13:12-0400\n"
+"PO-Revision-Date: 2026-05-26 13:13\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ar <LL@li.org>\n"
 "Language: ar\n"
@@ -18,264 +20,3323 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
 "Generated-By: Babel 2.18.0\n"
 
+#: trendsearth_ui/callbacks/admin.py:645
+msgid "Please fill in all required fields (Name, Email, Password)."
+msgstr ""
+"┘è╪▒╪¼┘ë ┘à┘ä╪í ╪¼┘à┘è╪╣ ╪º┘ä╪¡┘é┘ê┘ä ╪º┘ä┘à╪╖┘ä┘ê╪¿╪⌐ (╪º┘ä╪º╪│┘à╪î "
+"╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è╪î ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒)."
+
+#: trendsearth_ui/callbacks/admin.py:659
+msgid "Passwords do not match."
+msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪║┘è╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐."
+
+#: trendsearth_ui/callbacks/admin.py:689
+#, python-brace-format
+msgid "Password must contain {errors}."
+msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¡╪¬┘ê┘è ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪╣┘ä┘ë {errors}."
+
+#: trendsearth_ui/callbacks/admin.py:719
+#, python-brace-format
+msgid "User '{name}' created successfully with email '{email}'."
+msgstr ""
+"╪¬┘à ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à &#39;{name}&#39; ╪¿┘å╪¼╪º╪¡ "
+"╪¿╪º╪│╪¬╪«╪»╪º┘à ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è &#39;{email}&#39;."
+
+#: trendsearth_ui/callbacks/admin.py:734
+msgid "A user with this email already exists."
+msgstr ""
+"┘è┘ê╪¼╪» ┘à╪│╪¬╪«╪»┘à ╪¿┘ç╪░╪º ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è "
+"╪¿╪º┘ä┘ü╪╣┘ä."
+
+#: trendsearth_ui/callbacks/admin.py:746
+msgid "Invalid user data."
+msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐."
+
+#: trendsearth_ui/callbacks/admin.py:748
+#, python-brace-format
+msgid "Error creating user: {detail}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à: {detail}"
+
+#: trendsearth_ui/callbacks/admin.py:761
+#, python-brace-format
+msgid "Failed to create user. Server responded with status {status}."
+msgstr ""
+"┘ü╪┤┘ä ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à. ╪º╪│╪¬╪¼╪º╪¿ ╪º┘ä╪«╪º╪»┘à ╪¿╪º┘ä╪¡╪º┘ä╪⌐"
+" {status}."
+
+#: trendsearth_ui/callbacks/admin.py:777 trendsearth_ui/callbacks/auth.py:1328
+#: trendsearth_ui/callbacks/auth.py:1600 trendsearth_ui/callbacks/auth.py:1926
+#: trendsearth_ui/callbacks/auth.py:2109
+msgid "Request timed out. Please try again."
+msgstr ""
+"╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪╖┘ä╪¿. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/admin.py:790
+#: trendsearth_ui/callbacks/admin.py:1029
+msgid "Cannot connect to server. Please check your connection."
+msgstr ""
+"┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+"╪º╪¬╪╡╪º┘ä┘â ╪¿╪º┘ä╪Ñ┘å╪¬╪▒┘å╪¬."
+
+#: trendsearth_ui/callbacks/admin.py:803
+#: trendsearth_ui/callbacks/admin.py:1037
+#, python-brace-format
+msgid "Unexpected error: {error}"
+msgstr "╪«╪╖╪ú ╪║┘è╪▒ ┘à╪¬┘ê┘é╪╣: {error}"
+
+#: trendsearth_ui/callbacks/admin.py:849
+#, python-brace-format
+msgid ""
+"Invalid file type: {filename}. Must be a .tar.gz archive containing "
+"configuration.json."
+msgstr ""
+"┘å┘ê╪╣ ╪º┘ä┘à┘ä┘ü ╪║┘è╪▒ ╪╡╪º┘ä╪¡: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü}. ┘è╪¼╪¿ ╪ú┘å ┘è┘â┘ê┘å"
+" ┘à┘ä┘ü┘ï╪º ┘à╪╢╪║┘ê╪╖┘ï╪º ╪¿╪╡┘è╪║╪⌐ .tar.gz ┘è╪¡╪¬┘ê┘è ╪╣┘ä┘ë ┘à┘ä┘ü "
+"configuration.json."
+
+#: trendsearth_ui/callbacks/admin.py:864
+#, python-brace-format
+msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
+msgstr ""
+"╪¡╪¼┘à ╪º┘ä┘à┘ä┘ü ┘â╪¿┘è╪▒ ╪¼╪»┘ï╪º: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü} ({╪º┘ä╪¡╪¼┘à} "
+"┘à┘è╪¼╪º╪¿╪º┘è╪¬). ╪º┘ä╪¡╪» ╪º┘ä╪ú┘é╪╡┘ë ╪º┘ä┘à╪│┘à┘ê╪¡ ╪¿┘ç ┘ç┘ê 10 "
+"┘à┘è╪¼╪º╪¿╪º┘è╪¬."
+
+#: trendsearth_ui/callbacks/admin.py:873
+#, python-brace-format
+msgid "Archive ready: {filename} ({size}MB)"
+msgstr ""
+"╪¼╪º┘ç╪▓ ┘ä┘ä╪ú╪▒╪┤┘è┘ü: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü} ({╪º┘ä╪¡╪¼┘à} ┘à┘è╪¼╪º╪¿╪º┘è╪¬)"
+
+#: trendsearth_ui/callbacks/admin.py:925
+msgid "Access denied. Administrator privileges required."
+msgstr ""
+"╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+"╪º┘ä┘à╪│╪ñ┘ê┘ä."
+
+#: trendsearth_ui/callbacks/admin.py:940
+msgid "Please select a .tar.gz script archive to upload."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘à┘ä┘ü ╪ú╪▒╪┤┘è┘ü ┘å╪╡┘è ╪¿╪╡┘è╪║╪⌐ .tar.gz "
+"┘ä╪¬╪¡┘à┘è┘ä┘ç."
+
+#: trendsearth_ui/callbacks/admin.py:951
+msgid ""
+"Invalid file type. The API requires a .tar.gz archive containing a "
+"configuration.json file."
+msgstr ""
+"┘å┘ê╪╣ ╪º┘ä┘à┘ä┘ü ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ╪¬╪¬╪╖┘ä╪¿ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ "
+"╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ ┘à┘ä┘ü┘ï╪º ┘à╪╢╪║┘ê╪╖┘ï╪º ╪¿╪╡┘è╪║╪⌐ tar.gz ┘è╪¡╪¬┘ê┘è "
+"╪╣┘ä┘ë ┘à┘ä┘ü configuration.json."
+
+#: trendsearth_ui/callbacks/admin.py:981
+#, python-brace-format
+msgid "Script '{name}' uploaded successfully."
+msgstr ""
+"╪¬┘à ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è &#39;{name}&#39; ╪¿┘å╪¼╪º╪¡."
+
+#: trendsearth_ui/callbacks/admin.py:990 trendsearth_ui/callbacks/admin.py:992
+msgid "Invalid script archive."
+msgstr "╪ú╪▒╪┤┘è┘ü ┘å╪╡ ╪¿╪▒┘à╪¼┘è ╪║┘è╪▒ ╪╡╪º┘ä╪¡."
+
+#: trendsearth_ui/callbacks/admin.py:994
+#, python-brace-format
+msgid "Error uploading script: {detail}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è: {detail}"
+
+#: trendsearth_ui/callbacks/admin.py:1002
+msgid "Permission denied. Only admins and superadmins can create scripts."
+msgstr ""
+"╪¬┘à ╪▒┘ü╪╢ ╪º┘ä╪Ñ╪░┘å. ┘è┘Å╪│┘à╪¡ ┘ü┘é╪╖ ┘ä┘ä┘à╪│╪ñ┘ê┘ä┘è┘å "
+"┘ê╪º┘ä┘à╪│╪ñ┘ê┘ä┘è┘å ╪º┘ä┘à┘à┘è╪▓┘è┘å ╪¿╪Ñ┘å╪┤╪º╪í ╪º┘ä╪¿╪▒╪º┘à╪¼ "
+"╪º┘ä┘å╪╡┘è╪⌐."
+
+#: trendsearth_ui/callbacks/admin.py:1010
+#, python-brace-format
+msgid "Failed to upload script. Server responded with status {status}."
+msgstr ""
+"┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è. ╪º╪│╪¬╪¼╪º╪¿ ╪º┘ä╪«╪º╪»┘à "
+"╪¿╪º┘ä╪¡╪º┘ä╪⌐ {status}."
+
+#: trendsearth_ui/callbacks/admin.py:1021
+msgid "Upload timed out. Please try again with a smaller file."
+msgstr ""
+"╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪¬╪¡┘à┘è┘ä. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ "
+"╪ú╪«╪▒┘ë ╪¿┘à┘ä┘ü ╪ú╪╡╪║╪▒."
+
+#: trendsearth_ui/callbacks/admin.py:1200
+msgid "Rate limits have been successfully reset for all users and endpoints."
+msgstr ""
+"╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä ╪¿┘å╪¼╪º╪¡ ┘ä╪¼┘à┘è╪╣ "
+"╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ┘ê┘å┘é╪º╪╖ ╪º┘ä┘å┘ç╪º┘è╪⌐."
+
+#: trendsearth_ui/callbacks/admin.py:1210
+#, python-brace-format
+msgid "Failed to reset rate limits. Status: {status}"
+msgstr ""
+"┘ü╪┤┘ä ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä. ╪º┘ä╪¡╪º┘ä╪⌐: {status}"
+
+#: trendsearth_ui/callbacks/admin.py:1234
+#, python-brace-format
+msgid "Error resetting rate limits: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä: {error}"
+
+#: trendsearth_ui/callbacks/admin.py:1440
+msgid "Error: No rate limit selected."
+msgstr "╪«╪╖╪ú: ┘ä┘à ┘è╪¬┘à ╪¬╪¡╪»┘è╪» ╪¡╪»┘æ ┘ä┘ä┘à╪╣╪»┘ä."
+
+#: trendsearth_ui/callbacks/admin.py:1481
+#, python-brace-format
+msgid "Rate limit for {identifier} has been successfully reset."
+msgstr ""
+"╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ┘à╪╣╪»┘ä ╪º┘ä╪╖┘ä╪¿╪º╪¬ ┘ä┘Ç {identifier} "
+"╪¿┘å╪¼╪º╪¡."
+
+#: trendsearth_ui/callbacks/admin.py:1498
+#, python-brace-format
+msgid "Rate limit for {identifier} not found. It may have already expired."
+msgstr ""
+"┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪¡╪» ╪ú┘é╪╡┘ë ┘ä╪╣╪»╪» ╪º┘ä╪╖┘ä╪¿╪º╪¬ ┘ä┘Ç "
+"{identifier}. ╪▒╪¿┘à╪º ┘è┘â┘ê┘å ┘é╪» ╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪¬┘ç ╪¿╪º┘ä┘ü╪╣┘ä."
+
+#: trendsearth_ui/callbacks/admin.py:1510
+#, python-brace-format
+msgid "Failed to reset rate limit. Status: {status}"
+msgstr "┘ü╪┤┘ä ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä. ╪º┘ä╪¡╪º┘ä╪⌐: {status}"
+
+#: trendsearth_ui/callbacks/admin.py:1538
+#, python-brace-format
+msgid "Error resetting rate limit: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä: {error}"
+
+#: trendsearth_ui/callbacks/auth.py:402 trendsearth_ui/callbacks/auth.py:1840
+msgid "Please enter both email and password."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ┘â┘ä ┘à┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ê┘â┘ä┘à╪⌐ "
+"╪º┘ä┘à╪▒┘ê╪▒."
+
+#: trendsearth_ui/callbacks/auth.py:437 trendsearth_ui/callbacks/auth.py:1867
+msgid "Login failed: Invalid response format."
+msgstr ""
+"┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪¬┘å╪│┘è┘é ╪º┘ä╪º╪│╪¬╪¼╪º╪¿╪⌐ ╪║┘è╪▒ "
+"╪╡╪º┘ä╪¡."
+
+#: trendsearth_ui/callbacks/auth.py:483
+msgid "Login successful!"
+msgstr "╪¬┘à ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/auth.py:505
+msgid "Failed to retrieve user information."
+msgstr "┘ü╪┤┘ä ┘ü┘è ╪º╪│╪¬╪▒╪»╪º╪» ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à."
+
+#: trendsearth_ui/callbacks/auth.py:513 trendsearth_ui/callbacks/auth.py:1900
+msgid "Invalid credentials."
+msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐."
+
+#: trendsearth_ui/callbacks/auth.py:521
+msgid "Your account is locked due to too many failed login attempts. "
+msgstr ""
+"╪¬┘à ┘é┘ü┘ä ╪¡╪│╪º╪¿┘â ╪¿╪│╪¿╪¿ ┘â╪½╪▒╪⌐ ┘à╪¡╪º┘ê┘ä╪º╪¬ ╪¬╪│╪¼┘è┘ä "
+"╪º┘ä╪»╪«┘ê┘ä ╪º┘ä┘ü╪º╪┤┘ä╪⌐. "
+
+#: trendsearth_ui/callbacks/auth.py:523
+msgid "Please use the 'Forgot Password' link below to reset your password."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪º╪│╪¬╪«╪»╪º┘à ╪▒╪º╪¿╪╖ &quot;┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒&quot; "
+"╪ú╪»┘å╪º┘ç ┘ä╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒┘â."
+
+#: trendsearth_ui/callbacks/auth.py:526
+msgid "Your account is temporarily locked. "
+msgstr "╪¬┘à ╪Ñ╪║┘ä╪º┘é ╪¡╪│╪º╪¿┘â ┘à╪ñ┘é╪¬┘ï╪º. "
+
+#: trendsearth_ui/callbacks/auth.py:527
+#, python-brace-format
+msgid "Please try again in {minutes} minute(s)."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ╪«┘ä╪º┘ä {╪»┘é╪º╪ª┘é} ╪»┘é┘è┘é╪⌐."
+
+#: trendsearth_ui/callbacks/auth.py:547
+msgid "Login failed: Connection timeout. Please try again later."
+msgstr ""
+"┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪º┘å┘é╪╖╪╣ ╪º┘ä╪º╪¬╪╡╪º┘ä. ┘è╪▒╪¼┘ë "
+"╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é╪º┘ï."
+
+#: trendsearth_ui/callbacks/auth.py:559
+msgid ""
+"Login failed: Cannot connect to authentication server. Please check the "
+"server status."
+msgstr ""
+"┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪¬╪╣╪░╪▒ ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪«╪º╪»┘à "
+"╪º┘ä┘à╪╡╪º╪»┘é╪⌐. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪¡╪º┘ä╪⌐ ╪º┘ä╪«╪º╪»┘à."
+
+#: trendsearth_ui/callbacks/auth.py:571
+#, python-brace-format
+msgid "Login failed: {error}"
+msgstr "┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: {error}"
+
+#: trendsearth_ui/callbacks/auth.py:790 trendsearth_ui/callbacks/auth.py:1486
+msgid "Please enter your email address."
+msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è."
+
+#: trendsearth_ui/callbacks/auth.py:803 trendsearth_ui/callbacks/auth.py:1522
+msgid "Please enter a valid email address."
+msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ╪╡╪º┘ä╪¡."
+
+#: trendsearth_ui/callbacks/auth.py:839
+#, python-brace-format
+msgid ""
+"If an account exists with {email}, password recovery instructions have been "
+"sent. Please check your email."
+msgstr ""
+"╪Ñ╪░╪º ┘â╪º┘å ┘ç┘å╪º┘â ╪¡╪│╪º╪¿ ┘à┘ê╪¼┘ê╪» ╪¿╪º╪│╪¬╪«╪»╪º┘à {╪º┘ä╪¿╪▒┘è╪» "
+"╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è}╪î ┘ü┘é╪» ╪¬┘à ╪Ñ╪▒╪│╪º┘ä ╪¬╪╣┘ä┘è┘à╪º╪¬ ╪º╪│╪¬╪╣╪º╪»╪⌐"
+" ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒. ┘è╪▒╪¼┘ë ┘à╪▒╪º╪¼╪╣╪⌐ ╪¿╪▒┘è╪»┘â "
+"╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è."
+
+#: trendsearth_ui/callbacks/auth.py:850
+msgid "Failed to send password recovery email."
+msgstr ""
+"┘ü╪┤┘ä ╪Ñ╪▒╪│╪º┘ä ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ä╪º╪│╪¬╪╣╪º╪»╪⌐ ┘â┘ä┘à╪⌐ "
+"╪º┘ä┘à╪▒┘ê╪▒."
+
+#: trendsearth_ui/callbacks/auth.py:859
+#, python-brace-format
+msgid "{}. Please try again later."
+msgstr "{}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é╪º┘ï."
+
+#: trendsearth_ui/callbacks/auth.py:873
+msgid "Request timed out. Please try again later."
+msgstr ""
+"╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪╖┘ä╪¿. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë "
+"┘ä╪º╪¡┘é╪º┘ï."
+
+#: trendsearth_ui/callbacks/auth.py:885
+msgid ""
+"Cannot connect to the server. Please check your internet connection and try "
+"again."
+msgstr ""
+"┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+"╪º╪¬╪╡╪º┘ä┘â ╪¿╪º┘ä╪Ñ┘å╪¬╪▒┘å╪¬ ┘ê╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/auth.py:897
+#, python-brace-format
+msgid "An error occurred: {error}. Please try again later."
+msgstr ""
+"╪¡╪»╪½ ╪«╪╖╪ú: {error}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë "
+"┘ä╪º╪¡┘é╪º┘ï."
+
+#: trendsearth_ui/callbacks/auth.py:1226
+msgid "Invalid or missing reset token. Please request a new password reset."
+msgstr ""
+"╪▒┘à╪▓ ╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪¬╪╣┘è┘è┘å ╪║┘è╪▒ ╪╡╪º┘ä╪¡ ╪ú┘ê ┘à┘ü┘é┘ê╪». ┘è╪▒╪¼┘ë "
+"╪╖┘ä╪¿ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
+
+#: trendsearth_ui/callbacks/auth.py:1235
+msgid "Please enter and confirm your new password."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ┘ê╪¬╪ú┘â┘è╪»┘ç╪º."
+
+#: trendsearth_ui/callbacks/auth.py:1244
+msgid "Passwords do not match. Please try again."
+msgstr ""
+"┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪║┘è╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ "
+"┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/auth.py:1253
+#: trendsearth_ui/callbacks/profile.py:265
+msgid "Password must be at least 12 characters long."
+msgstr ""
+"┘è╪¼╪¿ ╪ú┘å ╪¬╪¬┘â┘ê┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘à┘å 12 ╪¡╪▒┘ü╪º┘ï ╪╣┘ä┘ë "
+"╪º┘ä╪ú┘é┘ä."
+
+#: trendsearth_ui/callbacks/auth.py:1274
+msgid "Password reset successful! You can now log in with your new password."
+msgstr ""
+"╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¿┘å╪¼╪º╪¡! ┘è┘à┘â┘å┘â "
+"╪º┘ä╪ó┘å ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ "
+"╪º┘ä╪¼╪»┘è╪»╪⌐."
+
+#: trendsearth_ui/callbacks/auth.py:1284
+msgid ""
+"This reset link is invalid or has expired. Please request a new password "
+"reset."
+msgstr ""
+"╪▒╪º╪¿╪╖ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘ç╪░╪º ╪║┘è╪▒ ╪╡╪º┘ä╪¡ "
+"╪ú┘ê ╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪¬┘ç. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å "
+"┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒ ╪¼╪»┘è╪»╪⌐."
+
+#: trendsearth_ui/callbacks/auth.py:1293
+msgid "Password does not meet requirements."
+msgstr "┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒ ┘ä╪º ╪¬┘ä╪¿┘è ╪º┘ä┘à╪¬╪╖┘ä╪¿╪º╪¬."
+
+#: trendsearth_ui/callbacks/auth.py:1308
+msgid "Failed to reset password."
+msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
+
+#: trendsearth_ui/callbacks/auth.py:1316 trendsearth_ui/callbacks/auth.py:1595
+#, python-brace-format
+msgid "{}. Please try again."
+msgstr "{}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/auth.py:1337 trendsearth_ui/callbacks/auth.py:1604
+#: trendsearth_ui/callbacks/auth.py:1934 trendsearth_ui/callbacks/auth.py:2113
+msgid "Cannot connect to the server. Please check your connection."
+msgstr ""
+"┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+"╪º╪¬╪╡╪º┘ä┘â."
+
+#: trendsearth_ui/callbacks/auth.py:1346 trendsearth_ui/callbacks/auth.py:1610
+#: trendsearth_ui/callbacks/auth.py:1942 trendsearth_ui/callbacks/auth.py:2119
+#, python-brace-format
+msgid "An error occurred: {error}"
+msgstr "╪¡╪»╪½ ╪«╪╖╪ú: {error}"
+
+#: trendsearth_ui/callbacks/auth.py:1489 trendsearth_ui/callbacks/auth.py:2000
+msgid "Please enter your name."
+msgstr "╪º┘ä╪▒╪¼╪º╪í ╪Ñ╪»╪«╪º┘ä ╪º╪│┘à┘â."
+
+#: trendsearth_ui/callbacks/auth.py:1492 trendsearth_ui/callbacks/auth.py:2003
+msgid "Please enter your organization."
+msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪º╪│┘à ┘à╪ñ╪│╪│╪¬┘â┘à."
+
+#: trendsearth_ui/callbacks/auth.py:1495 trendsearth_ui/callbacks/auth.py:2006
+#: trendsearth_ui/callbacks/profile.py:125
+msgid "Please select your sector."
+msgstr "┘è╪▒╪¼┘ë ╪º╪«╪¬┘è╪º╪▒ ┘é╪╖╪º╪╣┘â."
+
+#: trendsearth_ui/callbacks/auth.py:1498 trendsearth_ui/callbacks/auth.py:2009
+#: trendsearth_ui/callbacks/profile.py:128
+msgid "Please specify your sector."
+msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘é╪╖╪º╪╣┘â."
+
+#: trendsearth_ui/callbacks/auth.py:1501 trendsearth_ui/callbacks/auth.py:2012
+#: trendsearth_ui/callbacks/profile.py:131
+msgid "Please select your purpose of use."
+msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪║╪▒╪╢ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à."
+
+#: trendsearth_ui/callbacks/auth.py:1504 trendsearth_ui/callbacks/auth.py:2015
+#: trendsearth_ui/callbacks/profile.py:134
+msgid "Please specify your purpose of use."
+msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪º┘ä╪║╪▒╪╢ ┘à┘å ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à."
+
+#: trendsearth_ui/callbacks/auth.py:1507 trendsearth_ui/callbacks/auth.py:2018
+#: trendsearth_ui/callbacks/profile.py:137
+msgid "Please select your country."
+msgstr "┘è╪▒╪¼┘ë ╪º╪«╪¬┘è╪º╪▒ ╪¿┘ä╪»┘â."
+
+#: trendsearth_ui/callbacks/auth.py:1510 trendsearth_ui/callbacks/auth.py:2021
+#: trendsearth_ui/callbacks/profile.py:140
+msgid "Please describe your gender identity."
+msgstr "┘è╪▒╪¼┘ë ┘ê╪╡┘ü ┘ç┘ê┘è╪¬┘â ╪º┘ä╪¼┘å╪│┘è╪⌐."
+
+#: trendsearth_ui/callbacks/auth.py:1514 trendsearth_ui/callbacks/auth.py:2025
+#: trendsearth_ui/callbacks/profile.py:144
+msgid "Please acknowledge the Google Earth Engine license terms."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪º┘ä╪º╪╖┘ä╪º╪╣ ╪╣┘ä┘ë ╪┤╪▒┘ê╪╖ ╪¬╪▒╪«┘è╪╡ ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä "
+"╪Ñ┘è╪▒╪½."
+
+#: trendsearth_ui/callbacks/auth.py:1569
+msgid ""
+"Account created successfully! Please check your email to verify your "
+"account, then you can log in."
+msgstr ""
+"╪¬┘à ╪Ñ┘å╪┤╪º╪í ╪º┘ä╪¡╪│╪º╪¿ ╪¿┘å╪¼╪º╪¡! ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+"╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ä╪¬╪ú┘â┘è╪» ╪¡╪│╪º╪¿┘â╪î ╪½┘à ┘è┘à┘â┘å┘â "
+"╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä."
+
+#: trendsearth_ui/callbacks/auth.py:1576 trendsearth_ui/callbacks/auth.py:1592
+msgid "Registration failed."
+msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪¬╪│╪¼┘è┘ä."
+
+#: trendsearth_ui/callbacks/auth.py:1580
+msgid "Validation failed."
+msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪¬╪¡┘é┘é."
+
+#: trendsearth_ui/callbacks/auth.py:1586
+msgid "Too many registration attempts. Please try again later."
+msgstr ""
+"╪╣╪»╪» ┘à╪¡╪º┘ê┘ä╪º╪¬ ╪º┘ä╪¬╪│╪¼┘è┘ä ┘â╪¿┘è╪▒ ╪¼╪»┘ï╪º. ┘è╪▒╪¼┘ë "
+"╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é┘ï╪º."
+
+#: trendsearth_ui/callbacks/auth.py:1765
+msgid "Invalid or expired token. Please request a new profile update link."
+msgstr ""
+"╪▒┘à╪▓ ╪║┘è╪▒ ╪╡╪º┘ä╪¡ ╪ú┘ê ┘à┘å╪¬┘ç┘è ╪º┘ä╪╡┘ä╪º╪¡┘è╪⌐. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ "
+"╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» ┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
+
+#: trendsearth_ui/callbacks/auth.py:1811
+#, python-brace-format
+msgid "Error loading profile: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è: {error}"
+
+#: trendsearth_ui/callbacks/auth.py:1882
+msgid "Login successful! Loading your profile..."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1890
+msgid "Login failed: No access token received."
+msgstr ""
+
+#: trendsearth_ui/callbacks/auth.py:1993
+msgid "No authentication token. Please use a valid profile update link."
+msgstr ""
+"┘ä╪º ┘è┘ê╪¼╪» ╪▒┘à╪▓ ┘à╪╡╪º╪»┘é╪⌐. ┘è╪▒╪¼┘ë ╪º╪│╪¬╪«╪»╪º┘à ╪▒╪º╪¿╪╖ "
+"╪¬╪¡╪»┘è╪½ ┘à┘ä┘ü ╪¬╪╣╪▒┘è┘ü ╪╡╪º┘ä╪¡."
+
+#: trendsearth_ui/callbacks/auth.py:2087
+#: trendsearth_ui/callbacks/profile.py:205
+msgid "Profile updated successfully!"
+msgstr "╪¬┘à ╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è ╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/auth.py:2090
+msgid "Session expired. Please request a new profile update link."
+msgstr ""
+"╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪⌐ ╪º┘ä╪¼┘ä╪│╪⌐. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» "
+"┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
+
+#: trendsearth_ui/callbacks/auth.py:2096
+msgid "Invalid token. Please request a new profile update link."
+msgstr ""
+"╪▒┘à╪▓ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» ┘ä╪¬╪¡╪»┘è╪½ "
+"╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
+
+#: trendsearth_ui/callbacks/auth.py:2103
+#: trendsearth_ui/callbacks/profile.py:208
+msgid "Failed to update profile."
+msgstr "┘ü╪┤┘ä ╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
+
+#: trendsearth_ui/callbacks/edit.py:573
+#: trendsearth_ui/callbacks/profile.py:332
+msgid "Password changed successfully!"
+msgstr "╪¬┘à ╪¬╪║┘è┘è╪▒ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/edit.py:576
+#: trendsearth_ui/callbacks/profile.py:335
+msgid "Failed to change password."
+msgstr "┘ü╪┤┘ä ╪¬╪║┘è┘è╪▒ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
+
+#: trendsearth_ui/callbacks/edit.py:578
+#, python-brace-format
+msgid " (Status: {status})"
+msgstr " (╪º┘ä╪¡╪º┘ä╪⌐: {status})"
+
+#: trendsearth_ui/callbacks/edit.py:584
+#: trendsearth_ui/callbacks/gee_credentials.py:180
+#: trendsearth_ui/callbacks/gee_credentials.py:326
+#: trendsearth_ui/callbacks/gee_credentials.py:502
+#: trendsearth_ui/callbacks/gee_credentials.py:639
+#: trendsearth_ui/callbacks/openeo_credentials.py:241
+#: trendsearth_ui/callbacks/openeo_credentials.py:343
+#: trendsearth_ui/callbacks/profile.py:214
+#: trendsearth_ui/callbacks/profile.py:343
+#: trendsearth_ui/callbacks/profile.py:405
+#: trendsearth_ui/callbacks/profile.py:569
+#, python-brace-format
+msgid "Network error: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪º┘ä╪┤╪¿┘â╪⌐: {error}"
+
+#: trendsearth_ui/callbacks/executions.py:536
+#: trendsearth_ui/callbacks/executions.py:563
+#: trendsearth_ui/callbacks/executions.py:570
+#: trendsearth_ui/callbacks/executions.py:578
+#: trendsearth_ui/callbacks/executions.py:587
+#: trendsearth_ui/callbacks/executions.py:669
+#: trendsearth_ui/callbacks/executions.py:672
+#: trendsearth_ui/callbacks/gee_credentials.py:53
+#: trendsearth_ui/callbacks/openeo_credentials.py:43
+msgid "Unknown"
+msgstr "┘à╪¼┘ç┘ê┘ä"
+
+#: trendsearth_ui/callbacks/executions.py:540
+msgid "Cancellation Requested"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:542
+msgid "Execution Cancelled Successfully"
+msgstr "╪¬┘à ╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¬┘å┘ü┘è╪░ ╪¿┘å╪¼╪º╪¡"
+
+#: trendsearth_ui/callbacks/executions.py:562
+#: trendsearth_ui/callbacks/executions.py:727
+#: trendsearth_ui/callbacks/executions.py:745
+msgid "Execution ID: "
+msgstr "┘à╪╣╪▒┘æ┘ü ╪º┘ä╪¬┘å┘ü┘è╪░: "
+
+#: trendsearth_ui/callbacks/executions.py:569
+msgid "Script: "
+msgstr "┘å╪╡: "
+
+#: trendsearth_ui/callbacks/executions.py:576
+msgid "Previous Status: "
+msgstr "╪º┘ä╪¡╪º┘ä╪⌐ ╪º┘ä╪│╪º╪¿┘é╪⌐: "
+
+#: trendsearth_ui/callbacks/executions.py:585
+msgid "New Status: "
+msgstr "╪º┘ä╪¡╪º┘ä╪⌐ ╪º┘ä╪¼╪»┘è╪»╪⌐: "
+
+#: trendsearth_ui/callbacks/executions.py:602
+msgid ""
+"Cancellation was accepted and queued. Refresh in a few seconds to see final "
+"status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:616
+msgid "Infrastructure Cleanup"
+msgstr "╪¬┘å╪╕┘è┘ü ╪º┘ä╪¿┘å┘è╪⌐ ╪º┘ä╪¬╪¡╪¬┘è╪⌐"
+
+#: trendsearth_ui/callbacks/executions.py:622
+msgid "Docker service stopped"
+msgstr "╪¬┘ê┘é┘ü╪¬ ╪«╪»┘à╪⌐ Docker"
+
+#: trendsearth_ui/callbacks/executions.py:624
+msgid "Docker service not found/stopped"
+msgstr "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪«╪»┘à╪⌐ Docker/╪¬┘à ╪Ñ┘è┘é╪º┘ü┘ç╪º"
+
+#: trendsearth_ui/callbacks/executions.py:633
+msgid "Docker container stopped"
+msgstr "╪¬┘à ╪Ñ┘è┘é╪º┘ü ╪¡╪º┘ê┘è╪⌐ Docker"
+
+#: trendsearth_ui/callbacks/executions.py:635
+msgid "Docker container not found/stopped"
+msgstr "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪¡╪º┘ê┘è╪⌐ Docker/╪¬┘à ╪Ñ┘è┘é╪º┘ü┘ç╪º"
+
+#: trendsearth_ui/callbacks/executions.py:647
+#: trendsearth_ui/callbacks/executions.py:687
+msgid "Google Earth Engine Tasks"
+msgstr "┘à┘ç╪º┘à ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½"
+
+#: trendsearth_ui/callbacks/executions.py:651
+#, python-brace-format
+msgid "Found and processed {count} GEE tasks:"
+msgstr ""
+"╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë {count} ┘à┘ç┘à╪⌐ ┘à┘å ┘à┘ç╪º┘à GEE "
+"┘ê┘à╪╣╪º┘ä╪¼╪¬┘ç╪º:"
+
+#: trendsearth_ui/callbacks/executions.py:671
+#, python-brace-format
+msgid "Status: {status}"
+msgstr "╪º┘ä╪¡╪º┘ä╪⌐: {status}"
+
+#: trendsearth_ui/callbacks/executions.py:689
+msgid "No GEE tasks found in execution logs."
+msgstr ""
+"┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪ú┘è ┘à┘ç╪º┘à GEE ┘ü┘è ╪│╪¼┘ä╪º╪¬ "
+"╪º┘ä╪¬┘å┘ü┘è╪░."
+
+#: trendsearth_ui/callbacks/executions.py:702
+msgid "Errors Encountered"
+msgstr "╪º┘ä╪ú╪«╪╖╪º╪í ╪º┘ä╪¬┘è ╪¬┘à╪¬ ┘à┘ê╪º╪¼┘ç╪¬┘ç╪º"
+
+#: trendsearth_ui/callbacks/executions.py:711
+msgid "Cancellation Already In Progress"
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:714
+msgid "Message: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:719
+msgid "Cancellation has already been requested for this execution."
+msgstr ""
+
+#: trendsearth_ui/callbacks/executions.py:736
+msgid "Cancellation Failed"
+msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪Ñ┘ä╪║╪º╪í"
+
+#: trendsearth_ui/callbacks/executions.py:739
+msgid "Error: "
+msgstr "╪«╪╖╪ú: "
+
+#: trendsearth_ui/callbacks/gee_credentials.py:39
+#: trendsearth_ui/callbacks/openeo_credentials.py:28
+msgid "Please log in to view credentials status."
+msgstr ""
+"┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ "
+"╪º┘ä╪º╪╣╪¬┘à╪º╪»."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:64
+msgid "OAuth"
+msgstr "OAuth"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:64
+msgid "Service Account"
+msgstr "╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:70
+#, python-brace-format
+msgid "Credentials configured using {type_label}"
+msgstr ""
+"╪¬┘à ╪¬┘â┘ê┘è┘å ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪» ╪¿╪º╪│╪¬╪«╪»╪º┘à {type_label}"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:75
+#, python-brace-format
+msgid "Set up on: {created_date}"
+msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪Ñ┘å╪┤╪º╪í: {created_date}"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:93
+msgid ""
+"No personal Google Earth Engine account credentials configured. Using "
+"default Trends.Earth service account."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:101
+msgid "Unable to retrieve credentials status."
+msgstr "╪¬╪╣╪░╪▒ ╪º╪│╪¬╪▒╪»╪º╪» ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:108
+msgid "Error retrieving credentials status."
+msgstr ""
+"╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪º╪│╪¬╪▒╪»╪º╪» ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ "
+"╪º┘ä╪º╪╣╪¬┘à╪º╪»."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:169
+msgid "OAuth initiation failed - no authorization URL received."
+msgstr ""
+"┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪¿╪»╪í OAuth - ┘ä┘à ┘è╪¬┘à ╪º╪│╪¬┘ä╪º┘à ╪╣┘å┘ê╪º┘å URL "
+"┘ä┘ä╪¬┘ü┘ê┘è╪╢."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:175
+msgid "Failed to initiate OAuth flow."
+msgstr "┘ü╪┤┘ä ╪¿╪»╪í ╪╣┘à┘ä┘è╪⌐ OAuth."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:210
+msgid "Invalid JSON file. Please upload a valid service account key file."
+msgstr ""
+"┘à┘ä┘ü JSON ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪▒╪¼┘ë ╪¬╪¡┘à┘è┘ä ┘à┘ä┘ü ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ "
+"╪«╪»┘à╪⌐ ╪╡╪º┘ä╪¡."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:218
+msgid "Invalid service account key. Missing required fields."
+msgstr ""
+"┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ╪º┘ä╪¡┘é┘ê┘ä "
+"╪º┘ä┘à╪╖┘ä┘ê╪¿╪⌐ ┘à┘ü┘é┘ê╪»╪⌐."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:222
+msgid "Invalid service account key. Type field must be 'service_account'."
+msgstr ""
+"┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪¼╪¿ ╪ú┘å ┘è┘â┘ê┘å "
+"╪¡┘é┘ä ╪º┘ä┘å┘ê╪╣ &#39;service_account&#39;."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:240
+#, python-brace-format
+msgid "Service account key '{filename}' uploaded successfully!"
+msgstr ""
+"╪¬┘à ╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ &#39;{filename}&#39; "
+"╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:248
+msgid "Failed to upload service account key."
+msgstr "┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:253
+#, python-brace-format
+msgid "Error processing file: {error}"
+msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ┘à╪╣╪º┘ä╪¼╪⌐ ╪º┘ä┘à┘ä┘ü: {error}"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:293
+msgid "Google Earth Engine credentials are valid and working!"
+msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» Google Earth Engine ╪╡╪º┘ä╪¡╪⌐ ┘ê╪¬╪╣┘à┘ä!"
+
+#: trendsearth_ui/callbacks/gee_credentials.py:299
+msgid "Credentials test failed."
+msgstr "┘ü╪┤┘ä ╪º╪«╪¬╪¿╪º╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:315
+msgid "Google Earth Engine credentials deleted successfully."
+msgstr ""
+"╪¬┘à ╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ ╪¿┘å╪¼╪º╪¡."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:321
+#: trendsearth_ui/callbacks/openeo_credentials.py:338
+msgid "Failed to delete credentials."
+msgstr "┘ü╪┤┘ä ╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
+
+#: trendsearth_ui/callbacks/gee_credentials.py:359
+msgid "Invalid callback — missing authorization code or state parameter."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:390
+msgid ""
+"Google Earth Engine connected successfully! To set your GCP project ID, open"
+" the Trends.Earth settings in QGIS (Advanced tab)."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:397
+msgid ""
+"Google Earth Engine connected successfully! Please select your GCP project "
+"below to complete setup."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:410
+msgid "Failed to complete Google Earth Engine authorization."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:417
+#, python-brace-format
+msgid "Network error while completing authorization: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:453
+#: trendsearth_ui/callbacks/gee_credentials.py:588
+msgid ""
+"Invalid project ID format. Must be 6-30 characters, start with a letter, and"
+" contain only lowercase letters, numbers, and hyphens."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:481
+#: trendsearth_ui/callbacks/gee_credentials.py:621
+msgid ""
+"Project saved, but bucket write access could not be configured "
+"automatically."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:488
+msgid ""
+"GCP project saved successfully. Google Earth Engine setup is complete! You "
+"can now close this page and return to the app."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:496
+#: trendsearth_ui/callbacks/gee_credentials.py:633
+msgid "Failed to save project."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:522
+msgid "No project selected."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:542
+#: trendsearth_ui/callbacks/gee_credentials.py:609
+msgid "Current project: "
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:549
+msgid "No project selected yet. Click 'Change Project' to choose one."
+msgstr ""
+
+#: trendsearth_ui/callbacks/gee_credentials.py:627
+msgid "Project updated successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:202
+#: trendsearth_ui/components/tabs.py:2602
+#: trendsearth_ui/components/tabs.py:2700
+msgid "Create News Item"
+msgstr "╪Ñ┘å╪┤╪º╪í ╪«╪¿╪▒"
+
+#: trendsearth_ui/callbacks/news_admin.py:239
+#: trendsearth_ui/callbacks/news_admin.py:581
+#: trendsearth_ui/callbacks/news_admin.py:740
+msgid "Edit News Item"
+msgstr "╪¬╪╣╪»┘è┘ä ╪º┘ä╪«╪¿╪▒"
+
+#: trendsearth_ui/callbacks/news_admin.py:269
+msgid "Preview will appear here..."
+msgstr "╪│╪¬╪╕┘ç╪▒ ╪º┘ä┘à╪╣╪º┘è┘å╪⌐ ┘ç┘å╪º..."
+
+#: trendsearth_ui/callbacks/news_admin.py:333
+#: trendsearth_ui/callbacks/news_admin.py:524
+msgid "Please log in first."
+msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪ú┘ê┘ä╪º┘ï."
+
+#: trendsearth_ui/callbacks/news_admin.py:346
+msgid "Title is required."
+msgstr "╪º┘ä╪╣┘å┘ê╪º┘å ┘à╪╖┘ä┘ê╪¿."
+
+#: trendsearth_ui/callbacks/news_admin.py:358
+msgid "Message is required."
+msgstr "╪º┘ä╪▒╪│╪º┘ä╪⌐ ┘à╪╖┘ä┘ê╪¿╪⌐."
+
+#: trendsearth_ui/callbacks/news_admin.py:370
+msgid "At least one target platform is required."
+msgstr ""
+"┘è┘ä╪▓┘à ┘ê╪¼┘ê╪» ┘à┘å╪╡╪⌐ ┘à╪│╪¬┘ç╪»┘ü╪⌐ ┘ê╪º╪¡╪»╪⌐ ╪╣┘ä┘ë ╪º┘ä╪ú┘é┘ä."
+
+#: trendsearth_ui/callbacks/news_admin.py:428
+msgid "updated"
+msgstr "╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½"
+
+#: trendsearth_ui/callbacks/news_admin.py:428
+msgid "created"
+msgstr "┘à╪«┘ä┘ê┘é"
+
+#: trendsearth_ui/callbacks/news_admin.py:441
+#, python-brace-format
+msgid "News item {action} successfully!"
+msgstr "╪¬┘à ╪¬┘å┘ü┘è╪░ ╪º┘ä╪Ñ╪¼╪▒╪º╪í {action} ╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/news_admin.py:449
+#: trendsearth_ui/callbacks/news_admin.py:537
+msgid "Session expired. Please log in again."
+msgstr ""
+"╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪⌐ ╪º┘ä╪¼┘ä╪│╪⌐. ┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä "
+"┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/news_admin.py:460
+#: trendsearth_ui/callbacks/news_admin.py:539
+msgid "Access denied. Admin privileges required."
+msgstr ""
+"╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+"╪º┘ä┘à╪│╪ñ┘ê┘ä."
+
+#: trendsearth_ui/callbacks/news_admin.py:471
+#: trendsearth_ui/callbacks/news_admin.py:542
+#, python-brace-format
+msgid "Error: {status}"
+msgstr "╪«╪╖╪ú: {status}"
+
+#: trendsearth_ui/callbacks/news_admin.py:486
+#, python-brace-format
+msgid "Error saving news item: {error}"
+msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¡┘ü╪╕ ╪º┘ä╪«╪¿╪▒: {error}"
+
+#: trendsearth_ui/callbacks/news_admin.py:527
+msgid "No news item selected."
+msgstr "┘ä┘à ┘è╪¬┘à ╪º╪«╪¬┘è╪º╪▒ ╪ú┘è ╪«╪¿╪▒."
+
+#: trendsearth_ui/callbacks/news_admin.py:535
+msgid "News item deleted successfully!"
+msgstr "╪¬┘à ╪¡╪░┘ü ╪º┘ä╪«╪¿╪▒ ╪¿┘å╪¼╪º╪¡!"
+
+#: trendsearth_ui/callbacks/news_admin.py:548
+#, python-brace-format
+msgid "Error deleting news item: {error}"
+msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¡╪░┘ü ╪º┘ä╪«╪¿╪▒: {error}"
+
+#: trendsearth_ui/callbacks/news_admin.py:651
+msgid ""
+"Translation service not configured. Please set GOOGLE_TRANSLATE_CREDENTIALS "
+"environment variable."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:662
+msgid ""
+"No English content to translate. Please add title, message, or link text "
+"first."
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:690
+#, python-brace-format
+msgid "Successfully translated to {count} languages!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/news_admin.py:702
+#, python-brace-format
+msgid "Translation error: {error}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:40
+#: trendsearth_ui/callbacks/openeo_credentials.py:210
+#: trendsearth_ui/components/tabs.py:1363
+msgid "OIDC Refresh Token"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:41
+#: trendsearth_ui/callbacks/openeo_credentials.py:211
+#: trendsearth_ui/components/tabs.py:1367
+msgid "Basic Auth"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:49
+#: trendsearth_ui/callbacks/openeo_credentials.py:218
+#, python-brace-format
+msgid "openEO credentials configured ({type_label})"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:61
+#: trendsearth_ui/callbacks/openeo_credentials.py:319
+msgid "No openEO credentials configured."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:64
+#: trendsearth_ui/callbacks/openeo_credentials.py:322
+msgid "Choose a credential type below to set up access."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:72
+msgid "Unable to retrieve openEO credentials status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:79
+msgid "Error retrieving openEO credentials status."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:161
+msgid "Please select a credential type."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:170
+msgid "Client ID and Refresh Token are required for OIDC credentials."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:187
+msgid "Username and Password are required for Basic Auth credentials."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:229
+msgid "openEO credentials saved successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:236
+msgid "Failed to save openEO credentials."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:284
+#, python-brace-format
+msgid "openEO credentials are valid. {message}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:296
+#, python-brace-format
+msgid "openEO credentials check failed. {message}"
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:305
+msgid "Credentials check failed."
+msgstr ""
+
+#: trendsearth_ui/callbacks/openeo_credentials.py:331
+msgid "openEO credentials deleted successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:119
+msgid "Name is required."
+msgstr "╪º┘ä╪º╪│┘à ┘à╪╖┘ä┘ê╪¿."
+
+#: trendsearth_ui/callbacks/profile.py:122
+msgid "Organization is required."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:189
+msgid "User ID not found in user data."
+msgstr ""
+"┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ┘à╪╣╪▒┘æ┘ü ╪º┘ä┘à╪│╪¬╪«╪»┘à ┘ü┘è "
+"╪¿┘è╪º┘å╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à."
+
+#: trendsearth_ui/callbacks/profile.py:244
+msgid "All password fields are required."
+msgstr "╪¼┘à┘è╪╣ ╪¡┘é┘ê┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘à╪╖┘ä┘ê╪¿╪⌐."
+
+#: trendsearth_ui/callbacks/profile.py:253
+msgid "New passwords do not match."
+msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ┘ä╪º ╪¬╪¬╪╖╪º╪¿┘é."
+
+#: trendsearth_ui/callbacks/profile.py:275
+msgid "Password must include an uppercase letter."
+msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ┘â╪¿┘è╪▒┘ï╪º."
+
+#: trendsearth_ui/callbacks/profile.py:285
+msgid "Password must include a lowercase letter."
+msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ╪╡╪║┘è╪▒┘ï╪º."
+
+#: trendsearth_ui/callbacks/profile.py:295
+msgid "Password must include a number."
+msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪▒┘é┘à╪º┘ï."
+
+#: trendsearth_ui/callbacks/profile.py:306
+#, python-brace-format
+msgid ""
+"Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
+msgstr ""
+"┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ╪«╪º╪╡┘ï╪º "
+"(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
+
+#: trendsearth_ui/callbacks/profile.py:394
+msgid "Email preferences saved successfully!"
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:400
+msgid "Failed to save email preferences."
+msgstr ""
+
+#: trendsearth_ui/callbacks/profile.py:491
+msgid "Email confirmation does not match. Please try again."
+msgstr ""
+"┘ä┘à ┘è╪¬┘à ╪¬╪ú┘â┘è╪» ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è. ┘è╪▒╪¼┘ë "
+"╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/profile.py:516
+msgid "Your account has been deleted."
+msgstr "╪¬┘à ╪¡╪░┘ü ╪¡╪│╪º╪¿┘â."
+
+#: trendsearth_ui/callbacks/profile.py:529
+msgid "Admin accounts cannot be deleted through self-service. "
+msgstr ""
+"┘ä╪º ┘è┘à┘â┘å ╪¡╪░┘ü ╪¡╪│╪º╪¿╪º╪¬ ╪º┘ä┘à╪│╪ñ┘ê┘ä┘è┘å ┘à┘å ╪«┘ä╪º┘ä "
+"╪º┘ä╪«╪»┘à╪⌐ ╪º┘ä╪░╪º╪¬┘è╪⌐. "
+
+#: trendsearth_ui/callbacks/profile.py:530
+msgid "Please contact a system administrator."
+msgstr "┘è╪▒╪¼┘ë ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿┘à╪│╪ñ┘ê┘ä ╪º┘ä┘å╪╕╪º┘à."
+
+#: trendsearth_ui/callbacks/profile.py:546
+#: trendsearth_ui/callbacks/profile.py:551
+msgid "Failed to delete account."
+msgstr "┘ü╪┤┘ä ╪¡╪░┘ü ╪º┘ä╪¡╪│╪º╪¿."
+
+#: trendsearth_ui/callbacks/profile.py:550
+#: trendsearth_ui/callbacks/profile.py:552
+msgid "Please try again."
+msgstr "┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
+
+#: trendsearth_ui/callbacks/status.py:253
+#, python-brace-format
+msgid "Current System Status ({header_label})"
+msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪º┘ä╪¡╪º┘ä┘è╪⌐ ({header_label})"
+
+#: trendsearth_ui/callbacks/status.py:255
+#: trendsearth_ui/callbacks/status.py:285
+#: trendsearth_ui/components/tabs.py:2070
+msgid "Current System Status"
+msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪º┘ä╪¡╪º┘ä┘è╪⌐"
+
+#: trendsearth_ui/callbacks/status.py:265
+#, python-brace-format
+msgid "Cluster Status{cluster_cached_time}"
+msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐ {cluster_cached_time}"
+
+#: trendsearth_ui/callbacks/status.py:281
+#, python-brace-format
+msgid "Error loading status data: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪¡╪º┘ä╪⌐: {error}"
+
+#: trendsearth_ui/callbacks/status.py:289
+msgid "Error"
+msgstr "╪«╪╖╪ú"
+
+#: trendsearth_ui/callbacks/status.py:401
+#: trendsearth_ui/callbacks/status.py:578
+msgid "Statistics unavailable."
+msgstr "╪º┘ä╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ╪║┘è╪▒ ┘à╪¬┘ê┘ü╪▒╪⌐."
+
+#: trendsearth_ui/callbacks/status.py:403
+#: trendsearth_ui/callbacks/status.py:580
+#, python-brace-format
+msgid "Error: {error}"
+msgstr "╪«╪╖╪ú: {error}"
+
+#: trendsearth_ui/callbacks/status.py:404
+#: trendsearth_ui/callbacks/status.py:580
+msgid "Unknown error"
+msgstr "╪«╪╖╪ú ╪║┘è╪▒ ┘à╪╣╪▒┘ê┘ü"
+
+#: trendsearth_ui/callbacks/status.py:420
+#, python-brace-format
+msgid "Error loading statistics: {error}"
+msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬: {error}"
+
+#: trendsearth_ui/callbacks/status.py:472
+msgid "No status data available."
+msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪¡╪º┘ä╪⌐."
+
+#: trendsearth_ui/callbacks/status.py:500
+msgid "Overview"
+msgstr "┘à┘ä╪«╪╡"
+
+#: trendsearth_ui/callbacks/status.py:503
+msgid "Total Executions"
+msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪Ñ╪╣╪»╪º┘à ╪º┘ä┘â╪º┘à┘ä╪⌐"
+
+#: trendsearth_ui/callbacks/status.py:504
+msgid "Total Users"
+msgstr "╪Ñ╪¼┘à╪º┘ä┘è ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
+
+#: trendsearth_ui/callbacks/status.py:505
+msgid "Total Scripts"
+msgstr "╪¬┘ê╪¬╪º┘ä ╪│┘â╪▒┘è╪¿╪¬╪│"
+
+#: trendsearth_ui/callbacks/status.py:514
+#: trendsearth_ui/components/layout.py:2372
+msgid "Executions"
+msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪Ñ╪╣╪»╪º┘à"
+
+#: trendsearth_ui/callbacks/status.py:517
+#: trendsearth_ui/utils/mobile_utils.py:990
+msgid "Active"
+msgstr "┘å╪┤┘è╪╖"
+
+#: trendsearth_ui/callbacks/status.py:520
+msgid "Running"
+msgstr "╪¼╪▒┘è"
+
+#: trendsearth_ui/callbacks/status.py:521
+msgid "Ready"
+msgstr "┘à╪│╪¬╪╣╪»"
+
+#: trendsearth_ui/callbacks/status.py:522
+msgid "Pending"
+msgstr "┘é┘è╪» ╪º┘ä╪º┘å╪¬╪╕╪º╪▒"
+
+#: trendsearth_ui/callbacks/status.py:524
+#: trendsearth_ui/callbacks/status.py:547
+msgid "Total"
+msgstr "╪º┘ä┘à╪¼┘à┘ê╪╣"
+
+#: trendsearth_ui/callbacks/status.py:536
+#: trendsearth_ui/utils/stats_visualizations.py:2117
+msgid "Completed"
+msgstr "┘à┘â╪¬┘à┘ä"
+
+#: trendsearth_ui/callbacks/status.py:539
+#: trendsearth_ui/utils/stats_visualizations.py:800
+msgid "Finished"
+msgstr "╪º┘å╪¬┘ç┘ë"
+
+#: trendsearth_ui/callbacks/status.py:541
+#: trendsearth_ui/utils/stats_visualizations.py:2121
+msgid "Failed"
+msgstr "┘ü╪┤┘ä"
+
+#: trendsearth_ui/callbacks/status.py:545
+#: trendsearth_ui/utils/stats_visualizations.py:2125
+msgid "Cancelled"
+msgstr "╪¬┘à ╪º┘ä╪Ñ┘ä╪║╪º╪í"
+
+#: trendsearth_ui/callbacks/status.py:582
+msgid "No statistics available for the selected period."
+msgstr ""
+"┘ä╪º ╪¬┘ê╪¼╪» ╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ┘à╪¬╪º╪¡╪⌐ ┘ä┘ä┘ü╪¬╪▒╪⌐ ╪º┘ä┘à╪¡╪»╪»╪⌐."
+
+#: trendsearth_ui/callbacks/unsubscribe.py:50
+#: trendsearth_ui/callbacks/unsubscribe.py:113
+msgid "No unsubscribe token found. Please use the link from your email."
+msgstr ""
+
+#: trendsearth_ui/callbacks/unsubscribe.py:64
+#: trendsearth_ui/callbacks/unsubscribe.py:128
+msgid "Network error. Please try again."
+msgstr ""
+
+#: trendsearth_ui/callbacks/unsubscribe.py:80
+msgid "Failed to load preferences."
+msgstr ""
+
+#: trendsearth_ui/callbacks/unsubscribe.py:132
+msgid "Your email preferences have been saved successfully."
+msgstr ""
+
+#: trendsearth_ui/callbacks/unsubscribe.py:137
+msgid "Failed to save preferences."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:54
+msgid "Government - Environment/Natural Resources"
+msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪º┘ä╪¿┘è╪ª╪⌐/╪º┘ä┘à┘ê╪º╪▒╪» ╪º┘ä╪╖╪¿┘è╪╣┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:55
+msgid "Government - Agriculture"
+msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪º┘ä╪▓╪▒╪º╪╣╪⌐"
+
+#: trendsearth_ui/components/layout.py:56
+msgid "Government - Land Management/Planning"
+msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪▒╪º╪╢┘è/╪º┘ä╪¬╪«╪╖┘è╪╖"
+
+#: trendsearth_ui/components/layout.py:57
+msgid "Government - Other"
+msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪ú╪«╪▒┘ë"
+
+#: trendsearth_ui/components/layout.py:58
+msgid "International/Multilateral Organization"
+msgstr "┘à┘å╪╕┘à╪⌐ ╪»┘ê┘ä┘è╪⌐/┘à╪¬╪╣╪»╪»╪⌐ ╪º┘ä╪ú╪╖╪▒╪º┘ü"
+
+#: trendsearth_ui/components/layout.py:59
+msgid "NGO - Development/Aid"
+msgstr ""
+"╪º┘ä┘à┘å╪╕┘à╪º╪¬ ╪║┘è╪▒ ╪º┘ä╪¡┘â┘ê┘à┘è╪⌐ - ╪º┘ä╪¬┘å┘à┘è╪⌐/╪º┘ä┘à╪│╪º╪╣╪»╪⌐"
+
+#: trendsearth_ui/components/layout.py:60
+msgid "NGO - Community-Based"
+msgstr "┘à┘å╪╕┘à╪⌐ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ┘à╪¼╪¬┘à╪╣┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:61
+msgid "NGO - Conservation"
+msgstr "┘à┘å╪╕┘à╪⌐ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ╪º┘ä╪¡┘ü╪º╪╕ ╪╣┘ä┘ë ╪º┘ä╪¿┘è╪ª╪⌐"
+
+#: trendsearth_ui/components/layout.py:62
+msgid "NGO - Other"
+msgstr "┘à┘å╪╕┘à╪º╪¬ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ╪ú╪«╪▒┘ë"
+
+#: trendsearth_ui/components/layout.py:63
+msgid "Academic/Research Institution"
+msgstr "┘à╪ñ╪│╪│╪⌐ ╪ú┘â╪º╪»┘è┘à┘è╪⌐/╪¿╪¡╪½┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:64
+msgid "Consulting/Professional Services"
+msgstr "╪º┘ä╪«╪»┘à╪º╪¬ ╪º┘ä╪º╪│╪¬╪┤╪º╪▒┘è╪⌐/╪º┘ä┘à┘ç┘å┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:65
+msgid "Private Sector - Agriculture/Forestry"
+msgstr "╪º┘ä┘é╪╖╪º╪╣ ╪º┘ä╪«╪º╪╡ - ╪º┘ä╪▓╪▒╪º╪╣╪⌐/╪º┘ä╪║╪º╪¿╪º╪¬"
+
+#: trendsearth_ui/components/layout.py:66
+msgid "Private Sector - Other"
+msgstr "╪º┘ä┘é╪╖╪º╪╣ ╪º┘ä╪«╪º╪╡ - ╪ú╪«╪▒┘ë"
+
+#: trendsearth_ui/components/layout.py:67
+msgid "Independent Researcher"
+msgstr "╪¿╪º╪¡╪½ ┘à╪│╪¬┘é┘ä"
+
+#: trendsearth_ui/components/layout.py:68
+msgid "Student"
+msgstr "╪╖╪º┘ä╪¿"
+
+#: trendsearth_ui/components/layout.py:69
+#: trendsearth_ui/components/layout.py:92
+msgid "Other"
+msgstr "╪ó╪«╪▒"
+
+#: trendsearth_ui/components/layout.py:81
+msgid "National/International Reporting (UNCCD, SDGs, etc.)"
+msgstr ""
+"╪º┘ä╪¬┘é╪º╪▒┘è╪▒ ╪º┘ä┘ê╪╖┘å┘è╪⌐/╪º┘ä╪»┘ê┘ä┘è╪⌐ (╪º╪¬┘ü╪º┘é┘è╪⌐ ╪º┘ä╪ú┘à┘à "
+"╪º┘ä┘à╪¬╪¡╪»╪⌐ ┘ä┘à┘â╪º┘ü╪¡╪⌐ ╪º┘ä╪¬╪╡╪¡╪▒╪î ╪ú┘ç╪»╪º┘ü ╪º┘ä╪¬┘å┘à┘è╪⌐ "
+"╪º┘ä┘à╪│╪¬╪»╪º┘à╪⌐╪î ╪Ñ┘ä╪«)."
+
+#: trendsearth_ui/components/layout.py:82
+msgid "Academic Research"
+msgstr "╪º┘ä╪¿╪¡╪½ ╪º┘ä╪ú┘â╪º╪»┘è┘à┘è"
+
+#: trendsearth_ui/components/layout.py:83
+msgid "Policy Development & Planning"
+msgstr "╪¬╪╖┘ê┘è╪▒ ╪º┘ä╪│┘è╪º╪│╪º╪¬ ┘ê╪º┘ä╪¬╪«╪╖┘è╪╖"
+
+#: trendsearth_ui/components/layout.py:84
+msgid "Land Restoration/Management Planning"
+msgstr "╪¬╪«╪╖┘è╪╖ ╪º╪│╪¬╪╡┘ä╪º╪¡ ╪º┘ä╪ú╪▒╪º╪╢┘è ┘ê╪Ñ╪»╪º╪▒╪¬┘ç╪º"
+
+#: trendsearth_ui/components/layout.py:85
+msgid "Project Monitoring & Evaluation"
+msgstr "┘à╪▒╪º┘é╪¿╪⌐ ┘ê╪¬┘é┘è┘è┘à ╪º┘ä┘à╪┤╪▒┘ê╪╣"
+
+#: trendsearth_ui/components/layout.py:86
+msgid "Environmental Impact Assessment"
+msgstr "╪¬┘é┘è┘è┘à ╪º┘ä╪ú╪½╪▒ ╪º┘ä╪¿┘è╪ª┘è"
+
+#: trendsearth_ui/components/layout.py:87
+msgid "Agriculture/Forestry Planning"
+msgstr "╪º┘ä╪¬╪«╪╖┘è╪╖ ╪º┘ä╪▓╪▒╪º╪╣┘è/╪º┘ä╪¡╪▒╪º╪¼┘è"
+
+#: trendsearth_ui/components/layout.py:88
+msgid "Teaching & Education"
+msgstr "╪º┘ä╪¬╪»╪▒┘è╪│ ┘ê╪º┘ä╪¬╪╣┘ä┘è┘à"
+
+#: trendsearth_ui/components/layout.py:89
+msgid "Conservation Planning"
+msgstr "╪¬╪«╪╖┘è╪╖ ╪º┘ä╪¡┘ü╪╕"
+
+#: trendsearth_ui/components/layout.py:90
+msgid "Commercial Services/Products"
+msgstr "╪º┘ä╪«╪»┘à╪º╪¬/╪º┘ä┘à┘å╪¬╪¼╪º╪¬ ╪º┘ä╪¬╪¼╪º╪▒┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:91
+msgid "Community/Grassroots Initiatives"
+msgstr "┘à╪¿╪º╪»╪▒╪º╪¬ ┘à╪¼╪¬┘à╪╣┘è╪⌐/╪┤╪╣╪¿┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:104
+msgid "Woman"
+msgstr "╪º┘à╪▒╪ú╪⌐"
+
+#: trendsearth_ui/components/layout.py:105
+msgid "Man"
+msgstr "╪▒╪¼┘ä"
+
+#: trendsearth_ui/components/layout.py:106
+msgid "Non-binary"
+msgstr "╪║┘è╪▒ ╪½┘å╪º╪ª┘è"
+
+#: trendsearth_ui/components/layout.py:107
+msgid "Prefer to self-describe"
+msgstr "╪ú┘ü╪╢┘ä ╪ú┘å ╪ú╪╡┘ü ┘å┘ü╪│┘è"
+
+#: trendsearth_ui/components/layout.py:108
+msgid "Prefer not to say"
+msgstr "╪ú┘ü╪╢┘æ┘ä ╪╣╪»┘à ╪º┘ä╪Ñ┘ü╪╡╪º╪¡"
+
+#: trendsearth_ui/components/layout.py:199
+msgid "Forgot Password"
+msgstr "┘ç┘ä ┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒"
+
+#: trendsearth_ui/components/layout.py:209
+msgid ""
+"Enter your email address and we'll send you instructions to reset your "
+"password."
+msgstr ""
+"╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ê╪│┘å╪▒╪│┘ä ┘ä┘â "
+"╪¬╪╣┘ä┘è┘à╪º╪¬ ┘ä╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪«╪º╪╡╪⌐ "
+"╪¿┘â."
+
+#: trendsearth_ui/components/layout.py:212
+msgid "Email Address"
+msgstr "╪╣┘å┘ê╪º┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/layout.py:216
+#: trendsearth_ui/components/layout.py:1045
+msgid "Enter your email address"
+msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/layout.py:238
+#: trendsearth_ui/components/tabs.py:337
+#: trendsearth_ui/components/tabs.py:3129
+#: trendsearth_ui/components/tabs.py:3162
+msgid "Cancel"
+msgstr "┘è┘ä╪║┘è"
+
+#: trendsearth_ui/components/layout.py:244
+msgid "Send Reset Instructions"
+msgstr "╪Ñ╪▒╪│╪º┘ä ╪¬╪╣┘ä┘è┘à╪º╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪╢╪¿╪╖"
+
+#: trendsearth_ui/components/layout.py:256
+msgid "OK"
+msgstr "┘å╪╣┘à"
+
+#: trendsearth_ui/components/layout.py:291
+#: trendsearth_ui/components/layout.py:363
+#: trendsearth_ui/components/layout.py:1610
+msgid "Login"
+msgstr "╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä"
+
+#: trendsearth_ui/components/layout.py:311
+#: trendsearth_ui/components/layout.py:1031
+#: trendsearth_ui/components/layout.py:1577
+#: trendsearth_ui/components/layout.py:1659
+#: trendsearth_ui/components/tabs.py:580
+#: trendsearth_ui/utils/mobile_utils.py:96
+#: trendsearth_ui/utils/mobile_utils.py:245
+#: trendsearth_ui/utils/mobile_utils.py:858
+msgid "Email"
+msgstr "╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/layout.py:316
+#: trendsearth_ui/components/layout.py:1583
+msgid "Enter email"
+msgstr "╪ú╪»╪«┘ä ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/layout.py:325
+#: trendsearth_ui/components/layout.py:1594
+#: trendsearth_ui/components/tabs.py:1486
+#: trendsearth_ui/components/tabs.py:1495
+msgid "Password"
+msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
+
+#: trendsearth_ui/components/layout.py:330
+#: trendsearth_ui/components/layout.py:1601
+msgid "Enter password"
+msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
+
+#: trendsearth_ui/components/layout.py:353
+msgid "Remember me (keep me logged in)"
+msgstr "╪¬╪░┘â╪▒┘å┘è (╪ú╪¿┘é┘å┘è ┘à╪│╪¼┘ä╪º┘ï ╪»╪«┘ê┘ä┘è)"
+
+#: trendsearth_ui/components/layout.py:371
+msgid "Register"
+msgstr "┘è╪│╪¼┘ä"
+
+#: trendsearth_ui/components/layout.py:382
+msgid "Forgot your password?"
+msgstr "┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒╪ƒ"
+
+#: trendsearth_ui/components/layout.py:413
+#: trendsearth_ui/components/layout.py:655
+#: trendsearth_ui/components/layout.py:904
+#: trendsearth_ui/components/layout.py:1441
+#: trendsearth_ui/components/layout.py:2025
+#: trendsearth_ui/components/layout.py:2219
+msgid "Privacy Policy"
+msgstr "╪│┘è╪º╪│╪⌐ ╪º┘ä╪«╪╡┘ê╪╡┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:428
+#: trendsearth_ui/components/layout.py:670
+#: trendsearth_ui/components/layout.py:919
+#: trendsearth_ui/components/layout.py:1456
+#: trendsearth_ui/components/layout.py:2040
+#: trendsearth_ui/components/layout.py:2234
+msgid "Terms of Use"
+msgstr "╪┤╪▒┘ê╪╖ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
+
+#: trendsearth_ui/components/layout.py:511
+msgid "Set Your New Password"
+msgstr "┘é┘à ╪¿╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
+
+#: trendsearth_ui/components/layout.py:515
+msgid "Enter your new password below."
+msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ╪ú╪»┘å╪º┘ç."
+
+#: trendsearth_ui/components/layout.py:536
+msgid "New Password"
+msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
+
+#: trendsearth_ui/components/layout.py:542
+msgid "Enter new password"
+msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
+
+#: trendsearth_ui/components/layout.py:553
+msgid "Confirm Password"
+msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
+
+#: trendsearth_ui/components/layout.py:560
+msgid "Confirm new password"
+msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
+
+#: trendsearth_ui/components/layout.py:572
+#: trendsearth_ui/components/tabs.py:3265
+msgid "Password requirements:"
+msgstr "┘à╪¬╪╖┘ä╪¿╪º╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒:"
+
+#: trendsearth_ui/components/layout.py:578
+#: trendsearth_ui/components/tabs.py:3271
+msgid "At least 12 characters"
+msgstr "12 ╪¡╪▒┘ü┘ï╪º ╪╣┘ä┘ë ╪º┘ä╪ú┘é┘ä"
+
+#: trendsearth_ui/components/layout.py:583
+#: trendsearth_ui/components/tabs.py:3276
+msgid "Uppercase letter (A-Z)"
+msgstr "╪¡╪▒┘ü ┘â╪¿┘è╪▒ (AZ)"
+
+#: trendsearth_ui/components/layout.py:588
+#: trendsearth_ui/components/tabs.py:3281
+msgid "Lowercase letter (a-z)"
+msgstr "╪¡╪▒┘ü ╪╡╪║┘è╪▒ (az)"
+
+#: trendsearth_ui/components/layout.py:593
+#: trendsearth_ui/components/tabs.py:3286
+msgid "Number (0-9)"
+msgstr "╪º┘ä╪▒┘é┘à (0-9)"
+
+#: trendsearth_ui/components/layout.py:599
+#: trendsearth_ui/components/tabs.py:3292
+#, python-brace-format
+msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
+msgstr "╪▒┘à╪▓ ╪«╪º╪╡ (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+
+#: trendsearth_ui/components/layout.py:616
+msgid "Set Password"
+msgstr "╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
+
+#: trendsearth_ui/components/layout.py:632
+#: trendsearth_ui/components/layout.py:1425
+msgid "Back to Login"
+msgstr "╪º┘ä╪╣┘ê╪»╪⌐ ╪Ñ┘ä┘ë ╪╡┘ü╪¡╪⌐ ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä"
+
+#: trendsearth_ui/components/layout.py:756
+msgid "Connect Google Earth Engine"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:794
+msgid "Connecting your Google Earth Engine account…"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:805
+msgid "Invalid callback — missing authorization parameters."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:827
+msgid "Select your GEE Cloud Project"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:832
+msgid ""
+"Select the Google Cloud project where Earth Engine API is enabled. API usage"
+" will be billed to this project."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:841
+#: trendsearth_ui/components/tabs.py:1243
+msgid "Enter your GCP project ID:"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:857
+#: trendsearth_ui/components/tabs.py:1257
+msgid "Find your project ID in the "
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:859
+#: trendsearth_ui/components/tabs.py:1259
+msgid "Google Cloud Console"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:871
+#: trendsearth_ui/components/tabs.py:1271
+msgid ""
+"Project ID must be 6-30 characters, start with a letter, and contain only "
+"lowercase letters, numbers, and hyphens."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:880
+#: trendsearth_ui/components/tabs.py:1280
+msgid "Save Project"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:894
+msgid "Back to App"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1001
+msgid "Create Your Account"
+msgstr "╪ú┘å╪┤╪ª ╪¡╪│╪º╪¿┘â"
+
+#: trendsearth_ui/components/layout.py:1006
+msgid ""
+"After registration, you'll receive an email to verify your address and set "
+"your password."
+msgstr ""
+"╪¿╪╣╪» ╪º┘ä╪¬╪│╪¼┘è┘ä╪î ╪│╪¬╪¬┘ä┘é┘ë ╪▒╪│╪º┘ä╪⌐ ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è "
+"┘ä┘ä╪¬╪¡┘é┘é ┘à┘å ╪╣┘å┘ê╪º┘å┘â ┘ê╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ "
+"╪º┘ä╪«╪º╪╡╪⌐ ╪¿┘â."
+
+#: trendsearth_ui/components/layout.py:1019
+#: trendsearth_ui/components/layout.py:1650
+msgid "Required field"
+msgstr "╪¡┘é┘ä ┘à╪╖┘ä┘ê╪¿"
+
+#: trendsearth_ui/components/layout.py:1059
+#: trendsearth_ui/components/layout.py:1686
+msgid "Full Name"
+msgstr "╪º┘ä╪º╪│┘à ╪º┘ä┘â╪º┘à┘ä"
+
+#: trendsearth_ui/components/layout.py:1073
+#: trendsearth_ui/components/layout.py:1700
+#: trendsearth_ui/components/tabs.py:619
+msgid "Enter your full name"
+msgstr "╪ú╪»╪«┘ä ╪º╪│┘à┘â ╪º┘ä┘â╪º┘à┘ä"
+
+#: trendsearth_ui/components/layout.py:1085
+#: trendsearth_ui/components/layout.py:1712
+#: trendsearth_ui/components/tabs.py:627
+#: trendsearth_ui/utils/mobile_utils.py:388
+msgid "Role/Title"
+msgstr "╪º┘ä╪»┘ê╪▒/╪º┘ä┘ä┘é╪¿"
+
+#: trendsearth_ui/components/layout.py:1092
+#: trendsearth_ui/components/layout.py:1719
+#: trendsearth_ui/components/tabs.py:631
+msgid "Your job title (optional)"
+msgstr "┘à╪│┘à┘ë ┘ê╪╕┘è┘ü╪¬┘â (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/layout.py:1106
+#: trendsearth_ui/components/layout.py:1733
+#: trendsearth_ui/components/tabs.py:647
+msgid "Organization"
+msgstr "┘à┘å╪╕┘à╪⌐"
+
+#: trendsearth_ui/components/layout.py:1120
+#: trendsearth_ui/components/layout.py:1747
+#: trendsearth_ui/components/tabs.py:654
+msgid "Your organization"
+msgstr "┘à╪ñ╪│╪│╪¬┘â┘à"
+
+#: trendsearth_ui/components/layout.py:1134
+#: trendsearth_ui/components/layout.py:1761
+#: trendsearth_ui/components/tabs.py:688
+#: trendsearth_ui/utils/mobile_utils.py:404
+msgid "Sector"
+msgstr "┘é╪╖╪º╪╣"
+
+#: trendsearth_ui/components/layout.py:1148
+#: trendsearth_ui/components/layout.py:1775
+#: trendsearth_ui/components/tabs.py:695
+msgid "Select your sector"
+msgstr "╪º╪«╪¬╪▒ ┘é╪╖╪º╪╣┘â"
+
+#: trendsearth_ui/components/layout.py:1162
+#: trendsearth_ui/components/layout.py:1215
+#: trendsearth_ui/components/layout.py:1789
+#: trendsearth_ui/components/layout.py:1842
+msgid "Please specify"
+msgstr "┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡╪»┘è╪»"
+
+#: trendsearth_ui/components/layout.py:1169
+#: trendsearth_ui/components/layout.py:1796
+#: trendsearth_ui/components/tabs.py:709
+msgid "Please specify your sector"
+msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘é╪╖╪º╪╣┘â"
+
+#: trendsearth_ui/components/layout.py:1186
+#: trendsearth_ui/components/layout.py:1813
+#: trendsearth_ui/components/tabs.py:727
+#: trendsearth_ui/utils/mobile_utils.py:420
+msgid "Purpose of Use"
+msgstr "╪º┘ä╪║╪▒╪╢ ┘à┘å ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
+
+#: trendsearth_ui/components/layout.py:1201
+#: trendsearth_ui/components/layout.py:1828
+#: trendsearth_ui/components/tabs.py:734
+msgid "Select your purpose of use"
+msgstr "╪¡╪»╪» ╪║╪▒╪╢ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
+
+#: trendsearth_ui/components/layout.py:1222
+#: trendsearth_ui/components/layout.py:1849
+#: trendsearth_ui/components/tabs.py:749
+msgid "Please specify your purpose"
+msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪º┘ä╪║╪▒╪╢ ┘à┘å ╪░┘ä┘â"
+
+#: trendsearth_ui/components/layout.py:1238
+#: trendsearth_ui/components/layout.py:1865
+#: trendsearth_ui/components/tabs.py:664
+#: trendsearth_ui/components/tabs.py:3326
+#: trendsearth_ui/utils/mobile_utils.py:294
+#: trendsearth_ui/utils/stats_visualizations.py:1751
+msgid "Country"
+msgstr "╪»┘ê┘ä╪⌐"
+
+#: trendsearth_ui/components/layout.py:1251
+#: trendsearth_ui/components/layout.py:1878
+#: trendsearth_ui/components/tabs.py:670
+msgid "Select your country"
+msgstr "╪º╪«╪¬╪▒ ╪¿┘ä╪»┘â"
+
+#: trendsearth_ui/components/layout.py:1269
+#: trendsearth_ui/components/layout.py:1893
+#: trendsearth_ui/components/tabs.py:766
+msgid "Gender Identity"
+msgstr "╪º┘ä┘ç┘ê┘è╪⌐ ╪º┘ä╪¼┘å╪│┘è╪⌐"
+
+#: trendsearth_ui/components/layout.py:1277
+#: trendsearth_ui/components/layout.py:1901
+#: trendsearth_ui/components/tabs.py:770
+msgid "Select (optional)"
+msgstr "╪º╪«╪¬╪▒ (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/layout.py:1291
+#: trendsearth_ui/components/layout.py:1915
+#: trendsearth_ui/components/tabs.py:798
+msgid ""
+"We collect gender identity information to comply with donor reporting "
+"requirements and to assess equitable participation in capacity development "
+"and tool access. Providing this information is voluntary; your selection "
+"will not affect your access to the tool."
+msgstr ""
+"┘å╪¼┘à╪╣ ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘ç┘ê┘è╪⌐ ╪º┘ä╪¼┘å╪│┘è╪⌐ ╪º┘à╪¬╪½╪º┘ä╪º┘ï "
+"┘ä┘à╪¬╪╖┘ä╪¿╪º╪¬ ╪Ñ╪╣╪»╪º╪» ╪º┘ä╪¬┘é╪º╪▒┘è╪▒ ┘ä┘ä╪¼┘ç╪º╪¬ ╪º┘ä┘à╪º┘å╪¡╪⌐╪î "
+"┘ê┘ä╪¬┘é┘è┘è┘à ╪º┘ä┘à╪┤╪º╪▒┘â╪⌐ ╪º┘ä╪╣╪º╪»┘ä╪⌐ ┘ü┘è ╪¬┘å┘à┘è╪⌐ "
+"╪º┘ä┘é╪»╪▒╪º╪¬ ┘ê╪Ñ╪¬╪º╪¡╪⌐ ╪º┘ä╪ú╪»┘ê╪º╪¬. ╪¬┘é╪»┘è┘à ┘ç╪░┘ç "
+"╪º┘ä┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º╪«╪¬┘è╪º╪▒┘è╪î ┘ê┘ä┘å ┘è╪ñ╪½╪▒ ╪º╪«╪¬┘è╪º╪▒┘â ╪╣┘ä┘ë "
+"╪Ñ┘à┘â╪º┘å┘è╪⌐ ┘ê╪╡┘ê┘ä┘â ╪Ñ┘ä┘ë ╪º┘ä╪ú╪»╪º╪⌐."
+
+#: trendsearth_ui/components/layout.py:1300
+#: trendsearth_ui/components/layout.py:1308
+#: trendsearth_ui/components/layout.py:1924
+#: trendsearth_ui/components/layout.py:1932
+#: trendsearth_ui/components/tabs.py:780 trendsearth_ui/components/tabs.py:784
+msgid "Please describe"
+msgstr "┘è╪▒╪¼┘ë ╪º┘ä┘ê╪╡┘ü"
+
+#: trendsearth_ui/components/layout.py:1352
+#: trendsearth_ui/components/layout.py:1950
+#: trendsearth_ui/components/tabs.py:814
+msgid ""
+"Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
+"and, depending on your use, you may be required to have in place a "
+"commercial license to use Google Earth Engine?"
+msgstr ""
+"┘ç┘ä ╪¬┘é╪▒┘æ ╪¿╪ú┘å ╪¿╪╣╪╢ ┘à┘è╪▓╪º╪¬ Trends.Earth ╪¬╪│╪¬╪«╪»┘à ┘à╪¡╪▒┘â "
+"Google Earth╪î ┘ê╪ú┘å┘ç ┘é╪» ┘è┘Å╪╖┘ä╪¿ ┘à┘å┘â╪î ╪º╪╣╪¬┘à╪º╪»┘ï╪º ╪╣┘ä┘ë "
+"╪º╪│╪¬╪«╪»╪º┘à┘â╪î ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪¬╪▒╪«┘è╪╡ ╪¬╪¼╪º╪▒┘è "
+"┘ä╪º╪│╪¬╪«╪»╪º┘à ┘à╪¡╪▒┘â Google Earth╪ƒ"
+
+#: trendsearth_ui/components/layout.py:1365
+#: trendsearth_ui/components/layout.py:1963
+#: trendsearth_ui/components/tabs.py:827
+msgid ""
+"Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
+"details see the "
+msgstr ""
+"┘è┘ü╪▒╪╢ ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ (GEE) ┘é┘è┘ê╪»┘ï╪º ╪╣┘ä┘ë "
+"╪º┘ä╪º╪│╪¬╪«╪»╪º┘à ╪º┘ä╪¬╪¼╪º╪▒┘è. ┘ä┘à╪▓┘è╪» ┘à┘å ╪º┘ä╪¬┘ü╪º╪╡┘è┘ä╪î "
+"╪▒╪º╪¼╪╣ "
+
+#: trendsearth_ui/components/layout.py:1369
+#: trendsearth_ui/components/layout.py:1967
+#: trendsearth_ui/components/tabs.py:830
+msgid "Google Earth Engine Terms of Use"
+msgstr "╪┤╪▒┘ê╪╖ ╪º╪│╪¬╪«╪»╪º┘à ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½"
+
+#: trendsearth_ui/components/layout.py:1375
+#: trendsearth_ui/components/layout.py:1973
+#: trendsearth_ui/components/tabs.py:835
+msgid ""
+" . Conservation International does not provide or manage commercial GEE "
+"licenses. Users are solely responsible for ensuring their use of GEE "
+"complies with Google's commercial licensing requirements. Access to this "
+"tool does not grant or imply the provision of commercial licensing."
+msgstr ""
+" ┘ä╪º ╪¬┘Å┘é╪»┘æ┘à ┘à┘å╪╕┘à╪⌐ Conservation International ╪¬╪▒╪º╪«┘è╪╡ Google"
+" EEE ╪º┘ä╪¬╪¼╪º╪▒┘è╪⌐ ┘ê┘ä╪º ╪¬┘Å╪»┘è╪▒┘ç╪º. ┘è╪¬╪¡┘à┘æ┘ä "
+"╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å ┘ê╪¡╪»┘ç┘à ┘à╪│╪ñ┘ê┘ä┘è╪⌐ ╪╢┘à╪º┘å ╪¬┘ê╪º┘ü┘é "
+"╪º╪│╪¬╪«╪»╪º┘à┘ç┘à ┘ä┘Ç Google EEE ┘à╪╣ ┘à╪¬╪╖┘ä╪¿╪º╪¬ ╪º┘ä╪¬╪▒╪«┘è╪╡ "
+"╪º┘ä╪¬╪¼╪º╪▒┘è ┘ä╪┤╪▒┘â╪⌐ Google. ┘ê┘ä╪º ┘è┘Å┘à┘å╪¡ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë "
+"┘ç╪░┘ç ╪º┘ä╪ú╪»╪º╪⌐ ╪ú┘è ╪¬╪▒╪«┘è╪╡ ╪¬╪¼╪º╪▒┘è╪î ┘ê┘ä╪º ┘è┘Å┘ü┘ç┘à ┘à┘å┘ç "
+"╪░┘ä┘â."
+
+#: trendsearth_ui/components/layout.py:1384
+#: trendsearth_ui/components/layout.py:1982
+#: trendsearth_ui/components/tabs.py:844
+msgid "Yes, I acknowledge"
+msgstr "┘å╪╣┘à╪î ╪ú┘é╪▒ ╪¿╪░┘ä┘â."
+
+#: trendsearth_ui/components/layout.py:1409
+msgid "Create Account"
+msgstr "╪Ñ┘å╪┤╪º╪í ╪¡╪│╪º╪¿"
+
+#: trendsearth_ui/components/layout.py:1554
+msgid "Update Your Profile"
+msgstr "┘é┘à ╪¿╪¬╪¡╪»┘è╪½ ┘à┘ä┘ü┘â ╪º┘ä╪┤╪«╪╡┘è"
+
+#: trendsearth_ui/components/layout.py:1570
+msgid "Please log in to update your profile."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1629
+msgid "Loading profile..."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:1671
+msgid "Email cannot be changed"
+msgstr "┘ä╪º ┘è┘à┘â┘å ╪¬╪║┘è┘è╪▒ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/layout.py:2008
+#: trendsearth_ui/components/tabs.py:863
+msgid "Update Profile"
+msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è"
+
+#: trendsearth_ui/components/layout.py:2127
+msgid "Email Subscription Preferences"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2132
+msgid "Choose which types of emails you'd like to receive from Trends.Earth."
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2160
+#: trendsearth_ui/components/tabs.py:973
+msgid "Automated updates (job status, etc.)"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2168
+#: trendsearth_ui/components/tabs.py:990
+msgid "News and updates"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2175
+#: trendsearth_ui/components/tabs.py:998
+msgid "Engagement opportunities"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2183
+#: trendsearth_ui/components/tabs.py:1008
+msgid "System updates and announcements"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2197
+msgid "Save Preferences"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2203
+msgid "Unsubscribe from All"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2326
+msgid "Logout"
+msgstr "╪¬╪│╪¼┘è┘ä ╪º┘ä╪«╪▒┘ê╪¼"
+
+#: trendsearth_ui/components/layout.py:2382
+msgid "Users"
+msgstr "╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å"
+
+#: trendsearth_ui/components/layout.py:2396
+msgid "Scripts"
+msgstr "╪º┘ä┘å╪╡┘ê╪╡"
+
+#: trendsearth_ui/components/layout.py:2410
+#: trendsearth_ui/components/tabs.py:3354
+msgid "Admin"
+msgstr "┘à╪│╪ñ┘ä"
+
+#: trendsearth_ui/components/layout.py:2424
+#: trendsearth_ui/utils/mobile_utils.py:140
+#: trendsearth_ui/utils/mobile_utils.py:517
+#: trendsearth_ui/utils/mobile_utils.py:822
+msgid "Status"
+msgstr "╪¡╪º┘ä╪⌐"
+
+#: trendsearth_ui/components/layout.py:2438
+msgid "Bulk Email"
+msgstr ""
+
+#: trendsearth_ui/components/layout.py:2452
+msgid "Profile"
+msgstr "╪¡╪│╪º╪¿ ╪¬╪╣╪▒┘è┘ü┘è"
+
+#: trendsearth_ui/components/tabs.py:28
+#: trendsearth_ui/utils/mobile_utils.py:961
+msgid "Title"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:32
+msgid "Translated title..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:44
+#: trendsearth_ui/utils/mobile_utils.py:1009
+msgid "Message"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:47
+msgid "Translated message..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:60
+msgid "Link Text"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:64
+msgid "Translated link text..."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:78
+msgid "Machine translated (unverified)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:246
+msgid "Refresh Executions"
+msgstr "╪¬╪¡╪»┘è╪½ ╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░"
+
+#: trendsearth_ui/components/tabs.py:258
+msgid "Auto-refresh in:"
+msgstr "╪º┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä╪¬┘ä┘é╪º╪ª┘è ┘ü┘è:"
+
+#: trendsearth_ui/components/tabs.py:297
+msgid "Cancel Execution"
+msgstr "╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¬┘å┘ü┘è╪░"
+
+#: trendsearth_ui/components/tabs.py:303
+msgid "Are you sure you want to cancel this execution?"
+msgstr ""
+"┘ç┘ä ╪ú┘å╪¬ ┘à╪¬╪ú┘â╪» ┘à┘å ╪▒╪║╪¿╪¬┘â ┘ü┘è ╪Ñ┘ä╪║╪º╪í ┘ç╪░╪º "
+"╪º┘ä╪¬┘å┘ü┘è╪░╪ƒ"
+
+#: trendsearth_ui/components/tabs.py:308
+msgid "Execution ID:"
+msgstr "┘à╪╣╪▒┘æ┘ü ╪º┘ä╪¬┘å┘ü┘è╪░:"
+
+#: trendsearth_ui/components/tabs.py:315
+msgid "Script:"
+msgstr "┘å╪╡:"
+
+#: trendsearth_ui/components/tabs.py:322
+msgid "Status:"
+msgstr "╪¡╪º┘ä╪⌐:"
+
+#: trendsearth_ui/components/tabs.py:328
+msgid "This action cannot be undone."
+msgstr "┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪¬╪▒╪º╪¼╪╣ ╪╣┘å ┘ç╪░╪º ╪º┘ä╪Ñ╪¼╪▒╪º╪í."
+
+#: trendsearth_ui/components/tabs.py:345
+msgid "Confirm Cancel"
+msgstr "╪¬╪ú┘â┘è╪» ╪Ñ┘ä╪║╪º╪í"
+
+#: trendsearth_ui/components/tabs.py:384
+msgid "Cancellation Result"
+msgstr "┘å╪¬┘è╪¼╪⌐ ╪º┘ä╪Ñ┘ä╪║╪º╪í"
+
+#: trendsearth_ui/components/tabs.py:387
+msgid "Close"
+msgstr "┘è╪║┘ä┘é"
+
+#: trendsearth_ui/components/tabs.py:409
+msgid "Refresh Users"
+msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
+
+#: trendsearth_ui/components/tabs.py:483
+msgid "Refresh Scripts"
+msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:570
+msgid "Profile Settings"
+msgstr "╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è"
+
+#: trendsearth_ui/components/tabs.py:592
+msgid "System Role"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:612
+#: trendsearth_ui/components/tabs.py:1655
+#: trendsearth_ui/utils/mobile_utils.py:262
+#: trendsearth_ui/utils/mobile_utils.py:475
+msgid "Name"
+msgstr "╪º╪│┘à"
+
+#: trendsearth_ui/components/tabs.py:705
+msgid "Please specify sector"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:744
+msgid "Please specify purpose"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:964
+msgid "Email Preferences"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:984
+msgid "Choose which types of bulk emails you'd like to receive:"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1017
+msgid "Save Email Preferences"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1052
+msgid "Google Earth Engine Account"
+msgstr "╪¡╪│╪º╪¿ ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ ╪Ñ┘å╪¼┘å"
+
+#: trendsearth_ui/components/tabs.py:1054
+#: trendsearth_ui/components/tabs.py:1311
+msgid "EXPERIMENTAL"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1069
+#: trendsearth_ui/components/tabs.py:1326
+msgid "Current Credentials Status"
+msgstr "╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪¡╪º┘ä┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:1083
+msgid "Setup Your GEE Account"
+msgstr "┘é┘à ╪¿╪Ñ╪╣╪»╪º╪» ╪¡╪│╪º╪¿┘â ╪╣┘ä┘ë GEE"
+
+#: trendsearth_ui/components/tabs.py:1089
+msgid "Connect via OAuth (personal account)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1094
+#: trendsearth_ui/components/tabs.py:1163
+msgid "Upload Service Account Key"
+msgstr "╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐"
+
+#: trendsearth_ui/components/tabs.py:1118
+msgid ""
+"Connect your personal Google Earth Engine account using OAuth "
+"authentication."
+msgstr ""
+"┘é┘à ╪¿╪▒╪¿╪╖ ╪¡╪│╪º╪¿┘â ╪º┘ä╪┤╪«╪╡┘è ┘ü┘è Google Earth Engine "
+"╪¿╪º╪│╪¬╪«╪»╪º┘à ┘à╪╡╪º╪»┘é╪⌐ OAuth."
+
+#: trendsearth_ui/components/tabs.py:1123
+msgid "Connect GEE Account"
+msgstr "╪▒╪¿╪╖ ╪¡╪│╪º╪¿ GEE"
+
+#: trendsearth_ui/components/tabs.py:1152
+msgid ""
+"Upload a Google Cloud service account JSON key with Earth Engine access."
+msgstr ""
+"┘é┘à ╪¿╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ JSON ┘ä╪¡╪│╪º╪¿ ╪«╪»┘à╪⌐ Google Cloud ┘à╪╣ "
+"╪Ñ┘à┘â╪º┘å┘è╪⌐ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë Earth Engine."
+
+#: trendsearth_ui/components/tabs.py:1189
+#: trendsearth_ui/components/tabs.py:1538
+msgid "Manage Credentials"
+msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»"
+
+#: trendsearth_ui/components/tabs.py:1193
+msgid "Test Credentials"
+msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪º╪«╪¬╪¿╪º╪▒"
+
+#: trendsearth_ui/components/tabs.py:1200
+#: trendsearth_ui/components/tabs.py:1549
+msgid "Delete Credentials"
+msgstr "╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»"
+
+#: trendsearth_ui/components/tabs.py:1228
+msgid "Cloud Project"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1231
+msgid ""
+"Earth Engine API calls are billed to this Google Cloud project. It must have"
+" the Earth Engine API enabled."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1309
+msgid "openEO Account"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1340
+msgid "Configure openEO Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1343
+msgid ""
+"Provide credentials for authenticating with an openEO backend. These are "
+"used when running openEO scripts."
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1358
+msgid "Credential Type"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1390
+msgid "Client ID"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1399
+msgid "e.g. trends-earth"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1406
+msgid "Provider ID"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1411
+msgid "e.g. egi (optional)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1424
+msgid "Client Secret"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1428
+msgid "Optional"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1437
+msgid "Refresh Token"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1447
+msgid "Your OIDC refresh token"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1468
+msgid "Username"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1477
+msgid "Username or email"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1514
+msgid "Save Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1542
+msgid "Check Credentials"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:1580
+msgid "Service Credentials"
+msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐"
+
+#: trendsearth_ui/components/tabs.py:1585
+msgid ""
+"Service credentials allow external applications to authenticate with the "
+"Trends.Earth API using the OAuth2 client credentials grant. The client "
+"secret is shown only once at creation time."
+msgstr ""
+"╪¬╪│┘à╪¡ ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐ ┘ä┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ "
+"╪º┘ä╪«╪º╪▒╪¼┘è╪⌐ ╪¿╪º┘ä┘à╪╡╪º╪»┘é╪⌐ ┘à╪╣ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ "
+"╪¬╪╖╪¿┘è┘é╪º╪¬ Trends.Earth ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘à┘å╪¡ ╪¿┘è╪º┘å╪º╪¬ "
+"╪º╪╣╪¬┘à╪º╪» ╪╣┘à┘è┘ä OAuth2. ┘è╪¬┘à ╪╣╪▒╪╢ ╪│╪▒ ╪º┘ä╪╣┘à┘è┘ä ┘à╪▒╪⌐ "
+"┘ê╪º╪¡╪»╪⌐ ┘ü┘é╪╖ ╪╣┘å╪» ╪º┘ä╪Ñ┘å╪┤╪º╪í."
+
+#: trendsearth_ui/components/tabs.py:1599
+#: trendsearth_ui/components/tabs.py:2587
+msgid "Refresh"
+msgstr "┘è┘å╪╣╪┤"
+
+#: trendsearth_ui/components/tabs.py:1615
+msgid "New Credential"
+msgstr "┘ê╪½┘è┘é╪⌐ ╪º╪╣╪¬┘à╪º╪» ╪¼╪»┘è╪»╪⌐"
+
+#: trendsearth_ui/components/tabs.py:1644
+msgid "Create Service Credential"
+msgstr "╪Ñ┘å╪┤╪º╪í ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐"
+
+#: trendsearth_ui/components/tabs.py:1659
+msgid "e.g. My CLI Tool"
+msgstr "┘à╪½╪º┘ä: ╪ú╪»╪º╪⌐ ╪│╪╖╪▒ ╪º┘ä╪ú┘ê╪º┘à╪▒ ╪º┘ä╪«╪º╪╡╪⌐ ╪¿┘è"
+
+#: trendsearth_ui/components/tabs.py:1663
+msgid "A descriptive label for this credential."
+msgstr "┘ê╪╡┘ü┘î ┘ä┘ç╪░┘ç ╪º┘ä╪┤┘ç╪º╪»╪⌐."
+
+#: trendsearth_ui/components/tabs.py:2134
+msgid "Deployment Information"
+msgstr "┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘å╪┤╪▒"
+
+#: trendsearth_ui/components/tabs.py:2157
+msgid "System Status Trends"
+msgstr "╪º╪¬╪¼╪º┘ç╪º╪¬ ╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à"
+
+#: trendsearth_ui/components/tabs.py:2168
+msgid "Last 24 Hours"
+msgstr "╪ó╪«╪▒ 24 ╪│╪º╪╣╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2179
+msgid "Last Week"
+msgstr "╪º┘ä╪ú╪│╪¿┘ê╪╣ ╪º┘ä┘à╪º╪╢┘è"
+
+#: trendsearth_ui/components/tabs.py:2190
+msgid "Last Month"
+msgstr "╪º┘ä╪┤┘ç╪▒ ╪º┘ä┘à╪º╪╢┘è"
+
+#: trendsearth_ui/components/tabs.py:2201
+msgid "Last Year"
+msgstr "╪º┘ä╪╣╪º┘à ╪º┘ä┘à╪º╪╢┘è"
+
+#: trendsearth_ui/components/tabs.py:2212
+msgid "All Time"
+msgstr "╪╣┘ä┘ë ┘à╪▒ ╪º┘ä╪╣╪╡┘ê╪▒"
+
+#: trendsearth_ui/components/tabs.py:2250
+msgid "Countries with new user registrations"
+msgstr "╪º┘ä╪»┘ê┘ä ╪º┘ä╪¬┘è ╪│╪¼┘ä╪¬ ┘à╪│╪¬╪«╪»┘à┘è┘å ╪¼╪»╪»"
+
+#: trendsearth_ui/components/tabs.py:2277
+msgid "OS distribution (plugin)"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2291
+msgid "Language distribution"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2305
+msgid "Platform distribution"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2323
+msgid "Plugin Versions by QGIS Version"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2338
+msgid "QGIS Versions by Plugin Version"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:2381
+msgid ""
+"Access denied. Administrator privileges required to access admin functions."
+msgstr ""
+"╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+"╪º┘ä┘à╪│╪ñ┘ê┘ä ┘ä┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë ┘ê╪╕╪º╪ª┘ü ╪º┘ä╪Ñ╪»╪º╪▒╪⌐."
+
+#: trendsearth_ui/components/tabs.py:2398
+msgid "Administration Panel"
+msgstr "┘ä╪¼┘å╪⌐ ╪º┘ä╪Ñ╪»╪º╪▒╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2415
+msgid "Rate Limiting Management"
+msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪¬╪¡╪»┘è╪» ┘à╪╣╪»┘ä ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
+
+#: trendsearth_ui/components/tabs.py:2425
+msgid "Current & Historical Rate Limit Breaches"
+msgstr ""
+"╪º┘å╪¬┘ç╪º┘â╪º╪¬ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä ╪º┘ä╪¡╪º┘ä┘è╪⌐ ┘ê╪º┘ä╪¬╪º╪▒┘è╪«┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2436
+msgid "Refresh Breaches"
+msgstr "╪¬╪¼╪»┘è╪» ╪º┘ä╪½╪║╪▒╪º╪¬"
+
+#: trendsearth_ui/components/tabs.py:2450
+msgid "Cancel Selected Limit"
+msgstr "╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¡╪» ╪º┘ä┘à╪¡╪»╪»"
+
+#: trendsearth_ui/components/tabs.py:2471
+msgid "Reset All Rate Limits"
+msgstr "╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¼┘à┘è╪╣ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä"
+
+#: trendsearth_ui/components/tabs.py:2491
+msgid "Active and historical events"
+msgstr "╪º┘ä╪ú╪¡╪»╪º╪½ ╪º┘ä╪¼╪º╪▒┘è╪⌐ ┘ê╪º┘ä╪¬╪º╪▒┘è╪«┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2531
+msgid "Highlighted rows are active and can be cancelled individually."
+msgstr ""
+"╪º┘ä╪╡┘ü┘ê┘ü ╪º┘ä┘à┘à┘è╪▓╪⌐ ┘å╪┤╪╖╪⌐ ┘ê┘è┘à┘â┘å ╪Ñ┘ä╪║╪º╪ñ┘ç╪º ╪¿╪┤┘â┘ä "
+"┘ü╪▒╪»┘è."
+
+#: trendsearth_ui/components/tabs.py:2567
+msgid "News Management"
+msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪«╪¿╪º╪▒"
+
+#: trendsearth_ui/components/tabs.py:2576
+msgid "Manage News Items"
+msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪«╪¿╪º╪▒"
+
+#: trendsearth_ui/components/tabs.py:2616
+#: trendsearth_ui/utils/mobile_utils.py:463
+#: trendsearth_ui/utils/mobile_utils.py:692
+msgid "Edit"
+msgstr "┘è╪¡╪▒╪▒"
+
+#: trendsearth_ui/components/tabs.py:2632
+#: trendsearth_ui/components/tabs.py:3168
+msgid "Delete"
+msgstr "┘è┘à╪│╪¡"
+
+#: trendsearth_ui/components/tabs.py:2712
+msgid "Title *"
+msgstr "╪╣┘å┘ê╪º┘å *"
+
+#: trendsearth_ui/components/tabs.py:2716
+msgid "Enter news title"
+msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪º┘ä╪«╪¿╪▒"
+
+#: trendsearth_ui/components/tabs.py:2732
+msgid "Message (Markdown supported) *"
+msgstr "╪▒╪│╪º┘ä╪⌐ (╪¬╪»╪╣┘à ┘ä╪║╪⌐ Markdown) *"
+
+#: trendsearth_ui/components/tabs.py:2743
+msgid ""
+"Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
+"be converted to HTML."
+msgstr ""
+"╪º╪│╪¬╪«╪»┘à ╪¬┘å╪│┘è┘é Markdown: **╪║╪º┘à┘é**╪î *┘à╪º╪ª┘ä*╪î "
+"[╪▒╪º╪¿╪╖](url)╪î ┘é┘ê╪º╪ª┘à╪î ╪Ñ┘ä╪«. ╪│┘è╪¬┘à ╪¬╪¡┘ê┘è┘ä┘ç ╪Ñ┘ä┘ë HTML."
+
+#: trendsearth_ui/components/tabs.py:2750
+msgid "Enter news message using Markdown..."
+msgstr ""
+"╪ú╪»╪«┘ä ╪▒╪│╪º┘ä╪⌐ ╪Ñ╪«╪¿╪º╪▒┘è╪⌐ ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘ä╪║╪⌐ Markdown..."
+
+#: trendsearth_ui/components/tabs.py:2765
+msgid "Preview"
+msgstr "┘à╪╣╪º┘è┘å╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2785
+msgid "Link URL (optional)"
+msgstr "╪▒╪º╪¿╪╖ URL (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2796
+msgid "Link Text (optional)"
+msgstr "┘å╪╡ ╪º┘ä╪▒╪º╪¿╪╖ (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2800
+msgid "Read more..."
+msgstr "╪º┘é╪▒╪ú ╪º┘ä┘à╪▓┘è╪»..."
+
+#: trendsearth_ui/components/tabs.py:2812
+msgid "Target Platforms *"
+msgstr "╪º┘ä┘à┘å╪╡╪º╪¬ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐ *"
+
+#: trendsearth_ui/components/tabs.py:2817
+msgid "QGIS Plugin"
+msgstr "╪Ñ╪╢╪º┘ü╪⌐ QGIS"
+
+#: trendsearth_ui/components/tabs.py:2821
+msgid "Web App"
+msgstr "╪¬╪╖╪¿┘è┘é ┘ê┘è╪¿"
+
+#: trendsearth_ui/components/tabs.py:2825
+msgid "API UI"
+msgstr "┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ (API)"
+
+#: trendsearth_ui/components/tabs.py:2831
+msgid "Select target platforms..."
+msgstr "╪¡╪»╪» ╪º┘ä┘à┘å╪╡╪º╪¬ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐..."
+
+#: trendsearth_ui/components/tabs.py:2851
+msgid "Target Roles (optional)"
+msgstr "╪º┘ä╪ú╪»┘ê╪º╪▒ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐ (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2861
+msgid ""
+"Leave empty to show to all users including unauthenticated. Select specific "
+"roles to restrict visibility."
+msgstr ""
+"╪º╪¬╪▒┘â ┘ç╪░╪º ╪º┘ä╪¡┘é┘ä ┘ü╪º╪▒╪║┘ï╪º ┘ä╪╣╪▒╪╢┘ç ┘ä╪¼┘à┘è╪╣ "
+"╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å╪î ╪¿┘à╪º ┘ü┘è ╪░┘ä┘â ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪║┘è╪▒ "
+"╪º┘ä┘à╪╡╪º╪»┘é ╪╣┘ä┘è┘ç┘à. ╪¡╪»╪» ╪ú╪»┘ê╪º╪▒┘ï╪º ┘à╪╣┘è┘å╪⌐ ┘ä╪¬┘é┘è┘è╪» "
+"╪º┘ä╪▒╪ñ┘è╪⌐."
+
+#: trendsearth_ui/components/tabs.py:2869
+msgid "Regular Users"
+msgstr "╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å ╪º┘ä┘à┘å╪¬╪╕┘à┘ê┘å"
+
+#: trendsearth_ui/components/tabs.py:2873
+msgid "Admins"
+msgstr "╪º┘ä┘à╪┤╪▒┘ü┘ê┘å"
+
+#: trendsearth_ui/components/tabs.py:2877
+msgid "Super Admins"
+msgstr "╪º┘ä┘à╪┤╪▒┘ü┘ê┘å ╪º┘ä┘à┘à┘è╪▓┘ê┘å"
+
+#: trendsearth_ui/components/tabs.py:2883
+msgid "All users (no restriction)"
+msgstr "╪¼┘à┘è╪╣ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å (╪¿╪»┘ê┘å ┘é┘è┘ê╪»)"
+
+#: trendsearth_ui/components/tabs.py:2897
+msgid "News Type"
+msgstr "┘å┘ê╪╣ ╪º┘ä╪«╪¿╪▒"
+
+#: trendsearth_ui/components/tabs.py:2902
+msgid "Announcement"
+msgstr "╪Ñ╪╣┘ä╪º┘å"
+
+#: trendsearth_ui/components/tabs.py:2906
+msgid "Warning"
+msgstr "╪¬╪¡╪░┘è╪▒"
+
+#: trendsearth_ui/components/tabs.py:2910
+msgid "Release"
+msgstr "┘è╪╖┘ä┘é"
+
+#: trendsearth_ui/components/tabs.py:2914
+msgid "Tip"
+msgstr "┘å╪╡┘è╪¡╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2918
+msgid "Maintenance"
+msgstr "╪╡┘è╪º┘å╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2929
+#: trendsearth_ui/utils/mobile_utils.py:983
+msgid "Priority"
+msgstr "╪ú┘ê┘ä┘ê┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:2948
+msgid "Min Plugin Version (optional)"
+msgstr "╪º┘ä╪¡╪» ╪º┘ä╪ú╪»┘å┘ë ┘ä╪Ñ╪╡╪»╪º╪▒ ╪º┘ä┘à┘ä╪¡┘é (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2953
+msgid "e.g., 1.0.0"
+msgstr "┘à╪½╪º┘ä: 1.0.0"
+
+#: trendsearth_ui/components/tabs.py:2961
+msgid "Max Plugin Version (optional)"
+msgstr "╪Ñ╪╡╪»╪º╪▒ ╪¿╪▒┘å╪º┘à╪¼ Max ╪º┘ä╪Ñ╪╢╪º┘ü┘è (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2966
+msgid "e.g., 2.0.0"
+msgstr "┘à╪½╪º┘ä: 2.0.0"
+
+#: trendsearth_ui/components/tabs.py:2978
+msgid "Start Date (optional)"
+msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪¿╪»╪í (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2982
+msgid "Select start date..."
+msgstr "╪¡╪»╪» ╪¬╪º╪▒┘è╪« ╪º┘ä╪¿╪»╪í..."
+
+#: trendsearth_ui/components/tabs.py:2991
+msgid "End Date (optional)"
+msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í (╪º╪«╪¬┘è╪º╪▒┘è)"
+
+#: trendsearth_ui/components/tabs.py:2994
+msgid "Select end date..."
+msgstr "╪¡╪»╪» ╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í..."
+
+#: trendsearth_ui/components/tabs.py:3010
+msgid "Active (visible to users)"
+msgstr "┘å╪┤╪╖ (┘à╪▒╪ª┘è ┘ä┘ä┘à╪│╪¬╪«╪»┘à┘è┘å)"
+
+#: trendsearth_ui/components/tabs.py:3033
+msgid "Translations"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:3040
+msgid "Machine Translate All"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:3047
+msgid "Auto-translate English content to all languages using Google Translate"
+msgstr ""
+
+#: trendsearth_ui/components/tabs.py:3135
+msgid "Save"
+msgstr "┘è╪¡┘ü╪╕"
+
+#: trendsearth_ui/components/tabs.py:3151
+msgid "Confirm Delete"
+msgstr "╪¬╪ú┘â┘è╪» ╪º┘ä╪¡╪░┘ü"
+
+#: trendsearth_ui/components/tabs.py:3156
+msgid ""
+"Are you sure you want to delete this news item? This action cannot be "
+"undone."
+msgstr ""
+"┘ç┘ä ╪ú┘å╪¬ ┘à╪¬╪ú┘â╪» ┘à┘å ╪▒╪║╪¿╪¬┘â ┘ü┘è ╪¡╪░┘ü ┘ç╪░╪º ╪º┘ä╪«╪¿╪▒╪ƒ ┘ä╪º "
+"┘è┘à┘â┘å ╪º┘ä╪¬╪▒╪º╪¼╪╣ ╪╣┘å ┘ç╪░╪º ╪º┘ä╪Ñ╪¼╪▒╪º╪í."
+
+#: trendsearth_ui/components/tabs.py:3191
+msgid "Create New User"
+msgstr "╪Ñ┘å╪┤╪º╪í ┘à╪│╪¬╪«╪»┘à┘è┘å ╪¼╪»╪»"
+
+#: trendsearth_ui/components/tabs.py:3203
+msgid "Name *"
+msgstr "╪º╪│┘à *"
+
+#: trendsearth_ui/components/tabs.py:3207
+msgid "Enter full name"
+msgstr "╪ú╪»╪«┘ä ╪º┘ä╪º╪│┘à ╪º┘ä┘â╪º┘à┘ä"
+
+#: trendsearth_ui/components/tabs.py:3215
+msgid "Email *"
+msgstr "╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è *"
+
+#: trendsearth_ui/components/tabs.py:3220
+msgid "Enter email address"
+msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/components/tabs.py:3234
+msgid "Password *"
+msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ *"
+
+#: trendsearth_ui/components/tabs.py:3239
+msgid "Set password for user"
+msgstr "┘é┘à ╪¿╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒ ┘ä┘ä┘à╪│╪¬╪«╪»┘à"
+
+#: trendsearth_ui/components/tabs.py:3248
+msgid "Confirm Password *"
+msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ *"
+
+#: trendsearth_ui/components/tabs.py:3252
+msgid "Confirm password"
+msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
+
+#: trendsearth_ui/components/tabs.py:3298
+msgid "Passwords match"
+msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐"
+
+#: trendsearth_ui/components/tabs.py:3313
+#: trendsearth_ui/utils/mobile_utils.py:278
+msgid "Institution"
+msgstr "┘à╪ñ╪│╪│╪⌐"
+
+#: trendsearth_ui/components/tabs.py:3318
+msgid "Enter institution/organization"
+msgstr "╪ú╪»╪«┘ä ╪º╪│┘à ╪º┘ä┘à╪ñ╪│╪│╪⌐/╪º┘ä┘à┘å╪╕┘à╪⌐"
+
+#: trendsearth_ui/components/tabs.py:3330
+msgid "Select country..."
+msgstr "╪º╪«╪¬╪▒ ╪º┘ä╪¿┘ä╪»..."
+
+#: trendsearth_ui/components/tabs.py:3345
+msgid "Role *"
+msgstr "╪»┘ê╪▒ *"
+
+#: trendsearth_ui/components/tabs.py:3350
+#: trendsearth_ui/utils/mobile_utils.py:80
+#: trendsearth_ui/utils/mobile_utils.py:603
+msgid "User"
+msgstr "┘à╪│╪¬╪«╪»┘à"
+
+#: trendsearth_ui/components/tabs.py:3358
+msgid "Super Admin"
+msgstr "╪º┘ä┘à╪┤╪▒┘ü ╪º┘ä╪▒╪ª┘è╪│┘è"
+
+#: trendsearth_ui/components/tabs.py:3380
+msgid "Create User"
+msgstr "╪Ñ┘å╪┤╪º╪í ┘à╪│╪¬╪«╪»┘à┘è┘å"
+
+#: trendsearth_ui/components/tabs.py:3391
+msgid "Clear Form"
+msgstr "┘å┘à┘ê╪░╪¼ ┘ê╪º╪╢╪¡"
+
+#: trendsearth_ui/components/tabs.py:3427
+msgid "Upload New Script"
+msgstr "╪¬╪¡┘à┘è┘ä ┘å╪╡ ╪¿╪▒┘à╪¼┘è ╪¼╪»┘è╪»"
+
+#: trendsearth_ui/components/tabs.py:3436
+msgid "Upload a .tar.gz archive containing your script and a "
+msgstr ""
+"┘é┘à ╪¿╪¬╪¡┘à┘è┘ä ┘à┘ä┘ü ┘à╪╢╪║┘ê╪╖ ╪¿╪╡┘è╪║╪⌐ .tar.gz ┘è╪¡╪¬┘ê┘è ╪╣┘ä┘ë "
+"╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è ╪º┘ä╪«╪º╪╡ ╪¿┘â ┘ê "
+
+#: trendsearth_ui/components/tabs.py:3439
+msgid ""
+" file. The script name and metadata are read from the configuration file."
+msgstr ""
+" ┘è╪¬┘à ┘é╪▒╪º╪í╪⌐ ╪º╪│┘à ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è ┘ê╪º┘ä╪¿┘è╪º┘å╪º╪¬ "
+"╪º┘ä┘ê╪╡┘ü┘è╪⌐ ┘à┘å ┘à┘ä┘ü ╪º┘ä╪¬┘â┘ê┘è┘å."
+
+#: trendsearth_ui/components/tabs.py:3451
+msgid "Script Archive (.tar.gz) *"
+msgstr "┘à┘ä┘ü ╪ú╪▒╪┤┘è┘ü ╪º┘ä┘å╪╡┘ê╪╡ ╪º┘ä╪¿╪▒┘à╪¼┘è╪⌐ (.tar.gz) *"
+
+#: trendsearth_ui/components/tabs.py:3459
+msgid "Drag and Drop or "
+msgstr "╪º╪│╪¡╪¿ ┘ê╪ú┘ü┘ä╪¬ ╪ú┘ê "
+
+#: trendsearth_ui/components/tabs.py:3460
+msgid "Select Script Archive"
+msgstr "╪¡╪»╪» ╪ú╪▒╪┤┘è┘ü ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐"
+
+#: trendsearth_ui/components/tabs.py:3495
+msgid "Upload Script"
+msgstr "╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è"
+
+#: trendsearth_ui/utils/mobile_utils.py:63
+msgid "Script"
+msgstr "┘å╪╡"
+
+#: trendsearth_ui/utils/mobile_utils.py:112
+msgid "Start"
+msgstr "┘è╪¿╪»╪ú"
+
+#: trendsearth_ui/utils/mobile_utils.py:121
+msgid "End"
+msgstr "┘å┘ç╪º┘è╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:132
+msgid "Duration"
+msgstr "┘à╪»╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:157
+#: trendsearth_ui/utils/mobile_utils.py:372
+#: trendsearth_ui/utils/mobile_utils.py:644
+#: trendsearth_ui/utils/mobile_utils.py:1032
+msgid "ID"
+msgstr "╪¿╪╖╪º┘é╪⌐ ╪¬╪╣╪▒┘è┘ü"
+
+#: trendsearth_ui/utils/mobile_utils.py:172
+#: trendsearth_ui/utils/mobile_utils.py:780
+msgid "User ID"
+msgstr "┘à╪╣╪▒┘ü ╪º┘ä┘à╪│╪¬╪«╪»┘à"
+
+#: trendsearth_ui/utils/mobile_utils.py:187
+msgid "Params"
+msgstr "╪º┘ä┘à╪╣┘ä┘à╪º╪¬"
+
+#: trendsearth_ui/utils/mobile_utils.py:196
+msgid "Results"
+msgstr "┘å╪¬╪º╪ª╪¼"
+
+#: trendsearth_ui/utils/mobile_utils.py:205
+#: trendsearth_ui/utils/mobile_utils.py:652
+msgid "Logs"
+msgstr "╪│╪¼┘ä╪º╪¬"
+
+#: trendsearth_ui/utils/mobile_utils.py:214
+msgid "Docker Logs"
+msgstr "╪│╪¼┘ä╪º╪¬ Docker"
+
+#: trendsearth_ui/utils/mobile_utils.py:223
+msgid "Batch Logs"
+msgstr "╪│╪¼┘ä╪º╪¬ ╪º┘ä╪»┘ü╪╣╪º╪¬"
+
+#: trendsearth_ui/utils/mobile_utils.py:232
+msgid "Map"
+msgstr "╪▒╪│┘à ╪«╪▒┘è╪╖╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:310
+#: trendsearth_ui/utils/mobile_utils.py:740
+#: trendsearth_ui/utils/mobile_utils.py:867
+msgid "Role"
+msgstr "╪»┘ê╪▒"
+
+#: trendsearth_ui/utils/mobile_utils.py:325
+msgid "Last Activity"
+msgstr "╪ó╪«╪▒ ┘å╪┤╪º╪╖"
+
+#: trendsearth_ui/utils/mobile_utils.py:334
+msgid "Verified"
+msgstr "╪¬┘à ╪º┘ä╪¬╪¡┘é┘é"
+
+#: trendsearth_ui/utils/mobile_utils.py:343
+msgid "Verified At"
+msgstr "╪¬┘à ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪░┘ä┘â ┘ü┘è"
+
+#: trendsearth_ui/utils/mobile_utils.py:354
+#: trendsearth_ui/utils/mobile_utils.py:583
+#: trendsearth_ui/utils/mobile_utils.py:998
+msgid "Created"
+msgstr "┘à╪«┘ä┘ê┘é"
+
+#: trendsearth_ui/utils/mobile_utils.py:363
+#: trendsearth_ui/utils/mobile_utils.py:592
+msgid "Updated"
+msgstr "╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½"
+
+#: trendsearth_ui/utils/mobile_utils.py:436
+msgid "GEE License"
+msgstr "╪▒╪«╪╡╪⌐ GEE"
+
+#: trendsearth_ui/utils/mobile_utils.py:445
+msgid "GEE Creds"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:454
+msgid "OpenEO Creds"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:492
+msgid "Slug"
+msgstr "╪│╪¿┘è┘â╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:508
+msgid "Access"
+msgstr "┘ê╪╡┘ê┘ä"
+
+#: trendsearth_ui/utils/mobile_utils.py:532
+msgid "Environment"
+msgstr "╪¿┘è╪ª╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:548
+msgid "Env Version"
+msgstr "╪Ñ╪╡╪»╪º╪▒ ╪º┘ä╪¿┘è╪ª╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:564
+msgid "Compute"
+msgstr "╪º┘ä╪¡┘ê╪│╪¿╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:573
+msgid "GEE"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:619
+#: trendsearth_ui/utils/mobile_utils.py:732
+msgid "User Email"
+msgstr "╪¿╪▒┘è╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
+
+#: trendsearth_ui/utils/mobile_utils.py:635
+msgid "Description"
+msgstr "┘ê╪╡┘ü"
+
+#: trendsearth_ui/utils/mobile_utils.py:660
+msgid "openEO Backend"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:676
+msgid "Batch Image"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:704
+#: trendsearth_ui/utils/mobile_utils.py:833
+msgid "Occurred"
+msgstr "╪¡╪╡┘ä"
+
+#: trendsearth_ui/utils/mobile_utils.py:712
+#: trendsearth_ui/utils/mobile_utils.py:969
+msgid "Type"
+msgstr "┘è┘â╪¬╪¿"
+
+#: trendsearth_ui/utils/mobile_utils.py:718
+#: trendsearth_ui/utils/mobile_utils.py:874
+msgid "Endpoint"
+msgstr "┘å┘é╪╖╪⌐ ╪º┘ä┘å┘ç╪º┘è╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:726
+#: trendsearth_ui/utils/mobile_utils.py:883
+msgid "Method"
+msgstr "╪╖╪▒┘è┘é╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:746
+#: trendsearth_ui/utils/mobile_utils.py:918
+msgid "IP Address"
+msgstr "╪╣┘å┘ê╪º┘å IP"
+
+#: trendsearth_ui/utils/mobile_utils.py:752
+#: trendsearth_ui/utils/mobile_utils.py:890
+msgid "Limit"
+msgstr "╪¡╪»"
+
+#: trendsearth_ui/utils/mobile_utils.py:760
+msgid "Count"
+msgstr "╪╣╪»╪»"
+
+#: trendsearth_ui/utils/mobile_utils.py:766
+#: trendsearth_ui/utils/mobile_utils.py:904
+msgid "Window"
+msgstr "┘å╪º┘ü╪░╪⌐"
+
+#: trendsearth_ui/utils/mobile_utils.py:772
+#: trendsearth_ui/utils/mobile_utils.py:910
+msgid "Retry After"
+msgstr "╪ú╪╣╪» ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ╪¿╪╣╪»"
+
+#: trendsearth_ui/utils/mobile_utils.py:788
+#: trendsearth_ui/utils/mobile_utils.py:926
+msgid "Limiter Key"
+msgstr "┘à┘ü╪¬╪º╪¡ ╪º┘ä┘à╪¡╪»╪»"
+
+#: trendsearth_ui/utils/mobile_utils.py:796
+msgid "User Agent"
+msgstr "┘ê┘â┘è┘ä ╪º┘ä┘à╪│╪¬╪«╪»┘à"
+
+#: trendsearth_ui/utils/mobile_utils.py:804
+#: trendsearth_ui/utils/mobile_utils.py:940
+msgid "Event ID"
+msgstr "┘à╪╣╪▒┘ü ╪º┘ä╪¡╪»╪½"
+
+#: trendsearth_ui/utils/mobile_utils.py:842
+msgid "Expires"
+msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í"
+
+#: trendsearth_ui/utils/mobile_utils.py:849
+msgid "Identifier"
+msgstr "╪º┘ä┘à╪╣╪▒┘ü"
+
+#: trendsearth_ui/utils/mobile_utils.py:898
+msgid "Usage"
+msgstr "╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
+
+#: trendsearth_ui/utils/mobile_utils.py:934
+msgid "Rate Limit Type"
+msgstr "┘å┘ê╪╣ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä"
+
+#: trendsearth_ui/utils/mobile_utils.py:976
+msgid "Platforms"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:1018
+msgid "Start Date"
+msgstr ""
+
+#: trendsearth_ui/utils/mobile_utils.py:1025
+msgid "End Date"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:604
+#: trendsearth_ui/utils/stats_visualizations.py:962
+#: trendsearth_ui/utils/stats_visualizations.py:1226
+#: trendsearth_ui/utils/stats_visualizations.py:1386
+msgid "Number of Executions"
+msgstr "╪╣╪»╪» ╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░"
+
+#: trendsearth_ui/utils/stats_visualizations.py:627
+#, python-brace-format
+msgid "Running executions{suffix_label}"
+msgstr "╪¬┘å┘ü┘è╪░ ╪º┘ä╪╣┘à┘ä┘è╪º╪¬ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:642
+#: trendsearth_ui/utils/stats_visualizations.py:653
+#: trendsearth_ui/utils/stats_visualizations.py:660
+msgid "No in-progress execution data available."
+msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪¬┘å┘ü┘è╪░ ╪¼╪º╪▒┘è╪⌐."
+
+#: trendsearth_ui/utils/stats_visualizations.py:645
+msgid ""
+"Status time series data did not include ready, pending, or running counts "
+"for this period."
+msgstr ""
+"┘ä┘à ╪¬╪¬╪╢┘à┘å ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪│┘ä╪º╪│┘ä ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¡╪º┘ä╪⌐ "
+"╪ú╪╣╪»╪º╪» ╪º┘ä╪¼╪º┘ç╪▓┘è╪⌐ ╪ú┘ê ╪º┘ä┘à╪╣┘ä┘é╪⌐ ╪ú┘ê ╪º┘ä╪¼╪º╪▒┘è╪⌐ ┘ä┘ç╪░┘ç"
+" ╪º┘ä┘ü╪¬╪▒╪⌐."
+
+#: trendsearth_ui/utils/stats_visualizations.py:654
+msgid "Status timestamps could not be parsed from the API response."
+msgstr ""
+"╪¬╪╣╪░╪▒ ╪¬╪¡┘ä┘è┘ä ╪º┘ä╪╖┘ê╪º╪¿╪╣ ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¡╪º┘ä╪⌐ ┘à┘å "
+"╪º╪│╪¬╪¼╪º╪¿╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬."
+
+#: trendsearth_ui/utils/stats_visualizations.py:661
+msgid "Status time series data was not provided for this period."
+msgstr ""
+"┘ä┘à ┘è╪¬┘à ╪¬┘ê┘ü┘è╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪│┘ä╪º╪│┘ä ╪º┘ä╪▓┘à┘å┘è╪⌐ "
+"┘ä┘ä╪¡╪º┘ä╪⌐ ┘ä┘ç╪░┘ç ╪º┘ä┘ü╪¬╪▒╪⌐."
+
+#: trendsearth_ui/utils/stats_visualizations.py:809
+msgid "Cumulative Executions"
+msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ ╪º┘ä╪¬╪▒╪º┘â┘à┘è╪⌐"
+
+#: trendsearth_ui/utils/stats_visualizations.py:842
+msgid "Failed / Cancelled"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:854
+#, python-brace-format
+msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
+msgstr ""
+"╪º┘ä┘à┘ç╪º┘à ╪º┘ä┘à┘â╪¬┘à┘ä╪⌐ ╪º┘ä╪¬╪▒╪º┘â┘à┘è╪⌐ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+" {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪¼┘à┘è╪╣}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:875
+msgid "No cumulative execution data available."
+msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪¬┘å┘ü┘è╪░ ╪¬╪▒╪º┘â┘à┘è╪⌐."
+
+#: trendsearth_ui/utils/stats_visualizations.py:878
+msgid ""
+"The execution statistics time series did not include finished, failed, or "
+"cancelled statuses."
+msgstr ""
+"┘ä┘à ╪¬╪¬╪╢┘à┘å ╪│┘ä╪│┘ä╪⌐ ╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ ╪¡╪º┘ä╪º╪¬ "
+"╪º┘ä╪º┘å╪¬┘ç╪º╪í ╪ú┘ê ╪º┘ä┘ü╪┤┘ä ╪ú┘ê ╪º┘ä╪Ñ┘ä╪║╪º╪í."
+
+#: trendsearth_ui/utils/stats_visualizations.py:887
+msgid "No execution trend data available."
+msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪╣┘å ╪º╪¬╪¼╪º┘ç╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░."
+
+#: trendsearth_ui/utils/stats_visualizations.py:888
+msgid "Execution timestamps could not be parsed from the API response."
+msgstr ""
+"╪¬╪╣╪░╪▒ ╪¬╪¡┘ä┘è┘ä ╪º┘ä╪╖┘ê╪º╪¿╪╣ ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¬┘å┘ü┘è╪░ ┘à┘å "
+"╪º╪│╪¬╪¼╪º╪¿╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬."
+
+#: trendsearth_ui/utils/stats_visualizations.py:907
+msgid "base"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:972
+#, python-brace-format
+msgid "Execution count{suffix_label}"
+msgstr "╪╣╪»╪» ┘à╪▒╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ {╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1007
+msgid "Average Duration (minutes)"
+msgstr "┘à╪¬┘ê╪│╪╖ ╪º┘ä┘à╪»╪⌐ (╪¿╪º┘ä╪»┘é╪º╪ª┘é)"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1016
+#, python-brace-format
+msgid "Execution duration{suffix_label}"
+msgstr "┘à╪»╪⌐ ╪º┘ä╪¬┘å┘ü┘è╪░ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1116
+msgid "Failure Count"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:1126
+#, python-brace-format
+msgid "Top scripts by failure count{suffix_label}"
+msgstr ""
+"╪ú┘ü╪╢┘ä ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐ ╪¡╪│╪¿ ╪╣╪»╪» ╪¡╪º┘ä╪º╪¬ ╪º┘ä┘ü╪┤┘ä "
+"{suffix_label}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1235
+#, python-brace-format
+msgid "Top users by activity{suffix_label}"
+msgstr ""
+"╪ú┘ü╪╢┘ä ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪¡╪│╪¿ ╪º┘ä┘å╪┤╪º╪╖ "
+"{╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1385
+msgid "Script Version"
+msgstr "┘å╪│╪«╪⌐ ╪º┘ä┘å╪╡ ╪º┘ä╪¿╪▒┘à╪¼┘è"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1395
+#, python-brace-format
+msgid "{num_versions} distinct versions, {num_executions} executions"
+msgstr ""
+"{num_versions} ╪Ñ╪╡╪»╪º╪▒┘ï╪º ┘à┘à┘è╪▓┘ï╪º╪î {num_executions} ╪╣┘à┘ä┘è╪⌐ "
+"╪¬┘å┘ü┘è╪░"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1401
+#, python-brace-format
+msgid "{num_executions} executions from scripts with no parseable version"
+msgstr ""
+"{num_executions} ╪╣┘à┘ä┘è╪⌐ ╪¬┘å┘ü┘è╪░ ┘à┘å ┘å╪╡┘ê╪╡ ╪¿╪▒┘à╪¼┘è╪⌐ ╪¿╪»┘ê┘å "
+"┘å╪│╪«╪⌐ ┘é╪º╪¿┘ä╪⌐ ┘ä┘ä╪¬╪¡┘ä┘è┘ä"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1410
+#, python-brace-format
+msgid "Execution script version distribution{suffix_label}"
+msgstr ""
+"╪¬┘ê╪▓┘è╪╣ ╪Ñ╪╡╪»╪º╪▒ ╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä╪¬┘å┘ü┘è╪░ "
+"{╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1651
+#, python-brace-format
+msgid "New user registrations{suffix_label}"
+msgstr ""
+"╪¬╪│╪¼┘è┘ä╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪º┘ä╪¼╪»╪» {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1700
+msgid "Cumulative New Users"
+msgstr "╪Ñ╪¼┘à╪º┘ä┘è ╪╣╪»╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪º┘ä╪¼╪»╪»"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1752
+msgid "Number of Users"
+msgstr "╪╣╪»╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
+
+#: trendsearth_ui/utils/stats_visualizations.py:1761
+#, python-brace-format
+msgid "Top countries{suffix_label}"
+msgstr "╪ú┘ü╪╢┘ä ╪º┘ä╪»┘ê┘ä {╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+
+#: trendsearth_ui/utils/stats_visualizations.py:2100
+msgid "Registered Users"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2101
+msgid "Countries (Registered)"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2103
+msgid "New Users"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2104
+msgid "Countries (New Users)"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2113
+msgid "Submitted"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2148
+msgid "Active Users"
+msgstr ""
+
+#: trendsearth_ui/utils/stats_visualizations.py:2156
+msgid "Countries (Active Users)"
+msgstr ""
+
+#: trendsearth_ui/utils/status_helpers.py:132
+#: trendsearth_ui/utils/status_helpers.py:164
+#, python-brace-format
+msgid "Environment: {env}"
+msgstr "╪º┘ä╪¿┘è╪ª╪⌐: {env}"
+
+#: trendsearth_ui/utils/status_helpers.py:134
+msgid "API Status: Authentication required"
+msgstr ""
+"╪¡╪º┘ä╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬: ╪º┘ä┘à╪╡╪º╪»┘é╪⌐ "
+"┘à╪╖┘ä┘ê╪¿╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:135
+msgid "Please log in to view deployment status"
+msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪┤╪▒"
+
+#: trendsearth_ui/utils/status_helpers.py:167
+msgid "API status unavailable"
+msgstr "╪¡╪º┘ä╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ ╪║┘è╪▒ ┘à╪¬┘ê┘ü╪▒╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:178
+msgid "Authentication required"
+msgstr "┘è┘ä╪▓┘à ╪º┘ä┘à╪╡╪º╪»┘é╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:179
+msgid "Please log in to view cluster status"
+msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:182
+msgid " (Auth Required)"
+msgstr " (┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ┘à╪╡╪º╪»┘é╪⌐)"
+
+#: trendsearth_ui/utils/status_helpers.py:203
+msgid " (Live)"
+msgstr " (┘è╪╣┘è╪┤)"
+
+#: trendsearth_ui/utils/status_helpers.py:209
+#, python-brace-format
+msgid " (Updated: {time} {tz})"
+msgstr " (╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½: {╪º┘ä┘ê┘é╪¬} {╪º┘ä╪¬┘ê┘é┘è╪¬ ╪º┘ä╪▓┘à┘å┘è})"
+
+#: trendsearth_ui/utils/status_helpers.py:216
+#: trendsearth_ui/utils/status_helpers.py:219
+#, python-brace-format
+msgid " (Updated: {time})"
+msgstr " (╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½: {╪º┘ä┘ê┘é╪¬})"
+
+#: trendsearth_ui/utils/status_helpers.py:225
+msgid "Authentication failed"
+msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä┘à╪╡╪º╪»┘é╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:226
+msgid "Please check your login status"
+msgstr ""
+"┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪¡╪º┘ä╪⌐ ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪º┘ä╪«╪º╪╡╪⌐ "
+"╪¿┘â"
+
+#: trendsearth_ui/utils/status_helpers.py:229
+msgid " (Auth Error)"
+msgstr " (╪«╪╖╪ú ┘ü┘è ╪º┘ä┘à╪╡╪º╪»┘é╪⌐)"
+
+#: trendsearth_ui/utils/status_helpers.py:234
+msgid "Access denied"
+msgstr "╪¬┘à ╪º┘ä╪▒┘ü╪╢"
+
+#: trendsearth_ui/utils/status_helpers.py:236
+msgid "Admin privileges required for cluster status"
+msgstr ""
+"┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪º┘à╪¬┘è╪º╪▓╪º╪¬ ╪º┘ä┘à╪│╪ñ┘ê┘ä ┘ä╪╣╪▒╪╢ "
+"╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:241
+msgid " (Access Denied)"
+msgstr " (╪¬┘à ╪º┘ä╪▒┘ü╪╢)"
+
+#: trendsearth_ui/utils/status_helpers.py:247
+#, python-brace-format
+msgid "Cluster Status: Error ({status_code})"
+msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐: ╪«╪╖╪ú ({status_code})"
+
+#: trendsearth_ui/utils/status_helpers.py:253
+msgid "Unable to retrieve cluster information"
+msgstr "╪¬╪╣╪░╪▒ ╪º╪│╪¬╪▒╪»╪º╪» ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:257
+msgid " (Error)"
+msgstr " (╪«╪╖╪ú)"
+
+#: trendsearth_ui/utils/status_helpers.py:263
+msgid "Cluster Status: Connection Error"
+msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐: ╪«╪╖╪ú ┘ü┘è ╪º┘ä╪º╪¬╪╡╪º┘ä"
+
+#: trendsearth_ui/utils/status_helpers.py:264
+msgid "Unable to reach cluster status endpoint"
+msgstr ""
+"╪¬╪╣╪░╪▒ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë ┘å┘é╪╖╪⌐ ┘å┘ç╪º┘è╪⌐ ╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
+
+#: trendsearth_ui/utils/status_helpers.py:267
+msgid " (Connection Error)"
+msgstr " (╪«╪╖╪ú ┘ü┘è ╪º┘ä╪º╪¬╪╡╪º┘ä)"
+
+#: trendsearth_ui/utils/status_helpers.py:274
+msgid "System status is currently unavailable. Please try again later."
+msgstr ""
+"╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪║┘è╪▒ ┘à╪¬╪º╪¡╪⌐ ╪¡╪º┘ä┘è┘ï╪º. ┘è╪▒╪¼┘ë "
+"╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é┘ï╪º."
+
 #~ msgid "Forgot Password"
-#~ msgstr "هل نسيت كلمة السر"
+#~ msgstr "┘ç┘ä ┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒"
 
 #~ msgid ""
 #~ "Enter your email address and we'll send you instructions to reset your "
 #~ "password."
 #~ msgstr ""
-#~ "أدخل عنوان بريدك الإلكتروني وسنرسل لك تعليمات لإعادة تعيين كلمة المرور "
-#~ "الخاصة بك."
+#~ "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ê╪│┘å╪▒╪│┘ä ┘ä┘â "
+#~ "╪¬╪╣┘ä┘è┘à╪º╪¬ ┘ä╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪«╪º╪╡╪⌐ "
+#~ "╪¿┘â."
 
 #~ msgid "Email Address"
-#~ msgstr "عنوان البريد الإلكتروني"
+#~ msgstr "╪╣┘å┘ê╪º┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Enter your email address"
-#~ msgstr "أدخل عنوان بريدك الإلكتروني"
+#~ msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Cancel"
-#~ msgstr "يلغي"
+#~ msgstr "┘è┘ä╪║┘è"
 
 #~ msgid "Send Reset Instructions"
-#~ msgstr "إرسال تعليمات إعادة الضبط"
+#~ msgstr "╪Ñ╪▒╪│╪º┘ä ╪¬╪╣┘ä┘è┘à╪º╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪╢╪¿╪╖"
 
 #~ msgid "OK"
-#~ msgstr "نعم"
+#~ msgstr "┘å╪╣┘à"
 
 #~ msgid "Login"
-#~ msgstr "تسجيل الدخول"
+#~ msgstr "╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä"
 
 #~ msgid "Email"
-#~ msgstr "بريد إلكتروني"
+#~ msgstr "╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Enter email"
-#~ msgstr "أدخل البريد الإلكتروني"
+#~ msgstr "╪ú╪»╪«┘ä ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Password"
-#~ msgstr "كلمة المرور"
+#~ msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
 
 #~ msgid "Enter password"
-#~ msgstr "أدخل كلمة المرور"
+#~ msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
 
 #~ msgid "Remember me (keep me logged in)"
-#~ msgstr "تذكرني (أبقني مسجلاً دخولي)"
+#~ msgstr "╪¬╪░┘â╪▒┘å┘è (╪ú╪¿┘é┘å┘è ┘à╪│╪¼┘ä╪º┘ï ╪»╪«┘ê┘ä┘è)"
 
 #~ msgid "Register"
-#~ msgstr "يسجل"
+#~ msgstr "┘è╪│╪¼┘ä"
 
 #~ msgid "Forgot your password?"
-#~ msgstr "نسيت كلمة السر؟"
+#~ msgstr "┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒╪ƒ"
 
 #~ msgid "Privacy Policy"
-#~ msgstr "سياسة الخصوصية"
+#~ msgstr "╪│┘è╪º╪│╪⌐ ╪º┘ä╪«╪╡┘ê╪╡┘è╪⌐"
 
 #~ msgid "Terms of Use"
-#~ msgstr "شروط الاستخدام"
+#~ msgstr "╪┤╪▒┘ê╪╖ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
 
 #~ msgid "Set Your New Password"
-#~ msgstr "قم بتعيين كلمة المرور الجديدة"
+#~ msgstr "┘é┘à ╪¿╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
 
 #~ msgid "Enter your new password below."
-#~ msgstr "أدخل كلمة المرور الجديدة أدناه."
+#~ msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ╪ú╪»┘å╪º┘ç."
 
 #~ msgid "New Password"
-#~ msgstr "كلمة المرور الجديدة"
+#~ msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
 
 #~ msgid "Enter new password"
-#~ msgstr "أدخل كلمة المرور الجديدة"
+#~ msgstr "╪ú╪»╪«┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
 
 #~ msgid "Confirm Password"
-#~ msgstr "تأكيد كلمة المرور"
+#~ msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
 
 #~ msgid "Confirm new password"
-#~ msgstr "تأكيد كلمة المرور الجديدة"
+#~ msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐"
 
 #~ msgid "Password requirements:"
-#~ msgstr "متطلبات كلمة المرور:"
+#~ msgstr "┘à╪¬╪╖┘ä╪¿╪º╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒:"
 
 #~ msgid "At least 12 characters"
-#~ msgstr "12 حرفًا على الأقل"
+#~ msgstr "12 ╪¡╪▒┘ü┘ï╪º ╪╣┘ä┘ë ╪º┘ä╪ú┘é┘ä"
 
 #~ msgid "Uppercase letter (A-Z)"
-#~ msgstr "حرف كبير (AZ)"
+#~ msgstr "╪¡╪▒┘ü ┘â╪¿┘è╪▒ (AZ)"
 
 #~ msgid "Lowercase letter (a-z)"
-#~ msgstr "حرف صغير (az)"
+#~ msgstr "╪¡╪▒┘ü ╪╡╪║┘è╪▒ (az)"
 
 #~ msgid "Number (0-9)"
-#~ msgstr "الرقم (0-9)"
+#~ msgstr "╪º┘ä╪▒┘é┘à (0-9)"
 
 #~ msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-#~ msgstr "رمز خاص (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+#~ msgstr "╪▒┘à╪▓ ╪«╪º╪╡ (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
 #~ msgid "Set Password"
-#~ msgstr "تعيين كلمة المرور"
+#~ msgstr "╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
 
 #~ msgid "Back to Login"
-#~ msgstr "العودة إلى صفحة تسجيل الدخول"
+#~ msgstr "╪º┘ä╪╣┘ê╪»╪⌐ ╪Ñ┘ä┘ë ╪╡┘ü╪¡╪⌐ ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä"
 
 #~ msgid "Government - Environment/Natural Resources"
-#~ msgstr "الحكومة - البيئة/الموارد الطبيعية"
+#~ msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪º┘ä╪¿┘è╪ª╪⌐/╪º┘ä┘à┘ê╪º╪▒╪» ╪º┘ä╪╖╪¿┘è╪╣┘è╪⌐"
 
 #~ msgid "Government - Agriculture"
-#~ msgstr "الحكومة - الزراعة"
+#~ msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪º┘ä╪▓╪▒╪º╪╣╪⌐"
 
 #~ msgid "Government - Land Management/Planning"
-#~ msgstr "الحكومة - إدارة الأراضي/التخطيط"
+#~ msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪▒╪º╪╢┘è/╪º┘ä╪¬╪«╪╖┘è╪╖"
 
 #~ msgid "Government - Other"
-#~ msgstr "الحكومة - أخرى"
+#~ msgstr "╪º┘ä╪¡┘â┘ê┘à╪⌐ - ╪ú╪«╪▒┘ë"
 
 #~ msgid "International/Multilateral Organization"
-#~ msgstr "منظمة دولية/متعددة الأطراف"
+#~ msgstr "┘à┘å╪╕┘à╪⌐ ╪»┘ê┘ä┘è╪⌐/┘à╪¬╪╣╪»╪»╪⌐ ╪º┘ä╪ú╪╖╪▒╪º┘ü"
 
 #~ msgid "NGO - Development/Aid"
-#~ msgstr "المنظمات غير الحكومية - التنمية/المساعدة"
+#~ msgstr ""
+#~ "╪º┘ä┘à┘å╪╕┘à╪º╪¬ ╪║┘è╪▒ ╪º┘ä╪¡┘â┘ê┘à┘è╪⌐ - ╪º┘ä╪¬┘å┘à┘è╪⌐/╪º┘ä┘à╪│╪º╪╣╪»╪⌐"
 
 #~ msgid "NGO - Community-Based"
-#~ msgstr "منظمة غير حكومية - مجتمعية"
+#~ msgstr "┘à┘å╪╕┘à╪⌐ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ┘à╪¼╪¬┘à╪╣┘è╪⌐"
 
 #~ msgid "NGO - Conservation"
-#~ msgstr "منظمة غير حكومية - الحفاظ على البيئة"
+#~ msgstr "┘à┘å╪╕┘à╪⌐ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ╪º┘ä╪¡┘ü╪º╪╕ ╪╣┘ä┘ë ╪º┘ä╪¿┘è╪ª╪⌐"
 
 #~ msgid "NGO - Other"
-#~ msgstr "منظمات غير حكومية - أخرى"
+#~ msgstr "┘à┘å╪╕┘à╪º╪¬ ╪║┘è╪▒ ╪¡┘â┘ê┘à┘è╪⌐ - ╪ú╪«╪▒┘ë"
 
 #~ msgid "Academic/Research Institution"
-#~ msgstr "مؤسسة أكاديمية/بحثية"
+#~ msgstr "┘à╪ñ╪│╪│╪⌐ ╪ú┘â╪º╪»┘è┘à┘è╪⌐/╪¿╪¡╪½┘è╪⌐"
 
 #~ msgid "Consulting/Professional Services"
-#~ msgstr "الخدمات الاستشارية/المهنية"
+#~ msgstr "╪º┘ä╪«╪»┘à╪º╪¬ ╪º┘ä╪º╪│╪¬╪┤╪º╪▒┘è╪⌐/╪º┘ä┘à┘ç┘å┘è╪⌐"
 
 #~ msgid "Private Sector - Agriculture/Forestry"
-#~ msgstr "القطاع الخاص - الزراعة/الغابات"
+#~ msgstr "╪º┘ä┘é╪╖╪º╪╣ ╪º┘ä╪«╪º╪╡ - ╪º┘ä╪▓╪▒╪º╪╣╪⌐/╪º┘ä╪║╪º╪¿╪º╪¬"
 
 #~ msgid "Private Sector - Other"
-#~ msgstr "القطاع الخاص - أخرى"
+#~ msgstr "╪º┘ä┘é╪╖╪º╪╣ ╪º┘ä╪«╪º╪╡ - ╪ú╪«╪▒┘ë"
 
 #~ msgid "Independent Researcher"
-#~ msgstr "باحث مستقل"
+#~ msgstr "╪¿╪º╪¡╪½ ┘à╪│╪¬┘é┘ä"
 
 #~ msgid "Student"
-#~ msgstr "طالب"
+#~ msgstr "╪╖╪º┘ä╪¿"
 
 #~ msgid "Other"
-#~ msgstr "آخر"
+#~ msgstr "╪ó╪«╪▒"
 
 #~ msgid "National/International Reporting (UNCCD, SDGs, etc.)"
 #~ msgstr ""
-#~ "التقارير الوطنية/الدولية (اتفاقية الأمم المتحدة لمكافحة التصحر، أهداف "
-#~ "التنمية المستدامة، إلخ)."
+#~ "╪º┘ä╪¬┘é╪º╪▒┘è╪▒ ╪º┘ä┘ê╪╖┘å┘è╪⌐/╪º┘ä╪»┘ê┘ä┘è╪⌐ (╪º╪¬┘ü╪º┘é┘è╪⌐ ╪º┘ä╪ú┘à┘à "
+#~ "╪º┘ä┘à╪¬╪¡╪»╪⌐ ┘ä┘à┘â╪º┘ü╪¡╪⌐ ╪º┘ä╪¬╪╡╪¡╪▒╪î ╪ú┘ç╪»╪º┘ü ╪º┘ä╪¬┘å┘à┘è╪⌐ "
+#~ "╪º┘ä┘à╪│╪¬╪»╪º┘à╪⌐╪î ╪Ñ┘ä╪«)."
 
 #~ msgid "Academic Research"
-#~ msgstr "البحث الأكاديمي"
+#~ msgstr "╪º┘ä╪¿╪¡╪½ ╪º┘ä╪ú┘â╪º╪»┘è┘à┘è"
 
 #~ msgid "Policy Development & Planning"
-#~ msgstr "تطوير السياسات والتخطيط"
+#~ msgstr "╪¬╪╖┘ê┘è╪▒ ╪º┘ä╪│┘è╪º╪│╪º╪¬ ┘ê╪º┘ä╪¬╪«╪╖┘è╪╖"
 
 #~ msgid "Land Restoration/Management Planning"
-#~ msgstr "تخطيط استصلاح الأراضي وإدارتها"
+#~ msgstr "╪¬╪«╪╖┘è╪╖ ╪º╪│╪¬╪╡┘ä╪º╪¡ ╪º┘ä╪ú╪▒╪º╪╢┘è ┘ê╪Ñ╪»╪º╪▒╪¬┘ç╪º"
 
 #~ msgid "Project Monitoring & Evaluation"
-#~ msgstr "مراقبة وتقييم المشروع"
+#~ msgstr "┘à╪▒╪º┘é╪¿╪⌐ ┘ê╪¬┘é┘è┘è┘à ╪º┘ä┘à╪┤╪▒┘ê╪╣"
 
 #~ msgid "Environmental Impact Assessment"
-#~ msgstr "تقييم الأثر البيئي"
+#~ msgstr "╪¬┘é┘è┘è┘à ╪º┘ä╪ú╪½╪▒ ╪º┘ä╪¿┘è╪ª┘è"
 
 #~ msgid "Agriculture/Forestry Planning"
-#~ msgstr "التخطيط الزراعي/الحراجي"
+#~ msgstr "╪º┘ä╪¬╪«╪╖┘è╪╖ ╪º┘ä╪▓╪▒╪º╪╣┘è/╪º┘ä╪¡╪▒╪º╪¼┘è"
 
 #~ msgid "Teaching & Education"
-#~ msgstr "التدريس والتعليم"
+#~ msgstr "╪º┘ä╪¬╪»╪▒┘è╪│ ┘ê╪º┘ä╪¬╪╣┘ä┘è┘à"
 
 #~ msgid "Conservation Planning"
-#~ msgstr "تخطيط الحفظ"
+#~ msgstr "╪¬╪«╪╖┘è╪╖ ╪º┘ä╪¡┘ü╪╕"
 
 #~ msgid "Commercial Services/Products"
-#~ msgstr "الخدمات/المنتجات التجارية"
+#~ msgstr "╪º┘ä╪«╪»┘à╪º╪¬/╪º┘ä┘à┘å╪¬╪¼╪º╪¬ ╪º┘ä╪¬╪¼╪º╪▒┘è╪⌐"
 
 #~ msgid "Community/Grassroots Initiatives"
-#~ msgstr "مبادرات مجتمعية/شعبية"
+#~ msgstr "┘à╪¿╪º╪»╪▒╪º╪¬ ┘à╪¼╪¬┘à╪╣┘è╪⌐/╪┤╪╣╪¿┘è╪⌐"
 
 #~ msgid "Woman"
-#~ msgstr "امرأة"
+#~ msgstr "╪º┘à╪▒╪ú╪⌐"
 
 #~ msgid "Man"
-#~ msgstr "رجل"
+#~ msgstr "╪▒╪¼┘ä"
 
 #~ msgid "Non-binary"
-#~ msgstr "غير ثنائي"
+#~ msgstr "╪║┘è╪▒ ╪½┘å╪º╪ª┘è"
 
 #~ msgid "Prefer to self-describe"
-#~ msgstr "أفضل أن أصف نفسي"
+#~ msgstr "╪ú┘ü╪╢┘ä ╪ú┘å ╪ú╪╡┘ü ┘å┘ü╪│┘è"
 
 #~ msgid "Prefer not to say"
-#~ msgstr "أفضّل عدم الإفصاح"
+#~ msgstr "╪ú┘ü╪╢┘æ┘ä ╪╣╪»┘à ╪º┘ä╪Ñ┘ü╪╡╪º╪¡"
 
 #~ msgid "Create Your Account"
-#~ msgstr "أنشئ حسابك"
+#~ msgstr "╪ú┘å╪┤╪ª ╪¡╪│╪º╪¿┘â"
 
 #~ msgid ""
 #~ "After registration, you'll receive an email to verify your address and set "
 #~ "your password."
 #~ msgstr ""
-#~ "بعد التسجيل، ستتلقى رسالة بريد إلكتروني للتحقق من عنوانك وتعيين كلمة المرور "
-#~ "الخاصة بك."
+#~ "╪¿╪╣╪» ╪º┘ä╪¬╪│╪¼┘è┘ä╪î ╪│╪¬╪¬┘ä┘é┘ë ╪▒╪│╪º┘ä╪⌐ ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è "
+#~ "┘ä┘ä╪¬╪¡┘é┘é ┘à┘å ╪╣┘å┘ê╪º┘å┘â ┘ê╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ "
+#~ "╪º┘ä╪«╪º╪╡╪⌐ ╪¿┘â."
 
 #~ msgid "Required field"
-#~ msgstr "حقل مطلوب"
+#~ msgstr "╪¡┘é┘ä ┘à╪╖┘ä┘ê╪¿"
 
 #~ msgid "Full Name"
-#~ msgstr "الاسم الكامل"
+#~ msgstr "╪º┘ä╪º╪│┘à ╪º┘ä┘â╪º┘à┘ä"
 
 #~ msgid "Enter your full name"
-#~ msgstr "أدخل اسمك الكامل"
+#~ msgstr "╪ú╪»╪«┘ä ╪º╪│┘à┘â ╪º┘ä┘â╪º┘à┘ä"
 
 #~ msgid "Role/Title"
-#~ msgstr "الدور/اللقب"
+#~ msgstr "╪º┘ä╪»┘ê╪▒/╪º┘ä┘ä┘é╪¿"
 
 #~ msgid "Your job title (optional)"
-#~ msgstr "مسمى وظيفتك (اختياري)"
+#~ msgstr "┘à╪│┘à┘ë ┘ê╪╕┘è┘ü╪¬┘â (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "Organization"
-#~ msgstr "منظمة"
+#~ msgstr "┘à┘å╪╕┘à╪⌐"
 
 #~ msgid "Your organization"
-#~ msgstr "مؤسستكم"
+#~ msgstr "┘à╪ñ╪│╪│╪¬┘â┘à"
 
 #~ msgid "Sector"
-#~ msgstr "قطاع"
+#~ msgstr "┘é╪╖╪º╪╣"
 
 #~ msgid "Select your sector"
-#~ msgstr "اختر قطاعك"
+#~ msgstr "╪º╪«╪¬╪▒ ┘é╪╖╪º╪╣┘â"
 
 #~ msgid "Please specify"
-#~ msgstr "يرجى التحديد"
+#~ msgstr "┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡╪»┘è╪»"
 
 #~ msgid "Please specify your sector"
-#~ msgstr "يرجى تحديد قطاعك"
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘é╪╖╪º╪╣┘â"
 
 #~ msgid "Purpose of Use"
-#~ msgstr "الغرض من الاستخدام"
+#~ msgstr "╪º┘ä╪║╪▒╪╢ ┘à┘å ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
 
 #~ msgid "Select your purpose of use"
-#~ msgstr "حدد غرض الاستخدام"
+#~ msgstr "╪¡╪»╪» ╪║╪▒╪╢ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
 
 #~ msgid "Please specify your purpose"
-#~ msgstr "يرجى تحديد الغرض من ذلك"
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪º┘ä╪║╪▒╪╢ ┘à┘å ╪░┘ä┘â"
 
 #~ msgid "Country"
-#~ msgstr "دولة"
+#~ msgstr "╪»┘ê┘ä╪⌐"
 
 #~ msgid "Select your country"
-#~ msgstr "اختر بلدك"
+#~ msgstr "╪º╪«╪¬╪▒ ╪¿┘ä╪»┘â"
 
 #~ msgid "Gender Identity"
-#~ msgstr "الهوية الجنسية"
+#~ msgstr "╪º┘ä┘ç┘ê┘è╪⌐ ╪º┘ä╪¼┘å╪│┘è╪⌐"
 
 #~ msgid "Select (optional)"
-#~ msgstr "اختر (اختياري)"
+#~ msgstr "╪º╪«╪¬╪▒ (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid ""
 #~ "We collect gender identity information to comply with donor reporting "
@@ -283,31 +3344,36 @@ msgstr ""
 #~ "and tool access. Providing this information is voluntary; your selection "
 #~ "will not affect your access to the tool."
 #~ msgstr ""
-#~ "نجمع معلومات الهوية الجنسية امتثالاً لمتطلبات إعداد التقارير للجهات المانحة،"
-#~ " ولتقييم المشاركة العادلة في تنمية القدرات وإتاحة الأدوات. تقديم هذه "
-#~ "المعلومات اختياري، ولن يؤثر اختيارك على إمكانية وصولك إلى الأداة."
+#~ "┘å╪¼┘à╪╣ ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘ç┘ê┘è╪⌐ ╪º┘ä╪¼┘å╪│┘è╪⌐ ╪º┘à╪¬╪½╪º┘ä╪º┘ï "
+#~ "┘ä┘à╪¬╪╖┘ä╪¿╪º╪¬ ╪Ñ╪╣╪»╪º╪» ╪º┘ä╪¬┘é╪º╪▒┘è╪▒ ┘ä┘ä╪¼┘ç╪º╪¬ ╪º┘ä┘à╪º┘å╪¡╪⌐╪î "
+#~ "┘ê┘ä╪¬┘é┘è┘è┘à ╪º┘ä┘à╪┤╪º╪▒┘â╪⌐ ╪º┘ä╪╣╪º╪»┘ä╪⌐ ┘ü┘è ╪¬┘å┘à┘è╪⌐ "
+#~ "╪º┘ä┘é╪»╪▒╪º╪¬ ┘ê╪Ñ╪¬╪º╪¡╪⌐ ╪º┘ä╪ú╪»┘ê╪º╪¬. ╪¬┘é╪»┘è┘à ┘ç╪░┘ç "
+#~ "╪º┘ä┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º╪«╪¬┘è╪º╪▒┘è╪î ┘ê┘ä┘å ┘è╪ñ╪½╪▒ ╪º╪«╪¬┘è╪º╪▒┘â ╪╣┘ä┘ë "
+#~ "╪Ñ┘à┘â╪º┘å┘è╪⌐ ┘ê╪╡┘ê┘ä┘â ╪Ñ┘ä┘ë ╪º┘ä╪ú╪»╪º╪⌐."
 
 #~ msgid "Please describe"
-#~ msgstr "يرجى الوصف"
+#~ msgstr "┘è╪▒╪¼┘ë ╪º┘ä┘ê╪╡┘ü"
 
 #~ msgid ""
 #~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
 #~ "and, depending on your use, you may be required to have in place a "
 #~ "commercial license to use Google Earth Engine?"
 #~ msgstr ""
-#~ "هل تقرّ بأن بعض ميزات Trends.Earth تستخدم محرك Google Earth، وأنه قد يُطلب "
-#~ "منك، اعتمادًا على استخدامك، الحصول على ترخيص تجاري لاستخدام محرك Google "
-#~ "Earth؟"
+#~ "┘ç┘ä ╪¬┘é╪▒┘æ ╪¿╪ú┘å ╪¿╪╣╪╢ ┘à┘è╪▓╪º╪¬ Trends.Earth ╪¬╪│╪¬╪«╪»┘à ┘à╪¡╪▒┘â "
+#~ "Google Earth╪î ┘ê╪ú┘å┘ç ┘é╪» ┘è┘Å╪╖┘ä╪¿ ┘à┘å┘â╪î ╪º╪╣╪¬┘à╪º╪»┘ï╪º ╪╣┘ä┘ë "
+#~ "╪º╪│╪¬╪«╪»╪º┘à┘â╪î ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪¬╪▒╪«┘è╪╡ ╪¬╪¼╪º╪▒┘è "
+#~ "┘ä╪º╪│╪¬╪«╪»╪º┘à ┘à╪¡╪▒┘â Google Earth╪ƒ"
 
 #~ msgid ""
 #~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
 #~ "details see the "
 #~ msgstr ""
-#~ "يفرض محرك جوجل إيرث (GEE) قيودًا على الاستخدام التجاري. لمزيد من التفاصيل، "
-#~ "راجع "
+#~ "┘è┘ü╪▒╪╢ ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ (GEE) ┘é┘è┘ê╪»┘ï╪º ╪╣┘ä┘ë "
+#~ "╪º┘ä╪º╪│╪¬╪«╪»╪º┘à ╪º┘ä╪¬╪¼╪º╪▒┘è. ┘ä┘à╪▓┘è╪» ┘à┘å ╪º┘ä╪¬┘ü╪º╪╡┘è┘ä╪î "
+#~ "╪▒╪º╪¼╪╣ "
 
 #~ msgid "Google Earth Engine Terms of Use"
-#~ msgstr "شروط استخدام محرك جوجل إيرث"
+#~ msgstr "╪┤╪▒┘ê╪╖ ╪º╪│╪¬╪«╪»╪º┘à ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½"
 
 #~ msgid ""
 #~ " . Conservation International does not provide or manage commercial GEE "
@@ -315,1360 +3381,1524 @@ msgstr ""
 #~ "complies with Google's commercial licensing requirements. Access to this "
 #~ "tool does not grant or imply the provision of commercial licensing."
 #~ msgstr ""
-#~ " لا تُقدّم منظمة Conservation International تراخيص Google EEE التجارية ولا "
-#~ "تُديرها. يتحمّل المستخدمون وحدهم مسؤولية ضمان توافق استخدامهم لـ Google EEE "
-#~ "مع متطلبات الترخيص التجاري لشركة Google. ولا يُمنح الوصول إلى هذه الأداة أي "
-#~ "ترخيص تجاري، ولا يُفهم منه ذلك."
+#~ " ┘ä╪º ╪¬┘Å┘é╪»┘æ┘à ┘à┘å╪╕┘à╪⌐ Conservation International ╪¬╪▒╪º╪«┘è╪╡ Google"
+#~ " EEE ╪º┘ä╪¬╪¼╪º╪▒┘è╪⌐ ┘ê┘ä╪º ╪¬┘Å╪»┘è╪▒┘ç╪º. ┘è╪¬╪¡┘à┘æ┘ä "
+#~ "╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å ┘ê╪¡╪»┘ç┘à ┘à╪│╪ñ┘ê┘ä┘è╪⌐ ╪╢┘à╪º┘å ╪¬┘ê╪º┘ü┘é "
+#~ "╪º╪│╪¬╪«╪»╪º┘à┘ç┘à ┘ä┘Ç Google EEE ┘à╪╣ ┘à╪¬╪╖┘ä╪¿╪º╪¬ ╪º┘ä╪¬╪▒╪«┘è╪╡ "
+#~ "╪º┘ä╪¬╪¼╪º╪▒┘è ┘ä╪┤╪▒┘â╪⌐ Google. ┘ê┘ä╪º ┘è┘Å┘à┘å╪¡ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë "
+#~ "┘ç╪░┘ç ╪º┘ä╪ú╪»╪º╪⌐ ╪ú┘è ╪¬╪▒╪«┘è╪╡ ╪¬╪¼╪º╪▒┘è╪î ┘ê┘ä╪º ┘è┘Å┘ü┘ç┘à ┘à┘å┘ç "
+#~ "╪░┘ä┘â."
 
 #~ msgid "Yes, I acknowledge"
-#~ msgstr "نعم، أقر بذلك."
+#~ msgstr "┘å╪╣┘à╪î ╪ú┘é╪▒ ╪¿╪░┘ä┘â."
 
 #~ msgid "Create Account"
-#~ msgstr "إنشاء حساب"
+#~ msgstr "╪Ñ┘å╪┤╪º╪í ╪¡╪│╪º╪¿"
 
 #~ msgid "Logout"
-#~ msgstr "تسجيل الخروج"
+#~ msgstr "╪¬╪│╪¼┘è┘ä ╪º┘ä╪«╪▒┘ê╪¼"
 
 #~ msgid "Executions"
-#~ msgstr "عمليات الإعدام"
+#~ msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪Ñ╪╣╪»╪º┘à"
 
 #~ msgid "Users"
-#~ msgstr "المستخدمون"
+#~ msgstr "╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å"
 
 #~ msgid "Scripts"
-#~ msgstr "النصوص"
+#~ msgstr "╪º┘ä┘å╪╡┘ê╪╡"
 
 #~ msgid "Admin"
-#~ msgstr "مسؤل"
+#~ msgstr "┘à╪│╪ñ┘ä"
 
 #~ msgid "Status"
-#~ msgstr "حالة"
+#~ msgstr "╪¡╪º┘ä╪⌐"
 
 #~ msgid "Profile"
-#~ msgstr "حساب تعريفي"
+#~ msgstr "╪¡╪│╪º╪¿ ╪¬╪╣╪▒┘è┘ü┘è"
 
 #~ msgid "Please fill in all required fields (Name, Email, Password)."
 #~ msgstr ""
-#~ "يرجى ملء جميع الحقول المطلوبة (الاسم، البريد الإلكتروني، كلمة المرور)."
+#~ "┘è╪▒╪¼┘ë ┘à┘ä╪í ╪¼┘à┘è╪╣ ╪º┘ä╪¡┘é┘ê┘ä ╪º┘ä┘à╪╖┘ä┘ê╪¿╪⌐ (╪º┘ä╪º╪│┘à╪î "
+#~ "╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è╪î ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒)."
 
 #~ msgid "Passwords do not match."
-#~ msgstr "كلمات المرور غير متطابقة."
+#~ msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪║┘è╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐."
 
 #~ msgid "Password must contain {errors}."
-#~ msgstr "يجب أن تحتوي كلمة المرور على {errors}."
+#~ msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¡╪¬┘ê┘è ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪╣┘ä┘ë {errors}."
 
 #~ msgid "User '{name}' created successfully with email '{email}'."
 #~ msgstr ""
-#~ "تم إنشاء المستخدم &#39;{name}&#39; بنجاح باستخدام البريد الإلكتروني "
-#~ "&#39;{email}&#39;."
+#~ "╪¬┘à ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à &#39;{name}&#39; ╪¿┘å╪¼╪º╪¡ "
+#~ "╪¿╪º╪│╪¬╪«╪»╪º┘à ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è &#39;{email}&#39;."
 
 #~ msgid "A user with this email already exists."
-#~ msgstr "يوجد مستخدم بهذا البريد الإلكتروني بالفعل."
+#~ msgstr ""
+#~ "┘è┘ê╪¼╪» ┘à╪│╪¬╪«╪»┘à ╪¿┘ç╪░╪º ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è "
+#~ "╪¿╪º┘ä┘ü╪╣┘ä."
 
 #~ msgid "Invalid user data."
-#~ msgstr "بيانات المستخدم غير صالحة."
+#~ msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐."
 
 #~ msgid "Error creating user: {detail}"
-#~ msgstr "خطأ في إنشاء المستخدم: {detail}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à: {detail}"
 
 #~ msgid "Failed to create user. Server responded with status {status}."
-#~ msgstr "فشل إنشاء المستخدم. استجاب الخادم بالحالة {status}."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪Ñ┘å╪┤╪º╪í ╪º┘ä┘à╪│╪¬╪«╪»┘à. ╪º╪│╪¬╪¼╪º╪¿ ╪º┘ä╪«╪º╪»┘à ╪¿╪º┘ä╪¡╪º┘ä╪⌐"
+#~ " {status}."
 
 #~ msgid "Request timed out. Please try again."
-#~ msgstr "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى."
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪╖┘ä╪¿. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Cannot connect to server. Please check your connection."
-#~ msgstr "لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت."
+#~ msgstr ""
+#~ "┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+#~ "╪º╪¬╪╡╪º┘ä┘â ╪¿╪º┘ä╪Ñ┘å╪¬╪▒┘å╪¬."
 
 #~ msgid "Unexpected error: {error}"
-#~ msgstr "خطأ غير متوقع: {error}"
+#~ msgstr "╪«╪╖╪ú ╪║┘è╪▒ ┘à╪¬┘ê┘é╪╣: {error}"
 
 #~ msgid ""
 #~ "Invalid file type: {filename}. Must be a .tar.gz archive containing "
 #~ "configuration.json."
 #~ msgstr ""
-#~ "نوع الملف غير صالح: {اسم الملف}. يجب أن يكون ملفًا مضغوطًا بصيغة .tar.gz "
-#~ "يحتوي على ملف configuration.json."
+#~ "┘å┘ê╪╣ ╪º┘ä┘à┘ä┘ü ╪║┘è╪▒ ╪╡╪º┘ä╪¡: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü}. ┘è╪¼╪¿ ╪ú┘å ┘è┘â┘ê┘å"
+#~ " ┘à┘ä┘ü┘ï╪º ┘à╪╢╪║┘ê╪╖┘ï╪º ╪¿╪╡┘è╪║╪⌐ .tar.gz ┘è╪¡╪¬┘ê┘è ╪╣┘ä┘ë ┘à┘ä┘ü "
+#~ "configuration.json."
 
 #~ msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
 #~ msgstr ""
-#~ "حجم الملف كبير جدًا: {اسم الملف} ({الحجم} ميجابايت). الحد الأقصى المسموح به "
-#~ "هو 10 ميجابايت."
+#~ "╪¡╪¼┘à ╪º┘ä┘à┘ä┘ü ┘â╪¿┘è╪▒ ╪¼╪»┘ï╪º: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü} ({╪º┘ä╪¡╪¼┘à} "
+#~ "┘à┘è╪¼╪º╪¿╪º┘è╪¬). ╪º┘ä╪¡╪» ╪º┘ä╪ú┘é╪╡┘ë ╪º┘ä┘à╪│┘à┘ê╪¡ ╪¿┘ç ┘ç┘ê 10 "
+#~ "┘à┘è╪¼╪º╪¿╪º┘è╪¬."
 
 #~ msgid "Archive ready: {filename} ({size}MB)"
-#~ msgstr "جاهز للأرشيف: {اسم الملف} ({الحجم} ميجابايت)"
+#~ msgstr ""
+#~ "╪¼╪º┘ç╪▓ ┘ä┘ä╪ú╪▒╪┤┘è┘ü: {╪º╪│┘à ╪º┘ä┘à┘ä┘ü} ({╪º┘ä╪¡╪¼┘à} ┘à┘è╪¼╪º╪¿╪º┘è╪¬)"
 
 #~ msgid "Access denied. Administrator privileges required."
-#~ msgstr "تم رفض الوصول. يلزم الحصول على صلاحيات المسؤول."
+#~ msgstr ""
+#~ "╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+#~ "╪º┘ä┘à╪│╪ñ┘ê┘ä."
 
 #~ msgid "Please select a .tar.gz script archive to upload."
-#~ msgstr "يرجى تحديد ملف أرشيف نصي بصيغة .tar.gz لتحميله."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘à┘ä┘ü ╪ú╪▒╪┤┘è┘ü ┘å╪╡┘è ╪¿╪╡┘è╪║╪⌐ .tar.gz "
+#~ "┘ä╪¬╪¡┘à┘è┘ä┘ç."
 
 #~ msgid ""
 #~ "Invalid file type. The API requires a .tar.gz archive containing a "
 #~ "configuration.json file."
 #~ msgstr ""
-#~ "نوع الملف غير صالح. تتطلب واجهة برمجة التطبيقات ملفًا مضغوطًا بصيغة tar.gz "
-#~ "يحتوي على ملف configuration.json."
+#~ "┘å┘ê╪╣ ╪º┘ä┘à┘ä┘ü ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ╪¬╪¬╪╖┘ä╪¿ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ "
+#~ "╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ ┘à┘ä┘ü┘ï╪º ┘à╪╢╪║┘ê╪╖┘ï╪º ╪¿╪╡┘è╪║╪⌐ tar.gz ┘è╪¡╪¬┘ê┘è "
+#~ "╪╣┘ä┘ë ┘à┘ä┘ü configuration.json."
 
 #~ msgid "Script '{name}' uploaded successfully."
-#~ msgstr "تم تحميل البرنامج النصي &#39;{name}&#39; بنجاح."
+#~ msgstr ""
+#~ "╪¬┘à ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è &#39;{name}&#39; ╪¿┘å╪¼╪º╪¡."
 
 #~ msgid "Invalid script archive."
-#~ msgstr "أرشيف نص برمجي غير صالح."
+#~ msgstr "╪ú╪▒╪┤┘è┘ü ┘å╪╡ ╪¿╪▒┘à╪¼┘è ╪║┘è╪▒ ╪╡╪º┘ä╪¡."
 
 #~ msgid "Error uploading script: {detail}"
-#~ msgstr "خطأ في تحميل البرنامج النصي: {detail}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è: {detail}"
 
 #~ msgid "Permission denied. Only admins and superadmins can create scripts."
 #~ msgstr ""
-#~ "تم رفض الإذن. يُسمح فقط للمسؤولين والمسؤولين المميزين بإنشاء البرامج النصية."
+#~ "╪¬┘à ╪▒┘ü╪╢ ╪º┘ä╪Ñ╪░┘å. ┘è┘Å╪│┘à╪¡ ┘ü┘é╪╖ ┘ä┘ä┘à╪│╪ñ┘ê┘ä┘è┘å "
+#~ "┘ê╪º┘ä┘à╪│╪ñ┘ê┘ä┘è┘å ╪º┘ä┘à┘à┘è╪▓┘è┘å ╪¿╪Ñ┘å╪┤╪º╪í ╪º┘ä╪¿╪▒╪º┘à╪¼ "
+#~ "╪º┘ä┘å╪╡┘è╪⌐."
 
 #~ msgid "Failed to upload script. Server responded with status {status}."
-#~ msgstr "فشل تحميل البرنامج النصي. استجاب الخادم بالحالة {status}."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è. ╪º╪│╪¬╪¼╪º╪¿ ╪º┘ä╪«╪º╪»┘à "
+#~ "╪¿╪º┘ä╪¡╪º┘ä╪⌐ {status}."
 
 #~ msgid "Upload timed out. Please try again with a smaller file."
-#~ msgstr "انتهت مهلة التحميل. يرجى المحاولة مرة أخرى بملف أصغر."
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪¬╪¡┘à┘è┘ä. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ "
+#~ "╪ú╪«╪▒┘ë ╪¿┘à┘ä┘ü ╪ú╪╡╪║╪▒."
 
 #~ msgid "Rate limits have been successfully reset for all users and endpoints."
-#~ msgstr "تمت إعادة ضبط حدود المعدل بنجاح لجميع المستخدمين ونقاط النهاية."
+#~ msgstr ""
+#~ "╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä ╪¿┘å╪¼╪º╪¡ ┘ä╪¼┘à┘è╪╣ "
+#~ "╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ┘ê┘å┘é╪º╪╖ ╪º┘ä┘å┘ç╪º┘è╪⌐."
 
 #~ msgid "Failed to reset rate limits. Status: {status}"
-#~ msgstr "فشل إعادة ضبط حدود المعدل. الحالة: {status}"
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä. ╪º┘ä╪¡╪º┘ä╪⌐: {status}"
 
 #~ msgid "Error resetting rate limits: {error}"
-#~ msgstr "خطأ في إعادة ضبط حدود المعدل: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä: {error}"
 
 #~ msgid "Error: No rate limit selected."
-#~ msgstr "خطأ: لم يتم تحديد حدّ للمعدل."
+#~ msgstr "╪«╪╖╪ú: ┘ä┘à ┘è╪¬┘à ╪¬╪¡╪»┘è╪» ╪¡╪»┘æ ┘ä┘ä┘à╪╣╪»┘ä."
 
 #~ msgid "Rate limit for {identifier} has been successfully reset."
-#~ msgstr "تمت إعادة ضبط حد معدل الطلبات لـ {identifier} بنجاح."
+#~ msgstr ""
+#~ "╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ┘à╪╣╪»┘ä ╪º┘ä╪╖┘ä╪¿╪º╪¬ ┘ä┘Ç {identifier} "
+#~ "╪¿┘å╪¼╪º╪¡."
 
 #~ msgid "Rate limit for {identifier} not found. It may have already expired."
 #~ msgstr ""
-#~ "لم يتم العثور على حد أقصى لعدد الطلبات لـ {identifier}. ربما يكون قد انتهت "
-#~ "صلاحيته بالفعل."
+#~ "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪¡╪» ╪ú┘é╪╡┘ë ┘ä╪╣╪»╪» ╪º┘ä╪╖┘ä╪¿╪º╪¬ ┘ä┘Ç "
+#~ "{identifier}. ╪▒╪¿┘à╪º ┘è┘â┘ê┘å ┘é╪» ╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪¬┘ç ╪¿╪º┘ä┘ü╪╣┘ä."
 
 #~ msgid "Failed to reset rate limit. Status: {status}"
-#~ msgstr "فشل إعادة ضبط حد المعدل. الحالة: {status}"
+#~ msgstr "┘ü╪┤┘ä ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä. ╪º┘ä╪¡╪º┘ä╪⌐: {status}"
 
 #~ msgid "Error resetting rate limit: {error}"
-#~ msgstr "خطأ في إعادة ضبط حد المعدل: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä: {error}"
 
 #~ msgid "Please enter both email and password."
-#~ msgstr "يرجى إدخال كل من البريد الإلكتروني وكلمة المرور."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ┘â┘ä ┘à┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ê┘â┘ä┘à╪⌐ "
+#~ "╪º┘ä┘à╪▒┘ê╪▒."
 
 #~ msgid "Login failed: Invalid response format."
-#~ msgstr "فشل تسجيل الدخول: تنسيق الاستجابة غير صالح."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪¬┘å╪│┘è┘é ╪º┘ä╪º╪│╪¬╪¼╪º╪¿╪⌐ ╪║┘è╪▒ "
+#~ "╪╡╪º┘ä╪¡."
 
 #~ msgid "Login successful!"
-#~ msgstr "تم تسجيل الدخول بنجاح!"
+#~ msgstr "╪¬┘à ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Failed to retrieve user information."
-#~ msgstr "فشل في استرداد معلومات المستخدم."
+#~ msgstr "┘ü╪┤┘ä ┘ü┘è ╪º╪│╪¬╪▒╪»╪º╪» ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à."
 
 #~ msgid "Invalid credentials."
-#~ msgstr "بيانات اعتماد غير صالحة."
+#~ msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪║┘è╪▒ ╪╡╪º┘ä╪¡╪⌐."
 
 #~ msgid "Your account is locked due to too many failed login attempts. "
-#~ msgstr "تم قفل حسابك بسبب كثرة محاولات تسجيل الدخول الفاشلة. "
+#~ msgstr ""
+#~ "╪¬┘à ┘é┘ü┘ä ╪¡╪│╪º╪¿┘â ╪¿╪│╪¿╪¿ ┘â╪½╪▒╪⌐ ┘à╪¡╪º┘ê┘ä╪º╪¬ ╪¬╪│╪¼┘è┘ä "
+#~ "╪º┘ä╪»╪«┘ê┘ä ╪º┘ä┘ü╪º╪┤┘ä╪⌐. "
 
 #~ msgid "Please use the 'Forgot Password' link below to reset your password."
 #~ msgstr ""
-#~ "يرجى استخدام رابط &quot;نسيت كلمة المرور&quot; أدناه لإعادة تعيين كلمة "
-#~ "مرورك."
+#~ "┘è╪▒╪¼┘ë ╪º╪│╪¬╪«╪»╪º┘à ╪▒╪º╪¿╪╖ &quot;┘å╪│┘è╪¬ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒&quot; "
+#~ "╪ú╪»┘å╪º┘ç ┘ä╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒┘â."
 
 #~ msgid "Your account is temporarily locked. "
-#~ msgstr "تم إغلاق حسابك مؤقتًا. "
+#~ msgstr "╪¬┘à ╪Ñ╪║┘ä╪º┘é ╪¡╪│╪º╪¿┘â ┘à╪ñ┘é╪¬┘ï╪º. "
 
 #~ msgid "Please try again in {minutes} minute(s)."
-#~ msgstr "يرجى المحاولة مرة أخرى خلال {دقائق} دقيقة."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ╪«┘ä╪º┘ä {╪»┘é╪º╪ª┘é} ╪»┘é┘è┘é╪⌐."
 
 #~ msgid "Login failed: Connection timeout. Please try again later."
-#~ msgstr "فشل تسجيل الدخول: انقطع الاتصال. يرجى المحاولة مرة أخرى لاحقاً."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪º┘å┘é╪╖╪╣ ╪º┘ä╪º╪¬╪╡╪º┘ä. ┘è╪▒╪¼┘ë "
+#~ "╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é╪º┘ï."
 
 #~ msgid ""
 #~ "Login failed: Cannot connect to authentication server. Please check the "
 #~ "server status."
 #~ msgstr ""
-#~ "فشل تسجيل الدخول: تعذر الاتصال بخادم المصادقة. يرجى التحقق من حالة الخادم."
+#~ "┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: ╪¬╪╣╪░╪▒ ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪«╪º╪»┘à "
+#~ "╪º┘ä┘à╪╡╪º╪»┘é╪⌐. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪¡╪º┘ä╪⌐ ╪º┘ä╪«╪º╪»┘à."
 
 #~ msgid "Login failed: {error}"
-#~ msgstr "فشل تسجيل الدخول: {error}"
+#~ msgstr "┘ü╪┤┘ä ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä: {error}"
 
 #~ msgid "Please enter your email address."
-#~ msgstr "يرجى إدخال عنوان بريدك الإلكتروني."
+#~ msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è."
 
 #~ msgid "Please enter a valid email address."
-#~ msgstr "يرجى إدخال عنوان بريد إلكتروني صالح."
+#~ msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪╣┘å┘ê╪º┘å ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ╪╡╪º┘ä╪¡."
 
 #~ msgid ""
 #~ "If an account exists with {email}, password recovery instructions have been "
 #~ "sent. Please check your email."
 #~ msgstr ""
-#~ "إذا كان هناك حساب موجود باستخدام {البريد الإلكتروني}، فقد تم إرسال تعليمات "
-#~ "استعادة كلمة المرور. يرجى مراجعة بريدك الإلكتروني."
+#~ "╪Ñ╪░╪º ┘â╪º┘å ┘ç┘å╪º┘â ╪¡╪│╪º╪¿ ┘à┘ê╪¼┘ê╪» ╪¿╪º╪│╪¬╪«╪»╪º┘à {╪º┘ä╪¿╪▒┘è╪» "
+#~ "╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è}╪î ┘ü┘é╪» ╪¬┘à ╪Ñ╪▒╪│╪º┘ä ╪¬╪╣┘ä┘è┘à╪º╪¬ ╪º╪│╪¬╪╣╪º╪»╪⌐"
+#~ " ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒. ┘è╪▒╪¼┘ë ┘à╪▒╪º╪¼╪╣╪⌐ ╪¿╪▒┘è╪»┘â "
+#~ "╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è."
 
 #~ msgid "Failed to send password recovery email."
-#~ msgstr "فشل إرسال بريد إلكتروني لاستعادة كلمة المرور."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪Ñ╪▒╪│╪º┘ä ╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ä╪º╪│╪¬╪╣╪º╪»╪⌐ ┘â┘ä┘à╪⌐ "
+#~ "╪º┘ä┘à╪▒┘ê╪▒."
 
 #~ msgid "{}. Please try again later."
-#~ msgstr "{}. يرجى المحاولة مرة أخرى لاحقاً."
+#~ msgstr "{}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é╪º┘ï."
 
 #~ msgid "Request timed out. Please try again later."
-#~ msgstr "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى لاحقاً."
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪¬ ┘à┘ç┘ä╪⌐ ╪º┘ä╪╖┘ä╪¿. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë "
+#~ "┘ä╪º╪¡┘é╪º┘ï."
 
 #~ msgid ""
 #~ "Cannot connect to the server. Please check your internet connection and try "
 #~ "again."
 #~ msgstr ""
-#~ "لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+#~ "┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+#~ "╪º╪¬╪╡╪º┘ä┘â ╪¿╪º┘ä╪Ñ┘å╪¬╪▒┘å╪¬ ┘ê╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "An error occurred: {error}. Please try again later."
-#~ msgstr "حدث خطأ: {error}. يرجى المحاولة مرة أخرى لاحقاً."
+#~ msgstr ""
+#~ "╪¡╪»╪½ ╪«╪╖╪ú: {error}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë "
+#~ "┘ä╪º╪¡┘é╪º┘ï."
 
 #~ msgid "Invalid or missing reset token. Please request a new password reset."
 #~ msgstr ""
-#~ "رمز إعادة التعيين غير صالح أو مفقود. يرجى طلب إعادة تعيين كلمة المرور."
+#~ "╪▒┘à╪▓ ╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪¬╪╣┘è┘è┘å ╪║┘è╪▒ ╪╡╪º┘ä╪¡ ╪ú┘ê ┘à┘ü┘é┘ê╪». ┘è╪▒╪¼┘ë "
+#~ "╪╖┘ä╪¿ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
 
 #~ msgid "Please enter and confirm your new password."
-#~ msgstr "يرجى إدخال كلمة المرور الجديدة وتأكيدها."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ┘ê╪¬╪ú┘â┘è╪»┘ç╪º."
 
 #~ msgid "Passwords do not match. Please try again."
-#~ msgstr "كلمات المرور غير متطابقة. يرجى المحاولة مرة أخرى."
+#~ msgstr ""
+#~ "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪║┘è╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ "
+#~ "┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Password must be at least 12 characters long."
-#~ msgstr "يجب أن تتكون كلمة المرور من 12 حرفاً على الأقل."
+#~ msgstr ""
+#~ "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬┘â┘ê┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘à┘å 12 ╪¡╪▒┘ü╪º┘ï ╪╣┘ä┘ë "
+#~ "╪º┘ä╪ú┘é┘ä."
 
 #~ msgid "Password reset successful! You can now log in with your new password."
 #~ msgstr ""
-#~ "تمت إعادة تعيين كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول باستخدام كلمة "
-#~ "المرور الجديدة."
+#~ "╪¬┘à╪¬ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¿┘å╪¼╪º╪¡! ┘è┘à┘â┘å┘â "
+#~ "╪º┘ä╪ó┘å ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ "
+#~ "╪º┘ä╪¼╪»┘è╪»╪⌐."
 
 #~ msgid ""
 #~ "This reset link is invalid or has expired. Please request a new password "
 #~ "reset."
 #~ msgstr ""
-#~ "رابط إعادة تعيين كلمة المرور هذا غير صالح أو انتهت صلاحيته. يرجى طلب إعادة "
-#~ "تعيين كلمة مرور جديدة."
+#~ "╪▒╪º╪¿╪╖ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘ç╪░╪º ╪║┘è╪▒ ╪╡╪º┘ä╪¡ "
+#~ "╪ú┘ê ╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪¬┘ç. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å "
+#~ "┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒ ╪¼╪»┘è╪»╪⌐."
 
 #~ msgid "Password does not meet requirements."
-#~ msgstr "كلمة السر لا تلبي المتطلبات."
+#~ msgstr "┘â┘ä┘à╪⌐ ╪º┘ä╪│╪▒ ┘ä╪º ╪¬┘ä╪¿┘è ╪º┘ä┘à╪¬╪╖┘ä╪¿╪º╪¬."
 
 #~ msgid "Failed to reset password."
-#~ msgstr "فشلت عملية إعادة تعيين كلمة المرور."
+#~ msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
 
 #~ msgid "{}. Please try again."
-#~ msgstr "{}. يرجى المحاولة مرة أخرى."
+#~ msgstr "{}. ┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Cannot connect to the server. Please check your connection."
-#~ msgstr "لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك."
+#~ msgstr ""
+#~ "┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿╪º┘ä╪«╪º╪»┘à. ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+#~ "╪º╪¬╪╡╪º┘ä┘â."
 
 #~ msgid "An error occurred: {error}"
-#~ msgstr "حدث خطأ: {error}"
+#~ msgstr "╪¡╪»╪½ ╪«╪╖╪ú: {error}"
 
 #~ msgid "Please enter your name."
-#~ msgstr "الرجاء إدخال اسمك."
+#~ msgstr "╪º┘ä╪▒╪¼╪º╪í ╪Ñ╪»╪«╪º┘ä ╪º╪│┘à┘â."
 
 #~ msgid "Please enter your organization."
-#~ msgstr "يرجى إدخال اسم مؤسستكم."
+#~ msgstr "┘è╪▒╪¼┘ë ╪Ñ╪»╪«╪º┘ä ╪º╪│┘à ┘à╪ñ╪│╪│╪¬┘â┘à."
 
 #~ msgid "Please select your sector."
-#~ msgstr "يرجى اختيار قطاعك."
+#~ msgstr "┘è╪▒╪¼┘ë ╪º╪«╪¬┘è╪º╪▒ ┘é╪╖╪º╪╣┘â."
 
 #~ msgid "Please specify your sector."
-#~ msgstr "يرجى تحديد قطاعك."
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ┘é╪╖╪º╪╣┘â."
 
 #~ msgid "Please select your purpose of use."
-#~ msgstr "يرجى تحديد غرض الاستخدام."
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪║╪▒╪╢ ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à."
 
 #~ msgid "Please specify your purpose of use."
-#~ msgstr "يرجى تحديد الغرض من الاستخدام."
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪¡╪»┘è╪» ╪º┘ä╪║╪▒╪╢ ┘à┘å ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à."
 
 #~ msgid "Please select your country."
-#~ msgstr "يرجى اختيار بلدك."
+#~ msgstr "┘è╪▒╪¼┘ë ╪º╪«╪¬┘è╪º╪▒ ╪¿┘ä╪»┘â."
 
 #~ msgid "Please describe your gender identity."
-#~ msgstr "يرجى وصف هويتك الجنسية."
+#~ msgstr "┘è╪▒╪¼┘ë ┘ê╪╡┘ü ┘ç┘ê┘è╪¬┘â ╪º┘ä╪¼┘å╪│┘è╪⌐."
 
 #~ msgid "Please acknowledge the Google Earth Engine license terms."
-#~ msgstr "يرجى الاطلاع على شروط ترخيص محرك جوجل إيرث."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪º┘ä╪º╪╖┘ä╪º╪╣ ╪╣┘ä┘ë ╪┤╪▒┘ê╪╖ ╪¬╪▒╪«┘è╪╡ ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä "
+#~ "╪Ñ┘è╪▒╪½."
 
 #~ msgid ""
 #~ "Account created successfully! Please check your email to verify your "
 #~ "account, then you can log in."
 #~ msgstr ""
-#~ "تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك، ثم "
-#~ "يمكنك تسجيل الدخول."
+#~ "╪¬┘à ╪Ñ┘å╪┤╪º╪í ╪º┘ä╪¡╪│╪º╪¿ ╪¿┘å╪¼╪º╪¡! ┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å "
+#~ "╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ┘ä╪¬╪ú┘â┘è╪» ╪¡╪│╪º╪¿┘â╪î ╪½┘à ┘è┘à┘â┘å┘â "
+#~ "╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä."
 
 #~ msgid "Registration failed."
-#~ msgstr "فشلت عملية التسجيل."
+#~ msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪¬╪│╪¼┘è┘ä."
 
 #~ msgid "Validation failed."
-#~ msgstr "فشلت عملية التحقق."
+#~ msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪¬╪¡┘é┘é."
 
 #~ msgid "Too many registration attempts. Please try again later."
-#~ msgstr "عدد محاولات التسجيل كبير جدًا. يرجى المحاولة مرة أخرى لاحقًا."
+#~ msgstr ""
+#~ "╪╣╪»╪» ┘à╪¡╪º┘ê┘ä╪º╪¬ ╪º┘ä╪¬╪│╪¼┘è┘ä ┘â╪¿┘è╪▒ ╪¼╪»┘ï╪º. ┘è╪▒╪¼┘ë "
+#~ "╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é┘ï╪º."
 
 #~ msgid "Invalid or expired token. Please request a new profile update link."
 #~ msgstr ""
-#~ "رمز غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد لتحديث الملف الشخصي."
+#~ "╪▒┘à╪▓ ╪║┘è╪▒ ╪╡╪º┘ä╪¡ ╪ú┘ê ┘à┘å╪¬┘ç┘è ╪º┘ä╪╡┘ä╪º╪¡┘è╪⌐. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ "
+#~ "╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» ┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
 
 #~ msgid "Error loading profile: {error}"
-#~ msgstr "خطأ في تحميل الملف الشخصي: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è: {error}"
 
 #~ msgid "No authentication token. Please use a valid profile update link."
-#~ msgstr "لا يوجد رمز مصادقة. يرجى استخدام رابط تحديث ملف تعريف صالح."
+#~ msgstr ""
+#~ "┘ä╪º ┘è┘ê╪¼╪» ╪▒┘à╪▓ ┘à╪╡╪º╪»┘é╪⌐. ┘è╪▒╪¼┘ë ╪º╪│╪¬╪«╪»╪º┘à ╪▒╪º╪¿╪╖ "
+#~ "╪¬╪¡╪»┘è╪½ ┘à┘ä┘ü ╪¬╪╣╪▒┘è┘ü ╪╡╪º┘ä╪¡."
 
 #~ msgid "Profile updated successfully!"
-#~ msgstr "تم تحديث الملف الشخصي بنجاح!"
+#~ msgstr "╪¬┘à ╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è ╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Session expired. Please request a new profile update link."
-#~ msgstr "انتهت صلاحية الجلسة. يرجى طلب رابط جديد لتحديث الملف الشخصي."
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪⌐ ╪º┘ä╪¼┘ä╪│╪⌐. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» "
+#~ "┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
 
 #~ msgid "Invalid token. Please request a new profile update link."
-#~ msgstr "رمز غير صالح. يرجى طلب رابط جديد لتحديث الملف الشخصي."
+#~ msgstr ""
+#~ "╪▒┘à╪▓ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪▒╪¼┘ë ╪╖┘ä╪¿ ╪▒╪º╪¿╪╖ ╪¼╪»┘è╪» ┘ä╪¬╪¡╪»┘è╪½ "
+#~ "╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
 
 #~ msgid "Failed to update profile."
-#~ msgstr "فشل تحديث الملف الشخصي."
+#~ msgstr "┘ü╪┤┘ä ╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è."
 
 #~ msgid "Password changed successfully!"
-#~ msgstr "تم تغيير كلمة المرور بنجاح!"
+#~ msgstr "╪¬┘à ╪¬╪║┘è┘è╪▒ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Failed to change password."
-#~ msgstr "فشل تغيير كلمة المرور."
+#~ msgstr "┘ü╪┤┘ä ╪¬╪║┘è┘è╪▒ ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒."
 
 #~ msgid " (Status: {status})"
-#~ msgstr " (الحالة: {status})"
+#~ msgstr " (╪º┘ä╪¡╪º┘ä╪⌐: {status})"
 
 #~ msgid "Network error: {error}"
-#~ msgstr "خطأ في الشبكة: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪º┘ä╪┤╪¿┘â╪⌐: {error}"
 
 #~ msgid "Execution Cancelled Successfully"
-#~ msgstr "تم إلغاء التنفيذ بنجاح"
+#~ msgstr "╪¬┘à ╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¬┘å┘ü┘è╪░ ╪¿┘å╪¼╪º╪¡"
 
 #~ msgid "Execution ID: "
-#~ msgstr "معرّف التنفيذ: "
+#~ msgstr "┘à╪╣╪▒┘æ┘ü ╪º┘ä╪¬┘å┘ü┘è╪░: "
 
 #~ msgid "Unknown"
-#~ msgstr "مجهول"
+#~ msgstr "┘à╪¼┘ç┘ê┘ä"
 
 #~ msgid "Script: "
-#~ msgstr "نص: "
+#~ msgstr "┘å╪╡: "
 
 #~ msgid "Previous Status: "
-#~ msgstr "الحالة السابقة: "
+#~ msgstr "╪º┘ä╪¡╪º┘ä╪⌐ ╪º┘ä╪│╪º╪¿┘é╪⌐: "
 
 #~ msgid "New Status: "
-#~ msgstr "الحالة الجديدة: "
+#~ msgstr "╪º┘ä╪¡╪º┘ä╪⌐ ╪º┘ä╪¼╪»┘è╪»╪⌐: "
 
 #~ msgid "Infrastructure Cleanup"
-#~ msgstr "تنظيف البنية التحتية"
+#~ msgstr "╪¬┘å╪╕┘è┘ü ╪º┘ä╪¿┘å┘è╪⌐ ╪º┘ä╪¬╪¡╪¬┘è╪⌐"
 
 #~ msgid "Docker service stopped"
-#~ msgstr "توقفت خدمة Docker"
+#~ msgstr "╪¬┘ê┘é┘ü╪¬ ╪«╪»┘à╪⌐ Docker"
 
 #~ msgid "Docker service not found/stopped"
-#~ msgstr "لم يتم العثور على خدمة Docker/تم إيقافها"
+#~ msgstr "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪«╪»┘à╪⌐ Docker/╪¬┘à ╪Ñ┘è┘é╪º┘ü┘ç╪º"
 
 #~ msgid "Docker container stopped"
-#~ msgstr "تم إيقاف حاوية Docker"
+#~ msgstr "╪¬┘à ╪Ñ┘è┘é╪º┘ü ╪¡╪º┘ê┘è╪⌐ Docker"
 
 #~ msgid "Docker container not found/stopped"
-#~ msgstr "لم يتم العثور على حاوية Docker/تم إيقافها"
+#~ msgstr "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪¡╪º┘ê┘è╪⌐ Docker/╪¬┘à ╪Ñ┘è┘é╪º┘ü┘ç╪º"
 
 #~ msgid "Google Earth Engine Tasks"
-#~ msgstr "مهام محرك جوجل إيرث"
+#~ msgstr "┘à┘ç╪º┘à ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½"
 
 #~ msgid "Found and processed {count} GEE tasks:"
-#~ msgstr "تم العثور على {count} مهمة من مهام GEE ومعالجتها:"
+#~ msgstr ""
+#~ "╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë {count} ┘à┘ç┘à╪⌐ ┘à┘å ┘à┘ç╪º┘à GEE "
+#~ "┘ê┘à╪╣╪º┘ä╪¼╪¬┘ç╪º:"
 
 #~ msgid "Status: {status}"
-#~ msgstr "الحالة: {status}"
+#~ msgstr "╪º┘ä╪¡╪º┘ä╪⌐: {status}"
 
 #~ msgid "No GEE tasks found in execution logs."
-#~ msgstr "لم يتم العثور على أي مهام GEE في سجلات التنفيذ."
+#~ msgstr ""
+#~ "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪ú┘è ┘à┘ç╪º┘à GEE ┘ü┘è ╪│╪¼┘ä╪º╪¬ "
+#~ "╪º┘ä╪¬┘å┘ü┘è╪░."
 
 #~ msgid "Errors Encountered"
-#~ msgstr "الأخطاء التي تمت مواجهتها"
+#~ msgstr "╪º┘ä╪ú╪«╪╖╪º╪í ╪º┘ä╪¬┘è ╪¬┘à╪¬ ┘à┘ê╪º╪¼┘ç╪¬┘ç╪º"
 
 #~ msgid "Cancellation Failed"
-#~ msgstr "فشلت عملية الإلغاء"
+#~ msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪Ñ┘ä╪║╪º╪í"
 
 #~ msgid "Error: "
-#~ msgstr "خطأ: "
+#~ msgstr "╪«╪╖╪ú: "
 
 #~ msgid "Please log in to view credentials status."
-#~ msgstr "يرجى تسجيل الدخول لعرض حالة بيانات الاعتماد."
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ "
+#~ "╪º┘ä╪º╪╣╪¬┘à╪º╪»."
 
 #~ msgid "OAuth"
 #~ msgstr "OAuth"
 
 #~ msgid "Service Account"
-#~ msgstr "حساب الخدمة"
+#~ msgstr "╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐"
 
 #~ msgid "Credentials configured using {type_label}"
-#~ msgstr "تم تكوين بيانات الاعتماد باستخدام {type_label}"
+#~ msgstr ""
+#~ "╪¬┘à ╪¬┘â┘ê┘è┘å ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪» ╪¿╪º╪│╪¬╪«╪»╪º┘à {type_label}"
 
 #~ msgid "Set up on: {created_date}"
-#~ msgstr "تاريخ الإنشاء: {created_date}"
+#~ msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪Ñ┘å╪┤╪º╪í: {created_date}"
 
 #~ msgid "No Google Earth Engine credentials configured."
-#~ msgstr "لم يتم تكوين بيانات اعتماد Google Earth Engine."
+#~ msgstr "┘ä┘à ┘è╪¬┘à ╪¬┘â┘ê┘è┘å ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» Google Earth Engine."
 
 #~ msgid "Choose one of the setup options below."
-#~ msgstr "اختر أحد خيارات الإعداد أدناه."
+#~ msgstr "╪º╪«╪¬╪▒ ╪ú╪¡╪» ╪«┘è╪º╪▒╪º╪¬ ╪º┘ä╪Ñ╪╣╪»╪º╪» ╪ú╪»┘å╪º┘ç."
 
 #~ msgid "Unable to retrieve credentials status."
-#~ msgstr "تعذر استرداد حالة بيانات الاعتماد."
+#~ msgstr "╪¬╪╣╪░╪▒ ╪º╪│╪¬╪▒╪»╪º╪» ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
 
 #~ msgid "Error retrieving credentials status."
-#~ msgstr "حدث خطأ أثناء استرداد حالة بيانات الاعتماد."
+#~ msgstr ""
+#~ "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪º╪│╪¬╪▒╪»╪º╪» ╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ "
+#~ "╪º┘ä╪º╪╣╪¬┘à╪º╪»."
 
 #~ msgid ""
 #~ "OAuth window opened. Please complete the authorization and return here."
-#~ msgstr "تم فتح نافذة OAuth. يرجى إكمال عملية التفويض والعودة إلى هنا."
+#~ msgstr ""
+#~ "╪¬┘à ┘ü╪¬╪¡ ┘å╪º┘ü╪░╪⌐ OAuth. ┘è╪▒╪¼┘ë ╪Ñ┘â┘à╪º┘ä ╪╣┘à┘ä┘è╪⌐ ╪º┘ä╪¬┘ü┘ê┘è╪╢ "
+#~ "┘ê╪º┘ä╪╣┘ê╪»╪⌐ ╪Ñ┘ä┘ë ┘ç┘å╪º."
 
 #~ msgid ""
 #~ "After authorization, you may need to refresh this page to see the updated "
 #~ "status."
 #~ msgstr ""
-#~ "بعد الحصول على التفويض، قد تحتاج إلى تحديث هذه الصفحة للاطلاع على الحالة "
-#~ "المحدثة."
+#~ "╪¿╪╣╪» ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪º┘ä╪¬┘ü┘ê┘è╪╢╪î ┘é╪» ╪¬╪¡╪¬╪º╪¼ ╪Ñ┘ä┘ë "
+#~ "╪¬╪¡╪»┘è╪½ ┘ç╪░┘ç ╪º┘ä╪╡┘ü╪¡╪⌐ ┘ä┘ä╪º╪╖┘ä╪º╪╣ ╪╣┘ä┘ë ╪º┘ä╪¡╪º┘ä╪⌐ "
+#~ "╪º┘ä┘à╪¡╪»╪½╪⌐."
 
 #~ msgid "OAuth initiation failed - no authorization URL received."
-#~ msgstr "فشلت عملية بدء OAuth - لم يتم استلام عنوان URL للتفويض."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪¿╪»╪í OAuth - ┘ä┘à ┘è╪¬┘à ╪º╪│╪¬┘ä╪º┘à ╪╣┘å┘ê╪º┘å URL "
+#~ "┘ä┘ä╪¬┘ü┘ê┘è╪╢."
 
 #~ msgid "Failed to initiate OAuth flow."
-#~ msgstr "فشل بدء عملية OAuth."
+#~ msgstr "┘ü╪┤┘ä ╪¿╪»╪í ╪╣┘à┘ä┘è╪⌐ OAuth."
 
 #~ msgid "Invalid JSON file. Please upload a valid service account key file."
-#~ msgstr "ملف JSON غير صالح. يرجى تحميل ملف مفتاح حساب خدمة صالح."
+#~ msgstr ""
+#~ "┘à┘ä┘ü JSON ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪▒╪¼┘ë ╪¬╪¡┘à┘è┘ä ┘à┘ä┘ü ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ "
+#~ "╪«╪»┘à╪⌐ ╪╡╪º┘ä╪¡."
 
 #~ msgid "Invalid service account key. Missing required fields."
-#~ msgstr "مفتاح حساب الخدمة غير صالح. الحقول المطلوبة مفقودة."
+#~ msgstr ""
+#~ "┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ╪º┘ä╪¡┘é┘ê┘ä "
+#~ "╪º┘ä┘à╪╖┘ä┘ê╪¿╪⌐ ┘à┘ü┘é┘ê╪»╪⌐."
 
 #~ msgid "Invalid service account key. Type field must be 'service_account'."
 #~ msgstr ""
-#~ "مفتاح حساب الخدمة غير صالح. يجب أن يكون حقل النوع &#39;service_account&#39;."
+#~ "┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ ╪║┘è╪▒ ╪╡╪º┘ä╪¡. ┘è╪¼╪¿ ╪ú┘å ┘è┘â┘ê┘å "
+#~ "╪¡┘é┘ä ╪º┘ä┘å┘ê╪╣ &#39;service_account&#39;."
 
 #~ msgid "Service account key '{filename}' uploaded successfully!"
-#~ msgstr "تم تحميل مفتاح حساب الخدمة &#39;{filename}&#39; بنجاح!"
+#~ msgstr ""
+#~ "╪¬┘à ╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐ &#39;{filename}&#39; "
+#~ "╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Failed to upload service account key."
-#~ msgstr "فشل تحميل مفتاح حساب الخدمة."
+#~ msgstr "┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐."
 
 #~ msgid "Error processing file: {error}"
-#~ msgstr "حدث خطأ أثناء معالجة الملف: {error}"
+#~ msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ┘à╪╣╪º┘ä╪¼╪⌐ ╪º┘ä┘à┘ä┘ü: {error}"
 
 #~ msgid "Google Earth Engine credentials are valid and working!"
-#~ msgstr "بيانات اعتماد Google Earth Engine صالحة وتعمل!"
+#~ msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» Google Earth Engine ╪╡╪º┘ä╪¡╪⌐ ┘ê╪¬╪╣┘à┘ä!"
 
 #~ msgid "Credentials test failed."
-#~ msgstr "فشل اختبار بيانات الاعتماد."
+#~ msgstr "┘ü╪┤┘ä ╪º╪«╪¬╪¿╪º╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
 
 #~ msgid "Google Earth Engine credentials deleted successfully."
-#~ msgstr "تم حذف بيانات اعتماد محرك جوجل إيرث بنجاح."
+#~ msgstr ""
+#~ "╪¬┘à ╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ┘à╪¡╪▒┘â ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ ╪¿┘å╪¼╪º╪¡."
 
 #~ msgid "Failed to delete credentials."
-#~ msgstr "فشل حذف بيانات الاعتماد."
+#~ msgstr "┘ü╪┤┘ä ╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»."
 
 #~ msgid "No news items found."
-#~ msgstr "لم يتم العثور على أي أخبار."
+#~ msgstr "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪ú┘è ╪ú╪«╪¿╪º╪▒."
 
 #~ msgid "Please log in to manage news."
-#~ msgstr "يرجى تسجيل الدخول لإدارة الأخبار."
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪«╪¿╪º╪▒."
 
 #~ msgid "Session expired. Please log in again."
-#~ msgstr "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى."
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪¬ ╪╡┘ä╪º╪¡┘è╪⌐ ╪º┘ä╪¼┘ä╪│╪⌐. ┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä "
+#~ "┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Access denied. Admin privileges required."
-#~ msgstr "تم رفض الوصول. يلزم الحصول على صلاحيات المسؤول."
+#~ msgstr ""
+#~ "╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+#~ "╪º┘ä┘à╪│╪ñ┘ê┘ä."
 
 #~ msgid "Failed to load news: {status}"
-#~ msgstr "فشل تحميل الأخبار: {status}"
+#~ msgstr "┘ü╪┤┘ä ╪¬╪¡┘à┘è┘ä ╪º┘ä╪ú╪«╪¿╪º╪▒: {status}"
 
 #~ msgid "Error loading news: {error}"
-#~ msgstr "خطأ في تحميل الأخبار: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä╪ú╪«╪¿╪º╪▒: {error}"
 
 #~ msgid "Create News Item"
-#~ msgstr "إنشاء خبر"
+#~ msgstr "╪Ñ┘å╪┤╪º╪í ╪«╪¿╪▒"
 
 #~ msgid "Edit News Item"
-#~ msgstr "تعديل الخبر"
+#~ msgstr "╪¬╪╣╪»┘è┘ä ╪º┘ä╪«╪¿╪▒"
 
 #~ msgid "Preview will appear here..."
-#~ msgstr "ستظهر المعاينة هنا..."
+#~ msgstr "╪│╪¬╪╕┘ç╪▒ ╪º┘ä┘à╪╣╪º┘è┘å╪⌐ ┘ç┘å╪º..."
 
 #~ msgid "Please log in first."
-#~ msgstr "يرجى تسجيل الدخول أولاً."
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪ú┘ê┘ä╪º┘ï."
 
 #~ msgid "Title is required."
-#~ msgstr "العنوان مطلوب."
+#~ msgstr "╪º┘ä╪╣┘å┘ê╪º┘å ┘à╪╖┘ä┘ê╪¿."
 
 #~ msgid "Message is required."
-#~ msgstr "الرسالة مطلوبة."
+#~ msgstr "╪º┘ä╪▒╪│╪º┘ä╪⌐ ┘à╪╖┘ä┘ê╪¿╪⌐."
 
 #~ msgid "At least one target platform is required."
-#~ msgstr "يلزم وجود منصة مستهدفة واحدة على الأقل."
+#~ msgstr ""
+#~ "┘è┘ä╪▓┘à ┘ê╪¼┘ê╪» ┘à┘å╪╡╪⌐ ┘à╪│╪¬┘ç╪»┘ü╪⌐ ┘ê╪º╪¡╪»╪⌐ ╪╣┘ä┘ë ╪º┘ä╪ú┘é┘ä."
 
 #~ msgid "updated"
-#~ msgstr "تم التحديث"
+#~ msgstr "╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½"
 
 #~ msgid "created"
-#~ msgstr "مخلوق"
+#~ msgstr "┘à╪«┘ä┘ê┘é"
 
 #~ msgid "News item {action} successfully!"
-#~ msgstr "تم تنفيذ الإجراء {action} بنجاح!"
+#~ msgstr "╪¬┘à ╪¬┘å┘ü┘è╪░ ╪º┘ä╪Ñ╪¼╪▒╪º╪í {action} ╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Error: {status}"
-#~ msgstr "خطأ: {status}"
+#~ msgstr "╪«╪╖╪ú: {status}"
 
 #~ msgid "Error saving news item: {error}"
-#~ msgstr "حدث خطأ أثناء حفظ الخبر: {error}"
+#~ msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¡┘ü╪╕ ╪º┘ä╪«╪¿╪▒: {error}"
 
 #~ msgid "No news item selected."
-#~ msgstr "لم يتم اختيار أي خبر."
+#~ msgstr "┘ä┘à ┘è╪¬┘à ╪º╪«╪¬┘è╪º╪▒ ╪ú┘è ╪«╪¿╪▒."
 
 #~ msgid "News item deleted successfully!"
-#~ msgstr "تم حذف الخبر بنجاح!"
+#~ msgstr "╪¬┘à ╪¡╪░┘ü ╪º┘ä╪«╪¿╪▒ ╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Error deleting news item: {error}"
-#~ msgstr "حدث خطأ أثناء حذف الخبر: {error}"
+#~ msgstr "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¡╪░┘ü ╪º┘ä╪«╪¿╪▒: {error}"
 
 #~ msgid "Name is required."
-#~ msgstr "الاسم مطلوب."
+#~ msgstr "╪º┘ä╪º╪│┘à ┘à╪╖┘ä┘ê╪¿."
 
 #~ msgid "User ID not found in user data."
-#~ msgstr "لم يتم العثور على معرّف المستخدم في بيانات المستخدم."
+#~ msgstr ""
+#~ "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ┘à╪╣╪▒┘æ┘ü ╪º┘ä┘à╪│╪¬╪«╪»┘à ┘ü┘è "
+#~ "╪¿┘è╪º┘å╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à."
 
 #~ msgid "All password fields are required."
-#~ msgstr "جميع حقول كلمة المرور مطلوبة."
+#~ msgstr "╪¼┘à┘è╪╣ ╪¡┘é┘ê┘ä ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ┘à╪╖┘ä┘ê╪¿╪⌐."
 
 #~ msgid "New passwords do not match."
-#~ msgstr "كلمات المرور الجديدة لا تتطابق."
+#~ msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ╪º┘ä╪¼╪»┘è╪»╪⌐ ┘ä╪º ╪¬╪¬╪╖╪º╪¿┘é."
 
 #~ msgid "Password must include an uppercase letter."
-#~ msgstr "يجب أن تتضمن كلمة المرور حرفًا كبيرًا."
+#~ msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ┘â╪¿┘è╪▒┘ï╪º."
 
 #~ msgid "Password must include a lowercase letter."
-#~ msgstr "يجب أن تتضمن كلمة المرور حرفًا صغيرًا."
+#~ msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ╪╡╪║┘è╪▒┘ï╪º."
 
 #~ msgid "Password must include a number."
-#~ msgstr "يجب أن تتضمن كلمة المرور رقماً."
+#~ msgstr "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪▒┘é┘à╪º┘ï."
 
 #~ msgid ""
 #~ "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 #~ msgstr ""
-#~ "يجب أن تتضمن كلمة المرور حرفًا خاصًا "
+#~ "┘è╪¼╪¿ ╪ú┘å ╪¬╪¬╪╢┘à┘å ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ ╪¡╪▒┘ü┘ï╪º ╪«╪º╪╡┘ï╪º "
 #~ "(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
 
 #~ msgid "enabled"
-#~ msgstr "تم التمكين"
+#~ msgstr "╪¬┘à ╪º┘ä╪¬┘à┘â┘è┘å"
 
 #~ msgid "disabled"
-#~ msgstr "عاجز"
+#~ msgstr "╪╣╪º╪¼╪▓"
 
 #~ msgid "Email notifications {status} successfully!"
-#~ msgstr "تم إرسال إشعارات البريد الإلكتروني {status} بنجاح!"
+#~ msgstr ""
+#~ "╪¬┘à ╪Ñ╪▒╪│╪º┘ä ╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è {status} "
+#~ "╪¿┘å╪¼╪º╪¡!"
 
 #~ msgid "Failed to update email notification settings."
-#~ msgstr "فشل تحديث إعدادات إشعارات البريد الإلكتروني."
+#~ msgstr ""
+#~ "┘ü╪┤┘ä ╪¬╪¡╪»┘è╪½ ╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪º┘ä╪¿╪▒┘è╪» "
+#~ "╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è."
 
 #~ msgid "Email confirmation does not match. Please try again."
-#~ msgstr "لم يتم تأكيد البريد الإلكتروني. يرجى المحاولة مرة أخرى."
+#~ msgstr ""
+#~ "┘ä┘à ┘è╪¬┘à ╪¬╪ú┘â┘è╪» ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è. ┘è╪▒╪¼┘ë "
+#~ "╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Your account has been deleted."
-#~ msgstr "تم حذف حسابك."
+#~ msgstr "╪¬┘à ╪¡╪░┘ü ╪¡╪│╪º╪¿┘â."
 
 #~ msgid "Admin accounts cannot be deleted through self-service. "
-#~ msgstr "لا يمكن حذف حسابات المسؤولين من خلال الخدمة الذاتية. "
+#~ msgstr ""
+#~ "┘ä╪º ┘è┘à┘â┘å ╪¡╪░┘ü ╪¡╪│╪º╪¿╪º╪¬ ╪º┘ä┘à╪│╪ñ┘ê┘ä┘è┘å ┘à┘å ╪«┘ä╪º┘ä "
+#~ "╪º┘ä╪«╪»┘à╪⌐ ╪º┘ä╪░╪º╪¬┘è╪⌐. "
 
 #~ msgid "Please contact a system administrator."
-#~ msgstr "يرجى الاتصال بمسؤول النظام."
+#~ msgstr "┘è╪▒╪¼┘ë ╪º┘ä╪º╪¬╪╡╪º┘ä ╪¿┘à╪│╪ñ┘ê┘ä ╪º┘ä┘å╪╕╪º┘à."
 
 #~ msgid "Failed to delete account."
-#~ msgstr "فشل حذف الحساب."
+#~ msgstr "┘ü╪┤┘ä ╪¡╪░┘ü ╪º┘ä╪¡╪│╪º╪¿."
 
 #~ msgid "Please try again."
-#~ msgstr "يرجى المحاولة مرة أخرى."
+#~ msgstr "┘è╪▒╪¼┘ë ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë."
 
 #~ msgid "Current System Status ({header_label})"
-#~ msgstr "حالة النظام الحالية ({header_label})"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪º┘ä╪¡╪º┘ä┘è╪⌐ ({header_label})"
 
 #~ msgid "Current System Status"
-#~ msgstr "حالة النظام الحالية"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪º┘ä╪¡╪º┘ä┘è╪⌐"
 
 #~ msgid "Cluster Status{cluster_cached_time}"
-#~ msgstr "حالة المجموعة {cluster_cached_time}"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐ {cluster_cached_time}"
 
 #~ msgid "Error loading status data: {error}"
-#~ msgstr "خطأ في تحميل بيانات الحالة: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪¡╪º┘ä╪⌐: {error}"
 
 #~ msgid "Error"
-#~ msgstr "خطأ"
+#~ msgstr "╪«╪╖╪ú"
 
 #~ msgid "Statistics unavailable."
-#~ msgstr "الإحصائيات غير متوفرة."
+#~ msgstr "╪º┘ä╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ╪║┘è╪▒ ┘à╪¬┘ê┘ü╪▒╪⌐."
 
 #~ msgid "Error: {error}"
-#~ msgstr "خطأ: {error}"
+#~ msgstr "╪«╪╖╪ú: {error}"
 
 #~ msgid "Unknown error"
-#~ msgstr "خطأ غير معروف"
+#~ msgstr "╪«╪╖╪ú ╪║┘è╪▒ ┘à╪╣╪▒┘ê┘ü"
 
 #~ msgid "Error loading statistics: {error}"
-#~ msgstr "خطأ في تحميل الإحصائيات: {error}"
+#~ msgstr "╪«╪╖╪ú ┘ü┘è ╪¬╪¡┘à┘è┘ä ╪º┘ä╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬: {error}"
 
 #~ msgid "No status data available."
-#~ msgstr "لا تتوفر بيانات الحالة."
+#~ msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪¡╪º┘ä╪⌐."
 
 #~ msgid "Overview"
-#~ msgstr "ملخص"
+#~ msgstr "┘à┘ä╪«╪╡"
 
 #~ msgid "Total Executions"
-#~ msgstr "عمليات الإعدام الكاملة"
+#~ msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪Ñ╪╣╪»╪º┘à ╪º┘ä┘â╪º┘à┘ä╪⌐"
 
 #~ msgid "Total Users"
-#~ msgstr "إجمالي المستخدمين"
+#~ msgstr "╪Ñ╪¼┘à╪º┘ä┘è ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
 
 #~ msgid "Total Scripts"
-#~ msgstr "توتال سكريبتس"
+#~ msgstr "╪¬┘ê╪¬╪º┘ä ╪│┘â╪▒┘è╪¿╪¬╪│"
 
 #~ msgid "Active"
-#~ msgstr "نشيط"
+#~ msgstr "┘å╪┤┘è╪╖"
 
 #~ msgid "Running"
-#~ msgstr "جري"
+#~ msgstr "╪¼╪▒┘è"
 
 #~ msgid "Ready"
-#~ msgstr "مستعد"
+#~ msgstr "┘à╪│╪¬╪╣╪»"
 
 #~ msgid "Pending"
-#~ msgstr "قيد الانتظار"
+#~ msgstr "┘é┘è╪» ╪º┘ä╪º┘å╪¬╪╕╪º╪▒"
 
 #~ msgid "Total"
-#~ msgstr "المجموع"
+#~ msgstr "╪º┘ä┘à╪¼┘à┘ê╪╣"
 
 #~ msgid "Completed"
-#~ msgstr "مكتمل"
+#~ msgstr "┘à┘â╪¬┘à┘ä"
 
 #~ msgid "Finished"
-#~ msgstr "انتهى"
+#~ msgstr "╪º┘å╪¬┘ç┘ë"
 
 #~ msgid "Failed"
-#~ msgstr "فشل"
+#~ msgstr "┘ü╪┤┘ä"
 
 #~ msgid "Cancelled"
-#~ msgstr "تم الإلغاء"
+#~ msgstr "╪¬┘à ╪º┘ä╪Ñ┘ä╪║╪º╪í"
 
 #~ msgid "No statistics available for the selected period."
-#~ msgstr "لا توجد إحصائيات متاحة للفترة المحددة."
+#~ msgstr ""
+#~ "┘ä╪º ╪¬┘ê╪¼╪» ╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ┘à╪¬╪º╪¡╪⌐ ┘ä┘ä┘ü╪¬╪▒╪⌐ ╪º┘ä┘à╪¡╪»╪»╪⌐."
 
 #~ msgid "Update Your Profile"
-#~ msgstr "قم بتحديث ملفك الشخصي"
+#~ msgstr "┘é┘à ╪¿╪¬╪¡╪»┘è╪½ ┘à┘ä┘ü┘â ╪º┘ä╪┤╪«╪╡┘è"
 
 #~ msgid "Email cannot be changed"
-#~ msgstr "لا يمكن تغيير البريد الإلكتروني"
+#~ msgstr "┘ä╪º ┘è┘à┘â┘å ╪¬╪║┘è┘è╪▒ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Update Profile"
-#~ msgstr "تحديث الملف الشخصي"
+#~ msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è"
 
 #~ msgid "Refresh Executions"
-#~ msgstr "تحديث عمليات التنفيذ"
+#~ msgstr "╪¬╪¡╪»┘è╪½ ╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░"
 
 #~ msgid "Auto-refresh in:"
-#~ msgstr "التحديث التلقائي في:"
+#~ msgstr "╪º┘ä╪¬╪¡╪»┘è╪½ ╪º┘ä╪¬┘ä┘é╪º╪ª┘è ┘ü┘è:"
 
 #~ msgid "Cancel Execution"
-#~ msgstr "إلغاء التنفيذ"
+#~ msgstr "╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¬┘å┘ü┘è╪░"
 
 #~ msgid "Are you sure you want to cancel this execution?"
-#~ msgstr "هل أنت متأكد من رغبتك في إلغاء هذا التنفيذ؟"
+#~ msgstr ""
+#~ "┘ç┘ä ╪ú┘å╪¬ ┘à╪¬╪ú┘â╪» ┘à┘å ╪▒╪║╪¿╪¬┘â ┘ü┘è ╪Ñ┘ä╪║╪º╪í ┘ç╪░╪º "
+#~ "╪º┘ä╪¬┘å┘ü┘è╪░╪ƒ"
 
 #~ msgid "Execution ID:"
-#~ msgstr "معرّف التنفيذ:"
+#~ msgstr "┘à╪╣╪▒┘æ┘ü ╪º┘ä╪¬┘å┘ü┘è╪░:"
 
 #~ msgid "Script:"
-#~ msgstr "نص:"
+#~ msgstr "┘å╪╡:"
 
 #~ msgid "Status:"
-#~ msgstr "حالة:"
+#~ msgstr "╪¡╪º┘ä╪⌐:"
 
 #~ msgid "This action cannot be undone."
-#~ msgstr "لا يمكن التراجع عن هذا الإجراء."
+#~ msgstr "┘ä╪º ┘è┘à┘â┘å ╪º┘ä╪¬╪▒╪º╪¼╪╣ ╪╣┘å ┘ç╪░╪º ╪º┘ä╪Ñ╪¼╪▒╪º╪í."
 
 #~ msgid "Confirm Cancel"
-#~ msgstr "تأكيد إلغاء"
+#~ msgstr "╪¬╪ú┘â┘è╪» ╪Ñ┘ä╪║╪º╪í"
 
 #~ msgid "Cancellation Result"
-#~ msgstr "نتيجة الإلغاء"
+#~ msgstr "┘å╪¬┘è╪¼╪⌐ ╪º┘ä╪Ñ┘ä╪║╪º╪í"
 
 #~ msgid "Close"
-#~ msgstr "يغلق"
+#~ msgstr "┘è╪║┘ä┘é"
 
 #~ msgid "Refresh Users"
-#~ msgstr "تحديث المستخدمين"
+#~ msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
 
 #~ msgid "Refresh Scripts"
-#~ msgstr "تحديث البرامج النصية"
+#~ msgstr "╪¬╪¡╪»┘è╪½ ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐"
 
 #~ msgid "Profile Settings"
-#~ msgstr "إعدادات الملف الشخصي"
+#~ msgstr "╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪º┘ä┘à┘ä┘ü ╪º┘ä╪┤╪«╪╡┘è"
 
 #~ msgid "Name"
-#~ msgstr "اسم"
+#~ msgstr "╪º╪│┘à"
 
 #~ msgid "Enter your name"
-#~ msgstr "أدخل اسمك"
+#~ msgstr "╪ú╪»╪«┘ä ╪º╪│┘à┘â"
 
 #~ msgid "Enter your email"
-#~ msgstr "أدخل بريدك الإلكتروني"
+#~ msgstr "╪ú╪»╪«┘ä ╪¿╪▒┘è╪»┘â ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Institution"
-#~ msgstr "مؤسسة"
+#~ msgstr "┘à╪ñ╪│╪│╪⌐"
 
 #~ msgid "Enter your institution"
-#~ msgstr "أدخل مؤسستك"
+#~ msgstr "╪ú╪»╪«┘ä ┘à╪ñ╪│╪│╪¬┘â"
 
 #~ msgid "Role"
-#~ msgstr "دور"
+#~ msgstr "╪»┘ê╪▒"
 
 #~ msgid "Email Notifications"
-#~ msgstr "إشعارات البريد الإلكتروني"
+#~ msgstr "╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Execution Completion Notifications"
-#~ msgstr "إشعارات إتمام التنفيذ"
+#~ msgstr "╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪Ñ╪¬┘à╪º┘à ╪º┘ä╪¬┘å┘ü┘è╪░"
 
 #~ msgid "Enable email notifications"
-#~ msgstr "تفعيل إشعارات البريد الإلكتروني"
+#~ msgstr "╪¬┘ü╪╣┘è┘ä ╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid ""
 #~ "Receive email notifications when your script executions finish, fail, or are"
 #~ " cancelled."
 #~ msgstr ""
-#~ "تلقي إشعارات عبر البريد الإلكتروني عند انتهاء تنفيذ البرامج النصية أو فشلها "
-#~ "أو إلغائها."
+#~ "╪¬┘ä┘é┘è ╪Ñ╪┤╪╣╪º╪▒╪º╪¬ ╪╣╪¿╪▒ ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è ╪╣┘å╪» "
+#~ "╪º┘å╪¬┘ç╪º╪í ╪¬┘å┘ü┘è╪░ ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐ ╪ú┘ê ┘ü╪┤┘ä┘ç╪º ╪ú┘ê "
+#~ "╪Ñ┘ä╪║╪º╪ª┘ç╪º."
 
 #~ msgid "Google Earth Engine Account"
-#~ msgstr "حساب جوجل إيرث إنجن"
+#~ msgstr "╪¡╪│╪º╪¿ ╪¼┘ê╪¼┘ä ╪Ñ┘è╪▒╪½ ╪Ñ┘å╪¼┘å"
 
 #~ msgid "Current Credentials Status"
-#~ msgstr "حالة بيانات الاعتماد الحالية"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪¡╪º┘ä┘è╪⌐"
 
 #~ msgid "Setup Your GEE Account"
-#~ msgstr "قم بإعداد حسابك على GEE"
+#~ msgstr "┘é┘à ╪¿╪Ñ╪╣╪»╪º╪» ╪¡╪│╪º╪¿┘â ╪╣┘ä┘ë GEE"
 
 #~ msgid ""
 #~ "Choose one of the options below to configure your Google Earth Engine "
 #~ "credentials:"
-#~ msgstr "اختر أحد الخيارات أدناه لتكوين بيانات اعتمادك في Google Earth Engine:"
+#~ msgstr ""
+#~ "╪º╪«╪¬╪▒ ╪ú╪¡╪» ╪º┘ä╪«┘è╪º╪▒╪º╪¬ ╪ú╪»┘å╪º┘ç ┘ä╪¬┘â┘ê┘è┘å ╪¿┘è╪º┘å╪º╪¬ "
+#~ "╪º╪╣╪¬┘à╪º╪»┘â ┘ü┘è Google Earth Engine:"
 
 #~ msgid "Option 1: Connect Your GEE Account (OAuth)"
-#~ msgstr "الخيار الأول: ربط حسابك في GEE (OAuth)"
+#~ msgstr "╪º┘ä╪«┘è╪º╪▒ ╪º┘ä╪ú┘ê┘ä: ╪▒╪¿╪╖ ╪¡╪│╪º╪¿┘â ┘ü┘è GEE (OAuth)"
 
 #~ msgid ""
 #~ "Connect your personal Google Earth Engine account using OAuth "
 #~ "authentication."
-#~ msgstr "قم بربط حسابك الشخصي في Google Earth Engine باستخدام مصادقة OAuth."
+#~ msgstr ""
+#~ "┘é┘à ╪¿╪▒╪¿╪╖ ╪¡╪│╪º╪¿┘â ╪º┘ä╪┤╪«╪╡┘è ┘ü┘è Google Earth Engine "
+#~ "╪¿╪º╪│╪¬╪«╪»╪º┘à ┘à╪╡╪º╪»┘é╪⌐ OAuth."
 
 #~ msgid "Connect GEE Account"
-#~ msgstr "ربط حساب GEE"
+#~ msgstr "╪▒╪¿╪╖ ╪¡╪│╪º╪¿ GEE"
 
 #~ msgid "Option 2: Upload Service Account Key"
-#~ msgstr "الخيار الثاني: تحميل مفتاح حساب الخدمة"
+#~ msgstr ""
+#~ "╪º┘ä╪«┘è╪º╪▒ ╪º┘ä╪½╪º┘å┘è: ╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐"
 
 #~ msgid ""
 #~ "Upload a Google Cloud service account JSON key with Earth Engine access."
 #~ msgstr ""
-#~ "قم بتحميل مفتاح JSON لحساب خدمة Google Cloud مع إمكانية الوصول إلى Earth "
-#~ "Engine."
+#~ "┘é┘à ╪¿╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ JSON ┘ä╪¡╪│╪º╪¿ ╪«╪»┘à╪⌐ Google Cloud ┘à╪╣ "
+#~ "╪Ñ┘à┘â╪º┘å┘è╪⌐ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë Earth Engine."
 
 #~ msgid "Upload Service Account Key"
-#~ msgstr "تحميل مفتاح حساب الخدمة"
+#~ msgstr "╪¬╪¡┘à┘è┘ä ┘à┘ü╪¬╪º╪¡ ╪¡╪│╪º╪¿ ╪º┘ä╪«╪»┘à╪⌐"
 
 #~ msgid "Manage Credentials"
-#~ msgstr "إدارة بيانات الاعتماد"
+#~ msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»"
 
 #~ msgid "Test Credentials"
-#~ msgstr "بيانات اعتماد الاختبار"
+#~ msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪º╪«╪¬╪¿╪º╪▒"
 
 #~ msgid "Delete Credentials"
-#~ msgstr "حذف بيانات الاعتماد"
+#~ msgstr "╪¡╪░┘ü ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪º╪╣╪¬┘à╪º╪»"
 
 #~ msgid "Service Credentials"
-#~ msgstr "بيانات اعتماد الخدمة"
+#~ msgstr "╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐"
 
 #~ msgid ""
 #~ "Service credentials allow external applications to authenticate with the "
 #~ "Trends.Earth API using the OAuth2 client credentials grant. The client "
 #~ "secret is shown only once at creation time."
 #~ msgstr ""
-#~ "تسمح بيانات اعتماد الخدمة للتطبيقات الخارجية بالمصادقة مع واجهة برمجة "
-#~ "تطبيقات Trends.Earth باستخدام منح بيانات اعتماد عميل OAuth2. يتم عرض سر "
-#~ "العميل مرة واحدة فقط عند الإنشاء."
+#~ "╪¬╪│┘à╪¡ ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐ ┘ä┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ "
+#~ "╪º┘ä╪«╪º╪▒╪¼┘è╪⌐ ╪¿╪º┘ä┘à╪╡╪º╪»┘é╪⌐ ┘à╪╣ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ "
+#~ "╪¬╪╖╪¿┘è┘é╪º╪¬ Trends.Earth ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘à┘å╪¡ ╪¿┘è╪º┘å╪º╪¬ "
+#~ "╪º╪╣╪¬┘à╪º╪» ╪╣┘à┘è┘ä OAuth2. ┘è╪¬┘à ╪╣╪▒╪╢ ╪│╪▒ ╪º┘ä╪╣┘à┘è┘ä ┘à╪▒╪⌐ "
+#~ "┘ê╪º╪¡╪»╪⌐ ┘ü┘é╪╖ ╪╣┘å╪» ╪º┘ä╪Ñ┘å╪┤╪º╪í."
 
 #~ msgid "Refresh"
-#~ msgstr "ينعش"
+#~ msgstr "┘è┘å╪╣╪┤"
 
 #~ msgid "New Credential"
-#~ msgstr "وثيقة اعتماد جديدة"
+#~ msgstr "┘ê╪½┘è┘é╪⌐ ╪º╪╣╪¬┘à╪º╪» ╪¼╪»┘è╪»╪⌐"
 
 #~ msgid "Create Service Credential"
-#~ msgstr "إنشاء بيانات اعتماد الخدمة"
+#~ msgstr "╪Ñ┘å╪┤╪º╪í ╪¿┘è╪º┘å╪º╪¬ ╪º╪╣╪¬┘à╪º╪» ╪º┘ä╪«╪»┘à╪⌐"
 
 #~ msgid "e.g. My CLI Tool"
-#~ msgstr "مثال: أداة سطر الأوامر الخاصة بي"
+#~ msgstr "┘à╪½╪º┘ä: ╪ú╪»╪º╪⌐ ╪│╪╖╪▒ ╪º┘ä╪ú┘ê╪º┘à╪▒ ╪º┘ä╪«╪º╪╡╪⌐ ╪¿┘è"
 
 #~ msgid "A descriptive label for this credential."
-#~ msgstr "وصفٌ لهذه الشهادة."
+#~ msgstr "┘ê╪╡┘ü┘î ┘ä┘ç╪░┘ç ╪º┘ä╪┤┘ç╪º╪»╪⌐."
 
 #~ msgid "Deployment Information"
-#~ msgstr "معلومات النشر"
+#~ msgstr "┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘å╪┤╪▒"
 
 #~ msgid "System Status Trends"
-#~ msgstr "اتجاهات حالة النظام"
+#~ msgstr "╪º╪¬╪¼╪º┘ç╪º╪¬ ╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à"
 
 #~ msgid "Last 24 Hours"
-#~ msgstr "آخر 24 ساعة"
+#~ msgstr "╪ó╪«╪▒ 24 ╪│╪º╪╣╪⌐"
 
 #~ msgid "Last Week"
-#~ msgstr "الأسبوع الماضي"
+#~ msgstr "╪º┘ä╪ú╪│╪¿┘ê╪╣ ╪º┘ä┘à╪º╪╢┘è"
 
 #~ msgid "Last Month"
-#~ msgstr "الشهر الماضي"
+#~ msgstr "╪º┘ä╪┤┘ç╪▒ ╪º┘ä┘à╪º╪╢┘è"
 
 #~ msgid "Last Year"
-#~ msgstr "العام الماضي"
+#~ msgstr "╪º┘ä╪╣╪º┘à ╪º┘ä┘à╪º╪╢┘è"
 
 #~ msgid "All Time"
-#~ msgstr "على مر العصور"
+#~ msgstr "╪╣┘ä┘ë ┘à╪▒ ╪º┘ä╪╣╪╡┘ê╪▒"
 
 #~ msgid "Countries with new user registrations"
-#~ msgstr "الدول التي سجلت مستخدمين جدد"
+#~ msgstr "╪º┘ä╪»┘ê┘ä ╪º┘ä╪¬┘è ╪│╪¼┘ä╪¬ ┘à╪│╪¬╪«╪»┘à┘è┘å ╪¼╪»╪»"
 
 #~ msgid ""
 #~ "Access denied. Administrator privileges required to access admin functions."
 #~ msgstr ""
-#~ "تم رفض الوصول. يلزم الحصول على صلاحيات المسؤول للوصول إلى وظائف الإدارة."
+#~ "╪¬┘à ╪▒┘ü╪╢ ╪º┘ä┘ê╪╡┘ê┘ä. ┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪╡┘ä╪º╪¡┘è╪º╪¬ "
+#~ "╪º┘ä┘à╪│╪ñ┘ê┘ä ┘ä┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë ┘ê╪╕╪º╪ª┘ü ╪º┘ä╪Ñ╪»╪º╪▒╪⌐."
 
 #~ msgid "Administration Panel"
-#~ msgstr "لجنة الإدارة"
+#~ msgstr "┘ä╪¼┘å╪⌐ ╪º┘ä╪Ñ╪»╪º╪▒╪⌐"
 
 #~ msgid "Rate Limiting Management"
-#~ msgstr "إدارة تحديد معدل الاستخدام"
+#~ msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪¬╪¡╪»┘è╪» ┘à╪╣╪»┘ä ╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
 
 #~ msgid "Current & Historical Rate Limit Breaches"
-#~ msgstr "انتهاكات حدود المعدل الحالية والتاريخية"
+#~ msgstr ""
+#~ "╪º┘å╪¬┘ç╪º┘â╪º╪¬ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä ╪º┘ä╪¡╪º┘ä┘è╪⌐ ┘ê╪º┘ä╪¬╪º╪▒┘è╪«┘è╪⌐"
 
 #~ msgid "Refresh Breaches"
-#~ msgstr "تجديد الثغرات"
+#~ msgstr "╪¬╪¼╪»┘è╪» ╪º┘ä╪½╪║╪▒╪º╪¬"
 
 #~ msgid "Cancel Selected Limit"
-#~ msgstr "إلغاء الحد المحدد"
+#~ msgstr "╪Ñ┘ä╪║╪º╪í ╪º┘ä╪¡╪» ╪º┘ä┘à╪¡╪»╪»"
 
 #~ msgid "Reset All Rate Limits"
-#~ msgstr "إعادة ضبط جميع حدود المعدل"
+#~ msgstr "╪Ñ╪╣╪º╪»╪⌐ ╪╢╪¿╪╖ ╪¼┘à┘è╪╣ ╪¡╪»┘ê╪» ╪º┘ä┘à╪╣╪»┘ä"
 
 #~ msgid "Active and historical events"
-#~ msgstr "الأحداث الجارية والتاريخية"
+#~ msgstr "╪º┘ä╪ú╪¡╪»╪º╪½ ╪º┘ä╪¼╪º╪▒┘è╪⌐ ┘ê╪º┘ä╪¬╪º╪▒┘è╪«┘è╪⌐"
 
 #~ msgid "Highlighted rows are active and can be cancelled individually."
-#~ msgstr "الصفوف المميزة نشطة ويمكن إلغاؤها بشكل فردي."
+#~ msgstr ""
+#~ "╪º┘ä╪╡┘ü┘ê┘ü ╪º┘ä┘à┘à┘è╪▓╪⌐ ┘å╪┤╪╖╪⌐ ┘ê┘è┘à┘â┘å ╪Ñ┘ä╪║╪º╪ñ┘ç╪º ╪¿╪┤┘â┘ä "
+#~ "┘ü╪▒╪»┘è."
 
 #~ msgid "News Management"
-#~ msgstr "إدارة الأخبار"
+#~ msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪«╪¿╪º╪▒"
 
 #~ msgid "Manage News Items"
-#~ msgstr "إدارة الأخبار"
+#~ msgstr "╪Ñ╪»╪º╪▒╪⌐ ╪º┘ä╪ú╪«╪¿╪º╪▒"
 
 #~ msgid "Edit"
-#~ msgstr "يحرر"
+#~ msgstr "┘è╪¡╪▒╪▒"
 
 #~ msgid "Delete"
-#~ msgstr "يمسح"
+#~ msgstr "┘è┘à╪│╪¡"
 
 #~ msgid "Loading news items..."
-#~ msgstr "جارٍ تحميل الأخبار..."
+#~ msgstr "╪¼╪º╪▒┘ì ╪¬╪¡┘à┘è┘ä ╪º┘ä╪ú╪«╪¿╪º╪▒..."
 
 #~ msgid "Title *"
-#~ msgstr "عنوان *"
+#~ msgstr "╪╣┘å┘ê╪º┘å *"
 
 #~ msgid "Enter news title"
-#~ msgstr "أدخل عنوان الخبر"
+#~ msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪º┘ä╪«╪¿╪▒"
 
 #~ msgid "Message (Markdown supported) *"
-#~ msgstr "رسالة (تدعم لغة Markdown) *"
+#~ msgstr "╪▒╪│╪º┘ä╪⌐ (╪¬╪»╪╣┘à ┘ä╪║╪⌐ Markdown) *"
 
 #~ msgid ""
 #~ "Use Markdown formatting: **bold**, *italic*, [link](url), lists, etc. Will "
 #~ "be converted to HTML."
 #~ msgstr ""
-#~ "استخدم تنسيق Markdown: **غامق**، *مائل*، [رابط](url)، قوائم، إلخ. سيتم "
-#~ "تحويله إلى HTML."
+#~ "╪º╪│╪¬╪«╪»┘à ╪¬┘å╪│┘è┘é Markdown: **╪║╪º┘à┘é**╪î *┘à╪º╪ª┘ä*╪î "
+#~ "[╪▒╪º╪¿╪╖](url)╪î ┘é┘ê╪º╪ª┘à╪î ╪Ñ┘ä╪«. ╪│┘è╪¬┘à ╪¬╪¡┘ê┘è┘ä┘ç ╪Ñ┘ä┘ë HTML."
 
 #~ msgid "Enter news message using Markdown..."
-#~ msgstr "أدخل رسالة إخبارية باستخدام لغة Markdown..."
+#~ msgstr ""
+#~ "╪ú╪»╪«┘ä ╪▒╪│╪º┘ä╪⌐ ╪Ñ╪«╪¿╪º╪▒┘è╪⌐ ╪¿╪º╪│╪¬╪«╪»╪º┘à ┘ä╪║╪⌐ Markdown..."
 
 #~ msgid "Preview"
-#~ msgstr "معاينة"
+#~ msgstr "┘à╪╣╪º┘è┘å╪⌐"
 
 #~ msgid "Link URL (optional)"
-#~ msgstr "رابط URL (اختياري)"
+#~ msgstr "╪▒╪º╪¿╪╖ URL (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "Link Text (optional)"
-#~ msgstr "نص الرابط (اختياري)"
+#~ msgstr "┘å╪╡ ╪º┘ä╪▒╪º╪¿╪╖ (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "Read more..."
-#~ msgstr "اقرأ المزيد..."
+#~ msgstr "╪º┘é╪▒╪ú ╪º┘ä┘à╪▓┘è╪»..."
 
 #~ msgid "Target Platforms *"
-#~ msgstr "المنصات المستهدفة *"
+#~ msgstr "╪º┘ä┘à┘å╪╡╪º╪¬ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐ *"
 
 #~ msgid "QGIS Plugin"
-#~ msgstr "إضافة QGIS"
+#~ msgstr "╪Ñ╪╢╪º┘ü╪⌐ QGIS"
 
 #~ msgid "Web App"
-#~ msgstr "تطبيق ويب"
+#~ msgstr "╪¬╪╖╪¿┘è┘é ┘ê┘è╪¿"
 
 #~ msgid "API UI"
-#~ msgstr "واجهة برمجة التطبيقات (API)"
+#~ msgstr "┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ (API)"
 
 #~ msgid "Select target platforms..."
-#~ msgstr "حدد المنصات المستهدفة..."
+#~ msgstr "╪¡╪»╪» ╪º┘ä┘à┘å╪╡╪º╪¬ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐..."
 
 #~ msgid "Target Roles (optional)"
-#~ msgstr "الأدوار المستهدفة (اختياري)"
+#~ msgstr "╪º┘ä╪ú╪»┘ê╪º╪▒ ╪º┘ä┘à╪│╪¬┘ç╪»┘ü╪⌐ (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid ""
 #~ "Leave empty to show to all users including unauthenticated. Select specific "
 #~ "roles to restrict visibility."
 #~ msgstr ""
-#~ "اترك هذا الحقل فارغًا لعرضه لجميع المستخدمين، بما في ذلك المستخدمين غير "
-#~ "المصادق عليهم. حدد أدوارًا معينة لتقييد الرؤية."
+#~ "╪º╪¬╪▒┘â ┘ç╪░╪º ╪º┘ä╪¡┘é┘ä ┘ü╪º╪▒╪║┘ï╪º ┘ä╪╣╪▒╪╢┘ç ┘ä╪¼┘à┘è╪╣ "
+#~ "╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å╪î ╪¿┘à╪º ┘ü┘è ╪░┘ä┘â ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪║┘è╪▒ "
+#~ "╪º┘ä┘à╪╡╪º╪»┘é ╪╣┘ä┘è┘ç┘à. ╪¡╪»╪» ╪ú╪»┘ê╪º╪▒┘ï╪º ┘à╪╣┘è┘å╪⌐ ┘ä╪¬┘é┘è┘è╪» "
+#~ "╪º┘ä╪▒╪ñ┘è╪⌐."
 
 #~ msgid "Regular Users"
-#~ msgstr "المستخدمون المنتظمون"
+#~ msgstr "╪º┘ä┘à╪│╪¬╪«╪»┘à┘ê┘å ╪º┘ä┘à┘å╪¬╪╕┘à┘ê┘å"
 
 #~ msgid "Admins"
-#~ msgstr "المشرفون"
+#~ msgstr "╪º┘ä┘à╪┤╪▒┘ü┘ê┘å"
 
 #~ msgid "Super Admins"
-#~ msgstr "المشرفون المميزون"
+#~ msgstr "╪º┘ä┘à╪┤╪▒┘ü┘ê┘å ╪º┘ä┘à┘à┘è╪▓┘ê┘å"
 
 #~ msgid "All users (no restriction)"
-#~ msgstr "جميع المستخدمين (بدون قيود)"
+#~ msgstr "╪¼┘à┘è╪╣ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å (╪¿╪»┘ê┘å ┘é┘è┘ê╪»)"
 
 #~ msgid "News Type"
-#~ msgstr "نوع الخبر"
+#~ msgstr "┘å┘ê╪╣ ╪º┘ä╪«╪¿╪▒"
 
 #~ msgid "Announcement"
-#~ msgstr "إعلان"
+#~ msgstr "╪Ñ╪╣┘ä╪º┘å"
 
 #~ msgid "Warning"
-#~ msgstr "تحذير"
+#~ msgstr "╪¬╪¡╪░┘è╪▒"
 
 #~ msgid "Release"
-#~ msgstr "يطلق"
+#~ msgstr "┘è╪╖┘ä┘é"
 
 #~ msgid "Tip"
-#~ msgstr "نصيحة"
+#~ msgstr "┘å╪╡┘è╪¡╪⌐"
 
 #~ msgid "Maintenance"
-#~ msgstr "صيانة"
+#~ msgstr "╪╡┘è╪º┘å╪⌐"
 
 #~ msgid "Priority"
-#~ msgstr "أولوية"
+#~ msgstr "╪ú┘ê┘ä┘ê┘è╪⌐"
 
 #~ msgid "Min Plugin Version (optional)"
-#~ msgstr "الحد الأدنى لإصدار الملحق (اختياري)"
+#~ msgstr "╪º┘ä╪¡╪» ╪º┘ä╪ú╪»┘å┘ë ┘ä╪Ñ╪╡╪»╪º╪▒ ╪º┘ä┘à┘ä╪¡┘é (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "e.g., 1.0.0"
-#~ msgstr "مثال: 1.0.0"
+#~ msgstr "┘à╪½╪º┘ä: 1.0.0"
 
 #~ msgid "Max Plugin Version (optional)"
-#~ msgstr "إصدار برنامج Max الإضافي (اختياري)"
+#~ msgstr "╪Ñ╪╡╪»╪º╪▒ ╪¿╪▒┘å╪º┘à╪¼ Max ╪º┘ä╪Ñ╪╢╪º┘ü┘è (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "e.g., 2.0.0"
-#~ msgstr "مثال: 2.0.0"
+#~ msgstr "┘à╪½╪º┘ä: 2.0.0"
 
 #~ msgid "Start Date (optional)"
-#~ msgstr "تاريخ البدء (اختياري)"
+#~ msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪¿╪»╪í (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "Select start date..."
-#~ msgstr "حدد تاريخ البدء..."
+#~ msgstr "╪¡╪»╪» ╪¬╪º╪▒┘è╪« ╪º┘ä╪¿╪»╪í..."
 
 #~ msgid "End Date (optional)"
-#~ msgstr "تاريخ الانتهاء (اختياري)"
+#~ msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í (╪º╪«╪¬┘è╪º╪▒┘è)"
 
 #~ msgid "Select end date..."
-#~ msgstr "حدد تاريخ الانتهاء..."
+#~ msgstr "╪¡╪»╪» ╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í..."
 
 #~ msgid "Active (visible to users)"
-#~ msgstr "نشط (مرئي للمستخدمين)"
+#~ msgstr "┘å╪┤╪╖ (┘à╪▒╪ª┘è ┘ä┘ä┘à╪│╪¬╪«╪»┘à┘è┘å)"
 
 #~ msgid "Save"
-#~ msgstr "يحفظ"
+#~ msgstr "┘è╪¡┘ü╪╕"
 
 #~ msgid "Confirm Delete"
-#~ msgstr "تأكيد الحذف"
+#~ msgstr "╪¬╪ú┘â┘è╪» ╪º┘ä╪¡╪░┘ü"
 
 #~ msgid ""
 #~ "Are you sure you want to delete this news item? This action cannot be "
 #~ "undone."
 #~ msgstr ""
-#~ "هل أنت متأكد من رغبتك في حذف هذا الخبر؟ لا يمكن التراجع عن هذا الإجراء."
+#~ "┘ç┘ä ╪ú┘å╪¬ ┘à╪¬╪ú┘â╪» ┘à┘å ╪▒╪║╪¿╪¬┘â ┘ü┘è ╪¡╪░┘ü ┘ç╪░╪º ╪º┘ä╪«╪¿╪▒╪ƒ ┘ä╪º "
+#~ "┘è┘à┘â┘å ╪º┘ä╪¬╪▒╪º╪¼╪╣ ╪╣┘å ┘ç╪░╪º ╪º┘ä╪Ñ╪¼╪▒╪º╪í."
 
 #~ msgid "Create New User"
-#~ msgstr "إنشاء مستخدمين جدد"
+#~ msgstr "╪Ñ┘å╪┤╪º╪í ┘à╪│╪¬╪«╪»┘à┘è┘å ╪¼╪»╪»"
 
 #~ msgid "Name *"
-#~ msgstr "اسم *"
+#~ msgstr "╪º╪│┘à *"
 
 #~ msgid "Enter full name"
-#~ msgstr "أدخل الاسم الكامل"
+#~ msgstr "╪ú╪»╪«┘ä ╪º┘ä╪º╪│┘à ╪º┘ä┘â╪º┘à┘ä"
 
 #~ msgid "Email *"
-#~ msgstr "بريد إلكتروني *"
+#~ msgstr "╪¿╪▒┘è╪» ╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è *"
 
 #~ msgid "Enter email address"
-#~ msgstr "أدخل عنوان البريد الإلكتروني"
+#~ msgstr "╪ú╪»╪«┘ä ╪╣┘å┘ê╪º┘å ╪º┘ä╪¿╪▒┘è╪» ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Password *"
-#~ msgstr "كلمة المرور *"
+#~ msgstr "┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ *"
 
 #~ msgid "Set password for user"
-#~ msgstr "قم بتعيين كلمة مرور للمستخدم"
+#~ msgstr "┘é┘à ╪¿╪¬╪╣┘è┘è┘å ┘â┘ä┘à╪⌐ ┘à╪▒┘ê╪▒ ┘ä┘ä┘à╪│╪¬╪«╪»┘à"
 
 #~ msgid "Confirm Password *"
-#~ msgstr "تأكيد كلمة المرور *"
+#~ msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒ *"
 
 #~ msgid "Confirm password"
-#~ msgstr "تأكيد كلمة المرور"
+#~ msgstr "╪¬╪ú┘â┘è╪» ┘â┘ä┘à╪⌐ ╪º┘ä┘à╪▒┘ê╪▒"
 
 #~ msgid "Passwords match"
-#~ msgstr "كلمات المرور متطابقة"
+#~ msgstr "┘â┘ä┘à╪º╪¬ ╪º┘ä┘à╪▒┘ê╪▒ ┘à╪¬╪╖╪º╪¿┘é╪⌐"
 
 #~ msgid "Enter institution/organization"
-#~ msgstr "أدخل اسم المؤسسة/المنظمة"
+#~ msgstr "╪ú╪»╪«┘ä ╪º╪│┘à ╪º┘ä┘à╪ñ╪│╪│╪⌐/╪º┘ä┘à┘å╪╕┘à╪⌐"
 
 #~ msgid "Select country..."
-#~ msgstr "اختر البلد..."
+#~ msgstr "╪º╪«╪¬╪▒ ╪º┘ä╪¿┘ä╪»..."
 
 #~ msgid "Role *"
-#~ msgstr "دور *"
+#~ msgstr "╪»┘ê╪▒ *"
 
 #~ msgid "User"
-#~ msgstr "مستخدم"
+#~ msgstr "┘à╪│╪¬╪«╪»┘à"
 
 #~ msgid "Super Admin"
-#~ msgstr "المشرف الرئيسي"
+#~ msgstr "╪º┘ä┘à╪┤╪▒┘ü ╪º┘ä╪▒╪ª┘è╪│┘è"
 
 #~ msgid "Create User"
-#~ msgstr "إنشاء مستخدمين"
+#~ msgstr "╪Ñ┘å╪┤╪º╪í ┘à╪│╪¬╪«╪»┘à┘è┘å"
 
 #~ msgid "Clear Form"
-#~ msgstr "نموذج واضح"
+#~ msgstr "┘å┘à┘ê╪░╪¼ ┘ê╪º╪╢╪¡"
 
 #~ msgid "Upload New Script"
-#~ msgstr "تحميل نص برمجي جديد"
+#~ msgstr "╪¬╪¡┘à┘è┘ä ┘å╪╡ ╪¿╪▒┘à╪¼┘è ╪¼╪»┘è╪»"
 
 #~ msgid "Upload a .tar.gz archive containing your script and a "
 #~ msgstr ""
-#~ "قم بتحميل ملف مضغوط بصيغة .tar.gz يحتوي على البرنامج النصي الخاص بك و "
+#~ "┘é┘à ╪¿╪¬╪¡┘à┘è┘ä ┘à┘ä┘ü ┘à╪╢╪║┘ê╪╖ ╪¿╪╡┘è╪║╪⌐ .tar.gz ┘è╪¡╪¬┘ê┘è ╪╣┘ä┘ë "
+#~ "╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è ╪º┘ä╪«╪º╪╡ ╪¿┘â ┘ê "
 
 #~ msgid ""
 #~ " file. The script name and metadata are read from the configuration file."
-#~ msgstr " يتم قراءة اسم البرنامج النصي والبيانات الوصفية من ملف التكوين."
+#~ msgstr ""
+#~ " ┘è╪¬┘à ┘é╪▒╪º╪í╪⌐ ╪º╪│┘à ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è ┘ê╪º┘ä╪¿┘è╪º┘å╪º╪¬ "
+#~ "╪º┘ä┘ê╪╡┘ü┘è╪⌐ ┘à┘å ┘à┘ä┘ü ╪º┘ä╪¬┘â┘ê┘è┘å."
 
 #~ msgid "Script Archive (.tar.gz) *"
-#~ msgstr "ملف أرشيف النصوص البرمجية (.tar.gz) *"
+#~ msgstr "┘à┘ä┘ü ╪ú╪▒╪┤┘è┘ü ╪º┘ä┘å╪╡┘ê╪╡ ╪º┘ä╪¿╪▒┘à╪¼┘è╪⌐ (.tar.gz) *"
 
 #~ msgid "Drag and Drop or "
-#~ msgstr "اسحب وأفلت أو "
+#~ msgstr "╪º╪│╪¡╪¿ ┘ê╪ú┘ü┘ä╪¬ ╪ú┘ê "
 
 #~ msgid "Select Script Archive"
-#~ msgstr "حدد أرشيف البرامج النصية"
+#~ msgstr "╪¡╪»╪» ╪ú╪▒╪┤┘è┘ü ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐"
 
 #~ msgid "Upload Script"
-#~ msgstr "تحميل البرنامج النصي"
+#~ msgstr "╪¬╪¡┘à┘è┘ä ╪º┘ä╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä┘å╪╡┘è"
 
 #~ msgid "Script"
-#~ msgstr "نص"
+#~ msgstr "┘å╪╡"
 
 #~ msgid "Start"
-#~ msgstr "يبدأ"
+#~ msgstr "┘è╪¿╪»╪ú"
 
 #~ msgid "End"
-#~ msgstr "نهاية"
+#~ msgstr "┘å┘ç╪º┘è╪⌐"
 
 #~ msgid "Duration"
-#~ msgstr "مدة"
+#~ msgstr "┘à╪»╪⌐"
 
 #~ msgid "ID"
-#~ msgstr "بطاقة تعريف"
+#~ msgstr "╪¿╪╖╪º┘é╪⌐ ╪¬╪╣╪▒┘è┘ü"
 
 #~ msgid "User ID"
-#~ msgstr "معرف المستخدم"
+#~ msgstr "┘à╪╣╪▒┘ü ╪º┘ä┘à╪│╪¬╪«╪»┘à"
 
 #~ msgid "Params"
-#~ msgstr "المعلمات"
+#~ msgstr "╪º┘ä┘à╪╣┘ä┘à╪º╪¬"
 
 #~ msgid "Results"
-#~ msgstr "نتائج"
+#~ msgstr "┘å╪¬╪º╪ª╪¼"
 
 #~ msgid "Logs"
-#~ msgstr "سجلات"
+#~ msgstr "╪│╪¼┘ä╪º╪¬"
 
 #~ msgid "Docker Logs"
-#~ msgstr "سجلات Docker"
+#~ msgstr "╪│╪¼┘ä╪º╪¬ Docker"
 
 #~ msgid "Batch Logs"
-#~ msgstr "سجلات الدفعات"
+#~ msgstr "╪│╪¼┘ä╪º╪¬ ╪º┘ä╪»┘ü╪╣╪º╪¬"
 
 #~ msgid "Map"
-#~ msgstr "رسم خريطة"
+#~ msgstr "╪▒╪│┘à ╪«╪▒┘è╪╖╪⌐"
 
 #~ msgid "Last Activity"
-#~ msgstr "آخر نشاط"
+#~ msgstr "╪ó╪«╪▒ ┘å╪┤╪º╪╖"
 
 #~ msgid "Verified"
-#~ msgstr "تم التحقق"
+#~ msgstr "╪¬┘à ╪º┘ä╪¬╪¡┘é┘é"
 
 #~ msgid "Verified At"
-#~ msgstr "تم التحقق من ذلك في"
+#~ msgstr "╪¬┘à ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪░┘ä┘â ┘ü┘è"
 
 #~ msgid "Created"
-#~ msgstr "مخلوق"
+#~ msgstr "┘à╪«┘ä┘ê┘é"
 
 #~ msgid "Updated"
-#~ msgstr "تم التحديث"
+#~ msgstr "╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½"
 
 #~ msgid "GEE License"
-#~ msgstr "رخصة GEE"
+#~ msgstr "╪▒╪«╪╡╪⌐ GEE"
 
 #~ msgid "Slug"
-#~ msgstr "سبيكة"
+#~ msgstr "╪│╪¿┘è┘â╪⌐"
 
 #~ msgid "Access"
-#~ msgstr "وصول"
+#~ msgstr "┘ê╪╡┘ê┘ä"
 
 #~ msgid "Environment"
-#~ msgstr "بيئة"
+#~ msgstr "╪¿┘è╪ª╪⌐"
 
 #~ msgid "Env Version"
-#~ msgstr "إصدار البيئة"
+#~ msgstr "╪Ñ╪╡╪»╪º╪▒ ╪º┘ä╪¿┘è╪ª╪⌐"
 
 #~ msgid "Compute"
-#~ msgstr "الحوسبة"
+#~ msgstr "╪º┘ä╪¡┘ê╪│╪¿╪⌐"
 
 #~ msgid "User Email"
-#~ msgstr "بريد المستخدم الإلكتروني"
+#~ msgstr "╪¿╪▒┘è╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à ╪º┘ä╪Ñ┘ä┘â╪¬╪▒┘ê┘å┘è"
 
 #~ msgid "Description"
-#~ msgstr "وصف"
+#~ msgstr "┘ê╪╡┘ü"
 
 #~ msgid "Occurred"
-#~ msgstr "حصل"
+#~ msgstr "╪¡╪╡┘ä"
 
 #~ msgid "Type"
-#~ msgstr "يكتب"
+#~ msgstr "┘è┘â╪¬╪¿"
 
 #~ msgid "Endpoint"
-#~ msgstr "نقطة النهاية"
+#~ msgstr "┘å┘é╪╖╪⌐ ╪º┘ä┘å┘ç╪º┘è╪⌐"
 
 #~ msgid "Method"
-#~ msgstr "طريقة"
+#~ msgstr "╪╖╪▒┘è┘é╪⌐"
 
 #~ msgid "IP Address"
-#~ msgstr "عنوان IP"
+#~ msgstr "╪╣┘å┘ê╪º┘å IP"
 
 #~ msgid "Limit"
-#~ msgstr "حد"
+#~ msgstr "╪¡╪»"
 
 #~ msgid "Count"
-#~ msgstr "عدد"
+#~ msgstr "╪╣╪»╪»"
 
 #~ msgid "Window"
-#~ msgstr "نافذة"
+#~ msgstr "┘å╪º┘ü╪░╪⌐"
 
 #~ msgid "Retry After"
-#~ msgstr "أعد المحاولة بعد"
+#~ msgstr "╪ú╪╣╪» ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ╪¿╪╣╪»"
 
 #~ msgid "Limiter Key"
-#~ msgstr "مفتاح المحدد"
+#~ msgstr "┘à┘ü╪¬╪º╪¡ ╪º┘ä┘à╪¡╪»╪»"
 
 #~ msgid "User Agent"
-#~ msgstr "وكيل المستخدم"
+#~ msgstr "┘ê┘â┘è┘ä ╪º┘ä┘à╪│╪¬╪«╪»┘à"
 
 #~ msgid "Event ID"
-#~ msgstr "معرف الحدث"
+#~ msgstr "┘à╪╣╪▒┘ü ╪º┘ä╪¡╪»╪½"
 
 #~ msgid "Expires"
-#~ msgstr "تاريخ الانتهاء"
+#~ msgstr "╪¬╪º╪▒┘è╪« ╪º┘ä╪º┘å╪¬┘ç╪º╪í"
 
 #~ msgid "Identifier"
-#~ msgstr "المعرف"
+#~ msgstr "╪º┘ä┘à╪╣╪▒┘ü"
 
 #~ msgid "Usage"
-#~ msgstr "الاستخدام"
+#~ msgstr "╪º┘ä╪º╪│╪¬╪«╪»╪º┘à"
 
 #~ msgid "Rate Limit Type"
-#~ msgstr "نوع حد المعدل"
+#~ msgstr "┘å┘ê╪╣ ╪¡╪» ╪º┘ä┘à╪╣╪»┘ä"
 
 #~ msgid "Number of Executions"
-#~ msgstr "عدد عمليات التنفيذ"
+#~ msgstr "╪╣╪»╪» ╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░"
 
 #~ msgid "Running executions{suffix_label}"
-#~ msgstr "تنفيذ العمليات {لاحقة_التسمية}"
+#~ msgstr "╪¬┘å┘ü┘è╪░ ╪º┘ä╪╣┘à┘ä┘è╪º╪¬ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "No in-progress execution data available."
-#~ msgstr "لا تتوفر بيانات تنفيذ جارية."
+#~ msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪¬┘å┘ü┘è╪░ ╪¼╪º╪▒┘è╪⌐."
 
 #~ msgid ""
 #~ "Status time series data did not include ready, pending, or running counts "
 #~ "for this period."
 #~ msgstr ""
-#~ "لم تتضمن بيانات السلاسل الزمنية للحالة أعداد الجاهزية أو المعلقة أو الجارية "
-#~ "لهذه الفترة."
+#~ "┘ä┘à ╪¬╪¬╪╢┘à┘å ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪│┘ä╪º╪│┘ä ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¡╪º┘ä╪⌐ "
+#~ "╪ú╪╣╪»╪º╪» ╪º┘ä╪¼╪º┘ç╪▓┘è╪⌐ ╪ú┘ê ╪º┘ä┘à╪╣┘ä┘é╪⌐ ╪ú┘ê ╪º┘ä╪¼╪º╪▒┘è╪⌐ ┘ä┘ç╪░┘ç"
+#~ " ╪º┘ä┘ü╪¬╪▒╪⌐."
 
 #~ msgid "Status timestamps could not be parsed from the API response."
-#~ msgstr "تعذر تحليل الطوابع الزمنية للحالة من استجابة واجهة برمجة التطبيقات."
+#~ msgstr ""
+#~ "╪¬╪╣╪░╪▒ ╪¬╪¡┘ä┘è┘ä ╪º┘ä╪╖┘ê╪º╪¿╪╣ ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¡╪º┘ä╪⌐ ┘à┘å "
+#~ "╪º╪│╪¬╪¼╪º╪¿╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬."
 
 #~ msgid "Status time series data was not provided for this period."
-#~ msgstr "لم يتم توفير بيانات السلاسل الزمنية للحالة لهذه الفترة."
+#~ msgstr ""
+#~ "┘ä┘à ┘è╪¬┘à ╪¬┘ê┘ü┘è╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪º┘ä╪│┘ä╪º╪│┘ä ╪º┘ä╪▓┘à┘å┘è╪⌐ "
+#~ "┘ä┘ä╪¡╪º┘ä╪⌐ ┘ä┘ç╪░┘ç ╪º┘ä┘ü╪¬╪▒╪⌐."
 
 #~ msgid "Cumulative Executions"
-#~ msgstr "عمليات التنفيذ التراكمية"
+#~ msgstr "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ ╪º┘ä╪¬╪▒╪º┘â┘à┘è╪⌐"
 
 #~ msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
-#~ msgstr "المهام المكتملة التراكمية {لاحقة_التسمية} {لاحقة_التجميع}"
+#~ msgstr ""
+#~ "╪º┘ä┘à┘ç╪º┘à ╪º┘ä┘à┘â╪¬┘à┘ä╪⌐ ╪º┘ä╪¬╪▒╪º┘â┘à┘è╪⌐ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
+#~ " {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪¼┘à┘è╪╣}"
 
 #~ msgid "Completed executions (cumulative){suffix_label}"
-#~ msgstr "عمليات التنفيذ المكتملة (التراكمية) {لاحقة_التسمية}"
+#~ msgstr ""
+#~ "╪╣┘à┘ä┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ ╪º┘ä┘à┘â╪¬┘à┘ä╪⌐ (╪º┘ä╪¬╪▒╪º┘â┘à┘è╪⌐) "
+#~ "{┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "No cumulative execution data available."
-#~ msgstr "لا تتوفر بيانات تنفيذ تراكمية."
+#~ msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪¬┘å┘ü┘è╪░ ╪¬╪▒╪º┘â┘à┘è╪⌐."
 
 #~ msgid ""
 #~ "The execution statistics time series did not include finished, failed, or "
 #~ "cancelled statuses."
-#~ msgstr "لم تتضمن سلسلة إحصائيات التنفيذ حالات الانتهاء أو الفشل أو الإلغاء."
+#~ msgstr ""
+#~ "┘ä┘à ╪¬╪¬╪╢┘à┘å ╪│┘ä╪│┘ä╪⌐ ╪Ñ╪¡╪╡╪º╪ª┘è╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ ╪¡╪º┘ä╪º╪¬ "
+#~ "╪º┘ä╪º┘å╪¬┘ç╪º╪í ╪ú┘ê ╪º┘ä┘ü╪┤┘ä ╪ú┘ê ╪º┘ä╪Ñ┘ä╪║╪º╪í."
 
 #~ msgid "No execution trend data available."
-#~ msgstr "لا تتوفر بيانات عن اتجاهات التنفيذ."
+#~ msgstr "┘ä╪º ╪¬╪¬┘ê┘ü╪▒ ╪¿┘è╪º┘å╪º╪¬ ╪╣┘å ╪º╪¬╪¼╪º┘ç╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░."
 
 #~ msgid "Execution timestamps could not be parsed from the API response."
-#~ msgstr "تعذر تحليل الطوابع الزمنية للتنفيذ من استجابة واجهة برمجة التطبيقات."
+#~ msgstr ""
+#~ "╪¬╪╣╪░╪▒ ╪¬╪¡┘ä┘è┘ä ╪º┘ä╪╖┘ê╪º╪¿╪╣ ╪º┘ä╪▓┘à┘å┘è╪⌐ ┘ä┘ä╪¬┘å┘ü┘è╪░ ┘à┘å "
+#~ "╪º╪│╪¬╪¼╪º╪¿╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬."
 
 #~ msgid "Execution count{suffix_label}"
-#~ msgstr "عدد مرات التنفيذ {اللاحقة_التسمية}"
+#~ msgstr "╪╣╪»╪» ┘à╪▒╪º╪¬ ╪º┘ä╪¬┘å┘ü┘è╪░ {╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "Average Duration (minutes)"
-#~ msgstr "متوسط المدة (بالدقائق)"
+#~ msgstr "┘à╪¬┘ê╪│╪╖ ╪º┘ä┘à╪»╪⌐ (╪¿╪º┘ä╪»┘é╪º╪ª┘é)"
 
 #~ msgid "Execution duration{suffix_label}"
-#~ msgstr "مدة التنفيذ {لاحقة_التسمية}"
+#~ msgstr "┘à╪»╪⌐ ╪º┘ä╪¬┘å┘ü┘è╪░ {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "Failure Rate (%)"
-#~ msgstr "معدل الفشل (%)"
+#~ msgstr "┘à╪╣╪»┘ä ╪º┘ä┘ü╪┤┘ä (%)"
 
 #~ msgid "Top scripts by failure count{suffix_label}"
-#~ msgstr "أفضل البرامج النصية حسب عدد حالات الفشل {suffix_label}"
+#~ msgstr ""
+#~ "╪ú┘ü╪╢┘ä ╪º┘ä╪¿╪▒╪º┘à╪¼ ╪º┘ä┘å╪╡┘è╪⌐ ╪¡╪│╪¿ ╪╣╪»╪» ╪¡╪º┘ä╪º╪¬ ╪º┘ä┘ü╪┤┘ä "
+#~ "{suffix_label}"
 
 #~ msgid "Top users by activity{suffix_label}"
-#~ msgstr "أفضل المستخدمين حسب النشاط {اللاحقة_التسمية}"
+#~ msgstr ""
+#~ "╪ú┘ü╪╢┘ä ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪¡╪│╪¿ ╪º┘ä┘å╪┤╪º╪╖ "
+#~ "{╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "Script Version"
-#~ msgstr "نسخة النص البرمجي"
+#~ msgstr "┘å╪│╪«╪⌐ ╪º┘ä┘å╪╡ ╪º┘ä╪¿╪▒┘à╪¼┘è"
 
 #~ msgid "{num_versions} distinct versions, {num_executions} executions"
-#~ msgstr "{num_versions} إصدارًا مميزًا، {num_executions} عملية تنفيذ"
+#~ msgstr ""
+#~ "{num_versions} ╪Ñ╪╡╪»╪º╪▒┘ï╪º ┘à┘à┘è╪▓┘ï╪º╪î {num_executions} ╪╣┘à┘ä┘è╪⌐ "
+#~ "╪¬┘å┘ü┘è╪░"
 
 #~ msgid "{num_executions} executions from scripts with no parseable version"
-#~ msgstr "{num_executions} عملية تنفيذ من نصوص برمجية بدون نسخة قابلة للتحليل"
+#~ msgstr ""
+#~ "{num_executions} ╪╣┘à┘ä┘è╪⌐ ╪¬┘å┘ü┘è╪░ ┘à┘å ┘å╪╡┘ê╪╡ ╪¿╪▒┘à╪¼┘è╪⌐ ╪¿╪»┘ê┘å "
+#~ "┘å╪│╪«╪⌐ ┘é╪º╪¿┘ä╪⌐ ┘ä┘ä╪¬╪¡┘ä┘è┘ä"
 
 #~ msgid "Execution script version distribution{suffix_label}"
-#~ msgstr "توزيع إصدار برنامج التنفيذ {اللاحقة_التسمية}"
+#~ msgstr ""
+#~ "╪¬┘ê╪▓┘è╪╣ ╪Ñ╪╡╪»╪º╪▒ ╪¿╪▒┘å╪º┘à╪¼ ╪º┘ä╪¬┘å┘ü┘è╪░ "
+#~ "{╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "New user registrations{suffix_label}"
-#~ msgstr "تسجيلات المستخدمين الجدد {لاحقة_التسمية}"
+#~ msgstr ""
+#~ "╪¬╪│╪¼┘è┘ä╪º╪¬ ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪º┘ä╪¼╪»╪» {┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "Cumulative New Users"
-#~ msgstr "إجمالي عدد المستخدمين الجدد"
+#~ msgstr "╪Ñ╪¼┘à╪º┘ä┘è ╪╣╪»╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å ╪º┘ä╪¼╪»╪»"
 
 #~ msgid "Number of Users"
-#~ msgstr "عدد المستخدمين"
+#~ msgstr "╪╣╪»╪» ╪º┘ä┘à╪│╪¬╪«╪»┘à┘è┘å"
 
 #~ msgid "Top countries{suffix_label}"
-#~ msgstr "أفضل الدول {اللاحقة_التسمية}"
+#~ msgstr "╪ú┘ü╪╢┘ä ╪º┘ä╪»┘ê┘ä {╪º┘ä┘ä╪º╪¡┘é╪⌐_╪º┘ä╪¬╪│┘à┘è╪⌐}"
 
 #~ msgid "Environment: {env}"
-#~ msgstr "البيئة: {env}"
+#~ msgstr "╪º┘ä╪¿┘è╪ª╪⌐: {env}"
 
 #~ msgid "API Status: Authentication required"
-#~ msgstr "حالة واجهة برمجة التطبيقات: المصادقة مطلوبة"
+#~ msgstr ""
+#~ "╪¡╪º┘ä╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬: ╪º┘ä┘à╪╡╪º╪»┘é╪⌐ "
+#~ "┘à╪╖┘ä┘ê╪¿╪⌐"
 
 #~ msgid "Please log in to view deployment status"
-#~ msgstr "يرجى تسجيل الدخول لعرض حالة النشر"
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪┤╪▒"
 
 #~ msgid "API status unavailable"
-#~ msgstr "حالة واجهة برمجة التطبيقات غير متوفرة"
+#~ msgstr "╪¡╪º┘ä╪⌐ ┘ê╪º╪¼┘ç╪⌐ ╪¿╪▒┘à╪¼╪⌐ ╪º┘ä╪¬╪╖╪¿┘è┘é╪º╪¬ ╪║┘è╪▒ ┘à╪¬┘ê┘ü╪▒╪⌐"
 
 #~ msgid "Authentication required"
-#~ msgstr "يلزم المصادقة"
+#~ msgstr "┘è┘ä╪▓┘à ╪º┘ä┘à╪╡╪º╪»┘é╪⌐"
 
 #~ msgid "Please log in to view cluster status"
-#~ msgstr "يرجى تسجيل الدخول لعرض حالة المجموعة"
+#~ msgstr "┘è╪▒╪¼┘ë ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ┘ä╪╣╪▒╪╢ ╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
 
 #~ msgid " (Auth Required)"
-#~ msgstr " (يلزم الحصول على مصادقة)"
+#~ msgstr " (┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ┘à╪╡╪º╪»┘é╪⌐)"
 
 #~ msgid " (Live)"
-#~ msgstr " (يعيش)"
+#~ msgstr " (┘è╪╣┘è╪┤)"
 
 #~ msgid " (Updated: {time} {tz})"
-#~ msgstr " (تم التحديث: {الوقت} {التوقيت الزمني})"
+#~ msgstr " (╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½: {╪º┘ä┘ê┘é╪¬} {╪º┘ä╪¬┘ê┘é┘è╪¬ ╪º┘ä╪▓┘à┘å┘è})"
 
 #~ msgid " (Updated: {time})"
-#~ msgstr " (تم التحديث: {الوقت})"
+#~ msgstr " (╪¬┘à ╪º┘ä╪¬╪¡╪»┘è╪½: {╪º┘ä┘ê┘é╪¬})"
 
 #~ msgid "Authentication failed"
-#~ msgstr "فشلت عملية المصادقة"
+#~ msgstr "┘ü╪┤┘ä╪¬ ╪╣┘à┘ä┘è╪⌐ ╪º┘ä┘à╪╡╪º╪»┘é╪⌐"
 
 #~ msgid "Please check your login status"
-#~ msgstr "يرجى التحقق من حالة تسجيل الدخول الخاصة بك"
+#~ msgstr ""
+#~ "┘è╪▒╪¼┘ë ╪º┘ä╪¬╪¡┘é┘é ┘à┘å ╪¡╪º┘ä╪⌐ ╪¬╪│╪¼┘è┘ä ╪º┘ä╪»╪«┘ê┘ä ╪º┘ä╪«╪º╪╡╪⌐ "
+#~ "╪¿┘â"
 
 #~ msgid " (Auth Error)"
-#~ msgstr " (خطأ في المصادقة)"
+#~ msgstr " (╪«╪╖╪ú ┘ü┘è ╪º┘ä┘à╪╡╪º╪»┘é╪⌐)"
 
 #~ msgid "Access denied"
-#~ msgstr "تم الرفض"
+#~ msgstr "╪¬┘à ╪º┘ä╪▒┘ü╪╢"
 
 #~ msgid "Admin privileges required for cluster status"
-#~ msgstr "يلزم الحصول على امتيازات المسؤول لعرض حالة المجموعة"
+#~ msgstr ""
+#~ "┘è┘ä╪▓┘à ╪º┘ä╪¡╪╡┘ê┘ä ╪╣┘ä┘ë ╪º┘à╪¬┘è╪º╪▓╪º╪¬ ╪º┘ä┘à╪│╪ñ┘ê┘ä ┘ä╪╣╪▒╪╢ "
+#~ "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
 
 #~ msgid " (Access Denied)"
-#~ msgstr " (تم الرفض)"
+#~ msgstr " (╪¬┘à ╪º┘ä╪▒┘ü╪╢)"
 
 #~ msgid "Cluster Status: Error ({status_code})"
-#~ msgstr "حالة المجموعة: خطأ ({status_code})"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐: ╪«╪╖╪ú ({status_code})"
 
 #~ msgid "Unable to retrieve cluster information"
-#~ msgstr "تعذر استرداد معلومات المجموعة"
+#~ msgstr "╪¬╪╣╪░╪▒ ╪º╪│╪¬╪▒╪»╪º╪» ┘à╪╣┘ä┘ê┘à╪º╪¬ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
 
 #~ msgid " (Error)"
-#~ msgstr " (خطأ)"
+#~ msgstr " (╪«╪╖╪ú)"
 
 #~ msgid "Cluster Status: Connection Error"
-#~ msgstr "حالة المجموعة: خطأ في الاتصال"
+#~ msgstr "╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐: ╪«╪╖╪ú ┘ü┘è ╪º┘ä╪º╪¬╪╡╪º┘ä"
 
 #~ msgid "Unable to reach cluster status endpoint"
-#~ msgstr "تعذر الوصول إلى نقطة نهاية حالة المجموعة"
+#~ msgstr ""
+#~ "╪¬╪╣╪░╪▒ ╪º┘ä┘ê╪╡┘ê┘ä ╪Ñ┘ä┘ë ┘å┘é╪╖╪⌐ ┘å┘ç╪º┘è╪⌐ ╪¡╪º┘ä╪⌐ ╪º┘ä┘à╪¼┘à┘ê╪╣╪⌐"
 
 #~ msgid " (Connection Error)"
-#~ msgstr " (خطأ في الاتصال)"
+#~ msgstr " (╪«╪╖╪ú ┘ü┘è ╪º┘ä╪º╪¬╪╡╪º┘ä)"
 
 #~ msgid "System status is currently unavailable. Please try again later."
-#~ msgstr "حالة النظام غير متاحة حاليًا. يرجى المحاولة مرة أخرى لاحقًا."
+#~ msgstr ""
+#~ "╪¡╪º┘ä╪⌐ ╪º┘ä┘å╪╕╪º┘à ╪║┘è╪▒ ┘à╪¬╪º╪¡╪⌐ ╪¡╪º┘ä┘è┘ï╪º. ┘è╪▒╪¼┘ë "
+#~ "╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐ ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ┘ä╪º╪¡┘é┘ï╪º."
