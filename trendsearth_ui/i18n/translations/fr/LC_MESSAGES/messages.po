@@ -4,12 +4,14 @@
 #
 # Translations merged from git history on 2026-05-26
 #
+# Translations merged from git history on 2026-05-26
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-05-26 13:12-0400\n"
-"PO-Revision-Date: 2026-05-26 13:13\n"
+"PO-Revision-Date: 2026-05-26 13:41\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -38,40 +40,40 @@ msgstr "Le mot de passe doit contenir des erreurs."
 #, python-brace-format
 msgid "User '{name}' created successfully with email '{email}'."
 msgstr ""
-"L'utilisateur '{name}' a ├⌐t├⌐ cr├⌐├⌐ avec succ├¿s avec l'adresse e-mail "
+"L'utilisateur '{name}' a été créé avec succès avec l'adresse e-mail "
 "'{email}'."
 
 #: trendsearth_ui/callbacks/admin.py:734
 msgid "A user with this email already exists."
-msgstr "Un utilisateur associ├⌐ ├á cette adresse e-mail existe d├⌐j├á."
+msgstr "Un utilisateur associé à cette adresse e-mail existe déjà."
 
 #: trendsearth_ui/callbacks/admin.py:746
 msgid "Invalid user data."
-msgstr "Donn├⌐es utilisateur invalides."
+msgstr "Données utilisateur invalides."
 
 #: trendsearth_ui/callbacks/admin.py:748
 #, python-brace-format
 msgid "Error creating user: {detail}"
-msgstr "Erreur lors de la cr├⌐ation de l'utilisateur : {detail}"
+msgstr "Erreur lors de la création de l'utilisateur : {detail}"
 
 #: trendsearth_ui/callbacks/admin.py:761
 #, python-brace-format
 msgid "Failed to create user. Server responded with status {status}."
 msgstr ""
-"├ëchec de la cr├⌐ation de l'utilisateur. Le serveur a r├⌐pondu avec le "
-"statut {status}."
+"Échec de la création de l'utilisateur. Le serveur a répondu avec le statut "
+"{status}."
 
 #: trendsearth_ui/callbacks/admin.py:777 trendsearth_ui/callbacks/auth.py:1328
 #: trendsearth_ui/callbacks/auth.py:1600 trendsearth_ui/callbacks/auth.py:1926
 #: trendsearth_ui/callbacks/auth.py:2109
 msgid "Request timed out. Please try again."
-msgstr "D├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer."
+msgstr "Délai d'attente dépassé. Veuillez réessayer."
 
 #: trendsearth_ui/callbacks/admin.py:790
 #: trendsearth_ui/callbacks/admin.py:1029
 msgid "Cannot connect to server. Please check your connection."
 msgstr ""
-"Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion."
+"Impossible de se connecter au serveur. Veuillez vérifier votre connexion."
 
 #: trendsearth_ui/callbacks/admin.py:803
 #: trendsearth_ui/callbacks/admin.py:1037
@@ -85,7 +87,7 @@ msgid ""
 "Invalid file type: {filename}. Must be a .tar.gz archive containing "
 "configuration.json."
 msgstr ""
-"Type de fichier invalide : {filename}. Doit ├¬tre une archive .tar.gz "
+"Type de fichier invalide : {filename}. Doit être une archive .tar.gz "
 "contenant le fichier configuration.json."
 
 #: trendsearth_ui/callbacks/admin.py:864
@@ -93,22 +95,21 @@ msgstr ""
 msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
 msgstr ""
 "Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
-"autoris├⌐.Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
-"autoris├⌐."
+"autorisé.Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
+"autorisé."
 
 #: trendsearth_ui/callbacks/admin.py:873
 #, python-brace-format
 msgid "Archive ready: {filename} ({size}MB)"
-msgstr "Archive pr├¬te : {filename} ({size}MB)"
+msgstr "Archive prête : {filename} ({size}MB)"
 
 #: trendsearth_ui/callbacks/admin.py:925
 msgid "Access denied. Administrator privileges required."
-msgstr "Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis."
+msgstr "Accès refusé. Privilèges d'administrateur requis."
 
 #: trendsearth_ui/callbacks/admin.py:940
 msgid "Please select a .tar.gz script archive to upload."
-msgstr ""
-"Veuillez s├⌐lectionner une archive de script .tar.gz ├á t├⌐l├⌐charger."
+msgstr "Veuillez sélectionner une archive de script .tar.gz à télécharger."
 
 #: trendsearth_ui/callbacks/admin.py:951
 msgid ""
@@ -121,7 +122,7 @@ msgstr ""
 #: trendsearth_ui/callbacks/admin.py:981
 #, python-brace-format
 msgid "Script '{name}' uploaded successfully."
-msgstr "Script '{name}' t├⌐l├⌐charg├⌐ avec succ├¿s."
+msgstr "Script '{name}' téléchargé avec succès."
 
 #: trendsearth_ui/callbacks/admin.py:990 trendsearth_ui/callbacks/admin.py:992
 msgid "Invalid script archive."
@@ -135,71 +136,66 @@ msgstr "Erreur lors du chargement du script : {detail}"
 #: trendsearth_ui/callbacks/admin.py:1002
 msgid "Permission denied. Only admins and superadmins can create scripts."
 msgstr ""
-"Acc├¿s refus├⌐. Seuls les administrateurs et les super-administrateurs "
-"peuvent cr├⌐er des scripts."
+"Accès refusé. Seuls les administrateurs et les super-administrateurs peuvent"
+" créer des scripts."
 
 #: trendsearth_ui/callbacks/admin.py:1010
 #, python-brace-format
 msgid "Failed to upload script. Server responded with status {status}."
 msgstr ""
-"├ëchec du chargement du script. Le serveur a r├⌐pondu avec le statut "
-"{status}."
+"Échec du chargement du script. Le serveur a répondu avec le statut {status}."
 
 #: trendsearth_ui/callbacks/admin.py:1021
 msgid "Upload timed out. Please try again with a smaller file."
 msgstr ""
-"Le d├⌐lai d'attente pour le chargement a expir├⌐. Veuillez r├⌐essayer avec "
-"un fichier plus petit.Le d├⌐lai d'attente pour le chargement a expir├⌐. "
-"Veuillez r├⌐essayer avec un fichier plus petit."
+"Le délai d'attente pour le chargement a expiré. Veuillez réessayer avec un "
+"fichier plus petit.Le délai d'attente pour le chargement a expiré. Veuillez "
+"réessayer avec un fichier plus petit."
 
 #: trendsearth_ui/callbacks/admin.py:1200
 msgid "Rate limits have been successfully reset for all users and endpoints."
 msgstr ""
-"Les limites de d├⌐bit ont ├⌐t├⌐ r├⌐initialis├⌐es avec succ├¿s pour tous les "
-"utilisateurs et points de terminaison.Les limites de d├⌐bit ont ├⌐t├⌐ "
-"r├⌐initialis├⌐es avec succ├¿s pour tous les utilisateurs et points de "
+"Les limites de débit ont été réinitialisées avec succès pour tous les "
+"utilisateurs et points de terminaison.Les limites de débit ont été "
+"réinitialisées avec succès pour tous les utilisateurs et points de "
 "terminaison."
 
 #: trendsearth_ui/callbacks/admin.py:1210
 #, python-brace-format
 msgid "Failed to reset rate limits. Status: {status}"
-msgstr ""
-"├ëchec de la r├⌐initialisation des limites de d├⌐bit. Statut : {status}"
+msgstr "Échec de la réinitialisation des limites de débit. Statut : {status}"
 
 #: trendsearth_ui/callbacks/admin.py:1234
 #, python-brace-format
 msgid "Error resetting rate limits: {error}"
-msgstr "Erreur lors de la r├⌐initialisation des limites de d├⌐bit : {error}"
+msgstr "Erreur lors de la réinitialisation des limites de débit : {error}"
 
 #: trendsearth_ui/callbacks/admin.py:1440
 msgid "Error: No rate limit selected."
-msgstr "Erreur : Aucune limite de d├⌐bit s├⌐lectionn├⌐e."
+msgstr "Erreur : Aucune limite de débit sélectionnée."
 
 #: trendsearth_ui/callbacks/admin.py:1481
 #, python-brace-format
 msgid "Rate limit for {identifier} has been successfully reset."
 msgstr ""
-"La limite de d├⌐bit pour {identifier} a ├⌐t├⌐ r├⌐initialis├⌐e avec "
-"succ├¿s.La limite de d├⌐bit pour {identifier} a ├⌐t├⌐ r├⌐initialis├⌐e avec "
-"succ├¿s."
+"La limite de débit pour {identifier} a été réinitialisée avec succès.La "
+"limite de débit pour {identifier} a été réinitialisée avec succès."
 
 #: trendsearth_ui/callbacks/admin.py:1498
 #, python-brace-format
 msgid "Rate limit for {identifier} not found. It may have already expired."
 msgstr ""
-"Limite de d├⌐bit introuvable pour {identifier}. Elle a peut-├¬tre d├⌐j├á "
-"expir├⌐."
+"Limite de débit introuvable pour {identifier}. Elle a peut-être déjà expiré."
 
 #: trendsearth_ui/callbacks/admin.py:1510
 #, python-brace-format
 msgid "Failed to reset rate limit. Status: {status}"
-msgstr ""
-"├ëchec de la r├⌐initialisation de la limite de d├⌐bit. Statut : {status}"
+msgstr "Échec de la réinitialisation de la limite de débit. Statut : {status}"
 
 #: trendsearth_ui/callbacks/admin.py:1538
 #, python-brace-format
 msgid "Error resetting rate limit: {error}"
-msgstr "Erreur lors de la r├⌐initialisation de la limite de d├⌐bit : {error}"
+msgstr "Erreur lors de la réinitialisation de la limite de débit : {error}"
 
 #: trendsearth_ui/callbacks/auth.py:402 trendsearth_ui/callbacks/auth.py:1840
 msgid "Please enter both email and password."
@@ -207,15 +203,15 @@ msgstr "Veuillez saisir votre adresse e-mail et votre mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:437 trendsearth_ui/callbacks/auth.py:1867
 msgid "Login failed: Invalid response format."
-msgstr "├ëchec de la connexion : format de r├⌐ponse invalide."
+msgstr "Échec de la connexion : format de réponse invalide."
 
 #: trendsearth_ui/callbacks/auth.py:483
 msgid "Login successful!"
-msgstr "Connexion r├⌐ussie !"
+msgstr "Connexion réussie !"
 
 #: trendsearth_ui/callbacks/auth.py:505
 msgid "Failed to retrieve user information."
-msgstr "Impossible de r├⌐cup├⌐rer les informations de l'utilisateur."
+msgstr "Impossible de récupérer les informations de l'utilisateur."
 
 #: trendsearth_ui/callbacks/auth.py:513 trendsearth_ui/callbacks/auth.py:1900
 msgid "Invalid credentials."
@@ -224,43 +220,43 @@ msgstr "Identifiants invalides."
 #: trendsearth_ui/callbacks/auth.py:521
 msgid "Your account is locked due to too many failed login attempts. "
 msgstr ""
-"Votre compte est bloqu├⌐ suite ├á un trop grand nombre de tentatives de "
+"Votre compte est bloqué suite à un trop grand nombre de tentatives de "
 "connexion infructueuses. "
 
 #: trendsearth_ui/callbacks/auth.py:523
 msgid "Please use the 'Forgot Password' link below to reset your password."
 msgstr ""
-"Veuillez utiliser le lien ┬½ Mot de passe oubli├⌐ ┬╗ ci-dessous pour "
-"r├⌐initialiser votre mot de passe."
+"Veuillez utiliser le lien « Mot de passe oublié » ci-dessous pour "
+"réinitialiser votre mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:526
 msgid "Your account is temporarily locked. "
-msgstr "Votre compte est temporairement bloqu├⌐. "
+msgstr "Votre compte est temporairement bloqué. "
 
 #: trendsearth_ui/callbacks/auth.py:527
 #, python-brace-format
 msgid "Please try again in {minutes} minute(s)."
-msgstr "Veuillez r├⌐essayer dans {minutes} minute(s)."
+msgstr "Veuillez réessayer dans {minutes} minute(s)."
 
 #: trendsearth_ui/callbacks/auth.py:547
 msgid "Login failed: Connection timeout. Please try again later."
 msgstr ""
-"├ëchec de la connexion : d├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer "
-"plus tard.├ëchec de la connexion : d├⌐lai d'attente d├⌐pass├⌐. Veuillez "
-"r├⌐essayer plus tard."
+"Échec de la connexion : délai d'attente dépassé. Veuillez réessayer plus "
+"tard.Échec de la connexion : délai d'attente dépassé. Veuillez réessayer "
+"plus tard."
 
 #: trendsearth_ui/callbacks/auth.py:559
 msgid ""
 "Login failed: Cannot connect to authentication server. Please check the "
 "server status."
 msgstr ""
-"├ëchec de la connexion : impossible de se connecter au serveur "
-"d'authentification. Veuillez v├⌐rifier l'├⌐tat du serveur."
+"Échec de la connexion : impossible de se connecter au serveur "
+"d'authentification. Veuillez vérifier l'état du serveur."
 
 #: trendsearth_ui/callbacks/auth.py:571
 #, python-brace-format
 msgid "Login failed: {error}"
-msgstr "├ëchec de la connexion : {error}"
+msgstr "Échec de la connexion : {error}"
 
 #: trendsearth_ui/callbacks/auth.py:790 trendsearth_ui/callbacks/auth.py:1486
 msgid "Please enter your email address."
@@ -268,7 +264,7 @@ msgstr "Veuillez saisir votre adresse e-mail."
 
 #: trendsearth_ui/callbacks/auth.py:803 trendsearth_ui/callbacks/auth.py:1522
 msgid "Please enter a valid email address."
-msgstr "S'il vous pla├«t, mettez une adresse email valide."
+msgstr "S'il vous plaît, mettez une adresse email valide."
 
 #: trendsearth_ui/callbacks/auth.py:839
 #, python-brace-format
@@ -276,43 +272,43 @@ msgid ""
 "If an account exists with {email}, password recovery instructions have been "
 "sent. Please check your email."
 msgstr ""
-"Si un compte existe avec {email}, les instructions de r├⌐cup├⌐ration de mot "
-"de passe ont ├⌐t├⌐ envoy├⌐es. Veuillez consulter votre messagerie.Si un "
-"compte existe avec {email}, les instructions de r├⌐cup├⌐ration de mot de "
-"passe ont ├⌐t├⌐ envoy├⌐es. Veuillez consulter votre messagerie."
+"Si un compte existe avec {email}, les instructions de récupération de mot de"
+" passe ont été envoyées. Veuillez consulter votre messagerie.Si un compte "
+"existe avec {email}, les instructions de récupération de mot de passe ont "
+"été envoyées. Veuillez consulter votre messagerie."
 
 #: trendsearth_ui/callbacks/auth.py:850
 msgid "Failed to send password recovery email."
-msgstr "├ëchec de l'envoi de l'e-mail de r├⌐cup├⌐ration de mot de passe."
+msgstr "Échec de l'envoi de l'e-mail de récupération de mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:859
 #, python-brace-format
 msgid "{}. Please try again later."
-msgstr "Veuillez r├⌐essayer plus tard."
+msgstr "Veuillez réessayer plus tard."
 
 #: trendsearth_ui/callbacks/auth.py:873
 msgid "Request timed out. Please try again later."
-msgstr "D├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer plus tard."
+msgstr "Délai d'attente dépassé. Veuillez réessayer plus tard."
 
 #: trendsearth_ui/callbacks/auth.py:885
 msgid ""
 "Cannot connect to the server. Please check your internet connection and try "
 "again."
 msgstr ""
-"Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion "
-"Internet et r├⌐essayer.Impossible de se connecter au serveur. Veuillez "
-"v├⌐rifier votre connexion Internet et r├⌐essayer."
+"Impossible de se connecter au serveur. Veuillez vérifier votre connexion "
+"Internet et réessayer.Impossible de se connecter au serveur. Veuillez "
+"vérifier votre connexion Internet et réessayer."
 
 #: trendsearth_ui/callbacks/auth.py:897
 #, python-brace-format
 msgid "An error occurred: {error}. Please try again later."
-msgstr "Une erreur s'est produite : {error}. Veuillez r├⌐essayer plus tard."
+msgstr "Une erreur s'est produite : {error}. Veuillez réessayer plus tard."
 
 #: trendsearth_ui/callbacks/auth.py:1226
 msgid "Invalid or missing reset token. Please request a new password reset."
 msgstr ""
-"Jeton de r├⌐initialisation invalide ou manquant. Veuillez demander une "
-"nouvelle r├⌐initialisation de mot de passe."
+"Jeton de réinitialisation invalide ou manquant. Veuillez demander une "
+"nouvelle réinitialisation de mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:1235
 msgid "Please enter and confirm your new password."
@@ -320,19 +316,19 @@ msgstr "Veuillez saisir et confirmer votre nouveau mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:1244
 msgid "Passwords do not match. Please try again."
-msgstr "Les mots de passe ne correspondent pas. Veuillez r├⌐essayer."
+msgstr "Les mots de passe ne correspondent pas. Veuillez réessayer."
 
 #: trendsearth_ui/callbacks/auth.py:1253
 #: trendsearth_ui/callbacks/profile.py:265
 msgid "Password must be at least 12 characters long."
-msgstr "Le mot de passe doit comporter au moins 12 caract├¿res."
+msgstr "Le mot de passe doit comporter au moins 12 caractères."
 
 #: trendsearth_ui/callbacks/auth.py:1274
 msgid "Password reset successful! You can now log in with your new password."
 msgstr ""
-"R├⌐initialisation du mot de passe r├⌐ussie ! Vous pouvez maintenant vous "
-"connecter avec votre nouveau mot de passe.R├⌐initialisation du mot de passe "
-"r├⌐ussie ! Vous pouvez maintenant vous connecter avec votre nouveau mot de "
+"Réinitialisation du mot de passe réussie ! Vous pouvez maintenant vous "
+"connecter avec votre nouveau mot de passe.Réinitialisation du mot de passe "
+"réussie ! Vous pouvez maintenant vous connecter avec votre nouveau mot de "
 "passe."
 
 #: trendsearth_ui/callbacks/auth.py:1284
@@ -340,29 +336,29 @@ msgid ""
 "This reset link is invalid or has expired. Please request a new password "
 "reset."
 msgstr ""
-"Ce lien de r├⌐initialisation est invalide ou a expir├⌐. Veuillez demander "
-"une nouvelle r├⌐initialisation de mot de passe.Ce lien de r├⌐initialisation "
-"est invalide ou a expir├⌐. Veuillez demander une nouvelle r├⌐initialisation "
-"de mot de passe."
+"Ce lien de réinitialisation est invalide ou a expiré. Veuillez demander une "
+"nouvelle réinitialisation de mot de passe.Ce lien de réinitialisation est "
+"invalide ou a expiré. Veuillez demander une nouvelle réinitialisation de mot"
+" de passe."
 
 #: trendsearth_ui/callbacks/auth.py:1293
 msgid "Password does not meet requirements."
-msgstr "Le mot de passe ne r├⌐pond pas aux exigences."
+msgstr "Le mot de passe ne répond pas aux exigences."
 
 #: trendsearth_ui/callbacks/auth.py:1308
 msgid "Failed to reset password."
-msgstr "├ëchec de la r├⌐initialisation du mot de passe."
+msgstr "Échec de la réinitialisation du mot de passe."
 
 #: trendsearth_ui/callbacks/auth.py:1316 trendsearth_ui/callbacks/auth.py:1595
 #, python-brace-format
 msgid "{}. Please try again."
-msgstr "Veuillez r├⌐essayer."
+msgstr "Veuillez réessayer."
 
 #: trendsearth_ui/callbacks/auth.py:1337 trendsearth_ui/callbacks/auth.py:1604
 #: trendsearth_ui/callbacks/auth.py:1934 trendsearth_ui/callbacks/auth.py:2113
 msgid "Cannot connect to the server. Please check your connection."
 msgstr ""
-"Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion."
+"Impossible de se connecter au serveur. Veuillez vérifier votre connexion."
 
 #: trendsearth_ui/callbacks/auth.py:1346 trendsearth_ui/callbacks/auth.py:1610
 #: trendsearth_ui/callbacks/auth.py:1942 trendsearth_ui/callbacks/auth.py:2119
@@ -381,32 +377,32 @@ msgstr "Veuillez indiquer le nom de votre organisation."
 #: trendsearth_ui/callbacks/auth.py:1495 trendsearth_ui/callbacks/auth.py:2006
 #: trendsearth_ui/callbacks/profile.py:125
 msgid "Please select your sector."
-msgstr "Veuillez s├⌐lectionner votre secteur."
+msgstr "Veuillez sélectionner votre secteur."
 
 #: trendsearth_ui/callbacks/auth.py:1498 trendsearth_ui/callbacks/auth.py:2009
 #: trendsearth_ui/callbacks/profile.py:128
 msgid "Please specify your sector."
-msgstr "Veuillez pr├⌐ciser votre secteur."
+msgstr "Veuillez préciser votre secteur."
 
 #: trendsearth_ui/callbacks/auth.py:1501 trendsearth_ui/callbacks/auth.py:2012
 #: trendsearth_ui/callbacks/profile.py:131
 msgid "Please select your purpose of use."
-msgstr "Veuillez s├⌐lectionner votre objectif d'utilisation."
+msgstr "Veuillez sélectionner votre objectif d'utilisation."
 
 #: trendsearth_ui/callbacks/auth.py:1504 trendsearth_ui/callbacks/auth.py:2015
 #: trendsearth_ui/callbacks/profile.py:134
 msgid "Please specify your purpose of use."
-msgstr "Veuillez pr├⌐ciser l'usage que vous en ferez."
+msgstr "Veuillez préciser l'usage que vous en ferez."
 
 #: trendsearth_ui/callbacks/auth.py:1507 trendsearth_ui/callbacks/auth.py:2018
 #: trendsearth_ui/callbacks/profile.py:137
 msgid "Please select your country."
-msgstr "Veuillez s├⌐lectionner votre pays."
+msgstr "Veuillez sélectionner votre pays."
 
 #: trendsearth_ui/callbacks/auth.py:1510 trendsearth_ui/callbacks/auth.py:2021
 #: trendsearth_ui/callbacks/profile.py:140
 msgid "Please describe your gender identity."
-msgstr "Veuillez d├⌐crire votre identit├⌐ de genre."
+msgstr "Veuillez décrire votre identité de genre."
 
 #: trendsearth_ui/callbacks/auth.py:1514 trendsearth_ui/callbacks/auth.py:2025
 #: trendsearth_ui/callbacks/profile.py:144
@@ -420,27 +416,27 @@ msgid ""
 "Account created successfully! Please check your email to verify your "
 "account, then you can log in."
 msgstr ""
-"Compte cr├⌐├⌐ avec succ├¿s ! Veuillez consulter votre messagerie pour "
-"v├⌐rifier votre compte, puis vous pourrez vous connecter."
+"Compte créé avec succès ! Veuillez consulter votre messagerie pour vérifier "
+"votre compte, puis vous pourrez vous connecter."
 
 #: trendsearth_ui/callbacks/auth.py:1576 trendsearth_ui/callbacks/auth.py:1592
 msgid "Registration failed."
-msgstr "L'inscription a ├⌐chou├⌐."
+msgstr "L'inscription a échoué."
 
 #: trendsearth_ui/callbacks/auth.py:1580
 msgid "Validation failed."
-msgstr "La validation a ├⌐chou├⌐."
+msgstr "La validation a échoué."
 
 #: trendsearth_ui/callbacks/auth.py:1586
 msgid "Too many registration attempts. Please try again later."
-msgstr "Trop de tentatives d'inscription. Veuillez r├⌐essayer plus tard."
+msgstr "Trop de tentatives d'inscription. Veuillez réessayer plus tard."
 
 #: trendsearth_ui/callbacks/auth.py:1765
 msgid "Invalid or expired token. Please request a new profile update link."
 msgstr ""
-"Jeton invalide ou expir├⌐. Veuillez demander un nouveau lien de mise ├á jour"
-" de profil.Jeton invalide ou expir├⌐. Veuillez demander un nouveau lien de "
-"mise ├á jour de profil."
+"Jeton invalide ou expiré. Veuillez demander un nouveau lien de mise à jour "
+"de profil.Jeton invalide ou expiré. Veuillez demander un nouveau lien de "
+"mise à jour de profil."
 
 #: trendsearth_ui/callbacks/auth.py:1811
 #, python-brace-format
@@ -458,34 +454,33 @@ msgstr ""
 #: trendsearth_ui/callbacks/auth.py:1993
 msgid "No authentication token. Please use a valid profile update link."
 msgstr ""
-"Aucun jeton d'authentification. Veuillez utiliser un lien de mise ├á jour de"
-" profil valide."
+"Aucun jeton d'authentification. Veuillez utiliser un lien de mise à jour de "
+"profil valide."
 
 #: trendsearth_ui/callbacks/auth.py:2087
 #: trendsearth_ui/callbacks/profile.py:205
 msgid "Profile updated successfully!"
-msgstr "Profil mis ├á jour avec succ├¿s !"
+msgstr "Profil mis à jour avec succès !"
 
 #: trendsearth_ui/callbacks/auth.py:2090
 msgid "Session expired. Please request a new profile update link."
 msgstr ""
-"Session expir├⌐e. Veuillez demander un nouveau lien de mise ├á jour de "
-"profil."
+"Session expirée. Veuillez demander un nouveau lien de mise à jour de profil."
 
 #: trendsearth_ui/callbacks/auth.py:2096
 msgid "Invalid token. Please request a new profile update link."
 msgstr ""
-"Jeton invalide. Veuillez demander un nouveau lien de mise ├á jour de profil."
+"Jeton invalide. Veuillez demander un nouveau lien de mise à jour de profil."
 
 #: trendsearth_ui/callbacks/auth.py:2103
 #: trendsearth_ui/callbacks/profile.py:208
 msgid "Failed to update profile."
-msgstr "Impossible de mettre ├á jour le profil."
+msgstr "Impossible de mettre à jour le profil."
 
 #: trendsearth_ui/callbacks/edit.py:573
 #: trendsearth_ui/callbacks/profile.py:332
 msgid "Password changed successfully!"
-msgstr "Mot de passe modifi├⌐ avec succ├¿s !"
+msgstr "Mot de passe modifié avec succès !"
 
 #: trendsearth_ui/callbacks/edit.py:576
 #: trendsearth_ui/callbacks/profile.py:335
@@ -510,7 +505,7 @@ msgstr " (Statut : {statut})"
 #: trendsearth_ui/callbacks/profile.py:569
 #, python-brace-format
 msgid "Network error: {error}"
-msgstr "Erreur r├⌐seau : {error}"
+msgstr "Erreur réseau : {error}"
 
 #: trendsearth_ui/callbacks/executions.py:536
 #: trendsearth_ui/callbacks/executions.py:563
@@ -530,21 +525,21 @@ msgstr ""
 
 #: trendsearth_ui/callbacks/executions.py:542
 msgid "Execution Cancelled Successfully"
-msgstr "Ex├⌐cution annul├⌐e avec succ├¿s"
+msgstr "Exécution annulée avec succès"
 
 #: trendsearth_ui/callbacks/executions.py:562
 #: trendsearth_ui/callbacks/executions.py:727
 #: trendsearth_ui/callbacks/executions.py:745
 msgid "Execution ID: "
-msgstr "ID d'ex├⌐cution : "
+msgstr "ID d'exécution : "
 
 #: trendsearth_ui/callbacks/executions.py:569
 msgid "Script: "
-msgstr "Sc├⌐nario: "
+msgstr "Scénario: "
 
 #: trendsearth_ui/callbacks/executions.py:576
 msgid "Previous Status: "
-msgstr "├ëtat pr├⌐c├⌐dent : "
+msgstr "État précédent : "
 
 #: trendsearth_ui/callbacks/executions.py:585
 msgid "New Status: "
@@ -562,29 +557,29 @@ msgstr "Nettoyage des infrastructures"
 
 #: trendsearth_ui/callbacks/executions.py:622
 msgid "Docker service stopped"
-msgstr "Le service Docker s'est arr├¬t├⌐."
+msgstr "Le service Docker s'est arrêté."
 
 #: trendsearth_ui/callbacks/executions.py:624
 msgid "Docker service not found/stopped"
-msgstr "Service Docker introuvable/arr├¬t├⌐"
+msgstr "Service Docker introuvable/arrêté"
 
 #: trendsearth_ui/callbacks/executions.py:633
 msgid "Docker container stopped"
-msgstr "Le conteneur Docker s'est arr├¬t├⌐."
+msgstr "Le conteneur Docker s'est arrêté."
 
 #: trendsearth_ui/callbacks/executions.py:635
 msgid "Docker container not found/stopped"
-msgstr "Conteneur Docker introuvable/arr├¬t├⌐"
+msgstr "Conteneur Docker introuvable/arrêté"
 
 #: trendsearth_ui/callbacks/executions.py:647
 #: trendsearth_ui/callbacks/executions.py:687
 msgid "Google Earth Engine Tasks"
-msgstr "T├óches de Google Earth Engine"
+msgstr "Tâches de Google Earth Engine"
 
 #: trendsearth_ui/callbacks/executions.py:651
 #, python-brace-format
 msgid "Found and processed {count} GEE tasks:"
-msgstr "{count} t├óches GEE trouv├⌐es et trait├⌐es :"
+msgstr "{count} tâches GEE trouvées et traitées :"
 
 #: trendsearth_ui/callbacks/executions.py:671
 #, python-brace-format
@@ -593,11 +588,11 @@ msgstr "Statut : {statut}"
 
 #: trendsearth_ui/callbacks/executions.py:689
 msgid "No GEE tasks found in execution logs."
-msgstr "Aucune t├óche GEE trouv├⌐e dans les journaux d'ex├⌐cution."
+msgstr "Aucune tâche GEE trouvée dans les journaux d'exécution."
 
 #: trendsearth_ui/callbacks/executions.py:702
 msgid "Errors Encountered"
-msgstr "Erreurs rencontr├⌐es"
+msgstr "Erreurs rencontrées"
 
 #: trendsearth_ui/callbacks/executions.py:711
 msgid "Cancellation Already In Progress"
@@ -613,7 +608,7 @@ msgstr ""
 
 #: trendsearth_ui/callbacks/executions.py:736
 msgid "Cancellation Failed"
-msgstr "L'annulation a ├⌐chou├⌐"
+msgstr "L'annulation a échoué"
 
 #: trendsearth_ui/callbacks/executions.py:739
 msgid "Error: "
@@ -622,7 +617,7 @@ msgstr "Erreur: "
 #: trendsearth_ui/callbacks/gee_credentials.py:39
 #: trendsearth_ui/callbacks/openeo_credentials.py:28
 msgid "Please log in to view credentials status."
-msgstr "Veuillez vous connecter pour consulter l'├⌐tat de vos identifiants."
+msgstr "Veuillez vous connecter pour consulter l'état de vos identifiants."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:64
 msgid "OAuth"
@@ -635,12 +630,12 @@ msgstr "Compte de service"
 #: trendsearth_ui/callbacks/gee_credentials.py:70
 #, python-brace-format
 msgid "Credentials configured using {type_label}"
-msgstr "Identifiants configur├⌐s ├á l'aide de {type_label}"
+msgstr "Identifiants configurés à l'aide de {type_label}"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:75
 #, python-brace-format
 msgid "Set up on: {created_date}"
-msgstr "Cr├⌐├⌐ le : {created_date}"
+msgstr "Créé le : {created_date}"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:93
 msgid ""
@@ -650,49 +645,47 @@ msgstr ""
 
 #: trendsearth_ui/callbacks/gee_credentials.py:101
 msgid "Unable to retrieve credentials status."
-msgstr "Impossible de r├⌐cup├⌐rer l'├⌐tat des informations d'identification."
+msgstr "Impossible de récupérer l'état des informations d'identification."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:108
 msgid "Error retrieving credentials status."
 msgstr ""
-"Erreur lors de la r├⌐cup├⌐ration de l'├⌐tat des informations "
-"d'identification."
+"Erreur lors de la récupération de l'état des informations d'identification."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:169
 msgid "OAuth initiation failed - no authorization URL received."
 msgstr ""
-"L'initialisation OAuth a ├⌐chou├⌐ - aucune URL d'autorisation n'a ├⌐t├⌐ "
-"re├ºue."
+"L'initialisation OAuth a échoué - aucune URL d'autorisation n'a été reçue."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:175
 msgid "Failed to initiate OAuth flow."
-msgstr "├ëchec de l'initialisation du flux OAuth."
+msgstr "Échec de l'initialisation du flux OAuth."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:210
 msgid "Invalid JSON file. Please upload a valid service account key file."
 msgstr ""
-"Fichier JSON invalide. Veuillez t├⌐l├⌐verser un fichier de cl├⌐ de compte de"
-" service valide.Fichier JSON invalide. Veuillez t├⌐l├⌐verser un fichier de "
-"cl├⌐ de compte de service valide."
+"Fichier JSON invalide. Veuillez téléverser un fichier de clé de compte de "
+"service valide.Fichier JSON invalide. Veuillez téléverser un fichier de clé "
+"de compte de service valide."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:218
 msgid "Invalid service account key. Missing required fields."
-msgstr "Cl├⌐ de compte de service invalide. Champs obligatoires manquants."
+msgstr "Clé de compte de service invalide. Champs obligatoires manquants."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:222
 msgid "Invalid service account key. Type field must be 'service_account'."
 msgstr ""
-"Cl├⌐ de compte de service invalide. Le champ Type doit ├¬tre ┬½ "
-"service_account ┬╗."
+"Clé de compte de service invalide. Le champ Type doit être « service_account"
+" »."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:240
 #, python-brace-format
 msgid "Service account key '{filename}' uploaded successfully!"
-msgstr "Cl├⌐ du compte de service '{filename}' t├⌐l├⌐charg├⌐e avec succ├¿s !"
+msgstr "Clé du compte de service '{filename}' téléchargée avec succès !"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:248
 msgid "Failed to upload service account key."
-msgstr "├ëchec du chargement de la cl├⌐ du compte de service."
+msgstr "Échec du chargement de la clé du compte de service."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:253
 #, python-brace-format
@@ -705,16 +698,16 @@ msgstr "Les identifiants Google Earth Engine sont valides et fonctionnels !"
 
 #: trendsearth_ui/callbacks/gee_credentials.py:299
 msgid "Credentials test failed."
-msgstr "Le test d'authentification a ├⌐chou├⌐."
+msgstr "Le test d'authentification a échoué."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:315
 msgid "Google Earth Engine credentials deleted successfully."
-msgstr "Identifiants Google Earth Engine supprim├⌐s avec succ├¿s."
+msgstr "Identifiants Google Earth Engine supprimés avec succès."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:321
 #: trendsearth_ui/callbacks/openeo_credentials.py:338
 msgid "Failed to delete credentials."
-msgstr "├ëchec de la suppression des identifiants."
+msgstr "Échec de la suppression des identifiants."
 
 #: trendsearth_ui/callbacks/gee_credentials.py:359
 msgid "Invalid callback — missing authorization code or state parameter."
@@ -787,7 +780,7 @@ msgstr ""
 #: trendsearth_ui/components/tabs.py:2602
 #: trendsearth_ui/components/tabs.py:2700
 msgid "Create News Item"
-msgstr "Cr├⌐er un article d'actualit├⌐"
+msgstr "Créer un article d'actualité"
 
 #: trendsearth_ui/callbacks/news_admin.py:239
 #: trendsearth_ui/callbacks/news_admin.py:581
@@ -797,7 +790,7 @@ msgstr "Modifier l'article"
 
 #: trendsearth_ui/callbacks/news_admin.py:269
 msgid "Preview will appear here..."
-msgstr "Un aper├ºu appara├«tra ici..."
+msgstr "Un aperçu apparaîtra ici..."
 
 #: trendsearth_ui/callbacks/news_admin.py:333
 #: trendsearth_ui/callbacks/news_admin.py:524
@@ -818,26 +811,26 @@ msgstr "Au moins une plateforme cible est requise."
 
 #: trendsearth_ui/callbacks/news_admin.py:428
 msgid "updated"
-msgstr "mis ├á jour"
+msgstr "mis à jour"
 
 #: trendsearth_ui/callbacks/news_admin.py:428
 msgid "created"
-msgstr "cr├⌐├⌐"
+msgstr "créé"
 
 #: trendsearth_ui/callbacks/news_admin.py:441
 #, python-brace-format
 msgid "News item {action} successfully!"
-msgstr "Article d'actualit├⌐ {action} r├⌐ussi !"
+msgstr "Article d'actualité {action} réussi !"
 
 #: trendsearth_ui/callbacks/news_admin.py:449
 #: trendsearth_ui/callbacks/news_admin.py:537
 msgid "Session expired. Please log in again."
-msgstr "Session expir├⌐e. Veuillez vous reconnecter."
+msgstr "Session expirée. Veuillez vous reconnecter."
 
 #: trendsearth_ui/callbacks/news_admin.py:460
 #: trendsearth_ui/callbacks/news_admin.py:539
 msgid "Access denied. Admin privileges required."
-msgstr "Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis."
+msgstr "Accès refusé. Privilèges d'administrateur requis."
 
 #: trendsearth_ui/callbacks/news_admin.py:471
 #: trendsearth_ui/callbacks/news_admin.py:542
@@ -852,11 +845,11 @@ msgstr "Erreur lors de l'enregistrement de l'article : {error}"
 
 #: trendsearth_ui/callbacks/news_admin.py:527
 msgid "No news item selected."
-msgstr "Aucun article s├⌐lectionn├⌐."
+msgstr "Aucun article sélectionné."
 
 #: trendsearth_ui/callbacks/news_admin.py:535
 msgid "News item deleted successfully!"
-msgstr "Article supprim├⌐ avec succ├¿s !"
+msgstr "Article supprimé avec succès !"
 
 #: trendsearth_ui/callbacks/news_admin.py:548
 #, python-brace-format
@@ -969,7 +962,7 @@ msgstr ""
 
 #: trendsearth_ui/callbacks/profile.py:189
 msgid "User ID not found in user data."
-msgstr "Identifiant utilisateur introuvable dans les donn├⌐es utilisateur."
+msgstr "Identifiant utilisateur introuvable dans les données utilisateur."
 
 #: trendsearth_ui/callbacks/profile.py:244
 msgid "All password fields are required."
@@ -996,7 +989,7 @@ msgstr "Le mot de passe doit inclure un chiffre."
 msgid ""
 "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 msgstr ""
-"Le mot de passe doit inclure un caract├¿re sp├⌐cial "
+"Le mot de passe doit inclure un caractère spécial "
 "(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
 
 #: trendsearth_ui/callbacks/profile.py:394
@@ -1009,22 +1002,22 @@ msgstr ""
 
 #: trendsearth_ui/callbacks/profile.py:491
 msgid "Email confirmation does not match. Please try again."
-msgstr "La confirmation par courriel ne correspond pas. Veuillez r├⌐essayer."
+msgstr "La confirmation par courriel ne correspond pas. Veuillez réessayer."
 
 #: trendsearth_ui/callbacks/profile.py:516
 msgid "Your account has been deleted."
-msgstr "Votre compte a ├⌐t├⌐ supprim├⌐."
+msgstr "Votre compte a été supprimé."
 
 #: trendsearth_ui/callbacks/profile.py:529
 msgid "Admin accounts cannot be deleted through self-service. "
 msgstr ""
-"Les comptes d'administrateur ne peuvent pas ├¬tre supprim├⌐s via le libre-"
-"service. Les comptes d'administrateur ne peuvent pas ├¬tre supprim├⌐s via le"
-" libre-service. "
+"Les comptes d'administrateur ne peuvent pas être supprimés via le libre-"
+"service. Les comptes d'administrateur ne peuvent pas être supprimés via le "
+"libre-service. "
 
 #: trendsearth_ui/callbacks/profile.py:530
 msgid "Please contact a system administrator."
-msgstr "Veuillez contacter un administrateur syst├¿me."
+msgstr "Veuillez contacter un administrateur système."
 
 #: trendsearth_ui/callbacks/profile.py:546
 #: trendsearth_ui/callbacks/profile.py:551
@@ -1034,28 +1027,28 @@ msgstr "Impossible de supprimer le compte."
 #: trendsearth_ui/callbacks/profile.py:550
 #: trendsearth_ui/callbacks/profile.py:552
 msgid "Please try again."
-msgstr "Veuillez r├⌐essayer."
+msgstr "Veuillez réessayer."
 
 #: trendsearth_ui/callbacks/status.py:253
 #, python-brace-format
 msgid "Current System Status ({header_label})"
-msgstr "├ëtat actuel du syst├¿me ({header_label})"
+msgstr "État actuel du système ({header_label})"
 
 #: trendsearth_ui/callbacks/status.py:255
 #: trendsearth_ui/callbacks/status.py:285
 #: trendsearth_ui/components/tabs.py:2070
 msgid "Current System Status"
-msgstr "├ëtat actuel du syst├¿me"
+msgstr "État actuel du système"
 
 #: trendsearth_ui/callbacks/status.py:265
 #, python-brace-format
 msgid "Cluster Status{cluster_cached_time}"
-msgstr "├ëtat du cluster{cluster_cached_time}"
+msgstr "État du cluster{cluster_cached_time}"
 
 #: trendsearth_ui/callbacks/status.py:281
 #, python-brace-format
 msgid "Error loading status data: {error}"
-msgstr "Erreur lors du chargement des donn├⌐es d'├⌐tat : {error}"
+msgstr "Erreur lors du chargement des données d'état : {error}"
 
 #: trendsearth_ui/callbacks/status.py:289
 msgid "Error"
@@ -1084,15 +1077,15 @@ msgstr "Erreur lors du chargement des statistiques : {error}"
 
 #: trendsearth_ui/callbacks/status.py:472
 msgid "No status data available."
-msgstr "Aucune donn├⌐e d'├⌐tat disponible."
+msgstr "Aucune donnée d'état disponible."
 
 #: trendsearth_ui/callbacks/status.py:500
 msgid "Overview"
-msgstr "Aper├ºu"
+msgstr "Aperçu"
 
 #: trendsearth_ui/callbacks/status.py:503
 msgid "Total Executions"
-msgstr "Ex├⌐cutions totales"
+msgstr "Exécutions totales"
 
 #: trendsearth_ui/callbacks/status.py:504
 msgid "Total Users"
@@ -1105,7 +1098,7 @@ msgstr "Total des scripts"
 #: trendsearth_ui/callbacks/status.py:514
 #: trendsearth_ui/components/layout.py:2372
 msgid "Executions"
-msgstr "Ex├⌐cutions"
+msgstr "Exécutions"
 
 #: trendsearth_ui/callbacks/status.py:517
 #: trendsearth_ui/utils/mobile_utils.py:990
@@ -1114,11 +1107,11 @@ msgstr "Actif"
 
 #: trendsearth_ui/callbacks/status.py:520
 msgid "Running"
-msgstr "En cours d'ex├⌐cution"
+msgstr "En cours d'exécution"
 
 #: trendsearth_ui/callbacks/status.py:521
 msgid "Ready"
-msgstr "Pr├¬t"
+msgstr "Prêt"
 
 #: trendsearth_ui/callbacks/status.py:522
 msgid "Pending"
@@ -1132,7 +1125,7 @@ msgstr "Total"
 #: trendsearth_ui/callbacks/status.py:536
 #: trendsearth_ui/utils/stats_visualizations.py:2117
 msgid "Completed"
-msgstr "Compl├⌐t├⌐"
+msgstr "Complété"
 
 #: trendsearth_ui/callbacks/status.py:539
 #: trendsearth_ui/utils/stats_visualizations.py:800
@@ -1142,16 +1135,16 @@ msgstr "Fini"
 #: trendsearth_ui/callbacks/status.py:541
 #: trendsearth_ui/utils/stats_visualizations.py:2121
 msgid "Failed"
-msgstr "├ëchou├⌐"
+msgstr "Échoué"
 
 #: trendsearth_ui/callbacks/status.py:545
 #: trendsearth_ui/utils/stats_visualizations.py:2125
 msgid "Cancelled"
-msgstr "Annul├⌐"
+msgstr "Annulé"
 
 #: trendsearth_ui/callbacks/status.py:582
 msgid "No statistics available for the selected period."
-msgstr "Aucune statistique disponible pour la p├⌐riode s├⌐lectionn├⌐e."
+msgstr "Aucune statistique disponible pour la période sélectionnée."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:50
 #: trendsearth_ui/callbacks/unsubscribe.py:113
@@ -1185,7 +1178,7 @@ msgstr "Gouvernement - Agriculture"
 
 #: trendsearth_ui/components/layout.py:56
 msgid "Government - Land Management/Planning"
-msgstr "Gouvernement - Gestion/Am├⌐nagement du territoire"
+msgstr "Gouvernement - Gestion/Aménagement du territoire"
 
 #: trendsearth_ui/components/layout.py:57
 msgid "Government - Other"
@@ -1193,15 +1186,15 @@ msgstr "Gouvernement - Autres"
 
 #: trendsearth_ui/components/layout.py:58
 msgid "International/Multilateral Organization"
-msgstr "Organisation internationale/multilat├⌐rale"
+msgstr "Organisation internationale/multilatérale"
 
 #: trendsearth_ui/components/layout.py:59
 msgid "NGO - Development/Aid"
-msgstr "ONG - D├⌐veloppement/Aide"
+msgstr "ONG - Développement/Aide"
 
 #: trendsearth_ui/components/layout.py:60
 msgid "NGO - Community-Based"
-msgstr "ONG - Communaut├⌐"
+msgstr "ONG - Communauté"
 
 #: trendsearth_ui/components/layout.py:61
 msgid "NGO - Conservation"
@@ -1213,7 +1206,7 @@ msgstr "ONG - Autres"
 
 #: trendsearth_ui/components/layout.py:63
 msgid "Academic/Research Institution"
-msgstr "├ëtablissement d'enseignement sup├⌐rieur/de recherche"
+msgstr "Établissement d'enseignement supérieur/de recherche"
 
 #: trendsearth_ui/components/layout.py:64
 msgid "Consulting/Professional Services"
@@ -1221,19 +1214,19 @@ msgstr "Services de conseil/professionnels"
 
 #: trendsearth_ui/components/layout.py:65
 msgid "Private Sector - Agriculture/Forestry"
-msgstr "Secteur priv├⌐ - Agriculture/For├¬t"
+msgstr "Secteur privé - Agriculture/Forêt"
 
 #: trendsearth_ui/components/layout.py:66
 msgid "Private Sector - Other"
-msgstr "Secteur priv├⌐ - Autres"
+msgstr "Secteur privé - Autres"
 
 #: trendsearth_ui/components/layout.py:67
 msgid "Independent Researcher"
-msgstr "Chercheur ind├⌐pendant"
+msgstr "Chercheur indépendant"
 
 #: trendsearth_ui/components/layout.py:68
 msgid "Student"
-msgstr "├ëtudiant"
+msgstr "Étudiant"
 
 #: trendsearth_ui/components/layout.py:69
 #: trendsearth_ui/components/layout.py:92
@@ -1250,7 +1243,7 @@ msgstr "Recherche universitaire"
 
 #: trendsearth_ui/components/layout.py:83
 msgid "Policy Development & Planning"
-msgstr "├ëlaboration et planification des politiques"
+msgstr "Élaboration et planification des politiques"
 
 #: trendsearth_ui/components/layout.py:84
 msgid "Land Restoration/Management Planning"
@@ -1258,19 +1251,19 @@ msgstr "Planification de la restauration et de la gestion des terres"
 
 #: trendsearth_ui/components/layout.py:85
 msgid "Project Monitoring & Evaluation"
-msgstr "Suivi et ├⌐valuation des projets"
+msgstr "Suivi et évaluation des projets"
 
 #: trendsearth_ui/components/layout.py:86
 msgid "Environmental Impact Assessment"
-msgstr "├ëvaluation de l'impact environnemental"
+msgstr "Évaluation de l'impact environnemental"
 
 #: trendsearth_ui/components/layout.py:87
 msgid "Agriculture/Forestry Planning"
-msgstr "Planification agricole et foresti├¿re"
+msgstr "Planification agricole et forestière"
 
 #: trendsearth_ui/components/layout.py:88
 msgid "Teaching & Education"
-msgstr "Enseignement et ├⌐ducation"
+msgstr "Enseignement et éducation"
 
 #: trendsearth_ui/components/layout.py:89
 msgid "Conservation Planning"
@@ -1298,15 +1291,15 @@ msgstr "Non-binaire"
 
 #: trendsearth_ui/components/layout.py:107
 msgid "Prefer to self-describe"
-msgstr "Pr├⌐f├¿re s'auto-d├⌐crire"
+msgstr "Préfère s'auto-décrire"
 
 #: trendsearth_ui/components/layout.py:108
 msgid "Prefer not to say"
-msgstr "Je pr├⌐f├¿re ne pas le dire"
+msgstr "Je préfère ne pas le dire"
 
 #: trendsearth_ui/components/layout.py:199
 msgid "Forgot Password"
-msgstr "Mot de passe oubli├⌐"
+msgstr "Mot de passe oublié"
 
 #: trendsearth_ui/components/layout.py:209
 msgid ""
@@ -1314,8 +1307,8 @@ msgid ""
 "password."
 msgstr ""
 "Saisissez votre adresse e-mail et nous vous enverrons les instructions pour "
-"r├⌐initialiser votre mot de passe.Saisissez votre adresse e-mail et nous "
-"vous enverrons les instructions pour r├⌐initialiser votre mot de passe."
+"réinitialiser votre mot de passe.Saisissez votre adresse e-mail et nous vous"
+" enverrons les instructions pour réinitialiser votre mot de passe."
 
 #: trendsearth_ui/components/layout.py:212
 msgid "Email Address"
@@ -1335,7 +1328,7 @@ msgstr "Annuler"
 
 #: trendsearth_ui/components/layout.py:244
 msgid "Send Reset Instructions"
-msgstr "Envoyer les instructions de r├⌐initialisation"
+msgstr "Envoyer les instructions de réinitialisation"
 
 #: trendsearth_ui/components/layout.py:256
 msgid "OK"
@@ -1377,7 +1370,7 @@ msgstr "Saisissez le mot de passe"
 
 #: trendsearth_ui/components/layout.py:353
 msgid "Remember me (keep me logged in)"
-msgstr "Se souvenir de moi (me garder connect├⌐)"
+msgstr "Se souvenir de moi (me garder connecté)"
 
 #: trendsearth_ui/components/layout.py:371
 msgid "Register"
@@ -1385,7 +1378,7 @@ msgstr "Registre"
 
 #: trendsearth_ui/components/layout.py:382
 msgid "Forgot your password?"
-msgstr "Mot de passe oubli├⌐ ?"
+msgstr "Mot de passe oublié ?"
 
 #: trendsearth_ui/components/layout.py:413
 #: trendsearth_ui/components/layout.py:655
@@ -1394,7 +1387,7 @@ msgstr "Mot de passe oubli├⌐ ?"
 #: trendsearth_ui/components/layout.py:2025
 #: trendsearth_ui/components/layout.py:2219
 msgid "Privacy Policy"
-msgstr "politique de confidentialit├⌐"
+msgstr "politique de confidentialité"
 
 #: trendsearth_ui/components/layout.py:428
 #: trendsearth_ui/components/layout.py:670
@@ -1407,7 +1400,7 @@ msgstr "Conditions d'utilisation"
 
 #: trendsearth_ui/components/layout.py:511
 msgid "Set Your New Password"
-msgstr "D├⌐finissez votre nouveau mot de passe"
+msgstr "Définissez votre nouveau mot de passe"
 
 #: trendsearth_ui/components/layout.py:515
 msgid "Enter your new password below."
@@ -1437,7 +1430,7 @@ msgstr "Exigences relatives au mot de passe :"
 #: trendsearth_ui/components/layout.py:578
 #: trendsearth_ui/components/tabs.py:3271
 msgid "At least 12 characters"
-msgstr "Au moins 12 caract├¿res"
+msgstr "Au moins 12 caractères"
 
 #: trendsearth_ui/components/layout.py:583
 #: trendsearth_ui/components/tabs.py:3276
@@ -1452,22 +1445,22 @@ msgstr "Lettre minuscule (az)"
 #: trendsearth_ui/components/layout.py:593
 #: trendsearth_ui/components/tabs.py:3286
 msgid "Number (0-9)"
-msgstr "Num├⌐ro (0-9)"
+msgstr "Numéro (0-9)"
 
 #: trendsearth_ui/components/layout.py:599
 #: trendsearth_ui/components/tabs.py:3292
 #, python-brace-format
 msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-msgstr "Caract├¿re sp├⌐cial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+msgstr "Caractère spécial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
 #: trendsearth_ui/components/layout.py:616
 msgid "Set Password"
-msgstr "D├⌐finir le mot de passe"
+msgstr "Définir le mot de passe"
 
 #: trendsearth_ui/components/layout.py:632
 #: trendsearth_ui/components/layout.py:1425
 msgid "Back to Login"
-msgstr "Retour ├á la connexion"
+msgstr "Retour à la connexion"
 
 #: trendsearth_ui/components/layout.py:756
 msgid "Connect Google Earth Engine"
@@ -1524,15 +1517,15 @@ msgstr ""
 
 #: trendsearth_ui/components/layout.py:1001
 msgid "Create Your Account"
-msgstr "Cr├⌐ez votre compte"
+msgstr "Créez votre compte"
 
 #: trendsearth_ui/components/layout.py:1006
 msgid ""
 "After registration, you'll receive an email to verify your address and set "
 "your password."
 msgstr ""
-"Apr├¿s votre inscription, vous recevrez un courriel pour v├⌐rifier votre "
-"adresse et d├⌐finir votre mot de passe."
+"Après votre inscription, vous recevrez un courriel pour vérifier votre "
+"adresse et définir votre mot de passe."
 
 #: trendsearth_ui/components/layout.py:1019
 #: trendsearth_ui/components/layout.py:1650
@@ -1542,7 +1535,7 @@ msgstr "Champ obligatoire"
 #: trendsearth_ui/components/layout.py:1059
 #: trendsearth_ui/components/layout.py:1686
 msgid "Full Name"
-msgstr "Nom et pr├⌐nom"
+msgstr "Nom et prénom"
 
 #: trendsearth_ui/components/layout.py:1073
 #: trendsearth_ui/components/layout.py:1700
@@ -1555,7 +1548,7 @@ msgstr "Veuillez saisir votre nom complet"
 #: trendsearth_ui/components/tabs.py:627
 #: trendsearth_ui/utils/mobile_utils.py:388
 msgid "Role/Title"
-msgstr "R├┤le/Titre"
+msgstr "Rôle/Titre"
 
 #: trendsearth_ui/components/layout.py:1092
 #: trendsearth_ui/components/layout.py:1719
@@ -1586,20 +1579,20 @@ msgstr "Secteur"
 #: trendsearth_ui/components/layout.py:1775
 #: trendsearth_ui/components/tabs.py:695
 msgid "Select your sector"
-msgstr "S├⌐lectionnez votre secteur"
+msgstr "Sélectionnez votre secteur"
 
 #: trendsearth_ui/components/layout.py:1162
 #: trendsearth_ui/components/layout.py:1215
 #: trendsearth_ui/components/layout.py:1789
 #: trendsearth_ui/components/layout.py:1842
 msgid "Please specify"
-msgstr "Veuillez pr├⌐ciser"
+msgstr "Veuillez préciser"
 
 #: trendsearth_ui/components/layout.py:1169
 #: trendsearth_ui/components/layout.py:1796
 #: trendsearth_ui/components/tabs.py:709
 msgid "Please specify your sector"
-msgstr "Veuillez pr├⌐ciser votre secteur"
+msgstr "Veuillez préciser votre secteur"
 
 #: trendsearth_ui/components/layout.py:1186
 #: trendsearth_ui/components/layout.py:1813
@@ -1612,13 +1605,13 @@ msgstr "Objectif d'utilisation"
 #: trendsearth_ui/components/layout.py:1828
 #: trendsearth_ui/components/tabs.py:734
 msgid "Select your purpose of use"
-msgstr "S├⌐lectionnez votre objectif d'utilisation"
+msgstr "Sélectionnez votre objectif d'utilisation"
 
 #: trendsearth_ui/components/layout.py:1222
 #: trendsearth_ui/components/layout.py:1849
 #: trendsearth_ui/components/tabs.py:749
 msgid "Please specify your purpose"
-msgstr "Veuillez pr├⌐ciser votre objectif"
+msgstr "Veuillez préciser votre objectif"
 
 #: trendsearth_ui/components/layout.py:1238
 #: trendsearth_ui/components/layout.py:1865
@@ -1633,19 +1626,19 @@ msgstr "Pays"
 #: trendsearth_ui/components/layout.py:1878
 #: trendsearth_ui/components/tabs.py:670
 msgid "Select your country"
-msgstr "S├⌐lectionnez votre pays"
+msgstr "Sélectionnez votre pays"
 
 #: trendsearth_ui/components/layout.py:1269
 #: trendsearth_ui/components/layout.py:1893
 #: trendsearth_ui/components/tabs.py:766
 msgid "Gender Identity"
-msgstr "Identit├⌐ de genre"
+msgstr "Identité de genre"
 
 #: trendsearth_ui/components/layout.py:1277
 #: trendsearth_ui/components/layout.py:1901
 #: trendsearth_ui/components/tabs.py:770
 msgid "Select (optional)"
-msgstr "S├⌐lectionner (facultatif)"
+msgstr "Sélectionner (facultatif)"
 
 #: trendsearth_ui/components/layout.py:1291
 #: trendsearth_ui/components/layout.py:1915
@@ -1656,16 +1649,15 @@ msgid ""
 "and tool access. Providing this information is voluntary; your selection "
 "will not affect your access to the tool."
 msgstr ""
-"Nous recueillons des informations sur l'identit├⌐ de genre afin de respecter"
-" les exigences de d├⌐claration des donateurs et d'├⌐valuer l'├⌐quit├⌐ de "
-"participation au renforcement des capacit├⌐s et ├á l'acc├¿s aux outils. La "
+"Nous recueillons des informations sur l'identité de genre afin de respecter "
+"les exigences de déclaration des donateurs et d'évaluer l'équité de "
+"participation au renforcement des capacités et à l'accès aux outils. La "
 "communication de ces informations est facultative ; votre choix n'aura "
-"aucune incidence sur votre acc├¿s ├á l'outil.Nous recueillons des "
-"informations sur l'identit├⌐ de genre afin de respecter les exigences de "
-"d├⌐claration des donateurs et d'├⌐valuer l'├⌐quit├⌐ de participation au "
-"renforcement des capacit├⌐s et ├á l'acc├¿s aux outils. La communication de "
-"ces informations est facultative ; votre choix n'aura aucune incidence sur "
-"votre acc├¿s ├á l'outil."
+"aucune incidence sur votre accès à l'outil.Nous recueillons des informations"
+" sur l'identité de genre afin de respecter les exigences de déclaration des "
+"donateurs et d'évaluer l'équité de participation au renforcement des "
+"capacités et à l'accès aux outils. La communication de ces informations est "
+"facultative ; votre choix n'aura aucune incidence sur votre accès à l'outil."
 
 #: trendsearth_ui/components/layout.py:1300
 #: trendsearth_ui/components/layout.py:1308
@@ -1673,7 +1665,7 @@ msgstr ""
 #: trendsearth_ui/components/layout.py:1932
 #: trendsearth_ui/components/tabs.py:780 trendsearth_ui/components/tabs.py:784
 msgid "Please describe"
-msgstr "Veuillez d├⌐crire"
+msgstr "Veuillez décrire"
 
 #: trendsearth_ui/components/layout.py:1352
 #: trendsearth_ui/components/layout.py:1950
@@ -1683,10 +1675,10 @@ msgid ""
 "and, depending on your use, you may be required to have in place a "
 "commercial license to use Google Earth Engine?"
 msgstr ""
-"Reconnaissez-vous que certaines fonctionnalit├⌐s de Trends.Earth utilisent "
+"Reconnaissez-vous que certaines fonctionnalités de Trends.Earth utilisent "
 "Google Earth Engine et que, selon votre utilisation, vous pourriez avoir "
 "besoin d'une licence commerciale pour utiliser Google Earth Engine "
-"?Reconnaissez-vous que certaines fonctionnalit├⌐s de Trends.Earth utilisent "
+"?Reconnaissez-vous que certaines fonctionnalités de Trends.Earth utilisent "
 "Google Earth Engine et que, selon votre utilisation, vous pourriez avoir "
 "besoin d'une licence commerciale pour utiliser Google Earth Engine ?"
 
@@ -1697,10 +1689,10 @@ msgid ""
 "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
 "details see the "
 msgstr ""
-"Google Earth Engine (GEE) impose des restrictions quant ├á son utilisation "
-"commerciale. Pour plus de d├⌐tails, consultez la documentation. Google Earth"
-" Engine (GEE) impose des restrictions quant ├á son utilisation commerciale. "
-"Pour plus de d├⌐tails, consultez la documentation. "
+"Google Earth Engine (GEE) impose des restrictions quant à son utilisation "
+"commerciale. Pour plus de détails, consultez la documentation. Google Earth "
+"Engine (GEE) impose des restrictions quant à son utilisation commerciale. "
+"Pour plus de détails, consultez la documentation. "
 
 #: trendsearth_ui/components/layout.py:1369
 #: trendsearth_ui/components/layout.py:1967
@@ -1717,14 +1709,14 @@ msgid ""
 "complies with Google's commercial licensing requirements. Access to this "
 "tool does not grant or imply the provision of commercial licensing."
 msgstr ""
-" Conservation International ne fournit ni ne g├¿re de licences commerciales "
+" Conservation International ne fournit ni ne gère de licences commerciales "
 "pour GEE. Il incombe aux utilisateurs de s'assurer que leur utilisation de "
-"GEE est conforme aux exigences de licence commerciale de Google. L'acc├¿s ├á"
-" cet outil n'octroie ni n'implique l'octroi d'une licence commerciale. "
-"Conservation International ne fournit ni ne g├¿re de licences commerciales "
+"GEE est conforme aux exigences de licence commerciale de Google. L'accès à "
+"cet outil n'octroie ni n'implique l'octroi d'une licence commerciale. "
+"Conservation International ne fournit ni ne gère de licences commerciales "
 "pour GEE. Il incombe aux utilisateurs de s'assurer que leur utilisation de "
-"GEE est conforme aux exigences de licence commerciale de Google. L'acc├¿s ├á"
-" cet outil n'octroie ni n'implique l'octroi d'une licence commerciale."
+"GEE est conforme aux exigences de licence commerciale de Google. L'accès à "
+"cet outil n'octroie ni n'implique l'octroi d'une licence commerciale."
 
 #: trendsearth_ui/components/layout.py:1384
 #: trendsearth_ui/components/layout.py:1982
@@ -1734,11 +1726,11 @@ msgstr "Oui, je le reconnais"
 
 #: trendsearth_ui/components/layout.py:1409
 msgid "Create Account"
-msgstr "Cr├⌐er un compte"
+msgstr "Créer un compte"
 
 #: trendsearth_ui/components/layout.py:1554
 msgid "Update Your Profile"
-msgstr "Mettez ├á jour votre profil"
+msgstr "Mettez à jour votre profil"
 
 #: trendsearth_ui/components/layout.py:1570
 msgid "Please log in to update your profile."
@@ -1750,12 +1742,12 @@ msgstr ""
 
 #: trendsearth_ui/components/layout.py:1671
 msgid "Email cannot be changed"
-msgstr "L'adresse ├⌐lectronique ne peut pas ├¬tre modifi├⌐e."
+msgstr "L'adresse électronique ne peut pas être modifiée."
 
 #: trendsearth_ui/components/layout.py:2008
 #: trendsearth_ui/components/tabs.py:863
 msgid "Update Profile"
-msgstr "Mettre ├á jour le profil"
+msgstr "Mettre à jour le profil"
 
 #: trendsearth_ui/components/layout.py:2127
 msgid "Email Subscription Preferences"
@@ -1795,7 +1787,7 @@ msgstr ""
 
 #: trendsearth_ui/components/layout.py:2326
 msgid "Logout"
-msgstr "D├⌐connexion"
+msgstr "Déconnexion"
 
 #: trendsearth_ui/components/layout.py:2382
 msgid "Users"
@@ -1803,7 +1795,7 @@ msgstr "Utilisateurs"
 
 #: trendsearth_ui/components/layout.py:2396
 msgid "Scripts"
-msgstr "Sc├⌐narios"
+msgstr "Scénarios"
 
 #: trendsearth_ui/components/layout.py:2410
 #: trendsearth_ui/components/tabs.py:3354
@@ -1857,7 +1849,7 @@ msgstr ""
 
 #: trendsearth_ui/components/tabs.py:246
 msgid "Refresh Executions"
-msgstr "Actualiser les ex├⌐cutions"
+msgstr "Actualiser les exécutions"
 
 #: trendsearth_ui/components/tabs.py:258
 msgid "Auto-refresh in:"
@@ -1865,19 +1857,19 @@ msgstr "Actualisation automatique dans :"
 
 #: trendsearth_ui/components/tabs.py:297
 msgid "Cancel Execution"
-msgstr "Annuler l'ex├⌐cution"
+msgstr "Annuler l'exécution"
 
 #: trendsearth_ui/components/tabs.py:303
 msgid "Are you sure you want to cancel this execution?"
-msgstr "├ètes-vous s├╗r de vouloir annuler cette ex├⌐cution ?"
+msgstr "Êtes-vous sûr de vouloir annuler cette exécution ?"
 
 #: trendsearth_ui/components/tabs.py:308
 msgid "Execution ID:"
-msgstr "ID d'ex├⌐cution :"
+msgstr "ID d'exécution :"
 
 #: trendsearth_ui/components/tabs.py:315
 msgid "Script:"
-msgstr "Sc├⌐nario:"
+msgstr "Scénario:"
 
 #: trendsearth_ui/components/tabs.py:322
 msgid "Status:"
@@ -1885,7 +1877,7 @@ msgstr "Statut:"
 
 #: trendsearth_ui/components/tabs.py:328
 msgid "This action cannot be undone."
-msgstr "Cette action est irr├⌐versible."
+msgstr "Cette action est irréversible."
 
 #: trendsearth_ui/components/tabs.py:345
 msgid "Confirm Cancel"
@@ -1893,7 +1885,7 @@ msgstr "Confirmer Annuler"
 
 #: trendsearth_ui/components/tabs.py:384
 msgid "Cancellation Result"
-msgstr "R├⌐sultat d'annulation"
+msgstr "Résultat d'annulation"
 
 #: trendsearth_ui/components/tabs.py:387
 msgid "Close"
@@ -1909,7 +1901,7 @@ msgstr "Actualiser les scripts"
 
 #: trendsearth_ui/components/tabs.py:570
 msgid "Profile Settings"
-msgstr "Param├¿tres du profil"
+msgstr "Paramètres du profil"
 
 #: trendsearth_ui/components/tabs.py:592
 msgid "System Role"
@@ -1954,7 +1946,7 @@ msgstr ""
 #: trendsearth_ui/components/tabs.py:1069
 #: trendsearth_ui/components/tabs.py:1326
 msgid "Current Credentials Status"
-msgstr "├ëtat actuel des qualifications"
+msgstr "État actuel des qualifications"
 
 #: trendsearth_ui/components/tabs.py:1083
 msgid "Setup Your GEE Account"
@@ -1967,14 +1959,14 @@ msgstr ""
 #: trendsearth_ui/components/tabs.py:1094
 #: trendsearth_ui/components/tabs.py:1163
 msgid "Upload Service Account Key"
-msgstr "T├⌐l├⌐charger la cl├⌐ du compte de service"
+msgstr "Télécharger la clé du compte de service"
 
 #: trendsearth_ui/components/tabs.py:1118
 msgid ""
 "Connect your personal Google Earth Engine account using OAuth "
 "authentication."
 msgstr ""
-"Connectez votre compte personnel Google Earth Engine ├á l'aide de "
+"Connectez votre compte personnel Google Earth Engine à l'aide de "
 "l'authentification OAuth."
 
 #: trendsearth_ui/components/tabs.py:1123
@@ -1985,13 +1977,13 @@ msgstr "Compte Connect GEE"
 msgid ""
 "Upload a Google Cloud service account JSON key with Earth Engine access."
 msgstr ""
-"Importez une cl├⌐ JSON de compte de service Google Cloud avec acc├¿s ├á "
-"Earth Engine."
+"Importez une clé JSON de compte de service Google Cloud avec accès à Earth "
+"Engine."
 
 #: trendsearth_ui/components/tabs.py:1189
 #: trendsearth_ui/components/tabs.py:1538
 msgid "Manage Credentials"
-msgstr "G├⌐rer les identifiants"
+msgstr "Gérer les identifiants"
 
 #: trendsearth_ui/components/tabs.py:1193
 msgid "Test Credentials"
@@ -2089,16 +2081,16 @@ msgid ""
 "secret is shown only once at creation time."
 msgstr ""
 "Les informations d'identification du service permettent aux applications "
-"externes de s'authentifier aupr├¿s de l'API Trends.Earth ├á l'aide du "
-"syst├¿me d'autorisation OAuth2. Le secret client n'est affich├⌐ qu'une seule"
-" fois, lors de la cr├⌐ation du service.externes de s'authentifier aupr├¿s de"
-" l'API Trends.Earth ├á l'aide du syst├¿me d'autorisation OAuth2. Le secret "
-"client n'est affich├⌐ qu'une seule fois, lors de la cr├⌐ation du service."
+"externes de s'authentifier auprès de l'API Trends.Earth à l'aide du système "
+"d'autorisation OAuth2. Le secret client n'est affiché qu'une seule fois, "
+"lors de la création du service.externes de s'authentifier auprès de l'API "
+"Trends.Earth à l'aide du système d'autorisation OAuth2. Le secret client "
+"n'est affiché qu'une seule fois, lors de la création du service."
 
 #: trendsearth_ui/components/tabs.py:1599
 #: trendsearth_ui/components/tabs.py:2587
 msgid "Refresh"
-msgstr "Rafra├«chir"
+msgstr "Rafraîchir"
 
 #: trendsearth_ui/components/tabs.py:1615
 msgid "New Credential"
@@ -2106,7 +2098,7 @@ msgstr "Nouvelle certification"
 
 #: trendsearth_ui/components/tabs.py:1644
 msgid "Create Service Credential"
-msgstr "Cr├⌐er des informations d'identification de service"
+msgstr "Créer des informations d'identification de service"
 
 #: trendsearth_ui/components/tabs.py:1659
 msgid "e.g. My CLI Tool"
@@ -2114,23 +2106,23 @@ msgstr "par exemple, mon outil CLI"
 
 #: trendsearth_ui/components/tabs.py:1663
 msgid "A descriptive label for this credential."
-msgstr "Libell├⌐ descriptif pour cette certification."
+msgstr "Libellé descriptif pour cette certification."
 
 #: trendsearth_ui/components/tabs.py:2134
 msgid "Deployment Information"
-msgstr "Informations sur le d├⌐ploiement"
+msgstr "Informations sur le déploiement"
 
 #: trendsearth_ui/components/tabs.py:2157
 msgid "System Status Trends"
-msgstr "Tendances de l'├⌐tat du syst├¿me"
+msgstr "Tendances de l'état du système"
 
 #: trendsearth_ui/components/tabs.py:2168
 msgid "Last 24 Hours"
-msgstr "Derni├¿res 24 heures"
+msgstr "Dernières 24 heures"
 
 #: trendsearth_ui/components/tabs.py:2179
 msgid "Last Week"
-msgstr "La semaine derni├¿re"
+msgstr "La semaine dernière"
 
 #: trendsearth_ui/components/tabs.py:2190
 msgid "Last Month"
@@ -2138,7 +2130,7 @@ msgstr "Mois dernier"
 
 #: trendsearth_ui/components/tabs.py:2201
 msgid "Last Year"
-msgstr "L'ann├⌐e derni├¿re"
+msgstr "L'année dernière"
 
 #: trendsearth_ui/components/tabs.py:2212
 msgid "All Time"
@@ -2172,8 +2164,8 @@ msgstr ""
 msgid ""
 "Access denied. Administrator privileges required to access admin functions."
 msgstr ""
-"Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis pour acc├⌐der aux "
-"fonctions d'administration."
+"Accès refusé. Privilèges d'administrateur requis pour accéder aux fonctions "
+"d'administration."
 
 #: trendsearth_ui/components/tabs.py:2398
 msgid "Administration Panel"
@@ -2181,11 +2173,11 @@ msgstr "Panneau d'administration"
 
 #: trendsearth_ui/components/tabs.py:2415
 msgid "Rate Limiting Management"
-msgstr "Gestion de la limitation de d├⌐bit"
+msgstr "Gestion de la limitation de débit"
 
 #: trendsearth_ui/components/tabs.py:2425
 msgid "Current & Historical Rate Limit Breaches"
-msgstr "D├⌐passements de limites de d├⌐bit actuels et historiques"
+msgstr "Dépassements de limites de débit actuels et historiques"
 
 #: trendsearth_ui/components/tabs.py:2436
 msgid "Refresh Breaches"
@@ -2193,29 +2185,29 @@ msgstr "Actualiser les violations"
 
 #: trendsearth_ui/components/tabs.py:2450
 msgid "Cancel Selected Limit"
-msgstr "Annuler la limite s├⌐lectionn├⌐e"
+msgstr "Annuler la limite sélectionnée"
 
 #: trendsearth_ui/components/tabs.py:2471
 msgid "Reset All Rate Limits"
-msgstr "R├⌐initialiser toutes les limites de d├⌐bit"
+msgstr "Réinitialiser toutes les limites de débit"
 
 #: trendsearth_ui/components/tabs.py:2491
 msgid "Active and historical events"
-msgstr "├ëv├⌐nements actuels et historiques"
+msgstr "Événements actuels et historiques"
 
 #: trendsearth_ui/components/tabs.py:2531
 msgid "Highlighted rows are active and can be cancelled individually."
 msgstr ""
-"Les lignes surlign├⌐es sont actives et peuvent ├¬tre annul├⌐es "
+"Les lignes surlignées sont actives et peuvent être annulées "
 "individuellement."
 
 #: trendsearth_ui/components/tabs.py:2567
 msgid "News Management"
-msgstr "Gestion de l'actualit├⌐"
+msgstr "Gestion de l'actualité"
 
 #: trendsearth_ui/components/tabs.py:2576
 msgid "Manage News Items"
-msgstr "G├⌐rer les actualit├⌐s"
+msgstr "Gérer les actualités"
 
 #: trendsearth_ui/components/tabs.py:2616
 #: trendsearth_ui/utils/mobile_utils.py:463
@@ -2234,7 +2226,7 @@ msgstr "Titre *"
 
 #: trendsearth_ui/components/tabs.py:2716
 msgid "Enter news title"
-msgstr "Saisissez le titre de l'actualit├⌐"
+msgstr "Saisissez le titre de l'actualité"
 
 #: trendsearth_ui/components/tabs.py:2732
 msgid "Message (Markdown supported) *"
@@ -2250,11 +2242,11 @@ msgstr ""
 
 #: trendsearth_ui/components/tabs.py:2750
 msgid "Enter news message using Markdown..."
-msgstr "Saisissez votre message d'actualit├⌐ en utilisant Markdown..."
+msgstr "Saisissez votre message d'actualité en utilisant Markdown..."
 
 #: trendsearth_ui/components/tabs.py:2765
 msgid "Preview"
-msgstr "Aper├ºu"
+msgstr "Aperçu"
 
 #: trendsearth_ui/components/tabs.py:2785
 msgid "Link URL (optional)"
@@ -2274,7 +2266,7 @@ msgstr "Plateformes cibles *"
 
 #: trendsearth_ui/components/tabs.py:2817
 msgid "QGIS Plugin"
-msgstr "Module compl├⌐mentaire QGIS"
+msgstr "Module complémentaire QGIS"
 
 #: trendsearth_ui/components/tabs.py:2821
 msgid "Web App"
@@ -2286,11 +2278,11 @@ msgstr "Interface utilisateur API"
 
 #: trendsearth_ui/components/tabs.py:2831
 msgid "Select target platforms..."
-msgstr "S├⌐lectionner les plateformes cibles..."
+msgstr "Sélectionner les plateformes cibles..."
 
 #: trendsearth_ui/components/tabs.py:2851
 msgid "Target Roles (optional)"
-msgstr "R├┤les cibles (facultatif)"
+msgstr "Rôles cibles (facultatif)"
 
 #: trendsearth_ui/components/tabs.py:2861
 msgid ""
@@ -2298,14 +2290,14 @@ msgid ""
 "roles to restrict visibility."
 msgstr ""
 "Laissez ce champ vide pour que l'affichage soit visible par tous les "
-"utilisateurs, y compris ceux qui ne sont pas authentifi├⌐s. S├⌐lectionnez "
-"des r├┤les sp├⌐cifiques pour en restreindre la visibilit├⌐.utilisateurs, y "
-"compris ceux qui ne sont pas authentifi├⌐s. S├⌐lectionnez des r├┤les "
-"sp├⌐cifiques pour en restreindre la visibilit├⌐."
+"utilisateurs, y compris ceux qui ne sont pas authentifiés. Sélectionnez des "
+"rôles spécifiques pour en restreindre la visibilité.utilisateurs, y compris "
+"ceux qui ne sont pas authentifiés. Sélectionnez des rôles spécifiques pour "
+"en restreindre la visibilité."
 
 #: trendsearth_ui/components/tabs.py:2869
 msgid "Regular Users"
-msgstr "Utilisateurs r├⌐guliers"
+msgstr "Utilisateurs réguliers"
 
 #: trendsearth_ui/components/tabs.py:2873
 msgid "Admins"
@@ -2321,7 +2313,7 @@ msgstr "Tous les utilisateurs (sans restriction)"
 
 #: trendsearth_ui/components/tabs.py:2897
 msgid "News Type"
-msgstr "Type d'actualit├⌐s"
+msgstr "Type d'actualités"
 
 #: trendsearth_ui/components/tabs.py:2902
 msgid "Announcement"
@@ -2333,7 +2325,7 @@ msgstr "Avertissement"
 
 #: trendsearth_ui/components/tabs.py:2910
 msgid "Release"
-msgstr "Lib├⌐rer"
+msgstr "Libérer"
 
 #: trendsearth_ui/components/tabs.py:2914
 msgid "Tip"
@@ -2346,7 +2338,7 @@ msgstr "Entretien"
 #: trendsearth_ui/components/tabs.py:2929
 #: trendsearth_ui/utils/mobile_utils.py:983
 msgid "Priority"
-msgstr "Priorit├⌐"
+msgstr "Priorité"
 
 #: trendsearth_ui/components/tabs.py:2948
 msgid "Min Plugin Version (optional)"
@@ -2366,11 +2358,11 @@ msgstr "par exemple, 2.0.0"
 
 #: trendsearth_ui/components/tabs.py:2978
 msgid "Start Date (optional)"
-msgstr "Date de d├⌐but (facultatif)"
+msgstr "Date de début (facultatif)"
 
 #: trendsearth_ui/components/tabs.py:2982
 msgid "Select start date..."
-msgstr "S├⌐lectionnez une date de d├⌐but..."
+msgstr "Sélectionnez une date de début..."
 
 #: trendsearth_ui/components/tabs.py:2991
 msgid "End Date (optional)"
@@ -2378,7 +2370,7 @@ msgstr "Date de fin (facultatif)"
 
 #: trendsearth_ui/components/tabs.py:2994
 msgid "Select end date..."
-msgstr "S├⌐lectionnez la date de fin..."
+msgstr "Sélectionnez la date de fin..."
 
 #: trendsearth_ui/components/tabs.py:3010
 msgid "Active (visible to users)"
@@ -2409,12 +2401,12 @@ msgid ""
 "Are you sure you want to delete this news item? This action cannot be "
 "undone."
 msgstr ""
-"├ètes-vous s├╗r de vouloir supprimer cet article ? Cette action est "
-"irr├⌐versible."
+"Êtes-vous sûr de vouloir supprimer cet article ? Cette action est "
+"irréversible."
 
 #: trendsearth_ui/components/tabs.py:3191
 msgid "Create New User"
-msgstr "Cr├⌐er un nouvel utilisateur"
+msgstr "Créer un nouvel utilisateur"
 
 #: trendsearth_ui/components/tabs.py:3203
 msgid "Name *"
@@ -2438,7 +2430,7 @@ msgstr "Mot de passe *"
 
 #: trendsearth_ui/components/tabs.py:3239
 msgid "Set password for user"
-msgstr "D├⌐finir un mot de passe pour l'utilisateur"
+msgstr "Définir un mot de passe pour l'utilisateur"
 
 #: trendsearth_ui/components/tabs.py:3248
 msgid "Confirm Password *"
@@ -2459,15 +2451,15 @@ msgstr "Institution"
 
 #: trendsearth_ui/components/tabs.py:3318
 msgid "Enter institution/organization"
-msgstr "Indiquez l'├⌐tablissement/l'organisation"
+msgstr "Indiquez l'établissement/l'organisation"
 
 #: trendsearth_ui/components/tabs.py:3330
 msgid "Select country..."
-msgstr "S├⌐lectionnez un pays..."
+msgstr "Sélectionnez un pays..."
 
 #: trendsearth_ui/components/tabs.py:3345
 msgid "Role *"
-msgstr "R├┤le *"
+msgstr "Rôle *"
 
 #: trendsearth_ui/components/tabs.py:3350
 #: trendsearth_ui/utils/mobile_utils.py:80
@@ -2481,7 +2473,7 @@ msgstr "Super Administrateur"
 
 #: trendsearth_ui/components/tabs.py:3380
 msgid "Create User"
-msgstr "Cr├⌐er un utilisateur"
+msgstr "Créer un utilisateur"
 
 #: trendsearth_ui/components/tabs.py:3391
 msgid "Clear Form"
@@ -2489,17 +2481,17 @@ msgstr "Formulaire clair"
 
 #: trendsearth_ui/components/tabs.py:3427
 msgid "Upload New Script"
-msgstr "T├⌐l├⌐verser un nouveau script"
+msgstr "Téléverser un nouveau script"
 
 #: trendsearth_ui/components/tabs.py:3436
 msgid "Upload a .tar.gz archive containing your script and a "
-msgstr "T├⌐l├⌐versez une archive .tar.gz contenant votre script et un "
+msgstr "Téléversez une archive .tar.gz contenant votre script et un "
 
 #: trendsearth_ui/components/tabs.py:3439
 msgid ""
 " file. The script name and metadata are read from the configuration file."
 msgstr ""
-" Le nom du script et ses m├⌐tadonn├⌐es sont lus ├á partir du fichier de "
+" Le nom du script et ses métadonnées sont lus à partir du fichier de "
 "configuration."
 
 #: trendsearth_ui/components/tabs.py:3451
@@ -2508,19 +2500,19 @@ msgstr "Archive du script (.tar.gz) *"
 
 #: trendsearth_ui/components/tabs.py:3459
 msgid "Drag and Drop or "
-msgstr "Glisser-d├⌐poser ou "
+msgstr "Glisser-déposer ou "
 
 #: trendsearth_ui/components/tabs.py:3460
 msgid "Select Script Archive"
-msgstr "S├⌐lectionner l'archive de scripts"
+msgstr "Sélectionner l'archive de scripts"
 
 #: trendsearth_ui/components/tabs.py:3495
 msgid "Upload Script"
-msgstr "Script de t├⌐l├⌐chargement"
+msgstr "Script de téléchargement"
 
 #: trendsearth_ui/utils/mobile_utils.py:63
 msgid "Script"
-msgstr "Sc├⌐nario"
+msgstr "Scénario"
 
 #: trendsearth_ui/utils/mobile_utils.py:112
 msgid "Start"
@@ -2532,7 +2524,7 @@ msgstr "Fin"
 
 #: trendsearth_ui/utils/mobile_utils.py:132
 msgid "Duration"
-msgstr "Dur├⌐e"
+msgstr "Durée"
 
 #: trendsearth_ui/utils/mobile_utils.py:157
 #: trendsearth_ui/utils/mobile_utils.py:372
@@ -2548,16 +2540,16 @@ msgstr "ID de l&#39;utilisateur"
 
 #: trendsearth_ui/utils/mobile_utils.py:187
 msgid "Params"
-msgstr "Param├¿tres"
+msgstr "Paramètres"
 
 #: trendsearth_ui/utils/mobile_utils.py:196
 msgid "Results"
-msgstr "R├⌐sultats"
+msgstr "Résultats"
 
 #: trendsearth_ui/utils/mobile_utils.py:205
 #: trendsearth_ui/utils/mobile_utils.py:652
 msgid "Logs"
-msgstr "b├╗ches"
+msgstr "bûches"
 
 #: trendsearth_ui/utils/mobile_utils.py:214
 msgid "Docker Logs"
@@ -2575,30 +2567,30 @@ msgstr "Carte"
 #: trendsearth_ui/utils/mobile_utils.py:740
 #: trendsearth_ui/utils/mobile_utils.py:867
 msgid "Role"
-msgstr "R├┤le"
+msgstr "Rôle"
 
 #: trendsearth_ui/utils/mobile_utils.py:325
 msgid "Last Activity"
-msgstr "Derni├¿re activit├⌐"
+msgstr "Dernière activité"
 
 #: trendsearth_ui/utils/mobile_utils.py:334
 msgid "Verified"
-msgstr "V├⌐rifi├⌐"
+msgstr "Vérifié"
 
 #: trendsearth_ui/utils/mobile_utils.py:343
 msgid "Verified At"
-msgstr "V├⌐rifi├⌐ ├á"
+msgstr "Vérifié à"
 
 #: trendsearth_ui/utils/mobile_utils.py:354
 #: trendsearth_ui/utils/mobile_utils.py:583
 #: trendsearth_ui/utils/mobile_utils.py:998
 msgid "Created"
-msgstr "Cr├⌐├⌐"
+msgstr "Créé"
 
 #: trendsearth_ui/utils/mobile_utils.py:363
 #: trendsearth_ui/utils/mobile_utils.py:592
 msgid "Updated"
-msgstr "Mis ├á jour"
+msgstr "Mis à jour"
 
 #: trendsearth_ui/utils/mobile_utils.py:436
 msgid "GEE License"
@@ -2618,7 +2610,7 @@ msgstr "Limace"
 
 #: trendsearth_ui/utils/mobile_utils.py:508
 msgid "Access"
-msgstr "Acc├⌐der"
+msgstr "Accéder"
 
 #: trendsearth_ui/utils/mobile_utils.py:532
 msgid "Environment"
@@ -2671,7 +2663,7 @@ msgstr "Point de terminaison"
 #: trendsearth_ui/utils/mobile_utils.py:726
 #: trendsearth_ui/utils/mobile_utils.py:883
 msgid "Method"
-msgstr "M├⌐thode"
+msgstr "Méthode"
 
 #: trendsearth_ui/utils/mobile_utils.py:746
 #: trendsearth_ui/utils/mobile_utils.py:918
@@ -2690,17 +2682,17 @@ msgstr "Compter"
 #: trendsearth_ui/utils/mobile_utils.py:766
 #: trendsearth_ui/utils/mobile_utils.py:904
 msgid "Window"
-msgstr "Fen├¬tre"
+msgstr "Fenêtre"
 
 #: trendsearth_ui/utils/mobile_utils.py:772
 #: trendsearth_ui/utils/mobile_utils.py:910
 msgid "Retry After"
-msgstr "R├⌐essayer apr├¿s"
+msgstr "Réessayer après"
 
 #: trendsearth_ui/utils/mobile_utils.py:788
 #: trendsearth_ui/utils/mobile_utils.py:926
 msgid "Limiter Key"
-msgstr "Cl├⌐ limiteuse"
+msgstr "Clé limiteuse"
 
 #: trendsearth_ui/utils/mobile_utils.py:796
 msgid "User Agent"
@@ -2709,7 +2701,7 @@ msgstr "Agent utilisateur"
 #: trendsearth_ui/utils/mobile_utils.py:804
 #: trendsearth_ui/utils/mobile_utils.py:940
 msgid "Event ID"
-msgstr "ID de l&#39;├⌐v├⌐nement"
+msgstr "ID de l&#39;événement"
 
 #: trendsearth_ui/utils/mobile_utils.py:842
 msgid "Expires"
@@ -2725,7 +2717,7 @@ msgstr "Usage"
 
 #: trendsearth_ui/utils/mobile_utils.py:934
 msgid "Rate Limit Type"
-msgstr "Type de limite de d├⌐bit"
+msgstr "Type de limite de débit"
 
 #: trendsearth_ui/utils/mobile_utils.py:976
 msgid "Platforms"
@@ -2744,42 +2736,42 @@ msgstr ""
 #: trendsearth_ui/utils/stats_visualizations.py:1226
 #: trendsearth_ui/utils/stats_visualizations.py:1386
 msgid "Number of Executions"
-msgstr "Nombre d'ex├⌐cutions"
+msgstr "Nombre d'exécutions"
 
 #: trendsearth_ui/utils/stats_visualizations.py:627
 #, python-brace-format
 msgid "Running executions{suffix_label}"
-msgstr "Ex├⌐cutions en cours{suffix_label}"
+msgstr "Exécutions en cours{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:642
 #: trendsearth_ui/utils/stats_visualizations.py:653
 #: trendsearth_ui/utils/stats_visualizations.py:660
 msgid "No in-progress execution data available."
-msgstr "Aucune donn├⌐e d'ex├⌐cution en cours disponible."
+msgstr "Aucune donnée d'exécution en cours disponible."
 
 #: trendsearth_ui/utils/stats_visualizations.py:645
 msgid ""
 "Status time series data did not include ready, pending, or running counts "
 "for this period."
 msgstr ""
-"Les donn├⌐es chronologiques relatives ├á l'├⌐tat n'incluaient pas les "
-"d├⌐comptes des statuts pr├¬ts, en attente ou en cours pour cette p├⌐riode."
+"Les données chronologiques relatives à l'état n'incluaient pas les décomptes"
+" des statuts prêts, en attente ou en cours pour cette période."
 
 #: trendsearth_ui/utils/stats_visualizations.py:654
 msgid "Status timestamps could not be parsed from the API response."
 msgstr ""
-"Impossible d'analyser les horodatages d'├⌐tat ├á partir de la r├⌐ponse de "
+"Impossible d'analyser les horodatages d'état à partir de la réponse de "
 "l'API."
 
 #: trendsearth_ui/utils/stats_visualizations.py:661
 msgid "Status time series data was not provided for this period."
 msgstr ""
-"Les donn├⌐es chronologiques relatives ├á l'├⌐tat n'ont pas ├⌐t├⌐ fournies "
-"pour cette p├⌐riode."
+"Les données chronologiques relatives à l'état n'ont pas été fournies pour "
+"cette période."
 
 #: trendsearth_ui/utils/stats_visualizations.py:809
 msgid "Cumulative Executions"
-msgstr "Ex├⌐cutions cumulatives"
+msgstr "Exécutions cumulatives"
 
 #: trendsearth_ui/utils/stats_visualizations.py:842
 msgid "Failed / Cancelled"
@@ -2788,29 +2780,29 @@ msgstr ""
 #: trendsearth_ui/utils/stats_visualizations.py:854
 #, python-brace-format
 msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
-msgstr "T├óches cumul├⌐es termin├⌐es{suffix_label}{agg_suffix}"
+msgstr "Tâches cumulées terminées{suffix_label}{agg_suffix}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:875
 msgid "No cumulative execution data available."
-msgstr "Aucune donn├⌐e d'ex├⌐cution cumulative disponible."
+msgstr "Aucune donnée d'exécution cumulative disponible."
 
 #: trendsearth_ui/utils/stats_visualizations.py:878
 msgid ""
 "The execution statistics time series did not include finished, failed, or "
 "cancelled statuses."
 msgstr ""
-"Les s├⌐ries chronologiques des statistiques d'ex├⌐cution n'incluaient pas "
-"les statuts termin├⌐, ├⌐chou├⌐ ou annul├⌐."
+"Les séries chronologiques des statistiques d'exécution n'incluaient pas les "
+"statuts terminé, échoué ou annulé."
 
 #: trendsearth_ui/utils/stats_visualizations.py:887
 msgid "No execution trend data available."
-msgstr "Aucune donn├⌐e sur les tendances d'ex├⌐cution n'est disponible."
+msgstr "Aucune donnée sur les tendances d'exécution n'est disponible."
 
 #: trendsearth_ui/utils/stats_visualizations.py:888
 msgid "Execution timestamps could not be parsed from the API response."
 msgstr ""
-"Les horodatages d'ex├⌐cution n'ont pas pu ├¬tre analys├⌐s ├á partir de la "
-"r├⌐ponse de l'API."
+"Les horodatages d'exécution n'ont pas pu être analysés à partir de la "
+"réponse de l'API."
 
 #: trendsearth_ui/utils/stats_visualizations.py:907
 msgid "base"
@@ -2819,16 +2811,16 @@ msgstr ""
 #: trendsearth_ui/utils/stats_visualizations.py:972
 #, python-brace-format
 msgid "Execution count{suffix_label}"
-msgstr "Nombre d'ex├⌐cutions{suffix_label}"
+msgstr "Nombre d'exécutions{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1007
 msgid "Average Duration (minutes)"
-msgstr "Dur├⌐e moyenne (minutes)"
+msgstr "Durée moyenne (minutes)"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1016
 #, python-brace-format
 msgid "Execution duration{suffix_label}"
-msgstr "Dur├⌐e d'ex├⌐cution{suffix_label}"
+msgstr "Durée d'exécution{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1116
 msgid "Failure Count"
@@ -2837,12 +2829,12 @@ msgstr ""
 #: trendsearth_ui/utils/stats_visualizations.py:1126
 #, python-brace-format
 msgid "Top scripts by failure count{suffix_label}"
-msgstr "Scripts les plus performants par nombre d'├⌐checs{suffix_label}"
+msgstr "Scripts les plus performants par nombre d'échecs{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1235
 #, python-brace-format
 msgid "Top users by activity{suffix_label}"
-msgstr "Meilleurs utilisateurs par activit├⌐{suffix_label}"
+msgstr "Meilleurs utilisateurs par activité{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1385
 msgid "Script Version"
@@ -2851,17 +2843,17 @@ msgstr "Version du script"
 #: trendsearth_ui/utils/stats_visualizations.py:1395
 #, python-brace-format
 msgid "{num_versions} distinct versions, {num_executions} executions"
-msgstr "{num_versions} versions distinctes, {num_executions} ex├⌐cutions"
+msgstr "{num_versions} versions distinctes, {num_executions} exécutions"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1401
 #, python-brace-format
 msgid "{num_executions} executions from scripts with no parseable version"
-msgstr "{num_executions} ex├⌐cutions de scripts sans version analysable"
+msgstr "{num_executions} exécutions de scripts sans version analysable"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1410
 #, python-brace-format
 msgid "Execution script version distribution{suffix_label}"
-msgstr "distribution de la version du script d'ex├⌐cution{suffix_label}"
+msgstr "distribution de la version du script d'exécution{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1651
 #, python-brace-format
@@ -2870,7 +2862,7 @@ msgstr "Inscriptions de nouveaux utilisateurs{suffix_label}"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1700
 msgid "Cumulative New Users"
-msgstr "Nouveaux utilisateurs cumul├⌐s"
+msgstr "Nouveaux utilisateurs cumulés"
 
 #: trendsearth_ui/utils/stats_visualizations.py:1752
 msgid "Number of Users"
@@ -2917,15 +2909,15 @@ msgstr "Environnement : {env}"
 
 #: trendsearth_ui/utils/status_helpers.py:134
 msgid "API Status: Authentication required"
-msgstr "├ëtat de l'API : Authentification requise"
+msgstr "État de l'API : Authentification requise"
 
 #: trendsearth_ui/utils/status_helpers.py:135
 msgid "Please log in to view deployment status"
-msgstr "Veuillez vous connecter pour consulter l'├⌐tat du d├⌐ploiement"
+msgstr "Veuillez vous connecter pour consulter l'état du déploiement"
 
 #: trendsearth_ui/utils/status_helpers.py:167
 msgid "API status unavailable"
-msgstr "├ëtat de l'API indisponible"
+msgstr "État de l'API indisponible"
 
 #: trendsearth_ui/utils/status_helpers.py:178
 msgid "Authentication required"
@@ -2933,7 +2925,7 @@ msgstr "Authentification requise"
 
 #: trendsearth_ui/utils/status_helpers.py:179
 msgid "Please log in to view cluster status"
-msgstr "Veuillez vous connecter pour consulter l'├⌐tat du cluster"
+msgstr "Veuillez vous connecter pour consulter l'état du cluster"
 
 #: trendsearth_ui/utils/status_helpers.py:182
 msgid " (Auth Required)"
@@ -2946,21 +2938,21 @@ msgstr " (En direct)"
 #: trendsearth_ui/utils/status_helpers.py:209
 #, python-brace-format
 msgid " (Updated: {time} {tz})"
-msgstr " (Mis ├á jour : {time} {tz})"
+msgstr " (Mis à jour : {time} {tz})"
 
 #: trendsearth_ui/utils/status_helpers.py:216
 #: trendsearth_ui/utils/status_helpers.py:219
 #, python-brace-format
 msgid " (Updated: {time})"
-msgstr " (Mis ├á jour : {time})"
+msgstr " (Mis à jour : {time})"
 
 #: trendsearth_ui/utils/status_helpers.py:225
 msgid "Authentication failed"
-msgstr "L'authentification a ├⌐chou├⌐"
+msgstr "L'authentification a échoué"
 
 #: trendsearth_ui/utils/status_helpers.py:226
 msgid "Please check your login status"
-msgstr "Veuillez v├⌐rifier votre statut de connexion"
+msgstr "Veuillez vérifier votre statut de connexion"
 
 #: trendsearth_ui/utils/status_helpers.py:229
 msgid " (Auth Error)"
@@ -2968,24 +2960,24 @@ msgstr " (Erreur d'authentification)"
 
 #: trendsearth_ui/utils/status_helpers.py:234
 msgid "Access denied"
-msgstr "Acc├¿s refus├⌐"
+msgstr "Accès refusé"
 
 #: trendsearth_ui/utils/status_helpers.py:236
 msgid "Admin privileges required for cluster status"
-msgstr "Privil├¿ges d'administrateur requis pour l'├⌐tat du cluster"
+msgstr "Privilèges d'administrateur requis pour l'état du cluster"
 
 #: trendsearth_ui/utils/status_helpers.py:241
 msgid " (Access Denied)"
-msgstr " (Acc├¿s refus├⌐)"
+msgstr " (Accès refusé)"
 
 #: trendsearth_ui/utils/status_helpers.py:247
 #, python-brace-format
 msgid "Cluster Status: Error ({status_code})"
-msgstr "├ëtat du cluster : Erreur ({status_code})"
+msgstr "État du cluster : Erreur ({status_code})"
 
 #: trendsearth_ui/utils/status_helpers.py:253
 msgid "Unable to retrieve cluster information"
-msgstr "Impossible de r├⌐cup├⌐rer les informations du cluster"
+msgstr "Impossible de récupérer les informations du cluster"
 
 #: trendsearth_ui/utils/status_helpers.py:257
 msgid " (Error)"
@@ -2993,11 +2985,11 @@ msgstr " (Erreur)"
 
 #: trendsearth_ui/utils/status_helpers.py:263
 msgid "Cluster Status: Connection Error"
-msgstr "├ëtat du cluster : Erreur de connexion"
+msgstr "État du cluster : Erreur de connexion"
 
 #: trendsearth_ui/utils/status_helpers.py:264
 msgid "Unable to reach cluster status endpoint"
-msgstr "Impossible d'atteindre le point de terminaison d'├⌐tat du cluster"
+msgstr "Impossible d'atteindre le point de terminaison d'état du cluster"
 
 #: trendsearth_ui/utils/status_helpers.py:267
 msgid " (Connection Error)"
@@ -3006,20 +2998,20 @@ msgstr " (Erreur de connexion)"
 #: trendsearth_ui/utils/status_helpers.py:274
 msgid "System status is currently unavailable. Please try again later."
 msgstr ""
-"L'├⌐tat du syst├¿me est actuellement indisponible. Veuillez r├⌐essayer plus "
-"tard.L'├⌐tat du syst├¿me est actuellement indisponible. Veuillez r├⌐essayer "
+"L'état du système est actuellement indisponible. Veuillez réessayer plus "
+"tard.L'état du système est actuellement indisponible. Veuillez réessayer "
 "plus tard."
 
 #~ msgid "Forgot Password"
-#~ msgstr "Mot de passe oubli├⌐"
+#~ msgstr "Mot de passe oublié"
 
 #~ msgid ""
 #~ "Enter your email address and we'll send you instructions to reset your "
 #~ "password."
 #~ msgstr ""
 #~ "Saisissez votre adresse e-mail et nous vous enverrons les instructions pour "
-#~ "r├⌐initialiser votre mot de passe.Saisissez votre adresse e-mail et nous "
-#~ "vous enverrons les instructions pour r├⌐initialiser votre mot de passe."
+#~ "réinitialiser votre mot de passe.Saisissez votre adresse e-mail et nous vous"
+#~ " enverrons les instructions pour réinitialiser votre mot de passe."
 
 #~ msgid "Email Address"
 #~ msgstr "Adresse email"
@@ -3031,7 +3023,7 @@ msgstr ""
 #~ msgstr "Annuler"
 
 #~ msgid "Send Reset Instructions"
-#~ msgstr "Envoyer les instructions de r├⌐initialisation"
+#~ msgstr "Envoyer les instructions de réinitialisation"
 
 #~ msgid "OK"
 #~ msgstr "D'ACCORD"
@@ -3052,22 +3044,22 @@ msgstr ""
 #~ msgstr "Saisissez le mot de passe"
 
 #~ msgid "Remember me (keep me logged in)"
-#~ msgstr "Se souvenir de moi (me garder connect├⌐)"
+#~ msgstr "Se souvenir de moi (me garder connecté)"
 
 #~ msgid "Register"
 #~ msgstr "Registre"
 
 #~ msgid "Forgot your password?"
-#~ msgstr "Mot de passe oubli├⌐ ?"
+#~ msgstr "Mot de passe oublié ?"
 
 #~ msgid "Privacy Policy"
-#~ msgstr "politique de confidentialit├⌐"
+#~ msgstr "politique de confidentialité"
 
 #~ msgid "Terms of Use"
 #~ msgstr "Conditions d'utilisation"
 
 #~ msgid "Set Your New Password"
-#~ msgstr "D├⌐finissez votre nouveau mot de passe"
+#~ msgstr "Définissez votre nouveau mot de passe"
 
 #~ msgid "Enter your new password below."
 #~ msgstr "Saisissez votre nouveau mot de passe ci-dessous."
@@ -3088,7 +3080,7 @@ msgstr ""
 #~ msgstr "Exigences relatives au mot de passe :"
 
 #~ msgid "At least 12 characters"
-#~ msgstr "Au moins 12 caract├¿res"
+#~ msgstr "Au moins 12 caractères"
 
 #~ msgid "Uppercase letter (A-Z)"
 #~ msgstr "Lettre majuscule (AZ)"
@@ -3097,16 +3089,16 @@ msgstr ""
 #~ msgstr "Lettre minuscule (az)"
 
 #~ msgid "Number (0-9)"
-#~ msgstr "Num├⌐ro (0-9)"
+#~ msgstr "Numéro (0-9)"
 
 #~ msgid "Special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)"
-#~ msgstr "Caract├¿re sp├⌐cial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
+#~ msgstr "Caractère spécial (!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)"
 
 #~ msgid "Set Password"
-#~ msgstr "D├⌐finir le mot de passe"
+#~ msgstr "Définir le mot de passe"
 
 #~ msgid "Back to Login"
-#~ msgstr "Retour ├á la connexion"
+#~ msgstr "Retour à la connexion"
 
 #~ msgid "Government - Environment/Natural Resources"
 #~ msgstr "Gouvernement - Environnement/Ressources naturelles"
@@ -3115,19 +3107,19 @@ msgstr ""
 #~ msgstr "Gouvernement - Agriculture"
 
 #~ msgid "Government - Land Management/Planning"
-#~ msgstr "Gouvernement - Gestion/Am├⌐nagement du territoire"
+#~ msgstr "Gouvernement - Gestion/Aménagement du territoire"
 
 #~ msgid "Government - Other"
 #~ msgstr "Gouvernement - Autres"
 
 #~ msgid "International/Multilateral Organization"
-#~ msgstr "Organisation internationale/multilat├⌐rale"
+#~ msgstr "Organisation internationale/multilatérale"
 
 #~ msgid "NGO - Development/Aid"
-#~ msgstr "ONG - D├⌐veloppement/Aide"
+#~ msgstr "ONG - Développement/Aide"
 
 #~ msgid "NGO - Community-Based"
-#~ msgstr "ONG - Communaut├⌐"
+#~ msgstr "ONG - Communauté"
 
 #~ msgid "NGO - Conservation"
 #~ msgstr "ONG - Conservation"
@@ -3136,22 +3128,22 @@ msgstr ""
 #~ msgstr "ONG - Autres"
 
 #~ msgid "Academic/Research Institution"
-#~ msgstr "├ëtablissement d'enseignement sup├⌐rieur/de recherche"
+#~ msgstr "Établissement d'enseignement supérieur/de recherche"
 
 #~ msgid "Consulting/Professional Services"
 #~ msgstr "Services de conseil/professionnels"
 
 #~ msgid "Private Sector - Agriculture/Forestry"
-#~ msgstr "Secteur priv├⌐ - Agriculture/For├¬t"
+#~ msgstr "Secteur privé - Agriculture/Forêt"
 
 #~ msgid "Private Sector - Other"
-#~ msgstr "Secteur priv├⌐ - Autres"
+#~ msgstr "Secteur privé - Autres"
 
 #~ msgid "Independent Researcher"
-#~ msgstr "Chercheur ind├⌐pendant"
+#~ msgstr "Chercheur indépendant"
 
 #~ msgid "Student"
-#~ msgstr "├ëtudiant"
+#~ msgstr "Étudiant"
 
 #~ msgid "Other"
 #~ msgstr "Autre"
@@ -3163,22 +3155,22 @@ msgstr ""
 #~ msgstr "Recherche universitaire"
 
 #~ msgid "Policy Development & Planning"
-#~ msgstr "├ëlaboration et planification des politiques"
+#~ msgstr "Élaboration et planification des politiques"
 
 #~ msgid "Land Restoration/Management Planning"
 #~ msgstr "Planification de la restauration et de la gestion des terres"
 
 #~ msgid "Project Monitoring & Evaluation"
-#~ msgstr "Suivi et ├⌐valuation des projets"
+#~ msgstr "Suivi et évaluation des projets"
 
 #~ msgid "Environmental Impact Assessment"
-#~ msgstr "├ëvaluation de l'impact environnemental"
+#~ msgstr "Évaluation de l'impact environnemental"
 
 #~ msgid "Agriculture/Forestry Planning"
-#~ msgstr "Planification agricole et foresti├¿re"
+#~ msgstr "Planification agricole et forestière"
 
 #~ msgid "Teaching & Education"
-#~ msgstr "Enseignement et ├⌐ducation"
+#~ msgstr "Enseignement et éducation"
 
 #~ msgid "Conservation Planning"
 #~ msgstr "Planification de la conservation"
@@ -3199,32 +3191,32 @@ msgstr ""
 #~ msgstr "Non-binaire"
 
 #~ msgid "Prefer to self-describe"
-#~ msgstr "Pr├⌐f├¿re s'auto-d├⌐crire"
+#~ msgstr "Préfère s'auto-décrire"
 
 #~ msgid "Prefer not to say"
-#~ msgstr "Je pr├⌐f├¿re ne pas le dire"
+#~ msgstr "Je préfère ne pas le dire"
 
 #~ msgid "Create Your Account"
-#~ msgstr "Cr├⌐ez votre compte"
+#~ msgstr "Créez votre compte"
 
 #~ msgid ""
 #~ "After registration, you'll receive an email to verify your address and set "
 #~ "your password."
 #~ msgstr ""
-#~ "Apr├¿s votre inscription, vous recevrez un courriel pour v├⌐rifier votre "
-#~ "adresse et d├⌐finir votre mot de passe."
+#~ "Après votre inscription, vous recevrez un courriel pour vérifier votre "
+#~ "adresse et définir votre mot de passe."
 
 #~ msgid "Required field"
 #~ msgstr "Champ obligatoire"
 
 #~ msgid "Full Name"
-#~ msgstr "Nom et pr├⌐nom"
+#~ msgstr "Nom et prénom"
 
 #~ msgid "Enter your full name"
 #~ msgstr "Veuillez saisir votre nom complet"
 
 #~ msgid "Role/Title"
-#~ msgstr "R├┤le/Titre"
+#~ msgstr "Rôle/Titre"
 
 #~ msgid "Your job title (optional)"
 #~ msgstr "Votre titre de poste (facultatif)"
@@ -3239,34 +3231,34 @@ msgstr ""
 #~ msgstr "Secteur"
 
 #~ msgid "Select your sector"
-#~ msgstr "S├⌐lectionnez votre secteur"
+#~ msgstr "Sélectionnez votre secteur"
 
 #~ msgid "Please specify"
-#~ msgstr "Veuillez pr├⌐ciser"
+#~ msgstr "Veuillez préciser"
 
 #~ msgid "Please specify your sector"
-#~ msgstr "Veuillez pr├⌐ciser votre secteur"
+#~ msgstr "Veuillez préciser votre secteur"
 
 #~ msgid "Purpose of Use"
 #~ msgstr "Objectif d'utilisation"
 
 #~ msgid "Select your purpose of use"
-#~ msgstr "S├⌐lectionnez votre objectif d'utilisation"
+#~ msgstr "Sélectionnez votre objectif d'utilisation"
 
 #~ msgid "Please specify your purpose"
-#~ msgstr "Veuillez pr├⌐ciser votre objectif"
+#~ msgstr "Veuillez préciser votre objectif"
 
 #~ msgid "Country"
 #~ msgstr "Pays"
 
 #~ msgid "Select your country"
-#~ msgstr "S├⌐lectionnez votre pays"
+#~ msgstr "Sélectionnez votre pays"
 
 #~ msgid "Gender Identity"
-#~ msgstr "Identit├⌐ de genre"
+#~ msgstr "Identité de genre"
 
 #~ msgid "Select (optional)"
-#~ msgstr "S├⌐lectionner (facultatif)"
+#~ msgstr "Sélectionner (facultatif)"
 
 #~ msgid ""
 #~ "We collect gender identity information to comply with donor reporting "
@@ -3274,29 +3266,28 @@ msgstr ""
 #~ "and tool access. Providing this information is voluntary; your selection "
 #~ "will not affect your access to the tool."
 #~ msgstr ""
-#~ "Nous recueillons des informations sur l'identit├⌐ de genre afin de respecter"
-#~ " les exigences de d├⌐claration des donateurs et d'├⌐valuer l'├⌐quit├⌐ de "
-#~ "participation au renforcement des capacit├⌐s et ├á l'acc├¿s aux outils. La "
+#~ "Nous recueillons des informations sur l'identité de genre afin de respecter "
+#~ "les exigences de déclaration des donateurs et d'évaluer l'équité de "
+#~ "participation au renforcement des capacités et à l'accès aux outils. La "
 #~ "communication de ces informations est facultative ; votre choix n'aura "
-#~ "aucune incidence sur votre acc├¿s ├á l'outil.Nous recueillons des "
-#~ "informations sur l'identit├⌐ de genre afin de respecter les exigences de "
-#~ "d├⌐claration des donateurs et d'├⌐valuer l'├⌐quit├⌐ de participation au "
-#~ "renforcement des capacit├⌐s et ├á l'acc├¿s aux outils. La communication de "
-#~ "ces informations est facultative ; votre choix n'aura aucune incidence sur "
-#~ "votre acc├¿s ├á l'outil."
+#~ "aucune incidence sur votre accès à l'outil.Nous recueillons des informations"
+#~ " sur l'identité de genre afin de respecter les exigences de déclaration des "
+#~ "donateurs et d'évaluer l'équité de participation au renforcement des "
+#~ "capacités et à l'accès aux outils. La communication de ces informations est "
+#~ "facultative ; votre choix n'aura aucune incidence sur votre accès à l'outil."
 
 #~ msgid "Please describe"
-#~ msgstr "Veuillez d├⌐crire"
+#~ msgstr "Veuillez décrire"
 
 #~ msgid ""
 #~ "Do you acknowledge that some Trends.Earth features use Google Earth Engine, "
 #~ "and, depending on your use, you may be required to have in place a "
 #~ "commercial license to use Google Earth Engine?"
 #~ msgstr ""
-#~ "Reconnaissez-vous que certaines fonctionnalit├⌐s de Trends.Earth utilisent "
+#~ "Reconnaissez-vous que certaines fonctionnalités de Trends.Earth utilisent "
 #~ "Google Earth Engine et que, selon votre utilisation, vous pourriez avoir "
 #~ "besoin d'une licence commerciale pour utiliser Google Earth Engine "
-#~ "?Reconnaissez-vous que certaines fonctionnalit├⌐s de Trends.Earth utilisent "
+#~ "?Reconnaissez-vous que certaines fonctionnalités de Trends.Earth utilisent "
 #~ "Google Earth Engine et que, selon votre utilisation, vous pourriez avoir "
 #~ "besoin d'une licence commerciale pour utiliser Google Earth Engine ?"
 
@@ -3304,10 +3295,10 @@ msgstr ""
 #~ "Google Earth Engine (GEE) imposes restrictions on commercial use. For more "
 #~ "details see the "
 #~ msgstr ""
-#~ "Google Earth Engine (GEE) impose des restrictions quant ├á son utilisation "
-#~ "commerciale. Pour plus de d├⌐tails, consultez la documentation. Google Earth"
-#~ " Engine (GEE) impose des restrictions quant ├á son utilisation commerciale. "
-#~ "Pour plus de d├⌐tails, consultez la documentation. "
+#~ "Google Earth Engine (GEE) impose des restrictions quant à son utilisation "
+#~ "commerciale. Pour plus de détails, consultez la documentation. Google Earth "
+#~ "Engine (GEE) impose des restrictions quant à son utilisation commerciale. "
+#~ "Pour plus de détails, consultez la documentation. "
 
 #~ msgid "Google Earth Engine Terms of Use"
 #~ msgstr "Conditions d'utilisation de Google Earth Engine"
@@ -3318,32 +3309,32 @@ msgstr ""
 #~ "complies with Google's commercial licensing requirements. Access to this "
 #~ "tool does not grant or imply the provision of commercial licensing."
 #~ msgstr ""
-#~ " Conservation International ne fournit ni ne g├¿re de licences commerciales "
+#~ " Conservation International ne fournit ni ne gère de licences commerciales "
 #~ "pour GEE. Il incombe aux utilisateurs de s'assurer que leur utilisation de "
-#~ "GEE est conforme aux exigences de licence commerciale de Google. L'acc├¿s ├á"
-#~ " cet outil n'octroie ni n'implique l'octroi d'une licence commerciale. "
-#~ "Conservation International ne fournit ni ne g├¿re de licences commerciales "
+#~ "GEE est conforme aux exigences de licence commerciale de Google. L'accès à "
+#~ "cet outil n'octroie ni n'implique l'octroi d'une licence commerciale. "
+#~ "Conservation International ne fournit ni ne gère de licences commerciales "
 #~ "pour GEE. Il incombe aux utilisateurs de s'assurer que leur utilisation de "
-#~ "GEE est conforme aux exigences de licence commerciale de Google. L'acc├¿s ├á"
-#~ " cet outil n'octroie ni n'implique l'octroi d'une licence commerciale."
+#~ "GEE est conforme aux exigences de licence commerciale de Google. L'accès à "
+#~ "cet outil n'octroie ni n'implique l'octroi d'une licence commerciale."
 
 #~ msgid "Yes, I acknowledge"
 #~ msgstr "Oui, je le reconnais"
 
 #~ msgid "Create Account"
-#~ msgstr "Cr├⌐er un compte"
+#~ msgstr "Créer un compte"
 
 #~ msgid "Logout"
-#~ msgstr "D├⌐connexion"
+#~ msgstr "Déconnexion"
 
 #~ msgid "Executions"
-#~ msgstr "Ex├⌐cutions"
+#~ msgstr "Exécutions"
 
 #~ msgid "Users"
 #~ msgstr "Utilisateurs"
 
 #~ msgid "Scripts"
-#~ msgstr "Sc├⌐narios"
+#~ msgstr "Scénarios"
 
 #~ msgid "Admin"
 #~ msgstr "Administrateur"
@@ -3367,29 +3358,29 @@ msgstr ""
 
 #~ msgid "User '{name}' created successfully with email '{email}'."
 #~ msgstr ""
-#~ "L'utilisateur '{name}' a ├⌐t├⌐ cr├⌐├⌐ avec succ├¿s avec l'adresse e-mail "
+#~ "L'utilisateur '{name}' a été créé avec succès avec l'adresse e-mail "
 #~ "'{email}'."
 
 #~ msgid "A user with this email already exists."
-#~ msgstr "Un utilisateur associ├⌐ ├á cette adresse e-mail existe d├⌐j├á."
+#~ msgstr "Un utilisateur associé à cette adresse e-mail existe déjà."
 
 #~ msgid "Invalid user data."
-#~ msgstr "Donn├⌐es utilisateur invalides."
+#~ msgstr "Données utilisateur invalides."
 
 #~ msgid "Error creating user: {detail}"
-#~ msgstr "Erreur lors de la cr├⌐ation de l'utilisateur : {detail}"
+#~ msgstr "Erreur lors de la création de l'utilisateur : {detail}"
 
 #~ msgid "Failed to create user. Server responded with status {status}."
 #~ msgstr ""
-#~ "├ëchec de la cr├⌐ation de l'utilisateur. Le serveur a r├⌐pondu avec le "
-#~ "statut {status}."
+#~ "Échec de la création de l'utilisateur. Le serveur a répondu avec le statut "
+#~ "{status}."
 
 #~ msgid "Request timed out. Please try again."
-#~ msgstr "D├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer."
+#~ msgstr "Délai d'attente dépassé. Veuillez réessayer."
 
 #~ msgid "Cannot connect to server. Please check your connection."
 #~ msgstr ""
-#~ "Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion."
+#~ "Impossible de se connecter au serveur. Veuillez vérifier votre connexion."
 
 #~ msgid "Unexpected error: {error}"
 #~ msgstr "Erreur inattendue : {error}"
@@ -3398,24 +3389,23 @@ msgstr ""
 #~ "Invalid file type: {filename}. Must be a .tar.gz archive containing "
 #~ "configuration.json."
 #~ msgstr ""
-#~ "Type de fichier invalide : {filename}. Doit ├¬tre une archive .tar.gz "
+#~ "Type de fichier invalide : {filename}. Doit être une archive .tar.gz "
 #~ "contenant le fichier configuration.json."
 
 #~ msgid "File too large: {filename} ({size}MB). Maximum 10MB allowed."
 #~ msgstr ""
 #~ "Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
-#~ "autoris├⌐.Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
-#~ "autoris├⌐."
+#~ "autorisé.Fichier trop volumineux : {filename} ({size} Mo). Maximum 10 Mo "
+#~ "autorisé."
 
 #~ msgid "Archive ready: {filename} ({size}MB)"
-#~ msgstr "Archive pr├¬te : {filename} ({size}MB)"
+#~ msgstr "Archive prête : {filename} ({size}MB)"
 
 #~ msgid "Access denied. Administrator privileges required."
-#~ msgstr "Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis."
+#~ msgstr "Accès refusé. Privilèges d'administrateur requis."
 
 #~ msgid "Please select a .tar.gz script archive to upload."
-#~ msgstr ""
-#~ "Veuillez s├⌐lectionner une archive de script .tar.gz ├á t├⌐l├⌐charger."
+#~ msgstr "Veuillez sélectionner une archive de script .tar.gz à télécharger."
 
 #~ msgid ""
 #~ "Invalid file type. The API requires a .tar.gz archive containing a "
@@ -3425,7 +3415,7 @@ msgstr ""
 #~ "fichier configuration.json."
 
 #~ msgid "Script '{name}' uploaded successfully."
-#~ msgstr "Script '{name}' t├⌐l├⌐charg├⌐ avec succ├¿s."
+#~ msgstr "Script '{name}' téléchargé avec succès."
 
 #~ msgid "Invalid script archive."
 #~ msgstr "Archive de script invalide."
@@ -3435,179 +3425,174 @@ msgstr ""
 
 #~ msgid "Permission denied. Only admins and superadmins can create scripts."
 #~ msgstr ""
-#~ "Acc├¿s refus├⌐. Seuls les administrateurs et les super-administrateurs "
-#~ "peuvent cr├⌐er des scripts."
+#~ "Accès refusé. Seuls les administrateurs et les super-administrateurs peuvent"
+#~ " créer des scripts."
 
 #~ msgid "Failed to upload script. Server responded with status {status}."
 #~ msgstr ""
-#~ "├ëchec du chargement du script. Le serveur a r├⌐pondu avec le statut "
-#~ "{status}."
+#~ "Échec du chargement du script. Le serveur a répondu avec le statut {status}."
 
 #~ msgid "Upload timed out. Please try again with a smaller file."
 #~ msgstr ""
-#~ "Le d├⌐lai d'attente pour le chargement a expir├⌐. Veuillez r├⌐essayer avec "
-#~ "un fichier plus petit.Le d├⌐lai d'attente pour le chargement a expir├⌐. "
-#~ "Veuillez r├⌐essayer avec un fichier plus petit."
+#~ "Le délai d'attente pour le chargement a expiré. Veuillez réessayer avec un "
+#~ "fichier plus petit.Le délai d'attente pour le chargement a expiré. Veuillez "
+#~ "réessayer avec un fichier plus petit."
 
 #~ msgid "Rate limits have been successfully reset for all users and endpoints."
 #~ msgstr ""
-#~ "Les limites de d├⌐bit ont ├⌐t├⌐ r├⌐initialis├⌐es avec succ├¿s pour tous les "
-#~ "utilisateurs et points de terminaison.Les limites de d├⌐bit ont ├⌐t├⌐ "
-#~ "r├⌐initialis├⌐es avec succ├¿s pour tous les utilisateurs et points de "
+#~ "Les limites de débit ont été réinitialisées avec succès pour tous les "
+#~ "utilisateurs et points de terminaison.Les limites de débit ont été "
+#~ "réinitialisées avec succès pour tous les utilisateurs et points de "
 #~ "terminaison."
 
 #~ msgid "Failed to reset rate limits. Status: {status}"
-#~ msgstr ""
-#~ "├ëchec de la r├⌐initialisation des limites de d├⌐bit. Statut : {status}"
+#~ msgstr "Échec de la réinitialisation des limites de débit. Statut : {status}"
 
 #~ msgid "Error resetting rate limits: {error}"
-#~ msgstr "Erreur lors de la r├⌐initialisation des limites de d├⌐bit : {error}"
+#~ msgstr "Erreur lors de la réinitialisation des limites de débit : {error}"
 
 #~ msgid "Error: No rate limit selected."
-#~ msgstr "Erreur : Aucune limite de d├⌐bit s├⌐lectionn├⌐e."
+#~ msgstr "Erreur : Aucune limite de débit sélectionnée."
 
 #~ msgid "Rate limit for {identifier} has been successfully reset."
 #~ msgstr ""
-#~ "La limite de d├⌐bit pour {identifier} a ├⌐t├⌐ r├⌐initialis├⌐e avec "
-#~ "succ├¿s.La limite de d├⌐bit pour {identifier} a ├⌐t├⌐ r├⌐initialis├⌐e avec "
-#~ "succ├¿s."
+#~ "La limite de débit pour {identifier} a été réinitialisée avec succès.La "
+#~ "limite de débit pour {identifier} a été réinitialisée avec succès."
 
 #~ msgid "Rate limit for {identifier} not found. It may have already expired."
 #~ msgstr ""
-#~ "Limite de d├⌐bit introuvable pour {identifier}. Elle a peut-├¬tre d├⌐j├á "
-#~ "expir├⌐."
+#~ "Limite de débit introuvable pour {identifier}. Elle a peut-être déjà expiré."
 
 #~ msgid "Failed to reset rate limit. Status: {status}"
-#~ msgstr ""
-#~ "├ëchec de la r├⌐initialisation de la limite de d├⌐bit. Statut : {status}"
+#~ msgstr "Échec de la réinitialisation de la limite de débit. Statut : {status}"
 
 #~ msgid "Error resetting rate limit: {error}"
-#~ msgstr "Erreur lors de la r├⌐initialisation de la limite de d├⌐bit : {error}"
+#~ msgstr "Erreur lors de la réinitialisation de la limite de débit : {error}"
 
 #~ msgid "Please enter both email and password."
 #~ msgstr "Veuillez saisir votre adresse e-mail et votre mot de passe."
 
 #~ msgid "Login failed: Invalid response format."
-#~ msgstr "├ëchec de la connexion : format de r├⌐ponse invalide."
+#~ msgstr "Échec de la connexion : format de réponse invalide."
 
 #~ msgid "Login successful!"
-#~ msgstr "Connexion r├⌐ussie !"
+#~ msgstr "Connexion réussie !"
 
 #~ msgid "Failed to retrieve user information."
-#~ msgstr "Impossible de r├⌐cup├⌐rer les informations de l'utilisateur."
+#~ msgstr "Impossible de récupérer les informations de l'utilisateur."
 
 #~ msgid "Invalid credentials."
 #~ msgstr "Identifiants invalides."
 
 #~ msgid "Your account is locked due to too many failed login attempts. "
 #~ msgstr ""
-#~ "Votre compte est bloqu├⌐ suite ├á un trop grand nombre de tentatives de "
+#~ "Votre compte est bloqué suite à un trop grand nombre de tentatives de "
 #~ "connexion infructueuses. "
 
 #~ msgid "Please use the 'Forgot Password' link below to reset your password."
 #~ msgstr ""
-#~ "Veuillez utiliser le lien ┬½ Mot de passe oubli├⌐ ┬╗ ci-dessous pour "
-#~ "r├⌐initialiser votre mot de passe."
+#~ "Veuillez utiliser le lien « Mot de passe oublié » ci-dessous pour "
+#~ "réinitialiser votre mot de passe."
 
 #~ msgid "Your account is temporarily locked. "
-#~ msgstr "Votre compte est temporairement bloqu├⌐. "
+#~ msgstr "Votre compte est temporairement bloqué. "
 
 #~ msgid "Please try again in {minutes} minute(s)."
-#~ msgstr "Veuillez r├⌐essayer dans {minutes} minute(s)."
+#~ msgstr "Veuillez réessayer dans {minutes} minute(s)."
 
 #~ msgid "Login failed: Connection timeout. Please try again later."
 #~ msgstr ""
-#~ "├ëchec de la connexion : d├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer "
-#~ "plus tard.├ëchec de la connexion : d├⌐lai d'attente d├⌐pass├⌐. Veuillez "
-#~ "r├⌐essayer plus tard."
+#~ "Échec de la connexion : délai d'attente dépassé. Veuillez réessayer plus "
+#~ "tard.Échec de la connexion : délai d'attente dépassé. Veuillez réessayer "
+#~ "plus tard."
 
 #~ msgid ""
 #~ "Login failed: Cannot connect to authentication server. Please check the "
 #~ "server status."
 #~ msgstr ""
-#~ "├ëchec de la connexion : impossible de se connecter au serveur "
-#~ "d'authentification. Veuillez v├⌐rifier l'├⌐tat du serveur."
+#~ "Échec de la connexion : impossible de se connecter au serveur "
+#~ "d'authentification. Veuillez vérifier l'état du serveur."
 
 #~ msgid "Login failed: {error}"
-#~ msgstr "├ëchec de la connexion : {error}"
+#~ msgstr "Échec de la connexion : {error}"
 
 #~ msgid "Please enter your email address."
 #~ msgstr "Veuillez saisir votre adresse e-mail."
 
 #~ msgid "Please enter a valid email address."
-#~ msgstr "S'il vous pla├«t, mettez une adresse email valide."
+#~ msgstr "S'il vous plaît, mettez une adresse email valide."
 
 #~ msgid ""
 #~ "If an account exists with {email}, password recovery instructions have been "
 #~ "sent. Please check your email."
 #~ msgstr ""
-#~ "Si un compte existe avec {email}, les instructions de r├⌐cup├⌐ration de mot "
-#~ "de passe ont ├⌐t├⌐ envoy├⌐es. Veuillez consulter votre messagerie.Si un "
-#~ "compte existe avec {email}, les instructions de r├⌐cup├⌐ration de mot de "
-#~ "passe ont ├⌐t├⌐ envoy├⌐es. Veuillez consulter votre messagerie."
+#~ "Si un compte existe avec {email}, les instructions de récupération de mot de"
+#~ " passe ont été envoyées. Veuillez consulter votre messagerie.Si un compte "
+#~ "existe avec {email}, les instructions de récupération de mot de passe ont "
+#~ "été envoyées. Veuillez consulter votre messagerie."
 
 #~ msgid "Failed to send password recovery email."
-#~ msgstr "├ëchec de l'envoi de l'e-mail de r├⌐cup├⌐ration de mot de passe."
+#~ msgstr "Échec de l'envoi de l'e-mail de récupération de mot de passe."
 
 #~ msgid "{}. Please try again later."
-#~ msgstr "Veuillez r├⌐essayer plus tard."
+#~ msgstr "Veuillez réessayer plus tard."
 
 #~ msgid "Request timed out. Please try again later."
-#~ msgstr "D├⌐lai d'attente d├⌐pass├⌐. Veuillez r├⌐essayer plus tard."
+#~ msgstr "Délai d'attente dépassé. Veuillez réessayer plus tard."
 
 #~ msgid ""
 #~ "Cannot connect to the server. Please check your internet connection and try "
 #~ "again."
 #~ msgstr ""
-#~ "Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion "
-#~ "Internet et r├⌐essayer.Impossible de se connecter au serveur. Veuillez "
-#~ "v├⌐rifier votre connexion Internet et r├⌐essayer."
+#~ "Impossible de se connecter au serveur. Veuillez vérifier votre connexion "
+#~ "Internet et réessayer.Impossible de se connecter au serveur. Veuillez "
+#~ "vérifier votre connexion Internet et réessayer."
 
 #~ msgid "An error occurred: {error}. Please try again later."
-#~ msgstr "Une erreur s'est produite : {error}. Veuillez r├⌐essayer plus tard."
+#~ msgstr "Une erreur s'est produite : {error}. Veuillez réessayer plus tard."
 
 #~ msgid "Invalid or missing reset token. Please request a new password reset."
 #~ msgstr ""
-#~ "Jeton de r├⌐initialisation invalide ou manquant. Veuillez demander une "
-#~ "nouvelle r├⌐initialisation de mot de passe."
+#~ "Jeton de réinitialisation invalide ou manquant. Veuillez demander une "
+#~ "nouvelle réinitialisation de mot de passe."
 
 #~ msgid "Please enter and confirm your new password."
 #~ msgstr "Veuillez saisir et confirmer votre nouveau mot de passe."
 
 #~ msgid "Passwords do not match. Please try again."
-#~ msgstr "Les mots de passe ne correspondent pas. Veuillez r├⌐essayer."
+#~ msgstr "Les mots de passe ne correspondent pas. Veuillez réessayer."
 
 #~ msgid "Password must be at least 12 characters long."
-#~ msgstr "Le mot de passe doit comporter au moins 12 caract├¿res."
+#~ msgstr "Le mot de passe doit comporter au moins 12 caractères."
 
 #~ msgid "Password reset successful! You can now log in with your new password."
 #~ msgstr ""
-#~ "R├⌐initialisation du mot de passe r├⌐ussie ! Vous pouvez maintenant vous "
-#~ "connecter avec votre nouveau mot de passe.R├⌐initialisation du mot de passe "
-#~ "r├⌐ussie ! Vous pouvez maintenant vous connecter avec votre nouveau mot de "
+#~ "Réinitialisation du mot de passe réussie ! Vous pouvez maintenant vous "
+#~ "connecter avec votre nouveau mot de passe.Réinitialisation du mot de passe "
+#~ "réussie ! Vous pouvez maintenant vous connecter avec votre nouveau mot de "
 #~ "passe."
 
 #~ msgid ""
 #~ "This reset link is invalid or has expired. Please request a new password "
 #~ "reset."
 #~ msgstr ""
-#~ "Ce lien de r├⌐initialisation est invalide ou a expir├⌐. Veuillez demander "
-#~ "une nouvelle r├⌐initialisation de mot de passe.Ce lien de r├⌐initialisation "
-#~ "est invalide ou a expir├⌐. Veuillez demander une nouvelle r├⌐initialisation "
-#~ "de mot de passe."
+#~ "Ce lien de réinitialisation est invalide ou a expiré. Veuillez demander une "
+#~ "nouvelle réinitialisation de mot de passe.Ce lien de réinitialisation est "
+#~ "invalide ou a expiré. Veuillez demander une nouvelle réinitialisation de mot"
+#~ " de passe."
 
 #~ msgid "Password does not meet requirements."
-#~ msgstr "Le mot de passe ne r├⌐pond pas aux exigences."
+#~ msgstr "Le mot de passe ne répond pas aux exigences."
 
 #~ msgid "Failed to reset password."
-#~ msgstr "├ëchec de la r├⌐initialisation du mot de passe."
+#~ msgstr "Échec de la réinitialisation du mot de passe."
 
 #~ msgid "{}. Please try again."
-#~ msgstr "Veuillez r├⌐essayer."
+#~ msgstr "Veuillez réessayer."
 
 #~ msgid "Cannot connect to the server. Please check your connection."
 #~ msgstr ""
-#~ "Impossible de se connecter au serveur. Veuillez v├⌐rifier votre connexion."
+#~ "Impossible de se connecter au serveur. Veuillez vérifier votre connexion."
 
 #~ msgid "An error occurred: {error}"
 #~ msgstr "Une erreur s'est produite : {error}"
@@ -3619,22 +3604,22 @@ msgstr ""
 #~ msgstr "Veuillez indiquer le nom de votre organisation."
 
 #~ msgid "Please select your sector."
-#~ msgstr "Veuillez s├⌐lectionner votre secteur."
+#~ msgstr "Veuillez sélectionner votre secteur."
 
 #~ msgid "Please specify your sector."
-#~ msgstr "Veuillez pr├⌐ciser votre secteur."
+#~ msgstr "Veuillez préciser votre secteur."
 
 #~ msgid "Please select your purpose of use."
-#~ msgstr "Veuillez s├⌐lectionner votre objectif d'utilisation."
+#~ msgstr "Veuillez sélectionner votre objectif d'utilisation."
 
 #~ msgid "Please specify your purpose of use."
-#~ msgstr "Veuillez pr├⌐ciser l'usage que vous en ferez."
+#~ msgstr "Veuillez préciser l'usage que vous en ferez."
 
 #~ msgid "Please select your country."
-#~ msgstr "Veuillez s├⌐lectionner votre pays."
+#~ msgstr "Veuillez sélectionner votre pays."
 
 #~ msgid "Please describe your gender identity."
-#~ msgstr "Veuillez d├⌐crire votre identit├⌐ de genre."
+#~ msgstr "Veuillez décrire votre identité de genre."
 
 #~ msgid "Please acknowledge the Google Earth Engine license terms."
 #~ msgstr ""
@@ -3645,49 +3630,48 @@ msgstr ""
 #~ "Account created successfully! Please check your email to verify your "
 #~ "account, then you can log in."
 #~ msgstr ""
-#~ "Compte cr├⌐├⌐ avec succ├¿s ! Veuillez consulter votre messagerie pour "
-#~ "v├⌐rifier votre compte, puis vous pourrez vous connecter."
+#~ "Compte créé avec succès ! Veuillez consulter votre messagerie pour vérifier "
+#~ "votre compte, puis vous pourrez vous connecter."
 
 #~ msgid "Registration failed."
-#~ msgstr "L'inscription a ├⌐chou├⌐."
+#~ msgstr "L'inscription a échoué."
 
 #~ msgid "Validation failed."
-#~ msgstr "La validation a ├⌐chou├⌐."
+#~ msgstr "La validation a échoué."
 
 #~ msgid "Too many registration attempts. Please try again later."
-#~ msgstr "Trop de tentatives d'inscription. Veuillez r├⌐essayer plus tard."
+#~ msgstr "Trop de tentatives d'inscription. Veuillez réessayer plus tard."
 
 #~ msgid "Invalid or expired token. Please request a new profile update link."
 #~ msgstr ""
-#~ "Jeton invalide ou expir├⌐. Veuillez demander un nouveau lien de mise ├á jour"
-#~ " de profil.Jeton invalide ou expir├⌐. Veuillez demander un nouveau lien de "
-#~ "mise ├á jour de profil."
+#~ "Jeton invalide ou expiré. Veuillez demander un nouveau lien de mise à jour "
+#~ "de profil.Jeton invalide ou expiré. Veuillez demander un nouveau lien de "
+#~ "mise à jour de profil."
 
 #~ msgid "Error loading profile: {error}"
 #~ msgstr "Erreur lors du chargement du profil : {error}"
 
 #~ msgid "No authentication token. Please use a valid profile update link."
 #~ msgstr ""
-#~ "Aucun jeton d'authentification. Veuillez utiliser un lien de mise ├á jour de"
-#~ " profil valide."
+#~ "Aucun jeton d'authentification. Veuillez utiliser un lien de mise à jour de "
+#~ "profil valide."
 
 #~ msgid "Profile updated successfully!"
-#~ msgstr "Profil mis ├á jour avec succ├¿s !"
+#~ msgstr "Profil mis à jour avec succès !"
 
 #~ msgid "Session expired. Please request a new profile update link."
 #~ msgstr ""
-#~ "Session expir├⌐e. Veuillez demander un nouveau lien de mise ├á jour de "
-#~ "profil."
+#~ "Session expirée. Veuillez demander un nouveau lien de mise à jour de profil."
 
 #~ msgid "Invalid token. Please request a new profile update link."
 #~ msgstr ""
-#~ "Jeton invalide. Veuillez demander un nouveau lien de mise ├á jour de profil."
+#~ "Jeton invalide. Veuillez demander un nouveau lien de mise à jour de profil."
 
 #~ msgid "Failed to update profile."
-#~ msgstr "Impossible de mettre ├á jour le profil."
+#~ msgstr "Impossible de mettre à jour le profil."
 
 #~ msgid "Password changed successfully!"
-#~ msgstr "Mot de passe modifi├⌐ avec succ├¿s !"
+#~ msgstr "Mot de passe modifié avec succès !"
 
 #~ msgid "Failed to change password."
 #~ msgstr "Impossible de modifier le mot de passe."
@@ -3696,22 +3680,22 @@ msgstr ""
 #~ msgstr " (Statut : {statut})"
 
 #~ msgid "Network error: {error}"
-#~ msgstr "Erreur r├⌐seau : {error}"
+#~ msgstr "Erreur réseau : {error}"
 
 #~ msgid "Execution Cancelled Successfully"
-#~ msgstr "Ex├⌐cution annul├⌐e avec succ├¿s"
+#~ msgstr "Exécution annulée avec succès"
 
 #~ msgid "Execution ID: "
-#~ msgstr "ID d'ex├⌐cution : "
+#~ msgstr "ID d'exécution : "
 
 #~ msgid "Unknown"
 #~ msgstr "Inconnu"
 
 #~ msgid "Script: "
-#~ msgstr "Sc├⌐nario: "
+#~ msgstr "Scénario: "
 
 #~ msgid "Previous Status: "
-#~ msgstr "├ëtat pr├⌐c├⌐dent : "
+#~ msgstr "État précédent : "
 
 #~ msgid "New Status: "
 #~ msgstr "Nouveau statut : "
@@ -3720,40 +3704,40 @@ msgstr ""
 #~ msgstr "Nettoyage des infrastructures"
 
 #~ msgid "Docker service stopped"
-#~ msgstr "Le service Docker s'est arr├¬t├⌐."
+#~ msgstr "Le service Docker s'est arrêté."
 
 #~ msgid "Docker service not found/stopped"
-#~ msgstr "Service Docker introuvable/arr├¬t├⌐"
+#~ msgstr "Service Docker introuvable/arrêté"
 
 #~ msgid "Docker container stopped"
-#~ msgstr "Le conteneur Docker s'est arr├¬t├⌐."
+#~ msgstr "Le conteneur Docker s'est arrêté."
 
 #~ msgid "Docker container not found/stopped"
-#~ msgstr "Conteneur Docker introuvable/arr├¬t├⌐"
+#~ msgstr "Conteneur Docker introuvable/arrêté"
 
 #~ msgid "Google Earth Engine Tasks"
-#~ msgstr "T├óches de Google Earth Engine"
+#~ msgstr "Tâches de Google Earth Engine"
 
 #~ msgid "Found and processed {count} GEE tasks:"
-#~ msgstr "{count} t├óches GEE trouv├⌐es et trait├⌐es :"
+#~ msgstr "{count} tâches GEE trouvées et traitées :"
 
 #~ msgid "Status: {status}"
 #~ msgstr "Statut : {statut}"
 
 #~ msgid "No GEE tasks found in execution logs."
-#~ msgstr "Aucune t├óche GEE trouv├⌐e dans les journaux d'ex├⌐cution."
+#~ msgstr "Aucune tâche GEE trouvée dans les journaux d'exécution."
 
 #~ msgid "Errors Encountered"
-#~ msgstr "Erreurs rencontr├⌐es"
+#~ msgstr "Erreurs rencontrées"
 
 #~ msgid "Cancellation Failed"
-#~ msgstr "L'annulation a ├⌐chou├⌐"
+#~ msgstr "L'annulation a échoué"
 
 #~ msgid "Error: "
 #~ msgstr "Erreur: "
 
 #~ msgid "Please log in to view credentials status."
-#~ msgstr "Veuillez vous connecter pour consulter l'├⌐tat de vos identifiants."
+#~ msgstr "Veuillez vous connecter pour consulter l'état de vos identifiants."
 
 #~ msgid "OAuth"
 #~ msgstr "OAuth"
@@ -3762,67 +3746,65 @@ msgstr ""
 #~ msgstr "Compte de service"
 
 #~ msgid "Credentials configured using {type_label}"
-#~ msgstr "Identifiants configur├⌐s ├á l'aide de {type_label}"
+#~ msgstr "Identifiants configurés à l'aide de {type_label}"
 
 #~ msgid "Set up on: {created_date}"
-#~ msgstr "Cr├⌐├⌐ le : {created_date}"
+#~ msgstr "Créé le : {created_date}"
 
 #~ msgid "No Google Earth Engine credentials configured."
-#~ msgstr "Aucune authentification Google Earth Engine n'est configur├⌐e."
+#~ msgstr "Aucune authentification Google Earth Engine n'est configurée."
 
 #~ msgid "Choose one of the setup options below."
 #~ msgstr "Choisissez l'une des options de configuration ci-dessous."
 
 #~ msgid "Unable to retrieve credentials status."
-#~ msgstr "Impossible de r├⌐cup├⌐rer l'├⌐tat des informations d'identification."
+#~ msgstr "Impossible de récupérer l'état des informations d'identification."
 
 #~ msgid "Error retrieving credentials status."
 #~ msgstr ""
-#~ "Erreur lors de la r├⌐cup├⌐ration de l'├⌐tat des informations "
-#~ "d'identification."
+#~ "Erreur lors de la récupération de l'état des informations d'identification."
 
 #~ msgid ""
 #~ "OAuth window opened. Please complete the authorization and return here."
 #~ msgstr ""
-#~ "La fen├¬tre OAuth s'est ouverte. Veuillez terminer l'autorisation et revenir"
-#~ " ici.La fen├¬tre OAuth s'est ouverte. Veuillez terminer l'autorisation et "
+#~ "La fenêtre OAuth s'est ouverte. Veuillez terminer l'autorisation et revenir "
+#~ "ici.La fenêtre OAuth s'est ouverte. Veuillez terminer l'autorisation et "
 #~ "revenir ici."
 
 #~ msgid ""
 #~ "After authorization, you may need to refresh this page to see the updated "
 #~ "status."
 #~ msgstr ""
-#~ "Apr├¿s autorisation, vous devrez peut-├¬tre actualiser cette page pour voir "
-#~ "le statut mis ├á jour.Apr├¿s autorisation, vous devrez peut-├¬tre actualiser"
-#~ " cette page pour voir le statut mis ├á jour."
+#~ "Après autorisation, vous devrez peut-être actualiser cette page pour voir le"
+#~ " statut mis à jour.Après autorisation, vous devrez peut-être actualiser "
+#~ "cette page pour voir le statut mis à jour."
 
 #~ msgid "OAuth initiation failed - no authorization URL received."
 #~ msgstr ""
-#~ "L'initialisation OAuth a ├⌐chou├⌐ - aucune URL d'autorisation n'a ├⌐t├⌐ "
-#~ "re├ºue."
+#~ "L'initialisation OAuth a échoué - aucune URL d'autorisation n'a été reçue."
 
 #~ msgid "Failed to initiate OAuth flow."
-#~ msgstr "├ëchec de l'initialisation du flux OAuth."
+#~ msgstr "Échec de l'initialisation du flux OAuth."
 
 #~ msgid "Invalid JSON file. Please upload a valid service account key file."
 #~ msgstr ""
-#~ "Fichier JSON invalide. Veuillez t├⌐l├⌐verser un fichier de cl├⌐ de compte de"
-#~ " service valide.Fichier JSON invalide. Veuillez t├⌐l├⌐verser un fichier de "
-#~ "cl├⌐ de compte de service valide."
+#~ "Fichier JSON invalide. Veuillez téléverser un fichier de clé de compte de "
+#~ "service valide.Fichier JSON invalide. Veuillez téléverser un fichier de clé "
+#~ "de compte de service valide."
 
 #~ msgid "Invalid service account key. Missing required fields."
-#~ msgstr "Cl├⌐ de compte de service invalide. Champs obligatoires manquants."
+#~ msgstr "Clé de compte de service invalide. Champs obligatoires manquants."
 
 #~ msgid "Invalid service account key. Type field must be 'service_account'."
 #~ msgstr ""
-#~ "Cl├⌐ de compte de service invalide. Le champ Type doit ├¬tre ┬½ "
-#~ "service_account ┬╗."
+#~ "Clé de compte de service invalide. Le champ Type doit être « service_account"
+#~ " »."
 
 #~ msgid "Service account key '{filename}' uploaded successfully!"
-#~ msgstr "Cl├⌐ du compte de service '{filename}' t├⌐l├⌐charg├⌐e avec succ├¿s !"
+#~ msgstr "Clé du compte de service '{filename}' téléchargée avec succès !"
 
 #~ msgid "Failed to upload service account key."
-#~ msgstr "├ëchec du chargement de la cl├⌐ du compte de service."
+#~ msgstr "Échec du chargement de la clé du compte de service."
 
 #~ msgid "Error processing file: {error}"
 #~ msgstr "Erreur lors du traitement du fichier : {error}"
@@ -3831,40 +3813,40 @@ msgstr ""
 #~ msgstr "Les identifiants Google Earth Engine sont valides et fonctionnels !"
 
 #~ msgid "Credentials test failed."
-#~ msgstr "Le test d'authentification a ├⌐chou├⌐."
+#~ msgstr "Le test d'authentification a échoué."
 
 #~ msgid "Google Earth Engine credentials deleted successfully."
-#~ msgstr "Identifiants Google Earth Engine supprim├⌐s avec succ├¿s."
+#~ msgstr "Identifiants Google Earth Engine supprimés avec succès."
 
 #~ msgid "Failed to delete credentials."
-#~ msgstr "├ëchec de la suppression des identifiants."
+#~ msgstr "Échec de la suppression des identifiants."
 
 #~ msgid "No news items found."
-#~ msgstr "Aucun article d'actualit├⌐ trouv├⌐."
+#~ msgstr "Aucun article d'actualité trouvé."
 
 #~ msgid "Please log in to manage news."
-#~ msgstr "Veuillez vous connecter pour g├⌐rer les actualit├⌐s."
+#~ msgstr "Veuillez vous connecter pour gérer les actualités."
 
 #~ msgid "Session expired. Please log in again."
-#~ msgstr "Session expir├⌐e. Veuillez vous reconnecter."
+#~ msgstr "Session expirée. Veuillez vous reconnecter."
 
 #~ msgid "Access denied. Admin privileges required."
-#~ msgstr "Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis."
+#~ msgstr "Accès refusé. Privilèges d'administrateur requis."
 
 #~ msgid "Failed to load news: {status}"
-#~ msgstr "├ëchec du chargement des actualit├⌐s : {status}"
+#~ msgstr "Échec du chargement des actualités : {status}"
 
 #~ msgid "Error loading news: {error}"
-#~ msgstr "Erreur lors du chargement des actualit├⌐s : {error}"
+#~ msgstr "Erreur lors du chargement des actualités : {error}"
 
 #~ msgid "Create News Item"
-#~ msgstr "Cr├⌐er un article d'actualit├⌐"
+#~ msgstr "Créer un article d'actualité"
 
 #~ msgid "Edit News Item"
 #~ msgstr "Modifier l'article"
 
 #~ msgid "Preview will appear here..."
-#~ msgstr "Un aper├ºu appara├«tra ici..."
+#~ msgstr "Un aperçu apparaîtra ici..."
 
 #~ msgid "Please log in first."
 #~ msgstr "Veuillez d'abord vous connecter."
@@ -3879,13 +3861,13 @@ msgstr ""
 #~ msgstr "Au moins une plateforme cible est requise."
 
 #~ msgid "updated"
-#~ msgstr "mis ├á jour"
+#~ msgstr "mis à jour"
 
 #~ msgid "created"
-#~ msgstr "cr├⌐├⌐"
+#~ msgstr "créé"
 
 #~ msgid "News item {action} successfully!"
-#~ msgstr "Article d'actualit├⌐ {action} r├⌐ussi !"
+#~ msgstr "Article d'actualité {action} réussi !"
 
 #~ msgid "Error: {status}"
 #~ msgstr "Erreur : {statut}"
@@ -3894,10 +3876,10 @@ msgstr ""
 #~ msgstr "Erreur lors de l'enregistrement de l'article : {error}"
 
 #~ msgid "No news item selected."
-#~ msgstr "Aucun article s├⌐lectionn├⌐."
+#~ msgstr "Aucun article sélectionné."
 
 #~ msgid "News item deleted successfully!"
-#~ msgstr "Article supprim├⌐ avec succ├¿s !"
+#~ msgstr "Article supprimé avec succès !"
 
 #~ msgid "Error deleting news item: {error}"
 #~ msgstr "Erreur lors de la suppression de l'article : {error}"
@@ -3906,7 +3888,7 @@ msgstr ""
 #~ msgstr "Le nom est obligatoire."
 
 #~ msgid "User ID not found in user data."
-#~ msgstr "Identifiant utilisateur introuvable dans les donn├⌐es utilisateur."
+#~ msgstr "Identifiant utilisateur introuvable dans les données utilisateur."
 
 #~ msgid "All password fields are required."
 #~ msgstr "Tous les champs du mot de passe sont obligatoires."
@@ -3926,54 +3908,54 @@ msgstr ""
 #~ msgid ""
 #~ "Password must include a special character (!@#$%^&*()-_=+[]{}|;:,.<>?/)."
 #~ msgstr ""
-#~ "Le mot de passe doit inclure un caract├¿re sp├⌐cial "
+#~ "Le mot de passe doit inclure un caractère spécial "
 #~ "(!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?/)."
 
 #~ msgid "enabled"
-#~ msgstr "activ├⌐"
+#~ msgstr "activé"
 
 #~ msgid "disabled"
-#~ msgstr "d├⌐sactiv├⌐"
+#~ msgstr "désactivé"
 
 #~ msgid "Email notifications {status} successfully!"
-#~ msgstr "Notifications par e-mail {statut} r├⌐ussies !"
+#~ msgstr "Notifications par e-mail {statut} réussies !"
 
 #~ msgid "Failed to update email notification settings."
 #~ msgstr ""
-#~ "Impossible de mettre ├á jour les param├¿tres de notification par e-mail."
+#~ "Impossible de mettre à jour les paramètres de notification par e-mail."
 
 #~ msgid "Email confirmation does not match. Please try again."
-#~ msgstr "La confirmation par courriel ne correspond pas. Veuillez r├⌐essayer."
+#~ msgstr "La confirmation par courriel ne correspond pas. Veuillez réessayer."
 
 #~ msgid "Your account has been deleted."
-#~ msgstr "Votre compte a ├⌐t├⌐ supprim├⌐."
+#~ msgstr "Votre compte a été supprimé."
 
 #~ msgid "Admin accounts cannot be deleted through self-service. "
 #~ msgstr ""
-#~ "Les comptes d'administrateur ne peuvent pas ├¬tre supprim├⌐s via le libre-"
-#~ "service. Les comptes d'administrateur ne peuvent pas ├¬tre supprim├⌐s via le"
-#~ " libre-service. "
+#~ "Les comptes d'administrateur ne peuvent pas être supprimés via le libre-"
+#~ "service. Les comptes d'administrateur ne peuvent pas être supprimés via le "
+#~ "libre-service. "
 
 #~ msgid "Please contact a system administrator."
-#~ msgstr "Veuillez contacter un administrateur syst├¿me."
+#~ msgstr "Veuillez contacter un administrateur système."
 
 #~ msgid "Failed to delete account."
 #~ msgstr "Impossible de supprimer le compte."
 
 #~ msgid "Please try again."
-#~ msgstr "Veuillez r├⌐essayer."
+#~ msgstr "Veuillez réessayer."
 
 #~ msgid "Current System Status ({header_label})"
-#~ msgstr "├ëtat actuel du syst├¿me ({header_label})"
+#~ msgstr "État actuel du système ({header_label})"
 
 #~ msgid "Current System Status"
-#~ msgstr "├ëtat actuel du syst├¿me"
+#~ msgstr "État actuel du système"
 
 #~ msgid "Cluster Status{cluster_cached_time}"
-#~ msgstr "├ëtat du cluster{cluster_cached_time}"
+#~ msgstr "État du cluster{cluster_cached_time}"
 
 #~ msgid "Error loading status data: {error}"
-#~ msgstr "Erreur lors du chargement des donn├⌐es d'├⌐tat : {error}"
+#~ msgstr "Erreur lors du chargement des données d'état : {error}"
 
 #~ msgid "Error"
 #~ msgstr "Erreur"
@@ -3991,13 +3973,13 @@ msgstr ""
 #~ msgstr "Erreur lors du chargement des statistiques : {error}"
 
 #~ msgid "No status data available."
-#~ msgstr "Aucune donn├⌐e d'├⌐tat disponible."
+#~ msgstr "Aucune donnée d'état disponible."
 
 #~ msgid "Overview"
-#~ msgstr "Aper├ºu"
+#~ msgstr "Aperçu"
 
 #~ msgid "Total Executions"
-#~ msgstr "Ex├⌐cutions totales"
+#~ msgstr "Exécutions totales"
 
 #~ msgid "Total Users"
 #~ msgstr "Nombre total d'utilisateurs"
@@ -4009,10 +3991,10 @@ msgstr ""
 #~ msgstr "Actif"
 
 #~ msgid "Running"
-#~ msgstr "En cours d'ex├⌐cution"
+#~ msgstr "En cours d'exécution"
 
 #~ msgid "Ready"
-#~ msgstr "Pr├¬t"
+#~ msgstr "Prêt"
 
 #~ msgid "Pending"
 #~ msgstr "En attente"
@@ -4021,58 +4003,58 @@ msgstr ""
 #~ msgstr "Total"
 
 #~ msgid "Completed"
-#~ msgstr "Compl├⌐t├⌐"
+#~ msgstr "Complété"
 
 #~ msgid "Finished"
 #~ msgstr "Fini"
 
 #~ msgid "Failed"
-#~ msgstr "├ëchou├⌐"
+#~ msgstr "Échoué"
 
 #~ msgid "Cancelled"
-#~ msgstr "Annul├⌐"
+#~ msgstr "Annulé"
 
 #~ msgid "No statistics available for the selected period."
-#~ msgstr "Aucune statistique disponible pour la p├⌐riode s├⌐lectionn├⌐e."
+#~ msgstr "Aucune statistique disponible pour la période sélectionnée."
 
 #~ msgid "Update Your Profile"
-#~ msgstr "Mettez ├á jour votre profil"
+#~ msgstr "Mettez à jour votre profil"
 
 #~ msgid "Email cannot be changed"
-#~ msgstr "L'adresse ├⌐lectronique ne peut pas ├¬tre modifi├⌐e."
+#~ msgstr "L'adresse électronique ne peut pas être modifiée."
 
 #~ msgid "Update Profile"
-#~ msgstr "Mettre ├á jour le profil"
+#~ msgstr "Mettre à jour le profil"
 
 #~ msgid "Refresh Executions"
-#~ msgstr "Actualiser les ex├⌐cutions"
+#~ msgstr "Actualiser les exécutions"
 
 #~ msgid "Auto-refresh in:"
 #~ msgstr "Actualisation automatique dans :"
 
 #~ msgid "Cancel Execution"
-#~ msgstr "Annuler l'ex├⌐cution"
+#~ msgstr "Annuler l'exécution"
 
 #~ msgid "Are you sure you want to cancel this execution?"
-#~ msgstr "├ètes-vous s├╗r de vouloir annuler cette ex├⌐cution ?"
+#~ msgstr "Êtes-vous sûr de vouloir annuler cette exécution ?"
 
 #~ msgid "Execution ID:"
-#~ msgstr "ID d'ex├⌐cution :"
+#~ msgstr "ID d'exécution :"
 
 #~ msgid "Script:"
-#~ msgstr "Sc├⌐nario:"
+#~ msgstr "Scénario:"
 
 #~ msgid "Status:"
 #~ msgstr "Statut:"
 
 #~ msgid "This action cannot be undone."
-#~ msgstr "Cette action est irr├⌐versible."
+#~ msgstr "Cette action est irréversible."
 
 #~ msgid "Confirm Cancel"
 #~ msgstr "Confirmer Annuler"
 
 #~ msgid "Cancellation Result"
-#~ msgstr "R├⌐sultat d'annulation"
+#~ msgstr "Résultat d'annulation"
 
 #~ msgid "Close"
 #~ msgstr "Fermer"
@@ -4084,7 +4066,7 @@ msgstr ""
 #~ msgstr "Actualiser les scripts"
 
 #~ msgid "Profile Settings"
-#~ msgstr "Param├¿tres du profil"
+#~ msgstr "Paramètres du profil"
 
 #~ msgid "Name"
 #~ msgstr "Nom"
@@ -4099,16 +4081,16 @@ msgstr ""
 #~ msgstr "Institution"
 
 #~ msgid "Enter your institution"
-#~ msgstr "Indiquez votre ├⌐tablissement"
+#~ msgstr "Indiquez votre établissement"
 
 #~ msgid "Role"
-#~ msgstr "R├┤le"
+#~ msgstr "Rôle"
 
 #~ msgid "Email Notifications"
 #~ msgstr "Notifications par e-mail"
 
 #~ msgid "Execution Completion Notifications"
-#~ msgstr "Notifications de fin d'ex├⌐cution"
+#~ msgstr "Notifications de fin d'exécution"
 
 #~ msgid "Enable email notifications"
 #~ msgstr "Activer les notifications par e-mail"
@@ -4117,15 +4099,15 @@ msgstr ""
 #~ "Receive email notifications when your script executions finish, fail, or are"
 #~ " cancelled."
 #~ msgstr ""
-#~ "Recevez des notifications par e-mail lorsque l'ex├⌐cution de vos scripts se "
-#~ "termine, ├⌐choue ou est annul├⌐e.Recevez des notifications par e-mail "
-#~ "lorsque l'ex├⌐cution de vos scripts se termine, ├⌐choue ou est annul├⌐e."
+#~ "Recevez des notifications par e-mail lorsque l'exécution de vos scripts se "
+#~ "termine, échoue ou est annulée.Recevez des notifications par e-mail lorsque "
+#~ "l'exécution de vos scripts se termine, échoue ou est annulée."
 
 #~ msgid "Google Earth Engine Account"
 #~ msgstr "Compte Google Earth Engine"
 
 #~ msgid "Current Credentials Status"
-#~ msgstr "├ëtat actuel des qualifications"
+#~ msgstr "État actuel des qualifications"
 
 #~ msgid "Setup Your GEE Account"
 #~ msgstr "Configurez votre compte GEE"
@@ -4144,26 +4126,26 @@ msgstr ""
 #~ "Connect your personal Google Earth Engine account using OAuth "
 #~ "authentication."
 #~ msgstr ""
-#~ "Connectez votre compte personnel Google Earth Engine ├á l'aide de "
+#~ "Connectez votre compte personnel Google Earth Engine à l'aide de "
 #~ "l'authentification OAuth."
 
 #~ msgid "Connect GEE Account"
 #~ msgstr "Compte Connect GEE"
 
 #~ msgid "Option 2: Upload Service Account Key"
-#~ msgstr "Option 2 : T├⌐l├⌐charger la cl├⌐ du compte de service"
+#~ msgstr "Option 2 : Télécharger la clé du compte de service"
 
 #~ msgid ""
 #~ "Upload a Google Cloud service account JSON key with Earth Engine access."
 #~ msgstr ""
-#~ "Importez une cl├⌐ JSON de compte de service Google Cloud avec acc├¿s ├á "
-#~ "Earth Engine."
+#~ "Importez une clé JSON de compte de service Google Cloud avec accès à Earth "
+#~ "Engine."
 
 #~ msgid "Upload Service Account Key"
-#~ msgstr "T├⌐l├⌐charger la cl├⌐ du compte de service"
+#~ msgstr "Télécharger la clé du compte de service"
 
 #~ msgid "Manage Credentials"
-#~ msgstr "G├⌐rer les identifiants"
+#~ msgstr "Gérer les identifiants"
 
 #~ msgid "Test Credentials"
 #~ msgstr "Identifiants de test"
@@ -4180,44 +4162,44 @@ msgstr ""
 #~ "secret is shown only once at creation time."
 #~ msgstr ""
 #~ "Les informations d'identification du service permettent aux applications "
-#~ "externes de s'authentifier aupr├¿s de l'API Trends.Earth ├á l'aide du "
-#~ "syst├¿me d'autorisation OAuth2. Le secret client n'est affich├⌐ qu'une seule"
-#~ " fois, lors de la cr├⌐ation du service.externes de s'authentifier aupr├¿s de"
-#~ " l'API Trends.Earth ├á l'aide du syst├¿me d'autorisation OAuth2. Le secret "
-#~ "client n'est affich├⌐ qu'une seule fois, lors de la cr├⌐ation du service."
+#~ "externes de s'authentifier auprès de l'API Trends.Earth à l'aide du système "
+#~ "d'autorisation OAuth2. Le secret client n'est affiché qu'une seule fois, "
+#~ "lors de la création du service.externes de s'authentifier auprès de l'API "
+#~ "Trends.Earth à l'aide du système d'autorisation OAuth2. Le secret client "
+#~ "n'est affiché qu'une seule fois, lors de la création du service."
 
 #~ msgid "Refresh"
-#~ msgstr "Rafra├«chir"
+#~ msgstr "Rafraîchir"
 
 #~ msgid "New Credential"
 #~ msgstr "Nouvelle certification"
 
 #~ msgid "Create Service Credential"
-#~ msgstr "Cr├⌐er des informations d'identification de service"
+#~ msgstr "Créer des informations d'identification de service"
 
 #~ msgid "e.g. My CLI Tool"
 #~ msgstr "par exemple, mon outil CLI"
 
 #~ msgid "A descriptive label for this credential."
-#~ msgstr "Libell├⌐ descriptif pour cette certification."
+#~ msgstr "Libellé descriptif pour cette certification."
 
 #~ msgid "Deployment Information"
-#~ msgstr "Informations sur le d├⌐ploiement"
+#~ msgstr "Informations sur le déploiement"
 
 #~ msgid "System Status Trends"
-#~ msgstr "Tendances de l'├⌐tat du syst├¿me"
+#~ msgstr "Tendances de l'état du système"
 
 #~ msgid "Last 24 Hours"
-#~ msgstr "Derni├¿res 24 heures"
+#~ msgstr "Dernières 24 heures"
 
 #~ msgid "Last Week"
-#~ msgstr "La semaine derni├¿re"
+#~ msgstr "La semaine dernière"
 
 #~ msgid "Last Month"
 #~ msgstr "Mois dernier"
 
 #~ msgid "Last Year"
-#~ msgstr "L'ann├⌐e derni├¿re"
+#~ msgstr "L'année dernière"
 
 #~ msgid "All Time"
 #~ msgstr "Tout le temps"
@@ -4228,40 +4210,40 @@ msgstr ""
 #~ msgid ""
 #~ "Access denied. Administrator privileges required to access admin functions."
 #~ msgstr ""
-#~ "Acc├¿s refus├⌐. Privil├¿ges d'administrateur requis pour acc├⌐der aux "
-#~ "fonctions d'administration."
+#~ "Accès refusé. Privilèges d'administrateur requis pour accéder aux fonctions "
+#~ "d'administration."
 
 #~ msgid "Administration Panel"
 #~ msgstr "Panneau d'administration"
 
 #~ msgid "Rate Limiting Management"
-#~ msgstr "Gestion de la limitation de d├⌐bit"
+#~ msgstr "Gestion de la limitation de débit"
 
 #~ msgid "Current & Historical Rate Limit Breaches"
-#~ msgstr "D├⌐passements de limites de d├⌐bit actuels et historiques"
+#~ msgstr "Dépassements de limites de débit actuels et historiques"
 
 #~ msgid "Refresh Breaches"
 #~ msgstr "Actualiser les violations"
 
 #~ msgid "Cancel Selected Limit"
-#~ msgstr "Annuler la limite s├⌐lectionn├⌐e"
+#~ msgstr "Annuler la limite sélectionnée"
 
 #~ msgid "Reset All Rate Limits"
-#~ msgstr "R├⌐initialiser toutes les limites de d├⌐bit"
+#~ msgstr "Réinitialiser toutes les limites de débit"
 
 #~ msgid "Active and historical events"
-#~ msgstr "├ëv├⌐nements actuels et historiques"
+#~ msgstr "Événements actuels et historiques"
 
 #~ msgid "Highlighted rows are active and can be cancelled individually."
 #~ msgstr ""
-#~ "Les lignes surlign├⌐es sont actives et peuvent ├¬tre annul├⌐es "
+#~ "Les lignes surlignées sont actives et peuvent être annulées "
 #~ "individuellement."
 
 #~ msgid "News Management"
-#~ msgstr "Gestion de l'actualit├⌐"
+#~ msgstr "Gestion de l'actualité"
 
 #~ msgid "Manage News Items"
-#~ msgstr "G├⌐rer les actualit├⌐s"
+#~ msgstr "Gérer les actualités"
 
 #~ msgid "Edit"
 #~ msgstr "Modifier"
@@ -4270,13 +4252,13 @@ msgstr ""
 #~ msgstr "Supprimer"
 
 #~ msgid "Loading news items..."
-#~ msgstr "Chargement des actualit├⌐s..."
+#~ msgstr "Chargement des actualités..."
 
 #~ msgid "Title *"
 #~ msgstr "Titre *"
 
 #~ msgid "Enter news title"
-#~ msgstr "Saisissez le titre de l'actualit├⌐"
+#~ msgstr "Saisissez le titre de l'actualité"
 
 #~ msgid "Message (Markdown supported) *"
 #~ msgstr "Message (Markdown pris en charge) *"
@@ -4289,10 +4271,10 @@ msgstr ""
 #~ "listes, etc. Sera converti en HTML."
 
 #~ msgid "Enter news message using Markdown..."
-#~ msgstr "Saisissez votre message d'actualit├⌐ en utilisant Markdown..."
+#~ msgstr "Saisissez votre message d'actualité en utilisant Markdown..."
 
 #~ msgid "Preview"
-#~ msgstr "Aper├ºu"
+#~ msgstr "Aperçu"
 
 #~ msgid "Link URL (optional)"
 #~ msgstr "URL du lien (facultatif)"
@@ -4307,7 +4289,7 @@ msgstr ""
 #~ msgstr "Plateformes cibles *"
 
 #~ msgid "QGIS Plugin"
-#~ msgstr "Module compl├⌐mentaire QGIS"
+#~ msgstr "Module complémentaire QGIS"
 
 #~ msgid "Web App"
 #~ msgstr "Application Web"
@@ -4316,23 +4298,23 @@ msgstr ""
 #~ msgstr "Interface utilisateur API"
 
 #~ msgid "Select target platforms..."
-#~ msgstr "S├⌐lectionner les plateformes cibles..."
+#~ msgstr "Sélectionner les plateformes cibles..."
 
 #~ msgid "Target Roles (optional)"
-#~ msgstr "R├┤les cibles (facultatif)"
+#~ msgstr "Rôles cibles (facultatif)"
 
 #~ msgid ""
 #~ "Leave empty to show to all users including unauthenticated. Select specific "
 #~ "roles to restrict visibility."
 #~ msgstr ""
 #~ "Laissez ce champ vide pour que l'affichage soit visible par tous les "
-#~ "utilisateurs, y compris ceux qui ne sont pas authentifi├⌐s. S├⌐lectionnez "
-#~ "des r├┤les sp├⌐cifiques pour en restreindre la visibilit├⌐.utilisateurs, y "
-#~ "compris ceux qui ne sont pas authentifi├⌐s. S├⌐lectionnez des r├┤les "
-#~ "sp├⌐cifiques pour en restreindre la visibilit├⌐."
+#~ "utilisateurs, y compris ceux qui ne sont pas authentifiés. Sélectionnez des "
+#~ "rôles spécifiques pour en restreindre la visibilité.utilisateurs, y compris "
+#~ "ceux qui ne sont pas authentifiés. Sélectionnez des rôles spécifiques pour "
+#~ "en restreindre la visibilité."
 
 #~ msgid "Regular Users"
-#~ msgstr "Utilisateurs r├⌐guliers"
+#~ msgstr "Utilisateurs réguliers"
 
 #~ msgid "Admins"
 #~ msgstr "Administrateurs"
@@ -4344,7 +4326,7 @@ msgstr ""
 #~ msgstr "Tous les utilisateurs (sans restriction)"
 
 #~ msgid "News Type"
-#~ msgstr "Type d'actualit├⌐s"
+#~ msgstr "Type d'actualités"
 
 #~ msgid "Announcement"
 #~ msgstr "Annonce"
@@ -4353,7 +4335,7 @@ msgstr ""
 #~ msgstr "Avertissement"
 
 #~ msgid "Release"
-#~ msgstr "Lib├⌐rer"
+#~ msgstr "Libérer"
 
 #~ msgid "Tip"
 #~ msgstr "Conseil"
@@ -4362,7 +4344,7 @@ msgstr ""
 #~ msgstr "Entretien"
 
 #~ msgid "Priority"
-#~ msgstr "Priorit├⌐"
+#~ msgstr "Priorité"
 
 #~ msgid "Min Plugin Version (optional)"
 #~ msgstr "Version minimale du plugin (facultatif)"
@@ -4377,16 +4359,16 @@ msgstr ""
 #~ msgstr "par exemple, 2.0.0"
 
 #~ msgid "Start Date (optional)"
-#~ msgstr "Date de d├⌐but (facultatif)"
+#~ msgstr "Date de début (facultatif)"
 
 #~ msgid "Select start date..."
-#~ msgstr "S├⌐lectionnez une date de d├⌐but..."
+#~ msgstr "Sélectionnez une date de début..."
 
 #~ msgid "End Date (optional)"
 #~ msgstr "Date de fin (facultatif)"
 
 #~ msgid "Select end date..."
-#~ msgstr "S├⌐lectionnez la date de fin..."
+#~ msgstr "Sélectionnez la date de fin..."
 
 #~ msgid "Active (visible to users)"
 #~ msgstr "Actif (visible pour les utilisateurs)"
@@ -4401,11 +4383,11 @@ msgstr ""
 #~ "Are you sure you want to delete this news item? This action cannot be "
 #~ "undone."
 #~ msgstr ""
-#~ "├ètes-vous s├╗r de vouloir supprimer cet article ? Cette action est "
-#~ "irr├⌐versible."
+#~ "Êtes-vous sûr de vouloir supprimer cet article ? Cette action est "
+#~ "irréversible."
 
 #~ msgid "Create New User"
-#~ msgstr "Cr├⌐er un nouvel utilisateur"
+#~ msgstr "Créer un nouvel utilisateur"
 
 #~ msgid "Name *"
 #~ msgstr "Nom *"
@@ -4423,7 +4405,7 @@ msgstr ""
 #~ msgstr "Mot de passe *"
 
 #~ msgid "Set password for user"
-#~ msgstr "D├⌐finir un mot de passe pour l'utilisateur"
+#~ msgstr "Définir un mot de passe pour l'utilisateur"
 
 #~ msgid "Confirm Password *"
 #~ msgstr "Confirmez le mot de passe *"
@@ -4435,13 +4417,13 @@ msgstr ""
 #~ msgstr "Les mots de passe correspondent"
 
 #~ msgid "Enter institution/organization"
-#~ msgstr "Indiquez l'├⌐tablissement/l'organisation"
+#~ msgstr "Indiquez l'établissement/l'organisation"
 
 #~ msgid "Select country..."
-#~ msgstr "S├⌐lectionnez un pays..."
+#~ msgstr "Sélectionnez un pays..."
 
 #~ msgid "Role *"
-#~ msgstr "R├┤le *"
+#~ msgstr "Rôle *"
 
 #~ msgid "User"
 #~ msgstr "Utilisateur"
@@ -4450,37 +4432,37 @@ msgstr ""
 #~ msgstr "Super Administrateur"
 
 #~ msgid "Create User"
-#~ msgstr "Cr├⌐er un utilisateur"
+#~ msgstr "Créer un utilisateur"
 
 #~ msgid "Clear Form"
 #~ msgstr "Formulaire clair"
 
 #~ msgid "Upload New Script"
-#~ msgstr "T├⌐l├⌐verser un nouveau script"
+#~ msgstr "Téléverser un nouveau script"
 
 #~ msgid "Upload a .tar.gz archive containing your script and a "
-#~ msgstr "T├⌐l├⌐versez une archive .tar.gz contenant votre script et un "
+#~ msgstr "Téléversez une archive .tar.gz contenant votre script et un "
 
 #~ msgid ""
 #~ " file. The script name and metadata are read from the configuration file."
 #~ msgstr ""
-#~ " Le nom du script et ses m├⌐tadonn├⌐es sont lus ├á partir du fichier de "
+#~ " Le nom du script et ses métadonnées sont lus à partir du fichier de "
 #~ "configuration."
 
 #~ msgid "Script Archive (.tar.gz) *"
 #~ msgstr "Archive du script (.tar.gz) *"
 
 #~ msgid "Drag and Drop or "
-#~ msgstr "Glisser-d├⌐poser ou "
+#~ msgstr "Glisser-déposer ou "
 
 #~ msgid "Select Script Archive"
-#~ msgstr "S├⌐lectionner l'archive de scripts"
+#~ msgstr "Sélectionner l'archive de scripts"
 
 #~ msgid "Upload Script"
-#~ msgstr "Script de t├⌐l├⌐chargement"
+#~ msgstr "Script de téléchargement"
 
 #~ msgid "Script"
-#~ msgstr "Sc├⌐nario"
+#~ msgstr "Scénario"
 
 #~ msgid "Start"
 #~ msgstr "Commencer"
@@ -4489,7 +4471,7 @@ msgstr ""
 #~ msgstr "Fin"
 
 #~ msgid "Duration"
-#~ msgstr "Dur├⌐e"
+#~ msgstr "Durée"
 
 #~ msgid "ID"
 #~ msgstr "IDENTIFIANT"
@@ -4498,13 +4480,13 @@ msgstr ""
 #~ msgstr "ID de l&#39;utilisateur"
 
 #~ msgid "Params"
-#~ msgstr "Param├¿tres"
+#~ msgstr "Paramètres"
 
 #~ msgid "Results"
-#~ msgstr "R├⌐sultats"
+#~ msgstr "Résultats"
 
 #~ msgid "Logs"
-#~ msgstr "b├╗ches"
+#~ msgstr "bûches"
 
 #~ msgid "Docker Logs"
 #~ msgstr "Journaux Docker"
@@ -4516,19 +4498,19 @@ msgstr ""
 #~ msgstr "Carte"
 
 #~ msgid "Last Activity"
-#~ msgstr "Derni├¿re activit├⌐"
+#~ msgstr "Dernière activité"
 
 #~ msgid "Verified"
-#~ msgstr "V├⌐rifi├⌐"
+#~ msgstr "Vérifié"
 
 #~ msgid "Verified At"
-#~ msgstr "V├⌐rifi├⌐ ├á"
+#~ msgstr "Vérifié à"
 
 #~ msgid "Created"
-#~ msgstr "Cr├⌐├⌐"
+#~ msgstr "Créé"
 
 #~ msgid "Updated"
-#~ msgstr "Mis ├á jour"
+#~ msgstr "Mis à jour"
 
 #~ msgid "GEE License"
 #~ msgstr "Licence GEE"
@@ -4537,7 +4519,7 @@ msgstr ""
 #~ msgstr "Limace"
 
 #~ msgid "Access"
-#~ msgstr "Acc├⌐der"
+#~ msgstr "Accéder"
 
 #~ msgid "Environment"
 #~ msgstr "Environnement"
@@ -4564,7 +4546,7 @@ msgstr ""
 #~ msgstr "Point de terminaison"
 
 #~ msgid "Method"
-#~ msgstr "M├⌐thode"
+#~ msgstr "Méthode"
 
 #~ msgid "IP Address"
 #~ msgstr "Adresse IP"
@@ -4576,19 +4558,19 @@ msgstr ""
 #~ msgstr "Compter"
 
 #~ msgid "Window"
-#~ msgstr "Fen├¬tre"
+#~ msgstr "Fenêtre"
 
 #~ msgid "Retry After"
-#~ msgstr "R├⌐essayer apr├¿s"
+#~ msgstr "Réessayer après"
 
 #~ msgid "Limiter Key"
-#~ msgstr "Cl├⌐ limiteuse"
+#~ msgstr "Clé limiteuse"
 
 #~ msgid "User Agent"
 #~ msgstr "Agent utilisateur"
 
 #~ msgid "Event ID"
-#~ msgstr "ID de l&#39;├⌐v├⌐nement"
+#~ msgstr "ID de l&#39;événement"
 
 #~ msgid "Expires"
 #~ msgstr "Expire"
@@ -4600,96 +4582,96 @@ msgstr ""
 #~ msgstr "Usage"
 
 #~ msgid "Rate Limit Type"
-#~ msgstr "Type de limite de d├⌐bit"
+#~ msgstr "Type de limite de débit"
 
 #~ msgid "Number of Executions"
-#~ msgstr "Nombre d'ex├⌐cutions"
+#~ msgstr "Nombre d'exécutions"
 
 #~ msgid "Running executions{suffix_label}"
-#~ msgstr "Ex├⌐cutions en cours{suffix_label}"
+#~ msgstr "Exécutions en cours{suffix_label}"
 
 #~ msgid "No in-progress execution data available."
-#~ msgstr "Aucune donn├⌐e d'ex├⌐cution en cours disponible."
+#~ msgstr "Aucune donnée d'exécution en cours disponible."
 
 #~ msgid ""
 #~ "Status time series data did not include ready, pending, or running counts "
 #~ "for this period."
 #~ msgstr ""
-#~ "Les donn├⌐es chronologiques relatives ├á l'├⌐tat n'incluaient pas les "
-#~ "d├⌐comptes des statuts pr├¬ts, en attente ou en cours pour cette p├⌐riode."
+#~ "Les données chronologiques relatives à l'état n'incluaient pas les décomptes"
+#~ " des statuts prêts, en attente ou en cours pour cette période."
 
 #~ msgid "Status timestamps could not be parsed from the API response."
 #~ msgstr ""
-#~ "Impossible d'analyser les horodatages d'├⌐tat ├á partir de la r├⌐ponse de "
+#~ "Impossible d'analyser les horodatages d'état à partir de la réponse de "
 #~ "l'API."
 
 #~ msgid "Status time series data was not provided for this period."
 #~ msgstr ""
-#~ "Les donn├⌐es chronologiques relatives ├á l'├⌐tat n'ont pas ├⌐t├⌐ fournies "
-#~ "pour cette p├⌐riode."
+#~ "Les données chronologiques relatives à l'état n'ont pas été fournies pour "
+#~ "cette période."
 
 #~ msgid "Cumulative Executions"
-#~ msgstr "Ex├⌐cutions cumulatives"
+#~ msgstr "Exécutions cumulatives"
 
 #~ msgid "Cumulative completed tasks{suffix_label}{agg_suffix}"
-#~ msgstr "T├óches cumul├⌐es termin├⌐es{suffix_label}{agg_suffix}"
+#~ msgstr "Tâches cumulées terminées{suffix_label}{agg_suffix}"
 
 #~ msgid "Completed executions (cumulative){suffix_label}"
-#~ msgstr "Ex├⌐cutions termin├⌐es (cumulatives){suffix_label}"
+#~ msgstr "Exécutions terminées (cumulatives){suffix_label}"
 
 #~ msgid "No cumulative execution data available."
-#~ msgstr "Aucune donn├⌐e d'ex├⌐cution cumulative disponible."
+#~ msgstr "Aucune donnée d'exécution cumulative disponible."
 
 #~ msgid ""
 #~ "The execution statistics time series did not include finished, failed, or "
 #~ "cancelled statuses."
 #~ msgstr ""
-#~ "Les s├⌐ries chronologiques des statistiques d'ex├⌐cution n'incluaient pas "
-#~ "les statuts termin├⌐, ├⌐chou├⌐ ou annul├⌐."
+#~ "Les séries chronologiques des statistiques d'exécution n'incluaient pas les "
+#~ "statuts terminé, échoué ou annulé."
 
 #~ msgid "No execution trend data available."
-#~ msgstr "Aucune donn├⌐e sur les tendances d'ex├⌐cution n'est disponible."
+#~ msgstr "Aucune donnée sur les tendances d'exécution n'est disponible."
 
 #~ msgid "Execution timestamps could not be parsed from the API response."
 #~ msgstr ""
-#~ "Les horodatages d'ex├⌐cution n'ont pas pu ├¬tre analys├⌐s ├á partir de la "
-#~ "r├⌐ponse de l'API."
+#~ "Les horodatages d'exécution n'ont pas pu être analysés à partir de la "
+#~ "réponse de l'API."
 
 #~ msgid "Execution count{suffix_label}"
-#~ msgstr "Nombre d'ex├⌐cutions{suffix_label}"
+#~ msgstr "Nombre d'exécutions{suffix_label}"
 
 #~ msgid "Average Duration (minutes)"
-#~ msgstr "Dur├⌐e moyenne (minutes)"
+#~ msgstr "Durée moyenne (minutes)"
 
 #~ msgid "Execution duration{suffix_label}"
-#~ msgstr "Dur├⌐e d'ex├⌐cution{suffix_label}"
+#~ msgstr "Durée d'exécution{suffix_label}"
 
 #~ msgid "Failure Rate (%)"
-#~ msgstr "Taux d'├⌐chec (%)"
+#~ msgstr "Taux d'échec (%)"
 
 #~ msgid "Top scripts by failure count{suffix_label}"
-#~ msgstr "Scripts les plus performants par nombre d'├⌐checs{suffix_label}"
+#~ msgstr "Scripts les plus performants par nombre d'échecs{suffix_label}"
 
 #~ msgid "Top users by activity{suffix_label}"
-#~ msgstr "Meilleurs utilisateurs par activit├⌐{suffix_label}"
+#~ msgstr "Meilleurs utilisateurs par activité{suffix_label}"
 
 #~ msgid "Script Version"
 #~ msgstr "Version du script"
 
 #~ msgid "{num_versions} distinct versions, {num_executions} executions"
-#~ msgstr "{num_versions} versions distinctes, {num_executions} ex├⌐cutions"
+#~ msgstr "{num_versions} versions distinctes, {num_executions} exécutions"
 
 #~ msgid "{num_executions} executions from scripts with no parseable version"
-#~ msgstr "{num_executions} ex├⌐cutions de scripts sans version analysable"
+#~ msgstr "{num_executions} exécutions de scripts sans version analysable"
 
 #~ msgid "Execution script version distribution{suffix_label}"
-#~ msgstr "distribution de la version du script d'ex├⌐cution{suffix_label}"
+#~ msgstr "distribution de la version du script d'exécution{suffix_label}"
 
 #~ msgid "New user registrations{suffix_label}"
 #~ msgstr "Inscriptions de nouveaux utilisateurs{suffix_label}"
 
 #~ msgid "Cumulative New Users"
-#~ msgstr "Nouveaux utilisateurs cumul├⌐s"
+#~ msgstr "Nouveaux utilisateurs cumulés"
 
 #~ msgid "Number of Users"
 #~ msgstr "Nombre d'utilisateurs"
@@ -4701,19 +4683,19 @@ msgstr ""
 #~ msgstr "Environnement : {env}"
 
 #~ msgid "API Status: Authentication required"
-#~ msgstr "├ëtat de l'API : Authentification requise"
+#~ msgstr "État de l'API : Authentification requise"
 
 #~ msgid "Please log in to view deployment status"
-#~ msgstr "Veuillez vous connecter pour consulter l'├⌐tat du d├⌐ploiement"
+#~ msgstr "Veuillez vous connecter pour consulter l'état du déploiement"
 
 #~ msgid "API status unavailable"
-#~ msgstr "├ëtat de l'API indisponible"
+#~ msgstr "État de l'API indisponible"
 
 #~ msgid "Authentication required"
 #~ msgstr "Authentification requise"
 
 #~ msgid "Please log in to view cluster status"
-#~ msgstr "Veuillez vous connecter pour consulter l'├⌐tat du cluster"
+#~ msgstr "Veuillez vous connecter pour consulter l'état du cluster"
 
 #~ msgid " (Auth Required)"
 #~ msgstr " (Authentification requise)"
@@ -4722,49 +4704,49 @@ msgstr ""
 #~ msgstr " (En direct)"
 
 #~ msgid " (Updated: {time} {tz})"
-#~ msgstr " (Mis ├á jour : {time} {tz})"
+#~ msgstr " (Mis à jour : {time} {tz})"
 
 #~ msgid " (Updated: {time})"
-#~ msgstr " (Mis ├á jour : {time})"
+#~ msgstr " (Mis à jour : {time})"
 
 #~ msgid "Authentication failed"
-#~ msgstr "L'authentification a ├⌐chou├⌐"
+#~ msgstr "L'authentification a échoué"
 
 #~ msgid "Please check your login status"
-#~ msgstr "Veuillez v├⌐rifier votre statut de connexion"
+#~ msgstr "Veuillez vérifier votre statut de connexion"
 
 #~ msgid " (Auth Error)"
 #~ msgstr " (Erreur d'authentification)"
 
 #~ msgid "Access denied"
-#~ msgstr "Acc├¿s refus├⌐"
+#~ msgstr "Accès refusé"
 
 #~ msgid "Admin privileges required for cluster status"
-#~ msgstr "Privil├¿ges d'administrateur requis pour l'├⌐tat du cluster"
+#~ msgstr "Privilèges d'administrateur requis pour l'état du cluster"
 
 #~ msgid " (Access Denied)"
-#~ msgstr " (Acc├¿s refus├⌐)"
+#~ msgstr " (Accès refusé)"
 
 #~ msgid "Cluster Status: Error ({status_code})"
-#~ msgstr "├ëtat du cluster : Erreur ({status_code})"
+#~ msgstr "État du cluster : Erreur ({status_code})"
 
 #~ msgid "Unable to retrieve cluster information"
-#~ msgstr "Impossible de r├⌐cup├⌐rer les informations du cluster"
+#~ msgstr "Impossible de récupérer les informations du cluster"
 
 #~ msgid " (Error)"
 #~ msgstr " (Erreur)"
 
 #~ msgid "Cluster Status: Connection Error"
-#~ msgstr "├ëtat du cluster : Erreur de connexion"
+#~ msgstr "État du cluster : Erreur de connexion"
 
 #~ msgid "Unable to reach cluster status endpoint"
-#~ msgstr "Impossible d'atteindre le point de terminaison d'├⌐tat du cluster"
+#~ msgstr "Impossible d'atteindre le point de terminaison d'état du cluster"
 
 #~ msgid " (Connection Error)"
 #~ msgstr " (Erreur de connexion)"
 
 #~ msgid "System status is currently unavailable. Please try again later."
 #~ msgstr ""
-#~ "L'├⌐tat du syst├¿me est actuellement indisponible. Veuillez r├⌐essayer plus "
-#~ "tard.L'├⌐tat du syst├¿me est actuellement indisponible. Veuillez r├⌐essayer "
+#~ "L'état du système est actuellement indisponible. Veuillez réessayer plus "
+#~ "tard.L'état du système est actuellement indisponible. Veuillez réessayer "
 #~ "plus tard."
