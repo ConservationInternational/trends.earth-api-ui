@@ -75,7 +75,11 @@ def register_callbacks(app):
         Input("export-users-btn", "n_clicks"),
         prevent_initial_call=True,
     )
-    def _trigger_users_export(_n):
+    def _trigger_users_export(n):
+        # Guard: n_clicks is None when the button is first added to the DOM
+        # (dynamically rendered tabs fire callbacks even with prevent_initial_call=True)
+        if not n:
+            return no_update
         return "users"
 
     @app.callback(
@@ -83,7 +87,9 @@ def register_callbacks(app):
         Input("export-executions-btn", "n_clicks"),
         prevent_initial_call=True,
     )
-    def _trigger_executions_export(_n):
+    def _trigger_executions_export(n):
+        if not n:
+            return no_update
         return "executions"
 
     @app.callback(
@@ -91,7 +97,9 @@ def register_callbacks(app):
         Input("export-scripts-btn", "n_clicks"),
         prevent_initial_call=True,
     )
-    def _trigger_scripts_export(_n):
+    def _trigger_scripts_export(n):
+        if not n:
+            return no_update
         return "scripts"
 
     # ------------------------------------------------------------------
