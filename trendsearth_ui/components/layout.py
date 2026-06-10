@@ -164,6 +164,7 @@ def create_main_layout():
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             dcc.Store(id="selected-rate-limit-data"),  # Store data for selected rate limit to reset
             dcc.Store(id="csv-export-table-type-store"),  # Which table is being exported
+            dcc.Store(id="csv-export-trigger"),  # Set to table type when an export btn is clicked
             dcc.Download(id="csv-export-download"),
             # Timezone detection components
             *timezone_components,

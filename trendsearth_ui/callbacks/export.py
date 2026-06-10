@@ -4,7 +4,7 @@ from datetime import datetime
 import logging
 from urllib.parse import urlencode
 
-from dash import Input, Output, State, callback_context, dcc, no_update
+from dash import Input, Output, State, dcc, no_update
 
 from ..utils.helpers import is_admin, make_authenticated_request
 
@@ -64,7 +64,38 @@ def register_callbacks(app):
     """Register CSV export callbacks."""
 
     # ------------------------------------------------------------------
-    # 1. Open modal when any export button is clicked
+    # 1a-c. Each tab's export button writes the table type to a shared
+    #       always-present store.  Using separate per-tab callbacks means
+    #       no callback ever references a component from a different tab
+    #       as an Input, which avoids the Dash client-side ReferenceError
+    #       that fires when a tab's content is not yet in the DOM.
+    # ------------------------------------------------------------------
+    @app.callback(
+        Output("csv-export-trigger", "data", allow_duplicate=True),
+        Input("export-users-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def _trigger_users_export(_n):
+        return "users"
+
+    @app.callback(
+        Output("csv-export-trigger", "data", allow_duplicate=True),
+        Input("export-executions-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def _trigger_executions_export(_n):
+        return "executions"
+
+    @app.callback(
+        Output("csv-export-trigger", "data", allow_duplicate=True),
+        Input("export-scripts-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def _trigger_scripts_export(_n):
+        return "scripts"
+
+    # ------------------------------------------------------------------
+    # 2. Open the modal when the trigger store is updated.
     # ------------------------------------------------------------------
     @app.callback(
         [
@@ -75,34 +106,17 @@ def register_callbacks(app):
             Output("csv-export-date-from", "value"),
             Output("csv-export-date-to", "value"),
         ],
-        [
-            Input("export-users-btn", "n_clicks"),
-            Input("export-executions-btn", "n_clicks"),
-            Input("export-scripts-btn", "n_clicks"),
-            Input("csv-export-cancel-btn", "n_clicks"),
-        ],
+        Input("csv-export-trigger", "data"),
         prevent_initial_call=True,
     )
-    def toggle_export_modal(_users_clicks, _executions_clicks, _scripts_clicks, _cancel_clicks):
-        ctx = callback_context
-        if not ctx.triggered:
-            return no_update, no_update, no_update, no_update, no_update, no_update
-
-        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-        if trigger_id == "csv-export-cancel-btn":
-            return False, no_update, no_update, no_update, no_update, no_update
-
-        table_map = {
-            "export-users-btn": "users",
-            "export-executions-btn": "executions",
-            "export-scripts-btn": "scripts",
-        }
-        table_type = table_map.get(trigger_id)
+    def open_export_modal(table_type):
         if not table_type:
             return no_update, no_update, no_update, no_update, no_update, no_update
 
-        cfg = _TABLE_CONFIG[table_type]
+        cfg = _TABLE_CONFIG.get(table_type)
+        if not cfg:
+            return no_update, no_update, no_update, no_update, no_update, no_update
+
         return (
             True,
             table_type,
@@ -113,7 +127,18 @@ def register_callbacks(app):
         )
 
     # ------------------------------------------------------------------
-    # 2. Perform the export when the user confirms
+    # 3. Close the modal when Cancel is clicked.
+    # ------------------------------------------------------------------
+    @app.callback(
+        Output("csv-export-modal", "is_open", allow_duplicate=True),
+        Input("csv-export-cancel-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def close_export_modal(_n_clicks):
+        return False
+
+    # ------------------------------------------------------------------
+    # 4. Perform the export when the user confirms.
     # ------------------------------------------------------------------
     @app.callback(
         [
