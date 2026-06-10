@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import logging
+from urllib.parse import urlencode
 
 from dash import Input, Output, State, callback_context, dcc, no_update
 
@@ -156,8 +157,7 @@ def register_callbacks(app):
         params = _build_export_params(date_field, date_from, date_to)
         endpoint = cfg["endpoint"]
         if params:
-            query_string = "&".join(f"{k}={v}" for k, v in params.items())
-            endpoint = f"{endpoint}?{query_string}"
+            endpoint = f"{endpoint}?{urlencode(params)}"
 
         try:
             resp = make_authenticated_request(
