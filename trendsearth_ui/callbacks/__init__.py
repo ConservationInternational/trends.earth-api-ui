@@ -44,6 +44,7 @@ def register_all_callbacks(app):
         "news_admin",  # Add news admin callbacks
         "bulk_email",  # Add bulk email callbacks
         "unsubscribe",  # Add unsubscribe page callbacks
+        "export",  # Add CSV export callbacks
     ]
 
     for module_name in callback_modules:

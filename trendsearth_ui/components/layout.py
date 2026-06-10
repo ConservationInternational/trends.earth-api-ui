@@ -21,6 +21,7 @@ from .modals import (
     bulk_email_restore_draft_modal,
     bulk_email_switch_html_modal,
     bulk_email_verify_modal,
+    csv_export_modal,
     delete_script_modal,
     delete_user_modal,
     edit_script_modal,
@@ -162,6 +163,8 @@ def create_main_layout():
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             dcc.Store(id="selected-rate-limit-data"),  # Store data for selected rate limit to reset
+            dcc.Store(id="csv-export-table-type-store"),  # Which table is being exported
+            dcc.Download(id="csv-export-download"),
             # Timezone detection components
             *timezone_components,
             # Mobile detection components
@@ -181,6 +184,7 @@ def create_main_layout():
             bulk_email_switch_html_modal(),
             bulk_email_verify_modal(),
             bulk_email_restore_draft_modal(),
+            csv_export_modal(),
         ],
         fluid=True,
     )
