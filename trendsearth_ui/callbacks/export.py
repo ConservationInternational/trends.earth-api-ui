@@ -99,7 +99,7 @@ def register_callbacks(app):
     # ------------------------------------------------------------------
     @app.callback(
         [
-            Output("csv-export-modal", "is_open"),
+            Output("csv-export-modal", "is_open", allow_duplicate=True),
             Output("csv-export-table-type-store", "data"),
             Output("csv-export-date-field", "options"),
             Output("csv-export-date-field", "value"),
