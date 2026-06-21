@@ -64,8 +64,8 @@ class TestAppIntegration:
 class TestAuthenticationFlow:
     """Test authentication flow integration."""
 
-    def test_successful_login_flow(self, dash_app, mock_user_data):
-        """Test successful login authentication flow."""
+    def test_login_callback_registered(self, dash_app):
+        """Test that login callback is registered."""
         # Test would require Dash testing client to simulate clicks
         # This is a structure test to ensure the callback exists
         # Use callback_map instead of _callback_map for newer Dash versions
