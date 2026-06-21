@@ -1,7 +1,5 @@
 """Integration tests for the Dash application."""
 
-from unittest.mock import Mock, patch
-
 import pytest
 
 from trendsearth_ui.app import app
@@ -66,28 +64,17 @@ class TestAppIntegration:
 class TestAuthenticationFlow:
     """Test authentication flow integration."""
 
-    @patch("trendsearth_ui.callbacks.auth.requests.post")
-    def test_successful_login_flow(self, mock_post, dash_app, mock_user_data):
+    def test_successful_login_flow(self, dash_app, mock_user_data):
         """Test successful login authentication flow."""
-        # Mock successful login response
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {"access_token": "test_token_123"}
-        mock_post.return_value = mock_response
-
-        # Mock user info retrieval
-        with patch("trendsearth_ui.callbacks.auth.get_user_info") as mock_get_user:
-            mock_get_user.return_value = mock_user_data
-
-            # Test would require Dash testing client to simulate clicks
-            # This is a structure test to ensure the callback exists
-            # Use callback_map instead of _callback_map for newer Dash versions
-            try:
-                callback_map = str(dash_app.callback_map)
-            except AttributeError:
-                # Fallback for older versions or if callback_map doesn't exist
-                callback_map = str(getattr(dash_app, "_callback_map", {}))
-            assert "login_api" in callback_map
+        # Test would require Dash testing client to simulate clicks
+        # This is a structure test to ensure the callback exists
+        # Use callback_map instead of _callback_map for newer Dash versions
+        try:
+            callback_map = str(dash_app.callback_map)
+        except AttributeError:
+            # Fallback for older versions or if callback_map doesn't exist
+            callback_map = str(getattr(dash_app, "_callback_map", {}))
+        assert "login_api" in callback_map
 
     def test_page_navigation_callback_exists(self, dash_app):
         """Test that page navigation callback is registered."""
