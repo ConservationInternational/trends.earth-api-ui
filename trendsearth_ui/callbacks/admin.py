@@ -320,16 +320,16 @@ def _extract_rate_limit_events(payload: Any) -> tuple[list[dict[str, Any]], int 
             "combined_total",
         ):
             value = payload.get(key)
-            if isinstance(value, (int, float)):
+            if isinstance(value, int | float):
                 total_candidates.append(int(value))
 
         active_total = payload.get("total_active") or payload.get("active_total")
         hist_total = payload.get("total_historical") or payload.get("historical_total")
-        if isinstance(active_total, (int, float)) and isinstance(hist_total, (int, float)):
+        if isinstance(active_total, int | float) and isinstance(hist_total, int | float):
             total_candidates.append(int(active_total) + int(hist_total))
-        elif isinstance(active_total, (int, float)):
+        elif isinstance(active_total, int | float):
             total_candidates.append(int(active_total))
-        elif isinstance(hist_total, (int, float)):
+        elif isinstance(hist_total, int | float):
             total_candidates.append(int(hist_total))
 
     elif isinstance(payload, list):

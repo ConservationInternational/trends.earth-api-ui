@@ -453,7 +453,7 @@ class TestStatusTabsErrorHandling:
             # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
             # We want to check the first output (summary)
             summary_result = (
-                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+                result[1] if isinstance(result, tuple | list) and len(result) > 1 else result
             )
             result_str = str(summary_result)
 
@@ -536,7 +536,7 @@ class TestStatusTabsErrorHandling:
 
             # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
             result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-            assert isinstance(result, (tuple, list))
+            assert isinstance(result, tuple | list)
             status_title = result[0]
             summary_result = result[1]
             result_str = str(summary_result)
@@ -625,7 +625,7 @@ class TestStatusTabsErrorHandling:
             # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
             # We want to check the first output (summary)
             summary_result = (
-                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+                result[1] if isinstance(result, tuple | list) and len(result) > 1 else result
             )
             result_str = str(summary_result)
 

@@ -203,10 +203,10 @@ def _get_automatic_context() -> dict[str, Any]:
                 ]:
                     # Convert complex objects to string representation
                     try:
-                        if isinstance(value, (str, int, float, bool, list, dict)):
+                        if isinstance(value, str | int | float | bool | list | dict):
                             if isinstance(value, str) and len(value) > 200:
                                 filtered_vars[key] = value[:200] + "..."
-                            elif isinstance(value, (list, dict)):
+                            elif isinstance(value, list | dict):
                                 filtered_vars[key] = (
                                     str(value)[:200] + "..." if len(str(value)) > 200 else value
                                 )

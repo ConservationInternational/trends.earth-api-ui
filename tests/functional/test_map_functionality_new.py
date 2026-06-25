@@ -135,8 +135,8 @@ def test_point_coordinates_structure(test_geojsons):
     assert geometry["type"] == "Point", "Should be a Point type"
     assert "coordinates" in geometry, "Should have coordinates"
     assert len(geometry["coordinates"]) == 2, "Point should have exactly 2 coordinates"
-    assert isinstance(geometry["coordinates"][0], (int, float)), "Longitude should be numeric"
-    assert isinstance(geometry["coordinates"][1], (int, float)), "Latitude should be numeric"
+    assert isinstance(geometry["coordinates"][0], int | float), "Longitude should be numeric"
+    assert isinstance(geometry["coordinates"][1], int | float), "Latitude should be numeric"
 
 
 def test_map_modal_callback_simulation(test_geojsons):

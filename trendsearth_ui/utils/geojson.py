@@ -242,7 +242,7 @@ def create_map_from_geojsons(geojsons, exec_id):
             else:
                 logger.debug("No coordinates found, using default center")
 
-        elif isinstance(geojsons, (dict, str)):
+        elif isinstance(geojsons, dict | str):
             logger.debug("Processing single geojson")
             # Single geojson
             if isinstance(geojsons, str):
@@ -489,7 +489,7 @@ def create_minimap(center, zoom, map_id, geojsons=None):
             arr = np.array(coords)
             return [float(arr[:, 0].mean()), float(arr[:, 1].mean())]
 
-        if isinstance(geojsons, (dict, str)):
+        if isinstance(geojsons, dict | str):
             geojsons = [geojsons]
         for geo in geojsons:
             if isinstance(geo, str):

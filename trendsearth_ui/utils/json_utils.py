@@ -167,7 +167,7 @@ def _render_object(data: dict[str, Any], level: int, parent_id: str) -> html.Div
     items = []
     for k, v in data.items():
         node_id = f"{parent_id}-{k}"
-        is_complex = isinstance(v, (dict, list))
+        is_complex = isinstance(v, dict | list)
 
         if is_complex:
             # Create collapsible item for complex values
@@ -221,7 +221,7 @@ def _render_array(data: list[Any], level: int, parent_id: str) -> html.Div:
     items = []
     for idx, v in enumerate(data):
         node_id = f"{parent_id}-{idx}"
-        is_complex = isinstance(v, (dict, list))
+        is_complex = isinstance(v, dict | list)
 
         if is_complex:
             # Create collapsible item for complex values
@@ -382,7 +382,7 @@ def _get_type_name(value: Any) -> str:
         return "null"
     elif isinstance(value, bool):
         return "boolean"
-    elif isinstance(value, (int, float)):
+    elif isinstance(value, int | float):
         return "number"
     elif isinstance(value, str):
         return "string"
@@ -396,6 +396,6 @@ def _get_type_name(value: Any) -> str:
 
 def _get_size(value: Any) -> int | None:
     """Get the size of a collection (dict or list)."""
-    if isinstance(value, (dict, list)):
+    if isinstance(value, dict | list):
         return len(value)
     return None

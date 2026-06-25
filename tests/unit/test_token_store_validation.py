@@ -73,10 +73,10 @@ class TestTokenStoreCallbackOutputSchema:
         # Test: no current token → returns no_update (not a tuple)
         result = auto_refresh_token_fn(None)
         assert result is no_update
-        assert not isinstance(result, (list, tuple))
+        assert not isinstance(result, list | tuple)
 
         # Test: token that does not need refreshing → returns no_update (not a tuple)
         with patch("trendsearth_ui.callbacks.auth.should_refresh_token", return_value=False):
             result = auto_refresh_token_fn("some.valid.token")
         assert result is no_update
-        assert not isinstance(result, (list, tuple))
+        assert not isinstance(result, list | tuple)

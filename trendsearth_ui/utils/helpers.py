@@ -100,7 +100,7 @@ def safe_table_data(data: list[dict] | None, column_ids: list[str] | None = None
             v = row.get(k, "")
             if k in ("params", "results"):
                 newrow[k] = f"Show {k.capitalize()}"
-            elif isinstance(v, (dict, list)):
+            elif isinstance(v, dict | list):
                 newrow[k] = json.dumps(v)
             else:
                 newrow[k] = v
