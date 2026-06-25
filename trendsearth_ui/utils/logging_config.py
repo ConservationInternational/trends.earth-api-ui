@@ -4,7 +4,7 @@ import inspect
 import logging
 import os
 import sys
-from typing import Any, Optional
+from typing import Any
 
 import rollbar
 from rollbar.logger import RollbarHandler
@@ -98,7 +98,7 @@ def _attach_rollbar_handler(target_logger: logging.Logger) -> None:
     target_logger.addHandler(handler)
 
 
-def setup_logging(rollbar_token: Optional[str] = None) -> logging.Logger:
+def setup_logging(rollbar_token: str | None = None) -> logging.Logger:
     """Set up logging with Rollbar integration if token is provided."""
     global _rollbar_initialized  # noqa: PLW0603
 

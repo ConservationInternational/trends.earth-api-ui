@@ -1,6 +1,6 @@
 """Optimized status dashboard callbacks with reduced API calls and enhanced caching."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import logging
 
 from cachetools import TTLCache
@@ -87,10 +87,7 @@ def _format_display_time(value, safe_timezone, *, include_seconds=True):
         else:
             return None
 
-        if dt_utc.tzinfo is None:
-            dt_utc = dt_utc.replace(tzinfo=timezone.utc)
-        else:
-            dt_utc = dt_utc.astimezone(timezone.utc)
+        dt_utc = dt_utc.replace(tzinfo=UTC) if dt_utc.tzinfo is None else dt_utc.astimezone(UTC)
 
         local_time_str, tz_abbrev = format_local_time(
             dt_utc,

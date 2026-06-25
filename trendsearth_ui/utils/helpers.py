@@ -3,7 +3,7 @@
 from datetime import datetime
 import json
 import logging
-from typing import Any, Optional, Union
+from typing import Any
 
 import requests
 
@@ -21,12 +21,12 @@ FAST_API_TIMEOUT = (3, 10)
 ADMIN_ROLES = ("ADMIN", "SUPERADMIN")
 
 
-def is_admin(role: Optional[str]) -> bool:
+def is_admin(role: str | None) -> bool:
     """Return True if the given role has admin privileges (ADMIN or SUPERADMIN)."""
     return role in ADMIN_ROLES
 
 
-def is_superadmin(role: Optional[str]) -> bool:
+def is_superadmin(role: str | None) -> bool:
     """Return True if the given role is SUPERADMIN."""
     return role == "SUPERADMIN"
 
@@ -44,7 +44,7 @@ def extract_api_error(response: "requests.Response", default: str = "An error oc
         return default
 
 
-def format_duration(duration_seconds: Optional[Union[int, float, str]]) -> str:
+def format_duration(duration_seconds: int | float | str | None) -> str:
     """Format a duration in seconds to H:MM:SS clock format.
 
     Returns '-' for missing or zero values.
@@ -61,7 +61,7 @@ def format_duration(duration_seconds: Optional[Union[int, float, str]]) -> str:
         return "-"
 
 
-def parse_date(date_str: Optional[str], user_timezone: str = "UTC") -> Optional[str]:
+def parse_date(date_str: str | None, user_timezone: str = "UTC") -> str | None:
     """Parse date string and return formatted string for ag-grid with timezone conversion.
 
     Args:
@@ -89,9 +89,7 @@ def parse_date(date_str: Optional[str], user_timezone: str = "UTC") -> Optional[
         return date_str  # Return original if parsing fails
 
 
-def safe_table_data(
-    data: Optional[list[dict]], column_ids: Optional[list[str]] = None
-) -> list[dict]:
+def safe_table_data(data: list[dict] | None, column_ids: list[str] | None = None) -> list[dict]:
     """Safely process table data for display."""
     if not data:
         return []
@@ -111,7 +109,7 @@ def safe_table_data(
     return newdata
 
 
-def get_user_info(token: str, api_base: Optional[str] = None) -> Optional[dict[str, Any]]:
+def get_user_info(token: str, api_base: str | None = None) -> dict[str, Any] | None:
     """Get user information from API with improved error handling."""
     if not token:
         logger.debug("get_user_info: No token provided")
@@ -161,7 +159,7 @@ def get_user_info(token: str, api_base: Optional[str] = None) -> Optional[dict[s
 
 def refresh_access_token(
     refresh_token: str, api_environment: str = None
-) -> tuple[Optional[str], Optional[int], Optional[str]]:
+) -> tuple[str | None, int | None, str | None]:
     """Refresh access token using refresh token.
 
     The API implements refresh token rotation: the presented refresh token is

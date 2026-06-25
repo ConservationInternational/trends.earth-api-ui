@@ -1,9 +1,9 @@
 """Centralized status data management for optimized API calls and caching."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import logging
 import math
-from typing import Any, Optional
+from typing import Any
 
 from cachetools import TTLCache
 from requests.exceptions import RequestException
@@ -66,7 +66,7 @@ class StatusDataManager:
         return "_".join(key_parts)
 
     @staticmethod
-    def get_cached_data(cache_key: str, cache_type: str = "status") -> Optional[Any]:
+    def get_cached_data(cache_key: str, cache_type: str = "status") -> Any | None:
         """Get data from appropriate cache."""
         cache = _status_data_cache if cache_type == "status" else _stats_data_cache
         return cache.get(cache_key)
@@ -82,7 +82,7 @@ class StatusDataManager:
         token: str,
         api_environment: str,
         force_refresh: bool = False,
-        user_timezone: Optional[str] = None,
+        user_timezone: str | None = None,
     ) -> dict[str, Any]:
         """
         Fetch all status-related data in one consolidated call.
@@ -328,7 +328,7 @@ class StatusDataManager:
         # Calculate time range or aggregation strategy for the selected period
         from datetime import timedelta
 
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(UTC)
         use_aggregation = time_period in {"year", "all"}
         period_param: str | None = None
         group_by: str | None = None
@@ -528,7 +528,7 @@ class StatusDataManager:
         return StatusDataManager._systematic_sample(data, target_points)
 
     @staticmethod
-    def invalidate_cache(pattern: Optional[str] = None) -> int:
+    def invalidate_cache(pattern: str | None = None) -> int:
         """
         Invalidate cached data.
 
@@ -622,7 +622,7 @@ class StatusDataManager:
             "time_series_data": None,
             "meta": {
                 "cache_hit": False,
-                "fetch_time": datetime.now(timezone.utc),
+                "fetch_time": datetime.now(UTC),
                 "api_calls_made": [],
                 "optimizations_applied": [],
             },

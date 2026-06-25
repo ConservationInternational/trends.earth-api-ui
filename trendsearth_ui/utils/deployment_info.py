@@ -1,6 +1,6 @@
 """Utilities for getting deployment information."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import os
 
 
@@ -33,7 +33,7 @@ def get_health_response():
     response = {
         "deployment": deployment_info,
         "status": "ok",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     return response

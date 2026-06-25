@@ -42,7 +42,7 @@ DEFAULT_LANGUAGE = "en"
 LANGUAGE_COOKIE_NAME = "trendsearth_language"
 
 # Babel instance - initialized when init_i18n is called
-babel: Optional[Babel] = None
+babel: Babel | None = None
 
 
 def get_locale() -> str:

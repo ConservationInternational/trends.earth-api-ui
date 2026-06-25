@@ -1796,7 +1796,9 @@ def register_callbacks(app):
         n = max(len(contents_list), len(items))
         result_urls = [items[i].get("image_url", "") if i < len(items) else "" for i in range(n)]
 
-        for i, (contents, filename) in enumerate(zip(contents_list or [], filenames_list or [])):
+        for i, (contents, filename) in enumerate(
+            zip(contents_list or [], filenames_list or [], strict=True)
+        ):
             if not contents:
                 continue
             try:

@@ -7,7 +7,6 @@ using the Google Cloud Translation API v2.
 import json
 import logging
 import os
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ LANGUAGE_NAMES = {
 _translate_client = None
 
 
-def _get_credentials_from_env() -> Optional[dict]:
+def _get_credentials_from_env() -> dict | None:
     """Get Google Cloud credentials from environment variable.
 
     Looks for GOOGLE_TRANSLATE_CREDENTIALS which should contain
@@ -111,7 +110,7 @@ def translate_text(
     text: str,
     target_lang: str,
     source_lang: str = "en",
-) -> Optional[str]:
+) -> str | None:
     """Translate text using Google Cloud Translation API.
 
     Args:
@@ -160,10 +159,10 @@ def translate_text(
 def translate_news_item(
     title: str,
     message: str,
-    link_text: Optional[str] = None,
+    link_text: str | None = None,
     target_lang: str = "es",
     source_lang: str = "en",
-) -> Optional[dict]:
+) -> dict | None:
     """Translate a news item (title, message, link_text) to target language.
 
     Args:
@@ -201,7 +200,7 @@ def translate_news_item(
 def translate_to_all_languages(
     title: str,
     message: str,
-    link_text: Optional[str] = None,
+    link_text: str | None = None,
     source_lang: str = "en",
 ) -> dict[str, dict]:
     """Translate a news item to all supported languages.

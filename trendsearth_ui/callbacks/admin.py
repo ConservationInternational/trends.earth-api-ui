@@ -1,7 +1,7 @@
 """Admin functionality callbacks."""
 
 import base64
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import logging
 from typing import Any
 from urllib.parse import quote as url_quote
@@ -105,7 +105,7 @@ def _parse_iso_datetime(value: Any) -> datetime | None:
         return None
 
     if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
 
     text = str(value)
     if not text:
@@ -120,7 +120,7 @@ def _parse_iso_datetime(value: Any) -> datetime | None:
         return None
 
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return parsed
 
 
@@ -134,7 +134,7 @@ def _format_combined_rate_limit_rows(
         return []
 
     formatted_events = _format_rate_limit_events(events, user_timezone)
-    now_utc = datetime.now(timezone.utc)
+    now_utc = datetime.now(UTC)
     timezone_label = user_timezone or "UTC"
     rows: list[dict[str, Any]] = []
 

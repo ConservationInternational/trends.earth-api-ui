@@ -1,7 +1,6 @@
 """Cookie utility functions for authentication persistence."""
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 
 def create_auth_cookie_data(
@@ -25,7 +24,7 @@ def create_auth_cookie_data(
     """
     # Set expiration to 30 days from now for "remember me" functionality
     # This allows refresh tokens to keep users logged in for an extended period
-    expiration = datetime.now(timezone.utc) + timedelta(days=30)
+    expiration = datetime.now(UTC) + timedelta(days=30)
 
     return {
         "access_token": access_token,
@@ -34,11 +33,11 @@ def create_auth_cookie_data(
         "user_data": user_data,
         "api_environment": api_environment,
         "expires_at": expiration.isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
     }
 
 
-def is_auth_cookie_valid(cookie_data: Optional[dict]) -> bool:
+def is_auth_cookie_valid(cookie_data: dict | None) -> bool:
     """Check if authentication cookie data is valid and not expired.
 
     Args:
@@ -57,17 +56,17 @@ def is_auth_cookie_valid(cookie_data: Optional[dict]) -> bool:
     try:
         expiration = datetime.fromisoformat(cookie_data["expires_at"])
         # Ensure both datetimes are timezone-aware for comparison
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if expiration.tzinfo is None:
-            expiration = expiration.replace(tzinfo=timezone.utc)
+            expiration = expiration.replace(tzinfo=UTC)
         return now < expiration
     except (ValueError, TypeError):
         return False
 
 
 def extract_auth_from_cookie(
-    cookie_data: Optional[dict],
-) -> tuple[Optional[str], Optional[str], Optional[str], Optional[dict], Optional[str]]:
+    cookie_data: dict | None,
+) -> tuple[str | None, str | None, str | None, dict | None, str | None]:
     """Extract authentication data from cookie if valid.
 
     Args:
