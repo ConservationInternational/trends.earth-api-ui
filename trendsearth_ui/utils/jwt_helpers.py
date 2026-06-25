@@ -1,10 +1,10 @@
 """JWT token utility functions for debugging token expiration issues."""
 
 import base64
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def should_refresh_token(access_token: str, buffer_minutes: int = 5) -> bool:
         # Can't determine expiration, be safe and refresh
         return True
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     buffer_time = exp_time - timedelta(minutes=buffer_minutes)
 
     # Refresh if we're within the buffer time or already expired
@@ -40,7 +40,7 @@ def should_refresh_token(access_token: str, buffer_minutes: int = 5) -> bool:
     return should_refresh
 
 
-def decode_jwt_payload(token: str) -> Optional[dict[str, Any]]:
+def decode_jwt_payload(token: str) -> dict[str, Any] | None:
     """Decode JWT token payload without verification (for debugging only).
 
     Args:
@@ -77,7 +77,7 @@ def decode_jwt_payload(token: str) -> Optional[dict[str, Any]]:
         return None
 
 
-def get_token_expiration(token: str) -> Optional[datetime]:
+def get_token_expiration(token: str) -> datetime | None:
     """Get the expiration time of a JWT token.
 
     Args:
@@ -96,7 +96,7 @@ def get_token_expiration(token: str) -> Optional[datetime]:
 
     try:
         # Convert Unix timestamp to datetime (UTC)
-        return datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
+        return datetime.fromtimestamp(exp_timestamp, tz=UTC)
     except Exception as e:
         logger.debug("Error converting expiration timestamp: %s", e)
         return None
@@ -115,7 +115,7 @@ def is_token_expired(token: str) -> bool:
     if exp_time is None:
         return True  # Treat indeterminate tokens as expired for safety
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return now >= exp_time
 
 
@@ -154,11 +154,11 @@ def get_token_info(token: str) -> dict[str, Any]:
             exp_timestamp = payload["exp"]
             info["exp_timestamp"] = exp_timestamp
 
-            exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
+            exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=UTC)
             info["exp_datetime"] = exp_datetime
             info["exp_local"] = exp_datetime.astimezone()
 
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             info["is_expired"] = now >= exp_datetime
 
             if not info["is_expired"]:
@@ -173,7 +173,7 @@ def get_token_info(token: str) -> dict[str, Any]:
         # Other standard JWT claims
         if "iat" in payload:
             iat_timestamp = payload["iat"]
-            iat_datetime = datetime.fromtimestamp(iat_timestamp, tz=timezone.utc)
+            iat_datetime = datetime.fromtimestamp(iat_timestamp, tz=UTC)
             info["issued_at"] = iat_datetime.astimezone()
 
         info["subject"] = payload.get("sub")

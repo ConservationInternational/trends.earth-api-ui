@@ -18,8 +18,10 @@ from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     access_control_modal,
+    bulk_email_restore_draft_modal,
     bulk_email_switch_html_modal,
     bulk_email_verify_modal,
+    csv_export_modal,
     delete_script_modal,
     delete_user_modal,
     edit_script_modal,
@@ -161,6 +163,9 @@ def create_main_layout():
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
             dcc.Store(id="delete-script-data"),  # Store data for script being deleted
             dcc.Store(id="selected-rate-limit-data"),  # Store data for selected rate limit to reset
+            dcc.Store(id="csv-export-table-type-store"),  # Which table is being exported
+            dcc.Store(id="csv-export-trigger"),  # Set to table type when an export btn is clicked
+            dcc.Download(id="csv-export-download"),
             # Timezone detection components
             *timezone_components,
             # Mobile detection components
@@ -179,6 +184,8 @@ def create_main_layout():
             reset_individual_rate_limit_modal(),
             bulk_email_switch_html_modal(),
             bulk_email_verify_modal(),
+            bulk_email_restore_draft_modal(),
+            csv_export_modal(),
         ],
         fluid=True,
     )

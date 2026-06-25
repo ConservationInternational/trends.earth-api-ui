@@ -1175,16 +1175,40 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             # Section 4 â€” Bulk Email History
             # -------------------------------------------------------
+            dcc.Store(id="bulk-email-history-selected-id"),
             dbc.Card(
                 [
                     dbc.CardHeader(html.H5("Bulk Email History", className="mb-0")),
                     dbc.CardBody(
                         [
-                            dbc.Button(
-                                "Refresh",
-                                id="bulk-email-history-refresh-btn",
-                                color="outline-secondary",
-                                size="sm",
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Button(
+                                            "Refresh",
+                                            id="bulk-email-history-refresh-btn",
+                                            color="outline-secondary",
+                                            size="sm",
+                                        ),
+                                        width="auto",
+                                    ),
+                                    dbc.Col(
+                                        dbc.Button(
+                                            "Restore to Draft",
+                                            id="bulk-email-restore-draft-btn",
+                                            color="outline-warning",
+                                            size="sm",
+                                            disabled=True,
+                                        ),
+                                        width="auto",
+                                    ),
+                                ],
+                                className="g-2 mb-2",
+                            ),
+                            dbc.Alert(
+                                id="bulk-email-restore-draft-alert",
+                                is_open=False,
+                                dismissable=True,
                                 className="mb-2",
                             ),
                             dag.AgGrid(

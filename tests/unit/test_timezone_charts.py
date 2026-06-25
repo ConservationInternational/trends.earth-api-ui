@@ -1,6 +1,6 @@
 """Tests for timezone conversion in charts."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from unittest.mock import patch
 
 import pandas as pd
@@ -21,9 +21,9 @@ class TestTimezoneChartConversion:
         # Create test timestamps in UTC
         utc_timestamps = pd.Series(
             [
-                datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-                datetime(2023, 1, 2, 15, 30, 0, tzinfo=timezone.utc),
-                datetime(2023, 1, 3, 9, 45, 0, tzinfo=timezone.utc),
+                datetime(2023, 1, 1, 12, 0, 0, tzinfo=UTC),
+                datetime(2023, 1, 2, 15, 30, 0, tzinfo=UTC),
+                datetime(2023, 1, 3, 9, 45, 0, tzinfo=UTC),
             ]
         )
 
@@ -72,7 +72,7 @@ class TestTimezoneChartConversion:
         """Test conversion with invalid timezone falls back to UTC."""
         utc_timestamps = pd.Series(
             [
-                datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+                datetime(2023, 1, 1, 12, 0, 0, tzinfo=UTC),
             ]
         )
 
@@ -87,9 +87,9 @@ class TestTimezoneChartConversion:
         """Test conversion handles NaN values gracefully."""
         timestamps_with_nan = pd.Series(
             [
-                datetime(2023, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+                datetime(2023, 1, 1, 12, 0, 0, tzinfo=UTC),
                 pd.NaT,  # NaN timestamp
-                datetime(2023, 1, 3, 9, 45, 0, tzinfo=timezone.utc),
+                datetime(2023, 1, 3, 9, 45, 0, tzinfo=UTC),
             ]
         )
 

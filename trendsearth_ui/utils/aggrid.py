@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, MutableMapping
+from collections.abc import Callable, Iterable, Mapping, MutableMapping
 import copy
-from typing import Any, Callable
+from typing import Any
 
 from ..config import DEFAULT_PAGE_SIZE
 from .helpers import make_authenticated_request

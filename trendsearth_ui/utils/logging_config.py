@@ -4,7 +4,7 @@ import inspect
 import logging
 import os
 import sys
-from typing import Any, Optional
+from typing import Any
 
 import rollbar
 from rollbar.logger import RollbarHandler
@@ -98,7 +98,7 @@ def _attach_rollbar_handler(target_logger: logging.Logger) -> None:
     target_logger.addHandler(handler)
 
 
-def setup_logging(rollbar_token: Optional[str] = None) -> logging.Logger:
+def setup_logging(rollbar_token: str | None = None) -> logging.Logger:
     """Set up logging with Rollbar integration if token is provided."""
     global _rollbar_initialized  # noqa: PLW0603
 
@@ -203,10 +203,10 @@ def _get_automatic_context() -> dict[str, Any]:
                 ]:
                     # Convert complex objects to string representation
                     try:
-                        if isinstance(value, (str, int, float, bool, list, dict)):
+                        if isinstance(value, str | int | float | bool | list | dict):
                             if isinstance(value, str) and len(value) > 200:
                                 filtered_vars[key] = value[:200] + "..."
-                            elif isinstance(value, (list, dict)):
+                            elif isinstance(value, list | dict):
                                 filtered_vars[key] = (
                                     str(value)[:200] + "..." if len(str(value)) > 200 else value
                                 )

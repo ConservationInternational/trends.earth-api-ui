@@ -1,8 +1,9 @@
 """Visualization utilities for stats charts and maps."""
 
+from collections.abc import Callable
 import logging
 import re
-from typing import Any, Callable, Optional
+from typing import Any
 
 from dash import dcc, html
 import pandas as pd
@@ -125,7 +126,7 @@ def _extract_iso_candidate(country_name: str) -> str | None:
 
 def _resolve_country_iso(
     country_name: str,
-    iso_resolver: Optional[CountryIsoResolver],
+    iso_resolver: CountryIsoResolver | None,
 ) -> tuple[str | None, str | None]:
     """Resolve a country name to an ISO code and display label using available data."""
 
@@ -176,7 +177,7 @@ def _resolve_country_iso(
 
 def create_user_geographic_map(
     user_stats_data,
-    iso_resolver: Optional[CountryIsoResolver] = None,
+    iso_resolver: CountryIsoResolver | None = None,
 ):
     """Render a choropleth map of user registrations by country."""
 
@@ -1735,7 +1736,7 @@ def create_user_statistics_chart(
                 ]
 
                 if sorted_countries:
-                    countries, counts = zip(*sorted_countries)
+                    countries, counts = zip(*sorted_countries, strict=True)
 
                     fig_countries = go.Figure(
                         data=[

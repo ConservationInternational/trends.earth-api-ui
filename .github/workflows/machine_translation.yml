@@ -35,12 +35,12 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_TRANSLATE_CREDENTIALS }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           cache: pip
 
       - name: Install dependencies
@@ -57,6 +57,19 @@ jobs:
         run: |
           mkdir -p trendsearth_ui/i18n/translations
           pybabel extract -F babel.cfg -k _ -k _l -k _g -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot trendsearth_ui/
+
+      - name: Validate extraction completeness
+        run: |
+          # Count extracted strings to ensure extraction keywords are correct
+          msgid_count=$(grep -c "^msgid " trendsearth_ui/i18n/translations/messages.pot || echo 0)
+          MIN_STRINGS=250
+          echo "Extracted $msgid_count translatable strings (minimum: $MIN_STRINGS)"
+          if [ "$msgid_count" -lt "$MIN_STRINGS" ]; then
+            echo "ERROR: Only $msgid_count strings extracted, expected at least $MIN_STRINGS"
+            echo "This usually indicates incorrect pybabel extraction keywords."
+            echo "Verify the extract command includes: -k _ -k _g -k _l -k gettext -k lazy_gettext"
+            exit 1
+          fi
 
       - name: Determine target languages
         id: languages

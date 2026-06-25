@@ -166,9 +166,10 @@ def render_news(
     if highlight_image_url:
         _highlight_image_html = f"""
                 <tr>
-                  <td style="padding:0 24px 12px; text-align:center;">
+                  <td style="padding:0; text-align:center; line-height:0; font-size:0;">
                     <img src="{highlight_image_url}" alt=""
-                         style="max-width:100%; height:auto; border-radius:4px; display:block; margin:0 auto;">
+                         style="width:100%; max-width:100%; height:auto; display:block;
+                                border-radius:4px 4px 0 0;">
                   </td>
                 </tr>"""
 

@@ -2,7 +2,7 @@
 Unit tests for the new status tab functionality including manual tab switching.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from unittest.mock import MagicMock, Mock, patch
 
 from dash import dcc, html
@@ -437,7 +437,7 @@ class TestStatusTabsErrorHandling:
                         "total_api_calls": 1,
                         "cache_hit": False,
                         "optimizations_applied": [],
-                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=UTC),
                     },
                 },
             ),
@@ -453,7 +453,7 @@ class TestStatusTabsErrorHandling:
             # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
             # We want to check the first output (summary)
             summary_result = (
-                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+                result[1] if isinstance(result, tuple | list) and len(result) > 1 else result
             )
             result_str = str(summary_result)
 
@@ -523,7 +523,7 @@ class TestStatusTabsErrorHandling:
                         "total_api_calls": 1,
                         "cache_hit": False,
                         "optimizations_applied": [],
-                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=timezone.utc),
+                        "fetch_time": datetime(2023, 1, 1, 12, 30, tzinfo=UTC),
                     },
                 },
             ),
@@ -536,7 +536,7 @@ class TestStatusTabsErrorHandling:
 
             # Function signature: (n_intervals, refresh_clicks, token, active_tab, user_timezone, role, api_environment)
             result = summary_func(0, 0, "test_token", "status", "UTC", "ADMIN", "production")
-            assert isinstance(result, (tuple, list))
+            assert isinstance(result, tuple | list)
             status_title = result[0]
             summary_result = result[1]
             result_str = str(summary_result)
@@ -625,7 +625,7 @@ class TestStatusTabsErrorHandling:
             # The callback now returns four outputs: (summary, deployment_info, cluster_info, cluster_title)
             # We want to check the first output (summary)
             summary_result = (
-                result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+                result[1] if isinstance(result, tuple | list) and len(result) > 1 else result
             )
             result_str = str(summary_result)
 

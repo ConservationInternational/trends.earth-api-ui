@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from dash import html
 import dash_bootstrap_components as dbc
@@ -167,7 +167,7 @@ def _render_object(data: dict[str, Any], level: int, parent_id: str) -> html.Div
     items = []
     for k, v in data.items():
         node_id = f"{parent_id}-{k}"
-        is_complex = isinstance(v, (dict, list))
+        is_complex = isinstance(v, dict | list)
 
         if is_complex:
             # Create collapsible item for complex values
@@ -221,7 +221,7 @@ def _render_array(data: list[Any], level: int, parent_id: str) -> html.Div:
     items = []
     for idx, v in enumerate(data):
         node_id = f"{parent_id}-{idx}"
-        is_complex = isinstance(v, (dict, list))
+        is_complex = isinstance(v, dict | list)
 
         if is_complex:
             # Create collapsible item for complex values
@@ -342,7 +342,7 @@ def _render_primitive_value(value: Any, level: int, node_id: str) -> html.Div:
     )
 
 
-def _render_type_badge(type_name: str, size: Optional[int] = None) -> html.Span:
+def _render_type_badge(type_name: str, size: int | None = None) -> html.Span:
     """Render a small badge showing the type and size of a JSON structure."""
     badge_text = type_name
     if size is not None:
@@ -382,7 +382,7 @@ def _get_type_name(value: Any) -> str:
         return "null"
     elif isinstance(value, bool):
         return "boolean"
-    elif isinstance(value, (int, float)):
+    elif isinstance(value, int | float):
         return "number"
     elif isinstance(value, str):
         return "string"
@@ -394,8 +394,8 @@ def _get_type_name(value: Any) -> str:
         return "unknown"
 
 
-def _get_size(value: Any) -> Optional[int]:
+def _get_size(value: Any) -> int | None:
     """Get the size of a collection (dict or list)."""
-    if isinstance(value, (dict, list)):
+    if isinstance(value, dict | list):
         return len(value)
     return None

@@ -6,9 +6,9 @@ This is a **Dash-based web application** for viewing and managing the Trends.Ear
 
 **Size**: Medium-sized Python project (~51 test files, multiple components)  
 **Type**: Web application (Dash + Flask)  
-**Languages**: Python 3.10+  
+**Languages**: Python 3.13+  
 **Frameworks**: Dash, Flask, Bootstrap  
-**Runtime**: Python 3.11-3.12 (tested), Gunicorn (production)
+**Runtime**: Python 3.13-3.14 (tested), Gunicorn (production)
 
 ## Required Build and Development Steps
 
@@ -155,7 +155,7 @@ tests/
 ```
 
 ### GitHub Workflows
-- `.github/workflows/tests.yml` - Run tests on Python 3.11, 3.12
+- `.github/workflows/tests.yml` - Run tests on Python 3.13, 3.14
 - `.github/workflows/quality.yml` - Ruff linting and formatting (**ENFORCED**)
 - `.github/workflows/deploy.yml` - AWS ECS deployment
 - `.github/workflows/rollback.yml` - Production rollback

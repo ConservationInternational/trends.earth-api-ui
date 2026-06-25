@@ -32,12 +32,14 @@ class TestIssue77Fixes:
         old_completed_colors = ["#0F5132", "#721C24", "#495057"]
 
         # Verify colors are different (brighter)
-        for new_color, old_color in zip(expected_active_colors, old_active_colors):
+        for new_color, old_color in zip(expected_active_colors, old_active_colors, strict=True):
             assert new_color != old_color, (
                 f"Active color {new_color} should be different from old color {old_color}"
             )
 
-        for new_color, old_color in zip(expected_completed_colors, old_completed_colors):
+        for new_color, old_color in zip(
+            expected_completed_colors, old_completed_colors, strict=True
+        ):
             assert new_color != old_color, (
                 f"Completed color {new_color} should be different from old color {old_color}"
             )

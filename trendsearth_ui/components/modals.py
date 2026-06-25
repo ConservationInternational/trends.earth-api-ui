@@ -3,6 +3,94 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
+from ..i18n import gettext as _
+
+
+def csv_export_modal():
+    """Create the shared CSV export modal with date filtering controls."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle(_("Export as CSV"))),
+            dbc.ModalBody(
+                [
+                    dbc.Alert(
+                        id="csv-export-error-alert",
+                        color="danger",
+                        is_open=False,
+                        dismissable=True,
+                    ),
+                    html.P(
+                        _(
+                            "Optionally filter by date range before exporting. "
+                            "Leave blank to export all records."
+                        )
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    dbc.Label(_("Filter date field")),
+                                    dbc.Select(
+                                        id="csv-export-date-field",
+                                        options=[],
+                                        value=None,
+                                    ),
+                                ],
+                                width=12,
+                                className="mb-3",
+                            ),
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    dbc.Label(_("From (inclusive)")),
+                                    dbc.Input(
+                                        id="csv-export-date-from",
+                                        type="date",
+                                        placeholder="YYYY-MM-DD",
+                                    ),
+                                ],
+                                width=6,
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Label(_("To (inclusive)")),
+                                    dbc.Input(
+                                        id="csv-export-date-to",
+                                        type="date",
+                                        placeholder="YYYY-MM-DD",
+                                    ),
+                                ],
+                                width=6,
+                            ),
+                        ],
+                        className="mb-2",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        _("Cancel"),
+                        id="csv-export-cancel-btn",
+                        color="secondary",
+                        className="me-2",
+                    ),
+                    dbc.Button(
+                        _("Export CSV"),
+                        id="csv-export-confirm-btn",
+                        color="primary",
+                    ),
+                ]
+            ),
+        ],
+        id="csv-export-modal",
+        is_open=False,
+        backdrop="static",
+    )
+
 
 def json_modal():
     """Create the JSON/logs modal."""
@@ -1195,6 +1283,48 @@ def bulk_email_switch_html_modal():
             ),
         ],
         id="bulk-email-switch-html-modal",
+        is_open=False,
+        centered=True,
+        backdrop="static",
+    )
+
+
+def bulk_email_restore_draft_modal():
+    """Confirmation modal shown before restoring a SENT/FAILED email to draft."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("Restore to Draft?")),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "This will create a new Draft copy of the selected bulk email "
+                        "with the same subject and content. "
+                        "The original sent email and its history will remain unchanged."
+                    ),
+                    html.P(
+                        "This action does NOT unsend any emails that were already delivered.",
+                        className="text-danger fw-semibold mb-0",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                [
+                    dbc.Button(
+                        "Restore to Draft",
+                        id="bulk-email-restore-draft-confirm-btn",
+                        color="warning",
+                    ),
+                    dbc.Button(
+                        "Cancel",
+                        id="bulk-email-restore-draft-cancel-btn",
+                        color="secondary",
+                        className="ms-2",
+                        n_clicks=0,
+                    ),
+                ]
+            ),
+        ],
+        id="bulk-email-restore-draft-modal",
         is_open=False,
         centered=True,
         backdrop="static",

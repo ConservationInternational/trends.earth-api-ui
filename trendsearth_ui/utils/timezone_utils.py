@@ -1,11 +1,10 @@
 """Timezone utilities for converting UTC times to user's local timezone."""
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 import zoneinfo
 
 
-def get_timezone_from_name(timezone_name: str) -> Optional[zoneinfo.ZoneInfo]:
+def get_timezone_from_name(timezone_name: str) -> zoneinfo.ZoneInfo | None:
     """Get timezone object from timezone name.
 
     Args:
@@ -32,10 +31,10 @@ def convert_utc_to_local(utc_dt: datetime, user_timezone: str) -> tuple[datetime
     """
     # Ensure UTC datetime is timezone-aware
     if utc_dt.tzinfo is None:
-        utc_dt = utc_dt.replace(tzinfo=timezone.utc)
-    elif utc_dt.tzinfo != timezone.utc:
+        utc_dt = utc_dt.replace(tzinfo=UTC)
+    elif utc_dt.tzinfo != UTC:
         # Convert to UTC if not already
-        utc_dt = utc_dt.astimezone(timezone.utc)
+        utc_dt = utc_dt.astimezone(UTC)
 
     # Get user's timezone
     user_tz = get_timezone_from_name(user_timezone)
@@ -89,7 +88,7 @@ def get_chart_axis_label(user_timezone: str, base_label: str = "Time") -> str:
         Formatted axis label with timezone
     """
     # Create a sample datetime to get the timezone abbreviation
-    sample_dt = datetime.now(timezone.utc)
+    sample_dt = datetime.now(UTC)
     _, tz_abbrev = convert_utc_to_local(sample_dt, user_timezone)
 
     return f"{base_label} ({tz_abbrev})"
@@ -163,7 +162,7 @@ def is_valid_timezone(timezone_name: str) -> bool:
 DEFAULT_TIMEZONE = "UTC"
 
 
-def get_safe_timezone(timezone_name: Optional[str]) -> str:
+def get_safe_timezone(timezone_name: str | None) -> str:
     """Get a safe timezone name, falling back to default if invalid.
 
     Args:

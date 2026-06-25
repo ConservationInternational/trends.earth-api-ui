@@ -5,7 +5,7 @@
 [![Tests](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/tests.yml)
 [![Code Quality](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/quality.yml)
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Deploy Status](https://img.shields.io/badge/deployment-EC2_Docker_Swarm-blue.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy-production.yml)
 
