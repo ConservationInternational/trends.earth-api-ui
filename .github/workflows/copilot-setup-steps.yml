@@ -6,11 +6,10 @@ on:
       python_version:
         description: "Python version to use"
         required: false
-        default: "3.12"
+        default: "3.13"
         type: choice
         options:
-          - "3.11"
-          - "3.12"
+          - "3.13"
       install_browsers:
         description: "Install Playwright browsers"
         required: false
@@ -27,7 +26,7 @@ jobs:
         run: |
           echo "Event name: ${{ github.event_name }}"
           echo "Trigger: ${{ github.event.action || 'N/A' }}"
-          echo "Python version input: ${{ inputs.python_version || 'default (3.12)' }}"
+          echo "Python version input: ${{ inputs.python_version || 'default (3.13)' }}"
           echo "Install browsers input: ${{ inputs.install_browsers || 'default (true)' }}"
           echo "GitHub runner OS: ${{ runner.os }}"
           echo "Working directory: $(pwd)"
@@ -38,7 +37,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ inputs.python_version || '3.12' }}
+          python-version: ${{ inputs.python_version || '3.13' }}
           cache: "pip"
 
       - name: Install Poetry
