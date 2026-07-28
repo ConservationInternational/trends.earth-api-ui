@@ -198,6 +198,7 @@ type = PO
 3. **Handle plurals properly**: Use `ngettext` for pluralized strings.
    ```python
    from trendsearth_ui.i18n import ngettext
+
    msg = ngettext("%(num)d item", "%(num)d items", count) % {"num": count}
    ```
 

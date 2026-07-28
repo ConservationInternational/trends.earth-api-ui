@@ -240,7 +240,7 @@ API_ENVIRONMENTS = {
         "display_name": "Production (api.trends.earth)",
     },
     "staging": {
-        "base": "https://api-staging.trends.earth/api/v1", 
+        "base": "https://api-staging.trends.earth/api/v1",
         "auth": "https://api-staging.trends.earth/auth",
         "display_name": "Staging (api-staging.trends.earth)",
     },
