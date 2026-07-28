@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui/branch/master/graph/badge.svg)](https://codecov.io/gh/ConservationInternational/trends.earth-api-ui)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Deploy Status](https://img.shields.io/badge/deployment-EC2_Docker_Swarm-blue.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy-production.yml)
+[![Deploy Status](https://img.shields.io/badge/deployment-EC2_CodeDeploy-blue.svg)](https://github.com/ConservationInternational/trends.earth-api-ui/actions/workflows/deploy-production.yml)
 
 A Dash app for viewing and managing the Trends.Earth GEF API, supporting admin features and authentication.
 
@@ -21,11 +21,11 @@ This application supports automatic deployment to EC2 instances using Docker Swa
 - **Production Rollback** (`rollback-production.yml`) - Manual rollback to previous deployments or specific commits
 
 ### Deployment Architecture:
-- **Platform**: EC2 instances with Docker Swarm
-- **SSH Deployment**: Secure deployment via SSH using GitHub Actions
+- **Platform**: EC2 instances with Docker Compose
+- **CodeDeploy**: AWS CodeDeploy with deployment bundles (`appspec.yml`) triggered from GitHub Actions
+- **Registry**: Amazon ECR — images built and pushed by GitHub Actions, pulled on the EC2 instance
+- **IAM**: AWS IAM credentials used by GitHub Actions for ECR access and CodeDeploy deployments
 - **Health Monitoring**: Automated health checks and integration testing
-- **Security**: Dynamic security group management for GitHub Actions runners
-- **Registry**: Local Docker registry with build-on-server approach
 
 ### Error Tracking
 The application includes integrated Rollbar error tracking for production monitoring and debugging.
@@ -207,7 +207,7 @@ poetry run python -m pytest tests/playwright/ -v --browser chromium --html=playw
 ### Continuous Integration
 
 Tests and code quality checks are automatically run on GitHub Actions for:
-- **Tests**: Python versions 3.11, 3.12 on all pushes to `master` and `develop` branches and pull requests
+- **Tests**: Python versions 3.13, 3.14 on all pushes to `master` and `develop` branches and pull requests
 - **Playwright Tests**: End-to-end testing with Chromium browser automation
 - **Code Quality**: Ruff linting and formatting checks
 - **Coverage**: Code coverage is tracked and reported to Codecov
