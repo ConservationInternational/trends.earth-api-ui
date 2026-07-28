@@ -88,7 +88,7 @@ assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 app = dash.Dash(
     __name__,
     server=server,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP],
     suppress_callback_exceptions=True,
     assets_folder=assets_dir,
     assets_url_path="/assets",

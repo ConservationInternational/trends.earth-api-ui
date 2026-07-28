@@ -18,7 +18,11 @@ from ..i18n.dash_i18n import create_language_controls, create_language_selector
 from ..utils.mobile_utils import create_mobile_detection_components
 from .modals import (
     access_control_modal,
+    bulk_email_composer_help_modal,
+    bulk_email_history_help_modal,
+    bulk_email_recipient_groups_help_modal,
     bulk_email_restore_draft_modal,
+    bulk_email_send_help_modal,
     bulk_email_switch_html_modal,
     bulk_email_verify_modal,
     csv_export_modal,
@@ -185,6 +189,10 @@ def create_main_layout():
             bulk_email_switch_html_modal(),
             bulk_email_verify_modal(),
             bulk_email_restore_draft_modal(),
+            bulk_email_recipient_groups_help_modal(),
+            bulk_email_composer_help_modal(),
+            bulk_email_send_help_modal(),
+            bulk_email_history_help_modal(),
             csv_export_modal(),
         ],
         fluid=True,

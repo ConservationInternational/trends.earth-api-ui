@@ -518,7 +518,22 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Recipient Groups", className="mb-0")),
+                    dbc.CardHeader(
+                        dbc.Stack(
+                            [
+                                html.H5("Recipient Groups", className="mb-0 me-auto"),
+                                dbc.Button(
+                                    html.I(className="bi bi-question-circle-fill"),
+                                    id="bulk-email-recipient-groups-help-btn",
+                                    color="link",
+                                    size="sm",
+                                    className="p-0 text-muted",
+                                    n_clicks=0,
+                                ),
+                            ],
+                            direction="horizontal",
+                        )
+                    ),
                     dbc.CardBody(
                         [
                             # Status alert -- always at top
@@ -769,7 +784,22 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Email Composer", className="mb-0")),
+                    dbc.CardHeader(
+                        dbc.Stack(
+                            [
+                                html.H5("Email Composer", className="mb-0 me-auto"),
+                                dbc.Button(
+                                    html.I(className="bi bi-question-circle-fill"),
+                                    id="bulk-email-composer-help-btn",
+                                    color="link",
+                                    size="sm",
+                                    className="p-0 text-muted",
+                                    n_clicks=0,
+                                ),
+                            ],
+                            direction="horizontal",
+                        )
+                    ),
                     dbc.CardBody(
                         [
                             # Stores for structured editor state
@@ -1104,7 +1134,22 @@ def bulk_email_tab_content(_role=None):
             # -------------------------------------------------------
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Send Bulk Email", className="mb-0")),
+                    dbc.CardHeader(
+                        dbc.Stack(
+                            [
+                                html.H5("Send Bulk Email", className="mb-0 me-auto"),
+                                dbc.Button(
+                                    html.I(className="bi bi-question-circle-fill"),
+                                    id="bulk-email-send-help-btn",
+                                    color="link",
+                                    size="sm",
+                                    className="p-0 text-muted",
+                                    n_clicks=0,
+                                ),
+                            ],
+                            direction="horizontal",
+                        )
+                    ),
                     dbc.CardBody(
                         [
                             dbc.Row(
@@ -1178,7 +1223,22 @@ def bulk_email_tab_content(_role=None):
             dcc.Store(id="bulk-email-history-selected-id"),
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H5("Bulk Email History", className="mb-0")),
+                    dbc.CardHeader(
+                        dbc.Stack(
+                            [
+                                html.H5("Bulk Email History", className="mb-0 me-auto"),
+                                dbc.Button(
+                                    html.I(className="bi bi-question-circle-fill"),
+                                    id="bulk-email-history-help-btn",
+                                    color="link",
+                                    size="sm",
+                                    className="p-0 text-muted",
+                                    n_clicks=0,
+                                ),
+                            ],
+                            direction="horizontal",
+                        )
+                    ),
                     dbc.CardBody(
                         [
                             dbc.Row(

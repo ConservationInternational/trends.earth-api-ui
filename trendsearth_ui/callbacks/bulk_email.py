@@ -2371,6 +2371,77 @@ def register_callbacks(app):
     )
 
     # -----------------------------------------------------------------------
+    # Help modals — open on icon click, close on Close button
+    # -----------------------------------------------------------------------
+    @app.callback(
+        Output("bulk-email-recipient-groups-help-modal", "is_open"),
+        [
+            Input("bulk-email-recipient-groups-help-btn", "n_clicks"),
+            Input("bulk-email-recipient-groups-help-close", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def toggle_recipient_groups_help(_open_n, _close_n):
+        ctx = callback_context
+        if not ctx.triggered:
+            return no_update
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if triggered_id == "bulk-email-recipient-groups-help-btn":
+            return bool(_open_n)
+        return False
+
+    @app.callback(
+        Output("bulk-email-composer-help-modal", "is_open"),
+        [
+            Input("bulk-email-composer-help-btn", "n_clicks"),
+            Input("bulk-email-composer-help-close", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def toggle_composer_help(_open_n, _close_n):
+        ctx = callback_context
+        if not ctx.triggered:
+            return no_update
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if triggered_id == "bulk-email-composer-help-btn":
+            return bool(_open_n)
+        return False
+
+    @app.callback(
+        Output("bulk-email-send-help-modal", "is_open"),
+        [
+            Input("bulk-email-send-help-btn", "n_clicks"),
+            Input("bulk-email-send-help-close", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def toggle_send_help(_open_n, _close_n):
+        ctx = callback_context
+        if not ctx.triggered:
+            return no_update
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if triggered_id == "bulk-email-send-help-btn":
+            return bool(_open_n)
+        return False
+
+    @app.callback(
+        Output("bulk-email-history-help-modal", "is_open"),
+        [
+            Input("bulk-email-history-help-btn", "n_clicks"),
+            Input("bulk-email-history-help-close", "n_clicks"),
+        ],
+        prevent_initial_call=True,
+    )
+    def toggle_history_help(_open_n, _close_n):
+        ctx = callback_context
+        if not ctx.triggered:
+            return no_update
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if triggered_id == "bulk-email-history-help-btn":
+            return bool(_open_n)
+        return False
+
+    # -----------------------------------------------------------------------
     # Confirm restore-to-draft
     # -----------------------------------------------------------------------
     @app.callback(

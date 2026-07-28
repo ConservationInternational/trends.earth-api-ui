@@ -1329,3 +1329,444 @@ def bulk_email_restore_draft_modal():
         centered=True,
         backdrop="static",
     )
+
+
+def bulk_email_recipient_groups_help_modal():
+    """Help modal for the Recipient Groups section of the Bulk Email page."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [html.I(className="bi bi-question-circle-fill me-2"), "Recipient Groups — Help"]
+                ),
+                close_button=False,
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "Use this section to define and save the set of users who will receive a "
+                        "bulk email. You can filter by role, email verification status, and "
+                        "account activity dates."
+                    ),
+                    html.Hr(),
+                    html.H6("Saved Groups", className="fw-bold"),
+                    html.P(
+                        "Select a previously saved group from the dropdown and click Load to "
+                        "restore its filters. Saved groups let you reuse common recipient "
+                        "definitions without re-entering filters each time."
+                    ),
+                    html.H6("Load / Copy / Delete / New buttons", className="fw-bold"),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("Load"),
+                                    " — applies the selected saved group's filters to the form.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Copy"),
+                                    " — duplicates the selected group under a new name (you will be prompted to enter the new name).",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Delete"),
+                                    " — permanently removes the selected saved group.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("New / Clear"),
+                                    " — resets all filter fields and clears the group selection so you can start fresh.",
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.H6("Group Name & Description", className="fw-bold"),
+                    html.P(
+                        "Enter a descriptive Group Name before clicking Save Group. The optional "
+                        "Description field is for your own reference. Neither field is visible to "
+                        "email recipients."
+                    ),
+                    html.H6("Filters", className="fw-bold"),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("Roles"),
+                                    " — check one or more roles (USER, ADMIN, SUPERADMIN) to restrict recipients to users with those roles.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Email Verified"),
+                                    " — filter to only verified accounts, only unverified accounts, or any.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Created After / Before"),
+                                    " — include only users whose accounts were created within a date range.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Last Active After / Before"),
+                                    " — include only users who were last active within a date range. Useful for targeting recently active or inactive users.",
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.H6("Preview", className="fw-bold"),
+                    html.P(
+                        "Click Preview to count matching users and populate the recipients table "
+                        "below. The preview does not send anything — it simply shows who would "
+                        "receive the email given the current filters. The table uses infinite "
+                        "scrolling and loads results in pages as you scroll, so all matching "
+                        "users can be reviewed regardless of count."
+                    ),
+                    html.H6("Save Group", className="fw-bold"),
+                    html.P(
+                        "Click Save Group to store the current filter settings under the given "
+                        "Group Name. The saved group will appear in the dropdown and in the "
+                        "Send Bulk Email section when selecting recipients."
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Close",
+                    id="bulk-email-recipient-groups-help-close",
+                    color="secondary",
+                    n_clicks=0,
+                )
+            ),
+        ],
+        id="bulk-email-recipient-groups-help-modal",
+        is_open=False,
+        size="lg",
+        centered=True,
+        scrollable=True,
+    )
+
+
+def bulk_email_composer_help_modal():
+    """Help modal for the Email Composer section of the Bulk Email page."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [html.I(className="bi bi-question-circle-fill me-2"), "Email Composer — Help"]
+                ),
+                close_button=False,
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "Use this section to create and edit the email you will send. Emails are "
+                        "saved as Drafts so you can work on them over multiple sessions before "
+                        "sending."
+                    ),
+                    html.Hr(),
+                    html.H6("Drafts", className="fw-bold"),
+                    html.P(
+                        "Select an existing draft from the dropdown to load it. You can also "
+                        "create a new draft by clicking New / Clear to reset all fields and then "
+                        "filling in the form."
+                    ),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("Load"),
+                                    " — fills all composer fields from the selected saved draft.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Copy"),
+                                    " — saves a duplicate of the current draft under a new name.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Delete"),
+                                    " — permanently removes the selected saved draft.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("New / Clear"),
+                                    " — resets all composer fields so you can start a new draft from scratch.",
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.H6("Templates", className="fw-bold"),
+                    html.P(
+                        "Select a template from the Template dropdown and click Load Template to "
+                        "pre-populate the Template Fields tab with standard content. Templates "
+                        "provide a starting point; you can edit all fields after loading."
+                    ),
+                    html.H6("Draft Name", className="fw-bold"),
+                    html.P(
+                        "An internal label used to identify this draft in the Draft dropdown and "
+                        "in the Bulk Email History table. It is not visible to email recipients."
+                    ),
+                    html.H6("Subject Line", className="fw-bold"),
+                    html.P("The email subject line that recipients will see in their inbox."),
+                    html.H6("Email Category", className="fw-bold"),
+                    html.P(
+                        "A category tag used to classify the type of email for internal tracking "
+                        "purposes. It does not affect delivery."
+                    ),
+                    html.H6("Template Fields tab", className="fw-bold"),
+                    html.P(
+                        "Fill in the structured fields to compose the email body. Three collapsible "
+                        "sections are available:"
+                    ),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("News & Updates"),
+                                    " — headline news items with title, summary, URL, and optional image.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Engagement"),
+                                    " — a call-to-action block with a topic, description, and button link.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("System Update"),
+                                    " — information about a scheduled maintenance window or system change.",
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.H6("Raw HTML tab", className="fw-bold"),
+                    html.P(
+                        [
+                            html.Strong("Warning: "),
+                            "Switching to Raw HTML locks the Template Fields tab for the current "
+                            "session. Before switching, two drafts are automatically saved: one "
+                            "preserving the templated version and one with the rendered HTML. "
+                            "Use the Format HTML button to auto-indent the HTML code for "
+                            "readability.",
+                        ]
+                    ),
+                    html.H6("Save Draft", className="fw-bold"),
+                    html.P(
+                        "Click Save Draft to persist all changes and regenerate the Email Preview "
+                        "below the composer. Always save before navigating to the Send Bulk "
+                        "Email section — only saved drafts appear in the Send dropdown."
+                    ),
+                    html.H6("Email Preview", className="fw-bold"),
+                    html.P(
+                        "A live rendered preview of the email exactly as recipients will see it. "
+                        "The preview is regenerated every time you click Save Draft."
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Close",
+                    id="bulk-email-composer-help-close",
+                    color="secondary",
+                    n_clicks=0,
+                )
+            ),
+        ],
+        id="bulk-email-composer-help-modal",
+        is_open=False,
+        size="lg",
+        centered=True,
+        scrollable=True,
+    )
+
+
+def bulk_email_send_help_modal():
+    """Help modal for the Send Bulk Email section of the Bulk Email page."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [html.I(className="bi bi-question-circle-fill me-2"), "Send Bulk Email — Help"]
+                ),
+                close_button=False,
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "Use this section to send a saved draft to a saved recipient group. "
+                        "Always review the draft using the test send options before sending to "
+                        "a large group."
+                    ),
+                    html.Hr(),
+                    html.H6("Select Draft", className="fw-bold"),
+                    html.P(
+                        "Choose the draft you want to send from the dropdown. Only drafts with "
+                        "status DRAFT appear here. If your draft is not listed, return to the "
+                        "Email Composer and click Save Draft."
+                    ),
+                    html.H6("Select Recipient Group", className="fw-bold"),
+                    html.P(
+                        "Choose the saved recipient group who will receive the email. If no groups "
+                        "are listed, return to the Recipient Groups section, define your filters, "
+                        "and click Save Group."
+                    ),
+                    html.H6("Send Test to Self", className="fw-bold"),
+                    html.P(
+                        "Sends one copy of the selected draft to your own email address. Use this "
+                        "to review formatting, links, and content before a wider send."
+                    ),
+                    html.H6("Send Test to Superadmins", className="fw-bold"),
+                    html.P(
+                        "Sends a copy of the draft to all users with the SUPERADMIN role. Use this "
+                        "to share the email with your team for review before the bulk send."
+                    ),
+                    html.H6("Send Bulk Email", className="fw-bold"),
+                    html.P(
+                        "Initiates sending the selected draft to all users in the selected "
+                        "recipient group. This action cannot be undone."
+                    ),
+                    html.P(
+                        [
+                            html.Strong("Large-send verification: "),
+                            "If the recipient count exceeds the configured threshold, a 6-digit "
+                            "verification code will be sent to your email address. You must enter "
+                            "that code in the confirmation dialog to proceed. This is a safeguard "
+                            "against accidental bulk sends.",
+                        ]
+                    ),
+                    dbc.Alert(
+                        [
+                            html.I(className="fas fa-exclamation-triangle me-2"),
+                            html.Strong("Best practice: "),
+                            "Always send a test to yourself first and carefully review the Email "
+                            "Preview before clicking Send Bulk Email.",
+                        ],
+                        color="warning",
+                        className="mb-0",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Close",
+                    id="bulk-email-send-help-close",
+                    color="secondary",
+                    n_clicks=0,
+                )
+            ),
+        ],
+        id="bulk-email-send-help-modal",
+        is_open=False,
+        size="lg",
+        centered=True,
+        scrollable=True,
+    )
+
+
+def bulk_email_history_help_modal():
+    """Help modal for the Bulk Email History section of the Bulk Email page."""
+    return dbc.Modal(
+        [
+            dbc.ModalHeader(
+                dbc.ModalTitle(
+                    [
+                        html.I(className="bi bi-question-circle-fill me-2"),
+                        "Bulk Email History — Help",
+                    ]
+                ),
+                close_button=False,
+            ),
+            dbc.ModalBody(
+                [
+                    html.P(
+                        "This section shows a record of all bulk emails that have been sent, "
+                        "including their status and delivery details."
+                    ),
+                    html.Hr(),
+                    html.H6("History Table", className="fw-bold"),
+                    html.P("Each row represents one bulk email send. The columns show:"),
+                    html.Ul(
+                        [
+                            html.Li(
+                                [
+                                    html.Strong("Name"),
+                                    " — the draft name used when the email was sent.",
+                                ]
+                            ),
+                            html.Li([html.Strong("Subject"), " — the email subject line."]),
+                            html.Li(
+                                [
+                                    html.Strong("Status"),
+                                    " — the current delivery status: ",
+                                    html.Em("Sent"),
+                                    " (fully delivered), ",
+                                    html.Em("Failed"),
+                                    " (delivery error), or ",
+                                    html.Em("Pending"),
+                                    " (in progress).",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Recipients"),
+                                    " — the number of users the email was sent to.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Sent By"),
+                                    " — the email address of the admin who triggered the send.",
+                                ]
+                            ),
+                            html.Li(
+                                [
+                                    html.Strong("Sent At"),
+                                    " — the date and time when the send was initiated.",
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.H6("Refresh", className="fw-bold"),
+                    html.P(
+                        "Click Refresh to reload the history table with the latest data from "
+                        "the server. Use this to check whether a pending send has completed."
+                    ),
+                    html.H6("Restore to Draft", className="fw-bold"),
+                    html.P(
+                        "Select a row in the table, then click Restore to Draft to create a new "
+                        "Draft copy of that email with the same subject and HTML body. This is "
+                        "useful for resending a previous email or using it as the basis for a "
+                        "new one."
+                    ),
+                    html.P(
+                        "Restoring to a draft does not modify or unsend the original email — "
+                        "the history record remains unchanged.",
+                        className="text-muted small mb-0",
+                    ),
+                ]
+            ),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Close",
+                    id="bulk-email-history-help-close",
+                    color="secondary",
+                    n_clicks=0,
+                )
+            ),
+        ],
+        id="bulk-email-history-help-modal",
+        is_open=False,
+        size="lg",
+        centered=True,
+        scrollable=True,
+    )
