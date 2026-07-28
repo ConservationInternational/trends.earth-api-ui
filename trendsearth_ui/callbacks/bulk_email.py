@@ -302,7 +302,7 @@ def register_callbacks(app):
             token, fc, {"page": 1, "per_page": DEFAULT_PAGE_SIZE}
         )
         label = f"Editing: {row.get('name', '')}"
-        source_label = f"\u2014 Saved group: {row.get('name', '')}"
+        source_label = f"- Saved group: {row.get('name', '')}"
         return (
             row.get("name", ""),
             row.get("description", ""),
