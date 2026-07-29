@@ -14,7 +14,17 @@ render_system_update(...) â€” render the system update / maintenance templa
 
 TEMPLATES        â€” dict of template metadata (subject, default html, subscription_type)
 TEMPLATE_OPTIONS â€” list of (value, label) pairs for dropdowns
+
+Mini-markup supported in long text fields (intro, highlight body, summaries)
+-----------------------------------------------------------------------------
+Users can use a small subset of formatting without switching to Raw HTML:
+
+  * Newlines become <br> line breaks in the rendered email.
+  * [Display text](https://example.com) renders as a clickable hyperlink.
+  * Bare https:// URLs are automatically linked.
 """
+
+import re
 
 # ---------------------------------------------------------------------------
 # Shared branding constants
@@ -68,6 +78,51 @@ _FOOTER_HTML = f"""
 """
 
 # ---------------------------------------------------------------------------
+# Text-field formatter
+# ---------------------------------------------------------------------------
+
+# Matches [label](url) — processed first so bare-URL pass doesn't touch them.
+_LINK_MD_RE = re.compile(r'\[([^\]]+)\]\((https?://[^\)\s]+)\)')
+# Matches bare https:// URLs not already inside an href="…" attribute.
+_BARE_URL_RE = re.compile(r'(?<!["\'>])(https?://[^\s<>"\')\]]+)')
+
+
+def _format_text_field(text: str) -> str:
+    """Format a long plain-text field for insertion into an HTML email.
+
+    Conversions applied (in order):
+    1. ``[label](url)``  →  styled ``<a>`` link with the given display text.
+    2. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
+    3. Newlines (``\\n``)  →  ``<br>`` tags.
+
+    Existing HTML in the value is left untouched, so previously stored
+    content that already contains tags continues to render correctly.
+    """
+    if not text:
+        return text
+
+    def _md_link(m: re.Match) -> str:
+        label = m.group(1)
+        url = m.group(2)
+        return (
+            f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
+            f'style="color:{_PRIMARY_RED}; text-decoration:none;">{label}</a>'
+        )
+
+    def _bare_link(m: re.Match) -> str:
+        url = m.group(1)
+        return (
+            f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
+            f'style="color:{_PRIMARY_RED}; text-decoration:none;">{url}</a>'
+        )
+
+    text = _LINK_MD_RE.sub(_md_link, text)
+    text = _BARE_URL_RE.sub(_bare_link, text)
+    text = text.replace("\n", "<br>\n")
+    return text
+
+
+# ---------------------------------------------------------------------------
 # Default structured content
 # ---------------------------------------------------------------------------
 
@@ -95,7 +150,7 @@ _DEFAULT_IMPACT_ITEMS = [
 def _news_item_html(item: dict) -> str:
     """Render a single news item row for the HTML table."""
     title = item.get("title") or "[News Item Title]"
-    summary = item.get("summary") or "[Summary of news item.]"
+    summary = _format_text_field(item.get("summary") or "[Summary of news item.]")
     url = item.get("url") or _WEBSITE_URL
     image_url = (item.get("image_url") or "").strip()
     image_alt = (item.get("image_alt") or "").strip()
@@ -161,6 +216,8 @@ def render_news(
         cta_url = _WEBSITE_URL
 
     news_items_html = "\n".join(_news_item_html(item) for item in news_items)
+    intro = _format_text_field(intro)
+    highlight_body = _format_text_field(highlight_body)
 
     _highlight_image_html = ""
     if highlight_image_url:
@@ -287,6 +344,8 @@ def render_engagement(
     button_url: str = "#",
 ) -> str:
     """Render the User Engagement HTML email template."""
+    intro = _format_text_field(intro)
+    description = _format_text_field(description)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -384,6 +443,7 @@ def render_system_update(
     if impact_items is None:
         impact_items = _DEFAULT_IMPACT_ITEMS
 
+    intro = _format_text_field(intro)
     impact_items_html = "\n".join(_impact_item_html(item) for item in impact_items)
 
     return f"""<!DOCTYPE html>
