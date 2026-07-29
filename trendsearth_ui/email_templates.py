@@ -82,14 +82,14 @@ _FOOTER_HTML = f"""
 # ---------------------------------------------------------------------------
 
 # Matches [label](url) — processed first so bare-URL pass doesn't touch them.
-_LINK_MD_RE = re.compile(r'\[([^\]]+)\]\((https?://[^\)\s]+)\)')
+_LINK_MD_RE = re.compile(r"\[([^\]]+)\]\((https?://[^\)\s]+)\)")
 # Matches bare https:// URLs not already inside an href="…" attribute.
 _BARE_URL_RE = re.compile(r'(?<!["\'>])(https?://[^\s<>"\')\]]+)')
 # Bold-italic (***text***) must be matched before bold (**) and italic (*).
-_BOLD_ITALIC_RE = re.compile(r'\*\*\*(.+?)\*\*\*', re.DOTALL)
+_BOLD_ITALIC_RE = re.compile(r"\*\*\*(.+?)\*\*\*", re.DOTALL)
 # Bold (**text**) must be matched before italic (*text*).
-_BOLD_RE = re.compile(r'\*\*(.+?)\*\*', re.DOTALL)
-_ITALIC_RE = re.compile(r'\*(.+?)\*', re.DOTALL)
+_BOLD_RE = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
+_ITALIC_RE = re.compile(r"\*(.+?)\*", re.DOTALL)
 
 
 def _format_text_field(text: str) -> str:
@@ -118,9 +118,9 @@ def _format_text_field(text: str) -> str:
     # as "type \n") into a real newline so the line-break step handles both.
     text = text.replace("\\n", "\n")
 
-    text = _BOLD_ITALIC_RE.sub(r'<strong><em>\1</em></strong>', text)
-    text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
-    text = _ITALIC_RE.sub(r'<em>\1</em>', text)
+    text = _BOLD_ITALIC_RE.sub(r"<strong><em>\1</em></strong>", text)
+    text = _BOLD_RE.sub(r"<strong>\1</strong>", text)
+    text = _ITALIC_RE.sub(r"<em>\1</em>", text)
 
     def _md_link(m: re.Match) -> str:
         label = m.group(1)

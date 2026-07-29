@@ -1705,16 +1705,19 @@ def register_callbacks(app):
     @app.callback(
         Output("bulk-email-news-items-container", "children"),
         Input("bulk-email-news-items-store", "data"),
+        State("bulk-email-news-items-container", "children"),
     )
-    def render_news_items_container(news_items):
+    def render_news_items_container(news_items, current_children):
         from ..components.bulk_email import _news_item_row
 
         items = news_items or []
-        children = []
-        for i, item in enumerate(items):
-            row = _news_item_row(i, item=item)
-            children.append(row)
-        return children
+        # Only rebuild the DOM when the *number* of items changes (add / delete /
+        # initial load).  For plain field edits the count is unchanged, so we
+        # return no_update to avoid React patching the focused input's value
+        # prop — which would reset the cursor mid-keystroke.
+        if current_children is not None and len(current_children) == len(items):
+            return no_update
+        return [_news_item_row(i, item=item) for i, item in enumerate(items)]
 
     # -----------------------------------------------------------------------
     # Manage news items store (add / delete / field edits)
@@ -1846,11 +1849,14 @@ def register_callbacks(app):
     @app.callback(
         Output("bulk-email-impact-items-container", "children"),
         Input("bulk-email-impact-items-store", "data"),
+        State("bulk-email-impact-items-container", "children"),
     )
-    def render_impact_items_container(impact_items):
+    def render_impact_items_container(impact_items, current_children):
         from ..components.bulk_email import _impact_item_row
 
         items = impact_items or []
+        if current_children is not None and len(current_children) == len(items):
+            return no_update
         return [_impact_item_row(i, text=item) for i, item in enumerate(items)]
 
     # -----------------------------------------------------------------------
