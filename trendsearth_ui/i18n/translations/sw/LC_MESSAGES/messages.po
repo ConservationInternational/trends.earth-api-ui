@@ -1120,24 +1120,24 @@ msgstr "Hakuna takwimu zinazopatikana kwa kipindi kilichochaguliwa."
 #: trendsearth_ui/callbacks/unsubscribe.py:50
 #: trendsearth_ui/callbacks/unsubscribe.py:113
 msgid "No unsubscribe token found. Please use the link from your email."
-msgstr ""
+msgstr "Tokeni ya kujiondoa haikupatikana. Tafadhali tumia kiungo kutoka kwa barua pepe yako."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:64
 #: trendsearth_ui/callbacks/unsubscribe.py:128
 msgid "Network error. Please try again."
-msgstr ""
+msgstr "Hitilafu ya mtandao. Tafadhali jaribu tena."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:80
 msgid "Failed to load preferences."
-msgstr ""
+msgstr "Imeshindwa kupakia mapendeleo."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:132
 msgid "Your email preferences have been saved successfully."
-msgstr ""
+msgstr "Mapendeleo yako ya barua pepe yamehifadhiwa kwa mafanikio."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:137
 msgid "Failed to save preferences."
-msgstr ""
+msgstr "Imeshindwa kuhifadhi mapendeleo."
 
 #: trendsearth_ui/components/layout.py:54
 msgid "Government - Environment/Natural Resources"
@@ -1708,39 +1708,39 @@ msgstr "Sasisha Wasifu"
 
 #: trendsearth_ui/components/layout.py:2127
 msgid "Email Subscription Preferences"
-msgstr ""
+msgstr "Mapendeleo ya Usajili wa Barua Pepe"
 
 #: trendsearth_ui/components/layout.py:2132
 msgid "Choose which types of emails you'd like to receive from Trends.Earth."
-msgstr ""
+msgstr "Chagua aina za barua pepe unazotaka kupokea kutoka Trends.Earth."
 
 #: trendsearth_ui/components/layout.py:2160
 #: trendsearth_ui/components/tabs.py:973
 msgid "Automated updates (job status, etc.)"
-msgstr ""
+msgstr "Masasisho ya kiotomatiki (hali ya kazi, n.k.)"
 
 #: trendsearth_ui/components/layout.py:2168
 #: trendsearth_ui/components/tabs.py:990
 msgid "News and updates"
-msgstr ""
+msgstr "Habari na masasisho"
 
 #: trendsearth_ui/components/layout.py:2175
 #: trendsearth_ui/components/tabs.py:998
 msgid "Engagement opportunities"
-msgstr ""
+msgstr "Fursa za ushirikiano"
 
 #: trendsearth_ui/components/layout.py:2183
 #: trendsearth_ui/components/tabs.py:1008
 msgid "System updates and announcements"
-msgstr ""
+msgstr "Masasisho ya mfumo na matangazo"
 
 #: trendsearth_ui/components/layout.py:2197
 msgid "Save Preferences"
-msgstr ""
+msgstr "Hifadhi Mapendeleo"
 
 #: trendsearth_ui/components/layout.py:2203
 msgid "Unsubscribe from All"
-msgstr ""
+msgstr "Jiondoe kutoka Kila kitu"
 
 #: trendsearth_ui/components/layout.py:2326
 msgid "Logout"

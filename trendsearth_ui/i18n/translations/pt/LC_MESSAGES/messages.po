@@ -1121,24 +1121,24 @@ msgstr "Não há estatísticas disponíveis para o período selecionado."
 #: trendsearth_ui/callbacks/unsubscribe.py:50
 #: trendsearth_ui/callbacks/unsubscribe.py:113
 msgid "No unsubscribe token found. Please use the link from your email."
-msgstr ""
+msgstr "Token de cancelamento de assinatura não encontrado. Por favor, use o link do seu e-mail."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:64
 #: trendsearth_ui/callbacks/unsubscribe.py:128
 msgid "Network error. Please try again."
-msgstr ""
+msgstr "Erro de rede. Por favor, tente novamente."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:80
 msgid "Failed to load preferences."
-msgstr ""
+msgstr "Falha ao carregar preferências."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:132
 msgid "Your email preferences have been saved successfully."
-msgstr ""
+msgstr "Suas preferências de e-mail foram salvas com sucesso."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:137
 msgid "Failed to save preferences."
-msgstr ""
+msgstr "Falha ao salvar preferências."
 
 #: trendsearth_ui/components/layout.py:54
 msgid "Government - Environment/Natural Resources"
@@ -1711,39 +1711,39 @@ msgstr "Atualizar perfil"
 
 #: trendsearth_ui/components/layout.py:2127
 msgid "Email Subscription Preferences"
-msgstr ""
+msgstr "Preferências de assinatura de e-mail"
 
 #: trendsearth_ui/components/layout.py:2132
 msgid "Choose which types of emails you'd like to receive from Trends.Earth."
-msgstr ""
+msgstr "Escolha os tipos de e-mails que deseja receber da Trends.Earth."
 
 #: trendsearth_ui/components/layout.py:2160
 #: trendsearth_ui/components/tabs.py:973
 msgid "Automated updates (job status, etc.)"
-msgstr ""
+msgstr "Atualizações automáticas (status do trabalho, etc.)"
 
 #: trendsearth_ui/components/layout.py:2168
 #: trendsearth_ui/components/tabs.py:990
 msgid "News and updates"
-msgstr ""
+msgstr "Notícias e atualizações"
 
 #: trendsearth_ui/components/layout.py:2175
 #: trendsearth_ui/components/tabs.py:998
 msgid "Engagement opportunities"
-msgstr ""
+msgstr "Oportunidades de engajamento"
 
 #: trendsearth_ui/components/layout.py:2183
 #: trendsearth_ui/components/tabs.py:1008
 msgid "System updates and announcements"
-msgstr ""
+msgstr "Atualizações do sistema e anúncios"
 
 #: trendsearth_ui/components/layout.py:2197
 msgid "Save Preferences"
-msgstr ""
+msgstr "Salvar preferências"
 
 #: trendsearth_ui/components/layout.py:2203
 msgid "Unsubscribe from All"
-msgstr ""
+msgstr "Cancelar todas as assinaturas"
 
 #: trendsearth_ui/components/layout.py:2326
 msgid "Logout"

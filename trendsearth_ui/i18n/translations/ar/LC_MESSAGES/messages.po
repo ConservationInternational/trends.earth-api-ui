@@ -1102,24 +1102,24 @@ msgstr "لا توجد إحصائيات متاحة للفترة المحددة."
 #: trendsearth_ui/callbacks/unsubscribe.py:50
 #: trendsearth_ui/callbacks/unsubscribe.py:113
 msgid "No unsubscribe token found. Please use the link from your email."
-msgstr ""
+msgstr "لم يتم العثور على رمز إلغاء الاشتراك. يرجى استخدام الرابط الموجود في بريدك الإلكتروني."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:64
 #: trendsearth_ui/callbacks/unsubscribe.py:128
 msgid "Network error. Please try again."
-msgstr ""
+msgstr "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:80
 msgid "Failed to load preferences."
-msgstr ""
+msgstr "فشل تحميل التفضيلات."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:132
 msgid "Your email preferences have been saved successfully."
-msgstr ""
+msgstr "تم حفظ تفضيلات البريد الإلكتروني بنجاح."
 
 #: trendsearth_ui/callbacks/unsubscribe.py:137
 msgid "Failed to save preferences."
-msgstr ""
+msgstr "فشل حفظ التفضيلات."
 
 #: trendsearth_ui/components/layout.py:54
 msgid "Government - Environment/Natural Resources"
@@ -1690,39 +1690,39 @@ msgstr "تحديث الملف الشخصي"
 
 #: trendsearth_ui/components/layout.py:2127
 msgid "Email Subscription Preferences"
-msgstr ""
+msgstr "تفضيلات الاشتراك بالبريد الإلكتروني"
 
 #: trendsearth_ui/components/layout.py:2132
 msgid "Choose which types of emails you'd like to receive from Trends.Earth."
-msgstr ""
+msgstr "اختر أنواع رسائل البريد الإلكتروني التي تريد تلقيها من Trends.Earth."
 
 #: trendsearth_ui/components/layout.py:2160
 #: trendsearth_ui/components/tabs.py:973
 msgid "Automated updates (job status, etc.)"
-msgstr ""
+msgstr "تحديثات تلقائية (حالة المهمة، إلخ)"
 
 #: trendsearth_ui/components/layout.py:2168
 #: trendsearth_ui/components/tabs.py:990
 msgid "News and updates"
-msgstr ""
+msgstr "الأخبار والتحديثات"
 
 #: trendsearth_ui/components/layout.py:2175
 #: trendsearth_ui/components/tabs.py:998
 msgid "Engagement opportunities"
-msgstr ""
+msgstr "فرص المشاركة"
 
 #: trendsearth_ui/components/layout.py:2183
 #: trendsearth_ui/components/tabs.py:1008
 msgid "System updates and announcements"
-msgstr ""
+msgstr "تحديثات النظام والإعلانات"
 
 #: trendsearth_ui/components/layout.py:2197
 msgid "Save Preferences"
-msgstr ""
+msgstr "حفظ التفضيلات"
 
 #: trendsearth_ui/components/layout.py:2203
 msgid "Unsubscribe from All"
-msgstr ""
+msgstr "إلغاء الاشتراك من الكل"
 
 #: trendsearth_ui/components/layout.py:2326
 msgid "Logout"

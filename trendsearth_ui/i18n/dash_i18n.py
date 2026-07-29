@@ -89,6 +89,7 @@ function(lang, previousLang) {
         console.log('Saved to localStorage: ' + localStorage.getItem('trendsearth_language'));
         // Set cookie for server-side detection (1 year expiry)
         document.cookie = 'trendsearth_language=' + lang + ';path=/;max-age=31536000;SameSite=Lax';
+        var href = window.location.href;
         // Only reload if there was a previous language and it's different
         // This prevents reload on initial page load when browser language is detected
         if (previousLang && previousLang !== lang) {
@@ -99,13 +100,23 @@ function(lang, previousLang) {
                 // the new language so it won't override the selection after reload.
                 // Use string replacement instead of the URL API to avoid
                 // re-encoding other parameters (e.g. auth tokens).
-                var href = window.location.href;
                 if (/[?&]lang=/.test(href)) {
                     window.location.href = href.replace(/([?&]lang=)[^&]*/, '$1' + encodeURIComponent(lang));
                 } else {
                     window.location.reload();
                 }
             }, 50);
+        } else if (!previousLang && /[?&]token=/.test(href) && !/[?&]lang=/.test(href)) {
+            // Initial language detection on a token-based page (e.g. unsubscribe,
+            // update-profile).  Silently add ?lang= to the URL via replaceState so
+            // that future language changes use URL navigation instead of a full
+            // page reload, matching the behaviour of pages that arrive with lang=
+            // already in the URL.
+            try {
+                var url = new URL(href);
+                url.searchParams.set('lang', lang);
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
         }
     }
     // Store current language as the "previous" for next comparison

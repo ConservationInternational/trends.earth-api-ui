@@ -22,6 +22,7 @@ from ..components import (
     update_profile_standalone_layout,
 )
 from ..config import detect_api_environment_from_host, get_api_base, get_auth_url
+from ..i18n import force_locale
 from ..i18n import gettext as _
 from ..utils import (
     create_auth_cookie_data,
@@ -236,15 +237,26 @@ def register_callbacks(app):
         if _pathname and _pathname.startswith("/unsubscribe"):
             unsub_token = None
             api_env = current_api_environment or "production"
+            lang = None
             if search:
                 params = parse_qs(search[1:] if search.startswith("?") else search)
                 unsub_token = params.get("token", [None])[0]
                 env_param = params.get("env", [None])[0]
                 if env_param:
                     api_env = env_param
+                lang_param = params.get("lang", [None])[0]
+                if lang_param:
+                    lang = lang_param
 
+            if lang:
+                with force_locale(lang):
+                    layout = unsubscribe_layout(
+                        token=unsub_token, api_environment=api_env, lang=lang
+                    )
+            else:
+                layout = unsubscribe_layout(token=unsub_token, api_environment=api_env)
             return (
-                unsubscribe_layout(token=unsub_token, api_environment=api_env),
+                layout,
                 True,  # Clear auth stores for this public page
                 None,
                 None,

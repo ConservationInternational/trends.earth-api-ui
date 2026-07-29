@@ -2095,7 +2095,7 @@ def update_profile_standalone_layout(token=None, api_environment=None, lang=None
     )
 
 
-def unsubscribe_layout(token=None, api_environment="production"):
+def unsubscribe_layout(token=None, api_environment="production", lang=None):
     """Create the unsubscribe / email preferences page layout.
 
     This page is loaded directly from the unsubscribe link embedded in bulk
@@ -2105,6 +2105,7 @@ def unsubscribe_layout(token=None, api_environment="production"):
     Args:
         token: The signed JWT unsubscribe token from the URL
         api_environment: The API environment to use
+        lang: Language code from URL query parameter (e.g., 'en', 'es', 'fr')
     """
     return html.Div(
         [
@@ -2161,6 +2162,10 @@ def unsubscribe_layout(token=None, api_environment="production"):
                                             dcc.Store(
                                                 id="unsubscribe-api-env",
                                                 data=api_environment,
+                                            ),
+                                            dcc.Store(
+                                                id="unsubscribe-lang-store",
+                                                data=lang,
                                             ),
                                             dcc.Loading(
                                                 [
