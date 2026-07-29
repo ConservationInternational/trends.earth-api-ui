@@ -96,12 +96,17 @@ def _format_text_field(text: str) -> str:
     """Format a long plain-text field for insertion into an HTML email.
 
     Conversions applied (in order):
-    1. ``***text***``        →  ``<strong><em>text</em></strong>``
-    2. ``**text**``          →  ``<strong>text</strong>``
-    3. ``*text*``            →  ``<em>text</em>``
-    4. ``[label](url)``      →  styled ``<a>`` link with the given display text.
-    4. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
-    5. Newlines (``\\n``)     →  ``<br>`` tags.
+    1. Literal ``\\n`` (two chars: backslash + n) normalised to a real newline.
+    2. ``***text***``        →  ``<strong><em>text</em></strong>``
+    3. ``**text**``          →  ``<strong>text</strong>``
+    4. ``*text*``            →  ``<em>text</em>``
+    5. ``[label](url)``      →  underlined ``<a>`` link (colour inherits from context).
+    6. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
+    7. Real newlines          →  ``<br>`` tags.
+
+    Links use ``color:inherit`` so they are always legible regardless of the
+    background colour of the containing section (e.g. white body vs red
+    highlight box).
 
     Existing HTML in the value is left untouched, so previously stored
     content that already contains tags continues to render correctly.
@@ -109,22 +114,27 @@ def _format_text_field(text: str) -> str:
     if not text:
         return text
 
+    # Normalise literal \n (two characters typed by a user who read the hint
+    # as "type \n") into a real newline so the line-break step handles both.
+    text = text.replace("\\n", "\n")
+
     text = _BOLD_ITALIC_RE.sub(r'<strong><em>\1</em></strong>', text)
     text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
     text = _ITALIC_RE.sub(r'<em>\1</em>', text)
+
     def _md_link(m: re.Match) -> str:
         label = m.group(1)
         url = m.group(2)
         return (
             f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-            f'style="color:{_PRIMARY_RED}; text-decoration:none;">{label}</a>'
+            f'style="color:inherit; text-decoration:underline;">{label}</a>'
         )
 
     def _bare_link(m: re.Match) -> str:
         url = m.group(1)
         return (
             f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-            f'style="color:{_PRIMARY_RED}; text-decoration:none;">{url}</a>'
+            f'style="color:inherit; text-decoration:underline;">{url}</a>'
         )
 
     text = _LINK_MD_RE.sub(_md_link, text)
