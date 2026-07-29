@@ -85,15 +85,23 @@ _FOOTER_HTML = f"""
 _LINK_MD_RE = re.compile(r'\[([^\]]+)\]\((https?://[^\)\s]+)\)')
 # Matches bare https:// URLs not already inside an href="…" attribute.
 _BARE_URL_RE = re.compile(r'(?<!["\'>])(https?://[^\s<>"\')\]]+)')
+# Bold-italic (***text***) must be matched before bold (**) and italic (*).
+_BOLD_ITALIC_RE = re.compile(r'\*\*\*(.+?)\*\*\*', re.DOTALL)
+# Bold (**text**) must be matched before italic (*text*).
+_BOLD_RE = re.compile(r'\*\*(.+?)\*\*', re.DOTALL)
+_ITALIC_RE = re.compile(r'\*(.+?)\*', re.DOTALL)
 
 
 def _format_text_field(text: str) -> str:
     """Format a long plain-text field for insertion into an HTML email.
 
     Conversions applied (in order):
-    1. ``[label](url)``  →  styled ``<a>`` link with the given display text.
-    2. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
-    3. Newlines (``\\n``)  →  ``<br>`` tags.
+    1. ``***text***``        →  ``<strong><em>text</em></strong>``
+    2. ``**text**``          →  ``<strong>text</strong>``
+    3. ``*text*``            →  ``<em>text</em>``
+    4. ``[label](url)``      →  styled ``<a>`` link with the given display text.
+    4. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
+    5. Newlines (``\\n``)     →  ``<br>`` tags.
 
     Existing HTML in the value is left untouched, so previously stored
     content that already contains tags continues to render correctly.
@@ -101,6 +109,9 @@ def _format_text_field(text: str) -> str:
     if not text:
         return text
 
+    text = _BOLD_ITALIC_RE.sub(r'<strong><em>\1</em></strong>', text)
+    text = _BOLD_RE.sub(r'<strong>\1</strong>', text)
+    text = _ITALIC_RE.sub(r'<em>\1</em>', text)
     def _md_link(m: re.Match) -> str:
         label = m.group(1)
         url = m.group(2)
