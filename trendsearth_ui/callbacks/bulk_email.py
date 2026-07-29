@@ -2562,6 +2562,15 @@ def _load_draft_options(token):
 def _extract_error(resp):
     try:
         body = resp.json()
-        return body.get("message") or body.get("error") or resp.text
+        # Prefer an explicit error message from the API.
+        msg = body.get("message") or body.get("error")
+        if msg:
+            return f"HTTP {resp.status_code}: {msg}"
+        # Fall back to a truncated raw body so the alert stays readable.
+        raw = resp.text or ""
+        preview = raw[:300] + ("…" if len(raw) > 300 else "")
+        return f"HTTP {resp.status_code}: {preview}"
     except Exception:
-        return resp.text or "Unknown error"
+        raw = (resp.text or "Unknown error") if resp else "Unknown error"
+        preview = raw[:300] + ("…" if len(raw) > 300 else "")
+        return preview
