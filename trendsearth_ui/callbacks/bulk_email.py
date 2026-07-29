@@ -859,64 +859,66 @@ def register_callbacks(app):
                 *_nu9,
             )
 
-        # Determine content based on active tab
-        fields_data = None
-        if active_tab == "fields" and active_template:
-            html_content = _build_html_from_fields(
-                active_template,
-                news_issue_date=news_issue_date or "",
-                news_intro=news_intro or "",
-                news_highlight_title=news_highlight_title or "",
-                news_highlight_body=news_highlight_body or "",
-                news_highlight_image_url=news_highlight_image_url or "",
-                news_items=news_items or [],
-                news_cta_url=news_cta_url or "",
-                news_cta_label=news_cta_label or "",
-                engagement_intro=engagement_intro or "",
-                engagement_topic=engagement_topic or "",
-                engagement_description=engagement_description or "",
-                engagement_btn_label=engagement_btn_label or "",
-                engagement_btn_url=engagement_btn_url or "",
-                sysupdate_date_time=sysupdate_date_time or "",
-                sysupdate_intro=sysupdate_intro or "",
-                sysupdate_datetime_utc=sysupdate_datetime_utc or "",
-                sysupdate_duration=sysupdate_duration or "",
-                sysupdate_impact=sysupdate_impact or "",
-                impact_items=impact_items or [],
-            )
-            fields_data = {
-                "template": active_template,
-                "news_issue_date": news_issue_date,
-                "news_intro": news_intro,
-                "news_highlight_title": news_highlight_title,
-                "news_highlight_body": news_highlight_body,
-                "news_highlight_image_url": news_highlight_image_url,
-                "news_cta_url": news_cta_url,
-                "news_cta_label": news_cta_label,
-                "engagement_intro": engagement_intro,
-                "engagement_topic": engagement_topic,
-                "engagement_description": engagement_description,
-                "engagement_btn_label": engagement_btn_label,
-                "engagement_btn_url": engagement_btn_url,
-                "sysupdate_date_time": sysupdate_date_time,
-                "sysupdate_intro": sysupdate_intro,
-                "sysupdate_datetime_utc": sysupdate_datetime_utc,
-                "sysupdate_duration": sysupdate_duration,
-                "sysupdate_impact": sysupdate_impact,
-                "news_items": news_items or [],
-                "impact_items": impact_items or [],
-            }
-        else:
-            html_content = raw_html or ""
-
-        payload = {
-            "name": name,
-            "subject": subject,
-            "html_content": html_content,
-            "subscription_type": subscription_type or None,
-            "fields_data": fields_data,
-        }
+        # Determine content and make the API call — all inside one try block so
+        # any exception (including errors from _build_html_from_fields) surfaces
+        # as a clean alert instead of an ugly Dash callback error popup.
         try:
+            fields_data = None
+            if active_tab == "fields" and active_template:
+                html_content = _build_html_from_fields(
+                    active_template,
+                    news_issue_date=news_issue_date or "",
+                    news_intro=news_intro or "",
+                    news_highlight_title=news_highlight_title or "",
+                    news_highlight_body=news_highlight_body or "",
+                    news_highlight_image_url=news_highlight_image_url or "",
+                    news_items=news_items or [],
+                    news_cta_url=news_cta_url or "",
+                    news_cta_label=news_cta_label or "",
+                    engagement_intro=engagement_intro or "",
+                    engagement_topic=engagement_topic or "",
+                    engagement_description=engagement_description or "",
+                    engagement_btn_label=engagement_btn_label or "",
+                    engagement_btn_url=engagement_btn_url or "",
+                    sysupdate_date_time=sysupdate_date_time or "",
+                    sysupdate_intro=sysupdate_intro or "",
+                    sysupdate_datetime_utc=sysupdate_datetime_utc or "",
+                    sysupdate_duration=sysupdate_duration or "",
+                    sysupdate_impact=sysupdate_impact or "",
+                    impact_items=impact_items or [],
+                )
+                fields_data = {
+                    "template": active_template,
+                    "news_issue_date": news_issue_date,
+                    "news_intro": news_intro,
+                    "news_highlight_title": news_highlight_title,
+                    "news_highlight_body": news_highlight_body,
+                    "news_highlight_image_url": news_highlight_image_url,
+                    "news_cta_url": news_cta_url,
+                    "news_cta_label": news_cta_label,
+                    "engagement_intro": engagement_intro,
+                    "engagement_topic": engagement_topic,
+                    "engagement_description": engagement_description,
+                    "engagement_btn_label": engagement_btn_label,
+                    "engagement_btn_url": engagement_btn_url,
+                    "sysupdate_date_time": sysupdate_date_time,
+                    "sysupdate_intro": sysupdate_intro,
+                    "sysupdate_datetime_utc": sysupdate_datetime_utc,
+                    "sysupdate_duration": sysupdate_duration,
+                    "sysupdate_impact": sysupdate_impact,
+                    "news_items": news_items or [],
+                    "impact_items": impact_items or [],
+                }
+            else:
+                html_content = raw_html or ""
+
+            payload = {
+                "name": name,
+                "subject": subject,
+                "html_content": html_content,
+                "subscription_type": subscription_type or None,
+                "fields_data": fields_data,
+            }
             if loaded_draft_id:
                 resp = _api(token, "PATCH", f"/bulk-email/{loaded_draft_id}", json=payload)
                 action = "updated"
