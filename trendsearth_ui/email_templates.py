@@ -209,9 +209,7 @@ def _news_item_html(item: dict) -> str:
         f' font-weight:700; margin:0 0 6px 0;">{title}</h3>'
         f'<p style="font-family:Arial,sans-serif; font-size:14px; color:#495057;'
         f' line-height:1.6; margin:0{" 0 8px 0" if read_more_html else ";"}">'
-        f'{summary}</p>'
-        + read_more_html
-        + "</td>"
+        f"{summary}</p>" + read_more_html + "</td>"
         "</tr>"
     )
 

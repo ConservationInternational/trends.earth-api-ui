@@ -619,7 +619,7 @@ def register_callbacks(app):
                     },
                 )
                 action = "saved"
-            if resp.status_code in (200, 201):
+            if resp.status_code in (200, 201):  # PATCH=200, POST=201
                 saved_id = resp.json().get("data", {}).get("id") or loaded_rlist_id
                 rows = _load_recipient_lists(token)
                 options = [{"label": _rlist_label(r), "value": r["id"]} for r in rows if "id" in r]
@@ -925,7 +925,7 @@ def register_callbacks(app):
             else:
                 resp = _api(token, "POST", "/bulk-email", json=payload)
                 action = "saved"
-            if resp.status_code in (200, 201):
+            if resp.status_code in (201, 202):  # POST=201, PATCH=202
                 saved_id = resp.json().get("data", {}).get("id") or loaded_draft_id
                 options = _load_draft_options(token)
                 label = f"Editing: {name}"
