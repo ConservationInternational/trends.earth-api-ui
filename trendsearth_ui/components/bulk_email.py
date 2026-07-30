@@ -72,6 +72,10 @@ def _news_item_row(index: int, item: dict | None = None) -> dbc.Card:
                                     placeholder="https://...",
                                     value=item.get("url", ""),
                                 ),
+                                html.Small(
+                                    "Optional — leave blank to hide the 'Read more →' link",
+                                    className="text-muted",
+                                ),
                             ],
                             width=6,
                             className="mb-2",

@@ -62,7 +62,7 @@ _FOOTER_HTML = f"""
   <table width="100%" cellpadding="0" cellspacing="0" border="0"
          style="margin-top:32px; border-top:1px solid #dee2e6;">
     <tr>
-      <td align="center" style="padding:16px; font-family:Arial,sans-serif;
+      <td align="center" style="padding:16px 16px 4px; font-family:Arial,sans-serif;
           font-size:12px; color:#6c757d; line-height:1.6;">
         <a href="{_WEBSITE_URL}" target="_blank"
            style="color:{_PRIMARY_RED}; text-decoration:none;">trends.earth</a>
@@ -72,6 +72,14 @@ _FOOTER_HTML = f"""
         &nbsp;&bull;&nbsp;
         <a href="{_TERMS_URL}" target="_blank"
            style="color:{_PRIMARY_RED}; text-decoration:none;">Terms of Use</a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" style="padding:0 16px 16px; font-family:Arial,sans-serif;
+          font-size:12px; color:#6c757d; line-height:1.6;">
+        trends.earth is led by
+        <a href="https://www.conservation.org" target="_blank"
+           style="color:{_PRIMARY_RED}; text-decoration:none;">Conservation International</a>
       </td>
     </tr>
   </table>
@@ -151,7 +159,7 @@ _DEFAULT_NEWS_ITEMS = [
     {
         "title": "[News Item Title]",
         "summary": "[Summary of news item. Replace with your content.]",
-        "url": _WEBSITE_URL,
+        "url": "",
         "image_url": "",
         "image_alt": "",
     }
@@ -172,7 +180,7 @@ def _news_item_html(item: dict) -> str:
     """Render a single news item row for the HTML table."""
     title = item.get("title") or "[News Item Title]"
     summary = _format_text_field(item.get("summary") or "[Summary of news item.]")
-    url = item.get("url") or _WEBSITE_URL
+    url = (item.get("url") or "").strip()
     image_url = (item.get("image_url") or "").strip()
     image_alt = (item.get("image_alt") or "").strip()
 
@@ -183,18 +191,27 @@ def _news_item_html(item: dict) -> str:
             ' style="display:block;max-width:100%;height:auto;margin-bottom:12px;">'
         )
 
+    # Only render the "Read more" link when an explicit URL is provided.
+    read_more_html = ""
+    if url:
+        read_more_html = (
+            f'<a href="{url}" target="_blank"'
+            f' style="font-family:Arial,sans-serif; font-size:14px; color:{_PRIMARY_RED};'
+            f' text-decoration:none; font-weight:600;">Read more &rarr;</a>'
+        )
+
     return (
         "<tr>"
-        '<td style="padding:12px 0; border-bottom:1px solid #dee2e6;">'
+        '<td style="padding:12px 0; border-bottom:1px solid #dee2e6; word-wrap:break-word;'
+        ' overflow-wrap:break-word;">'
         + img_html
         + f'<h3 style="font-family:Arial,sans-serif; font-size:15px; color:#212529;'
         f' font-weight:700; margin:0 0 6px 0;">{title}</h3>'
         f'<p style="font-family:Arial,sans-serif; font-size:14px; color:#495057;'
-        f' line-height:1.6; margin:0 0 8px 0;">{summary}</p>'
-        f'<a href="{url}" target="_blank"'
-        f' style="font-family:Arial,sans-serif; font-size:14px; color:{_PRIMARY_RED};'
-        f' text-decoration:none; font-weight:600;">Read more &rarr;</a>'
-        "</td>"
+        f' line-height:1.6; margin:0{" 0 8px 0" if read_more_html else ";"}">'
+        f'{summary}</p>'
+        + read_more_html
+        + "</td>"
         "</tr>"
     )
 
@@ -260,14 +277,15 @@ def render_news(
          style="background-color:#f8f9fa;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <table cellpadding="0" cellspacing="0" border="0"
                style="background-color:#ffffff; border-radius:4px;
-                      box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                      box-shadow:0 1px 3px rgba(0,0,0,0.12);
+                      max-width:600px; width:100%;">
           <tr><td>
             {_HEADER_HTML}
           </td></tr>
           <tr>
-            <td style="padding:0 32px 24px;">
+            <td style="padding:0 32px 24px; word-wrap:break-word; overflow-wrap:break-word;">
               <h1 style="font-family:Arial,sans-serif; font-size:22px; color:#212529;
                           font-weight:700; margin:0 0 8px 0;">
                 Trends.Earth News &amp; Updates
@@ -376,14 +394,15 @@ def render_engagement(
          style="background-color:#f8f9fa;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <table cellpadding="0" cellspacing="0" border="0"
                style="background-color:#ffffff; border-radius:4px;
-                      box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                      box-shadow:0 1px 3px rgba(0,0,0,0.12);
+                      max-width:600px; width:100%;">
           <tr><td>
             {_HEADER_HTML}
           </td></tr>
           <tr>
-            <td style="padding:0 32px 24px;">
+            <td style="padding:0 32px 24px; word-wrap:break-word; overflow-wrap:break-word;">
               <h1 style="font-family:Arial,sans-serif; font-size:22px; color:#212529;
                           font-weight:700; margin:0 0 24px 0;">
                 We&rsquo;d love your input
@@ -476,14 +495,15 @@ def render_system_update(
          style="background-color:#f8f9fa;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <table cellpadding="0" cellspacing="0" border="0"
                style="background-color:#ffffff; border-radius:4px;
-                      box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                      box-shadow:0 1px 3px rgba(0,0,0,0.12);
+                      max-width:600px; width:100%;">
           <tr><td>
             {_HEADER_HTML}
           </td></tr>
           <tr>
-            <td style="padding:0 32px 24px;">
+            <td style="padding:0 32px 24px; word-wrap:break-word; overflow-wrap:break-word;">
               <h1 style="font-family:Arial,sans-serif; font-size:22px; color:#212529;
                           font-weight:700; margin:0 0 8px 0;">
                 System Update Notice
