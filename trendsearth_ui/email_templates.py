@@ -44,6 +44,25 @@ _TERMS_URL = "https://www.conservation.org/policies/terms-of-use"
 # Shared HTML fragments
 # ---------------------------------------------------------------------------
 
+
+# color-scheme: light prevents dark-mode clients from inverting backgrounds.
+# width="600" on the inner card table is for Outlook, which ignores CSS max-width.
+def _email_head(title: str) -> str:
+    return f"""<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{title}</title>
+<style>
+  :root {{ color-scheme: light; }}
+  body {{ background-color: #f8f9fa !important; }}
+  .email-bg {{ background-color: #f8f9fa !important; }}
+  .email-card {{ background-color: #ffffff !important; }}
+</style>
+</head>"""
+
+
 _HEADER_HTML = f"""
   <table width="100%" cellpadding="0" cellspacing="0" border="0"
          style="background-color:{_HEADER_BG}; margin-bottom:24px;">
@@ -270,15 +289,15 @@ def render_news(
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trends.Earth News &amp; Updates</title></head>
-<body style="margin:0; padding:0; background-color:#f8f9fa;">
+{_email_head("Trends.Earth News &amp; Updates")}
+<body style="margin:0; padding:0; background-color:#f8f9fa !important;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0"
-         style="background-color:#f8f9fa;">
+         class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table cellpadding="0" cellspacing="0" border="0"
-               style="background-color:#ffffff; border-radius:4px;
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               class="email-card"
+               style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
                       max-width:600px; width:100%;">
           <tr><td>
@@ -387,15 +406,15 @@ def render_engagement(
     description = _format_text_field(description)
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trends.Earth Community</title></head>
-<body style="margin:0; padding:0; background-color:#f8f9fa;">
+{_email_head("Trends.Earth Community")}
+<body style="margin:0; padding:0; background-color:#f8f9fa !important;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0"
-         style="background-color:#f8f9fa;">
+         class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table cellpadding="0" cellspacing="0" border="0"
-               style="background-color:#ffffff; border-radius:4px;
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               class="email-card"
+               style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
                       max-width:600px; width:100%;">
           <tr><td>
@@ -488,15 +507,15 @@ def render_system_update(
 
     return f"""<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trends.Earth System Update</title></head>
-<body style="margin:0; padding:0; background-color:#f8f9fa;">
+{_email_head("Trends.Earth System Update")}
+<body style="margin:0; padding:0; background-color:#f8f9fa !important;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0"
-         style="background-color:#f8f9fa;">
+         class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table cellpadding="0" cellspacing="0" border="0"
-               style="background-color:#ffffff; border-radius:4px;
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               class="email-card"
+               style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
                       max-width:600px; width:100%;">
           <tr><td>
