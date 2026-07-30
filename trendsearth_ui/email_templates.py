@@ -254,6 +254,8 @@ def render_news(
     news_items_html = "\n".join(_news_item_html(item) for item in news_items)
     intro = _format_text_field(intro)
     highlight_body = _format_text_field(highlight_body)
+    # Neutral dark when image is present — red clashes with most image backgrounds.
+    highlight_bg = _HEADER_BG if highlight_image_url else _PRIMARY_RED
 
     _highlight_image_html = ""
     if highlight_image_url:
@@ -305,7 +307,7 @@ def render_news(
 
               <!-- Section: Highlight -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background-color:{_PRIMARY_RED}; border-radius:4px;
+                     style="background-color:{highlight_bg}; border-radius:4px;
                             margin-bottom:24px;">{_highlight_image_html}
                 <tr>
                   <td style="padding:20px 24px;">
