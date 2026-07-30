@@ -45,7 +45,6 @@ def upload_image_to_s3(file_bytes: bytes, filename: str, content_type: str) -> s
         Bucket=bucket,
         Key=key,
         Body=file_bytes,
-        ACL="public-read",
         ContentType=content_type,
     )
 

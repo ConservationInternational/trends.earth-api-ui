@@ -1785,7 +1785,12 @@ def register_callbacks(app):
     # Upload news item image to S3
     # -----------------------------------------------------------------------
     @app.callback(
-        Output({"type": "news-image-url", "index": ALL}, "value", allow_duplicate=True),
+        [
+            Output({"type": "news-image-url", "index": ALL}, "value", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+        ],
         Input({"type": "news-image-upload", "index": ALL}, "contents"),
         [
             State({"type": "news-image-upload", "index": ALL}, "filename"),
@@ -1800,6 +1805,7 @@ def register_callbacks(app):
         items = list(current_store or [])
         n = max(len(contents_list), len(items))
         result_urls = [items[i].get("image_url", "") if i < len(items) else "" for i in range(n)]
+        errors = []
 
         for i, (contents, filename) in enumerate(
             zip(contents_list or [], filenames_list or [], strict=True)
@@ -1815,16 +1821,24 @@ def register_callbacks(app):
                     result_urls[i] = url
                 else:
                     result_urls.append(url)
-            except Exception:
+            except Exception as exc:
                 logger.exception("Failed to upload news image %s", filename)
+                errors.append(f"{filename}: {exc}")
 
-        return result_urls
+        if errors:
+            return result_urls, "Upload failed: " + "; ".join(errors), True, "danger"
+        return result_urls, no_update, no_update, no_update
 
     # -----------------------------------------------------------------------
     # Upload single highlight image for the News template
     # -----------------------------------------------------------------------
     @app.callback(
-        Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+        [
+            Output("bulk-email-field-news-highlight-image-url", "value", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "children", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "is_open", allow_duplicate=True),
+            Output("bulk-email-composer-alert", "color", allow_duplicate=True),
+        ],
         Input("bulk-email-highlight-image-upload", "contents"),
         State("bulk-email-highlight-image-upload", "filename"),
         prevent_initial_call=True,
@@ -1833,15 +1847,16 @@ def register_callbacks(app):
         from ..utils.s3_upload import upload_image_to_s3
 
         if not contents:
-            return no_update
+            return no_update, no_update, no_update, no_update
         try:
             content_type_prefix, b64data = contents.split(",", 1)
             content_type = content_type_prefix.split(":")[1].split(";")[0]
             file_bytes = base64.b64decode(b64data)
-            return upload_image_to_s3(file_bytes, filename, content_type)
-        except Exception:
+            url = upload_image_to_s3(file_bytes, filename, content_type)
+            return url, no_update, no_update, no_update
+        except Exception as exc:
             logger.exception("Failed to upload highlight image %s", filename)
-            return no_update
+            return no_update, f"Image upload failed: {exc}", True, "danger"
 
     # -----------------------------------------------------------------------
     # Render impact items container from store
