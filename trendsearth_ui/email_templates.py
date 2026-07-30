@@ -295,7 +295,8 @@ def render_news(
          class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <!--[if mso]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td width="600"><![endif]-->
+        <table cellpadding="0" cellspacing="0" border="0"
                class="email-card"
                style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
@@ -376,6 +377,7 @@ def render_news(
             {_FOOTER_HTML}
           </td></tr>
         </table>
+        <!--[if mso]></td></tr></table><![endif]-->
       </td>
     </tr>
   </table>
@@ -412,7 +414,8 @@ def render_engagement(
          class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <!--[if mso]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td width="600"><![endif]-->
+        <table cellpadding="0" cellspacing="0" border="0"
                class="email-card"
                style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
@@ -478,6 +481,7 @@ def render_engagement(
             {_FOOTER_HTML}
           </td></tr>
         </table>
+        <!--[if mso]></td></tr></table><![endif]-->
       </td>
     </tr>
   </table>
@@ -513,7 +517,8 @@ def render_system_update(
          class="email-bg" style="background-color:#f8f9fa !important;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
+        <!--[if mso]><table align="center" border="0" cellspacing="0" cellpadding="0" width="600"><tr><td width="600"><![endif]-->
+        <table cellpadding="0" cellspacing="0" border="0"
                class="email-card"
                style="background-color:#ffffff !important; border-radius:4px;
                       box-shadow:0 1px 3px rgba(0,0,0,0.12);
@@ -621,6 +626,7 @@ def render_system_update(
             {_FOOTER_HTML}
           </td></tr>
         </table>
+        <!--[if mso]></td></tr></table><![endif]-->
       </td>
     </tr>
   </table>
