@@ -1461,6 +1461,9 @@ def register_callbacks(app):
             State("register-gender", "value"),
             State("register-gender-description", "value"),
             State("register-gee-acknowledged", "value"),
+            State("register-sub-news", "value"),
+            State("register-sub-engagement", "value"),
+            State("register-sub-system-updates", "value"),
         ],
         prevent_initial_call=True,
     )
@@ -1479,6 +1482,9 @@ def register_callbacks(app):
         gender,
         gender_description,
         gee_acknowledged,
+        sub_news,
+        sub_engagement,
+        sub_system_updates,
     ):
         """Handle user registration form submission.
 
@@ -1549,6 +1555,9 @@ def register_callbacks(app):
                 "sector": sector,
                 "purpose_of_use": purpose,
                 "gee_license_acknowledged": gee_acknowledged,
+                "email_subscription_news": bool(sub_news),
+                "email_subscription_engagement": bool(sub_engagement),
+                "email_subscription_system_updates": bool(sub_system_updates),
             }
 
             # Add optional/conditional fields
