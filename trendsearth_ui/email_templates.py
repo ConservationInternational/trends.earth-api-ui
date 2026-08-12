@@ -59,6 +59,9 @@ def _email_head(title: str) -> str:
   body {{ background-color: #f8f9fa !important; }}
   .email-bg {{ background-color: #f8f9fa !important; }}
   .email-card {{ background-color: #ffffff !important; }}
+  /* Fallback cap for any img (e.g. inserted via Raw HTML) lacking its own
+     inline width; inline styles on template-generated images still win. */
+  img {{ max-width: 300px; height: auto; }}
 </style>
 </head>"""
 
@@ -206,8 +209,9 @@ def _news_item_html(item: dict) -> str:
     img_html = ""
     if image_url:
         img_html = (
-            f'<img src="{image_url}" alt="{image_alt}" width="100%"'
-            ' style="display:block;max-width:100%;height:auto;margin-bottom:12px;">'
+            f'<img src="{image_url}" alt="{image_alt}" width="300"'
+            ' style="display:block;max-width:300px;width:100%;height:auto;'
+            ' margin-bottom:12px;">'
         )
 
     # Only render the "Read more" link when an explicit URL is provided.
@@ -281,9 +285,9 @@ def render_news(
         _highlight_image_html = f"""
                 <tr>
                   <td style="padding:0; text-align:center; line-height:0; font-size:0;">
-                    <img src="{highlight_image_url}" alt=""
-                         style="width:100%; max-width:100%; height:auto; display:block;
-                                border-radius:4px 4px 0 0;">
+                    <img src="{highlight_image_url}" alt="" width="300"
+                         style="width:100%; max-width:300px; height:auto; display:block;
+                                margin:0 auto; border-radius:4px 4px 0 0;">
                   </td>
                 </tr>"""
 
