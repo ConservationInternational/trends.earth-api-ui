@@ -1338,6 +1338,12 @@ def registration_layout():
                                                         className="text-muted mb-2",
                                                     ),
                                                     dbc.Switch(
+                                                        id="register-sub-system-updates",
+                                                        label=_("System updates and announcements"),
+                                                        value=True,
+                                                        className="mb-2",
+                                                    ),
+                                                    dbc.Switch(
                                                         id="register-sub-news",
                                                         label=_("News and updates"),
                                                         value=False,
@@ -1347,12 +1353,6 @@ def registration_layout():
                                                         id="register-sub-engagement",
                                                         label=_("Engagement opportunities"),
                                                         value=False,
-                                                        className="mb-2",
-                                                    ),
-                                                    dbc.Switch(
-                                                        id="register-sub-system-updates",
-                                                        label=_("System updates and announcements"),
-                                                        value=True,
                                                         className="mb-3",
                                                     ),
                                                     # Hidden password inputs to satisfy callback dependencies
