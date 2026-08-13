@@ -2218,6 +2218,14 @@ def unsubscribe_layout(token=None, api_environment="production", lang=None):
                                                                 ),
                                                                 html.Hr(className="my-2"),
                                                                 dbc.Switch(
+                                                                    id="unsubscribe-sub-system-updates",
+                                                                    label=_(
+                                                                        "System updates and announcements"
+                                                                    ),
+                                                                    value=True,
+                                                                    className="mb-2",
+                                                                ),
+                                                                dbc.Switch(
                                                                     id="unsubscribe-sub-news",
                                                                     label=_(
                                                                         "General Trends.Earth news and updates"
@@ -2229,14 +2237,6 @@ def unsubscribe_layout(token=None, api_environment="production", lang=None):
                                                                     id="unsubscribe-sub-engagement",
                                                                     label=_(
                                                                         "Engagement opportunities"
-                                                                    ),
-                                                                    value=True,
-                                                                    className="mb-2",
-                                                                ),
-                                                                dbc.Switch(
-                                                                    id="unsubscribe-sub-system-updates",
-                                                                    label=_(
-                                                                        "System updates and announcements"
                                                                     ),
                                                                     value=True,
                                                                     className="mb-2",

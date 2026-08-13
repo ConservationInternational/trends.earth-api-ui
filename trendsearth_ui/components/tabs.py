@@ -1004,6 +1004,16 @@ def profile_tab_content(user_data):
                                                 className="text-muted mb-3",
                                             ),
                                             dbc.Switch(
+                                                id="profile-sub-system-updates",
+                                                label=_("System updates and announcements"),
+                                                value=user_data.get(
+                                                    "email_subscription_system_updates", True
+                                                )
+                                                if user_data
+                                                else True,
+                                                className="mb-2",
+                                            ),
+                                            dbc.Switch(
                                                 id="profile-sub-news",
                                                 label=_("General Trends.Earth news and updates"),
                                                 value=user_data.get("email_subscription_news", True)
@@ -1016,16 +1026,6 @@ def profile_tab_content(user_data):
                                                 label=_("Engagement opportunities"),
                                                 value=user_data.get(
                                                     "email_subscription_engagement", True
-                                                )
-                                                if user_data
-                                                else True,
-                                                className="mb-2",
-                                            ),
-                                            dbc.Switch(
-                                                id="profile-sub-system-updates",
-                                                label=_("System updates and announcements"),
-                                                value=user_data.get(
-                                                    "email_subscription_system_updates", True
                                                 )
                                                 if user_data
                                                 else True,
