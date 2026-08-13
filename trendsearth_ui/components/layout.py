@@ -1333,20 +1333,20 @@ def registration_layout():
                                                     # labels/translations as the unsubscribe page)
                                                     html.P(
                                                         _(
-                                                            "Choose which types of bulk emails you'd like to receive:"
+                                                            "Choose which emails you'd like to receive:"
                                                         ),
                                                         className="text-muted mb-2",
                                                     ),
                                                     dbc.Switch(
                                                         id="register-sub-news",
                                                         label=_("News and updates"),
-                                                        value=True,
+                                                        value=False,
                                                         className="mb-2",
                                                     ),
                                                     dbc.Switch(
                                                         id="register-sub-engagement",
                                                         label=_("Engagement opportunities"),
-                                                        value=True,
+                                                        value=False,
                                                         className="mb-2",
                                                     ),
                                                     dbc.Switch(

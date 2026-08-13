@@ -999,7 +999,7 @@ def profile_tab_content(user_data):
                                             html.Hr(className="my-3"),
                                             html.P(
                                                 _(
-                                                    "Choose which types of bulk emails you'd like to receive:"
+                                                    "Choose which emails you'd like to receive:"
                                                 ),
                                                 className="text-muted mb-3",
                                             ),
