@@ -36,6 +36,7 @@ _LOGO_URL = (
 )
 _PRIMARY_RED = "#c8272a"
 _HEADER_BG = "#495057"
+_HIGHLIGHT_LINK_COLOR = "#ffffff"
 _WEBSITE_URL = "https://trends.earth"
 _PRIVACY_URL = "https://www.conservation.org/policies/privacy"
 _TERMS_URL = "https://www.conservation.org/policies/terms-of-use"
@@ -122,7 +123,7 @@ _BOLD_RE = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
 _ITALIC_RE = re.compile(r"\*(.+?)\*", re.DOTALL)
 
 
-def _format_text_field(text: str) -> str:
+def _format_text_field(text: str, link_color: str = _PRIMARY_RED) -> str:
     """Format a long plain-text field for insertion into an HTML email.
 
     Conversions applied (in order):
@@ -130,13 +131,16 @@ def _format_text_field(text: str) -> str:
     2. ``***text***``        →  ``<strong><em>text</em></strong>``
     3. ``**text**``          →  ``<strong>text</strong>``
     4. ``*text*``            →  ``<em>text</em>``
-    5. ``[label](url)``      →  underlined ``<a>`` link (colour inherits from context).
+    5. ``[label](url)``      →  underlined ``<a>`` link.
     6. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
     7. Real newlines          →  ``<br>`` tags.
 
-    Links use ``color:inherit`` so they are always legible regardless of the
-    background colour of the containing section (e.g. white body vs red
-    highlight box).
+    ``link_color`` is applied explicitly (rather than ``color:inherit``)
+    because Outlook's Word rendering engine ignores inherited colour on
+    ``<a>`` tags and forces its own blue, regardless of the surrounding
+    background. Callers should pass a colour that is legible against the
+    section's actual background (e.g. the brand red on a white body, or an
+    amber accent inside a dark/red highlight box).
 
     Existing HTML in the value is left untouched, so previously stored
     content that already contains tags continues to render correctly.
@@ -157,14 +161,14 @@ def _format_text_field(text: str) -> str:
         url = m.group(2)
         return (
             f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-            f'style="color:inherit; text-decoration:underline;">{label}</a>'
+            f'style="color:{link_color}; text-decoration:underline;">{label}</a>'
         )
 
     def _bare_link(m: re.Match) -> str:
         url = m.group(1)
         return (
             f'<a href="{url}" target="_blank" rel="noopener noreferrer" '
-            f'style="color:inherit; text-decoration:underline;">{url}</a>'
+            f'style="color:{link_color}; text-decoration:underline;">{url}</a>'
         )
 
     text = _LINK_MD_RE.sub(_md_link, text)
@@ -276,7 +280,9 @@ def render_news(
 
     news_items_html = "\n".join(_news_item_html(item) for item in news_items)
     intro = _format_text_field(intro)
-    highlight_body = _format_text_field(highlight_body)
+    # Amber reads clearly against both the grey and red highlight box
+    # backgrounds, unlike the default blue browsers/clients apply to links.
+    highlight_body = _format_text_field(highlight_body, link_color=_HIGHLIGHT_LINK_COLOR)
     # Neutral dark when image is present — red clashes with most image backgrounds.
     highlight_bg = _HEADER_BG if highlight_image_url else _PRIMARY_RED
 
