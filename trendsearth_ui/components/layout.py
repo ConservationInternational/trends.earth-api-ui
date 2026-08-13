@@ -1353,7 +1353,9 @@ def registration_layout():
                                                     ),
                                                     dbc.Switch(
                                                         id="register-sub-news",
-                                                        label=_("News and updates"),
+                                                        label=_(
+                                                            "General Trends.Earth news and updates"
+                                                        ),
                                                         value=False,
                                                         className="mb-2",
                                                     ),
@@ -2217,7 +2219,9 @@ def unsubscribe_layout(token=None, api_environment="production", lang=None):
                                                                 html.Hr(className="my-2"),
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-news",
-                                                                    label=_("News and updates"),
+                                                                    label=_(
+                                                                        "General Trends.Earth news and updates"
+                                                                    ),
                                                                     value=True,
                                                                     className="mb-2",
                                                                 ),

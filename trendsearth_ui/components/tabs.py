@@ -1005,7 +1005,7 @@ def profile_tab_content(user_data):
                                             ),
                                             dbc.Switch(
                                                 id="profile-sub-news",
-                                                label=_("News and updates"),
+                                                label=_("General Trends.Earth news and updates"),
                                                 value=user_data.get("email_subscription_news", True)
                                                 if user_data
                                                 else True,
