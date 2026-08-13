@@ -988,7 +988,9 @@ def profile_tab_content(user_data):
                                         [
                                             dbc.Switch(
                                                 id="profile-email-notifications-switch",
-                                                label=_("Automated updates (job status, etc.)"),
+                                                label=_(
+                                                    "Automated job updates (job status changes)"
+                                                ),
                                                 value=user_data.get(
                                                     "email_notifications_enabled", True
                                                 )

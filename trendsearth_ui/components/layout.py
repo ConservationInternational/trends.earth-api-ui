@@ -1338,6 +1338,14 @@ def registration_layout():
                                                         className="text-muted mb-2",
                                                     ),
                                                     dbc.Switch(
+                                                        id="register-email-notifications",
+                                                        label=_(
+                                                            "Automated job updates (job status changes)"
+                                                        ),
+                                                        value=True,
+                                                        className="mb-2",
+                                                    ),
+                                                    dbc.Switch(
                                                         id="register-sub-system-updates",
                                                         label=_("System updates and announcements"),
                                                         value=True,
@@ -2201,7 +2209,7 @@ def unsubscribe_layout(token=None, api_environment="production", lang=None):
                                                                 dbc.Switch(
                                                                     id="unsubscribe-sub-automated",
                                                                     label=_(
-                                                                        "Automated updates (job status, etc.)"
+                                                                        "Automated job updates (job status changes)"
                                                                     ),
                                                                     value=True,
                                                                     className="mb-2",
