@@ -998,9 +998,7 @@ def profile_tab_content(user_data):
                                             ),
                                             html.Hr(className="my-3"),
                                             html.P(
-                                                _(
-                                                    "Choose which emails you'd like to receive:"
-                                                ),
+                                                _("Choose which emails you'd like to receive:"),
                                                 className="text-muted mb-3",
                                             ),
                                             dbc.Switch(
