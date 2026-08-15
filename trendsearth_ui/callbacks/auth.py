@@ -831,11 +831,8 @@ def register_callbacks(app):
             # Get the API base for the selected environment
             api_base = get_api_base(api_environment)
 
-            # Use the email as the user_id parameter in the endpoint
-            # Use legacy=false to send a secure reset link instead of emailing
-            # the password directly
             resp = get_session().post(
-                f"{api_base}/user/{email}/recover-password?legacy=false",
+                f"{api_base}/user/{email}/recover-password",
                 headers=apply_default_headers(),
                 timeout=10,
             )
@@ -1490,7 +1487,7 @@ def register_callbacks(app):
     ):
         """Handle user registration form submission.
 
-        This uses the secure registration flow (legacy=false) where:
+        This uses the secure registration flow where:
         1. User provides email and profile info only
         2. API creates account with temporary password
         3. User receives email with link to verify and set password
@@ -1578,9 +1575,8 @@ def register_callbacks(app):
                 if gender == "self_describe" and gender_description:
                     payload["gender_identity_description"] = gender_description
 
-            # Use legacy=false to send secure reset link instead of emailing password
             resp = get_session().post(
-                f"{api_base}/user?legacy=false",
+                f"{api_base}/user",
                 json=payload,
                 headers=apply_default_headers(),
                 timeout=15,
