@@ -147,8 +147,7 @@ class TestForgotPasswordIntegration:
         assert send_reset_callback is not None
 
         test_email = "test@example.com"
-        # URL now includes legacy=false to use secure token-based password reset
-        expected_url = f"{API_BASE}/user/{test_email}/recover-password?legacy=false"
+        expected_url = f"{API_BASE}/user/{test_email}/recover-password"
 
         with patch("trendsearth_ui.callbacks.auth.callback_context", Mock()):
             with patch("trendsearth_ui.callbacks.auth.get_session") as mock_get_session:
@@ -171,3 +170,61 @@ class TestForgotPasswordIntegration:
                 # Verify headers contain Accept-Encoding
                 call_headers = mock_session.post.call_args.kwargs.get("headers", {})
                 assert "Accept-Encoding" in call_headers
+
+    def test_registration_uses_secure_password_free_endpoint(self):
+        """Registration posts profile data without a legacy flag or password."""
+        from trendsearth_ui.callbacks.auth import register_callbacks
+
+        mock_app = Mock()
+        callbacks = []
+
+        def mock_callback(*args, **kwargs):
+            def decorator(func):
+                callbacks.append(func)
+                return func
+
+            return decorator
+
+        mock_app.callback = mock_callback
+        with patch("trendsearth_ui.callbacks.auth.callback_context", Mock()):
+            register_callbacks(mock_app)
+
+        submit_registration = next(
+            callback for callback in callbacks if callback.__name__ == "submit_registration"
+        )
+
+        with (
+            patch(
+                "trendsearth_ui.callbacks.auth.detect_api_environment_from_host",
+                return_value="production",
+            ),
+            patch("trendsearth_ui.callbacks.auth.get_session") as mock_get_session,
+        ):
+            mock_response = Mock(status_code=200)
+            mock_get_session.return_value.post.return_value = mock_response
+
+            result = submit_registration(
+                1,
+                "new-user@example.com",
+                "New User",
+                "US",
+                "Test Institution",
+                "production",
+                None,
+                "academic",
+                None,
+                "academic_research",
+                None,
+                None,
+                None,
+                True,
+                True,
+                True,
+                True,
+                True,
+            )
+
+        assert result[1:] == ("success", True)
+        request = mock_get_session.return_value.post.call_args
+        assert request.args[0] == f"{API_BASE}/user"
+        assert "password" not in request.kwargs["json"]
