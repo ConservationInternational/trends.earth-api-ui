@@ -141,24 +141,30 @@ def create_main_layout():
             dcc.Store(id="edit-user-modal-user-id"),  # Derived user ID for admin edit sub-callbacks
             dcc.Store(id="edit-script-data"),
             dcc.Store(
-                id="executions-table-state"
+                id="executions-table-state", storage_type="session"
             ),  # Store current sort/filter state for executions table
-            dcc.Store(id="users-table-state"),  # Store current sort/filter state for users table
             dcc.Store(
-                id="scripts-table-state"
+                id="users-table-state", storage_type="session"
+            ),  # Store current sort/filter state for users table
+            dcc.Store(
+                id="scripts-table-state", storage_type="session"
             ),  # Store current sort/filter state for scripts table
             dcc.Store(
-                id="rate-limit-breaches-table-state"
+                id="rate-limit-breaches-table-state", storage_type="session"
             ),  # Store current sort/filter state for rate limit breaches
             dcc.Store(
-                id="executions-total-count-store", data=0
+                id="executions-total-count-store", data=0, storage_type="session"
             ),  # Store total count for executions
-            dcc.Store(id="users-total-count-store", data=0),  # Store total count for users
-            dcc.Store(id="scripts-total-count-store", data=0),  # Store total count for scripts
             dcc.Store(
-                id="rate-limit-breaches-total-count-store", data=0
+                id="users-total-count-store", data=0, storage_type="session"
+            ),  # Store total count for users
+            dcc.Store(
+                id="scripts-total-count-store", data=0, storage_type="session"
+            ),  # Store total count for scripts
+            dcc.Store(
+                id="rate-limit-breaches-total-count-store", data=0, storage_type="session"
             ),  # Store total count for rate limit breaches
-            dcc.Store(id="active-tab-store", data="executions"),
+            dcc.Store(id="active-tab-store", data="executions", storage_type="session"),
             dcc.Store(
                 id="bulk-email-tab-rendered", data=None
             ),  # Bumped after bulk-email tab is fully rendered

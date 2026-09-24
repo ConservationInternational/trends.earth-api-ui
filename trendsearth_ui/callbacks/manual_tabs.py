@@ -2,7 +2,7 @@
 
 import logging
 
-from dash import Input, Output, callback_context
+from dash import Input, Output, State, callback_context
 
 from ..utils.helpers import ADMIN_ROLES
 
@@ -61,23 +61,29 @@ def register_callbacks(app):
             Input("profile-tab-btn", "n_clicks"),
             Input("bulk-email-tab-btn", "n_clicks"),
         ],
+        [State("active-tab-store", "data")],
         prevent_initial_call=False,  # Allow initial call to set default tab
     )
-    def switch_tabs(*_clicks):
+    def switch_tabs(*args):
         """Handle tab switching by updating button classes and active tab store."""
+        persisted_tab = args[-1]
         ctx = callback_context
         if not ctx.triggered:
-            # Set default tab when no user interaction yet
-            return (
-                "nav-link active",
-                "nav-link",
-                "nav-link",
-                "nav-link",
-                "nav-link",
-                "nav-link",
-                "nav-link",
-                "executions",
-            )
+            # No user interaction yet: restore the previously active tab (if any)
+            active_tab = persisted_tab or "executions"
+            nav_classes = [
+                "nav-link active" if tab == active_tab else "nav-link"
+                for tab in [
+                    "executions",
+                    "users",
+                    "scripts",
+                    "admin",
+                    "status",
+                    "profile",
+                    "bulk-email",
+                ]
+            ]
+            return (*nav_classes, active_tab)
 
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
