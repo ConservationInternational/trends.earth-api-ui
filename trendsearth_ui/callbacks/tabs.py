@@ -27,15 +27,17 @@ def register_callbacks(app):
             Output("tab-content-dynamic", "children"),
             Output("bulk-email-tab-rendered", "data"),
         ],
-        [Input("active-tab-store", "data")],
+        [
+            Input("active-tab-store", "data"),
+            Input("token-store", "data"),
+        ],
         [
             State("user-store", "data"),
-            State("token-store", "data"),
             State("role-store", "data"),
         ],
         prevent_initial_call=False,
     )
-    def render_tab(tab, user_data, token, role):
+    def render_tab(tab, token, user_data, role):
         from dash import no_update
 
         # Guard: Skip if not logged in (prevents execution after logout)
