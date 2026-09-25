@@ -2,7 +2,7 @@
 
 import logging
 
-from dash import Input, Output, State, callback_context
+from dash import Input, Output, callback_context
 
 from ..utils.helpers import ADMIN_ROLES
 
@@ -42,16 +42,7 @@ def register_callbacks(app):
         )(_make_tab_toggle(allowed_roles))
 
     @app.callback(
-        [
-            Output("executions-tab-btn", "className"),
-            Output("users-tab-btn", "className"),
-            Output("scripts-tab-btn", "className"),
-            Output("admin-tab-btn", "className"),
-            Output("status-tab-btn", "className"),
-            Output("profile-tab-btn", "className"),
-            Output("bulk-email-tab-btn", "className"),
-            Output("active-tab-store", "data"),
-        ],
+        Output("active-tab-store", "data"),
         [
             Input("executions-tab-btn", "n_clicks"),
             Input("users-tab-btn", "n_clicks"),
@@ -61,30 +52,22 @@ def register_callbacks(app):
             Input("profile-tab-btn", "n_clicks"),
             Input("bulk-email-tab-btn", "n_clicks"),
         ],
-        [State("active-tab-store", "data")],
-        prevent_initial_call=False,  # Allow initial call to set default tab
+        prevent_initial_call=True,  # Only react to real clicks; never overwrite persisted tab
     )
-    def switch_tabs(*args):
-        """Handle tab switching by updating button classes and active tab store."""
-        persisted_tab = args[-1]
-        ctx = callback_context
-        if not ctx.triggered:
-            # No user interaction yet: restore the previously active tab (if any)
-            active_tab = persisted_tab or "executions"
-            nav_classes = [
-                "nav-link active" if tab == active_tab else "nav-link"
-                for tab in [
-                    "executions",
-                    "users",
-                    "scripts",
-                    "admin",
-                    "status",
-                    "profile",
-                    "bulk-email",
-                ]
-            ]
-            return (*nav_classes, active_tab)
+    def switch_tabs(*clicks):
+        """Handle tab switching by updating the active tab store from a real click."""
+        from dash import no_update
 
+        # Guard: when the tab buttons first mount (they live inside dashboard_layout,
+        # which is inserted dynamically after login), Dash treats every n_clicks going
+        # from undefined to 0 as a simultaneous "change" and still invokes this callback
+        # despite prevent_initial_call=True. Without this guard, ctx.triggered[0] would
+        # arbitrarily pick the first button in the list (executions-tab-btn) and clobber
+        # whatever tab was persisted in active-tab-store. Only proceed on a real click.
+        if not any(clicks):
+            return no_update
+
+        ctx = callback_context
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Define tab mapping
@@ -98,36 +81,48 @@ def register_callbacks(app):
             "bulk-email-tab-btn": "bulk-email",
         }
 
-        # Get the active tab
         active_tab = tab_map.get(trigger_id, "executions")
-
-        # Set classes for nav links
-        nav_classes = []
-        for btn_id in [
-            "executions-tab-btn",
-            "users-tab-btn",
-            "scripts-tab-btn",
-            "admin-tab-btn",
-            "status-tab-btn",
-            "profile-tab-btn",
-            "bulk-email-tab-btn",
-        ]:
-            tab_key = tab_map[btn_id]
-            if tab_key == active_tab:
-                nav_classes.append("nav-link active")
-            else:
-                nav_classes.append("nav-link")
-
         logger.debug("Tab switched to: %s", active_tab)
+        return active_tab
 
-        # Return all classes and active tab
-        return (
-            nav_classes[0],
-            nav_classes[1],
-            nav_classes[2],
-            nav_classes[3],
-            nav_classes[4],
-            nav_classes[5],
-            nav_classes[6],
-            active_tab,
+    @app.callback(
+        [
+            Output("executions-tab-btn", "className"),
+            Output("users-tab-btn", "className"),
+            Output("scripts-tab-btn", "className"),
+            Output("admin-tab-btn", "className"),
+            Output("status-tab-btn", "className"),
+            Output("profile-tab-btn", "className"),
+            Output("bulk-email-tab-btn", "className"),
+        ],
+        [
+            Input("active-tab-store", "data"),
+            Input("token-store", "data"),
+        ],
+        prevent_initial_call=False,
+    )
+    def sync_nav_highlight(active_tab, _token):
+        """Set nav highlighting purely from the store's value (Input, not State), so it
+        reacts correctly whether the store was just written by a real click or restored
+        from persisted (session/local) storage on page load.
+
+        token-store is included as a second Input purely to delay this callback's
+        initial dispatch the same way render_tab is delayed: active-tab-store already
+        exists in the static layout, so a callback depending on it alone fires in the
+        earliest dispatch batch, before the Store's client-side localStorage hydration
+        has necessarily completed. token-store is only populated later (after an async
+        cookie round-trip), so waiting on it too guarantees hydration has already landed.
+        """
+        active_tab = active_tab or "executions"
+        return tuple(
+            "nav-link active" if tab == active_tab else "nav-link"
+            for tab in [
+                "executions",
+                "users",
+                "scripts",
+                "admin",
+                "status",
+                "profile",
+                "bulk-email",
+            ]
         )
