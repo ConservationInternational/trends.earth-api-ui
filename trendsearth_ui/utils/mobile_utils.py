@@ -322,6 +322,16 @@ def get_mobile_column_config():
                     },
                 },
                 {
+                    "headerName": _("App Access"),
+                    "field": "app_access_display",
+                    "width": 220,
+                    "cellStyle": {**TRUNCATED_CELL_STYLE, "fontSize": "12px"},
+                    "tooltipField": "app_access_display",
+                    "resizable": True,
+                    "sortable": False,
+                    "filter": False,
+                },
+                {
                     "headerName": _("Last Activity"),
                     "field": "last_activity_at",
                     "width": 150,

@@ -173,6 +173,91 @@ def json_modal():
     )
 
 
+def _app_access_section():
+    """Application access management block inside the edit user modal.
+
+    Hidden for non-superadmins by the ``edit-user-app-access-section`` style callback.
+    """
+    return html.Div(
+        [
+            dcc.Store(id="edit-user-app-access-apps", data=[]),
+            dcc.Store(id="edit-user-app-access-refresh", data=0),
+            html.Hr(),
+            html.H5("Application Access", className="mb-3"),
+            html.Div(id="edit-user-app-access-current", className="mb-3"),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label("Application"),
+                            dbc.Select(id="edit-user-app-access-app", options=[]),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Status"),
+                            dbc.Select(
+                                id="edit-user-app-access-status",
+                                options=[
+                                    {"label": "Active", "value": "active"},
+                                    {"label": "Pending", "value": "pending"},
+                                    {"label": "Revoked", "value": "revoked"},
+                                ],
+                                value="active",
+                            ),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("App Role"),
+                            dbc.Select(id="edit-user-app-access-role", options=[]),
+                        ],
+                        width=4,
+                    ),
+                ],
+                className="mb-2",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label("Note"),
+                            dbc.Input(
+                                id="edit-user-app-access-note",
+                                type="text",
+                                placeholder="Optional justification for the audit log",
+                            ),
+                        ],
+                        width=8,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Button(
+                                "Apply Access Change",
+                                id="edit-user-app-access-apply-btn",
+                                color="primary",
+                                outline=True,
+                                className="mt-4",
+                            ),
+                        ],
+                        width=4,
+                    ),
+                ],
+                className="mb-2",
+            ),
+            dbc.Alert(
+                id="edit-user-app-access-alert",
+                is_open=False,
+                dismissable=True,
+            ),
+        ],
+        id="edit-user-app-access-section",
+        style={"display": "none"},
+    )
+
+
 def edit_user_modal():
     """Create the edit user modal."""
     return dbc.Modal(
@@ -298,6 +383,7 @@ def edit_user_modal():
                                 ],
                                 className="mb-3",
                             ),
+                            _app_access_section(),
                             html.Hr(),
                             html.H5("Google Earth Engine Credentials", className="mb-3"),
                             dbc.Row(

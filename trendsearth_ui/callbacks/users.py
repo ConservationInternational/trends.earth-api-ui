@@ -49,6 +49,39 @@ USER_ALLOWED_SORT_COLUMNS = {
 }
 USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 
+# Human readable labels for the gated applications exposed by the API.
+APP_LABELS = {
+    "avoided_emissions": "Avoided Emissions",
+    "rio_coherence": "Rio Coherence",
+}
+
+
+def app_label(app_key: str | None) -> str:
+    """Return a display label for an application key."""
+    if not app_key:
+        return ""
+    return APP_LABELS.get(app_key, app_key.replace("_", " ").title())
+
+
+def _format_app_access(grants: Any) -> str:
+    """Summarize a user's per-application access grants for the grid."""
+    if not isinstance(grants, list) or not grants:
+        return "—"
+    active = []
+    other = []
+    for grant in grants:
+        if not isinstance(grant, dict):
+            continue
+        label = app_label(grant.get("app_key"))
+        status = grant.get("status")
+        if status == "active":
+            app_role = grant.get("role")
+            active.append(f"{label} ({app_role})" if app_role else label)
+        elif status:
+            other.append(f"{label} ({status})")
+    parts = active + other
+    return ", ".join(parts) if parts else "—"
+
 
 def _format_user_rows(
     users: list[dict[str, Any]],
@@ -113,6 +146,7 @@ def _format_user_rows(
             )
         else:
             row["has_openeo_credentials"] = "—"
+        row["app_access_display"] = _format_app_access(row.pop("app_access", None))
         rows.append(row)
     return rows
 
@@ -125,7 +159,7 @@ def _fetch_users_page(
     user_timezone: str | None,
 ) -> tuple[list[dict[str, Any]], int]:
     """Fetch a page of users from the API and format the rows."""
-    fetch_params = {**params, "include": "openeo_credentials,gee_credentials"}
+    fetch_params = {**params, "include": "openeo_credentials,gee_credentials,app_access"}
     return fetch_aggrid_page(
         USER_ENDPOINT,
         token,

@@ -39,6 +39,7 @@ def register_all_callbacks(app):
         "openeo_credentials",  # Add openEO credentials callbacks
         "service_credentials",  # Add service credentials callbacks
         "edit",
+        "app_access",  # Add per-application access callbacks (after edit modal)
         "refresh",
         "news",  # Add news callbacks
         "news_admin",  # Add news admin callbacks
