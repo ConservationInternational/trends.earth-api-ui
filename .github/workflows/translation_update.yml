@@ -62,7 +62,8 @@ jobs:
 
       - name: Extract translatable strings
         run: |
-          poetry run pybabel extract -F babel.cfg -k _ -k _g -k _l -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot trendsearth_ui/
+          # babel.cfg paths are relative to the input dir, so extract from the repo root.
+          poetry run pybabel extract -F babel.cfg -k _ -k _g -k _l -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot .
 
       - name: Validate extraction completeness
         run: |

@@ -56,7 +56,8 @@ jobs:
       - name: Extract translatable strings
         run: |
           mkdir -p trendsearth_ui/i18n/translations
-          pybabel extract -F babel.cfg -k _ -k _l -k _g -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot trendsearth_ui/
+          # babel.cfg paths are relative to the input dir, so extract from the repo root.
+          pybabel extract -F babel.cfg -k _ -k _l -k _g -k gettext -k lazy_gettext -o trendsearth_ui/i18n/translations/messages.pot .
 
       - name: Validate extraction completeness
         run: |
