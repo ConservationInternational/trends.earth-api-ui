@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TX_TOKEN: ${{ secrets.TX_TOKEN }}
-      TX_HOSTNAME: ${{ secrets.TX_HOSTNAME }}
+      TX_HOSTNAME: ${{ vars.TX_HOSTNAME }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
@@ -79,7 +79,7 @@ jobs:
             exit 1
           fi
 
-      - name: Update PO files from POT
+      - name: Update PO  files from POT
         run: |
           for lang in ar en es fa fr pt ru sw zh; do
             poetry run pybabel update -i trendsearth_ui/i18n/translations/messages.pot -d trendsearth_ui/i18n/translations -l $lang --no-fuzzy-matching || true
