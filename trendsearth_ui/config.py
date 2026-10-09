@@ -130,16 +130,16 @@ LOGO_SQUARE_URL = "/assets/trends_earth_logo_square_192x192.png"
 # Map Configuration - Tile providers with English labels
 MAP_TILE_PROVIDERS = {
     "carto_voyager": {
-        "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        "url": "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
         "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        "subdomains": ["a", "b", "c", "d"],
+        "api_key_env": "CARTO_API_KEY",
         "maxZoom": 20,
         "description": "CartoDB Voyager - Clean style with English labels",
     },
     "carto_positron": {
-        "url": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        "url": "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
         "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        "subdomains": ["a", "b", "c", "d"],
+        "api_key_env": "CARTO_API_KEY",
         "maxZoom": 20,
         "description": "CartoDB Positron - Light style with English labels",
     },
@@ -160,3 +160,6 @@ MAP_TILE_PROVIDERS = {
 
 # Default tile provider for maps
 DEFAULT_MAP_TILE_PROVIDER = "carto_voyager"
+
+# Used when a provider's API key (see "api_key_env") is not configured
+FALLBACK_MAP_TILE_PROVIDER = "osm_english"

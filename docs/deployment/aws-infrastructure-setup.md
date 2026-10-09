@@ -391,6 +391,7 @@ This script will prompt for and configure:
 - `AWS_REGION`
 - `CODEDEPLOY_S3_BUCKET`
 - `ROLLBAR_ACCESS_TOKEN` (optional)
+- `CARTO_API_KEY` (optional, CARTO basemaps key for map tiles)
 
 ## Verification Commands
 

@@ -20,6 +20,7 @@ The following secrets must be configured in the GitHub repository settings for t
 
 ### Optional
 - `ROLLBAR_ACCESS_TOKEN` - Rollbar token for deployment notifications
+- `CARTO_API_KEY` - CARTO basemaps API key for map tiles (maps fall back to OpenStreetMap tiles if unset)
 
 ## Architecture
 

@@ -339,3 +339,41 @@ class TestGetTileLayer:
         # Should still return a valid TileLayer
         assert isinstance(layer, dl.TileLayer)
         assert layer._type == "TileLayer"
+
+    def test_carto_key_appended_to_url(self):
+        """CARTO tile URLs include the configured API key."""
+        with patch.dict("os.environ", {"CARTO_API_KEY": "abc123"}):
+            voyager = get_tile_layer("carto_voyager")
+            positron = get_tile_layer("carto_positron")
+
+        assert (
+            voyager.url
+            == "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=abc123"
+        )
+        assert positron.url == "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=abc123"
+
+    def test_carto_key_is_url_encoded(self):
+        """Special characters in the API key are URL-encoded."""
+        with patch.dict("os.environ", {"CARTO_API_KEY": "a/b&c"}):
+            layer = get_tile_layer("carto_voyager")
+
+        assert layer.url.endswith("?key=a%2Fb%26c")
+
+    def test_missing_carto_key_falls_back(self):
+        """Without CARTO_API_KEY, the keyless fallback provider is used."""
+        from trendsearth_ui.config import FALLBACK_MAP_TILE_PROVIDER, MAP_TILE_PROVIDERS
+
+        with patch.dict("os.environ", {"CARTO_API_KEY": ""}):
+            layer = get_tile_layer("carto_voyager")
+
+        assert layer.url == MAP_TILE_PROVIDERS[FALLBACK_MAP_TILE_PROVIDER]["url"]
+        assert "cartocdn" not in layer.url
+
+    def test_keyless_provider_unchanged(self):
+        """Providers without an api_key_env are not modified."""
+        from trendsearth_ui.config import MAP_TILE_PROVIDERS
+
+        with patch.dict("os.environ", {"CARTO_API_KEY": "abc123"}):
+            layer = get_tile_layer("esri_world_imagery")
+
+        assert layer.url == MAP_TILE_PROVIDERS["esri_world_imagery"]["url"]

@@ -2,11 +2,13 @@
 
 import json
 import logging
+import os
+from urllib.parse import quote
 
 from dash import html
 import dash_leaflet as dl
 
-from ..config import DEFAULT_MAP_TILE_PROVIDER, MAP_TILE_PROVIDERS
+from ..config import DEFAULT_MAP_TILE_PROVIDER, FALLBACK_MAP_TILE_PROVIDER, MAP_TILE_PROVIDERS
 
 logger = logging.getLogger(__name__)
 
@@ -435,6 +437,10 @@ def get_tile_layer(provider_name=None):
 
     Returns:
         dl.TileLayer: Configured tile layer component.
+
+    Providers that declare an ``api_key_env`` have the key from that
+    environment variable appended as a ``key`` query parameter. If the key is
+    not set, the fallback provider is used instead.
     """
     provider = provider_name or DEFAULT_MAP_TILE_PROVIDER
 
@@ -442,9 +448,25 @@ def get_tile_layer(provider_name=None):
         provider = DEFAULT_MAP_TILE_PROVIDER
 
     tile_config = MAP_TILE_PROVIDERS[provider]
+    url = tile_config["url"]
+
+    api_key_env = tile_config.get("api_key_env")
+    if api_key_env:
+        api_key = os.environ.get(api_key_env, "").strip()
+        if api_key:
+            url = f"{url}?key={quote(api_key, safe='')}"
+        else:
+            logger.warning(
+                "%s is not set; using %s tiles instead of %s",
+                api_key_env,
+                FALLBACK_MAP_TILE_PROVIDER,
+                provider,
+            )
+            tile_config = MAP_TILE_PROVIDERS[FALLBACK_MAP_TILE_PROVIDER]
+            url = tile_config["url"]
 
     return dl.TileLayer(
-        url=tile_config["url"],
+        url=url,
         attribution=tile_config["attribution"],
         maxZoom=tile_config.get("maxZoom", 18),
     )

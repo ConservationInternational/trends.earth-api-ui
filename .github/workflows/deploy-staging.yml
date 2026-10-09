@@ -33,6 +33,7 @@ jobs:
       CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
       ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       GOOGLE_TRANSLATE_CREDENTIALS: ${{ secrets.GOOGLE_TRANSLATE_CREDENTIALS }}
+      CARTO_API_KEY: ${{ secrets.CARTO_API_KEY }}
     
     steps:
     - name: Checkout code
@@ -108,6 +109,7 @@ jobs:
           "environment": "staging",
           "rollbarAccessToken": "${ROLLBAR_ACCESS_TOKEN}",
           "googleTranslateCredentialsB64": "${GOOGLE_TRANSLATE_CREDS_B64}",
+          "cartoApiKey": "${CARTO_API_KEY}",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         }
         EOF

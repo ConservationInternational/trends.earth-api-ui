@@ -27,6 +27,7 @@ jobs:
     env:
       ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
+      CARTO_API_KEY: ${{ secrets.CARTO_API_KEY }}
     
     steps:
     - name: Validate inputs and configuration
@@ -159,6 +160,7 @@ jobs:
           "image": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ steps.rollback-strategy.outputs.target-commit }}",
           "registry": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com",
           "environment": "production",
+          "cartoApiKey": "${CARTO_API_KEY}",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
           "rollback": true,
           "reason": "${{ github.event.inputs.reason }}"

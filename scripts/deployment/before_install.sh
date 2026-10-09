@@ -97,6 +97,7 @@ print(info.get("branch", ""))
 print(info.get("deploymentId", ""))
 print(info.get("rollbarAccessToken", ""))
 print(info.get("googleTranslateCredentialsB64", ""))
+print(info.get("cartoApiKey", ""))
 PY
         )
         DEPLOYMENT_IMAGE="${_DEPLOYMENT_METADATA[0]}"
@@ -104,12 +105,14 @@ PY
         DEPLOYMENT_COMMIT="${_DEPLOYMENT_METADATA[2]}"
         ROLLBAR_TOKEN_METADATA="${_DEPLOYMENT_METADATA[3]}"
         GOOGLE_TRANSLATE_CREDS_B64="${_DEPLOYMENT_METADATA[4]}"
+        CARTO_API_KEY_METADATA="${_DEPLOYMENT_METADATA[5]}"
     else
         DEPLOYMENT_IMAGE=$(grep '"image"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"image"[[:space:]]*:[[:space:]]*"//; s/".*//')
         BRANCH_NAME_METADATA=$(grep '"branch"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"branch"[[:space:]]*:[[:space:]]*"//; s/".*//')
         DEPLOYMENT_COMMIT=$(grep '"deploymentId"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"deploymentId"[[:space:]]*:[[:space:]]*"//; s/".*//')
         ROLLBAR_TOKEN_METADATA=$(grep '"rollbarAccessToken"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"rollbarAccessToken"[[:space:]]*:[[:space:]]*"//; s/".*//')
         GOOGLE_TRANSLATE_CREDS_B64=$(grep '"googleTranslateCredentialsB64"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"googleTranslateCredentialsB64"[[:space:]]*:[[:space:]]*"//; s/".*//')
+        CARTO_API_KEY_METADATA=$(grep '"cartoApiKey"' "$DEPLOYMENT_INFO_FILE" | head -n1 | sed 's/.*"cartoApiKey"[[:space:]]*:[[:space:]]*"//; s/".*//')
     fi
 
     if [ -n "$DEPLOYMENT_IMAGE" ]; then
@@ -153,6 +156,13 @@ PY
         echo "export GOOGLE_TRANSLATE_CREDENTIALS='$GOOGLE_TRANSLATE_CREDS'" >> /opt/deploy-env
     else
         echo "  ⚠️ GOOGLE_TRANSLATE_CREDENTIALS not found in deployment metadata"
+    fi
+
+    if [ -n "$CARTO_API_KEY_METADATA" ]; then
+        echo "  • CARTO_API_KEY: (set)"
+        echo "export CARTO_API_KEY=$CARTO_API_KEY_METADATA" >> /opt/deploy-env
+    else
+        echo "  ⚠️ CARTO_API_KEY not found in deployment metadata; maps will use fallback tiles"
     fi
 else
     echo "ℹ️ deployment-info.json not found; default image tag will be used"

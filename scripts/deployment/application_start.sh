@@ -88,6 +88,7 @@ export GIT_BRANCH="${BRANCH_NAME:-master}"
 export DEPLOYMENT_ENVIRONMENT="$ENVIRONMENT"
 export ROLLBAR_ACCESS_TOKEN="${ROLLBAR_ACCESS_TOKEN:-}"
 export GOOGLE_TRANSLATE_CREDENTIALS="${GOOGLE_TRANSLATE_CREDENTIALS:-}"
+export CARTO_API_KEY="${CARTO_API_KEY:-}"
 
 # Validate compose file syntax
 echo "🧪 Validating compose file syntax..."

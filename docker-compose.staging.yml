@@ -14,6 +14,7 @@ services:
       - GIT_COMMIT=${GIT_COMMIT_SHA:-unknown}
       - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN:-}
       - GOOGLE_TRANSLATE_CREDENTIALS=${GOOGLE_TRANSLATE_CREDENTIALS:-}
+      - CARTO_API_KEY=${CARTO_API_KEY:-}
     healthcheck:
       test: ["CMD", "curl", "-f", "--max-time", "3", "http://127.0.0.1:8000/api-ui-health"]
       interval: 10s

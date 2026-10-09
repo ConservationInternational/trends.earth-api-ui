@@ -116,6 +116,7 @@ echo ""
 echo -e "${BLUE}📊 Optional Services${NC}"
 echo "===================="
 set_secret "ROLLBAR_ACCESS_TOKEN" "Rollbar access token for deployment notifications" true
+set_secret "CARTO_API_KEY" "CARTO basemaps API key for map tiles" true
 
 echo ""
 echo -e "${GREEN}🎉 GitHub Secrets Setup Complete!${NC}"
