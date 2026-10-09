@@ -84,10 +84,34 @@ def test_rollback_workflow_secrets():
         "AWS_REGION",
         "CODEDEPLOY_S3_BUCKET",
         "ROLLBAR_ACCESS_TOKEN",  # Optional but should be referenced
+        "GOOGLE_TRANSLATE_CREDENTIALS",
+        "CARTO_API_KEY",
     ]
 
     for secret in required_secrets:
         assert f"secrets.{secret}" in content, f"Missing secret reference: {secret}"
+
+
+def test_rollback_bundle_includes_runtime_credentials():
+    """Rollback bundles must carry the same runtime credentials as normal deploys.
+
+    before_install.sh reads these keys from deployment-info.json; if they are
+    missing the rolled-back app runs without Rollbar, translation, or CARTO tiles.
+    """
+    workflows_dir = Path(__file__).parent.parent.parent / ".github" / "workflows"
+    rollback = (workflows_dir / "rollback-production.yml").read_text(encoding="utf-8")
+    deploy = (workflows_dir / "deploy-production.yml").read_text(encoding="utf-8")
+
+    bundle_entries = [
+        '"rollbarAccessToken": "${ROLLBAR_ACCESS_TOKEN}"',
+        '"googleTranslateCredentialsB64": "${GOOGLE_TRANSLATE_CREDS_B64}"',
+        '"cartoApiKey": "${CARTO_API_KEY}"',
+    ]
+    for entry in bundle_entries:
+        assert entry in deploy, f"Production deploy bundle missing {entry}"
+        assert entry in rollback, f"Rollback bundle missing {entry}"
+
+    assert "GOOGLE_TRANSLATE_CREDS_B64=$(" in rollback
 
 
 def test_rollback_workflow_has_ec2_references():

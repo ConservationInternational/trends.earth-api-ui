@@ -27,6 +27,7 @@ jobs:
     env:
       ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
       CODEDEPLOY_S3_BUCKET: ${{ secrets.CODEDEPLOY_S3_BUCKET }}
+      GOOGLE_TRANSLATE_CREDENTIALS: ${{ secrets.GOOGLE_TRANSLATE_CREDENTIALS }}
       CARTO_API_KEY: ${{ secrets.CARTO_API_KEY }}
     
     steps:
@@ -152,6 +153,9 @@ jobs:
         cp docker-compose.prod.yml deploy-bundle/
         cp docker-compose.staging.yml deploy-bundle/
         
+        # Base64 encode the Google Translate credentials (JSON) for safe embedding
+        GOOGLE_TRANSLATE_CREDS_B64=$(echo -n "${GOOGLE_TRANSLATE_CREDENTIALS}" | base64 -w0)
+        
         # Create deployment info file
         cat > deploy-bundle/deployment-info.json <<EOF
         {
@@ -160,6 +164,8 @@ jobs:
           "image": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ steps.rollback-strategy.outputs.target-commit }}",
           "registry": "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com",
           "environment": "production",
+          "rollbarAccessToken": "${ROLLBAR_ACCESS_TOKEN}",
+          "googleTranslateCredentialsB64": "${GOOGLE_TRANSLATE_CREDS_B64}",
           "cartoApiKey": "${CARTO_API_KEY}",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
           "rollback": true,
