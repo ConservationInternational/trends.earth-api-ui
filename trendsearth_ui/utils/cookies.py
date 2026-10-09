@@ -52,6 +52,11 @@ def is_auth_cookie_valid(cookie_data: dict | None) -> bool:
     required_fields = ["access_token", "refresh_token", "email", "user_data", "expires_at"]
     if not all(field in cookie_data for field in required_fields):
         return False
+    if not all(
+        isinstance(cookie_data[field], str) and cookie_data[field]
+        for field in ("access_token", "refresh_token")
+    ) or not isinstance(cookie_data["user_data"], dict):
+        return False
 
     try:
         expiration = datetime.fromisoformat(cookie_data["expires_at"])

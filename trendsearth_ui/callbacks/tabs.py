@@ -30,6 +30,7 @@ def register_callbacks(app):
         [
             Input("active-tab-store", "data"),
             Input("token-store", "data"),
+            Input("tabs-nav", "id"),
         ],
         [
             State("user-store", "data"),
@@ -37,7 +38,7 @@ def register_callbacks(app):
         ],
         prevent_initial_call=False,
     )
-    def render_tab(tab, token, user_data, role):
+    def render_tab(tab, token, _tabs_id, user_data, role):
         from dash import no_update
 
         # Guard: Skip if not logged in (prevents execution after logout)

@@ -157,6 +157,10 @@ def get_user_info(token: str, api_base: str | None = None) -> dict[str, Any] | N
     return None
 
 
+class RefreshTokenRejected(Exception):
+    """The refresh credential is missing or was rejected by the API."""
+
+
 def refresh_access_token(
     refresh_token: str, api_environment: str = None
 ) -> tuple[str | None, int | None, str | None]:
@@ -172,10 +176,13 @@ def refresh_access_token(
 
     Returns:
         Tuple of (new_access_token, expires_in, new_refresh_token) or
-        (None, None, None) if refresh failed
+        (None, None, None) if refresh temporarily failed.
+
+    Raises:
+        RefreshTokenRejected: The refresh credential cannot be used again.
     """
     if not refresh_token:
-        return None, None
+        raise RefreshTokenRejected("Missing refresh credential")
 
     # Import here to avoid circular imports
     from ..config import get_auth_url
@@ -192,25 +199,40 @@ def refresh_access_token(
             timeout=10,
         )
 
+        if resp.status_code in (401, 403):
+            logger.warning("Refresh credential rejected (HTTP %s)", resp.status_code)
+            raise RefreshTokenRejected("Refresh credential rejected")
+
         if resp.status_code == 200:
             data = resp.json()
+            if not isinstance(data, dict):
+                logger.error("Token refresh response is not a JSON object")
+                return None, None, None
             access_token = data.get("access_token")
             expires_in = data.get("expires_in")
             new_refresh_token = data.get("refresh_token")
+            if not isinstance(access_token, str) or not access_token:
+                logger.error("Token refresh response is missing an access token")
+                return None, None, None
+            if not isinstance(new_refresh_token, str) or not new_refresh_token:
+                logger.error("Rotating token refresh response is missing a refresh token")
+                return None, None, None
             logger.debug("Access token refreshed successfully")
             return access_token, expires_in, new_refresh_token
         else:
-            logger.debug("Token refresh failed with status: %s", resp.status_code)
+            logger.warning("Token refresh temporarily failed (HTTP %s)", resp.status_code)
             return None, None, None
 
+    except RefreshTokenRejected:
+        raise
     except requests.exceptions.Timeout:
-        logger.debug("Token refresh request timed out")
+        logger.warning("Token refresh request timed out; preserving session for retry")
         return None, None, None
     except requests.exceptions.ConnectionError:
-        logger.debug("Connection error during token refresh")
+        logger.warning("Token refresh connection failed; preserving session for retry")
         return None, None, None
-    except Exception as e:
-        logger.debug("Error during token refresh: %s", str(e))
+    except (ValueError, requests.exceptions.RequestException):
+        logger.error("Invalid response or request failure during token refresh")
         return None, None, None
 
 
@@ -381,9 +403,15 @@ def make_authenticated_request(
             logger.debug("Error reading refresh token from cookie: %s", e)
 
         if refresh_token:
-            new_access_token, expires_in, new_refresh_token = refresh_access_token(
-                refresh_token, api_environment
-            )
+            try:
+                new_access_token, expires_in, new_refresh_token = refresh_access_token(
+                    refresh_token, api_environment
+                )
+            except RefreshTokenRejected:
+                from flask import g
+
+                g.auth_cookie_invalid = True
+                return resp
             if new_access_token:
                 logger.debug("Token refreshed successfully, retrying %s %s", method, full_url)
 

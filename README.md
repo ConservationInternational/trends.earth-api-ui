@@ -39,6 +39,10 @@ For detailed deployment setup instructions, see:
 ## Features
 
 - Login/logout with API JWT
+- Session recovery: expired or rejected refresh credentials clear the authentication
+  cookie and return users to login without requiring browser site-data cleanup.
+  Temporary API/network failures preserve the cookie for retry; token rotation
+  preserves the active dashboard and tab content.
 - View and edit users and scripts (admin only)
 - Browse executions, parameters, results, and logs
 - Paging and per-ID search for executions
