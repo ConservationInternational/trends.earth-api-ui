@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 from playwright.sync_api import expect
 import pytest
+from werkzeug.http import parse_cookie
 
 from trendsearth_ui.utils.cookies import create_auth_cookie_data
 from trendsearth_ui.utils.helpers import RefreshTokenRejected
@@ -43,8 +44,8 @@ def test_stale_session_recovers_without_site_data_cleanup(page, live_server, out
             "requests.sessions.Session.request",
             return_value=Mock(
                 status_code=200,
-                json=Mock(return_value={"data": [], "total": 0}),
-                text='{"data": [], "total": 0}',
+                json=Mock(return_value={"data": {}, "total": 0}),
+                text='{"data": {}, "total": 0}',
                 headers={},
             ),
         ),
@@ -60,14 +61,24 @@ def test_stale_session_recovers_without_site_data_cleanup(page, live_server, out
             expect(page.locator("[data-testid='dashboard-content']")).to_be_visible()
             expect(page.locator("#tab-content-dynamic")).not_to_be_empty()
             expect(page.locator("#profile-tab-btn")).to_have_class("nav-link active")
+            panel = page.locator("#tab-content-dynamic").element_handle()
+            page.evaluate(
+                "window.dash_clientside.set_props('token-store', {data: 'rotated-access'})"
+            )
+            page.wait_for_load_state("networkidle")
+            assert panel.evaluate("(element) => element.isConnected")
+            expect(page.locator("#tab-content-dynamic")).not_to_be_empty()
         else:
             expect(page.locator("#login-btn")).to_be_visible()
             expect(page.locator("[data-testid='dashboard-content']")).to_have_count(0)
             expect(page.get_by_role("alert").first).to_be_visible()
+        page.wait_for_load_state("networkidle")
         cookies = {cookie["name"]: cookie["value"] for cookie in page.context.cookies()}
         if outcome in ("expired", "rejected"):
             assert "auth_token" not in cookies
         elif outcome == "temporary":
-            assert json.loads(cookies["auth_token"])["refresh_token"] == "old-refresh"
+            value = parse_cookie("auth_token=" + cookies["auth_token"])["auth_token"]
+            assert json.loads(value)["refresh_token"] == "old-refresh"
         else:
-            assert json.loads(cookies["auth_token"])["refresh_token"] == "new-refresh"
+            value = parse_cookie("auth_token=" + cookies["auth_token"])["auth_token"]
+            assert json.loads(value)["refresh_token"] == "new-refresh"
