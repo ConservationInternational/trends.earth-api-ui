@@ -9,6 +9,7 @@ from flask import Response, g
 import pytest
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import Timeout
+from werkzeug.http import dump_cookie
 
 from trendsearth_ui.app import app
 from trendsearth_ui.utils.cookies import create_auth_cookie_data
@@ -27,6 +28,10 @@ def callback(name):
     )
 
 
+def auth_cookie_header(value):
+    return dump_cookie("auth_token", value).split(";", 1)[0]
+
+
 @pytest.fixture
 def session_cookie():
     return create_auth_cookie_data(
@@ -39,7 +44,7 @@ def test_expired_cookie_cannot_restore_dashboard(session_cookie):
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.get_user_info") as user_info,
@@ -58,7 +63,7 @@ def test_transient_refresh_failure_does_not_clear_session(session_cookie):
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.should_refresh_token", return_value=True),
@@ -133,7 +138,7 @@ def test_rejected_refresh_clears_cookie_and_token(name, session_cookie):
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.should_refresh_token", return_value=True),
@@ -161,7 +166,7 @@ def test_rejected_refresh_clears_cookie_and_token(name, session_cookie):
 def test_malformed_cookie_is_removed(raw_cookie):
     response = Response()
     with (
-        app.server.test_request_context("/", headers={"Cookie": "auth_token=" + raw_cookie}),
+        app.server.test_request_context("/", headers={"Cookie": auth_cookie_header(raw_cookie)}),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.get_user_info") as user_info,
     ):
@@ -179,7 +184,7 @@ def test_cookie_restoration_never_hydrates_failed_refresh(session_cookie, reject
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.should_refresh_token", return_value=True),
@@ -204,7 +209,7 @@ def test_cookie_restoration_refreshes_before_hydrating(session_cookie):
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.should_refresh_token", return_value=True),
@@ -230,7 +235,7 @@ def test_cleared_token_shows_login_without_restoring_cookie(session_cookie):
     response = Response()
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.callbacks.auth.callback_context") as context,
         patch("trendsearth_ui.callbacks.auth.get_user_info") as user_info,
@@ -357,7 +362,7 @@ def test_authenticated_request_rejection_expires_cookie(session_cookie):
     rejected_response = Mock(status_code=401, text="token expired")
     with (
         app.server.test_request_context(
-            "/", headers={"Cookie": "auth_token=" + json.dumps(session_cookie)}
+            "/", headers={"Cookie": auth_cookie_header(json.dumps(session_cookie))}
         ),
         patch("trendsearth_ui.utils.helpers.get_session") as session,
         patch(
