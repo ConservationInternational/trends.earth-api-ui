@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 from playwright.sync_api import expect
 import pytest
-from werkzeug.http import parse_cookie
+from werkzeug.http import dump_cookie, parse_cookie
 
 from trendsearth_ui.utils.cookies import create_auth_cookie_data
 from trendsearth_ui.utils.helpers import RefreshTokenRejected
@@ -27,7 +27,15 @@ def test_stale_session_recovers_without_site_data_cleanup(page, live_server, out
     if outcome == "expired":
         cookie_data["expires_at"] = (datetime.now(UTC) - timedelta(days=1)).isoformat()
     page.context.add_cookies(
-        [{"name": "auth_token", "value": json.dumps(cookie_data), "url": live_server}]
+        [
+            {
+                "name": "auth_token",
+                "value": dump_cookie("auth_token", json.dumps(cookie_data))
+                .split(";", 1)[0]
+                .split("=", 1)[1],
+                "url": live_server,
+            }
+        ]
     )
     page.add_init_script("localStorage.setItem('active-tab-store', JSON.stringify('profile'));")
     with (
