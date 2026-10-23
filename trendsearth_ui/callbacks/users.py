@@ -53,6 +53,7 @@ USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 APP_LABELS = {
     "avoided_emissions": "Avoided Emissions",
     "rio_coherence": "Rio Coherence",
+    "rio_coherence_staging": "Rio Coherence (staging)",
 }
 
 
