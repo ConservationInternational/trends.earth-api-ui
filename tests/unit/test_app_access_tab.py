@@ -85,7 +85,13 @@ class TestDeeplinkParsing:
     def test_invalid_values_sanitized(self):
         assert parse_app_access_deeplink("?tab=app-access&app=../../x&status=bogus") == {
             "app": None,
-            "status": "pending",
+            "status": "all",
+        }
+
+    def test_missing_status_defaults_to_all(self):
+        assert parse_app_access_deeplink("?tab=app-access&app=rio_coherence") == {
+            "app": "rio_coherence",
+            "status": "all",
         }
 
     def test_url_encoded_values(self):
@@ -177,18 +183,41 @@ class TestRecipients:
 
 
 class TestWiring:
+    def test_shared_filters_precede_both_sections(self):
+        content = app_access_tab_content("SUPERADMIN")
+        cards = [child for child in content.children if hasattr(child, "children")]
+        assert len(cards) == 1
+        card = cards[0]
+        assert card.id == "app-access-card"
+        filters, sections = card.children[1].children
+        assert filters.id == "app-access-filters"
+        assert [section.id for section in sections.children] == [
+            "app-access-requests-card",
+            "app-access-recipients-card",
+        ]
+        assert all(section.to_plotly_json()["type"] == "Section" for section in sections.children)
+        assert _find_ids(filters) == [
+            "app-access-filters",
+            "app-access-app-filter",
+            "app-access-status-filter",
+            "app-access-refresh-btn",
+        ]
+        status = filters.children[1].children[1].children[1]
+        assert status.value == "all"
+        assert "Status filters access requests only." in str(filters)
+        assert "app-access-action-note" in _find_ids(sections.children[0])
+        ids = _find_ids(content)
+        assert len(ids) == len(set(ids))
+
     def test_tab_visible_to_admins(self):
         assert ("app-access-tab-li", ("ADMIN", "SUPERADMIN")) in _TAB_CONFIGS
 
     def test_recipients_card_hidden_for_admin_shown_for_superadmin(self):
         def card_style(role):
             content = app_access_tab_content(role)
-            card = next(
-                c
-                for c in content.children
-                if getattr(c, "id", None) == "app-access-recipients-card"
-            )
-            return card.style
+            card = content.children[-1]
+            recipients = card.children[1].children[1].children[1]
+            return recipients.style
 
         assert card_style("ADMIN") == {"display": "none"}
         assert card_style("SUPERADMIN") == {}
@@ -204,6 +233,11 @@ class TestWiring:
 
 class TestDeeplinkCallback:
     SEARCH = "?tab=app-access&app=avoided_emissions&status=pending"
+
+    def test_init_preserves_layout_default_without_deeplink(self, callbacks):
+        with patch.object(app_access_tab, "_fetch_apps", return_value=APPS):
+            _, _, _, status, _ = callbacks["init_app_access_tab"](1, "tok", "SUPERADMIN", None)
+        assert status is no_update
 
     def test_admin_opens_tab_once(self, callbacks):
         cb = callbacks["apply_app_access_deeplink"]
@@ -239,6 +273,21 @@ class TestDeeplinkCallback:
             )
         assert selected == "avoided_emissions"
         assert status == "pending"
+
+    @pytest.mark.parametrize("status", [None, "all", "pending", "active", "revoked"])
+    def test_request_status_sent_to_api(self, callbacks, status):
+        with patch.object(
+            app_access_tab, "make_authenticated_request", return_value=_response(200, {})
+        ) as request:
+            callbacks["load_access_requests"](
+                "rio_coherence", status, 0, 0, APPS, "tok", "SUPERADMIN"
+            )
+        params = request.call_args.kwargs["params"]
+        assert params["app"] == "rio_coherence"
+        if status in (None, "all"):
+            assert "status" not in params
+        else:
+            assert params["status"] == status
 
 
 class TestActions:

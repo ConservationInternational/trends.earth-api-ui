@@ -3,6 +3,10 @@
 Lists per-application access requests/grants so ADMIN and SUPERADMIN users can
 approve or revoke them, and lets SUPERADMIN users configure who is emailed
 about new access requests for each application.
+
+One application access card contains shared controls and two subordinate
+sections. Request status defaults to all and filters only the requests table,
+not notification recipients.
 """
 
 from dash import dcc, html
@@ -18,59 +22,97 @@ APP_ACCESS_STATUS_OPTIONS = [
 ]
 
 
-def _requests_card() -> dbc.Card:
+def _application_access_card(role) -> dbc.Card:
     return dbc.Card(
         [
-            dbc.CardHeader(html.H5("Access requests", className="mb-0")),
+            dbc.CardHeader(html.H5("Application access", className="mb-0")),
             dbc.CardBody(
                 [
-                    dbc.Row(
+                    html.Div(
                         [
-                            dbc.Col(
+                            html.P(
+                                "The selected application applies to both access requests and "
+                                "notification recipients below. Status filters access requests only.",
+                                className="text-muted small mb-3",
+                            ),
+                            dbc.Row(
                                 [
-                                    dbc.Label("Application", html_for="app-access-app-filter"),
-                                    dcc.Dropdown(
-                                        id="app-access-app-filter",
-                                        options=[],
-                                        clearable=False,
-                                        placeholder="Select an application",
+                                    dbc.Col(
+                                        [
+                                            dbc.Label(
+                                                "Application", html_for="app-access-app-filter"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="app-access-app-filter",
+                                                options=[],
+                                                clearable=False,
+                                                placeholder="Select an application",
+                                            ),
+                                        ],
+                                        md=5,
+                                        className="mb-2",
                                     ),
-                                ],
-                                md=5,
-                                className="mb-2",
-                            ),
-                            dbc.Col(
-                                [
-                                    dbc.Label("Status", html_for="app-access-status-filter"),
-                                    dcc.Dropdown(
-                                        id="app-access-status-filter",
-                                        options=APP_ACCESS_STATUS_OPTIONS,
-                                        value="pending",
-                                        clearable=False,
+                                    dbc.Col(
+                                        [
+                                            dbc.Label(
+                                                "Request status",
+                                                html_for="app-access-status-filter",
+                                            ),
+                                            dcc.Dropdown(
+                                                id="app-access-status-filter",
+                                                options=APP_ACCESS_STATUS_OPTIONS,
+                                                value="all",
+                                                clearable=False,
+                                            ),
+                                        ],
+                                        md=4,
+                                        className="mb-2",
                                     ),
-                                ],
-                                md=4,
-                                className="mb-2",
+                                    dbc.Col(
+                                        dbc.Button(
+                                            [html.I(className="fas fa-sync-alt me-1"), "Refresh"],
+                                            id="app-access-refresh-btn",
+                                            color="secondary",
+                                            outline=True,
+                                            n_clicks=0,
+                                        ),
+                                        md=3,
+                                        className="mb-2 d-flex align-items-end",
+                                    ),
+                                ]
                             ),
-                            dbc.Col(
-                                dbc.Button(
-                                    [html.I(className="fas fa-sync-alt me-1"), "Refresh"],
-                                    id="app-access-refresh-btn",
-                                    color="secondary",
-                                    outline=True,
-                                    n_clicks=0,
-                                ),
-                                md=3,
-                                className="mb-2 d-flex align-items-end",
-                            ),
-                        ]
+                        ],
+                        id="app-access-filters",
+                        className="bg-light rounded p-3 mb-4",
                     ),
+                    html.Div(
+                        [
+                            _requests_section(),
+                            _recipients_section(is_superadmin(role)),
+                        ],
+                        className="border-start border-3 ps-3 ms-2",
+                    ),
+                ]
+            ),
+        ],
+        id="app-access-card",
+        className="mb-4",
+    )
+
+
+def _requests_section() -> html.Section:
+    return html.Section(
+        [
+            html.H6("Access requests", className="fw-bold mb-3"),
+            html.Div(
+                [
                     dbc.Alert(
                         id="app-access-alert",
                         is_open=False,
                         dismissable=True,
                         className="mt-2",
                     ),
+                    dbc.Label("Action note (optional)", html_for="app-access-action-note"),
                     dbc.Input(
                         id="app-access-action-note",
                         type="text",
@@ -81,15 +123,16 @@ def _requests_card() -> dbc.Card:
                 ]
             ),
         ],
-        className="mb-4",
+        id="app-access-requests-card",
+        className="pb-4",
     )
 
 
-def _recipients_card(visible: bool) -> dbc.Card:
-    return dbc.Card(
+def _recipients_section(visible: bool) -> html.Section:
+    return html.Section(
         [
-            dbc.CardHeader(html.H5("Access request notification recipients", className="mb-0")),
-            dbc.CardBody(
+            html.H6("Access request notification recipients", className="fw-bold mb-3"),
+            html.Div(
                 [
                     html.P(
                         [
@@ -132,7 +175,7 @@ def _recipients_card(visible: bool) -> dbc.Card:
             ),
         ],
         id="app-access-recipients-card",
-        className="mb-4",
+        className="border-top pt-4",
         style={} if visible else {"display": "none"},
     )
 
@@ -140,7 +183,7 @@ def _recipients_card(visible: bool) -> dbc.Card:
 def app_access_tab_content(role=None) -> html.Div:
     """Return the App Access tab layout.
 
-    The recipients card is always part of the layout (so its callbacks have
+    The recipients section is always part of the layout (so its callbacks have
     targets) but is hidden for non-superadmins; its callbacks also refuse to
     act for them.
     """
@@ -150,8 +193,7 @@ def app_access_tab_content(role=None) -> html.Div:
             dcc.Store(id="app-access-refresh-store", data=0),
             dcc.Store(id="app-access-recipient-candidates-store", data=[]),
             dcc.Store(id="app-access-recipients-listed-store", data=None),
-            _requests_card(),
-            _recipients_card(is_superadmin(role)),
+            _application_access_card(role),
         ],
         className="mt-3",
     )

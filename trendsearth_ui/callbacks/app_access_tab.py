@@ -53,7 +53,7 @@ def parse_app_access_deeplink(search: str | None) -> dict[str, Any] | None:
         app_key = None
     status = params.get("status", [None])[0]
     if status not in VALID_STATUS_FILTERS:
-        status = "pending"
+        status = "all"
     return {"app": app_key, "status": status}
 
 
@@ -379,7 +379,7 @@ def register_callbacks(app):
         if deeplink and not deeplink.get("applied"):
             if deeplink.get("app") in app_keys:
                 selected = deeplink["app"]
-            status = deeplink.get("status") or "pending"
+            status = deeplink.get("status") or "all"
             deeplink_out = {**deeplink, "applied": True}
         return apps, options, selected, status, deeplink_out
 
@@ -404,7 +404,7 @@ def register_callbacks(app):
         if not app_key:
             return render_requests_table([], apps or [], None)
         try:
-            grants, total, err = _fetch_requests(token, app_key, status or "pending")
+            grants, total, err = _fetch_requests(token, app_key, status or "all")
         except Exception as exc:  # pragma: no cover - defensive guard
             logger.exception("Error loading access requests: %s", exc)
             return html.Small(f"Could not load access requests: {exc}", className="text-danger")
