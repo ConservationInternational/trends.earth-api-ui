@@ -109,6 +109,7 @@ def _recipients_card(visible: bool) -> dbc.Card:
                         multi=True,
                         placeholder="No recipients listed (all superadmins are notified)",
                     ),
+                    html.Div(id="app-access-recipients-candidates-status"),
                     html.Div(
                         dbc.Button(
                             "Save recipients",
@@ -116,6 +117,7 @@ def _recipients_card(visible: bool) -> dbc.Card:
                             color="primary",
                             className="mt-2",
                             n_clicks=0,
+                            disabled=True,
                         ),
                     ),
                     dbc.Alert(
@@ -146,6 +148,8 @@ def app_access_tab_content(role=None) -> html.Div:
         [
             dcc.Store(id="app-access-apps-store", data=[]),
             dcc.Store(id="app-access-refresh-store", data=0),
+            dcc.Store(id="app-access-recipient-candidates-store", data=[]),
+            dcc.Store(id="app-access-recipients-listed-store", data=None),
             _requests_card(),
             _recipients_card(is_superadmin(role)),
         ],

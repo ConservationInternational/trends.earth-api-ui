@@ -300,6 +300,68 @@ class TestActions:
         req.assert_not_called()
 
 
+class TestRecipientLoading:
+    def test_candidates_use_paginated_requests(self, callbacks):
+        page1 = _response(
+            200,
+            {
+                "data": [
+                    {"id": f"a{i}", "email": f"a{i}@x", "role": "ADMIN"}
+                    for i in range(app_access_tab.CANDIDATE_PAGE_SIZE)
+                ],
+                "total": app_access_tab.CANDIDATE_PAGE_SIZE + 1,
+            },
+        )
+        page2 = _response(
+            200, {"data": [{"id": "s1", "email": "s@x", "role": "SUPERADMIN"}], "total": 101}
+        )
+        with patch.object(
+            app_access_tab, "make_authenticated_request", side_effect=[page1, page2]
+        ) as req:
+            candidates, status = callbacks["load_recipient_candidates"](
+                1, None, "tok", "SUPERADMIN"
+            )
+        assert len(candidates) == app_access_tab.CANDIDATE_PAGE_SIZE + 1
+        assert status == ""
+        for call, page in zip(req.call_args_list, (1, 2), strict=True):
+            params = call.kwargs["params"]
+            assert params["page"] == page
+            assert params["per_page"] == app_access_tab.CANDIDATE_PAGE_SIZE
+
+    def test_candidate_timeout_does_not_block_summary(self, callbacks):
+        with patch.object(
+            app_access_tab, "make_authenticated_request", side_effect=TimeoutError("Read timed out")
+        ):
+            candidates, status = callbacks["load_recipient_candidates"](
+                1, None, "tok", "SUPERADMIN"
+            )
+        assert candidates == []
+        assert "Read timed out" in str(status)
+
+        payload = {"data": {"listed_recipients": [{"user_id": "s1", "email": "s@x"}]}}
+        with patch.object(
+            app_access_tab, "make_authenticated_request", return_value=_response(200, payload)
+        ):
+            _summary, listed = callbacks["load_recipients"](
+                "avoided_emissions", 0, None, "tok", "SUPERADMIN"
+            )
+        options, value, disabled = callbacks["update_recipient_options"]([], listed)
+        assert value == ["s1"]
+        assert [o["value"] for o in options] == ["s1"]
+        assert disabled is False
+
+    def test_save_blocked_when_current_list_unknown(self, callbacks):
+        with patch.object(
+            app_access_tab, "make_authenticated_request", side_effect=TimeoutError("slow")
+        ):
+            summary, listed = callbacks["load_recipients"](
+                "avoided_emissions", 0, None, "tok", "SUPERADMIN"
+            )
+        assert listed is None
+        assert "slow" in str(summary)
+        assert callbacks["update_recipient_options"]([], listed) == ([], [], True)
+
+
 class TestSaveRecipients:
     def test_non_superadmin_rejected(self, callbacks):
         with patch.object(app_access_tab, "make_authenticated_request") as req:

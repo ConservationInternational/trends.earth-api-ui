@@ -28,6 +28,9 @@ VALID_STATUS_FILTERS = ("pending", "active", "revoked", "all")
 _APP_KEY_RE = re.compile(r"^[a-z0-9_]{1,50}$")
 REQUESTS_PAGE_SIZE = 200
 RECIPIENT_CANDIDATE_FILTER = "(role='ADMIN' OR role='SUPERADMIN')"
+CANDIDATE_PAGE_SIZE = 100  # API maximum for paginated /user
+CANDIDATE_MAX_PAGES = 10
+CANDIDATE_TIMEOUT = 30
 
 
 def recipients_endpoint(app_key: str) -> str:
@@ -206,18 +209,38 @@ def render_requests_table(
     return html.Div(children)
 
 
-def _fetch_recipient_candidates(token: str) -> list[dict[str, Any]]:
-    """Return every ADMIN/SUPERADMIN account (the only eligible recipients)."""
-    resp = make_authenticated_request(
-        "/user",
-        token,
-        params={"filter": RECIPIENT_CANDIDATE_FILTER, "sort": "email"},
-        timeout=15,
-    )
-    if resp.status_code != 200:
-        logger.warning("Failed to fetch recipient candidates: %s %s", resp.status_code, resp.text)
-        return []
-    return [u for u in (resp.json() or {}).get("data", []) or [] if is_admin(u.get("role"))]
+def _fetch_recipient_candidates(token: str) -> tuple[list[dict[str, Any]], str | None]:
+    """Return ``(users, error)`` for every ADMIN/SUPERADMIN account.
+
+    Uses the paginated form of ``/user`` (as the Users table does); the
+    unpaginated form can be slow on large deployments.
+    """
+    users: list[dict[str, Any]] = []
+    for page in range(1, CANDIDATE_MAX_PAGES + 1):
+        resp = make_authenticated_request(
+            "/user",
+            token,
+            params={
+                "filter": RECIPIENT_CANDIDATE_FILTER,
+                "page": page,
+                "per_page": CANDIDATE_PAGE_SIZE,
+            },
+            timeout=CANDIDATE_TIMEOUT,
+        )
+        if resp.status_code != 200:
+            logger.warning(
+                "Failed to fetch recipient candidates: %s %s", resp.status_code, resp.text
+            )
+            return users, extract_api_error(resp, "Could not load admin accounts.")
+        body = resp.json() or {}
+        data = body.get("data", []) or []
+        users.extend(u for u in data if is_admin(u.get("role")))
+        total = body.get("total")
+        if len(data) < CANDIDATE_PAGE_SIZE or (
+            total is not None and page * CANDIDATE_PAGE_SIZE >= total
+        ):
+            break
+    return users, None
 
 
 def _user_label(user: dict[str, Any]) -> str:
@@ -465,32 +488,82 @@ def register_callbacks(app):
 
     @app.callback(
         [
-            Output("app-access-recipients-summary", "children"),
-            Output("app-access-recipients-select", "options"),
-            Output("app-access-recipients-select", "value"),
+            Output("app-access-recipient-candidates-store", "data"),
+            Output("app-access-recipients-candidates-status", "children"),
         ],
         [
-            Input("app-access-app-filter", "value"),
-            Input("app-access-refresh-store", "data"),
+            Input("app-access-tab-rendered", "data"),
+            Input("app-access-refresh-btn", "n_clicks"),
         ],
         [State("token-store", "data"), State("role-store", "data")],
         prevent_initial_call=True,
     )
-    def load_recipients(app_key, _refresh, token, role):
-        if not token or not is_superadmin(role) or not app_key:
-            return "", [], []
+    def load_recipient_candidates(_rendered, _refresh_clicks, token, role):
+        """Load eligible (ADMIN/SUPERADMIN) accounts once per tab render."""
+        if not token or not is_superadmin(role):
+            return [], ""
         try:
-            resp = make_authenticated_request(recipients_endpoint(app_key), token, timeout=10)
-            if resp.status_code != 200:
-                err = extract_api_error(resp, "Failed to load notification recipients.")
-                return html.Small(err, className="text-danger"), [], []
-            payload = (resp.json() or {}).get("data", {}) or {}
-            candidates = _fetch_recipient_candidates(token)
-        except Exception as exc:  # pragma: no cover - defensive guard
+            users, err = _fetch_recipient_candidates(token)
+        except Exception as exc:
+            logger.exception("Error loading recipient candidates: %s", exc)
+            users, err = [], f"Could not load admin accounts: {exc}"
+        candidates = [
+            {k: u.get(k) for k in ("id", "email", "name", "role")} for u in users if u.get("id")
+        ]
+        status = ""
+        if err:
+            status = html.Small(
+                f"{err} Only currently listed recipients can be shown; use Refresh to retry.",
+                className="text-warning",
+            )
+        return candidates, status
+
+    @app.callback(
+        [
+            Output("app-access-recipients-summary", "children"),
+            Output("app-access-recipients-listed-store", "data"),
+        ],
+        [
+            Input("app-access-app-filter", "value"),
+            Input("app-access-refresh-store", "data"),
+            Input("app-access-refresh-btn", "n_clicks"),
+        ],
+        [State("token-store", "data"), State("role-store", "data")],
+        prevent_initial_call=True,
+    )
+    def load_recipients(app_key, _refresh, _refresh_clicks, token, role):
+        if not token or not is_superadmin(role) or not app_key:
+            return "", []
+        try:
+            resp = make_authenticated_request(recipients_endpoint(app_key), token, timeout=15)
+        except Exception as exc:
             logger.exception("Error loading notification recipients: %s", exc)
-            return html.Small(f"Could not load recipients: {exc}", className="text-danger"), [], []
-        options, value = build_recipient_options(candidates, payload.get("listed_recipients") or [])
-        return render_recipients_summary(payload), options, value
+            return html.Small(f"Could not load recipients: {exc}", className="text-danger"), None
+        if resp.status_code != 200:
+            err = extract_api_error(resp, "Failed to load notification recipients.")
+            return html.Small(err, className="text-danger"), None
+        payload = (resp.json() or {}).get("data", {}) or {}
+        return render_recipients_summary(payload), payload.get("listed_recipients") or []
+
+    @app.callback(
+        [
+            Output("app-access-recipients-select", "options"),
+            Output("app-access-recipients-select", "value"),
+            Output("app-access-recipients-save-btn", "disabled"),
+        ],
+        [
+            Input("app-access-recipient-candidates-store", "data"),
+            Input("app-access-recipients-listed-store", "data"),
+        ],
+        prevent_initial_call=True,
+    )
+    def update_recipient_options(candidates, listed):
+        # listed is None when the current list could not be loaded; block saving
+        # so an unknown list is never overwritten.
+        if listed is None:
+            return [], [], True
+        options, value = build_recipient_options(candidates or [], listed)
+        return options, value, False
 
     @app.callback(
         [
