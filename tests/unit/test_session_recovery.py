@@ -352,10 +352,25 @@ def test_tab_render_is_triggered_when_dashboard_mounts():
         if "callback" in entry and entry["callback"].__wrapped__.__name__ == "render_tab"
     )
     assert {"id": "tabs-nav", "property": "id"} in entry["inputs"]
-    content, _ = entry["callback"].__wrapped__(
+    content, _, _ = entry["callback"].__wrapped__(
         "executions", "valid-access", "tabs-nav", {"role": "USER"}, "USER"
     )
     assert content is not no_update
+
+
+def test_app_access_tab_renders_for_admins_only():
+    entry = next(
+        entry
+        for entry in app.callback_map.values()
+        if "callback" in entry and entry["callback"].__wrapped__.__name__ == "render_tab"
+    )
+    render = entry["callback"].__wrapped__
+    _content, bulk_rendered, rendered = render("app-access", "tok", "tabs-nav", {}, "ADMIN")
+    assert bulk_rendered is no_update
+    assert rendered is not no_update
+    content, _, rendered = render("app-access", "tok", "tabs-nav", {}, "USER")
+    assert rendered is no_update
+    assert "Access Denied" in str(content)
 
 
 def test_authenticated_request_rejection_expires_cookie(session_cookie):

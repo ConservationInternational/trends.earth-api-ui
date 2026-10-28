@@ -52,6 +52,7 @@ USER_ALLOWED_FILTER_COLUMNS = USER_ALLOWED_SORT_COLUMNS
 # Human readable labels for the gated applications exposed by the API.
 APP_LABELS = {
     "avoided_emissions": "Avoided Emissions",
+    "avoided_emissions_staging": "Avoided Emissions (staging)",
     "rio_coherence": "Rio Coherence",
     "rio_coherence_staging": "Rio Coherence (staging)",
 }

@@ -16,6 +16,7 @@ _TAB_CONFIGS = [
     ("status-tab-li", ADMIN_ROLES),
     ("scripts-tab-li", ADMIN_ROLES),
     ("bulk-email-tab-li", ("SUPERADMIN",)),
+    ("app-access-tab-li", ADMIN_ROLES),
 ]
 
 
@@ -51,6 +52,7 @@ def register_callbacks(app):
             Input("status-tab-btn", "n_clicks"),
             Input("profile-tab-btn", "n_clicks"),
             Input("bulk-email-tab-btn", "n_clicks"),
+            Input("app-access-tab-btn", "n_clicks"),
         ],
         prevent_initial_call=True,  # Only react to real clicks; never overwrite persisted tab
     )
@@ -79,6 +81,7 @@ def register_callbacks(app):
             "status-tab-btn": "status",
             "profile-tab-btn": "profile",
             "bulk-email-tab-btn": "bulk-email",
+            "app-access-tab-btn": "app-access",
         }
 
         active_tab = tab_map.get(trigger_id, "executions")
@@ -94,6 +97,7 @@ def register_callbacks(app):
             Output("status-tab-btn", "className"),
             Output("profile-tab-btn", "className"),
             Output("bulk-email-tab-btn", "className"),
+            Output("app-access-tab-btn", "className"),
         ],
         [
             Input("active-tab-store", "data"),
@@ -124,5 +128,6 @@ def register_callbacks(app):
                 "status",
                 "profile",
                 "bulk-email",
+                "app-access",
             ]
         )

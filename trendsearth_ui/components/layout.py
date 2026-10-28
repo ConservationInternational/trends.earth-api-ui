@@ -168,6 +168,12 @@ def create_main_layout():
             dcc.Store(
                 id="bulk-email-tab-rendered", data=None
             ),  # Bumped after bulk-email tab is fully rendered
+            dcc.Store(
+                id="app-access-tab-rendered", data=None
+            ),  # Bumped after app-access tab is fully rendered
+            dcc.Store(
+                id="app-access-deeplink-store", data=None
+            ),  # Filters requested via ?tab=app-access&app=...&status=...
             dcc.Store(id="user-store-cookie-sync"),  # Hidden sink for cookie sync callback
             dcc.Store(id="gee-oauth-redirect-url"),  # Holds external OAuth URL for JS redirect
             dcc.Store(id="delete-user-data"),  # Store data for user being deleted
@@ -2507,6 +2513,20 @@ def dashboard_layout():
                                 style={
                                     "display": "none"
                                 },  # Hidden by default, shown only for superadmin
+                            ),
+                            html.Li(
+                                [
+                                    html.Button(
+                                        _("App Access"),
+                                        id="app-access-tab-btn",
+                                        className="nav-link",
+                                    )
+                                ],
+                                className="nav-item",
+                                id="app-access-tab-li",
+                                style={
+                                    "display": "none"
+                                },  # Hidden by default, shown only for admin
                             ),
                             html.Li(
                                 [

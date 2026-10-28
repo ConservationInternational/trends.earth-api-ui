@@ -40,6 +40,7 @@ def register_all_callbacks(app):
         "service_credentials",  # Add service credentials callbacks
         "edit",
         "app_access",  # Add per-application access callbacks (after edit modal)
+        "app_access_tab",  # App Access tab: requests + notification recipients
         "refresh",
         "news",  # Add news callbacks
         "news_admin",  # Add news admin callbacks

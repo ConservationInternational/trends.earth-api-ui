@@ -1,5 +1,6 @@
 """Initialize components package."""
 
+from .app_access import app_access_tab_content
 from .bulk_email import bulk_email_tab_content
 from .layout import (
     create_main_layout,
@@ -61,6 +62,7 @@ __all__ = [
     "profile_tab_content",
     "status_tab_content",
     "bulk_email_tab_content",
+    "app_access_tab_content",
     "create_news_banner",
     "create_news_item_card",
 ]

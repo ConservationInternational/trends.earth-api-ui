@@ -7,6 +7,7 @@ from dash import Input, Output, State, html
 
 from ..components import (
     admin_tab_content,
+    app_access_tab_content,
     bulk_email_tab_content,
     executions_tab_content,
     profile_tab_content,
@@ -26,6 +27,7 @@ def register_callbacks(app):
         [
             Output("tab-content-dynamic", "children"),
             Output("bulk-email-tab-rendered", "data"),
+            Output("app-access-tab-rendered", "data"),
         ],
         [
             Input("active-tab-store", "data"),
@@ -39,6 +41,25 @@ def register_callbacks(app):
         prevent_initial_call=False,
     )
     def render_tab(tab, token, _tabs_id, user_data, role):
+        from dash import no_update
+
+        if token and tab == "app-access":
+            if is_admin(role):
+                # Timestamp lets the tab's load callbacks fire after components exist
+                return app_access_tab_content(role), no_update, time.time()
+            return (
+                html.Div(
+                    [
+                        html.H4("Access Denied"),
+                        html.P("Administrator privileges required to manage application access."),
+                    ]
+                ),
+                no_update,
+                no_update,
+            )
+        return (*_render_other_tab(tab, token, user_data, role), no_update)
+
+    def _render_other_tab(tab, token, user_data, role):
         from dash import no_update
 
         # Guard: Skip if not logged in (prevents execution after logout)
