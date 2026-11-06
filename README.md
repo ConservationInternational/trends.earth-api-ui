@@ -27,6 +27,23 @@ This application supports automatic deployment to EC2 instances using Docker Swa
 - **IAM**: AWS IAM credentials used by GitHub Actions for ECR access and CodeDeploy deployments
 - **Health Monitoring**: Automated health checks and integration testing
 
+### Container Security Updates
+
+Both deployment workflows pull the latest base and disable layer-cache reuse,
+so package security upgrades are not skipped when the source is unchanged.
+Manually dispatch the production or staging workflow to rebuild and deploy
+security updates; there is no scheduled security redeployment.
+
+For a local security refresh:
+
+```bash
+docker compose build --pull --no-cache
+docker compose up -d
+```
+
+Scan the final built image before rollout; updating a Dockerfile does not patch
+already-running containers.
+
 ### Error Tracking
 The application includes integrated Rollbar error tracking for production monitoring and debugging.
 
@@ -101,7 +118,7 @@ poetry run trendsearth-api-ui
 #### Production mode (Docker with Gunicorn)
 ```bash
 # Build the Docker image
-docker build -t trendsearth-api-ui .
+docker build --pull --no-cache -t trendsearth-api-ui .
 
 # Run the container
 docker run -p 8000:8000 trendsearth-api-ui

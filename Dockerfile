@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.13-slim-trixie
 
 # Accept build arguments for git information
 ARG GIT_BRANCH=unknown
@@ -16,7 +16,9 @@ ENV DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT}
 # secrets in the Docker image layers.
 
 # Install build tools and dependencies
-RUN apt-get update \
+RUN sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources \
+	&& apt-get update \
+	&& apt-get upgrade -y \
 	&& apt-get install -y --no-install-recommends build-essential gcc curl \
 	&& rm -rf /var/lib/apt/lists/*
 
