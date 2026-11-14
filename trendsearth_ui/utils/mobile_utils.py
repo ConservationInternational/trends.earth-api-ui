@@ -151,6 +151,15 @@ def get_mobile_column_config():
                         "debounceMs": 500,
                     },
                 },
+                {
+                    "headerName": _("Progress"),
+                    "field": "progress",
+                    "width": 150,
+                    "resizable": True,
+                    "filter": False,
+                    "cellRenderer": "ExecutionProgress",
+                    "cellRendererParams": {"label": _("Progress")},
+                },
             ],
             "secondary_columns": [
                 {

@@ -61,7 +61,7 @@ For detailed deployment setup instructions, see:
   Temporary API/network failures preserve the cookie for retry; token rotation
   preserves the active dashboard and tab content.
 - View and edit users and scripts (admin only)
-- Browse executions, parameters, results, and logs
+- Browse executions, progress, parameters, results, and logs
 - Paging and per-ID search for executions
 - **Map Visualization** - View execution areas on an interactive map:
   - Click "Show Map" buttons in the Executions table to display processing areas

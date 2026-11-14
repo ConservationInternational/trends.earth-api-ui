@@ -3,10 +3,74 @@ Table column filter functionality tests using Playwright.
 Tests the recently added table column filter checkbox functionality.
 """
 
+from pathlib import Path
+from threading import Thread
+
+from dash import Dash, Input, Output, html
 from playwright.sync_api import Page, expect
 import pytest
+from werkzeug.serving import make_server
+
+from trendsearth_ui.callbacks.executions import process_execution_data
+from trendsearth_ui.components.tabs import create_responsive_table
 
 from .conftest import skip_if_no_browsers
+
+
+@pytest.mark.playwright
+@skip_if_no_browsers
+def test_execution_progress_column(page: Page):
+    assets = Path(__file__).resolve().parents[2] / "trendsearth_ui" / "assets"
+    app = Dash(__name__, assets_folder=str(assets))
+    app.layout = html.Div(
+        [
+            html.Button("Refresh", id="refresh"),
+            create_responsive_table("executions-table", "executions"),
+        ]
+    )
+    values = [0, 42, 100, None]
+    rows = process_execution_data(
+        [
+            {"id": str(i), "script_name": f"Script {i}", "progress": value}
+            for i, value in enumerate(values)
+        ],
+        "USER",
+        "UTC",
+    )
+
+    @app.callback(
+        Output("executions-table", "getRowsResponse"),
+        Input("executions-table", "getRowsRequest"),
+        Input("refresh", "n_clicks"),
+    )
+    def get_rows(request, refresh_clicks):
+        updated_rows = [dict(row) for row in rows]
+        if refresh_clicks:
+            updated_rows[1]["progress"] = 73
+        return {"rowData": updated_rows, "rowCount": len(updated_rows)}
+
+    server = make_server("127.0.0.1", 0, app.server, threaded=True)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        page.set_viewport_size({"width": 1600, "height": 900})
+        page.goto(f"http://127.0.0.1:{server.server_port}")
+        cells = page.locator('#executions-table .ag-center-cols-container [col-id="progress"]')
+        expect(cells).to_have_count(4)
+        for index, value in enumerate(values[:3]):
+            bar = cells.nth(index).locator("progress")
+            expect(bar).to_have_attribute("value", str(value))
+            expect(bar).to_have_attribute("max", "100")
+            expect(bar).to_have_attribute("aria-label", "Progress")
+            expect(cells.nth(index)).to_contain_text(f"{value}%")
+        expect(cells.nth(3)).to_have_text("—")
+        expect(cells.nth(3).locator("progress")).to_have_count(0)
+        page.get_by_role("button", name="Refresh").click()
+        expect(cells.nth(1).locator("progress")).to_have_attribute("value", "73")
+        expect(cells.nth(1)).to_contain_text("73%")
+    finally:
+        server.shutdown()
+        thread.join()
 
 
 @pytest.mark.playwright

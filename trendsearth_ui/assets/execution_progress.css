@@ -1,0 +1,15 @@
+.execution-progress {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.execution-progress progress {
+    flex: 1;
+    min-width: 0;
+}
+
+.execution-progress span {
+    font-size: 12px;
+}

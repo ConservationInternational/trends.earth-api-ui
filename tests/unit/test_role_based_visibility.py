@@ -103,6 +103,14 @@ class TestGetExecutionsColumnsForRole:
         assert "logs" in field_names
         assert "map" in field_names
 
+    @pytest.mark.parametrize("role", ["USER", "ADMIN", "SUPERADMIN", None])
+    def test_execution_progress_column_available_for_all_roles(self, role):
+        columns = get_executions_columns_for_role(role)
+        progress = next(col for col in columns if col["field"] == "progress")
+
+        assert progress["cellRenderer"] == "ExecutionProgress"
+        assert progress.get("sortable", True)
+
     def test_admin_has_more_columns_than_user(self):
         """Test that admin role returns more columns than user role."""
         admin_columns = get_executions_columns_for_role("ADMIN")
