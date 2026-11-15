@@ -116,8 +116,14 @@ class TestGetExecutionsColumnsForRole:
         admin_columns = get_executions_columns_for_role("ADMIN")
         user_columns = get_executions_columns_for_role("USER")
 
-        # Admin should have exactly 4 more columns (user_name, user_email, docker_logs, batch_logs)
-        assert len(admin_columns) == len(user_columns) + 4
+        # Admin also sees user name, email, and Docker logs.
+        assert len(admin_columns) == len(user_columns) + 3
+
+    @pytest.mark.parametrize("role", ["USER", "ADMIN", "SUPERADMIN", None])
+    def test_batch_logs_column_is_not_available(self, role):
+        assert "batch_logs" not in {
+            col.get("field") for col in get_executions_columns_for_role(role)
+        }
 
     def test_column_structure_preserved(self):
         """Test that column definitions maintain their structure after filtering."""
