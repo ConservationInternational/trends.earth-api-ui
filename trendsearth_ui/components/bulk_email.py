@@ -52,7 +52,7 @@ def _news_item_row(index: int, item: dict | None = None) -> dbc.Card:
                                     value=item.get("summary", ""),
                                 ),
                                 html.Small(
-                                    "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                    "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                     className="text-muted",
                                 ),
                             ],
@@ -227,7 +227,7 @@ def _template_fields_panel() -> html.Div:
                                         rows=2,
                                     ),
                                     html.Small(
-                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                         className="text-muted",
                                     ),
                                 ],
@@ -258,7 +258,7 @@ def _template_fields_panel() -> html.Div:
                                             rows=2,
                                         ),
                                         html.Small(
-                                            "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                            "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                             className="text-muted",
                                         ),
                                     ],
@@ -365,7 +365,7 @@ def _template_fields_panel() -> html.Div:
                                         rows=3,
                                     ),
                                     html.Small(
-                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                         className="text-muted",
                                     ),
                                 ],
@@ -399,7 +399,7 @@ def _template_fields_panel() -> html.Div:
                                         rows=3,
                                     ),
                                     html.Small(
-                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                         className="text-muted",
                                     ),
                                 ],
@@ -470,7 +470,7 @@ def _template_fields_panel() -> html.Div:
                                         rows=2,
                                     ),
                                     html.Small(
-                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…)",
+                                        "Enter = line break · **bold** · *italic* · ***bold-italic*** · [link text](https://…) · [email](mailto:…)",
                                         className="text-muted",
                                     ),
                                 ],

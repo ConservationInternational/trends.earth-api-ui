@@ -21,6 +21,7 @@ Users can use a small subset of formatting without switching to Raw HTML:
 
   * Newlines become <br> line breaks in the rendered email.
   * [Display text](https://example.com) renders as a clickable hyperlink.
+  * [Email us](mailto:team@example.com) renders as an email link.
   * Bare https:// URLs are automatically linked.
 """
 
@@ -113,7 +114,7 @@ _FOOTER_HTML = f"""
 # ---------------------------------------------------------------------------
 
 # Matches [label](url) — processed first so bare-URL pass doesn't touch them.
-_LINK_MD_RE = re.compile(r"\[([^\]]+)\]\((https?://[^\)\s]+)\)")
+_LINK_MD_RE = re.compile(r"\[([^\]]+)\]\(((?:https?://|mailto:)[^\)\s]+)\)")
 # Matches bare https:// URLs not already inside an href="…" attribute.
 _BARE_URL_RE = re.compile(r'(?<!["\'>])(https?://[^\s<>"\')\]]+)')
 # Bold-italic (***text***) must be matched before bold (**) and italic (*).
@@ -131,7 +132,7 @@ def _format_text_field(text: str, link_color: str = _PRIMARY_RED) -> str:
     2. ``***text***``        →  ``<strong><em>text</em></strong>``
     3. ``**text**``          →  ``<strong>text</strong>``
     4. ``*text*``            →  ``<em>text</em>``
-    5. ``[label](url)``      →  underlined ``<a>`` link.
+    5. ``[label](url)``      →  underlined ``<a>`` link for HTTP(S) or mailto.
     6. Bare ``https://`` URLs  →  auto-linked (display text = the URL itself).
     7. Real newlines          →  ``<br>`` tags.
 
